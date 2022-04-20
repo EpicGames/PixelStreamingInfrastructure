@@ -1,0 +1,231 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+
+    <script type="text/javascript">
+        var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+        if (isFirefox) {
+            window.navigator.mozGetUserMedia = function () { };
+            if (window.navigator.mediaDevices === undefined) {
+                navigator.mediaDevices = {};
+                navigator.mediaDevices.getSupportedConstraints = function () { return {}; };
+                navigator.mediaDevices.getUserMedia = function () { return {}; };
+            }
+        }
+    </script>
+
+    <title>Scalable Pixel Streaming 0.0.0-devel</title>
+</head>
+
+<body>
+    <div id="playerUI">
+        <div id="player"></div>
+        <div id="overlay" class="overlay">
+            <div id="overlayHeader">
+                <div id="qualityStatus" class="greyStatus">&#9679</div>
+                <div id="overlayButton">+</div>
+            </div>
+            <div id="overlaySettings" class="container d-none">
+
+                <!--Controls Box-->
+                <div id="Controls" class="row">
+
+                    <section id="preStreamOptions" class="settingsContainer">
+
+                        <div id="preStreamOptionsHeader" class="settings-text">
+                            <div>Pre Stream Options</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm">
+                                <label class="form-check-label" for="force-turn-tgl">Force TURN</label>
+                            </div>
+                            <div class="form-check form-switch col-auto">
+                                <input class="form-check-input" type="checkbox" role="switch" id="force-turn-tgl">
+                            </div>
+                        </div>
+
+                        <div class="row" style="padding-top:5px; padding-bottom: 5px;">
+                            <div class="col col-auto">
+                                <input id="restart-stream-button" class="overlay-button btn-flat" type="button"
+                                    value="Restart Stream">
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="viewSettings" class="settingsContainer">
+                        <div id="viewSettingsHeader" class="settings-text">
+                            <div>Viewing</div>
+                        </div>
+                        <div id="viewSettingsContainer" class="d-none">
+
+                            <div class="row">
+                                <div class="col-sm">
+                                    <label class="form-check-label" for="enlarge-display-to-fill-window-tgl">Enlarge
+                                        display to fill window</label>
+                                </div>
+                                <div class="form-check form-switch col-auto">
+                                    <input class="form-check-input" type="checkbox" role="switch"
+                                        id="enlarge-display-to-fill-window-tgl" checked>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm">
+                                    <label class="form-check-label" for="quality-control-ownership-tgl">Is Quality
+                                        Controller</label>
+                                </div>
+                                <div class="form-check form-switch col-auto">
+                                    <input class="form-check-input" type="checkbox" role="switch"
+                                        id="quality-control-ownership-tgl">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm">
+                                    <label class="form-check-label" for="match-viewport-res-tgl">Match viewport
+                                        resolution</label>
+                                </div>
+                                <div class="form-check form-switch col-auto">
+                                    <input class="form-check-input" type="checkbox" role="switch"
+                                        id="match-viewport-res-tgl">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm">
+                                    <label class="form-check-label" for="control-scheme-tgl"
+                                        id="control-scheme-title">Match viewport resolution</label>
+                                </div>
+                                <div class="form-check form-switch col-auto">
+                                    <input class="form-check-input" type="checkbox" role="switch"
+                                        id="control-scheme-tgl">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="commands" class="settingsContainer">
+                        <div id="commandsHeader" class="settings-text">
+                            <div>Commands</div>
+                        </div>
+                        <div id="commandsContainer" class="d-none">
+                            <div class="row" style="padding-top:5px; padding-bottom: 5px;">
+                                <div class="row" style="padding-top:5px; padding-bottom: 5px;">
+                                    <div class="col col-auto">
+                                        <input id="show-fps-button" class="overlay-button btn-flat" type="button"
+                                            value="Show FPS">
+                                    </div>
+                                </div>
+                                <div class="col col-auto">
+                                    <label for="ui-descriptor-text" class="settings-text">UI Descriptor</label>
+                                </div>
+                                <div class="col col-auto">
+                                    <input type="text" class="form-control form-control-sm" id="ui-descriptor-text">
+                                </div>
+
+                                <div class="col col-auto">
+                                    <input type="button" id="sendUiDescriptor" class="overlay-button btn-flat"
+                                        value="Send">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="streamingSettings" class="settingsContainer">
+                        <div id="streamingSettingsHeader" class="settings-text">
+                            <div>Settings</div>
+                        </div>
+                        <div id="streamingSettingsContainer" class="d-none">
+                            <div class="form-group row">
+                                <div class="col-sm">
+                                    <div>Encoder Settings</div>
+                                    <div id="encoderSettings" class="col">
+                                        <div class="form-group row">
+                                            <label for="encoder-min-qp-text">Min QP</label>
+                                            <input type="number" class="form-control form-control-sm"
+                                                id="encoder-min-qp-text" value="0" min="0" max="51" />
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="encoder-max-qp-text">Max QP</label>
+                                            <input type="number" class="form-control form-control-sm"
+                                                id="encoder-max-qp-text" value="51" min="0" max="51" />
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-sm">
+                                    <div>WebRTC Settings</div>
+                                    <div id="webrtcSettings">
+                                        <div class="form-group row">
+                                            <label for="webrtc-fps-text">FPS</label>
+                                            <input type="number" class="form-control form-control-sm"
+                                                id="webrtc-fps-text" value="0" min="1" max="999" />
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="webrtc-min-bitrate-text">Min bitrate (kbps)</label>
+                                            <input type="number" class="form-control form-control-sm"
+                                                id="webrtc-min-bitrate-text" value="0" min="0" max="100000" />
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="webrtc-max-bitrate-text">Max bitrate (kbps)</label>
+                                            <input type="number" class="form-control form-control-sm"
+                                                id="webrtc-max-bitrate-text" value="0" min="0" max="100000" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <input id="btn-streaming-settings" class="overlay-button btn-flat" type="button"
+                                    value="Apply">
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="statistics" class="settingsContainer">
+                        <div id="statisticsHeader" class="settings-text">
+                            <div>Statistics</div>
+                        </div>
+                        <div id="statisticsContainer" class="d-none">
+
+                            <div class="row">
+                                <div class="col-sm">
+                                    <label class="form-check-label" for="send-stats-tgl" id="control-scheme-title">Send
+                                        to server</label>
+                                </div>
+                                <div class="form-check form-switch col-auto">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="send-stats-tgl">
+                                </div>
+                            </div>
+                            <div id="statisticsResult" class="StatsResult"></div>
+                        </div>
+                    </section>
+
+                    <section id="latencyTest" class="settingsContainer">
+                        <div id="latencyTestHeader" class="settings-text">
+                            <div>Latency Test</div>
+                            <input id="btn-start-latency-test" class="overlay-button btn-flat" type="button"
+                                value="Run Test">
+                        </div>
+                        <div id="latencyTestContainer" class="d-none">
+                            <div id="latencyStatsResults" class="StatsResult"></div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div
+        style="position: fixed; bottom: 0; right: 0; padding-right: 10px; padding-bottom: 10px; font-size: 12px; color: #c80000; z-index: 9999;">
+        Scalable Pixel Streaming (0.0.0-devel) by <a href="https://scalablestreaming.io/" target="_blank"><span
+                style="color: #007bff">Tensor</span><span style="color: #ffffff">Works</span></a></div>
+</body>
+
+</html>
