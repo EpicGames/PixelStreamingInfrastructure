@@ -15,6 +15,7 @@ export class VideoPlayerController {
     videoInputBindings: IVideoPlayerMouseInterface;
     startVideoMuted: boolean;
     autoPlayAudio: boolean;
+    audioElement: HTMLAudioElement;
 
     constructor(htmlDivElement: HTMLDivElement, startVideoMuted: boolean, autoPlayAudio: boolean) {
         // set the audio defaults
@@ -24,6 +25,7 @@ export class VideoPlayerController {
         // the video element needs to exist before creating the player so assign the div and make the element
         this.videoPlayerDiv = htmlDivElement;
         this.videoElement = document.createElement("video");
+        this.audioElement = document.createElement("Audio") as HTMLAudioElement;
     }
 
     /**
@@ -131,23 +133,9 @@ export class VideoPlayerController {
         else if (this.videoElement.srcObject && this.videoElement.srcObject !== audioMediaStream) {
             // create a new audio element
             // had to assign any type as cannot assign type MediaStreamTrack to html element may change soon 
-            let audioElem = document.createElement("Audio") as HTMLAudioElement;
-            audioElem.srcObject = audioMediaStream;
+            //  let audioElem = document.createElement("Audio") as HTMLAudioElement;
+            this.audioElement.srcObject = audioMediaStream;
 
-            // there is no way to autoplay audio (even muted), so we defer audio until first click
-            if (this.autoPlayAudio === false) {
-
-                let clickToPlayAudio = () => {
-                    audioElem.play();
-                    this.videoElement.removeEventListener("click", clickToPlayAudio);
-                };
-
-                this.videoElement.addEventListener("click", clickToPlayAudio);
-            }
-            // we assume the user has clicked somewhere on the page and autoplaying audio will work
-            else {
-                audioElem.play();
-            }
             console.log('Created new audio element to play separate audio stream.');
         }
     }
