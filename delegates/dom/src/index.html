@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-
+    
     <script type="text/javascript">
         var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
         if (isFirefox) {
@@ -17,8 +17,8 @@
             }
         }
     </script>
-
-    <title>Scalable Pixel Streaming 0.0.0-devel</title>
+    
+    <title>Scalable Pixel Streaming</title>
 </head>
 
 <body>
@@ -30,16 +30,16 @@
                 <div id="overlayButton">+</div>
             </div>
             <div id="overlaySettings" class="container d-none">
-
+                
                 <!--Controls Box-->
                 <div id="Controls" class="row">
-
+                    
                     <section id="preStreamOptions" class="settingsContainer">
-
+                        
                         <div id="preStreamOptionsHeader" class="settings-text">
                             <div>Pre Stream Options</div>
                         </div>
-
+                        
                         <div class="row">
                             <div class="col-sm">
                                 <label class="form-check-label" for="force-turn-tgl">Force TURN</label>
@@ -48,7 +48,7 @@
                                 <input class="form-check-input" type="checkbox" role="switch" id="force-turn-tgl">
                             </div>
                         </div>
-
+                        
                         <div class="row" style="padding-top:5px; padding-bottom: 5px;">
                             <div class="col col-auto">
                                 <input id="restart-stream-button" class="overlay-button btn-flat" type="button"
@@ -56,13 +56,13 @@
                             </div>
                         </div>
                     </section>
-
+                    
                     <section id="viewSettings" class="settingsContainer">
                         <div id="viewSettingsHeader" class="settings-text">
                             <div>Viewing</div>
                         </div>
                         <div id="viewSettingsContainer" class="d-none">
-
+                            
                             <div class="row">
                                 <div class="col-sm">
                                     <label class="form-check-label" for="enlarge-display-to-fill-window-tgl">Enlarge
@@ -73,7 +73,7 @@
                                         id="enlarge-display-to-fill-window-tgl" checked>
                                 </div>
                             </div>
-
+                            
                             <div class="row">
                                 <div class="col-sm">
                                     <label class="form-check-label" for="quality-control-ownership-tgl">Is Quality
@@ -84,7 +84,7 @@
                                         id="quality-control-ownership-tgl">
                                 </div>
                             </div>
-
+                            
                             <div class="row">
                                 <div class="col-sm">
                                     <label class="form-check-label" for="match-viewport-res-tgl">Match viewport
@@ -95,7 +95,7 @@
                                         id="match-viewport-res-tgl">
                                 </div>
                             </div>
-
+                            
                             <div class="row">
                                 <div class="col-sm">
                                     <label class="form-check-label" for="control-scheme-tgl"
@@ -108,7 +108,7 @@
                             </div>
                         </div>
                     </section>
-
+                    
                     <section id="commands" class="settingsContainer">
                         <div id="commandsHeader" class="settings-text">
                             <div>Commands</div>
@@ -135,7 +135,7 @@
                             </div>
                         </div>
                     </section>
-
+                    
                     <section id="streamingSettings" class="settingsContainer">
                         <div id="streamingSettingsHeader" class="settings-text">
                             <div>Settings</div>
@@ -150,16 +150,16 @@
                                             <input type="number" class="form-control form-control-sm"
                                                 id="encoder-min-qp-text" value="0" min="0" max="51" />
                                         </div>
-
+                                        
                                         <div class="form-group row">
                                             <label for="encoder-max-qp-text">Max QP</label>
                                             <input type="number" class="form-control form-control-sm"
                                                 id="encoder-max-qp-text" value="51" min="0" max="51" />
                                         </div>
-
+                                        
                                     </div>
                                 </div>
-
+                                
                                 <div class="col-sm">
                                     <div>WebRTC Settings</div>
                                     <div id="webrtcSettings">
@@ -187,7 +187,7 @@
                             </div>
                         </div>
                     </section>
-
+                    
                     <section id="statistics" class="settingsContainer">
                         <div id="statisticsHeader" class="settings-text">
                             <div>Statistics</div>
@@ -206,7 +206,7 @@
                             <div id="statisticsResult" class="StatsResult"></div>
                         </div>
                     </section>
-
+                    
                     <section id="latencyTest" class="settingsContainer">
                         <div id="latencyTestHeader" class="settings-text">
                             <div>Latency Test</div>
@@ -222,10 +222,8 @@
         </div>
     </div>
     </div>
-    <div
-        style="position: fixed; bottom: 0; right: 0; padding-right: 10px; padding-bottom: 10px; font-size: 12px; color: #c80000; z-index: 9999;">
-        Scalable Pixel Streaming (0.0.0-devel) by <a href="https://scalablestreaming.io/" target="_blank"><span
-                style="color: #007bff">Tensor</span><span style="color: #ffffff">Works</span></a></div>
+    <div style="position: fixed; bottom: 0; right: 0; padding-right: 10px; padding-bottom: 10px; font-size: 12px; color: #ffffff; z-index: 9999;">
+        <a href="https://scalablestreaming.io/" target="_blank">Scalable Pixel Streaming</a> by <span style="color: #007bff">TensorWorks</span></div>
 </body>
 
 </html>

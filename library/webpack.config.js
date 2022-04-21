@@ -1,4 +1,6 @@
+const package = require('./package.json');
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   mode: 'development',
@@ -20,6 +22,11 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      LIBRARY_VERSION: JSON.stringify(package.version)
+    })
+  ],
   output: {
     filename: 'libspsfrontend.min.js',
     library: 'libspsfrontend', // exposed variable that will provide access to the library classes
