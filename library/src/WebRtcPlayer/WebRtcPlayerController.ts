@@ -106,7 +106,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 					this.delegate.overlayController.hideOverlay();
 					this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
 				});
-				console.log("playing audio");
+				Logger.verboseLog("Playing Audio");
 				this.videoPlayerController.audioElement.play()
 			} else {
 				console.error("Could not player video stream because webRtcPlayerObj.video was not valid.")
