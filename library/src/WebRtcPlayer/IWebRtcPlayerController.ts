@@ -69,7 +69,7 @@ export interface IWebRtcPlayerController {
     resizePlayerStyle(): void;
 
     /**
-     * registers the mouse
+     * Registers the mouse
      */
      activateRegisterMouse(): void;
 

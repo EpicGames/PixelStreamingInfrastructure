@@ -15,7 +15,7 @@ export class OverlayController {
      * @param htmlElement the created html element you are applying
      * @param onClickFunction the event listener you are applying to your custom element     
      */
-    setOverlay(htmlClass?: string, htmlElement?: HTMLElement, onClickFunction?: EventListener, progress? : number) {
+    setOverlay(htmlClass?: string, htmlElement?: HTMLElement, onClickFunction?: EventListener, progress?: number) {
         // videoPlayOverlay is made dynamically so it is left as is
         var videoPlayOverlay = document.getElementById('videoPlayOverlay') as HTMLDivElement;
         if (!videoPlayOverlay) {
@@ -31,16 +31,31 @@ export class OverlayController {
         }
 
         if (htmlElement) {
-            
-            // add a progress bar if the progress is given
-            if(progress !== undefined) {
-                let progressBar : HTMLElement = document.createElement('div');
-                progressBar.className = 'progress'
-                let progressBarInner : HTMLElement = document.createElement('div');
-                progressBarInner.className = 'progress-bar progress-bar-striped active'
-                progressBarInner.style.width = progress + "%"
-                progressBar.appendChild(progressBarInner);
-                htmlElement.appendChild(progressBar);
+
+            // add a progress bar if the progress is given currently unused leaving here in case
+            // if (progress !== undefined) {
+            //     let progressBar: HTMLElement = document.createElement('div');
+            //     progressBar.className = 'progress'
+            //     let progressBarInner: HTMLElement = document.createElement('div');
+            //     progressBarInner.className = 'progress-bar progress-bar-striped active'
+            //     progressBarInner.style.width = progress + "%"
+            //     progressBar.appendChild(progressBarInner);
+            //     htmlElement.appendChild(progressBar);
+            // }
+
+            // add a spinner 
+            if (progress !== undefined) {
+                let spinnerSpan: HTMLSpanElement = document.createElement('span');
+                spinnerSpan.className = "visually-hidden"
+                spinnerSpan.innerHTML = "Loading..."
+
+                let spinnerDiv: HTMLDivElement = document.createElement('div');
+                spinnerDiv.id = "loading-spinner"
+                spinnerDiv.className = "spinner-border ms-2"
+                spinnerDiv.setAttribute("role", "status");
+
+                spinnerDiv.appendChild(spinnerSpan);
+                htmlElement.appendChild(spinnerDiv);
             }
 
             videoPlayOverlay.appendChild(htmlElement);
@@ -66,7 +81,7 @@ export class OverlayController {
     * Create a text overlay 
     * @param text the text you want your text overlay to display
     */
-    showTextOverlay(text: string, progress? : number) {
+    showTextOverlay(text: string, progress?: number) {
         let textOverlay = document.createElement('div');
         textOverlay.id = 'messageOverlay';
         textOverlay.innerHTML = text ? text : '';

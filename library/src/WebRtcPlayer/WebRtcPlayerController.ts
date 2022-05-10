@@ -92,7 +92,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.dataChannelController.OnInitialSettings = this.handleInitialSettings.bind(this);
 		this.dataChannelController.onQualityControlOwnership = this.handleQualityControlOwnership.bind(this);
 
-		this.videoPlayerController = new VideoPlayerController(this.config.playerElement, this.config.startVideoMuted, this.config.autoPlayAudio);
+		this.videoPlayerController = new VideoPlayerController(this.config.playerElement, this.config.startVideoMuted);
 
 		//when running showPlayOverlay it requires an event listener. make it first then pass in the var
 		this.playOverlayEvent = () => {
@@ -105,24 +105,24 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 					this.freezeFrameController.showFreezeFrameOverlay();
 					this.delegate.overlayController.hideOverlay();
 					this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
+					this.delegate.startAfkWatch();
 				});
-				Logger.verboseLog("Playing Audio");
-				this.videoPlayerController.audioElement.play()
+				Logger.verboseLog("Playing audio");
+				this.videoPlayerController.PlayAudioTrack();
 			} else {
 				console.error("Could not player video stream because webRtcPlayerObj.video was not valid.")
 			}
 		}
 
+		// set up websocket methods
 		this.webSocketController = new WebSocketController(this.config.signallingServerAddress);
 		this.webSocketController.onConfig = this.handleOnConfigMessage.bind(this);
 		this.webSocketController.onInstanceStateChange = this.handleInstanceStateChange.bind(this);
-
 		this.webSocketController.onAuthenticationResponse = this.handleAuthenticationResponse.bind(this);
+		this.webSocketController.onWebSocketOncloseOverlayMessage = this.delegate.onDisconnect.bind(this.delegate);
 
-		this.webSocketController.onWebSocketOncloseOverlayMessage = this.handleWebSocketOnCloseOverlayMessage.bind(this);
-
-		// FOR HEADLESS TESTING 'Click To Start'
-		this.enableWebRtcConnection();
+		// set up the final webrtc player controller methods from within our delegate so a connection can be activated
+		this.setUpWebRtcConnectionForActivation();
 	}
 
 	/**
@@ -143,19 +143,15 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.webSocketController.close();
 
 			// wait for the connection to close and restart the connection
-			setTimeout(() => { this.enableWebRtcConnection() }, 3000);
+			setTimeout(() => { this.setUpWebRtcConnectionForActivation() }, 3000);
 		}
 	}
 
 	/**
-	 * Enable the webrtc connection to occur automaticity if enableSpsAutoplay is true
+	 * activate the setIWebRtcPlayerController method within our delegate to set up the final webrtc player controller methods so a webrtc connection can be made 
 	 */
-	enableWebRtcConnection() {
-		if (this.config.enableSpsAutoplay === true) {
-			this.delegate.setIWebRtcPlayerControllerAutoplay(this);
-		} else {
-			this.delegate.setIWebRtcPlayerController(this);
-		}
+	setUpWebRtcConnectionForActivation() {
+		this.delegate.setIWebRtcPlayerController(this);
 	}
 
 	/**
@@ -173,8 +169,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 					this.ueControlMessage.SendRequestInitialSettings();
 					this.ueControlMessage.SendRequestQualityControl();
 					this.freezeFrameController.showFreezeFrameOverlay();
+					this.videoPlayerController.PlayAudioTrack();
 					this.delegate.overlayController.hideOverlay();
 					this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
+					this.delegate.startAfkWatch();
 				}).catch((onRejectedReason: string) => {
 					console.log(onRejectedReason);
 					console.log("Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.")
@@ -227,8 +225,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// handel mic connections with promise
 		this.dataChannelController.createDataChannel(this.peerConnectionController.peerConnection, "cirrus", this.datachannelOptions);
 
-		this.peerConnectionController.showTextOverlayConnecting = this.peerControllerConnectingFailedText.bind(this);
-		this.peerConnectionController.showTextOverlaySetupFailure = this.peerControllerConnectingFailedText.bind(this);
+		// set up webRtc text overlays 
+		this.peerConnectionController.showTextOverlayConnecting = this.delegate.onWebRtcConnecting.bind(this.delegate);
+		this.peerConnectionController.showTextOverlaySetupFailure = this.delegate.onWebRtcFailed.bind(this.delegate);
 
 		/* RTC Peer Connection on Track event -> handle on track */
 		this.peerConnectionController.onTrack = this.videoPlayerController.handleOnTrack.bind(this.videoPlayerController);
@@ -242,20 +241,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param messageConfig - Config Message received from the signaling server
 	 */
 	handleOnConfigMessage(messageConfig: MessageConfig) {
-		/* Handel the autoplay video and audio options coming in from the signaling server */
-		if (messageConfig.autoPlayAudio !== undefined) {
-			//update the config
-			this.config.autoPlayAudio = messageConfig.autoPlayAudio;
-			//update the videoPlayerController
-			this.videoPlayerController.autoPlayAudio = messageConfig.autoPlayAudio;
-		}
-		if (messageConfig.startVideoMuted !== undefined) {
-			//update the config
-			this.config.startVideoMuted = messageConfig.startVideoMuted;
-			//update the video element
-			this.videoPlayerController.videoElement.muted = this.config.startVideoMuted;
-		}
-
+		
 		/* Tell the WebRtcController to start a session with the peer options sent from the signaling server */
 		this.startSession(messageConfig.peerConnectionOptions);
 
@@ -326,7 +312,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	handleDataChannelConnected() {
 		Logger.verboseLog("Data Channel is open");
-		this.delegate.overlayController.showTextOverlay('WebRTC connected, waiting for video');
+
+		// show the connected overlay 
+		this.delegate.onWebRtcConnected();
 
 		this.inputController = new InputController(this.dataChannelController);
 
@@ -400,35 +388,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
-	 * Handles when the websocket Closes
-	 * @param event - Websocket close event
-	 */
-	handleWebSocketOnCloseOverlayMessage(event: CloseEvent) {
-		this.delegate.overlayController.showTextOverlay(`Disconnected: ${event.code} -  ${event.reason}`);
-		this.delegate.onDisconnect();
-	}
-
-	/**
 	 * Handles when the Instance State Changes
 	 * @param instanceState  - Instance State 
 	 */
 	handleInstanceStateChange(instanceState: MessageInstanceState) {
 		this.delegate.onInstanceStateChange(instanceState)
-	}
-
-
-	/** 
-	 * Handles when the RTC Peer Connection is connecting
-	 */
-	peerControllerConnectingText() {
-		this.delegate.overlayController.showTextOverlay("Starting connection to server, please wait");
-	}
-
-	/**
-	 * Handles when the RTC Peer Connection Fails
-	 */
-	peerControllerConnectingFailedText() {
-		this.delegate.overlayController.showTextOverlay("Unable to setup video");
 	}
 
 	/**

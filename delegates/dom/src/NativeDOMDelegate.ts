@@ -9,7 +9,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	videoEncoderAvgQP: number;
 
 	//instantiate the WebRtcPlayerControllers interface var 
-	iWebRTCController: libspsfrontend.IWebRtcPlayerController;
+	iWebRtcController: libspsfrontend.IWebRtcPlayerController;
 
 	//instantiate the connect overlay click event listener
 	connectOverlayEvent: EventListener;
@@ -51,7 +51,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	sendStatsToServer = document.getElementById("send-stats-tgl") as HTMLInputElement;
 
 	//Containers Headers
-
 	preStreamContainer = document.getElementById("preStreamOptionsHeader") as HTMLDivElement;
 	viewSettingsHeader = document.getElementById("viewSettingsHeader") as HTMLDivElement;
 	commandsHeader = document.getElementById("commandsHeader") as HTMLDivElement;
@@ -85,7 +84,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		// set up the restart stream button
 		document.getElementById("restart-stream-button").onclick = () => {
-			this.iWebRTCController.restartStreamAutomaticity();
+			this.iWebRtcController.restartStreamAutomaticity();
 		}
 
 		document.getElementById("btn-streaming-settings").onclick = () => {
@@ -101,37 +100,37 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 				MaxBitrate: Number(this.webRtcMaxBitrateText.value) * 1000,
 			}
 
-			this.iWebRTCController.sendEncoderSettings(encode);
-			this.iWebRTCController.sendWebRtcSettings(webRtcSettings);
+			this.iWebRtcController.sendEncoderSettings(encode);
+			this.iWebRtcController.sendWebRtcSettings(webRtcSettings);
 			console.debug("-------------------------------------------");
 		}
 
 
 		// sending UI descriptors 
 		document.getElementById("sendUiDescriptor").onclick = () => {
-			this.iWebRTCController.sendUeUiDescriptor(this.uiDescriptorText.value);
+			this.iWebRtcController.sendUeUiDescriptor(this.uiDescriptorText.value);
 
 		};
 
 		// show the current fps on screen 
 		document.getElementById("show-fps-button").onclick = () => {
-			this.iWebRTCController.sendShowFps();
+			this.iWebRtcController.sendShowFps();
 		};
 
 		// make the player fill the window
 		document.getElementById("enlarge-display-to-fill-window-tgl").onchange = () => {
-			this.iWebRTCController.resizePlayerStyle();
+			this.iWebRtcController.resizePlayerStyle();
 		};
 
 		// make the player match the view port resolution 
 		this.toggleMatchViewPortRes.onchange = () => {
-			this.iWebRTCController.matchViewportResolution = this.toggleMatchViewPortRes.checked
+			this.iWebRtcController.matchViewportResolution = this.toggleMatchViewPortRes.checked
 		};
 
 		// quality control ownership checkbox 
 		this.qualityControlOwnershipCheckBox.onchange = () => {
 			if (this.qualityControlOwnershipCheckBox.checked === false) {
-				this.iWebRTCController.sendRequestQualityControlOwnership();
+				this.iWebRtcController.sendRequestQualityControlOwnership();
 			}
 		};
 
@@ -160,11 +159,11 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 				if (toggleElement.checked === true) {
 					this.controlSchemeToggleTitle.innerHTML = "Control Scheme: Hovering Mouse"
 					this.config.controlScheme = libspsfrontend.ControlSchemeType.HoveringMouse;
-					this.iWebRTCController.activateRegisterMouse();
+					this.iWebRtcController.activateRegisterMouse();
 				} else {
 					this.controlSchemeToggleTitle.innerHTML = "Control Scheme: Locked Mouse"
 					this.config.controlScheme = libspsfrontend.ControlSchemeType.LockedMouse;
-					this.iWebRTCController.activateRegisterMouse();
+					this.iWebRtcController.activateRegisterMouse();
 				}
 			};
 		}
@@ -197,15 +196,12 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	* Finnish setting up all things that require the WebRtcPlayerController
 	*/
 	setIWebRtcPlayerController(iWebRtcPlayerController: libspsfrontend.IWebRtcPlayerController) {
-		this.iWebRTCController = iWebRtcPlayerController;
+		this.iWebRtcController = iWebRtcPlayerController;
 
-		/**
-		* Build the connect overlay Event Listener
-		*/
-		this.connectOverlayEvent = () => {
-			this.iWebRTCController.connectToSignallingSever();
-			this.afkOverlayController.startAfkWatch(); //begin the watch for mouse or keyboard inactivity
-		}
+		//set up Ui's for start up 
+		this.iWebRtcController.freezeFrameController.iOverlayController = this.overlayController;
+		this.iWebRtcController.freezeFrameController.invalidateFreezeFrameOverlay();
+		this.iWebRtcController.resizePlayerStyle();
 
 		/**
 		* Build the AFK overlay Event Listener
@@ -222,24 +218,27 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			}
 		}
 
-		//set up the overlays and Ui's for start up 
-		this.overlayController.showConnectOverlay(this.connectOverlayEvent);
-		this.iWebRTCController.freezeFrameController.iOverlayController = this.overlayController;
-		this.iWebRTCController.freezeFrameController.invalidateFreezeFrameOverlay();
-		this.iWebRTCController.resizePlayerStyle();
-
-		/* Config the AFK Overlay controller Interface methods for use in AFK Overlay */
+		// Config the AFK Overlay controller Interface methods for use in AFK Overlay 
 		this.afkOverlayController.iAfkOverlayController = this;
+
+		// set up if the auto play will be used or regular click to start
+		if (this.config.enableSpsAutoplay === false) {
+			// Build the connect overlay Event Listener and show the connect overlay
+			this.connectOverlayEvent = () => {
+				this.iWebRtcController.connectToSignallingSever();
+			}
+			this.overlayController.showConnectOverlay(this.connectOverlayEvent);
+		}else{
+			this.iWebRtcController.connectToSignallingSever();
+		}
 	}
 
 	/**
-	* Finnish setting up WebRtcPlayerController for headless testing
-	*/
-	setIWebRtcPlayerControllerAutoplay(iWebRtcPlayerController: libspsfrontend.IWebRtcPlayerController) {
-		this.iWebRTCController = iWebRtcPlayerController;
-		this.iWebRTCController.connectToSignallingSever();
+	 * give the webRtcPlayerController the ability to start the afk inactivity watcher
+	 */
+	startAfkWatch(): void {
+		this.afkOverlayController.startAfkWatch();	
 	}
-
 
 	/**
 	 * Handle when the Video has been Initialised
@@ -247,10 +246,10 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	onVideoInitialised() {
 		// starting a latency check
 		document.getElementById("btn-start-latency-test").onclick = () => {
-			this.iWebRTCController.sendLatencyTest();
+			this.iWebRtcController.sendLatencyTest();
 		}
 
-		//Set up overlay header functionality
+		// Set up overlay header functionality
 		this.viewSettingsHeader.onclick = () => {
 			this.viewSettingsContainer.classList.contains("d-none") ? this.viewSettingsContainer.classList.remove("d-none") : this.viewSettingsContainer.classList.add("d-none")
 		}
@@ -269,7 +268,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.latencyContainer.classList.contains("d-none") ? this.latencyContainer.classList.remove("d-none") : this.latencyContainer.classList.add("d-none")
 		}
 
-		//Reveal all the container
+		// Reveal all the container
 		this.viewSettingsContainer.classList.remove("d-none");
 		this.commandsContainer.classList.remove("d-none");
 		this.streamingSettingsContainer.classList.remove("d-none");
@@ -279,20 +278,23 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	}
 
 
-	onDisconnect() {
+	// Extended from the base functionality; displays the text overlay and resets the buttons overlay upon disconnect
+	onDisconnect(event: CloseEvent) {
+		// display the text overlay
+		this.overlayController.showTextOverlay(`Disconnected: ${event.code} -  ${event.reason}`);
+
 		this.onVideoEncoderAvgQP(-1);
 		// starting a latency check
 		document.getElementById("btn-start-latency-test").onclick = () => { }
 
-		//Set up overlay header functionality
+		// Set up overlay header functionality
 		this.viewSettingsHeader.onclick = () => { }
 		this.commandsHeader.onclick = () => { }
 		this.streamingSettingsHeader.onclick = () => { }
 		this.statsHeader.onclick = () => { }
 		this.latencyHeader.onclick = () => { }
 
-
-		//Hide all the containers
+		// Hide all the containers
 		this.viewSettingsContainer.classList.add("d-none");
 		this.commandsContainer.classList.add("d-none");
 		this.streamingSettingsContainer.classList.add("d-none");
@@ -323,10 +325,9 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	onVideoStats(stats: libspsfrontend.AggregatedStats): void {
 		let runTime = new Date(Date.now() - this.videoStartTime).toISOString().substr(11, 8);
 		let statsText = "";
-		let inboundData = this.formatBytes(stats.inboundVideoStats.bytesReceived,2);
 
 		statsText += `<div>Duration: ${runTime}</div>`;
-		statsText += `<div>Inbound Video Data Received: ${inboundData}</div>`;
+		statsText += `<div>Inbound Video Bytes Received ${stats.inboundVideoStats.bytesReceived}</div>`;
 		statsText += `<div>Packets Lost: ${stats.inboundVideoStats.packetsLost}</div>`;
 		statsText += `<div>Bitrate (kbps): ${stats.inboundVideoStats.bitrate}</div>`;
 		statsText += `<div>Framerate: ${stats.inboundVideoStats.framerate}</div>`;
@@ -342,27 +343,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		if (this.logging) { libspsfrontend.Logger.verboseLog(`--------- Stats ---------\n ${stats}\n------------------------`) }
 
 		if (this.sendStatsToServer.checked === true) {
-			this.iWebRTCController.sendStatsToSignallingServer(stats);
+			this.iWebRtcController.sendStatsToSignallingServer(stats);
 		}
-	}
-
-	/**
-	 * 
-	 * @param bytes number to convert
-	 * @param decimals number of decimal places
-	 */
-	formatBytes(bytes:number,decimals:number): string {
-		if (bytes === 0 ){
-			return "0";
-		}
-
-		const factor: number = 1024;
-		const dm = decimals <0 ? 0  :decimals;
-		const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
-
-    	const i = Math.floor(Math.log(bytes) / Math.log(factor));
-
-		return parseFloat((bytes / Math.pow(factor, i)).toFixed(dm)) + ' ' + sizes[i];
 	}
 
 	/**
@@ -452,7 +434,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	onAuthenticationResponse(authResponse: libspsfrontend.MessageAuthResponse): void {
 		switch (authResponse.outcome) {
 			case libspsfrontend.MessageAuthResponseOutcomeType.AUTHENTICATED:
-				this.overlayController.showTextOverlay("Authenticated Requesting Instance");
+				this.overlayController.showTextOverlay("Authentication has succeeded. Requesting Instance");
 				break;
 			case libspsfrontend.MessageAuthResponseOutcomeType.INVALID_TOKEN:
 				this.overlayController.showTextOverlay("Invalid Token: " + authResponse.error);
@@ -515,7 +497,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 * Close the websocket by invoking closeSignalingServer from the IWebRtcPlayerController interface
 	 */
 	afkCloseWs() {
-		this.iWebRTCController.closeSignalingServer();
+		this.iWebRtcController.closeSignalingServer();
 	}
 }
 

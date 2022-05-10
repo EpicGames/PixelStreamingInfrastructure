@@ -17,7 +17,7 @@ export class PeerConnectionController {
     constructor(options: RTCConfiguration, urlParams: URLSearchParams) {
         // set the turn status 
         this.forceTurn = urlParams.has('ForceTURN');
-        
+
         // if using TURN set the ice transport policy to relay for the options
         if (this.forceTurn) {
             console.log("Forcing TURN usage by setting ICE Transport Policy in peer connection config.");
@@ -41,17 +41,15 @@ export class PeerConnectionController {
     createOffer(offerOptions: RTCOfferOptions, useMic: boolean) {
         Logger.verboseLog("Create Offer");
 
-        var context = this;
-
-        this.setupTracksToSendAsync(useMic).finally(() => {});
+        this.setupTracksToSendAsync(useMic).finally(() => { });
 
         this.peerConnection.createOffer(offerOptions).then((offer: RTCSessionDescriptionInit) => {
-            context.showTextOverlayConnecting();
-            offer.sdp = context.mungeOffer(offer.sdp, useMic);
-            context.peerConnection.setLocalDescription(offer);
-            context.onSendWebRTCOffer(offer);
-        }, () => {
-            context.showTextOverlaySetupFailure();
+            this.showTextOverlayConnecting();
+            offer.sdp = this.mungeOffer(offer.sdp, useMic);
+            this.peerConnection.setLocalDescription(offer);
+            this.onSendWebRTCOffer(offer);
+        }).catch((onRejectedReason: string) => {
+            this.showTextOverlaySetupFailure();
         });
     }
 

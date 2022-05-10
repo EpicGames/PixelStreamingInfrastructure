@@ -16,9 +16,9 @@ export class DelegateBase implements IDelegate {
 	public config: Config;
 
 	/**
-	  * @param config - A newly instantiated config object  
-	* returns the base delegate object with the config inside it along with a new instance of the Overlay controller class 
-	*/
+	 * @param config - A newly instantiated config object  
+	 * returns the base delegate object with the config inside it along with a new instance of the Overlay controller class 
+	 */
 	constructor(config: Config) {
 		this.config = config;
 		this.overlayController = new OverlayController(config.playerElement);
@@ -37,20 +37,9 @@ export class DelegateBase implements IDelegate {
 	}
 
 	/**
-	 * Set up the WebRtcPlayerController to run automaticity on startup for headless testing and ease of use
-	 * @param iWebRtcPlayerController - a webrtc controller type  
-	 */
-	setIWebRtcPlayerControllerAutoplay(iWebRtcPlayerController: IWebRtcPlayerController) { }
-
-	/**
 	 * Set up methods and functions to run when the video is initialised 
 	 */
 	onVideoInitialised() { }
-
-	/**
- * Event fired when the video is disconnected
- */
-	onDisconnect() { }
 
 	/**
 	 * Set up functionality to happen when receiving latency test results 
@@ -98,4 +87,37 @@ export class DelegateBase implements IDelegate {
 	 * Set up functionality to happen when receiving a webRTC answer 
 	 */
 	onWebRtcAnswer() { }
+
+	/**
+	 * Starts the AFK inactivity watcher
+	 */
+	startAfkWatch() { }
+
+	/**
+	 * Event fired when the video is disconnected
+	 */
+	onDisconnect(event: CloseEvent) {
+		this.overlayController.showTextOverlay(`Disconnected: ${event.code} -  ${event.reason}`);
+	}
+
+	/**
+	 * Handles when Web Rtc is connecting 
+	 */
+	onWebRtcConnecting() {
+		this.overlayController.showTextOverlay('WebRTC connected, waiting for video');
+	}
+
+	/**
+	 * Handles when Web Rtc has connected 
+	 */
+	onWebRtcConnected() {
+		this.overlayController.showTextOverlay("Starting connection to server, please wait");
+	}
+
+	/**
+	 * Handles when Web Rtc fails to connect 
+	 */
+	onWebRtcFailed() {
+		this.overlayController.showTextOverlay("Unable to setup video");
+	}
 }

@@ -14,13 +14,11 @@ export class VideoPlayerController {
     onUpdatePosition: (mouseEvent: MouseEvent) => void;
     videoInputBindings: IVideoPlayerMouseInterface;
     startVideoMuted: boolean;
-    autoPlayAudio: boolean;
     audioElement: HTMLAudioElement;
 
-    constructor(htmlDivElement: HTMLDivElement, startVideoMuted: boolean, autoPlayAudio: boolean) {
+    constructor(htmlDivElement: HTMLDivElement, startVideoMuted: boolean) {
         // set the audio defaults
         this.startVideoMuted = startVideoMuted;
-        this.autoPlayAudio = autoPlayAudio;
 
         // the video element needs to exist before creating the player so assign the div and make the element
         this.videoPlayerDiv = htmlDivElement;
@@ -111,7 +109,7 @@ export class VideoPlayerController {
         }
 
         if (rtcTrackEvent.track.kind == "audio") {
-            this.handleOnAudioTrack(rtcTrackEvent.streams[0]);
+            this.CreateAudioTrack(rtcTrackEvent.streams[0]);
             return;
         } else if (rtcTrackEvent.track.kind == "video" && this.videoElement.srcObject !== rtcTrackEvent.streams[0]) {
             this.videoElement.srcObject = rtcTrackEvent.streams[0];
@@ -121,10 +119,11 @@ export class VideoPlayerController {
     }
 
     /**
-    * Handles when receiving an RTCTrackEvent with the kind of "audio"
+    * Creates the audio device when receiving an RTCTrackEvent with the kind of "audio"
     * @param audioMediaStream - Audio Media stream track
     */
-    handleOnAudioTrack(audioMediaStream: MediaStream) {
+    CreateAudioTrack(audioMediaStream: MediaStream) {
+
         // do nothing the video has the same media stream as the audio track we have here (they are linked)
         if (this.videoElement.srcObject == audioMediaStream) {
             return;
@@ -132,12 +131,29 @@ export class VideoPlayerController {
         // video element has some other media stream that is not associated with this audio track
         else if (this.videoElement.srcObject && this.videoElement.srcObject !== audioMediaStream) {
             // create a new audio element
-            // had to assign any type as cannot assign type MediaStreamTrack to html element may change soon 
-            //  let audioElem = document.createElement("Audio") as HTMLAudioElement;
             this.audioElement.srcObject = audioMediaStream;
-
             console.log('Created new audio element to play separate audio stream.');
         }
+    }
+
+    /**
+     * Plays the audio from the audio element or sets up an event listener to play it once an interaction has occurred 
+     */
+    PlayAudioTrack(){
+        // attempt to auto play the audio from the audio element if not then set up a listener 
+        this.audioElement.muted = false;
+        this.audioElement.play().catch((onRejectedReason: string) => {
+            console.log(onRejectedReason);
+            console.log("Browser does not support autoplaying audio without interaction - to resolve this we are going to run the audio until the video is clicked");
+
+            let clickToPlayAudio = () => {
+                this.audioElement.muted = false;
+                this.audioElement.play();
+                this.videoElement.removeEventListener("click", clickToPlayAudio);
+            };
+    
+            this.videoElement.addEventListener("click", clickToPlayAudio);
+        });    
     }
 
     /**

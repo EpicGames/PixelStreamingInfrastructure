@@ -65,10 +65,7 @@ export class MessageInstanceState extends MessageRecv {
  * Config Message Wrapper
  */
 export class MessageConfig extends MessageRecv {
-    startVideoMuted: boolean;
-    autoPlayAudio: boolean;
-    peerConnectionOptions: RTCConfiguration;
-    
+    peerConnectionOptions: RTCConfiguration; 
 }
 
 /**
@@ -83,7 +80,6 @@ export class MessagePlayerCount extends MessageRecv {
  */
 export class MessageAnswer extends MessageRecv {
     sdp: string;
-
 }
 
 /**

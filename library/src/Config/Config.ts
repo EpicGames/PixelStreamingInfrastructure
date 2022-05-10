@@ -9,10 +9,7 @@ export class Config {
 	
 	// start the video muted
 	startVideoMuted = false;
-	
-	// auto play video audio
-	autoPlayAudio = false;
-	
+
 	// The control scheme controls the behaviour of the mouse when it interacts with the WebRTC player.
 	controlScheme = ControlSchemeType.LockedMouse;
 	

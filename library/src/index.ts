@@ -15,6 +15,3 @@ import { Logger } from './Logger/Logger';
 
 export { Config, ControlSchemeType, webRtcPlayerController, IDelegate, DelegateBase, IWebRtcPlayerController }
 export { LatencyTestResults, OverlayController, AfkOverlayController, Encoder, InitialSettings, WebRTC, AggregatedStats, IAfkOverlayController, MessageInstanceState, InstanceState, MessageAuthResponse, MessageAuthResponseOutcomeType, Logger }
-
-declare var LIBRARY_VERSION : string;
-export const version = LIBRARY_VERSION;
