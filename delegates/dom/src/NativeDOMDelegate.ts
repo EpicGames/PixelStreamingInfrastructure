@@ -325,9 +325,10 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	onVideoStats(stats: libspsfrontend.AggregatedStats): void {
 		let runTime = new Date(Date.now() - this.videoStartTime).toISOString().substr(11, 8);
 		let statsText = "";
+		let inboundData = this.formatBytes(stats.inboundVideoStats.bytesReceived,2);
 
 		statsText += `<div>Duration: ${runTime}</div>`;
-		statsText += `<div>Inbound Video Bytes Received ${stats.inboundVideoStats.bytesReceived}</div>`;
+		statsText += `<div>Inbound Video Data Received: ${inboundData}</div>`;
 		statsText += `<div>Packets Lost: ${stats.inboundVideoStats.packetsLost}</div>`;
 		statsText += `<div>Bitrate (kbps): ${stats.inboundVideoStats.bitrate}</div>`;
 		statsText += `<div>Framerate: ${stats.inboundVideoStats.framerate}</div>`;
@@ -346,7 +347,26 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.iWebRtcController.sendStatsToSignallingServer(stats);
 		}
 	}
-
+	
+	/**
+	* 
+	* @param bytes number to convert
+	* @param decimals number of decimal places
+	*/
+	formatBytes(bytes:number,decimals:number): string {
+		if (bytes === 0 ){
+			return "0";
+		}
+		
+		const factor: number = 1024;
+		const dm = decimals <0 ? 0  :decimals;
+		const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+		
+		const i = Math.floor(Math.log(bytes) / Math.log(factor));
+		
+		return parseFloat((bytes / Math.pow(factor, i)).toFixed(dm)) + ' ' + sizes[i];
+	}
+	
 	/**
 	* Handles the result of the UE Latency Test
 	* @param latencyTimings - Latency Test Timings sent from the UE Instance 

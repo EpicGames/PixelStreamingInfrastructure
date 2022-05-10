@@ -7,12 +7,13 @@
     "build": "npx webpack",
     "watch": "npx webpack --watch",
     "start": "npx webpack && open-cli ./dist/index.html",
-    "serve": "webpack serve"
+    "serve": "webpack serve",
+    "symlink": "cd ../../library && npm link && cd ../delegates/dom && npm link @tensorworks/libspsfrontend"
   },
   "author": "TensorWorks Pty Ltd",
   "license": "MIT",
   "devDependencies": {
-    "@tensorworks/libspsfrontend": "0.0.1",
+    "@tensorworks/libspsfrontend": "0.0.3",
     "bootstrap": "^5.0.2",
     "css-loader": "^6.2.0",
     "html-webpack-plugin": "^5.3.2",
