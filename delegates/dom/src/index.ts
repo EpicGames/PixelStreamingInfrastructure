@@ -19,8 +19,6 @@ if(window.location.pathname == "/") {
     signallingServerAddress += (window.location.pathname + '/ws')
 }
 
-signallingServerAddress = "ws://myapplication.tenant-tensorworks-testing.lga1.ingress.coreweave.cloud/ws"
-
 // Create a config file
 let config = CreateConfig(signallingServerAddress, "player");
 
