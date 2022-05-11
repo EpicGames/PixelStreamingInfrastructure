@@ -62,7 +62,7 @@ export class DataChannelController {
         let message = new Uint8Array(event.data);
         if (this.logging) { Logger.verboseLog("Message incoming") }
         if (this.logging) { Logger.verboseLog("Message:" + message) }
-        
+
         //there is logic for when a freeze frame is sent;
         // if (this.isReceivingFreezeFrame) {
         //     this.onReceivingFreezeFrame(message);
@@ -117,7 +117,7 @@ export class DataChannelController {
                 let payloadAsString = new TextDecoder("utf-16").decode(message.slice(1));
                 let iInitialSettings: IInitialSettings = JSON.parse(payloadAsString);
                 let initialSettings: InitialSettings = new InitialSettings();
-                Object.assign(initialSettings,iInitialSettings);
+                Object.assign(initialSettings, iInitialSettings);
                 initialSettings.ueCompatible()
                 Logger.verboseLog(payloadAsString);
                 this.OnInitialSettings(initialSettings);
@@ -161,6 +161,9 @@ export class DataChannelController {
      * @param data - Message Data Array Buffer
      */
     sendData(data: ArrayBuffer) {
+        // reset the afk inactivity
+        this.resetAfkWarningTimerOnDataSend();
+        
         if (this.dataChannel && this.dataChannel.readyState == "open") {
             this.dataChannel.send(data);
         } else {
@@ -202,6 +205,11 @@ export class DataChannelController {
      * @param InitialSettings - Initial Settings
      */
     OnInitialSettings(InitialSettings: InitialSettings) { }
+
+    /**
+     * An override method for resetting the Afk warning timer when data is sent over the data channel 
+     */
+    resetAfkWarningTimerOnDataSend() { }
 }
 
 export interface InstanceCommand {

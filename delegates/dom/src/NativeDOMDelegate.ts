@@ -16,7 +16,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 	//instantiate the AFK Overlay Controller and click event listener
 	afkOverlayController: libspsfrontend.AfkOverlayController
-	iAfkOverlayController: libspsfrontend.IAfkOverlayController;
 	afkOverlayEvent: EventListener;
 
 	showStats: boolean;
@@ -59,7 +58,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	latencyHeader = document.getElementById("latencyTestHeader") as HTMLDivElement;
 
 	//Containers
-
 	viewSettingsContainer = document.getElementById("viewSettingsContainer") as HTMLDivElement;
 	commandsContainer = document.getElementById("commandsContainer") as HTMLDivElement;
 	streamingSettingsContainer = document.getElementById("streamingSettingsContainer") as HTMLDivElement;
@@ -71,11 +69,40 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.showStats = true;
 		this.logging = false;
 		this.videoEncoderAvgQP = -1;
-		this.afkOverlayController = new libspsfrontend.AfkOverlayController(this.config.controlScheme);
+		this.afkOverlayController = new libspsfrontend.AfkOverlayController(this.config.controlScheme, this.config.enableAfk);
+
+		// Build the AFK overlay Event Listener
+		this.afkOverlayEvent = () => {
+			// The user clicked so start the timer again and carry on.
+			this.overlayController.hideOverlay();
+			clearInterval(this.afkOverlayController.afk.countdownTimer);
+			this.afkOverlayController.startAfkWarningTimer();
+		}
+
+		// Set the AFK overlay by invoking setOverlay from the overlay Controller
+		this.afkOverlayController.afkSetOverlay = () => this.overlayController.setOverlay('clickableState', this.afkOverlayController.afk.overlay, this.afkOverlayEvent);
+
+		// Hide the AFK Overlay by invoking hideOverlay from the overlay Controller
+		this.afkOverlayController.afkHideOverlay = () => this.overlayController.hideOverlay();
+
+		// Close the websocket by invoking closeSignalingServer from the IWebRtcPlayerController interface and turn off the watcher
+		this.afkOverlayController.afkCloseWs = () => {
+			this.iWebRtcController.closeSignalingServer();
+			this.afkOverlayController.afk.enabled = false;
+		};
+
+		// give the webRtcPlayerController the ability to start the afk inactivity watcher
+		this.startAfkWatch = () => this.afkOverlayController.startAfkWarningTimer();
+
+		// give the webRtcPlayerController the ability to reset the afk inactivity watcher
+		this.resetAfkWatch = () => this.afkOverlayController.resetAfkWarningTimer();
+
 		this.ConfigureButtons();
 	}
 
-	// set up button click functions and button functionality  
+	/**
+	 * Set up button click functions and button functionality  
+	 */
 	ConfigureButtons() {
 		// setup the Force TURN toggle
 		this.setUpToggleWithUrlParams(this.forceTurnToggle, "ForceTURN");
@@ -142,6 +169,10 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 	}
 
+	/**
+	 * Set up toggle element for controlling hovering mouse or locked mouse  
+	 * @param toggleElement the toggle html element to be set up
+	 */
 	setUpControlSchemeTypeToggle(toggleElement: HTMLInputElement) {
 		if (toggleElement) {
 
@@ -169,7 +200,11 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		}
 	}
 
-	// set up url toggle buttons
+	/**
+	 * Set up url toggle buttons
+	 * @param toggleElement the toggle element being activated  
+	 * @param urlParameterKey the url key that is being made use of
+	 */
 	setUpToggleWithUrlParams(toggleElement: HTMLInputElement, urlParameterKey: string) {
 		if (toggleElement) {
 			//Check if the element has been set from the URL Params 
@@ -187,7 +222,10 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		}
 	}
 
-	// Disable shared session links for all players
+	/**
+	 * Disable shared session links for all players
+	 * @returns false
+	 */
 	async IsLinkSharingEnabled() {
 		return false;
 	}
@@ -203,24 +241,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.iWebRtcController.freezeFrameController.invalidateFreezeFrameOverlay();
 		this.iWebRtcController.resizePlayerStyle();
 
-		/**
-		* Build the AFK overlay Event Listener
-		*/
-		this.afkOverlayEvent = () => {
-			// The user clicked so start the timer again and carry on.
-			this.overlayController.hideOverlay();
-			clearInterval(this.afkOverlayController.afk.countdownTimer);
-			//afkOverlayController.startAfkWarningTimer();
-			this.afkOverlayController.stopAfkWarningTimer();
-			this.afkOverlayController.afk.enabled = false;
-			if (this.afkOverlayController.wasTimedOut === false) {
-				this.afkOverlayController.startIdleWatch();
-			}
-		}
-
-		// Config the AFK Overlay controller Interface methods for use in AFK Overlay 
-		this.afkOverlayController.iAfkOverlayController = this;
-
 		// set up if the auto play will be used or regular click to start
 		if (this.config.enableSpsAutoplay === false) {
 			// Build the connect overlay Event Listener and show the connect overlay
@@ -228,16 +248,9 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 				this.iWebRtcController.connectToSignallingSever();
 			}
 			this.overlayController.showConnectOverlay(this.connectOverlayEvent);
-		}else{
+		} else {
 			this.iWebRtcController.connectToSignallingSever();
 		}
-	}
-
-	/**
-	 * give the webRtcPlayerController the ability to start the afk inactivity watcher
-	 */
-	startAfkWatch(): void {
-		this.afkOverlayController.startAfkWatch();	
 	}
 
 	/**
@@ -277,8 +290,10 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.videoStartTime = Date.now();
 	}
 
-
-	// Extended from the base functionality; displays the text overlay and resets the buttons overlay upon disconnect
+	/**
+	 * Extended from the base functionality; displays the text overlay and resets the buttons overlay upon disconnect 
+	 * @param event 
+	 */
 	onDisconnect(event: CloseEvent) {
 		// display the text overlay
 		this.overlayController.showTextOverlay(`Disconnected: ${event.code} -  ${event.reason}`);
@@ -300,7 +315,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.streamingSettingsContainer.classList.add("d-none");
 		this.statsContainer.classList.add("d-none");
 	}
-
 
 	/**
 	 * `Takes the InitialSettings and wired to frontend
@@ -325,7 +339,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	onVideoStats(stats: libspsfrontend.AggregatedStats): void {
 		let runTime = new Date(Date.now() - this.videoStartTime).toISOString().substr(11, 8);
 		let statsText = "";
-		let inboundData = this.formatBytes(stats.inboundVideoStats.bytesReceived,2);
+		let inboundData = this.formatBytes(stats.inboundVideoStats.bytesReceived, 2);
 
 		statsText += `<div>Duration: ${runTime}</div>`;
 		statsText += `<div>Inbound Video Data Received: ${inboundData}</div>`;
@@ -347,26 +361,26 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.iWebRtcController.sendStatsToSignallingServer(stats);
 		}
 	}
-	
+
 	/**
-	* 
+	* formats Bytes coming in for video stats
 	* @param bytes number to convert
 	* @param decimals number of decimal places
 	*/
-	formatBytes(bytes:number,decimals:number): string {
-		if (bytes === 0 ){
+	formatBytes(bytes: number, decimals: number): string {
+		if (bytes === 0) {
 			return "0";
 		}
-		
+
 		const factor: number = 1024;
-		const dm = decimals <0 ? 0  :decimals;
+		const dm = decimals < 0 ? 0 : decimals;
 		const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
-		
+
 		const i = Math.floor(Math.log(bytes) / Math.log(factor));
-		
+
 		return parseFloat((bytes / Math.pow(factor, i)).toFixed(dm)) + ' ' + sizes[i];
 	}
-	
+
 	/**
 	* Handles the result of the UE Latency Test
 	* @param latencyTimings - Latency Test Timings sent from the UE Instance 
@@ -497,27 +511,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 				}
 			}
 		}, 100 / speed);
-	}
-
-	/** 
-	  * Set the AFK overlay by invoking setOverlay from the overlay Controller 
-	  */
-	afkSetOverlay() {
-		this.overlayController.setOverlay('clickableState', this.afkOverlayController.afk.overlay, this.afkOverlayEvent);
-	}
-
-	/**
-	 * Hide the AFK Overlay by invoking hideOverlay from the overlay Controller 
-	 */
-	afkHideOverlay() {
-		this.overlayController.hideOverlay();
-	}
-
-	/**
-	 * Close the websocket by invoking closeSignalingServer from the IWebRtcPlayerController interface
-	 */
-	afkCloseWs() {
-		this.iWebRtcController.closeSignalingServer();
 	}
 }
 

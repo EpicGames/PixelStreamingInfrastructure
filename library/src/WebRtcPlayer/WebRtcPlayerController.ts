@@ -91,6 +91,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.dataChannelController.onVideoEncoderAvgQP = this.handleVideoEncoderAvgQP.bind(this);
 		this.dataChannelController.OnInitialSettings = this.handleInitialSettings.bind(this);
 		this.dataChannelController.onQualityControlOwnership = this.handleQualityControlOwnership.bind(this);
+		this.dataChannelController.resetAfkWarningTimerOnDataSend = this.delegate.resetAfkWatch.bind(this.delegate);
 
 		this.videoPlayerController = new VideoPlayerController(this.config.playerElement, this.config.startVideoMuted);
 
@@ -99,7 +100,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			if (this.videoPlayerController && this.videoPlayerController.videoElement) {
 				// handle play() with .then as it is an asynchronous call 
 				this.videoPlayerController.videoElement.play().then(() => {
-					this.videoPlayerController.videoElement.click();
+					//this.videoPlayerController.videoElement.click();
 					this.ueControlMessage.SendRequestInitialSettings();
 					this.ueControlMessage.SendRequestQualityControl();
 					this.freezeFrameController.showFreezeFrameOverlay();

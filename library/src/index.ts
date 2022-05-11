@@ -9,12 +9,11 @@ import { AfkOverlayController } from './Overlay/AfkOverlayController';
 import { LatencyTestResults } from "./DataChannel/LatencyTestResults";
 import { Encoder, InitialSettings, WebRTC } from './DataChannel/InitialSettings';
 import { AggregatedStats } from './PeerConnectionController/AggregatedStats';
-import { IAfkOverlayController } from './Overlay/IAfkOverlayController';
 import { MessageInstanceState, InstanceState, MessageAuthResponse, MessageAuthResponseOutcomeType } from './WebSockets/MessageReceive';
 import { Logger } from './Logger/Logger';
 
 export { Config, ControlSchemeType, webRtcPlayerController, IDelegate, DelegateBase, IWebRtcPlayerController }
-export { LatencyTestResults, OverlayController, AfkOverlayController, Encoder, InitialSettings, WebRTC, AggregatedStats, IAfkOverlayController, MessageInstanceState, InstanceState, MessageAuthResponse, MessageAuthResponseOutcomeType, Logger }
+export { LatencyTestResults, OverlayController, AfkOverlayController, Encoder, InitialSettings, WebRTC, AggregatedStats, MessageInstanceState, InstanceState, MessageAuthResponse, MessageAuthResponseOutcomeType, Logger }
 
 declare var LIBRARY_VERSION : string;
 export const version = LIBRARY_VERSION;

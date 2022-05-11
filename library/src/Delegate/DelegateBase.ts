@@ -94,6 +94,11 @@ export class DelegateBase implements IDelegate {
 	startAfkWatch() { }
 
 	/**
+	 * Resets the AFK inactivity watcher
+	 */
+	 resetAfkWatch() { }
+
+	/**
 	 * Event fired when the video is disconnected
 	 */
 	onDisconnect(event: CloseEvent) {

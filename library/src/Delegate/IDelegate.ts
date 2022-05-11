@@ -76,6 +76,11 @@ export interface IDelegate {
 	startAfkWatch(): void;
 
 	/**
+	 * Resets the AFK inactivity watcher
+	 */
+	resetAfkWatch(): void;
+
+	/**
 	 * Event fired when the video is disconnected
 	 */
 	onDisconnect(event: CloseEvent): void;

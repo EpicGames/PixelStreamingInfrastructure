@@ -10,6 +10,9 @@ export class Config {
 	// start the video muted
 	startVideoMuted = false;
 
+	// set the amount of wait time in seconds while there is inactivity for afk to occur 
+	afkTimeout: number = 120;
+
 	// The control scheme controls the behaviour of the mouse when it interacts with the WebRTC player.
 	controlScheme = ControlSchemeType.LockedMouse;
 	

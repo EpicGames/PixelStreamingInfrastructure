@@ -1,26 +1,26 @@
 import { ControlSchemeType } from "../Config/Config";
-import { IAfkOverlayController } from "./IAfkOverlayController";
 
 export class AfkOverlayController {
     afk: afk;
-    iAfkOverlayController: IAfkOverlayController;
     controlScheme: number;
     idleTimer = 0;
     idleInterval: ReturnType<typeof setInterval>;
     wasTimedOut = false;
 
-    constructor(controlScheme: number) {
-        this.afk = new afk();
+    constructor(controlScheme: number, afkTimeout: number) {
+        this.afk = new afk(afkTimeout);
         this.controlScheme = controlScheme;
-
     }
 
     /**
-     * Start the warning timer  
+     * Start the warning timer if a timeout is set greater that 0 seconds   
      */
     startAfkWarningTimer() {
-        console.log("started warning timer")
-        this.afk.active = this.afk.enabled;
+        if(this.afk.warnTimeout > 0){
+            this.afk.active = true;
+        }else{
+            this.afk.active = false;
+        }
         this.resetAfkWarningTimer();
     }
 
@@ -35,9 +35,10 @@ export class AfkOverlayController {
      * If the user interacts then reset the warning timer.  
      */
     resetAfkWarningTimer() {
+        console.log("reseting timer")
         if (this.afk.active) {
             clearTimeout(this.afk.warnTimer);
-            this.afk.warnTimer = setTimeout(() => { this.showAfkOverlay() }, this.afk.warnTimeout * 1000); //1000
+            this.afk.warnTimer = setTimeout(() => { this.showAfkOverlay() }, this.afk.warnTimeout * 1000);
         }
     }
 
@@ -49,27 +50,9 @@ export class AfkOverlayController {
     }
 
     /**
-     * This callback is called during the count down timer  
-     */
-    setIntervalCallBack() {
-        this.afk.countdown--;
-        if (this.afk.countdown == 0) {
-            // The user failed to click so disconnect them.
-            this.iAfkOverlayController.afkHideOverlay();
-            this.iAfkOverlayController.afkCloseWs();
-            this.stopIdleWatch();
-            this.wasTimedOut = true;
-        } else {
-            // Update the countdown message.
-            this.updateAfkOverlayText();
-        }
-    }
-
-    /**
      * Show the AFK overlay and begin the countdown   
      */
     showAfkOverlay() {
-        console.log("showing afk overlay")
         // Pause the timer while the user is looking at the inactivity warning overlay.
         this.stopAfkWarningTimer();
 
@@ -77,7 +60,8 @@ export class AfkOverlayController {
         this.afk.overlay = document.createElement('div');
         this.afk.overlay.id = 'afkOverlay';
 
-        this.iAfkOverlayController.afkSetOverlay();
+        // set the afk overlay 
+        this.afkSetOverlay();
 
         this.afk.countdown = this.afk.closeTimeout;
         this.updateAfkOverlayText();
@@ -86,73 +70,44 @@ export class AfkOverlayController {
             document.exitPointerLock();
         }
 
-        this.afk.countdownTimer = setInterval(this.setIntervalCallBack.bind(this), 1000);
-
-        this.stopIdleWatch();
-    }
-
-    //EXTRAS for watching for inactivity. may remove
-    /**
-     * Stop the Idle watcher    
-     */
-    stopIdleWatch() {
-        clearInterval(this.idleInterval);
-    }
-
-    /**
-     * Start the Idle watcher   
-     */
-    startIdleWatch() {
-        // Increment the idle time counter every minute.
-        this.idleInterval = setInterval(this.checkIdleTime.bind(this), 60000); // 1 minute
+        this.afk.countdownTimer = setInterval(() => {
+            this.afk.countdown--;
+            if (this.afk.countdown == 0) {
+                // The user failed to click so disconnect them.
+                this.afkHideOverlay();
+                this.afkCloseWs();
+            } else {
+                // Update the countdown message.
+                this.updateAfkOverlayText();
+            }
+        }, 1000);
     }
 
     /**
-     * Starts the Idle watcher and set the idleTimer to 0 when mouse and keyboard interactions are made    
+     * An override method for setting the Afk Overlay 
      */
-    startAfkWatch() {
-        this.startIdleWatch();
-
-        document.addEventListener('keypress', function () {
-            this.idleTimer = 0;
-        }.bind(this));
-
-        document.addEventListener('mousemove', function () {
-            this.idleTimer = 0;
-        }.bind(this));
-    }
+    afkSetOverlay() { }
 
     /**
-     * checks when the idleTimer get to 10 and activates the AFK countdown timer     
+     * An override method for hiding the Afk overlay
      */
-    checkIdleTime() {
-        this.idleTimer++;
-        if (this.idleTimer > 10) { // 10 minutes
-            this.afk.enabled = true;
-            this.startAfkWarningTimer();
-        }
-    }
+    afkHideOverlay() { }
 
+    /**
+     * An override method for closing the websocket within the AfkOverlayController
+     */
+    afkCloseWs() { }
 }
-
 export class afk {
-    enabled = false;
-    warnTimeout = 1;
+    warnTimeout = 0;
     closeTimeout = 10;
     active = false;
     overlay: HTMLDivElement = undefined;
     warnTimer: ReturnType<typeof setTimeout> = undefined;
     countdown = 0;
     countdownTimer: ReturnType<typeof setInterval> = undefined;
-}
 
-/* //AFK testing
-document.addEventListener('keypress', handelFreezeFrameActivation);
-
-function handelFreezeFrameActivation(e: KeyboardEvent) {
-    if (e.key === '3' && afkOverlayController.afk.enabled === false) {
-        afkOverlayController.afk.enabled = true;
-        afkOverlayController.startAfkWarningTimer();
+    constructor(afkTimeout: number) {
+        this.warnTimeout = afkTimeout;
     }
 }
-*/
