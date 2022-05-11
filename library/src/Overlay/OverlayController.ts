@@ -1,6 +1,7 @@
 import { Images } from "./Images";
+import { IOverlayController } from "./IOverlayController";
 /**This controller should be created in your Noop Delegate and accessed in WebRtcPlayerController through the Delegate interface*/
-export class OverlayController {
+export class OverlayController implements IOverlayController{
     shouldShowPlayOverlay = true;
     playerDiv: HTMLDivElement;
     playButtonImage: string;
@@ -90,7 +91,7 @@ export class OverlayController {
 
     //to show the connect overlay the overlay Event listener must be preset and passed in
     /**
-     * shows the starting connect overlay
+     * Shows the starting connect overlay
      * @param event the event listener you want to activate when you click this overlay
      */
     showConnectOverlay(event: EventListener) {
@@ -101,7 +102,7 @@ export class OverlayController {
     }
 
     /**
-    * shows the play overlay
+    * Shows the play overlay
     *  @param event the event listener you want to activate when you click this overlay
     */
     showPlayOverlay(event: EventListener) {

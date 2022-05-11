@@ -1,6 +1,7 @@
 import { ControlSchemeType } from "../Config/Config";
+import { IAfkOverlayController } from "./IAfkOverlayController";
 
-export class AfkOverlayController {
+export class AfkOverlayController implements IAfkOverlayController{
     afk: afk;
     controlScheme: number;
     idleTimer = 0;
