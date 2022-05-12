@@ -15,7 +15,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	connectOverlayEvent: EventListener;
 
 	//instantiate the AFK Overlay Controller and click event listener
-	afkOverlayController: libspsfrontend.AfkOverlayController
+	AfkLogic: libspsfrontend.AfkLogic
 	afkOverlayEvent: EventListener;
 
 	showStats: boolean;
@@ -69,33 +69,27 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.showStats = true;
 		this.logging = false;
 		this.videoEncoderAvgQP = -1;
-		this.afkOverlayController = new libspsfrontend.AfkOverlayController(this.config.controlScheme, this.config.enableAfk);
+		this.AfkLogic = new libspsfrontend.AfkLogic(this.config.controlScheme, this.config.enableAfk);
 
 		// Build the AFK overlay Event Listener
 		this.afkOverlayEvent = () => {
 			// The user clicked so start the timer again and carry on.
-			this.overlayController.hideOverlay();
-			clearInterval(this.afkOverlayController.afk.countdownTimer);
-			this.afkOverlayController.startAfkWarningTimer();
+			this.Overlay.hideOverlay();
+			clearInterval(this.AfkLogic.afk.countdownTimer);
+			this.AfkLogic.startAfkWarningTimer();
 		}
 
 		// Set the AFK overlay by invoking setOverlay from the overlay Controller
-		this.afkOverlayController.afkSetOverlay = () => this.overlayController.setOverlay('clickableState', this.afkOverlayController.afk.overlay, this.afkOverlayEvent);
+		this.AfkLogic.afkSetOverlay = () => this.Overlay.setOverlay('clickableState', this.AfkLogic.afk.overlay, this.afkOverlayEvent);
 
 		// Hide the AFK Overlay by invoking hideOverlay from the overlay Controller
-		this.afkOverlayController.afkHideOverlay = () => this.overlayController.hideOverlay();
-
-		// Close the websocket by invoking closeSignalingServer from the IWebRtcPlayerController interface and turn off the watcher
-		this.afkOverlayController.afkCloseWs = () => {
-			this.iWebRtcController.closeSignalingServer();
-			this.afkOverlayController.afk.enabled = false;
-		};
+		this.AfkLogic.afkHideOverlay = () => this.Overlay.hideOverlay();
 
 		// give the webRtcPlayerController the ability to start the afk inactivity watcher
-		this.startAfkWatch = () => this.afkOverlayController.startAfkWarningTimer();
+		this.startAfkWatch = () => this.AfkLogic.startAfkWarningTimer();
 
 		// give the webRtcPlayerController the ability to reset the afk inactivity watcher
-		this.resetAfkWatch = () => this.afkOverlayController.resetAfkWarningTimer();
+		this.resetAfkWatch = () => this.AfkLogic.resetAfkWarningTimer();
 
 		this.ConfigureButtons();
 	}
@@ -237,8 +231,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.iWebRtcController = iWebRtcPlayerController;
 
 		//set up Ui's for start up 
-		this.iWebRtcController.freezeFrameController.iOverlayController = this.overlayController;
-		this.iWebRtcController.freezeFrameController.invalidateFreezeFrameOverlay();
+		this.iWebRtcController.FreezeFrameLogic.IOverlay = this.Overlay;
+		this.iWebRtcController.FreezeFrameLogic.invalidateFreezeFrameOverlay();
 		this.iWebRtcController.resizePlayerStyle();
 
 		// set up if the auto play will be used or regular click to start
@@ -247,7 +241,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.connectOverlayEvent = () => {
 				this.iWebRtcController.connectToSignallingSever();
 			}
-			this.overlayController.showConnectOverlay(this.connectOverlayEvent);
+			this.Overlay.showConnectOverlay(this.connectOverlayEvent);
 		} else {
 			this.iWebRtcController.connectToSignallingSever();
 		}
@@ -296,7 +290,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 */
 	onDisconnect(event: CloseEvent) {
 		// display the text overlay
-		this.overlayController.showTextOverlay(`Disconnected: ${event.code} -  ${event.reason}`);
+		this.Overlay.showTextOverlay(`Disconnected: ${event.code} -  ${event.reason}`);
 
 		this.onVideoEncoderAvgQP(-1);
 		// starting a latency check
@@ -444,19 +438,19 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	onInstanceStateChange(instanceState: libspsfrontend.MessageInstanceState): void {
 		switch (instanceState.state) {
 			case libspsfrontend.InstanceState.UNALLOCATED:
-				this.overlayController.showTextOverlay("Instance Unallocated: " + instanceState.details);
+				this.Overlay.showTextOverlay("Instance Unallocated: " + instanceState.details);
 				break;
 			case libspsfrontend.InstanceState.PENDING:
-				this.overlayController.showTextOverlay(instanceState.details, instanceState.progress);
+				this.Overlay.showTextOverlay(instanceState.details, instanceState.progress);
 				break;
 			case libspsfrontend.InstanceState.FAILED:
-				this.overlayController.showTextOverlay("UE Instance Failed: " + instanceState.details);
+				this.Overlay.showTextOverlay("UE Instance Failed: " + instanceState.details);
 				break;
 			case libspsfrontend.InstanceState.READY:
-				this.overlayController.showTextOverlay("Instance is Ready: " + instanceState.details, 100);
+				this.Overlay.showTextOverlay("Instance is Ready: " + instanceState.details, 100);
 				break;
 			default:
-				this.overlayController.showTextOverlay("Unhandled Instance State");
+				this.Overlay.showTextOverlay("Unhandled Instance State");
 				break;
 		}
 	}
@@ -468,19 +462,19 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	onAuthenticationResponse(authResponse: libspsfrontend.MessageAuthResponse): void {
 		switch (authResponse.outcome) {
 			case libspsfrontend.MessageAuthResponseOutcomeType.AUTHENTICATED:
-				this.overlayController.showTextOverlay("Authentication has succeeded. Requesting Instance");
+				this.Overlay.showTextOverlay("Authentication has succeeded. Requesting Instance");
 				break;
 			case libspsfrontend.MessageAuthResponseOutcomeType.INVALID_TOKEN:
-				this.overlayController.showTextOverlay("Invalid Token: " + authResponse.error);
+				this.Overlay.showTextOverlay("Invalid Token: " + authResponse.error);
 				break;
 			case libspsfrontend.MessageAuthResponseOutcomeType.REDIRECT:
-				this.overlayController.showTextOverlay("Redirecting to: " + authResponse.redirect);
+				this.Overlay.showTextOverlay("Redirecting to: " + authResponse.redirect);
 				break;
 			case libspsfrontend.MessageAuthResponseOutcomeType.ERROR:
-				this.overlayController.showTextOverlay("Error: " + authResponse.error);
+				this.Overlay.showTextOverlay("Error: " + authResponse.error);
 				break;
 			default:
-				this.overlayController.showTextOverlay("Unhandled Auth Response: " + authResponse.outcome);
+				this.Overlay.showTextOverlay("Unhandled Auth Response: " + authResponse.outcome);
 				break;
 		}
 	}
@@ -489,7 +483,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 * Show an overlay when an RTC Answer has been received
 	 */
 	onWebRtcAnswer(): void {
-		this.overlayController.showTextOverlay("RTC Answer", 100);
+		this.Overlay.showTextOverlay("RTC Answer", 100);
 	}
 
 	/**

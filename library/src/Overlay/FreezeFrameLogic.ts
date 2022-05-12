@@ -1,12 +1,12 @@
 import { UeControlMessage } from "../UeInstanceMessage/UeControlMessage";
-import { IOverlayController } from "./IOverlayController";
+import { IOverlay } from "./IOverlay";
 
-export class FreezeFrameController {
+export class FreezeFrameLogic {
     freezeFrameOverlay: HTMLDivElement;
     freezeFrameImage: HTMLImageElement;
     freezeFrame: FreezeFrame;
     ueControlMessage: UeControlMessage;
-    iOverlayController: IOverlayController;
+    IOverlay: IOverlay;
     player: HTMLDivElement;
     enlargeDisplayToFillWindowInput: HTMLInputElement;
 
@@ -185,9 +185,9 @@ export class FreezeFrameController {
             this.freezeFrame.height = this.freezeFrameImage.naturalHeight;
             this.freezeFrame.width = this.freezeFrameImage.naturalWidth;
             this.resizeFreezeFrameOverlay();
-            if (this.iOverlayController.shouldShowPlayOverlay === true) {
+            if (this.IOverlay.shouldShowPlayOverlay === true) {
                 console.log("showing play overlay")
-                this.iOverlayController.showPlayOverlay();
+                this.IOverlay.showPlayOverlay();
                 this.resizePlayerStyle();
             } else {
                 console.log("showing freeze frame")

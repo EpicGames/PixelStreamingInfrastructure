@@ -1,19 +1,22 @@
 import { InitialSettings } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults"
-import { OverlayController } from "../Overlay/OverlayController";
+import { Overlay } from "../Overlay/Overlay";
+import { IOverlay } from "../Overlay/IOverlay";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { IWebRtcPlayerController } from "../WebRtcPlayer/IWebRtcPlayerController";
 import { MessageInstanceState, MessageAuthResponse } from "../WebSockets/MessageReceive";
-import { Config } from "..";
+import { Config, FreezeFrameLogic, AfkLogic, IAfkLogic } from "..";
 import { IDelegate } from "./IDelegate";
 
 /**
  * Provides common base functionality for delegates that implement the IDelegate interface
 */
 export class DelegateBase implements IDelegate {
-	public overlayController: OverlayController;
-	public iWebRTCController: IWebRtcPlayerController;
+	public iWebRtcController: IWebRtcPlayerController;
 	public config: Config;
+	overlay: IOverlay;
+	afkLogic: IAfkLogic;
+	freezeFrameLogic: FreezeFrameLogic;
 
 	/**
 	 * @param config - A newly instantiated config object  
@@ -21,7 +24,26 @@ export class DelegateBase implements IDelegate {
 	 */
 	constructor(config: Config) {
 		this.config = config;
-		this.overlayController = new OverlayController(config.playerElement);
+
+		this.afkLogic = new AfkLogic(this.config.controlScheme, this.config.afkTimeout);
+
+		// Close the websocket by invoking closeSignalingServer from the IWebRtcPlayerController interface and turn off the watcher
+		this.afkLogic.closeWs = () => {
+			this.iWebRtcController.closeSignalingServer();
+			this.afkLogic.afk.warnTimeout = 0;
+			this.afkLogic.afk.active = false;
+		};
+	}
+
+	/**
+	 * Returns a new overlay object and shows it in the playerDiv element 
+	 * @param htmlClass the html class you are applying 
+	 * @param htmlElement the created html element you are applying
+	 * @param onClickEvent the event listener you are applying to your custom element
+	 * @returns Overlay object 
+	 */
+	returnNewOverlay(htmlClass?: string, htmlElement?: HTMLElement, onClickEvent?: EventListener) {
+		return new Overlay(this.config.playerElement, htmlClass, htmlElement, onClickEvent)
 	}
 
 	/**
@@ -29,11 +51,20 @@ export class DelegateBase implements IDelegate {
 	 * @param iWebRtcPlayerController 
 	 */
 	setIWebRtcPlayerController(iWebRtcPlayerController: IWebRtcPlayerController) {
-		this.iWebRTCController = iWebRtcPlayerController;
+		this.iWebRtcController = iWebRtcPlayerController;
+		
+		// set up the html 
+		let connectOverlayHtml = document.createElement('div');
+		connectOverlayHtml.id = 'playButton';
+		connectOverlayHtml.innerHTML = 'Click to start';
+		
+		// set up the event listener 
 		let connectOverlayEvent = () => {
 			iWebRtcPlayerController.connectToSignallingSever();
 		}
-		this.overlayController.showConnectOverlay(connectOverlayEvent);
+
+		// create the overlay
+		this.overlay = this.returnNewOverlay('clickableState', connectOverlayHtml, connectOverlayEvent);
 	}
 
 	/**
@@ -96,33 +127,61 @@ export class DelegateBase implements IDelegate {
 	/**
 	 * Resets the AFK inactivity watcher
 	 */
-	 resetAfkWatch() { }
+	resetAfkWatch() { }
 
 	/**
 	 * Event fired when the video is disconnected
 	 */
 	onDisconnect(event: CloseEvent) {
-		this.overlayController.showTextOverlay(`Disconnected: ${event.code} -  ${event.reason}`);
+
+		// set up the new html element for the overlay 
+		let onDisconnectHtml = document.createElement('div');
+        onDisconnectHtml.id = 'messageOverlay';
+        onDisconnectHtml.innerHTML = `Disconnected: ${event.code} -  ${event.reason}`;
+        
+		// create the overlay 
+		this.overlay = this.returnNewOverlay('textDisplayState', onDisconnectHtml, undefined);
 	}
 
 	/**
 	 * Handles when Web Rtc is connecting 
 	 */
 	onWebRtcConnecting() {
-		this.overlayController.showTextOverlay('WebRTC connected, waiting for video');
+		
+		// set up the new html element for the overlay 
+		let onWebRtcConnectingHtml = document.createElement('div');
+        onWebRtcConnectingHtml.id = 'messageOverlay';
+        onWebRtcConnectingHtml.innerHTML = 'WebRTC connected, waiting for video';
+        
+		// create the overlay 
+		this.overlay = this.returnNewOverlay('textDisplayState', onWebRtcConnectingHtml, undefined);
 	}
 
 	/**
 	 * Handles when Web Rtc has connected 
 	 */
 	onWebRtcConnected() {
-		this.overlayController.showTextOverlay("Starting connection to server, please wait");
+		
+		// set up the new html element for the overlay 
+		let onWebRtcConnectedHtml = document.createElement('div');
+        onWebRtcConnectedHtml.id = 'messageOverlay';
+        onWebRtcConnectedHtml.innerHTML = "Starting connection to server, please wait";
+        
+		// create the overlay 
+		this.overlay = this.returnNewOverlay('textDisplayState', onWebRtcConnectedHtml, undefined);
 	}
 
 	/**
 	 * Handles when Web Rtc fails to connect 
 	 */
 	onWebRtcFailed() {
-		this.overlayController.showTextOverlay("Unable to setup video");
+
+		// set up the new html element for the overlay 
+		let onWebRtcFailedHtml = document.createElement('div');
+        onWebRtcFailedHtml.id = 'messageOverlay';
+        onWebRtcFailedHtml.innerHTML = "Unable to setup video";
+        
+		// create the overlay 
+		this.overlay = this.returnNewOverlay('textDisplayState', onWebRtcFailedHtml, undefined);
 	}
 }

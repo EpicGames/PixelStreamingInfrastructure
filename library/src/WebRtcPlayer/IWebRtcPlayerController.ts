@@ -1,13 +1,13 @@
 import { Encoder, WebRTC } from "../DataChannel/InitialSettings";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
-import { FreezeFrameController } from "../Overlay/FreezeFrameController";
+import { FreezeFrameLogic } from "../Overlay/FreezeFrameLogic";
 
 /**
  * Interface for the Web RTC Player Controller
  */
 export interface IWebRtcPlayerController {
     matchViewportResolution: boolean;
-    freezeFrameController: FreezeFrameController;
+    FreezeFrameLogic: FreezeFrameLogic;
 
     /**
      * Connect to the Signaling server

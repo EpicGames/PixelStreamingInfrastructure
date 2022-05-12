@@ -1,7 +1,7 @@
 import { ControlSchemeType } from "../Config/Config";
-import { IAfkOverlayController } from "./IAfkOverlayController";
+import { IAfkLogic } from "./IAfkLogic";
 
-export class AfkOverlayController implements IAfkOverlayController{
+export class AfkLogic implements IAfkLogic{
     afk: afk;
     controlScheme: number;
     idleTimer = 0;
@@ -76,7 +76,7 @@ export class AfkOverlayController implements IAfkOverlayController{
             if (this.afk.countdown == 0) {
                 // The user failed to click so disconnect them.
                 this.afkHideOverlay();
-                this.afkCloseWs();
+                this.closeWs();
             } else {
                 // Update the countdown message.
                 this.updateAfkOverlayText();
@@ -87,17 +87,17 @@ export class AfkOverlayController implements IAfkOverlayController{
     /**
      * An override method for setting the Afk Overlay 
      */
-    afkSetOverlay() { }
+    setOverlay() { }
 
     /**
      * An override method for hiding the Afk overlay
      */
-    afkHideOverlay() { }
+    hideOverlay() { }
 
     /**
-     * An override method for closing the websocket within the AfkOverlayController
+     * An override method for closing the websocket within the AfkLogic
      */
-    afkCloseWs() { }
+    closeWs() { }
 }
 export class afk {
     warnTimeout = 0;
