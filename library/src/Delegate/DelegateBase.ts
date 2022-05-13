@@ -28,6 +28,15 @@ export class DelegateBase implements IDelegate {
 		// create the afkLogic class 
 		this.afkLogic = new AfkLogic(this.config.controlScheme, this.config.afkTimeout);
 
+		// set the event to occur if the logic closes the websocket connection
+		this.afkLogic.closeWebSocket = () => this.iWebRtcController.closeSignalingServer();
+
+		// give the webRtcPlayerController the ability to start the afk inactivity watcher
+		this.startAfkWatch = () => this.afkLogic.startAfkWarningTimer();
+
+		// give the webRtcPlayerController the ability to reset the afk inactivity watcher
+		this.resetAfkWatch = () => this.afkLogic.resetAfkWarningTimer();
+
 		// create the afk overlay html 
 		let afkOverlayHtml = document.createElement('div') as HTMLDivElement;
 		afkOverlayHtml.id = 'afkOverlay';
@@ -45,19 +54,6 @@ export class DelegateBase implements IDelegate {
 
 		// set the afk overlays update html that uses its own countdown timer number 
 		this.afkLogic.afkOverlay.setAfkOverlayUpdateHtml('<center>No activity detected<br>Disconnecting in ' + this.afkLogic.afkOverlay.countdown + ' seconds<br>Click to continue<br></center>');
-
-		// set the event to occur after the afk overlay is hidden 
-		this.afkLogic.afkOverlay.afterHideOverlay = () => {
-			this.iWebRtcController.closeSignalingServer();
-			this.afkLogic.warnTimeout = 0;
-			this.afkLogic.active = false;
-		};
-
-		// give the webRtcPlayerController the ability to start the afk inactivity watcher
-		this.startAfkWatch = () => this.afkLogic.startAfkWarningTimer();
-
-		// give the webRtcPlayerController the ability to reset the afk inactivity watcher
-		this.resetAfkWatch = () => this.afkLogic.resetAfkWarningTimer();
 	}
 
 	/**

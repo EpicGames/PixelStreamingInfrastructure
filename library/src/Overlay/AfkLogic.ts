@@ -70,10 +70,17 @@ export class AfkLogic {
             if (this.countdown == 0) {
                 // The user failed to click so hide the overlay and disconnect them.
                 this.afkOverlay.hideOverlay();
+                this.closeWebSocket();
+
+                // switch off the afk feature as stream has closed 
+                this.warnTimeout = 0;
+                this.active = false;
             } else {
                 // Update the countdown message.
                 this.afkOverlay.updateAfkOverlayContents(this.countdown, this.afkOverlay.afkOverlayUpdateHtml);
             }
         }, 1000);
     }
+
+    closeWebSocket() { }
 }
