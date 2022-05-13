@@ -44,9 +44,10 @@ export class Overlay implements IOverlay {
         // If the overlay has any previous classes remove them so we can set the new ones
         this.updateOverlayClasses(htmlClass);
 
-        // create into the baseParentDiv and run any show functionality 
+        // create into the baseParentDiv and run any show functionality
+        this.beforeShowOverlay();
         this.baseParentDiv.appendChild(this.overlay);
-        this.onShowOverlay();
+        this.afterShowOverlay();
     }
 
     /**
@@ -78,21 +79,41 @@ export class Overlay implements IOverlay {
      * hide the overlay by setting a hiddenState class and runs any onHideOverlay functionality 
      */
     hideOverlay() {
-        this.onHideOverlay();
+        this.beforeHideOverlay();
         this.updateOverlayClasses('hiddenState');
+        this.afterHideOverlay();
     }
 
     /**
-     * An override function that users can pass in custom functionality for when an overlay shows 
+     * Update an overlays div html contents 
+     * @param htmlContent a string of html content you wish to replace into you div
      */
-    onShowOverlay() { }
+    updateOverlayContents(htmlContent: string) {
+        this.overlay.innerHTML = htmlContent;
+    }
 
     /**
-     * An override function that users can pass in custom functionality for when an overlay hides 
+     * An override function that users can pass in custom functionality for before an overlay is shown 
      */
-    onHideOverlay() { }
+    beforeShowOverlay() { }
 
-    // //to show the connect overlay the overlay Event listener must be preset and passed in
+    /**
+     * An override function that users can pass in custom functionality for after an overlay has shown 
+     */
+    afterShowOverlay() { }
+
+    /**
+     * An override function that users can pass in custom functionality for before an overlay is hidden 
+     */
+    beforeHideOverlay() { }
+
+    /**
+     * An override function that users can pass in custom functionality for after an overlay has hidden
+     */
+    afterHideOverlay() { }
+}
+
+// //to show the connect overlay the overlay Event listener must be preset and passed in
     // /**
     //  * Shows the starting connect overlay
     //  * @param event the event listener you want to activate when you click this overlay
@@ -116,7 +137,6 @@ export class Overlay implements IOverlay {
     //     this.setOverlay('clickableState', img, event);
     //     this.shouldShowPlayOverlay = false;
     // }
-}
 
 // add a progress bar if the progress is given currently unused leaving here in case
 // if (progress !== undefined) {

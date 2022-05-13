@@ -1,7 +1,5 @@
 import { InitialSettings } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults"
-import { FreezeFrameLogic } from "../Overlay/FreezeFrameLogic";
-import { IAfkLogic } from "../Overlay/IAfkLogic";
 import { IOverlay } from "../Overlay/IOverlay";
 import { Overlay } from "../Overlay/Overlay";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
@@ -14,14 +12,12 @@ import { MessageInstanceState, MessageAuthResponse } from "../WebSockets/Message
 export interface IDelegate {
 
 	overlay: IOverlay;
-	afkLogic: IAfkLogic;
-	freezeFrameLogic: FreezeFrameLogic;
 
 	/**
 	 * Returns a new overlay object and shows it in the playerDiv element 
 	 * @param htmlClass the html class you are applying 
-     * @param htmlElement the created html element you are applying
-     * @param onClickFunction the event listener you are applying to your custom element
+	 * @param htmlElement the created html element you are applying
+	 * @param onClickFunction the event listener you are applying to your custom element
 	 * @returns Overlay object 
 	 */
 	returnNewOverlay(htmlClass?: string, htmlElement?: HTMLElement, onClickFunction?: EventListener): Overlay;

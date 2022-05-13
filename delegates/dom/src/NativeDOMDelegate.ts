@@ -14,10 +14,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	//instantiate the connect overlay click event listener
 	connectOverlayEvent: EventListener;
 
-	//instantiate the AFK Overlay Controller and click event listener
-	AfkLogic: libspsfrontend.AfkLogic
-	afkOverlayEvent: EventListener;
-
 	showStats: boolean;
 
 	logging: boolean;
@@ -69,28 +65,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.showStats = true;
 		this.logging = false;
 		this.videoEncoderAvgQP = -1;
-		this.AfkLogic = new libspsfrontend.AfkLogic(this.config.controlScheme, this.config.enableAfk);
-
-		// Build the AFK overlay Event Listener
-		this.afkOverlayEvent = () => {
-			// The user clicked so start the timer again and carry on.
-			this.Overlay.hideOverlay();
-			clearInterval(this.AfkLogic.afk.countdownTimer);
-			this.AfkLogic.startAfkWarningTimer();
-		}
-
-		// Set the AFK overlay by invoking setOverlay from the overlay Controller
-		this.AfkLogic.afkSetOverlay = () => this.Overlay.setOverlay('clickableState', this.AfkLogic.afk.overlay, this.afkOverlayEvent);
-
-		// Hide the AFK Overlay by invoking hideOverlay from the overlay Controller
-		this.AfkLogic.afkHideOverlay = () => this.Overlay.hideOverlay();
-
-		// give the webRtcPlayerController the ability to start the afk inactivity watcher
-		this.startAfkWatch = () => this.AfkLogic.startAfkWarningTimer();
-
-		// give the webRtcPlayerController the ability to reset the afk inactivity watcher
-		this.resetAfkWatch = () => this.AfkLogic.resetAfkWarningTimer();
-
+	
 		this.ConfigureButtons();
 	}
 

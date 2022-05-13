@@ -4,14 +4,36 @@
 export interface IOverlay {
 
     //shouldShowPlayOverlay: boolean;
+    overlay: HTMLDivElement;
 
     /**
-     * An override function that users can pass in custom functionality for when an overlay shows 
+     * hide the overlay by setting a hiddenState class and runs any onHideOverlay functionality 
      */
-    onShowOverlay(): void;
+    hideOverlay(): void;
 
     /**
-     * An override function that users can pass in custom functionality for when an overlay hides 
+     * An override function that users can pass in custom functionality for before an overlay is shown 
      */
-    onHideOverlay(): void;
+    beforeShowOverlay(): any;
+
+    /**
+    * An override function that users can pass in custom functionality for after an overlay has shown 
+    */
+    afterShowOverlay(): any;
+
+    /**
+     * An override function that users can pass in custom functionality for before an overlay is hidden 
+     */
+    beforeHideOverlay(): any;
+
+    /**
+    * An override function that users can pass in custom functionality for after an overlay has hidden
+    */
+    afterHideOverlay(): any;
+
+    /**
+     * Update an overlays div html contents 
+     * @param htmlContent a string of html content you wish to replace into you div
+     */
+    updateOverlayContents(htmlContent: string): void;
 }

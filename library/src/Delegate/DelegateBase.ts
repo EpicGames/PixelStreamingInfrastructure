@@ -25,14 +25,39 @@ export class DelegateBase implements IDelegate {
 	constructor(config: Config) {
 		this.config = config;
 
+		// create the afkLogic class 
 		this.afkLogic = new AfkLogic(this.config.controlScheme, this.config.afkTimeout);
 
-		// Close the websocket by invoking closeSignalingServer from the IWebRtcPlayerController interface and turn off the watcher
-		this.afkLogic.closeWs = () => {
+		// create the afk overlay html 
+		let afkOverlayHtml = document.createElement('div') as HTMLDivElement;
+		afkOverlayHtml.id = 'afkOverlay';
+
+		// Build the AFK overlay Event Listener
+		let afkOverlayEvent = () => {
+			// The user clicked so start the timer again and carry on.
+			this.afkLogic.afkOverlay.hideOverlay();
+			clearInterval(this.afkLogic.countdownTimer);
+			this.afkLogic.startAfkWarningTimer();
+		}
+
+		// set the afk overlay parameters so an new overlay can be instantiated inside the class when required 
+		this.afkLogic.afkOverlay.setOverlayParameters(this.returnNewOverlay('clickableState', afkOverlayHtml, afkOverlayEvent));
+
+		// set the afk overlays update html that uses its own countdown timer number 
+		this.afkLogic.afkOverlay.setAfkOverlayUpdateHtml('<center>No activity detected<br>Disconnecting in ' + this.afkLogic.afkOverlay.countdown + ' seconds<br>Click to continue<br></center>');
+
+		// set the event to occur after the afk overlay is hidden 
+		this.afkLogic.afkOverlay.afterHideOverlay = () => {
 			this.iWebRtcController.closeSignalingServer();
-			this.afkLogic.afk.warnTimeout = 0;
-			this.afkLogic.afk.active = false;
+			this.afkLogic.warnTimeout = 0;
+			this.afkLogic.active = false;
 		};
+
+		// give the webRtcPlayerController the ability to start the afk inactivity watcher
+		this.startAfkWatch = () => this.afkLogic.startAfkWarningTimer();
+
+		// give the webRtcPlayerController the ability to reset the afk inactivity watcher
+		this.resetAfkWatch = () => this.afkLogic.resetAfkWarningTimer();
 	}
 
 	/**
@@ -52,12 +77,12 @@ export class DelegateBase implements IDelegate {
 	 */
 	setIWebRtcPlayerController(iWebRtcPlayerController: IWebRtcPlayerController) {
 		this.iWebRtcController = iWebRtcPlayerController;
-		
+
 		// set up the html 
 		let connectOverlayHtml = document.createElement('div');
 		connectOverlayHtml.id = 'playButton';
 		connectOverlayHtml.innerHTML = 'Click to start';
-		
+
 		// set up the event listener 
 		let connectOverlayEvent = () => {
 			iWebRtcPlayerController.connectToSignallingSever();
@@ -136,9 +161,9 @@ export class DelegateBase implements IDelegate {
 
 		// set up the new html element for the overlay 
 		let onDisconnectHtml = document.createElement('div');
-        onDisconnectHtml.id = 'messageOverlay';
-        onDisconnectHtml.innerHTML = `Disconnected: ${event.code} -  ${event.reason}`;
-        
+		onDisconnectHtml.id = 'messageOverlay';
+		onDisconnectHtml.innerHTML = `Disconnected: ${event.code} -  ${event.reason}`;
+
 		// create the overlay 
 		this.overlay = this.returnNewOverlay('textDisplayState', onDisconnectHtml, undefined);
 	}
@@ -147,12 +172,12 @@ export class DelegateBase implements IDelegate {
 	 * Handles when Web Rtc is connecting 
 	 */
 	onWebRtcConnecting() {
-		
+
 		// set up the new html element for the overlay 
 		let onWebRtcConnectingHtml = document.createElement('div');
-        onWebRtcConnectingHtml.id = 'messageOverlay';
-        onWebRtcConnectingHtml.innerHTML = 'WebRTC connected, waiting for video';
-        
+		onWebRtcConnectingHtml.id = 'messageOverlay';
+		onWebRtcConnectingHtml.innerHTML = 'WebRTC connected, waiting for video';
+
 		// create the overlay 
 		this.overlay = this.returnNewOverlay('textDisplayState', onWebRtcConnectingHtml, undefined);
 	}
@@ -161,12 +186,12 @@ export class DelegateBase implements IDelegate {
 	 * Handles when Web Rtc has connected 
 	 */
 	onWebRtcConnected() {
-		
+
 		// set up the new html element for the overlay 
 		let onWebRtcConnectedHtml = document.createElement('div');
-        onWebRtcConnectedHtml.id = 'messageOverlay';
-        onWebRtcConnectedHtml.innerHTML = "Starting connection to server, please wait";
-        
+		onWebRtcConnectedHtml.id = 'messageOverlay';
+		onWebRtcConnectedHtml.innerHTML = "Starting connection to server, please wait";
+
 		// create the overlay 
 		this.overlay = this.returnNewOverlay('textDisplayState', onWebRtcConnectedHtml, undefined);
 	}
@@ -178,9 +203,9 @@ export class DelegateBase implements IDelegate {
 
 		// set up the new html element for the overlay 
 		let onWebRtcFailedHtml = document.createElement('div');
-        onWebRtcFailedHtml.id = 'messageOverlay';
-        onWebRtcFailedHtml.innerHTML = "Unable to setup video";
-        
+		onWebRtcFailedHtml.id = 'messageOverlay';
+		onWebRtcFailedHtml.innerHTML = "Unable to setup video";
+
 		// create the overlay 
 		this.overlay = this.returnNewOverlay('textDisplayState', onWebRtcFailedHtml, undefined);
 	}
