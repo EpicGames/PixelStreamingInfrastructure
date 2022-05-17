@@ -4,7 +4,7 @@
 export interface IOverlay {
 
     //shouldShowPlayOverlay: boolean;
-    overlay: HTMLDivElement;
+    currentOverlayElement: HTMLDivElement;
 
     /**
      * hide the overlay by setting a hiddenState class and runs any onHideOverlay functionality 

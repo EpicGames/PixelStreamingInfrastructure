@@ -53,7 +53,7 @@ export class AfkLogic {
         this.stopAfkWarningTimer();
 
         // instantiate a new overlay 
-        this.afkOverlay = new AfkOverlay(this.afkOverlay.baseParentDiv, this.afkOverlay.htmlClass, this.afkOverlay.htmlElement, this.afkOverlay.onClickEvent)
+        this.afkOverlay = new AfkOverlay(this.afkOverlay.baseInsertDiv, this.afkOverlay.overlayDivId, this.afkOverlay.overlayDivClass, this.afkOverlay.overlayHtmlElement, this.afkOverlay.overlayClickEvent)
 
         // update our countdown timer and overlay contents
         this.countdown = this.closeTimeout;
@@ -82,5 +82,8 @@ export class AfkLogic {
         }, 1000);
     }
 
+    /**
+     * An override method for closing the websocket connection from the clients side
+     */
     closeWebSocket() { }
 }

@@ -1,78 +1,77 @@
-import { Images } from "./Images";
 import { IOverlay } from "./IOverlay";
 
 export class Overlay implements IOverlay {
-    baseParentDiv: HTMLDivElement;
-    overlay: HTMLDivElement;
+    baseInsertDiv: HTMLDivElement;
+    currentOverlayElement: HTMLDivElement;
     //shouldShowPlayOverlay = true;
-    //playButtonImage: string;
 
     /**
      * Create a clickable div with text and onclick functions
-     * @param baseParentDiv the parent div element that this overlay will be inserted into 
-     * @param htmlClass the html class you are applying 
-     * @param htmlElement the created html element you are applying
-     * @param onClickEvent the event listener you are applying to your custom element     
+     * @param baseInsertDiv the parent div element that this overlay will be inserted into 
+     * @param overlayDivId the id for the base div of the overlay 
+     * @param overlayDivClass the html class you are applying 
+     * @param overlayHtmlElement the created html element you are applying
+     * @param overlayClickEvent the event listener you are applying to your custom element     
      */
-    constructor(baseParentDiv: HTMLDivElement, htmlClass?: string, htmlElement?: HTMLElement, onClickEvent?: EventListener) {
-        this.baseParentDiv = baseParentDiv;
+    constructor(baseInsertDiv: HTMLDivElement, overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener) {
+        this.baseInsertDiv = baseInsertDiv;
 
-        let preExistingOverlay = document.getElementById('videoPlayOverlay') as HTMLDivElement;
+        let preExistingOverlay = document.getElementById(overlayDivId) as HTMLDivElement;
         // an overlay may already exist inside its parent so lets check if not we will make a new one
-        if (!this.baseParentDiv.contains(preExistingOverlay)) {
-            this.overlay = document.createElement('div');
-            this.overlay.id = 'videoPlayOverlay';
+        if (!this.baseInsertDiv.contains(preExistingOverlay)) {
+            this.currentOverlayElement = document.createElement('div');
+            this.currentOverlayElement.id = overlayDivId;
         } else {
-            this.overlay = preExistingOverlay;
+            this.currentOverlayElement = preExistingOverlay;
         }
 
         // While this overlay has child elements remove them so we can add the new ones
-        while (this.overlay.lastChild) {
-            this.overlay.removeChild(this.overlay.lastChild);
+        while (this.currentOverlayElement.lastChild) {
+            this.currentOverlayElement.removeChild(this.currentOverlayElement.lastChild);
         }
 
         // if the user passes a custom html elements add them in
-        if (htmlElement) {
-            this.overlay.appendChild(htmlElement);
+        if (overlayHtmlElement) {
+            this.currentOverlayElement.appendChild(overlayHtmlElement);
         }
 
         // if the user passes click functionality then add an event listener to it
-        if (onClickEvent) {
-            this.addOverlayOnClickEvent(onClickEvent);
+        if (overlayClickEvent) {
+            this.addOverlayOnClickEvent(overlayClickEvent);
         }
 
         // If the overlay has any previous classes remove them so we can set the new ones
-        this.updateOverlayClasses(htmlClass);
+        this.updateOverlayClasses(overlayDivClass);
 
-        // create into the baseParentDiv and run any show functionality
+        // create into the baseInsertDiv and run any show functionality
         this.beforeShowOverlay();
-        this.baseParentDiv.appendChild(this.overlay);
+        this.baseInsertDiv.appendChild(this.currentOverlayElement);
         this.afterShowOverlay();
     }
 
     /**
      * Add an on click event to an overlay 
-     * @param onClickEvent the on click event to be activated
+     * @param overlayClickEvent the on click event to be activated
      */
-    addOverlayOnClickEvent(onClickEvent: EventListener) {
-        this.overlay.addEventListener('click', function onOverlayClick(event: Event) {
-            onClickEvent(event);
+    addOverlayOnClickEvent(overlayClickEvent: EventListener) {
+        this.currentOverlayElement.addEventListener('click', function onOverlayClick(event: Event) {
+            overlayClickEvent(event);
             this.overlay.removeEventListener('click', onOverlayClick);
         }.bind(this));
     }
 
     /**
      * Update all classes on an overlay 
-     * @param htmlClass a string of html classes you wish to apply to an overlay  
+     * @param overlayDivClass a string of html classes you wish to apply to an overlay  
      */
-    updateOverlayClasses(htmlClass: string) {
+    updateOverlayClasses(overlayDivClass: string) {
         // If the overlay has any previous classes remove them so we can set the new ones
-        let cl = this.overlay.classList;
+        let cl = this.currentOverlayElement.classList;
         for (let i = cl.length - 1; i >= 0; i--) {
             cl.remove(cl[i]);
         }
 
-        this.overlay.classList.add(htmlClass);
+        this.currentOverlayElement.classList.add(overlayDivClass);
     }
 
     /**
@@ -89,7 +88,7 @@ export class Overlay implements IOverlay {
      * @param htmlContent a string of html content you wish to replace into you div
      */
     updateOverlayContents(htmlContent: string) {
-        this.overlay.innerHTML = htmlContent;
+        this.currentOverlayElement.innerHTML = htmlContent;
     }
 
     /**
@@ -113,18 +112,6 @@ export class Overlay implements IOverlay {
     afterHideOverlay() { }
 }
 
-// //to show the connect overlay the overlay Event listener must be preset and passed in
-    // /**
-    //  * Shows the starting connect overlay
-    //  * @param event the event listener you want to activate when you click this overlay
-    //  */
-    // showConnectOverlay(event: EventListener) {
-    //     let startText = document.createElement('div');
-    //     startText.id = 'playButton';
-    //     startText.innerHTML = 'Click to start';
-    //     this.setOverlay('clickableState', startText, event);
-    // }
-
     // /**
     // * Shows the play overlay
     // *  @param event the event listener you want to activate when you click this overlay
@@ -140,13 +127,13 @@ export class Overlay implements IOverlay {
 
 // add a progress bar if the progress is given currently unused leaving here in case
 // if (progress !== undefined) {
-//     let progressBar: HTMLElement = document.createElement('div');
+//     let progressBar: overlayHtmlElement = document.createElement('div');
 //     progressBar.className = 'progress'
-//     let progressBarInner: HTMLElement = document.createElement('div');
+//     let progressBarInner: overlayHtmlElement = document.createElement('div');
 //     progressBarInner.className = 'progress-bar progress-bar-striped active'
 //     progressBarInner.style.width = progress + "%"
 //     progressBar.appendChild(progressBarInner);
-//     htmlElement.appendChild(progressBar);
+//     overlayHtmlElement.appendChild(progressBar);
 // }
 
 // add a spinner 
@@ -161,5 +148,5 @@ export class Overlay implements IOverlay {
 //     spinnerDiv.setAttribute("role", "status");
 
 //     spinnerDiv.appendChild(spinnerSpan);
-//     htmlElement.appendChild(spinnerDiv);
+//     overlayHtmlElement.appendChild(spinnerDiv);
 // }

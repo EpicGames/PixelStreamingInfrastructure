@@ -14,13 +14,14 @@ export interface IDelegate {
 	overlay: IOverlay;
 
 	/**
-	 * Returns a new overlay object and shows it in the playerDiv element 
-	 * @param htmlClass the html class you are applying 
-	 * @param htmlElement the created html element you are applying
+	 * Returns a new overlay object and shows it in the playerDiv element
+	 * @param overlayDivId the id for the base div of the overlay 
+	 * @param overlayDivClass the html class you are applying 
+	 * @param overlayHtmlElement the created html element you are applying
 	 * @param onClickFunction the event listener you are applying to your custom element
 	 * @returns Overlay object 
 	 */
-	returnNewOverlay(htmlClass?: string, htmlElement?: HTMLElement, onClickFunction?: EventListener): Overlay;
+	returnNewOverlay(overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, onClickFunction?: EventListener): Overlay;
 
 	/**
 	 * acts as an override for instantiating the WebRTCPlayerController interface to provide WebRTCPlayerController functionality  

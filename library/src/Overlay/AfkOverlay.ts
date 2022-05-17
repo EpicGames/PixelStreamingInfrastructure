@@ -1,25 +1,28 @@
 import { Overlay } from "./Overlay";
 
 export class AfkOverlay extends Overlay {
-    baseParentDiv: HTMLDivElement;
-    htmlClass: string;
-    htmlElement: HTMLElement;
-    onClickEvent: EventListener;
+    baseInsertDiv: HTMLDivElement;
+    overlayDivId: string;
+    overlayDivClass: string;
+    overlayHtmlElement: HTMLElement;
+    overlayClickEvent: EventListener;
     afkOverlayUpdateHtml: string;
-    countdown = 0;
+    countDown = 0;
 
     /**
      * Set the overlays parameters before construction
-     * @param baseParentDiv the parent div element that this overlay will be inserted into 
-     * @param htmlClass the html class you are applying 
-     * @param htmlElement the created html element you are applying
-     * @param onClickEvent the event listener you are applying to your custom element 
+     * @param baseInsertDiv the parent div element that this overlay will be inserted into 
+     * @param overlayDivId the id for the base div of the overlay
+     * @param overlayDivClass the html class you are applying 
+     * @param overlayHtmlElement the created html element you are applying
+     * @param overlayClickEvent the event listener you are applying to your custom element 
      */
-    setOverlayParameters(baseParentDiv: HTMLDivElement, htmlClass?: string, htmlElement?: HTMLElement, onClickEvent?: EventListener) {
-        this.baseParentDiv = baseParentDiv;
-        this.htmlClass = htmlClass;
-        this.htmlElement = htmlElement;
-        this.onClickEvent = onClickEvent;
+    setOverlayParameters(baseInsertDiv: HTMLDivElement, overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener) {
+        this.baseInsertDiv = baseInsertDiv;
+        this.overlayDivId = overlayDivId;
+        this.overlayDivClass = overlayDivClass;
+        this.overlayHtmlElement = overlayHtmlElement;
+        this.overlayClickEvent = overlayClickEvent;
     }
 
     /**
@@ -31,12 +34,12 @@ export class AfkOverlay extends Overlay {
     }
 
     /**
-     * Gets the latest countdown number and updates the overlay html as the html will contain the countdown variable
-     * @param countdown 
+     * Gets the latest countDown number and updates the overlay html as the html will contain the countDown variable
+     * @param countDown 
      * @param afkOverlayUpdateHtml 
      */
-    updateAfkOverlayContents(countdown: number, afkOverlayUpdateHtml: string) {
-        this.countdown = countdown;
+    updateAfkOverlayContents(countDown: number, afkOverlayUpdateHtml: string) {
+        this.countDown = countDown;
         this.updateOverlayContents(afkOverlayUpdateHtml);
     }
 }

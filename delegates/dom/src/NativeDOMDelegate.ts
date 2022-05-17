@@ -206,8 +206,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.iWebRtcController = iWebRtcPlayerController;
 
 		//set up Ui's for start up 
-		this.iWebRtcController.FreezeFrameLogic.IOverlay = this.Overlay;
-		this.iWebRtcController.FreezeFrameLogic.invalidateFreezeFrameOverlay();
+		this.iWebRtcController.FreezeFrame.IOverlay = this.Overlay;
+		this.iWebRtcController.FreezeFrame.invalidateFreezeFrameOverlay();
 		this.iWebRtcController.resizePlayerStyle();
 
 		// set up if the auto play will be used or regular click to start
