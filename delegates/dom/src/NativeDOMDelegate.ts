@@ -11,9 +11,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	//instantiate the WebRtcPlayerControllers interface var 
 	iWebRtcController: libspsfrontend.IWebRtcPlayerController;
 
-	//instantiate the connect overlay click event listener
-	connectOverlayEvent: EventListener;
-
 	showStats: boolean;
 
 	logging: boolean;
@@ -200,29 +197,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	}
 
 	/**
-	* Finnish setting up all things that require the WebRtcPlayerController
-	*/
-	setIWebRtcPlayerController(iWebRtcPlayerController: libspsfrontend.IWebRtcPlayerController) {
-		this.iWebRtcController = iWebRtcPlayerController;
-
-		//set up Ui's for start up 
-		this.iWebRtcController.FreezeFrame.IOverlay = this.Overlay;
-		this.iWebRtcController.FreezeFrame.invalidateFreezeFrameOverlay();
-		this.iWebRtcController.resizePlayerStyle();
-
-		// set up if the auto play will be used or regular click to start
-		if (this.config.enableSpsAutoplay === false) {
-			// Build the connect overlay Event Listener and show the connect overlay
-			this.connectOverlayEvent = () => {
-				this.iWebRtcController.connectToSignallingSever();
-			}
-			this.Overlay.showConnectOverlay(this.connectOverlayEvent);
-		} else {
-			this.iWebRtcController.connectToSignallingSever();
-		}
-	}
-
-	/**
 	 * Handle when the Video has been Initialised
 	 */
 	onVideoInitialised() {
@@ -264,10 +238,12 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 * @param event 
 	 */
 	onDisconnect(event: CloseEvent) {
-		// display the text overlay
-		this.Overlay.showTextOverlay(`Disconnected: ${event.code} -  ${event.reason}`);
+		// display the text overlay by calling its super method so it will use its default behavior first 
+		super.onDisconnect(event);
 
+		// update all of the tools upon disconnect 
 		this.onVideoEncoderAvgQP(-1);
+		
 		// starting a latency check
 		document.getElementById("btn-start-latency-test").onclick = () => { }
 
@@ -404,61 +380,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 */
 	onQualityControlOwnership(hasQualityOwnership: boolean): void {
 		this.qualityControlOwnershipCheckBox.checked = hasQualityOwnership;
-	}
-
-	/**
-	 * Handles when there is a instance state changes
-	 * @param instanceState - Instance State
-	 */
-	onInstanceStateChange(instanceState: libspsfrontend.MessageInstanceState): void {
-		switch (instanceState.state) {
-			case libspsfrontend.InstanceState.UNALLOCATED:
-				this.Overlay.showTextOverlay("Instance Unallocated: " + instanceState.details);
-				break;
-			case libspsfrontend.InstanceState.PENDING:
-				this.Overlay.showTextOverlay(instanceState.details, instanceState.progress);
-				break;
-			case libspsfrontend.InstanceState.FAILED:
-				this.Overlay.showTextOverlay("UE Instance Failed: " + instanceState.details);
-				break;
-			case libspsfrontend.InstanceState.READY:
-				this.Overlay.showTextOverlay("Instance is Ready: " + instanceState.details, 100);
-				break;
-			default:
-				this.Overlay.showTextOverlay("Unhandled Instance State");
-				break;
-		}
-	}
-
-	/**
-	 * Show an overlay when an Authentication response is received
-	 * @param authResponse - Authentication response 
-	 */
-	onAuthenticationResponse(authResponse: libspsfrontend.MessageAuthResponse): void {
-		switch (authResponse.outcome) {
-			case libspsfrontend.MessageAuthResponseOutcomeType.AUTHENTICATED:
-				this.Overlay.showTextOverlay("Authentication has succeeded. Requesting Instance");
-				break;
-			case libspsfrontend.MessageAuthResponseOutcomeType.INVALID_TOKEN:
-				this.Overlay.showTextOverlay("Invalid Token: " + authResponse.error);
-				break;
-			case libspsfrontend.MessageAuthResponseOutcomeType.REDIRECT:
-				this.Overlay.showTextOverlay("Redirecting to: " + authResponse.redirect);
-				break;
-			case libspsfrontend.MessageAuthResponseOutcomeType.ERROR:
-				this.Overlay.showTextOverlay("Error: " + authResponse.error);
-				break;
-			default:
-				this.Overlay.showTextOverlay("Unhandled Auth Response: " + authResponse.outcome);
-				break;
-		}
-	}
-
-	/**
-	 * Show an overlay when an RTC Answer has been received
-	 */
-	onWebRtcAnswer(): void {
-		this.Overlay.showTextOverlay("RTC Answer", 100);
 	}
 
 	/**

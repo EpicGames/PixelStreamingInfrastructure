@@ -94,25 +94,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.videoPlayerController = new VideoPlayerController(this.config.playerElement, this.config.startVideoMuted);
 
-		//when running showPlayOverlay it requires an event listener. make it first then pass in the var
-		this.playOverlayEvent = () => {
-			if (this.videoPlayerController && this.videoPlayerController.videoElement) {
-				// handle play() with .then as it is an asynchronous call 
-				this.videoPlayerController.videoElement.play().then(() => {
-					//this.videoPlayerController.videoElement.click();
-					this.ueControlMessage.SendRequestInitialSettings();
-					this.ueControlMessage.SendRequestQualityControl();
-					this.freezeFrame.freezeFrameOverlay.showFreezeFrameOverlay();
-					this.delegate.overlay.hideOverlay();
-					this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
-					this.delegate.startAfkWatch();
-				});
-				Logger.verboseLog("Playing audio");
-				this.videoPlayerController.PlayAudioTrack();
-			} else {
-				console.error("Could not player video stream because webRtcPlayerObj.video was not valid.")
-			}
-		}
+		// attach playStream to an event listener so it can be passed to an overlay for activation 
+		this.playOverlayEvent = () => this.playStream();
 
 		// set up websocket methods
 		this.webSocketController = new WebSocketController(this.config.signallingServerAddress);
@@ -148,42 +131,50 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
-	 * activate the setIWebRtcPlayerController method within our delegate to set up the final webrtc player controller methods so a webrtc connection can be made 
+	 * activate the setIWebRtcPlayerController method within our delegate to set up the final webRtc player controller methods so a webRtc connection can be made 
 	 */
 	setUpWebRtcConnectionForActivation() {
 		this.delegate.setIWebRtcPlayerController(this);
 	}
 
 	/**
+	 * Plays the stream and sets up other pieces while the stream starts also handles if the video cannot play
+	 */
+	playStream() {
+		if (this.videoPlayerController && this.videoPlayerController.videoElement) {
+			// handle play() with .then as it is an asynchronous call  
+			this.videoPlayerController.videoElement.play().then(() => {
+				this.videoPlayerController.PlayAudioTrack();
+				this.ueControlMessage.SendRequestInitialSettings();
+				this.ueControlMessage.SendRequestQualityControl();
+				this.freezeFrame.freezeFrameOverlay.showFreezeFrameOverlay();
+				this.delegate.overlay.hideOverlay();
+				this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
+				this.delegate.startAfkWatch();
+			}).catch((onRejectedReason: string) => {
+				console.log(onRejectedReason);
+				console.log("Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.")
+				this.delegate.onShowPlayOverlay(this.playOverlayEvent);
+			});
+		} else {
+			console.error("Could not player video stream because webRtcPlayerObj.video was not valid.")
+		}
+	}
+
+	/**
 	 * Enable the video to play automaticity if enableSpsAutoplay is true
 	 */
-	enableVideoPlay() {
+	autoPlayVideoOrSetUpPlayOverlay() {
 		if (this.config.enableSpsAutoplay === true) {
-			if (this.videoPlayerController && this.videoPlayerController.videoElement) {
-				// set up the auto play 
-				this.videoPlayerController.videoElement.autoplay = true;
 
-				// handle play() with .then as it is an asynchronous call  
-				// catch the auto play if the browser does not support it
-				this.videoPlayerController.videoElement.play().then(() => {
-					this.ueControlMessage.SendRequestInitialSettings();
-					this.ueControlMessage.SendRequestQualityControl();
-					this.freezeFrame.freezeFrameOverlay.showFreezeFrameOverlay();
-					this.videoPlayerController.PlayAudioTrack();
-					this.delegate.overlay.hideOverlay();
-					this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
-					this.delegate.startAfkWatch();
-				}).catch((onRejectedReason: string) => {
-					console.log(onRejectedReason);
-					console.log("Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.")
-					this.delegate.Overlay.showPlayOverlay(this.playOverlayEvent);
-				});
-			} else {
-				console.error("Could not player video stream because webRtcPlayerObj.video was not valid.")
-			}
+			// set up the auto play on the video element  
+			this.videoPlayerController.videoElement.autoplay = true;
+			
+			// attempt to play the video
+			this.playStream();
+
 		} else {
-			// The engine may not be started when this fires its ok and will be fixed. 
-			this.delegate.Overlay.showPlayOverlay(this.playOverlayEvent);
+			this.delegate.onShowPlayOverlay(this.playOverlayEvent);
 		}
 	}
 
@@ -241,7 +232,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param messageConfig - Config Message received from the signaling server
 	 */
 	handleOnConfigMessage(messageConfig: MessageConfig) {
-		
+
 		/* Tell the WebRtcController to start a session with the peer options sent from the signaling server */
 		this.startSession(messageConfig.peerConnectionOptions);
 
@@ -338,8 +329,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		setInterval(this.getStats.bind(this), 1000);
 
-		// FOR HEADLESS TESTING 'Start Streaming'
-		this.enableVideoPlay();
+		// either autoplay the video or set up the play overlay
+		this.autoPlayVideoOrSetUpPlayOverlay();
 
 		this.uiController.resizePlayerStyle();
 

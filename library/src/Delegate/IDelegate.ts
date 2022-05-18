@@ -92,6 +92,11 @@ export interface IDelegate {
 	resetAfkWatch(): void;
 
 	/**
+	 * Creates the play overlay for playing the video stream
+	 */
+	onShowPlayOverlay(overlayClickEvent: EventListener): void;
+
+	/**
 	 * Event fired when the video is disconnected
 	 */
 	onDisconnect(event: CloseEvent): void;

@@ -1,16 +1,6 @@
 export interface IFreezeFrameOverlay {
 
-    /**
-     * Set the value of shouldShowPlayOverlay for this class
-     * @param shouldShowPlayOverlay a boolean if the play overlay should be showing or not 
-     */
-    setShouldShowPlayOverlay(shouldShowPlayOverlay: boolean): void;
-
-    /**
-     * Set the value of isFillDisplayToggled for this class
-     * @param isFillDisplayToggled a boolean if the toggle to fill the display is toggled or not
-     */
-    setIsFillDisplayToggled(isFillDisplayToggled: boolean): void;
+    shouldShowPlayOverlay: boolean;
 
     /**
      * Set the required freeze frame object data for this class to use  

@@ -4,27 +4,10 @@ import { IFreezeFrameOverlay } from "./IFreezeFrameOverlay";
 export class FreezeFrameOverlay extends Overlay implements IFreezeFrameOverlay {
     freezeFrameImage: HTMLImageElement;
     shouldShowPlayOverlay: boolean;
-    isFillDisplayToggled: boolean;
     freezeFrameWidth: number;
     freezeFrameHeight: number;
     freezeFrameValid: boolean;
     freezeFrameJpg: Uint8Array;
-
-    /**
-     * Set the value of shouldShowPlayOverlay for this class
-     * @param shouldShowPlayOverlay a boolean if the play overlay should be showing or not 
-     */
-    setShouldShowPlayOverlay(shouldShowPlayOverlay: boolean) {
-        this.shouldShowPlayOverlay = shouldShowPlayOverlay;
-    }
-
-    /**
-     * Set the value of isFillDisplayToggled for this class
-     * @param isFillDisplayToggled a boolean if the toggle to fill the display is toggled or not
-     */
-    setIsFillDisplayToggled(isFillDisplayToggled: boolean) {
-        this.isFillDisplayToggled = isFillDisplayToggled;
-    }
 
     /**
      * Set the required freeze frame object data for this class to use  
@@ -57,7 +40,10 @@ export class FreezeFrameOverlay extends Overlay implements IFreezeFrameOverlay {
             let displayHeight = 0;
             let displayTop = 0;
             let displayLeft = 0;
-            if (this.isFillDisplayToggled) {
+
+            // get the current status of fill display checkbox if it checked or undefined follow that logic
+            let checkBox = document.getElementById('enlarge-display-to-fill-window-tgl') as HTMLInputElement;
+            if (checkBox === undefined || (checkBox !== null && checkBox.checked)) {
                 let windowAspectRatio = window.innerWidth / window.innerHeight;
                 let videoAspectRatio = this.freezeFrameWidth / this.freezeFrameHeight;
                 if (windowAspectRatio < videoAspectRatio) {
