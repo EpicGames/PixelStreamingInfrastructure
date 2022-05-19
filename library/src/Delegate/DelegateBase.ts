@@ -10,6 +10,7 @@ import { IWebRtcPlayerController } from "../WebRtcPlayer/IWebRtcPlayerController
 import { MessageInstanceState, InstanceState, MessageAuthResponse, MessageAuthResponseOutcomeType } from '../WebSockets/MessageReceive';
 import { Config } from "..";
 import { IDelegate } from "./IDelegate";
+import { AfkOverlay } from "../Overlay/AfkOverlay";
 
 /**
  * Provides common base functionality for delegates that implement the IDelegate interface
@@ -18,8 +19,8 @@ export class DelegateBase implements IDelegate {
 	public iWebRtcController: IWebRtcPlayerController;
 	public config: Config;
 	overlay: IOverlay = new Overlay();
-	freezeFrameOverlay: IFreezeFrameOverlay = new FreezeFrameOverlay();
-	afkLogic: AfkLogic;
+	afkOverlay: AfkOverlay = new AfkOverlay();
+	//freezeFrameOverlay: IFreezeFrameOverlay = new FreezeFrameOverlay();
 	shouldShowPlayOverlay = true;
 
 	/**
@@ -63,23 +64,25 @@ export class DelegateBase implements IDelegate {
 		// give the webRtcPlayerController the ability to reset the afk inactivity watcher
 		//this.resetAfkWatch = () => this.afkLogic.resetAfkWarningTimer();
 
+		this.createNewAfkOverlay();
+	}
+
+	createNewAfkOverlay() {
 		// create the afk overlay html 
-		//let afkOverlayHtml = document.createElement('div') as HTMLDivElement;
-		//afkOverlayHtml.id = 'afkOverlay';
+		let afkOverlayHtml = document.createElement('div') as HTMLDivElement;
+		afkOverlayHtml.id = 'afkOverlay';
 
-		// Build the AFK overlay Event Listener
-		// let afkOverlayEvent = () => {
-		// 	// The user clicked so start the timer again and carry on.
-		// 	this.afkLogic.afkOverlay.hideOverlay();
-		// 	clearInterval(this.afkLogic.countdownTimer);
-		// 	this.afkLogic.startAfkWarningTimer();
-		// }
+		// set the afk overlay parameters so an new overlay can be instantiated but not applied 
+		this.afkOverlay.createNewOverlayElement(this.config.playerElement, false, "videoPlayOverlay", 'clickableState', afkOverlayHtml, undefined);
 
-		// set the afk overlay parameters so an new overlay can be instantiated inside the class when required 
-		//this.afkLogic.afkOverlay.setOverlayParameters(this.config.playerElement, "videoPlayOverlay", 'clickableState', afkOverlayHtml, afkOverlayEvent);
+		// Build the AFK overlay Event Listener after the fact as it requires afk logic
+		let afkOverlayEvent = () => this.iWebRtcController.onAfkEventListener(this.afkOverlay);
+
+		// add the event listener to the overlay
+		this.afkOverlay.addOverlayOnClickEvent(afkOverlayEvent);
 
 		// set the afk overlays update html that uses its own countdown timer number 
-		//this.afkLogic.afkOverlay.setAfkOverlayUpdateHtml('<center>No activity detected<br>Disconnecting in ' + this.afkLogic.afkOverlay.countDown + ' seconds<br>Click to continue<br></center>');
+		this.afkOverlay.setAfkOverlayUpdateHtml(`<center>No activity detected<br>Disconnecting in ${this.afkOverlay.returnCountdown()} seconds<br>Click to continue<br></center>`);
 	}
 
 	/**
@@ -89,8 +92,8 @@ export class DelegateBase implements IDelegate {
 	 * @param overlayHtmlElement the created html element you are applying
 	 * @param overlayClickEvent the event listener you are applying to your custom element
 	 */
-	createNewOverlay(overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener) {
-		this.overlay.createNewOverlayElement(this.config.playerElement, overlayDivId, overlayDivClass, overlayHtmlElement, overlayClickEvent)
+	createNewOverlay(applyOnCreation: boolean, overlayDivId?: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener) {
+		this.overlay.createNewOverlayElement(this.config.playerElement, applyOnCreation, overlayDivId, overlayDivClass, overlayHtmlElement, overlayClickEvent)
 	}
 
 	/**
@@ -130,7 +133,7 @@ export class DelegateBase implements IDelegate {
 			}
 
 			// create the webRtc connect overlay
-			this.createNewOverlay('videoPlayOverlay', 'clickableState', webRtcConnectOverlayHtml, connectOverlayEvent);
+			this.createNewOverlay(true, 'videoPlayOverlay', 'clickableState', webRtcConnectOverlayHtml, connectOverlayEvent);
 
 		} else {
 			this.iWebRtcController.connectToSignallingSever();
@@ -156,12 +159,17 @@ export class DelegateBase implements IDelegate {
 
 				// check if there is already and instance pending if so return 
 				let preExistingPendingMessage = document.getElementById('messageOverlay') as HTMLDivElement;
-				if(preExistingPendingMessage.classList.contains("instance-pending")){
+				if (preExistingPendingMessage.classList.contains("instance-pending")) {
 					return;
 				}
 
-				// make a loading spinner
-				onInstanceStateChangeHtml.innerHTML = instanceState.details;
+				// sometimes the first states from the ss may be empty if so just make it manually this code will change when we update the SS
+				if (instanceState.details == undefined || instanceState.details == null) {
+					onInstanceStateChangeHtml.innerHTML = "Your application is pending";
+				} else {
+					onInstanceStateChangeHtml.innerHTML = instanceState.details;
+				}
+
 				onInstanceStateChangeHtml.className = "instance-pending";
 
 				var spinnerSpan: HTMLSpanElement = document.createElement('span');
@@ -186,7 +194,7 @@ export class DelegateBase implements IDelegate {
 		}
 
 		// create the overlay 
-		this.createNewOverlay('videoPlayOverlay', 'textDisplayState', onInstanceStateChangeHtml, undefined);
+		this.createNewOverlay(true, 'videoPlayOverlay', 'textDisplayState', onInstanceStateChangeHtml, undefined);
 	}
 
 	/**
@@ -216,7 +224,7 @@ export class DelegateBase implements IDelegate {
 		}
 
 		// create the overlay 
-		this.createNewOverlay('videoPlayOverlay', 'textDisplayState', onAuthenticationResponseHtml, undefined);
+		this.createNewOverlay(true, 'videoPlayOverlay', 'textDisplayState', onAuthenticationResponseHtml, undefined);
 	}
 
 	/**
@@ -230,7 +238,7 @@ export class DelegateBase implements IDelegate {
 		onWebRtcAnswerHtml.innerHTML = "RTC Answer";
 
 		// create the overlay 
-		this.createNewOverlay('videoPlayOverlay', 'textDisplayState', onWebRtcAnswerHtml, undefined);
+		this.createNewOverlay(true, 'videoPlayOverlay', 'textDisplayState', onWebRtcAnswerHtml, undefined);
 	}
 
 	/**
@@ -245,7 +253,7 @@ export class DelegateBase implements IDelegate {
 		playOverlayHtml.alt = 'Start Streaming';
 
 		// create the webRtc connect overlay
-		this.createNewOverlay('videoPlayOverlay', 'clickableState', playOverlayHtml, overlayClickEvent);
+		this.createNewOverlay(true, 'videoPlayOverlay', 'clickableState', playOverlayHtml, overlayClickEvent);
 
 		// set shouldShowPlayOverlay to false in this class and also in the freeze
 		this.shouldShowPlayOverlay = false;
@@ -263,7 +271,7 @@ export class DelegateBase implements IDelegate {
 		onDisconnectHtml.innerHTML = `Disconnected: ${event.code} -  ${event.reason}`;
 
 		// create the overlay 
-		this.createNewOverlay('videoPlayOverlay', 'textDisplayState', onDisconnectHtml, undefined);
+		this.createNewOverlay(true, 'videoPlayOverlay', 'textDisplayState', onDisconnectHtml, undefined);
 	}
 
 	/**
@@ -277,7 +285,7 @@ export class DelegateBase implements IDelegate {
 		onWebRtcConnectingHtml.innerHTML = 'WebRTC connected, waiting for video';
 
 		// create the overlay 
-		this.createNewOverlay('videoPlayOverlay', 'textDisplayState', onWebRtcConnectingHtml, undefined);
+		this.createNewOverlay(true, 'videoPlayOverlay', 'textDisplayState', onWebRtcConnectingHtml, undefined);
 	}
 
 	/**
@@ -291,7 +299,7 @@ export class DelegateBase implements IDelegate {
 		onWebRtcConnectedHtml.innerHTML = "Starting connection to server, please wait";
 
 		// create the overlay 
-		this.createNewOverlay('videoPlayOverlay', 'textDisplayState', onWebRtcConnectedHtml, undefined);
+		this.createNewOverlay(true, 'videoPlayOverlay', 'textDisplayState', onWebRtcConnectedHtml, undefined);
 	}
 
 	/**
@@ -305,7 +313,7 @@ export class DelegateBase implements IDelegate {
 		onWebRtcFailedHtml.innerHTML = "Unable to setup video";
 
 		// create the overlay 
-		this.createNewOverlay('videoPlayOverlay', 'textDisplayState', onWebRtcFailedHtml, undefined);
+		this.createNewOverlay(true, 'videoPlayOverlay', 'textDisplayState', onWebRtcFailedHtml, undefined);
 	}
 
 	/**

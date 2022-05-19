@@ -1,5 +1,6 @@
 import { InitialSettings } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults"
+import { AfkOverlay } from "../Overlay/AfkOverlay";
 import { IOverlay } from "../Overlay/IOverlay";
 import { Overlay } from "../Overlay/Overlay";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
@@ -12,6 +13,7 @@ import { MessageInstanceState, MessageAuthResponse } from "../WebSockets/Message
 export interface IDelegate {
 
 	overlay: IOverlay;
+	afkOverlay: AfkOverlay;
 
 	/**
 	 * Creates a new overlay object
@@ -20,7 +22,7 @@ export interface IDelegate {
 	 * @param overlayHtmlElement the created html element you are applying
 	 * @param onClickFunction the event listener you are applying to your custom element
 	 */
-	createNewOverlay(overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, onClickFunction?: EventListener): void;
+	createNewOverlay(applyOnCreation: boolean, overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, onClickFunction?: EventListener): void;
 
 	/**
 	 * Creates a new freeze frame overlay element 
@@ -29,7 +31,7 @@ export interface IDelegate {
 	 * @param overlayHtmlElement the created html element you are applying
 	 * @param overlayClickEvent the event listener you are applying to your custom element
 	 */
-	 createNewFreezeFrameOverlay(overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener): void;
+	createNewFreezeFrameOverlay(overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener): void;
 
 	/**
 	 * Acts as an override for instantiating the WebRTCPlayerController interface to provide WebRTCPlayerController functionality  

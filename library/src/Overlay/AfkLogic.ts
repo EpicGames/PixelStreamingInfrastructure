@@ -7,9 +7,8 @@ export class AfkLogic {
     closeTimeout = 10;
     active = false;
     warnTimer: ReturnType<typeof setTimeout> = undefined;
-    countdown = 0;
-    countdownTimer: ReturnType<typeof setInterval> = undefined;
-    afkOverlay: AfkOverlay = new AfkOverlay();
+    countDown = 0;
+    countDownTimer: ReturnType<typeof setInterval> = undefined;
 
     constructor(controlScheme: number, afkTimeout: number) {
         this.warnTimeout = afkTimeout;
@@ -17,15 +16,25 @@ export class AfkLogic {
     }
 
     /**
+     * The methods that occur when an afk event listener is clicked
+     * @param afkOverlay the afk overlay 
+     */
+    onAfkEventListener(afkOverlay: AfkOverlay) {
+        afkOverlay.hideOverlay();
+        clearInterval(this.countDownTimer);
+        this.startAfkWarningTimer(afkOverlay);
+    }
+
+    /**
      * Start the warning timer if a timeout is set greater that 0 seconds   
      */
-    startAfkWarningTimer() {
+    startAfkWarningTimer(afkOverlay: AfkOverlay) {
         if (this.warnTimeout > 0) {
             this.active = true;
         } else {
             this.active = false;
         }
-        this.resetAfkWarningTimer();
+        this.resetAfkWarningTimer(afkOverlay);
     }
 
     /**
@@ -38,46 +47,46 @@ export class AfkLogic {
     /**
      * If the user interacts then reset the warning timer.  
      */
-    resetAfkWarningTimer() {
+    resetAfkWarningTimer(afkOverlay: AfkOverlay) {
         if (this.active) {
             clearTimeout(this.warnTimer);
-            this.warnTimer = setTimeout(() => { this.activateAfkEvent() }, this.warnTimeout * 1000);
+            this.warnTimer = setTimeout(() => { this.activateAfkEvent(afkOverlay) }, this.warnTimeout * 1000);
         }
     }
 
     /**
-     * Show the AFK overlay and begin the countdown   
+     * Show the AFK overlay and begin the countDown   
      */
-    activateAfkEvent() {
+    activateAfkEvent(afkOverlay: AfkOverlay) {
         // Pause the timer while the user is looking at the inactivity warning overlay
         this.stopAfkWarningTimer();
 
         // instantiate a new overlay 
-        this.afkOverlay.createNewOverlayElement(this.afkOverlay.baseInsertDiv, this.afkOverlay.overlayDivId, this.afkOverlay.overlayDivClass, this.afkOverlay.overlayHtmlElement, this.afkOverlay.overlayClickEvent)
+        afkOverlay.applyNewElement();
 
-        // update our countdown timer and overlay contents
-        this.countdown = this.closeTimeout;
-        this.afkOverlay.updateAfkOverlayContents(this.countdown, this.afkOverlay.afkOverlayUpdateHtml);
+        // update our countDown timer and overlay contents
+        this.countDown = this.closeTimeout;
+        afkOverlay.updateAfkOverlayContents(this.countDown, afkOverlay.afkOverlayUpdateHtml);
 
         // if we are in locked mouse exit pointerlock 
         if (this.controlScheme == ControlSchemeType.LockedMouse) {
             document.exitPointerLock();
         }
 
-        // reset our countdown interval accordingly 
-        this.countdownTimer = setInterval(() => {
-            this.countdown--;
-            if (this.countdown == 0) {
+        // reset our countDown interval accordingly 
+        this.countDownTimer = setInterval(() => {
+            this.countDown--;
+            if (this.countDown == 0) {
                 // The user failed to click so hide the overlay and disconnect them.
-                this.afkOverlay.hideOverlay();
+                afkOverlay.hideOverlay();
                 this.closeWebSocket();
 
                 // switch off the afk feature as stream has closed 
-                this.warnTimeout = 0;
                 this.active = false;
+                this.warnTimeout = 0;
             } else {
-                // Update the countdown message.
-                this.afkOverlay.updateAfkOverlayContents(this.countdown, this.afkOverlay.afkOverlayUpdateHtml);
+                // Update the countDown message.
+                afkOverlay.updateAfkOverlayContents(this.countDown, afkOverlay.afkOverlayUpdateHtml);
             }
         }, 1000);
     }

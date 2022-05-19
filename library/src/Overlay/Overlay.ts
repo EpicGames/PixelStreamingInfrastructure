@@ -14,7 +14,7 @@ export class Overlay implements IOverlay {
      * @param overlayHtmlElement the created html element you are applying
      * @param overlayClickEvent the event listener you are applying to your custom element     
      */
-    createNewOverlayElement(baseInsertDiv: HTMLDivElement, overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener) {
+    createNewOverlayElement(baseInsertDiv: HTMLDivElement, applyOnCreation: boolean, overlayDivId?: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener) {
         this.baseInsertDiv = baseInsertDiv;
 
         // check for a pre existing element and make a new element for the scope of this method
@@ -40,19 +40,22 @@ export class Overlay implements IOverlay {
 
         // if the user passes click functionality then add an event listener to it
         if (overlayClickEvent) {
-            let contextElement = this.currentElement
-            contextElement.addEventListener('click', function onOverlayClick(event: Event) {
-                overlayClickEvent(event);
-                contextElement.removeEventListener('click', onOverlayClick);
-            });
-            //this.addOverlayOnClickEvent(overlayClickEvent);
-            this.currentElement = contextElement;
+            this.addOverlayOnClickEvent(overlayClickEvent);
         }
 
         // If the overlay has any previous classes remove them so we can set the new ones
         this.updateOverlayClasses(overlayDivClass);
 
         // create into the baseInsertDiv and run any show functionality
+        if(applyOnCreation){
+            this.applyNewElement();
+        }
+    }
+
+    /**
+     * Apply the current overlay element into the baseInsertDiv and run any show functionality
+     */
+    applyNewElement() {
         this.beforeShowOverlay();
         this.baseInsertDiv.appendChild(this.currentElement);
         this.afterShowOverlay();
@@ -63,10 +66,17 @@ export class Overlay implements IOverlay {
      * @param overlayClickEvent the on click event to be activated
      */
     addOverlayOnClickEvent(overlayClickEvent: EventListener) {
-        // this.currentElement.addEventListener('click', function overlayClickEvent(event: Event) {
-        //     overlayClickEvent(event);
-        //     this.currentElement.removeEventListener('click', overlayClickEvent);
-        // }.bind(this));
+        // capture the element context 
+        let elementContext = this.currentElement
+
+        // add the new event listener 
+        elementContext.addEventListener('click', function onOverlayClick(event: Event) {
+            overlayClickEvent(event);
+            elementContext.removeEventListener('click', onOverlayClick);
+        });
+
+        // assign the updated context
+        this.currentElement = elementContext;
     }
 
     /**

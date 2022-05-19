@@ -13,7 +13,7 @@ export interface IOverlay {
      * @param overlayHtmlElement the created html element you are applying
      * @param overlayClickEvent the event listener you are applying to your custom element     
      */
-    createNewOverlayElement(baseInsertDiv: HTMLDivElement, overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener): void;
+    createNewOverlayElement(baseInsertDiv: HTMLDivElement, applyOnCreation: boolean, overlayDivId?: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener): void;
 
     /**
      * hide the overlay by setting a hiddenState class and runs any onHideOverlay functionality 

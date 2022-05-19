@@ -1,6 +1,7 @@
 import { Encoder, WebRTC } from "../DataChannel/InitialSettings";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { FreezeFrame } from "../Overlay/FreezeFrame";
+import { AfkOverlay } from "../Overlay/AfkOverlay";
 
 /**
  * Interface for the Web RTC Player Controller
@@ -9,6 +10,8 @@ export interface IWebRtcPlayerController {
     matchViewportResolution: boolean;
     freezeFrame: FreezeFrame;
     playOverlayEvent: EventListener;
+
+    onAfkEventListener(afkOverlay: AfkOverlay): void;
     
     /**
      * Connect to the Signaling server

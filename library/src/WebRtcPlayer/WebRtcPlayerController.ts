@@ -3,6 +3,7 @@ import { VideoPlayerController } from "../VideoPlayer/VideoPlayerController";
 import { MessageInstanceState, MessageAnswer, MessageAuthResponse, MessageConfig } from "../WebSockets/MessageReceive";
 import { UiController } from "../Ui/UiController";
 import { FreezeFrame } from "../Overlay/FreezeFrame";
+import { AfkLogic } from "../Overlay/AfkLogic";
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { PeerConnectionController } from "../PeerConnectionController/PeerConnectionController"
 import { MouseController } from "../Inputs/MouseController";
@@ -19,6 +20,7 @@ import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
 import { Logger } from "../Logger/Logger";
 import { InputController } from "../Inputs/InputController";
 import { MicController } from "../MicPlayer/MicController";
+import { AfkOverlay } from "../Overlay/AfkOverlay";
 
 /**
  * Entry point for the Web RTC Player
@@ -26,37 +28,26 @@ import { MicController } from "../MicPlayer/MicController";
 export class webRtcPlayerController implements IWebRtcPlayerController {
 	config: Config;
 	sdpConstraints: RTCOfferOptions;
-
 	webSocketController: WebSocketController;
-
 	dataChannelController: DataChannelController;
 	datachannelOptions: RTCDataChannelInit;
-
 	videoPlayerController: VideoPlayerController;
-
 	keyboardController: KeyboardController;
 	mouseController: MouseController
 	touchController: ITouchController;
-
 	ueControlMessage: UeControlMessage;
 	ueDescriptorUi: UeDescriptorUi;
-
 	peerConnectionController: PeerConnectionController;
-
 	uiController: UiController;
-
 	inputController: InputController;
 	freezeFrame: FreezeFrame;
+	afkLogic: AfkLogic;
 	playerElementClientRect: DOMRect;
-
 	playOverlayEvent: EventListener;
-
 	lastTimeResized = new Date().getTime();
 	matchViewportResolution: boolean;
 	resizeTimeout: ReturnType<typeof setTimeout>;
-
 	latencyStartTime: number;
-
 	delegate: IDelegate;
 
 	// for mic support 
@@ -77,6 +68,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			offerToReceiveVideo: true
 		}
 
+		this.afkLogic = new AfkLogic(this.config.controlScheme, this.config.afkTimeout);
+		this.afkLogic.closeWebSocket = () => this.closeSignalingServer();
+
 		this.uiController = new UiController();
 		this.uiController.setUpMouseAndFreezeFrame = this.setUpMouseAndFreezeFrame.bind(this);
 		this.uiController.registerResizeTickBoxEvent();
@@ -90,7 +84,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.dataChannelController.onVideoEncoderAvgQP = this.handleVideoEncoderAvgQP.bind(this);
 		this.dataChannelController.OnInitialSettings = this.handleInitialSettings.bind(this);
 		this.dataChannelController.onQualityControlOwnership = this.handleQualityControlOwnership.bind(this);
-		this.dataChannelController.resetAfkWarningTimerOnDataSend = this.delegate.resetAfkWatch.bind(this.delegate);
+		this.dataChannelController.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer(this.delegate.afkOverlay);
 
 		this.videoPlayerController = new VideoPlayerController(this.config.playerElement, this.config.startVideoMuted);
 
@@ -107,6 +101,14 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		// set up the final webRtc player controller methods from within our delegate so a connection can be activated
 		this.setUpWebRtcConnectionForActivation();
+	}
+
+	/**
+	 * Expose onAfkEventListener to the delegate without exposing the afk logic
+	 * @param afkOverlay the afk overlay
+	 */
+	onAfkEventListener(afkOverlay: AfkOverlay) {
+		this.afkLogic.onAfkEventListener(afkOverlay);
 	}
 
 	/**
@@ -151,7 +153,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 				//this.freezeFrame.freezeFrameOverlay.showFreezeFrameOverlay();
 				this.delegate.overlay.hideOverlay();
 				this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
-				this.delegate.startAfkWatch();
+				this.afkLogic.startAfkWarningTimer(this.delegate.afkOverlay);
 			}).catch((onRejectedReason: string) => {
 				console.log(onRejectedReason);
 				console.log("Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.")
@@ -170,7 +172,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 			// set up the auto play on the video element  
 			this.videoPlayerController.videoElement.autoplay = true;
-			
+
 			// attempt to play the video
 			this.playStream();
 
