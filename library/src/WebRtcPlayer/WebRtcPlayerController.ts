@@ -81,8 +81,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.uiController.setUpMouseAndFreezeFrame = this.setUpMouseAndFreezeFrame.bind(this);
 		this.uiController.registerResizeTickBoxEvent();
 
-		this.freezeFrame = new FreezeFrame();
-		this.freezeFrame.freezeFrameOverlay.resizePlayerStyle = this.uiController.resizePlayerStyle.bind(this);
+		//this.freezeFrame = new FreezeFrame();
+		//this.freezeFrame.freezeFrameOverlay.resizePlayerStyle = this.uiController.resizePlayerStyle.bind(this);
 
 		this.dataChannelController = new DataChannelController();
 		this.dataChannelController.handleOnOpen = this.handleDataChannelConnected.bind(this);
@@ -96,6 +96,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		// attach playStream to an event listener so it can be passed to an overlay for activation 
 		this.playOverlayEvent = () => this.playStream();
+		//this.freezeFrame.setPlayOverlayEvent(this.playOverlayEvent);
 
 		// set up websocket methods
 		this.webSocketController = new WebSocketController(this.config.signallingServerAddress);
@@ -147,7 +148,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 				this.videoPlayerController.PlayAudioTrack();
 				this.ueControlMessage.SendRequestInitialSettings();
 				this.ueControlMessage.SendRequestQualityControl();
-				this.freezeFrame.freezeFrameOverlay.showFreezeFrameOverlay();
+				//this.freezeFrame.freezeFrameOverlay.showFreezeFrameOverlay();
 				this.delegate.overlay.hideOverlay();
 				this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
 				this.delegate.startAfkWatch();
@@ -324,8 +325,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		Logger.verboseLog("onVideoInitialised");
 
-		this.dataChannelController.processFreezeFrameMessage = this.freezeFrame.processFreezeFrameMessage.bind(this.freezeFrame);
-		this.dataChannelController.onUnFreezeFrame = this.freezeFrame.freezeFrameOverlay.invalidateFreezeFrameOverlay.bind(this.freezeFrame);
+		//this.dataChannelController.processFreezeFrameMessage = //this.freezeFrame.processFreezeFrameMessage.bind(//this.freezeFrame);
+		//this.dataChannelController.onUnFreezeFrame = //this.freezeFrame.freezeFrameOverlay.invalidateFreezeFrameOverlay.bind(//this.freezeFrame);
 
 		setInterval(this.getStats.bind(this), 1000);
 
@@ -334,8 +335,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.uiController.resizePlayerStyle();
 
-		this.freezeFrame.freezeFrameOverlay.checkIfVideoExists = this.checkIfVideoExists.bind(this.freezeFrame);
-		this.freezeFrame.freezeFrameOverlay.setVideoEnabled = this.videoPlayerController.setVideoEnabled.bind(this.videoPlayerController);
+		//this.freezeFrame.freezeFrameOverlay.checkIfVideoExists = this.checkIfVideoExists.bind(//this.freezeFrame);
+		//this.freezeFrame.freezeFrameOverlay.setVideoEnabled = this.videoPlayerController.setVideoEnabled.bind(this.videoPlayerController);
 
 		this.ueDescriptorUi.sendUpdateVideoStreamSize(this.videoPlayerController.videoElement.clientWidth, this.videoPlayerController.videoElement.clientHeight);
 
@@ -402,7 +403,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	setUpMouseAndFreezeFrame(playerElement: HTMLDivElement) {
 		// Calculating and normalizing positions depends on the width and height of the player.
 		this.playerElementClientRect = playerElement.getBoundingClientRect();
-		this.freezeFrame.freezeFrameOverlay.resizeFreezeFrameOverlay();
+		//this.freezeFrame.freezeFrameOverlay.resizeFreezeFrameOverlay();
 	}
 
 	/**

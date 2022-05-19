@@ -30,6 +30,8 @@ signallingServerAddress = "ws://myapplication.tenant-tensorworks-testing.lga1.in
 // Create a config object
 let config = CreateConfig(signallingServerAddress, "player");
 
+//config.enableSpsAutoplay = true;
+
 // Create a Native DOM delegate instance that implements the Delegate interface class
 let delegate = new NativeDOMDelegate(config);
 

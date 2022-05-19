@@ -12,14 +12,26 @@ export class FreezeFrame {
 
     constructor() { }
 
-     /**
-     * Set the value of shouldShowPlayOverlay for this class
-     * @param shouldShowPlayOverlay a boolean if the play overlay should be showing or not 
-     */
-      setShouldShowPlayOverlay(shouldShowPlayOverlay: boolean) {
+    /**
+    * Set the value of shouldShowPlayOverlay for this class
+    * @param shouldShowPlayOverlay a boolean if the play overlay should be showing or not 
+    */
+    setShouldShowPlayOverlay(shouldShowPlayOverlay: boolean) {
         this.freezeFrameOverlay.shouldShowPlayOverlay = shouldShowPlayOverlay;
     }
 
+    /**
+     * Set the value of play overlay event click so it can be accessed within freeze frame
+     * @param playOverlayClickEvent 
+     */
+    setPlayOverlayEvent(playOverlayClickEvent: EventListener){
+        this.freezeFrameOverlay.playOverlayClickEvent = playOverlayClickEvent;
+    }
+
+    /**
+     * Set the value of the freeze frame overlay 
+     * @param freezeFrameOverlay a freeze frame overlay 
+     */
     setFreezeFrameOverlay(freezeFrameOverlay: IFreezeFrameOverlay) {
         this.freezeFrameOverlay = freezeFrameOverlay;
     }

@@ -8,7 +8,8 @@ import { FreezeFrame } from "../Overlay/FreezeFrame";
 export interface IWebRtcPlayerController {
     matchViewportResolution: boolean;
     freezeFrame: FreezeFrame;
-
+    playOverlayEvent: EventListener;
+    
     /**
      * Connect to the Signaling server
      */

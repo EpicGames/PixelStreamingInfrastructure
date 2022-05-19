@@ -9,7 +9,7 @@ export class AfkLogic {
     warnTimer: ReturnType<typeof setTimeout> = undefined;
     countdown = 0;
     countdownTimer: ReturnType<typeof setInterval> = undefined;
-    afkOverlay: AfkOverlay;
+    afkOverlay: AfkOverlay = new AfkOverlay();
 
     constructor(controlScheme: number, afkTimeout: number) {
         this.warnTimeout = afkTimeout;
@@ -53,7 +53,7 @@ export class AfkLogic {
         this.stopAfkWarningTimer();
 
         // instantiate a new overlay 
-        this.afkOverlay = new AfkOverlay(this.afkOverlay.baseInsertDiv, this.afkOverlay.overlayDivId, this.afkOverlay.overlayDivClass, this.afkOverlay.overlayHtmlElement, this.afkOverlay.overlayClickEvent)
+        this.afkOverlay.createNewOverlayElement(this.afkOverlay.baseInsertDiv, this.afkOverlay.overlayDivId, this.afkOverlay.overlayDivClass, this.afkOverlay.overlayHtmlElement, this.afkOverlay.overlayClickEvent)
 
         // update our countdown timer and overlay contents
         this.countdown = this.closeTimeout;

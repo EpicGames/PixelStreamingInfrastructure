@@ -4,6 +4,7 @@ import { IFreezeFrameOverlay } from "./IFreezeFrameOverlay";
 export class FreezeFrameOverlay extends Overlay implements IFreezeFrameOverlay {
     freezeFrameImage: HTMLImageElement;
     shouldShowPlayOverlay: boolean;
+    playOverlayClickEvent: EventListener;
     freezeFrameWidth: number;
     freezeFrameHeight: number;
     freezeFrameValid: boolean;
@@ -73,10 +74,10 @@ export class FreezeFrameOverlay extends Overlay implements IFreezeFrameOverlay {
                     displayLeft = Math.floor((this.baseInsertDiv.offsetWidth - displayWidth) * 0.5);
                 }
             }
-            this.currentOverlayElement.style.width = this.baseInsertDiv.offsetWidth + 'px';
-            this.currentOverlayElement.style.height = this.baseInsertDiv.offsetHeight + 'px';
-            this.currentOverlayElement.style.left = 0 + 'px';
-            this.currentOverlayElement.style.top = 0 + 'px';
+            this.currentElement.style.width = this.baseInsertDiv.offsetWidth + 'px';
+            this.currentElement.style.height = this.baseInsertDiv.offsetHeight + 'px';
+            this.currentElement.style.left = 0 + 'px';
+            this.currentElement.style.top = 0 + 'px';
 
             this.freezeFrameImage.style.width = displayWidth + 'px';
             this.freezeFrameImage.style.height = displayHeight + 'px';
@@ -90,8 +91,8 @@ export class FreezeFrameOverlay extends Overlay implements IFreezeFrameOverlay {
     */
     showFreezeFrameOverlay() {
         if (this.freezeFrameValid) {
-            this.currentOverlayElement.classList.add("freezeframeBackground");
-            this.currentOverlayElement.style.display = 'block';
+            this.currentElement.classList.add("freezeframeBackground");
+            this.currentElement.style.display = 'block';
         }
     }
 
@@ -99,9 +100,9 @@ export class FreezeFrameOverlay extends Overlay implements IFreezeFrameOverlay {
     * Remove and hide the freezeFrame overlay 
     */
     invalidateFreezeFrameOverlay() {
-        this.currentOverlayElement.style.display = 'none';
+        this.currentElement.style.display = 'none';
         this.freezeFrameValid = false;
-        this.currentOverlayElement.classList.remove("freezeframeBackground");
+        this.currentElement.classList.remove("freezeframeBackground");
         if (this.checkIfVideoExists) {
             this.setVideoEnabled(true);
         }
@@ -119,7 +120,7 @@ export class FreezeFrameOverlay extends Overlay implements IFreezeFrameOverlay {
             this.resizeFreezeFrameOverlay();
             if (this.shouldShowPlayOverlay === true) {
                 console.log("showing play overlay")
-                this.returnNewPlayOverlay();
+                this.returnNewPlayOverlay(this.playOverlayClickEvent);
                 this.resizePlayerStyle();
             } else {
                 console.log("showing freeze frame")
@@ -132,7 +133,7 @@ export class FreezeFrameOverlay extends Overlay implements IFreezeFrameOverlay {
     /**
      * An override for returning a new play overlay 
      */
-    returnNewPlayOverlay() { }
+    returnNewPlayOverlay(overlayClickEvent: EventListener) { }
 
     /**
      * An override for checking if the video is enabled 
