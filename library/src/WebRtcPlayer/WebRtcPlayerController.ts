@@ -2,7 +2,7 @@ import { WebSocketController } from "../WebSockets/WebSocketController";
 import { VideoPlayerController } from "../VideoPlayer/VideoPlayerController";
 import { MessageInstanceState, MessageAnswer, MessageAuthResponse, MessageConfig } from "../WebSockets/MessageReceive";
 import { UiController } from "../Ui/UiController";
-import { FreezeFrame } from "../Overlay/FreezeFrame";
+import { FreezeFrameLogic } from "../Overlay/FreezeFrameLogic";
 import { AfkLogic } from "../Overlay/AfkLogic";
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { PeerConnectionController } from "../PeerConnectionController/PeerConnectionController"
@@ -40,7 +40,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	peerConnectionController: PeerConnectionController;
 	uiController: UiController;
 	inputController: InputController;
-	freezeFrame: FreezeFrame;
+	freezeFrameLogic: FreezeFrameLogic;
 	afkLogic: AfkLogic;
 	playerElementClientRect: DOMRect;
 	playOverlayEvent: EventListener;

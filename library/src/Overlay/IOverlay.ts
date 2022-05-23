@@ -2,18 +2,17 @@
  * The interface for Overlay 
  */
 export interface IOverlay {
-
+    baseInsertDiv: HTMLDivElement;
     currentElement: HTMLDivElement;
+    overlayDivId: string;
+    overlayDivClass: string;
+    overlayHtmlElement: HTMLElement;
+    overlayClickEvent: EventListener;
 
     /**
-     * Create a clickable div with text and onclick functions
-     * @param baseInsertDiv the parent div element that this overlay will be inserted into 
-     * @param overlayDivId the id for the base div of the overlay 
-     * @param overlayDivClass the html class you are applying 
-     * @param overlayHtmlElement the created html element you are applying
-     * @param overlayClickEvent the event listener you are applying to your custom element     
+     * Create a clickable div with text and onclick functions    
      */
-    createNewOverlayElement(baseInsertDiv: HTMLDivElement, applyOnCreation: boolean, overlayDivId?: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener): void;
+    createNewOverlayElement(): void;
 
     /**
      * hide the overlay by setting a hiddenState class and runs any onHideOverlay functionality 

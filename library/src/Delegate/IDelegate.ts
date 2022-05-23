@@ -22,7 +22,7 @@ export interface IDelegate {
 	 * @param overlayHtmlElement the created html element you are applying
 	 * @param onClickFunction the event listener you are applying to your custom element
 	 */
-	createNewOverlay(applyOnCreation: boolean, overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, onClickFunction?: EventListener): void;
+	returnNewOverlay(buildOnCreation: boolean, overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, onClickFunction?: EventListener): void;
 
 	/**
 	 * Creates a new freeze frame overlay element 
@@ -31,7 +31,7 @@ export interface IDelegate {
 	 * @param overlayHtmlElement the created html element you are applying
 	 * @param overlayClickEvent the event listener you are applying to your custom element
 	 */
-	createNewFreezeFrameOverlay(overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener): void;
+	returnNewFreezeFrameOverlay(buildOnCreation: boolean, overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener): void;
 
 	/**
 	 * Acts as an override for instantiating the WebRTCPlayerController interface to provide WebRTCPlayerController functionality  

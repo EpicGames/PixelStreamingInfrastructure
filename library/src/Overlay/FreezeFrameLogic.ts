@@ -1,8 +1,7 @@
 import { FreezeFrameOverlay } from "./FreezeFrameOverlay";
 import { IFreezeFrameOverlay } from "./IFreezeFrameOverlay";
 
-export class FreezeFrame {
-    freezeFrameOverlay: IFreezeFrameOverlay;
+export class FreezeFrameLogic {
     receiving = false;
     valid = false;
     size = 0;
@@ -17,15 +16,15 @@ export class FreezeFrame {
     * @param shouldShowPlayOverlay a boolean if the play overlay should be showing or not 
     */
     setShouldShowPlayOverlay(shouldShowPlayOverlay: boolean) {
-        this.freezeFrameOverlay.shouldShowPlayOverlay = shouldShowPlayOverlay;
+        //this.freezeFrameOverlay.shouldShowPlayOverlay = shouldShowPlayOverlay;
     }
 
     /**
      * Set the value of play overlay event click so it can be accessed within freeze frame
      * @param playOverlayClickEvent 
      */
-    setPlayOverlayEvent(playOverlayClickEvent: EventListener){
-        this.freezeFrameOverlay.playOverlayClickEvent = playOverlayClickEvent;
+    setPlayOverlayEvent(playOverlayClickEvent: EventListener) {
+        //this.freezeFrameOverlay.playOverlayClickEvent = playOverlayClickEvent;
     }
 
     /**
@@ -33,7 +32,7 @@ export class FreezeFrame {
      * @param freezeFrameOverlay a freeze frame overlay 
      */
     setFreezeFrameOverlay(freezeFrameOverlay: IFreezeFrameOverlay) {
-        this.freezeFrameOverlay = freezeFrameOverlay;
+        //this.freezeFrameOverlay = freezeFrameOverlay;
     }
 
     /**
@@ -73,15 +72,15 @@ export class FreezeFrame {
             this.receiving = false;
             this.valid = true;
             console.log(`received complete freeze frame ${this.size}`);
-            this.freezeFrameOverlay.setFreezeFrameData(this.width, this.height, this.valid, this.jpeg);
-            this.freezeFrameOverlay.showFreezeFrame();
+            //this.freezeFrameOverlay.setFreezeFrameData(this.width, this.height, this.valid, this.jpeg);
+            //this.freezeFrameOverlay.showFreezeFrame();
         }
         else if (this.jpeg.length > this.size) {
             // We received more data than the freeze frame payload message indicate (this is an error)
             console.error(`received bigger freeze frame than advertised: ${this.jpeg.length}/${this.size}`);
             this.jpeg = undefined;
             this.receiving = false;
-            this.freezeFrameOverlay.setFreezeFrameData(this.width, this.height, this.valid, this.jpeg);
+            //this.freezeFrameOverlay.setFreezeFrameData(this.width, this.height, this.valid, this.jpeg);
         }
     }
 }

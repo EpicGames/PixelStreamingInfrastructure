@@ -1,6 +1,6 @@
 import { Encoder, WebRTC } from "../DataChannel/InitialSettings";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
-import { FreezeFrame } from "../Overlay/FreezeFrame";
+import { FreezeFrameLogic } from "../Overlay/FreezeFrameLogic";
 import { AfkOverlay } from "../Overlay/AfkOverlay";
 
 /**
@@ -8,7 +8,7 @@ import { AfkOverlay } from "../Overlay/AfkOverlay";
  */
 export interface IWebRtcPlayerController {
     matchViewportResolution: boolean;
-    freezeFrame: FreezeFrame;
+    freezeFrameLogic: FreezeFrameLogic;
     playOverlayEvent: EventListener;
 
     onAfkEventListener(afkOverlay: AfkOverlay): void;

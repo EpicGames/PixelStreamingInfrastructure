@@ -3,27 +3,43 @@ import { IOverlay } from "./IOverlay";
 export class Overlay implements IOverlay {
     baseInsertDiv: HTMLDivElement;
     currentElement: HTMLDivElement;
-
-    constructor() { }
+    overlayDivId: string;
+    overlayDivClass: string;
+    overlayHtmlElement: HTMLElement;
+    overlayClickEvent: EventListener;
 
     /**
-     * Create a clickable div with text and onclick functions
      * @param baseInsertDiv the parent div element that this overlay will be inserted into 
+     * @param buildOnCreation build the overlay immediately on instantiation 
      * @param overlayDivId the id for the base div of the overlay 
      * @param overlayDivClass the html class you are applying 
      * @param overlayHtmlElement the created html element you are applying
-     * @param overlayClickEvent the event listener you are applying to your custom element     
+     * @param overlayClickEvent the event listener you are applying to your custom element  
      */
-    createNewOverlayElement(baseInsertDiv: HTMLDivElement, applyOnCreation: boolean, overlayDivId?: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener) {
+    constructor(baseInsertDiv: HTMLDivElement, buildOnCreation: boolean, overlayDivId?: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener) {
         this.baseInsertDiv = baseInsertDiv;
+        this.overlayDivId = overlayDivId;
+        this.overlayDivClass = overlayDivClass;
+        this.overlayHtmlElement = overlayHtmlElement;
+        this.overlayClickEvent = overlayClickEvent;
+
+        if (buildOnCreation) {
+            this.createNewOverlayElement();
+        }
+    }
+
+    /**
+     * Create a clickable div with text and onclick functions based off the overlay classes attributes
+     */
+    createNewOverlayElement() {
 
         // check for a pre existing element and make a new element for the scope of this method
-        let preExistingElement = document.getElementById(overlayDivId) as HTMLDivElement;
+        let preExistingElement = document.getElementById(this.overlayDivId) as HTMLDivElement;
 
         // an overlay may already exist inside its parent so lets check if not we will make a new one
         if (!this.baseInsertDiv.contains(preExistingElement)) {
             this.currentElement = document.createElement('div');
-            this.currentElement.id = overlayDivId;
+            this.currentElement.id = this.overlayDivId;
         } else {
             this.currentElement = preExistingElement;
         }
@@ -34,28 +50,19 @@ export class Overlay implements IOverlay {
         }
 
         // if the user passes a custom html elements add them in
-        if (overlayHtmlElement) {
-            this.currentElement.appendChild(overlayHtmlElement);
+        if (this.overlayHtmlElement) {
+            this.currentElement.appendChild(this.overlayHtmlElement);
         }
 
         // if the user passes click functionality then add an event listener to it
-        if (overlayClickEvent) {
-            this.addOverlayOnClickEvent(overlayClickEvent);
+        if (this.overlayClickEvent) {
+            this.addOverlayOnClickEvent(this.overlayClickEvent);
         }
 
         // If the overlay has any previous classes remove them so we can set the new ones
-        this.updateOverlayClasses(overlayDivClass);
+        this.updateOverlayClasses(this.overlayDivClass);
 
         // create into the baseInsertDiv and run any show functionality
-        if(applyOnCreation){
-            this.applyNewElement();
-        }
-    }
-
-    /**
-     * Apply the current overlay element into the baseInsertDiv and run any show functionality
-     */
-    applyNewElement() {
         this.beforeShowOverlay();
         this.baseInsertDiv.appendChild(this.currentElement);
         this.afterShowOverlay();
