@@ -17,6 +17,7 @@ export interface IDelegate {
 
 	/**
 	 * Creates a new overlay object
+	 * @param buildOnCreation build the overlay immediately on instantiation
 	 * @param overlayDivId the id for the base div of the overlay 
 	 * @param overlayDivClass the html class you are applying 
 	 * @param overlayHtmlElement the created html element you are applying
@@ -25,7 +26,18 @@ export interface IDelegate {
 	returnNewOverlay(buildOnCreation: boolean, overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, onClickFunction?: EventListener): void;
 
 	/**
+	 * Returns a new afk overlay element
+	 * @param buildOnCreation build the overlay immediately on instantiation 
+	 * @param overlayDivId the id for the base div of the overlay  
+	 * @param overlayDivClass the html class you are applying 
+	 * @param overlayHtmlElement the created html element you are applying
+	 * @param overlayClickEvent the event listener you are applying to your custom element
+	 */
+	returnNewAfkOverlay(buildOnCreation: boolean, overlayDivId?: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener): void;
+
+	/**
 	 * Creates a new freeze frame overlay element 
+	 * @param buildOnCreation build the overlay immediately on instantiation
 	 * @param overlayDivId the id for the base div of the overlay  
 	 * @param overlayDivClass the html class you are applying 
 	 * @param overlayHtmlElement the created html element you are applying

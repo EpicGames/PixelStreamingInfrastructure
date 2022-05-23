@@ -67,13 +67,16 @@ export class DelegateBase implements IDelegate {
 		this.createNewAfkOverlay();
 	}
 
+	/**
+	 * Creates an afk overlay and sets the html update contents 
+	 */
 	createNewAfkOverlay() {
 		// create the afk overlay html 
 		let afkOverlayHtml = document.createElement('div') as HTMLDivElement;
 		afkOverlayHtml.id = 'afkOverlay';
 
 		// set the afk overlay parameters so an new overlay can be instantiated but not applied 
-		this.afkOverlay = new AfkOverlay(this.config.playerElement, false, "videoPlayOverlay", 'clickableState', afkOverlayHtml, undefined);
+		this.afkOverlay = this.returnNewAfkOverlay(false, "videoPlayOverlay", 'clickableState', afkOverlayHtml, undefined);
 
 		// set the afk overlays update html that uses its own countdown timer number 
 		this.afkOverlay.updateOverlayContents = () => {
@@ -81,6 +84,9 @@ export class DelegateBase implements IDelegate {
 		}
 	}
 
+	/**
+	 * Set the afk click event listener. This should be done after iWebRtcController has been instantiated
+	 */
 	setAfkOverlayClickEvent() {
 		// Build the AFK overlay Event Listener after the fact as it requires afk logic
 		this.afkOverlay.overlayClickEvent = () => this.iWebRtcController.onAfkEventListener(this.afkOverlay);
@@ -99,7 +105,20 @@ export class DelegateBase implements IDelegate {
 	}
 
 	/**
-	 * Creates a new freeze frame overlay element 
+	 * Returns a new afk overlay element
+	 * @param buildOnCreation build the overlay immediately on instantiation 
+	 * @param overlayDivId the id for the base div of the overlay  
+	 * @param overlayDivClass the html class you are applying 
+	 * @param overlayHtmlElement the created html element you are applying
+	 * @param overlayClickEvent the event listener you are applying to your custom element
+	 */
+	returnNewAfkOverlay(buildOnCreation: boolean, overlayDivId?: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener) {
+		return new AfkOverlay(this.config.playerElement, buildOnCreation, overlayDivId, overlayDivClass, overlayHtmlElement, overlayClickEvent);
+	}
+
+	/**
+	 * Returns a new freeze frame overlay element
+	 * @param buildOnCreation build the overlay immediately on instantiation 
 	 * @param overlayDivId the id for the base div of the overlay  
 	 * @param overlayDivClass the html class you are applying 
 	 * @param overlayHtmlElement the created html element you are applying
