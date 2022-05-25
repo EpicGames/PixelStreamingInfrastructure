@@ -24,7 +24,6 @@ module.exports = (env) => {
       new MiniCssExtractPlugin()
       
     ],
-    devtool: 'inline-source-map',
     module: {
         rules: [
             {

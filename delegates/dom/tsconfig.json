@@ -6,7 +6,7 @@
     "esModuleInterop": true,
     "target": "es5",
     "moduleResolution": "node",
-    "sourceMap": true,
+    "sourceMap": false,
     "allowJs": true,
     "declaration": false
   },

@@ -25,8 +25,6 @@ if (signallingServerAddress == '')
     }
 }
 
-signallingServerAddress = "ws://myapplication.tenant-tensorworks-testing.lga1.ingress.coreweave.cloud/ws"
-
 // Create a config object
 let config = CreateConfig(signallingServerAddress, "player");
 
