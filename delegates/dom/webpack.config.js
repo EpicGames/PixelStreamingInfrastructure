@@ -24,7 +24,8 @@ module.exports = (env) => {
       new MiniCssExtractPlugin()
       
     ],
-    devtool: 'inline-source-map',
+    // turn off so we can see the source map for dom delegate so we can debug the library
+    //devtool: 'inline-source-map',
     module: {
         rules: [
             {

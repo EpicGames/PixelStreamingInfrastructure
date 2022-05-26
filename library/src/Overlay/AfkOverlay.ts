@@ -1,13 +1,5 @@
-import { Overlay } from "./Overlay";
+import { ActionOverlay } from "./ActionOverlay";
 
-export class AfkOverlay extends Overlay {
-    countDown = 0;
-
-    setCountDown(countDown: number) {
-        this.countDown = countDown;
-    }
-
-    getCountDown() {
-        return this.countDown;
-    }
+export abstract class AfkOverlay extends ActionOverlay {
+    public abstract update(countdown: number): void;
 }

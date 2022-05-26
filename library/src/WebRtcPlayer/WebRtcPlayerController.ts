@@ -2,7 +2,7 @@ import { WebSocketController } from "../WebSockets/WebSocketController";
 import { VideoPlayerController } from "../VideoPlayer/VideoPlayerController";
 import { MessageInstanceState, MessageAnswer, MessageAuthResponse, MessageConfig } from "../WebSockets/MessageReceive";
 import { UiController } from "../Ui/UiController";
-import { FreezeFrameLogic } from "../Overlay/FreezeFrameLogic";
+//import { FreezeFrameLogic } from "../FreezeFrame/FreezeFrameLogic";
 import { AfkLogic } from "../Overlay/AfkLogic";
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { PeerConnectionController } from "../PeerConnectionController/PeerConnectionController"
@@ -21,7 +21,6 @@ import { Logger } from "../Logger/Logger";
 import { InputController } from "../Inputs/InputController";
 import { MicController } from "../MicPlayer/MicController";
 import { AfkOverlay } from "../Overlay/AfkOverlay";
-
 /**
  * Entry point for the Web RTC Player
  */
@@ -40,7 +39,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	peerConnectionController: PeerConnectionController;
 	uiController: UiController;
 	inputController: InputController;
-	freezeFrameLogic: FreezeFrameLogic;
+	//freezeFrameLogic: FreezeFrameLogic;
 	afkLogic: AfkLogic;
 	playerElementClientRect: DOMRect;
 	playOverlayEvent: EventListener;
@@ -89,7 +88,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.videoPlayerController = new VideoPlayerController(this.config.playerElement, this.config.startVideoMuted);
 
 		// attach playStream to an event listener so it can be passed to an overlay for activation 
-		this.playOverlayEvent = () => this.playStream();
+		//this.playOverlayEvent = () => this.playStream();
+		//EventEmitter.on("playStream", () => this.playStream());
 		//this.freezeFrame.setPlayOverlayEvent(this.playOverlayEvent);
 
 		// set up websocket methods
@@ -101,6 +101,13 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		// set up the final webRtc player controller methods from within our delegate so a connection can be activated
 		this.setUpWebRtcConnectionForActivation();
+
+		/**
+		 * Connect to the Signaling server
+		 */
+		// EventEmitter.on("connectToSignallingSever", () => {
+		// 	this.webSocketController.connect();
+		// });
 	}
 
 	/**
@@ -151,7 +158,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 				this.ueControlMessage.SendRequestInitialSettings();
 				this.ueControlMessage.SendRequestQualityControl();
 				//this.freezeFrame.freezeFrameOverlay.showFreezeFrameOverlay();
-				this.delegate.overlay.hideOverlay();
+				//this.delegate.overlay.hideOverlay();
 				this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
 				this.afkLogic.startAfkWarningTimer(this.delegate.afkOverlay);
 			}).catch((onRejectedReason: string) => {

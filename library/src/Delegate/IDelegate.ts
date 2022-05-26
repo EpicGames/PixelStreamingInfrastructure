@@ -1,8 +1,9 @@
 import { InitialSettings } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults"
+import { ActionOverlay } from "../Overlay/ActionOverlay";
 import { AfkOverlay } from "../Overlay/AfkOverlay";
 import { IOverlay } from "../Overlay/IOverlay";
-import { Overlay } from "../Overlay/Overlay";
+import { ITextOverlay } from "../Overlay/ITextOverlay";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { IWebRtcPlayerController } from "../WebRtcPlayer/IWebRtcPlayerController";
 import { MessageInstanceState, MessageAuthResponse } from "../WebSockets/MessageReceive";
@@ -12,38 +13,32 @@ import { MessageInstanceState, MessageAuthResponse } from "../WebSockets/Message
 */
 export interface IDelegate {
 
-	overlay: IOverlay;
+	currentOverlay: IOverlay;
+	connectOverlay: ActionOverlay;
+	playOverlay: ActionOverlay;
 	afkOverlay: AfkOverlay;
+	infoOverlay: ITextOverlay;
+	errorOverlay: ITextOverlay;
 
-	/**
-	 * Creates a new overlay object
-	 * @param buildOnCreation build the overlay immediately on instantiation
-	 * @param overlayDivId the id for the base div of the overlay 
-	 * @param overlayDivClass the html class you are applying 
-	 * @param overlayHtmlElement the created html element you are applying
-	 * @param onClickFunction the event listener you are applying to your custom element
-	 */
-	returnNewOverlay(buildOnCreation: boolean, overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, onClickFunction?: EventListener): void;
+	hideCurrentOverlay(): void;
 
-	/**
-	 * Returns a new afk overlay element
-	 * @param buildOnCreation build the overlay immediately on instantiation 
-	 * @param overlayDivId the id for the base div of the overlay  
-	 * @param overlayDivClass the html class you are applying 
-	 * @param overlayHtmlElement the created html element you are applying
-	 * @param overlayClickEvent the event listener you are applying to your custom element
-	 */
-	returnNewAfkOverlay(buildOnCreation: boolean, overlayDivId?: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener): void;
+	showPlayOverlay(): void;
 
-	/**
-	 * Creates a new freeze frame overlay element 
-	 * @param buildOnCreation build the overlay immediately on instantiation
-	 * @param overlayDivId the id for the base div of the overlay  
-	 * @param overlayDivClass the html class you are applying 
-	 * @param overlayHtmlElement the created html element you are applying
-	 * @param overlayClickEvent the event listener you are applying to your custom element
-	 */
-	returnNewFreezeFrameOverlay(buildOnCreation: boolean, overlayDivId: string, overlayDivClass?: string, overlayHtmlElement?: HTMLElement, overlayClickEvent?: EventListener): void;
+	showConnectOverlay(): void;
+
+	showAfkOverlay(countDown: number): void;
+
+	updateAfkOverlay(countDown: number): void;
+
+	showTextOverlay(text: string): void;
+
+	showErrorOverlay(text: string): void;
+
+	onConnectAction(): void;
+
+	onPlayAction(): void;
+
+	onAfkAction(): void;
 
 	/**
 	 * Acts as an override for instantiating the WebRTCPlayerController interface to provide WebRTCPlayerController functionality  
@@ -102,16 +97,6 @@ export interface IDelegate {
 	 * Set up functionality to happen when receiving a webRTC answer
 	 */
 	onWebRtcAnswer(): void;
-
-	/**
-	 * Starts the AFK inactivity watcher
-	 */
-	startAfkWatch(): void;
-
-	/**
-	 * Resets the AFK inactivity watcher
-	 */
-	resetAfkWatch(): void;
 
 	/**
 	 * Creates the play overlay for playing the video stream

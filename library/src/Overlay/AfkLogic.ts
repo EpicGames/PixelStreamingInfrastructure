@@ -20,7 +20,7 @@ export class AfkLogic {
      * @param afkOverlay the afk overlay 
      */
     onAfkEventListener(afkOverlay: AfkOverlay) {
-        afkOverlay.hideOverlay();
+        //afkOverlay.hideOverlay();
         clearInterval(this.countDownTimer);
         this.startAfkWarningTimer(afkOverlay);
     }
@@ -62,12 +62,12 @@ export class AfkLogic {
         this.stopAfkWarningTimer();
 
         // instantiate a new overlay 
-        afkOverlay.createNewOverlayElement();
+        //afkOverlay.createNewOverlayElement();
 
         // update our countDown timer and overlay contents
         this.countDown = this.closeTimeout;
-        afkOverlay.setCountDown(this.countDown);
-        afkOverlay.updateOverlayContents(undefined);
+        //afkOverlay.setCountDown(this.countDown);
+        //afkOverlay.updateOverlayContents(undefined);
 
         // if we are in locked mouse exit pointerlock 
         if (this.controlScheme == ControlSchemeType.LockedMouse) {
@@ -79,16 +79,16 @@ export class AfkLogic {
             this.countDown--;
             if (this.countDown == 0) {
                 // The user failed to click so hide the overlay and disconnect them.
-                afkOverlay.hideOverlay();
+                //afkOverlay.hideOverlay();
                 this.closeWebSocket();
 
                 // switch off the afk feature as stream has closed 
-                //this.active = false;
-                //this.warnTimeout = 0;
+                this.active = false;
+                this.warnTimeout = 0;
             } else {
                 // Update the countDown message.
-                afkOverlay.setCountDown(this.countDown);
-                afkOverlay.updateOverlayContents(undefined);
+                //afkOverlay.setCountDown(this.countDown);
+                //afkOverlay.updateOverlayContents(undefined);
             }
         }, 1000);
     }
