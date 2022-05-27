@@ -32,31 +32,50 @@ export class DelegateBase implements IDelegate {
 		this.config = config;
 	}
 
-	hideCurrentOverlay() { };
+	hideCurrentOverlay() {
+		if (this.currentOverlay != null) {
+			this.currentOverlay.hide();
+			this.currentOverlay = null;
+		}
+	};
 
-	showConnectOverlay() { 
+	showConnectOverlay() {
 		this.connectOverlay.show();
+		this.currentOverlay = this.connectOverlay;
 	};
 
-	showPlayOverlay() { 
+	showPlayOverlay() {
 		this.playOverlay.show();
+		this.currentOverlay = this.playOverlay;
 	};
 
-	showTextOverlay(text: string) { };
+	showTextOverlay(text: string) {
+		this.infoOverlay.show();
+		this.currentOverlay = this.infoOverlay;
+	};
 
-	showErrorOverlay(text: string) { };
+	showErrorOverlay(text: string) {
+		this.errorOverlay.show();
+		this.currentOverlay = this.errorOverlay;
+	};
 
-	onConnectAction() { };
+	onConnectAction() {
+		this.connectOverlay.activate();
+	};
 
-	onPlayAction() { };
+	onPlayAction() {
+		this.playOverlay.activate();
+	};
 
-
-
-	showAfkOverlay(countDown: number) { };
+	showAfkOverlay(countDown: number) {
+		this.afkOverlay.show();
+	};
 
 	updateAfkOverlay(countDown: number) { };
 
-	onAfkAction() { };
+	onAfkAction() { 
+		this.afkOverlay.activate();
+	};
 
 	/**
 	 * Creates an afk overlay and sets the html update contents 
@@ -108,20 +127,7 @@ export class DelegateBase implements IDelegate {
 		// set up if the auto play will be used or regular click to start
 		if (!this.config.enableSpsAutoplay) {
 			// Build the webRtc connect overlay Event Listener and show the connect overlay
-
-			// set up the html 
-			// let webRtcConnectOverlayHtml = document.createElement('div');
-			// webRtcConnectOverlayHtml.id = 'playButton';
-			// webRtcConnectOverlayHtml.innerHTML = 'Click to start';
-
-			// set up the event listener 
-			let connectOverlayEvent = () => {
-				//EventEmitter.emit("connectToSignallingSever", undefined);
-			}
-
-			// create the webRtc connect overlay
-			//this.overlay = this.returnNewOverlay(true, 'videoPlayOverlay', 'clickableState', webRtcConnectOverlayHtml, connectOverlayEvent);
-
+			this.showConnectOverlay();
 		} else {
 			//EventEmitter.emit("connectToSignallingSever", undefined);
 		}

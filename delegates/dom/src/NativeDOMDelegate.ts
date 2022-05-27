@@ -3,20 +3,46 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import * as libspsfrontend from '@tensorworks/libspsfrontend'
 
 export class OverlayBase implements libspsfrontend.IOverlay {
-	protected baseOverlayElement: HTMLDivElement;
+	protected rootElement: HTMLDivElement;
 	protected rootDiv: HTMLDivElement;
 
-	protected constructor(rootDiv: HTMLDivElement, baseOverlayElement: HTMLDivElement) {
+	protected constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement) {
 		this.rootDiv = rootDiv;
-		this.baseOverlayElement = baseOverlayElement;
+		this.rootElement = rootElement;
 	}
 
 	public show(): void {
-		this.rootDiv.appendChild(this.baseOverlayElement);
+		this.rootDiv.appendChild(this.rootElement);
 	}
 
 	public hide(): void {
-		this.baseOverlayElement.className = "hiddenState";
+		this.rootElement.className = "hiddenState";
+	}
+}
+
+export class ActionOverlayBase extends libspsfrontend.ActionOverlay implements libspsfrontend.ITextOverlay {
+	protected rootElement: HTMLDivElement;
+	protected rootDiv: HTMLDivElement;
+	private textElement: HTMLDivElement;
+
+	public constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement, textElement: HTMLDivElement) {
+		super();
+		this.rootDiv = rootDiv;
+		this.rootElement = rootElement;
+		this.textElement = textElement;
+		this.rootElement.appendChild(this.textElement);
+	}
+
+	update(text: string): void {
+		this.textElement.innerText = text;
+	}
+
+	public show(): void {
+		this.rootDiv.appendChild(this.rootElement);
+	}
+
+	public hide(): void {
+		this.rootElement.className = "hiddenState";
 	}
 
 }
@@ -24,10 +50,10 @@ export class OverlayBase implements libspsfrontend.IOverlay {
 export class TextOverlayBase extends OverlayBase implements libspsfrontend.ITextOverlay {
 	private textElement: HTMLDivElement;
 
-	public constructor(rootDiv: HTMLDivElement, baseOverlayElement: HTMLDivElement) {
-		super(rootDiv, baseOverlayElement);
-		this.textElem = document.createElement("p");
-		this.baseOverlayElement.appendChild(this.textElem);
+	public constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement, textElement: HTMLDivElement) {
+		super(rootDiv, rootElement);
+		this.textElement = textElement;
+		this.rootElement.appendChild(this.textElement);
 	}
 
 	public update(text: string): void {
@@ -96,175 +122,140 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.logging = false;
 		this.videoEncoderAvgQP = -1;
 
+		this.buildConnectOverlay();
+		this.buildPlayOverlay();
+		this.buildInfoOverlay();
+		this.buildErrorOverlay();
 		this.ConfigureButtons();
 	}
 
 	buildConnectOverlay() {
 		// build the overlay base div 
-		this.connectOverlay.htmlElement = document.createElement('div');
-		this.connectOverlay.htmlElement.id = "videoPlayOverlay";
-		this.connectOverlay.htmlElement.className = "clickableState";
+		let connectOverlayHtml = document.createElement('div');
+		connectOverlayHtml.id = "videoPlayOverlay";
+		connectOverlayHtml.className = "clickableState";
 
 		// build the inner html 
-		let connectOverlayHtml = document.createElement('div');
-		connectOverlayHtml.id = 'playButton';
-		connectOverlayHtml.innerHTML = 'Click to start';
+		let connectOverlayHtmlInner = document.createElement('div');
+		connectOverlayHtmlInner.id = 'playButton';
+		connectOverlayHtmlInner.innerHTML = 'Click to start';
 
-		// insert the inner html into the base div
-		this.connectOverlay.htmlElement.appendChild(connectOverlayHtml);
+		this.connectOverlay = new ActionOverlayBase(this.config.playerElement, connectOverlayHtml, connectOverlayHtmlInner);
 	}
 
 	buildPlayOverlay() {
 		// build the overlay base div 
-		this.playOverlay.htmlElement = document.createElement('div');
-		this.playOverlay.htmlElement.id = "videoPlayOverlay";
-		this.playOverlay.htmlElement.className = "clickableState";
+		let playOverlayHtml = document.createElement('div');
+		playOverlayHtml.id = "videoPlayOverlay";
+		playOverlayHtml.className = "clickableState";
 
 		// build the inner html 
-		let playOverlayHtml = document.createElement('img');
-		playOverlayHtml.id = 'playButton';
-		playOverlayHtml.src = Images.playButton;
-		playOverlayHtml.alt = 'Start Streaming';
+		let playOverlayHtmlInner = document.createElement('img');
+		playOverlayHtmlInner.id = 'playButton';
+		playOverlayHtmlInner.src = Images.playButton;
+		playOverlayHtmlInner.alt = 'Start Streaming';
 
 		// insert the inner html into the base div
-		this.playOverlay.htmlElement.appendChild(playOverlayHtml);
+		this.playOverlay = new ActionOverlayBase(this.config.playerElement, playOverlayHtml, playOverlayHtmlInner);
 	}
 
 	buildInfoOverlay() {
 		// build the overlay base div 
-		this.infoOverlay.htmlElement = document.createElement('div');
-		this.infoOverlay.htmlElement.id = "videoPlayOverlay";
-		this.infoOverlay.htmlElement.className = "textDisplayState";
+		let infoOverlayHtml = document.createElement('div');
+		infoOverlayHtml.id = "videoPlayOverlay";
+		infoOverlayHtml.className = "textDisplayState";
 
 		// build the inner html
-		let onInfoHtml = document.createElement('div');
-		onInfoHtml.id = 'messageOverlay';
-		//onInfoHtml.innerHTML = "RTC Answer";
+		let infoOverlayHtmlInner = document.createElement('div');
+		infoOverlayHtmlInner.id = 'messageOverlay';
 
 		// insert the inner html into the base div
-		this.infoOverlay.htmlElement.appendChild(onInfoHtml);
+		this.infoOverlay = new TextOverlayBase(this.config.playerElement, infoOverlayHtml, infoOverlayHtmlInner);
 	}
 
 	buildErrorOverlay() {
 		// build the overlay base div 
-		this.errorOverlay.htmlElement = document.createElement('div');
-		this.errorOverlay.htmlElement.id = "videoPlayOverlay";
-		this.errorOverlay.htmlElement.className = "textDisplayState";
+		let errorOverlayHtml = document.createElement('div');
+		errorOverlayHtml.id = "videoPlayOverlay";
+		errorOverlayHtml.className = "textDisplayState";
 
 		// build the inner html
-		let onErrorHtml = document.createElement('div');
-		onErrorHtml.id = 'errorOverlay';
-		//onWebRtcFailedHtml.innerHTML = "Unable to setup video";
+		let errorOverlayHtmlInner = document.createElement('div');
+		errorOverlayHtmlInner.id = 'errorOverlay';
 
 		// insert the inner html into the base div
-		this.errorOverlay.htmlElement.appendChild(onErrorHtml);
+		this.errorOverlay = new TextOverlayBase(this.config.playerElement, errorOverlayHtml, errorOverlayHtmlInner);
 	}
-
-	// buildWebRtcConnectingOverlay() {
-	// 	// build the overlay base div 
-	// 	this.infoOverlay.htmlElement = document.createElement('div');
-	// 	this.infoOverlay.htmlElement.id = "videoPlayOverlay";
-	// 	this.infoOverlay.htmlElement.className = "textDisplayState";
-
-	// 	// build the inner html
-	// 	let onWebRtcConnectedHtml = document.createElement('div');
-	// 	onWebRtcConnectedHtml.id = 'messageOverlay';
-	// 	onWebRtcConnectedHtml.innerHTML = "Starting connection to server, please wait";
-
-	// 	// insert the inner html into the base div
-	// 	this.infoOverlay.htmlElement.appendChild(onWebRtcConnectedHtml);
-	// }
-
-	// buildWebRtcConnectedOverlay() {
-	// 	// build the overlay base div 
-	// 	this.infoOverlay.htmlElement = document.createElement('div');
-	// 	this.infoOverlay.htmlElement.id = "videoPlayOverlay";
-	// 	this.infoOverlay.htmlElement.className = "textDisplayState";
-
-	// 	// build the inner html
-	// 	let onWebRtcConnectingHtml = document.createElement('div');
-	// 	onWebRtcConnectingHtml.id = 'messageOverlay';
-	// 	onWebRtcConnectingHtml.innerHTML = 'WebRTC connected, waiting for video';
-
-	// 	// insert the inner html into the base div
-	// 	this.infoOverlay.htmlElement.appendChild(onWebRtcConnectingHtml);
-	// }
-
-	// buildDisconnectOverlay() {
-	// 	// build the overlay base div 
-	// 	this.errorOverlay.htmlElement = document.createElement('div');
-	// 	this.errorOverlay.htmlElement.id = "videoPlayOverlay";
-	// 	this.errorOverlay.htmlElement.className = "textDisplayState";
-
-	// 	// build the inner html
-	// 	let onDisconnectHtml = document.createElement('div');
-	// 	onDisconnectHtml.id = 'messageOverlay';
-	// 	//onDisconnectHtml.innerHTML = `Disconnected: ${event.code} -  ${event.reason}`;
-
-	// 	// insert the inner html into the base div
-	// 	this.errorOverlay.htmlElement.appendChild(onDisconnectHtml);
-	// }
 
 	/**
 	* Set up functionality to happen when an instance state change occurs
 	* @param instanceState - the message instance state 
 	*/
 	onInstanceStateChange(instanceState: libspsfrontend.MessageInstanceState) {
-		this.infoOverlay.htmlElement = document.createElement('div');
-		this.infoOverlay.htmlElement.id = "videoPlayOverlay";
-		this.infoOverlay.htmlElement.className = "textDisplayState";
-
-		let onInstanceStateChangeHtml = document.createElement('div');
-		onInstanceStateChangeHtml.id = 'messageOverlay';
+		let instanceStateMessage = "";
+		let isInstancePending = false;
 
 		switch (instanceState.state) {
 			case libspsfrontend.InstanceState.UNALLOCATED:
-				onInstanceStateChangeHtml.innerHTML = "Instance Unallocated: " + instanceState.details;
+				instanceStateMessage = "Instance Unallocated: " + instanceState.details;
 				break;
 			case libspsfrontend.InstanceState.FAILED:
-				onInstanceStateChangeHtml.innerHTML = "UE Instance Failed: " + instanceState.details;
+				instanceStateMessage = "UE Instance Failed: " + instanceState.details;
 				break;
 			case libspsfrontend.InstanceState.PENDING:
-
-				// check if there is already and instance pending if so return 
-				let preExistingPendingMessage = document.getElementById('messageOverlay') as HTMLDivElement;
-				if (preExistingPendingMessage.classList.contains("instance-pending")) {
-					return;
-				}
-
-				// sometimes the first states from the ss may be empty if so just make it manually this code will change when we update the SS
 				if (instanceState.details == undefined || instanceState.details == null) {
-					onInstanceStateChangeHtml.innerHTML = "Your application is pending";
+					instanceStateMessage = "Your application is pending";
 				} else {
-					onInstanceStateChangeHtml.innerHTML = instanceState.details;
+					instanceStateMessage = instanceState.details;
 				}
-
-				onInstanceStateChangeHtml.className = "instance-pending";
-
-				var spinnerSpan: HTMLSpanElement = document.createElement('span');
-				spinnerSpan.className = "visually-hidden"
-				spinnerSpan.innerHTML = "Loading..."
-
-				var spinnerDiv: HTMLDivElement = document.createElement('div');
-				spinnerDiv.id = "loading-spinner"
-				spinnerDiv.className = "spinner-border ms-2"
-				spinnerDiv.setAttribute("role", "status");
-
-				spinnerDiv.appendChild(spinnerSpan);
-				onInstanceStateChangeHtml.appendChild(spinnerDiv);
-
 				break;
 			case libspsfrontend.InstanceState.READY:
-				onInstanceStateChangeHtml.innerHTML = "Instance is Ready: " + instanceState.details;
+				instanceStateMessage = "Instance is Ready: " + instanceState.details;
 				break;
 			default:
-				onInstanceStateChangeHtml.innerHTML = "Unhandled Instance State" + instanceState.state + " " + instanceState.details;
+				instanceStateMessage = "Unhandled Instance State" + instanceState.state + " " + instanceState.details;
 				break;
 		}
 
-		// create the overlay 
-		this.infoOverlay.htmlElement.appendChild(onInstanceStateChangeHtml);
-		//this.overlay = this.returnNewOverlay(true, 'videoPlayOverlay', 'textDisplayState', onInstanceStateChangeHtml, undefined);
+		if (isInstancePending) {
+			//check if there is already and instance pending if so return 
+			let preExistingPendingMessage = document.getElementById('messageOverlay') as HTMLDivElement;
+			if (preExistingPendingMessage.classList.contains("instance-pending")) {
+				return;
+			}
+
+			// build the overlay base div 
+			let infoOverlayHtml = document.createElement('div');
+			infoOverlayHtml.id = "videoPlayOverlay";
+			infoOverlayHtml.className = "textDisplayState";
+
+			// build the inner html
+			let infoOverlayHtmlInner = document.createElement('div');
+			infoOverlayHtmlInner.id = 'messageOverlay';
+			infoOverlayHtmlInner.innerHTML = instanceStateMessage;
+			infoOverlayHtmlInner.className = "instance-pending";
+
+			// build the spinner span
+			var spinnerSpan: HTMLSpanElement = document.createElement('span');
+			spinnerSpan.className = "visually-hidden"
+			spinnerSpan.innerHTML = "Loading..."
+
+			// build the spinner div
+			var spinnerDiv: HTMLDivElement = document.createElement('div');
+			spinnerDiv.id = "loading-spinner"
+			spinnerDiv.className = "spinner-border ms-2"
+			spinnerDiv.setAttribute("role", "status");
+
+			// append the spinner to the element
+			spinnerDiv.appendChild(spinnerSpan);
+			infoOverlayHtmlInner.appendChild(spinnerDiv);
+
+			// insert the inner html into the base div
+			this.infoOverlay = new TextOverlayBase(this.config.playerElement, infoOverlayHtml, infoOverlayHtmlInner);
+
+		} else {
+			this.infoOverlay.update(instanceStateMessage);
+		}
 	}
 
 	/**
@@ -272,34 +263,28 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 * @param authResponse - the auth response message type
 	 */
 	onAuthenticationResponse(authResponse: libspsfrontend.MessageAuthResponse) {
-		this.infoOverlay.htmlElement = document.createElement('div');
-		this.infoOverlay.htmlElement.id = "videoPlayOverlay";
-		this.infoOverlay.htmlElement.className = "textDisplayState";
-
-		let onAuthenticationResponseHtml = document.createElement('div');
-		onAuthenticationResponseHtml.id = 'messageOverlay';
+		let instanceStateMessage = "";
 
 		switch (authResponse.outcome) {
 			case libspsfrontend.MessageAuthResponseOutcomeType.AUTHENTICATED:
-				onAuthenticationResponseHtml.innerHTML = "Authentication has succeeded. Requesting Instance";
+				instanceStateMessage = "Authentication has succeeded. Requesting Instance";
 				break;
 			case libspsfrontend.MessageAuthResponseOutcomeType.INVALID_TOKEN:
-				onAuthenticationResponseHtml.innerHTML = "Invalid Token: " + authResponse.error;
+				instanceStateMessage = "Invalid Token: " + authResponse.error;
 				break;
 			case libspsfrontend.MessageAuthResponseOutcomeType.REDIRECT:
-				onAuthenticationResponseHtml.innerHTML = "Redirecting to: " + authResponse.redirect;
+				instanceStateMessage = "Redirecting to: " + authResponse.redirect;
 				break;
 			case libspsfrontend.MessageAuthResponseOutcomeType.ERROR:
-				onAuthenticationResponseHtml.innerHTML = "Error: " + authResponse.error;
+				instanceStateMessage = "Error: " + authResponse.error;
 				break;
 			default:
-				onAuthenticationResponseHtml.innerHTML = "Unhandled Auth Response: " + authResponse.outcome;
+				instanceStateMessage = "Unhandled Auth Response: " + authResponse.outcome;
 				break;
 		}
 
-		// create the overlay 
-		this.infoOverlay.htmlElement.appendChild(onAuthenticationResponseHtml);
-		//this.overlay = this.returnNewOverlay(true, 'videoPlayOverlay', 'textDisplayState', onAuthenticationResponseHtml, undefined);
+		// update the overlay 
+		this.infoOverlay.update(instanceStateMessage);
 	}
 
 	/**
