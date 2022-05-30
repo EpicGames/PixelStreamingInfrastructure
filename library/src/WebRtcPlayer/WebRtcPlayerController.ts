@@ -42,7 +42,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	//freezeFrameLogic: FreezeFrameLogic;
 	afkLogic: AfkLogic;
 	playerElementClientRect: DOMRect;
-	playOverlayEvent: EventListener;
 	lastTimeResized = new Date().getTime();
 	matchViewportResolution: boolean;
 	resizeTimeout: ReturnType<typeof setTimeout>;
@@ -87,9 +86,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.videoPlayerController = new VideoPlayerController(this.config.playerElement, this.config.startVideoMuted);
 
-		// attach playStream to an event listener so it can be passed to an overlay for activation 
-		//this.playOverlayEvent = () => this.playStream();
-		//EventEmitter.on("playStream", () => this.playStream());
 		//this.freezeFrame.setPlayOverlayEvent(this.playOverlayEvent);
 
 		// set up websocket methods
@@ -101,13 +97,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		// set up the final webRtc player controller methods from within our delegate so a connection can be activated
 		this.setUpWebRtcConnectionForActivation();
-
-		/**
-		 * Connect to the Signaling server
-		 */
-		// EventEmitter.on("connectToSignallingSever", () => {
-		// 	this.webSocketController.connect();
-		// });
 	}
 
 	/**
@@ -158,13 +147,13 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 				this.ueControlMessage.SendRequestInitialSettings();
 				this.ueControlMessage.SendRequestQualityControl();
 				//this.freezeFrame.freezeFrameOverlay.showFreezeFrameOverlay();
-				//this.delegate.overlay.hideOverlay();
+				this.delegate.hideCurrentOverlay();
 				this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
 				this.afkLogic.startAfkWarningTimer(this.delegate.afkOverlay);
 			}).catch((onRejectedReason: string) => {
 				console.log(onRejectedReason);
 				console.log("Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.")
-				this.delegate.onShowPlayOverlay(this.playOverlayEvent);
+				this.delegate.showPlayOverlay();
 			});
 		} else {
 			console.error("Could not player video stream because webRtcPlayerObj.video was not valid.")
@@ -184,7 +173,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.playStream();
 
 		} else {
-			this.delegate.onShowPlayOverlay(this.playOverlayEvent);
+			this.delegate.showPlayOverlay();
 		}
 	}
 

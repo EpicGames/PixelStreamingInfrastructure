@@ -50,11 +50,13 @@ export class DelegateBase implements IDelegate {
 	};
 
 	showTextOverlay(text: string) {
+		this.infoOverlay.update(text);
 		this.infoOverlay.show();
 		this.currentOverlay = this.infoOverlay;
 	};
 
 	showErrorOverlay(text: string) {
+		this.errorOverlay.update(text);
 		this.errorOverlay.show();
 		this.currentOverlay = this.errorOverlay;
 	};
@@ -73,7 +75,7 @@ export class DelegateBase implements IDelegate {
 
 	updateAfkOverlay(countDown: number) { };
 
-	onAfkAction() { 
+	onAfkAction() {
 		this.afkOverlay.activate();
 	};
 
@@ -110,6 +112,7 @@ export class DelegateBase implements IDelegate {
 	 */
 	setIWebRtcPlayerController(iWebRtcPlayerController: IWebRtcPlayerController) {
 		this.iWebRtcController = iWebRtcPlayerController;
+
 		this.iWebRtcController.resizePlayerStyle();
 
 		//this.setAfkOverlayClickEvent();
@@ -118,6 +121,8 @@ export class DelegateBase implements IDelegate {
 		//this.iWebRtcController.freezeFrame.setFreezeFrameOverlay(//this.freezeFrameOverlay);
 
 		this.setWebRtcConnectOverlay();
+
+		this.playOverlay.onAction(() => this.iWebRtcController.playStream());
 	}
 
 	/**
@@ -127,9 +132,10 @@ export class DelegateBase implements IDelegate {
 		// set up if the auto play will be used or regular click to start
 		if (!this.config.enableSpsAutoplay) {
 			// Build the webRtc connect overlay Event Listener and show the connect overlay
+			this.connectOverlay.onAction(() => this.iWebRtcController.connectToSignallingSever());
 			this.showConnectOverlay();
 		} else {
-			//EventEmitter.emit("connectToSignallingSever", undefined);
+			this.iWebRtcController.connectToSignallingSever();
 		}
 	}
 
@@ -149,34 +155,13 @@ export class DelegateBase implements IDelegate {
 	 * Set up functionality to happen when receiving a webRTC answer 
 	 */
 	onWebRtcAnswer() {
-
-		// set up the new html element for the overlay 
-		// let onWebRtcAnswerHtml = document.createElement('div');
-		// onWebRtcAnswerHtml.id = 'messageOverlay';
-		// onWebRtcAnswerHtml.innerHTML = "RTC Answer";
-
-		// create the overlay 
-		//this.overlay = this.returnNewOverlay(true, 'videoPlayOverlay', 'textDisplayState', onWebRtcAnswerHtml, undefined);
+		this.showTextOverlay("RTC Answer");
 	}
 
 	/**
 	 * Creates the play overlay for playing the video stream
 	 */
 	onShowPlayOverlay() {
-
-		// set up the html 
-		// let playOverlayHtml = document.createElement('img');
-		// playOverlayHtml.id = 'playButton';
-		// playOverlayHtml.src = Images.playButton;
-		// playOverlayHtml.alt = 'Start Streaming';
-
-		let overlayClickEvent = () => {
-			//EventEmitter.emit("playStream", undefined);
-		}
-
-		// create the webRtc connect overlay
-		//this.overlay = this.returnNewOverlay(true, 'videoPlayOverlay', 'clickableState', playOverlayHtml, overlayClickEvent);
-
 		// set shouldShowPlayOverlay to false in this class and also in the freeze
 		this.shouldShowPlayOverlay = false;
 		//this.iWebRtcController.freezeFrame.setShouldShowPlayOverlay(this.shouldShowPlayOverlay);
@@ -186,54 +171,28 @@ export class DelegateBase implements IDelegate {
 	 * Event fired when the video is disconnected
 	 */
 	onDisconnect(event: CloseEvent) {
-
-		// set up the new html element for the overlay 
-		// let onDisconnectHtml = document.createElement('div');
-		// onDisconnectHtml.id = 'messageOverlay';
-		// onDisconnectHtml.innerHTML = `Disconnected: ${event.code} -  ${event.reason}`;
-
-		// create the overlay 
-		//this.overlay = this.returnNewOverlay(true, 'videoPlayOverlay', 'textDisplayState', onDisconnectHtml, undefined);
+		this.showErrorOverlay(`Disconnected: ${event.code} -  ${event.reason}`);
 	}
 
 	/**
 	 * Handles when Web Rtc is connecting 
 	 */
 	onWebRtcConnecting() {
-		// set up the new html element for the overlay 
-		// let onWebRtcConnectedHtml = document.createElement('div');
-		// onWebRtcConnectedHtml.id = 'messageOverlay';
-		// onWebRtcConnectedHtml.innerHTML = "Starting connection to server, please wait";
-
-		// create the overlay 
-		//this.overlay = this.returnNewOverlay(true, 'videoPlayOverlay', 'textDisplayState', onWebRtcConnectedHtml, undefined);
+		this.showTextOverlay("Starting connection to server, please wait");
 	}
 
 	/**
 	 * Handles when Web Rtc has connected 
 	 */
 	onWebRtcConnected() {
-		// set up the new html element for the overlay 
-		// let onWebRtcConnectingHtml = document.createElement('div');
-		// onWebRtcConnectingHtml.id = 'messageOverlay';
-		// onWebRtcConnectingHtml.innerHTML = 'WebRTC connected, waiting for video';
-
-		// create the overlay 
-		//this.overlay = this.returnNewOverlay(true, 'videoPlayOverlay', 'textDisplayState', onWebRtcConnectingHtml, undefined);
+		this.showTextOverlay("WebRTC connected, waiting for video");
 	}
 
 	/**
 	 * Handles when Web Rtc fails to connect 
 	 */
 	onWebRtcFailed() {
-
-		// set up the new html element for the overlay 
-		// let onWebRtcFailedHtml = document.createElement('div');
-		// onWebRtcFailedHtml.id = 'messageOverlay';
-		// onWebRtcFailedHtml.innerHTML = "Unable to setup video";
-
-		// create the overlay 
-		//this.overlay = this.returnNewOverlay(true, 'videoPlayOverlay', 'textDisplayState', onWebRtcFailedHtml, undefined);
+		this.showErrorOverlay("Unable to setup video");
 	}
 
 	/**

@@ -9,10 +9,10 @@ import { AfkOverlay } from "../Overlay/AfkOverlay";
 export interface IWebRtcPlayerController {
     matchViewportResolution: boolean;
     //freezeFrameLogic: FreezeFrameLogic;
-    playOverlayEvent: EventListener;
-
     onAfkEventListener(afkOverlay: AfkOverlay): void;
-    
+
+    playStream(): void;
+
     /**
      * Connect to the Signaling server
      */
@@ -24,8 +24,8 @@ export interface IWebRtcPlayerController {
     closeSignalingServer(): void;
 
     /**
-	 * Restart the stream automaticity without refreshing the page
-	 */
+     * Restart the stream automaticity without refreshing the page
+     */
     restartStreamAutomaticity(): void;
 
     /**
@@ -75,6 +75,6 @@ export interface IWebRtcPlayerController {
     /**
      * Registers the mouse
      */
-     activateRegisterMouse(): void;
+    activateRegisterMouse(): void;
 
 }

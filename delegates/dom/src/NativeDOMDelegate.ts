@@ -12,6 +12,10 @@ export class OverlayBase implements libspsfrontend.IOverlay {
 	}
 
 	public show(): void {
+		let preExistingElement = document.getElementById(this.rootElement.id) as HTMLDivElement;
+		if (this.rootDiv.contains(preExistingElement)) {
+			preExistingElement.remove();
+		}
 		this.rootDiv.appendChild(this.rootElement);
 	}
 
@@ -34,10 +38,16 @@ export class ActionOverlayBase extends libspsfrontend.ActionOverlay implements l
 	}
 
 	update(text: string): void {
-		this.textElement.innerText = text;
+		if (text != null || text != undefined) {
+			this.textElement.innerHTML = text;
+		}
 	}
 
 	public show(): void {
+		let preExistingElement = document.getElementById(this.rootElement.id) as HTMLDivElement;
+		if (this.rootDiv.contains(preExistingElement)) {
+			preExistingElement.remove();
+		}
 		this.rootDiv.appendChild(this.rootElement);
 	}
 
@@ -57,7 +67,9 @@ export class TextOverlayBase extends OverlayBase implements libspsfrontend.IText
 	}
 
 	public update(text: string): void {
-		this.textElement.innerText = text;
+		if (text != null || text != undefined) {
+			this.textElement.innerHTML = text;
+		}
 	}
 }
 
@@ -135,6 +147,15 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		connectOverlayHtml.id = "videoPlayOverlay";
 		connectOverlayHtml.className = "clickableState";
 
+		// set the event Listener
+		let connectOverlayEvent: EventListener = () => this.onConnectAction();
+
+		// add the new event listener 
+		connectOverlayHtml.addEventListener('click', function onOverlayClick(event: Event) {
+			connectOverlayEvent(event);
+			connectOverlayHtml.removeEventListener('click', onOverlayClick);
+		});
+
 		// build the inner html 
 		let connectOverlayHtmlInner = document.createElement('div');
 		connectOverlayHtmlInner.id = 'playButton';
@@ -148,6 +169,15 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		let playOverlayHtml = document.createElement('div');
 		playOverlayHtml.id = "videoPlayOverlay";
 		playOverlayHtml.className = "clickableState";
+
+		// set the event Listener
+		let playOverlayEvent: EventListener = () => this.onPlayAction();
+
+		// add the new event listener 
+		playOverlayHtml.addEventListener('click', function onOverlayClick(event: Event) {
+			playOverlayEvent(event);
+			playOverlayHtml.removeEventListener('click', onOverlayClick);
+		});
 
 		// build the inner html 
 		let playOverlayHtmlInner = document.createElement('img');
@@ -194,6 +224,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	onInstanceStateChange(instanceState: libspsfrontend.MessageInstanceState) {
 		let instanceStateMessage = "";
 		let isInstancePending = false;
+		let isError = false;
 
 		switch (instanceState.state) {
 			case libspsfrontend.InstanceState.UNALLOCATED:
@@ -201,8 +232,10 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 				break;
 			case libspsfrontend.InstanceState.FAILED:
 				instanceStateMessage = "UE Instance Failed: " + instanceState.details;
+				isError = true;
 				break;
 			case libspsfrontend.InstanceState.PENDING:
+				isInstancePending = true;
 				if (instanceState.details == undefined || instanceState.details == null) {
 					instanceStateMessage = "Your application is pending";
 				} else {
@@ -217,7 +250,9 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 				break;
 		}
 
-		if (isInstancePending) {
+		if (isError) {
+			this.showErrorOverlay(instanceStateMessage);
+		} else if (isInstancePending) {
 			//check if there is already and instance pending if so return 
 			let preExistingPendingMessage = document.getElementById('messageOverlay') as HTMLDivElement;
 			if (preExistingPendingMessage.classList.contains("instance-pending")) {
@@ -232,8 +267,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			// build the inner html
 			let infoOverlayHtmlInner = document.createElement('div');
 			infoOverlayHtmlInner.id = 'messageOverlay';
-			infoOverlayHtmlInner.innerHTML = instanceStateMessage;
 			infoOverlayHtmlInner.className = "instance-pending";
+			infoOverlayHtmlInner.innerHTML = instanceStateMessage;
 
 			// build the spinner span
 			var spinnerSpan: HTMLSpanElement = document.createElement('span');
@@ -252,9 +287,10 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 			// insert the inner html into the base div
 			this.infoOverlay = new TextOverlayBase(this.config.playerElement, infoOverlayHtml, infoOverlayHtmlInner);
+			this.showTextOverlay(undefined);
 
 		} else {
-			this.infoOverlay.update(instanceStateMessage);
+			this.showTextOverlay(instanceStateMessage);
 		}
 	}
 
@@ -264,6 +300,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 */
 	onAuthenticationResponse(authResponse: libspsfrontend.MessageAuthResponse) {
 		let instanceStateMessage = "";
+		let isError = false;
 
 		switch (authResponse.outcome) {
 			case libspsfrontend.MessageAuthResponseOutcomeType.AUTHENTICATED:
@@ -271,20 +308,25 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 				break;
 			case libspsfrontend.MessageAuthResponseOutcomeType.INVALID_TOKEN:
 				instanceStateMessage = "Invalid Token: " + authResponse.error;
+				isError = true;
 				break;
 			case libspsfrontend.MessageAuthResponseOutcomeType.REDIRECT:
 				instanceStateMessage = "Redirecting to: " + authResponse.redirect;
 				break;
 			case libspsfrontend.MessageAuthResponseOutcomeType.ERROR:
 				instanceStateMessage = "Error: " + authResponse.error;
+				isError = true;
 				break;
 			default:
 				instanceStateMessage = "Unhandled Auth Response: " + authResponse.outcome;
 				break;
 		}
 
-		// update the overlay 
-		this.infoOverlay.update(instanceStateMessage);
+		if (isError) {
+			this.showErrorOverlay(instanceStateMessage);
+		} else {
+			this.showTextOverlay(instanceStateMessage);
+		}
 	}
 
 	/**
