@@ -3,7 +3,7 @@ import { VideoPlayerController } from "../VideoPlayer/VideoPlayerController";
 import { MessageInstanceState, MessageAnswer, MessageAuthResponse, MessageConfig } from "../WebSockets/MessageReceive";
 import { UiController } from "../Ui/UiController";
 //import { FreezeFrameLogic } from "../FreezeFrame/FreezeFrameLogic";
-import { AfkLogic } from "../Overlay/AfkLogic";
+import { AfkLogic } from "../Afk/AfkLogic";
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { PeerConnectionController } from "../PeerConnectionController/PeerConnectionController"
 import { MouseController } from "../Inputs/MouseController";

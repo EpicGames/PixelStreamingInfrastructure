@@ -40,22 +40,26 @@ export class DelegateBase implements IDelegate {
 	};
 
 	showConnectOverlay() {
+		this.hideCurrentOverlay();
 		this.connectOverlay.show();
 		this.currentOverlay = this.connectOverlay;
 	};
 
 	showPlayOverlay() {
+		this.hideCurrentOverlay();
 		this.playOverlay.show();
 		this.currentOverlay = this.playOverlay;
 	};
 
 	showTextOverlay(text: string) {
+		this.hideCurrentOverlay();
 		this.infoOverlay.update(text);
 		this.infoOverlay.show();
 		this.currentOverlay = this.infoOverlay;
 	};
 
 	showErrorOverlay(text: string) {
+		this.hideCurrentOverlay();
 		this.errorOverlay.update(text);
 		this.errorOverlay.show();
 		this.currentOverlay = this.errorOverlay;
@@ -70,6 +74,7 @@ export class DelegateBase implements IDelegate {
 	};
 
 	showAfkOverlay(countDown: number) {
+		this.hideCurrentOverlay();
 		this.afkOverlay.show();
 	};
 

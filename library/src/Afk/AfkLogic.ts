@@ -1,5 +1,5 @@
 import { ControlSchemeType } from "../Config/Config";
-import { AfkOverlay } from "./AfkOverlay";
+import { AfkOverlay } from "../Overlay/AfkOverlay";
 export class AfkLogic {
     // time out logic details 
     controlScheme: number;

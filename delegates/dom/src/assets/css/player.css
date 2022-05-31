@@ -182,7 +182,7 @@ video{
 }
 
 
-#videoPlayOverlay{
+#connectOverlay, #playOverlay, #infoOverlay, #errorOverlay{
 	z-index: 30;
 	position: absolute;
 	color: var(--colour4);
@@ -213,7 +213,7 @@ video{
 	display: none;
 }
 
-#playButton{
+#playButton, #connectButton{
 	display: inline-block;
 	height: auto;
 }

@@ -8,7 +8,7 @@ import { IOverlay } from './Overlay/IOverlay';
 import { ITextOverlay } from './Overlay/ITextOverlay';
 import { ActionOverlay } from "./Overlay/ActionOverlay"
 import { AfkOverlay } from './Overlay/AfkOverlay';
-import { AfkLogic } from './Overlay/AfkLogic';
+import { AfkLogic } from './Afk/AfkLogic';
 
 import { LatencyTestResults } from "./DataChannel/LatencyTestResults";
 import { Encoder, InitialSettings, WebRTC } from './DataChannel/InitialSettings';

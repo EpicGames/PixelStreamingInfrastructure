@@ -9,18 +9,16 @@ export class OverlayBase implements libspsfrontend.IOverlay {
 	protected constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement) {
 		this.rootDiv = rootDiv;
 		this.rootElement = rootElement;
-	}
-
-	public show(): void {
-		let preExistingElement = document.getElementById(this.rootElement.id) as HTMLDivElement;
-		if (this.rootDiv.contains(preExistingElement)) {
-			preExistingElement.remove();
-		}
+		this.rootElement.classList.add("hiddenState");
 		this.rootDiv.appendChild(this.rootElement);
 	}
 
+	public show(): void {
+		this.rootElement.classList.remove("hiddenState");
+	}
+
 	public hide(): void {
-		this.rootElement.className = "hiddenState";
+		this.rootElement.classList.add("hiddenState");
 	}
 }
 
@@ -35,6 +33,8 @@ export class ActionOverlayBase extends libspsfrontend.ActionOverlay implements l
 		this.rootElement = rootElement;
 		this.textElement = textElement;
 		this.rootElement.appendChild(this.textElement);
+		this.rootElement.classList.add("hiddenState");
+		this.rootDiv.appendChild(this.rootElement);
 	}
 
 	update(text: string): void {
@@ -44,15 +44,11 @@ export class ActionOverlayBase extends libspsfrontend.ActionOverlay implements l
 	}
 
 	public show(): void {
-		let preExistingElement = document.getElementById(this.rootElement.id) as HTMLDivElement;
-		if (this.rootDiv.contains(preExistingElement)) {
-			preExistingElement.remove();
-		}
-		this.rootDiv.appendChild(this.rootElement);
+		this.rootElement.classList.remove("hiddenState");
 	}
 
 	public hide(): void {
-		this.rootElement.className = "hiddenState";
+		this.rootElement.classList.add("hiddenState");
 	}
 
 }
@@ -139,12 +135,13 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.buildInfoOverlay();
 		this.buildErrorOverlay();
 		this.ConfigureButtons();
+		this.showConnectOverlay();
 	}
 
 	buildConnectOverlay() {
 		// build the overlay base div 
 		let connectOverlayHtml = document.createElement('div');
-		connectOverlayHtml.id = "videoPlayOverlay";
+		connectOverlayHtml.id = "connectOverlay";
 		connectOverlayHtml.className = "clickableState";
 
 		// set the event Listener
@@ -153,12 +150,12 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		// add the new event listener 
 		connectOverlayHtml.addEventListener('click', function onOverlayClick(event: Event) {
 			connectOverlayEvent(event);
-			connectOverlayHtml.removeEventListener('click', onOverlayClick);
+			//connectOverlayHtml.removeEventListener('click', onOverlayClick);
 		});
 
 		// build the inner html 
 		let connectOverlayHtmlInner = document.createElement('div');
-		connectOverlayHtmlInner.id = 'playButton';
+		connectOverlayHtmlInner.id = 'connectButton';
 		connectOverlayHtmlInner.innerHTML = 'Click to start';
 
 		this.connectOverlay = new ActionOverlayBase(this.config.playerElement, connectOverlayHtml, connectOverlayHtmlInner);
@@ -167,7 +164,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	buildPlayOverlay() {
 		// build the overlay base div 
 		let playOverlayHtml = document.createElement('div');
-		playOverlayHtml.id = "videoPlayOverlay";
+		playOverlayHtml.id = "playOverlay";
 		playOverlayHtml.className = "clickableState";
 
 		// set the event Listener
@@ -176,7 +173,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		// add the new event listener 
 		playOverlayHtml.addEventListener('click', function onOverlayClick(event: Event) {
 			playOverlayEvent(event);
-			playOverlayHtml.removeEventListener('click', onOverlayClick);
+			//playOverlayHtml.removeEventListener('click', onOverlayClick);
 		});
 
 		// build the inner html 
@@ -192,12 +189,12 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	buildInfoOverlay() {
 		// build the overlay base div 
 		let infoOverlayHtml = document.createElement('div');
-		infoOverlayHtml.id = "videoPlayOverlay";
+		infoOverlayHtml.id = "infoOverlay";
 		infoOverlayHtml.className = "textDisplayState";
 
 		// build the inner html
 		let infoOverlayHtmlInner = document.createElement('div');
-		infoOverlayHtmlInner.id = 'messageOverlay';
+		infoOverlayHtmlInner.id = 'messageOverlayInner';
 
 		// insert the inner html into the base div
 		this.infoOverlay = new TextOverlayBase(this.config.playerElement, infoOverlayHtml, infoOverlayHtmlInner);
@@ -206,12 +203,13 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	buildErrorOverlay() {
 		// build the overlay base div 
 		let errorOverlayHtml = document.createElement('div');
-		errorOverlayHtml.id = "videoPlayOverlay";
+		errorOverlayHtml.id = "errorOverlay";
 		errorOverlayHtml.className = "textDisplayState";
 
 		// build the inner html
 		let errorOverlayHtmlInner = document.createElement('div');
-		errorOverlayHtmlInner.id = 'errorOverlay';
+		errorOverlayHtmlInner.id = 'errorOverlayInner';
+		errorOverlayHtmlInner.classList.add(".text-danger");
 
 		// insert the inner html into the base div
 		this.errorOverlay = new TextOverlayBase(this.config.playerElement, errorOverlayHtml, errorOverlayHtmlInner);
@@ -254,21 +252,10 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.showErrorOverlay(instanceStateMessage);
 		} else if (isInstancePending) {
 			//check if there is already and instance pending if so return 
-			let preExistingPendingMessage = document.getElementById('messageOverlay') as HTMLDivElement;
-			if (preExistingPendingMessage.classList.contains("instance-pending")) {
+			let preExistingPendingMessage = document.getElementById('loading-spinner') as HTMLDivElement;
+			if (preExistingPendingMessage) {
 				return;
 			}
-
-			// build the overlay base div 
-			let infoOverlayHtml = document.createElement('div');
-			infoOverlayHtml.id = "videoPlayOverlay";
-			infoOverlayHtml.className = "textDisplayState";
-
-			// build the inner html
-			let infoOverlayHtmlInner = document.createElement('div');
-			infoOverlayHtmlInner.id = 'messageOverlay';
-			infoOverlayHtmlInner.className = "instance-pending";
-			infoOverlayHtmlInner.innerHTML = instanceStateMessage;
 
 			// build the spinner span
 			var spinnerSpan: HTMLSpanElement = document.createElement('span');
@@ -283,12 +270,9 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 			// append the spinner to the element
 			spinnerDiv.appendChild(spinnerSpan);
-			infoOverlayHtmlInner.appendChild(spinnerDiv);
 
 			// insert the inner html into the base div
-			this.infoOverlay = new TextOverlayBase(this.config.playerElement, infoOverlayHtml, infoOverlayHtmlInner);
-			this.showTextOverlay(undefined);
-
+			this.showTextOverlay(instanceStateMessage + spinnerDiv.outerHTML);
 		} else {
 			this.showTextOverlay(instanceStateMessage);
 		}
