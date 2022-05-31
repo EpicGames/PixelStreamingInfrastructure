@@ -9,7 +9,7 @@ import { AfkOverlay } from "../Overlay/AfkOverlay";
 export interface IWebRtcPlayerController {
     matchViewportResolution: boolean;
     //freezeFrameLogic: FreezeFrameLogic;
-    onAfkEventListener(afkOverlay: AfkOverlay): void;
+    onAfkClick(): void;
 
     playStream(): void;
 

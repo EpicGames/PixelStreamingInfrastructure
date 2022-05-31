@@ -75,41 +75,18 @@ export class DelegateBase implements IDelegate {
 
 	showAfkOverlay(countDown: number) {
 		this.hideCurrentOverlay();
+		this.updateAfkOverlay(countDown);
 		this.afkOverlay.show();
+		this.currentOverlay = this.afkOverlay;
 	};
 
-	updateAfkOverlay(countDown: number) { };
+	updateAfkOverlay(countDown: number) {
+		this.afkOverlay.update(countDown);
+	};
 
 	onAfkAction() {
 		this.afkOverlay.activate();
 	};
-
-	/**
-	 * Creates an afk overlay and sets the html update contents 
-	 */
-	// createNewAfkOverlay() {
-	// 	// create the afk overlay html 
-	// 	let afkOverlayHtml = document.createElement('div') as HTMLDivElement;
-	// 	afkOverlayHtml.id = 'afkOverlay';
-
-	// 	// set the afk overlay parameters so an new overlay can be instantiated but not applied 
-	// 	this.afkOverlay = this.returnNewAfkOverlay(false, "videoPlayOverlay", 'clickableState', afkOverlayHtml, undefined);
-
-	// 	// set the afk overlays update html that uses its own countdown timer number 
-	// 	this.afkOverlay.updateOverlayContents = () => {
-	// 		this.afkOverlay.currentElement.innerHTML = `<center>No activity detected<br>Disconnecting in ${this.afkOverlay.getCountDown()} seconds<br>Click to continue<br></center>`
-	// 	}
-	// }
-
-	/**
-	 * Set the afk click event listener. This should be done after iWebRtcController has been instantiated
-	 */
-	// setAfkOverlayClickEvent() {
-	// 	// Build the AFK overlay Event Listener after the fact as it requires afk logic
-	// 	this.afkOverlay.overlayClickEvent = () => this.iWebRtcController.onAfkEventListener(this.afkOverlay);
-	// }
-
-
 
 	/**
 	 * Instantiate the WebRTCPlayerController interface to provide WebRTCPlayerController functionality within this class and set up anything that requires it 
@@ -120,12 +97,12 @@ export class DelegateBase implements IDelegate {
 
 		this.iWebRtcController.resizePlayerStyle();
 
-		//this.setAfkOverlayClickEvent();
-
 		// update the freeze frame object in the webRtc player controller with the new overlay  
 		//this.iWebRtcController.freezeFrame.setFreezeFrameOverlay(//this.freezeFrameOverlay);
 
 		this.setWebRtcConnectOverlay();
+
+		this.afkOverlay.onAction(() => this.iWebRtcController.onAfkClick());
 
 		this.playOverlay.onAction(() => this.iWebRtcController.playStream());
 	}

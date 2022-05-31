@@ -182,7 +182,7 @@ video{
 }
 
 
-#connectOverlay, #playOverlay, #infoOverlay, #errorOverlay{
+#connectOverlay, #playOverlay, #infoOverlay, #errorOverlay, #afkOverlay{
 	z-index: 30;
 	position: absolute;
 	color: var(--colour4);

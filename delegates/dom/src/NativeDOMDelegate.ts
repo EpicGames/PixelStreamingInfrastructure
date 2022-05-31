@@ -22,7 +22,7 @@ export class OverlayBase implements libspsfrontend.IOverlay {
 	}
 }
 
-export class ActionOverlayBase extends libspsfrontend.ActionOverlay implements libspsfrontend.ITextOverlay {
+export class ActionOverlayBase extends libspsfrontend.ActionOverlay {
 	protected rootElement: HTMLDivElement;
 	protected rootDiv: HTMLDivElement;
 	private textElement: HTMLDivElement;
@@ -37,10 +37,32 @@ export class ActionOverlayBase extends libspsfrontend.ActionOverlay implements l
 		this.rootDiv.appendChild(this.rootElement);
 	}
 
-	update(text: string): void {
-		if (text != null || text != undefined) {
-			this.textElement.innerHTML = text;
-		}
+	public show(): void {
+		this.rootElement.classList.remove("hiddenState");
+	}
+
+	public hide(): void {
+		this.rootElement.classList.add("hiddenState");
+	}
+
+}
+
+
+export class AfkOverlayBase extends libspsfrontend.AfkOverlay {
+	protected rootElement: HTMLDivElement;
+	protected rootDiv: HTMLDivElement;
+	private textElement: HTMLDivElement;
+	private countDownSpanElementId: string;
+
+	public constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement, textElement: HTMLDivElement, countDownSpanElementId: string) {
+		super();
+		this.rootDiv = rootDiv;
+		this.rootElement = rootElement;
+		this.countDownSpanElementId = countDownSpanElementId;
+		this.textElement = textElement;
+		this.rootElement.appendChild(this.textElement);
+		this.rootElement.classList.add("hiddenState");
+		this.rootDiv.appendChild(this.rootElement);
 	}
 
 	public show(): void {
@@ -49,6 +71,10 @@ export class ActionOverlayBase extends libspsfrontend.ActionOverlay implements l
 
 	public hide(): void {
 		this.rootElement.classList.add("hiddenState");
+	}
+
+	update(countdown: number): void {
+		document.getElementById(this.countDownSpanElementId).innerHTML = countdown.toString();
 	}
 
 }
@@ -132,6 +158,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		this.buildConnectOverlay();
 		this.buildPlayOverlay();
+		this.buildAfkOverlay();
 		this.buildInfoOverlay();
 		this.buildErrorOverlay();
 		this.ConfigureButtons();
@@ -184,6 +211,28 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		// insert the inner html into the base div
 		this.playOverlay = new ActionOverlayBase(this.config.playerElement, playOverlayHtml, playOverlayHtmlInner);
+	}
+
+	buildAfkOverlay() {
+		// build the overlay base div 
+		let afkOverlayHtml = document.createElement('div');
+		afkOverlayHtml.id = "afkOverlay";
+		afkOverlayHtml.className = "clickableState";
+
+		let afkOverlayEvent: EventListener = () => this.onAfkAction();
+
+		afkOverlayHtml.addEventListener('click', function onOverlayClick(event: Event) {
+			afkOverlayEvent(event);
+			//playOverlayHtml.removeEventListener('click', onOverlayClick);
+		});
+
+		// build the inner html
+		let afkOverlayHtmlInner = document.createElement('div');
+		afkOverlayHtmlInner.id = 'afkOverlayInner';
+		afkOverlayHtmlInner.innerHTML = '<center>No activity detected<br>Disconnecting in <span id="afkCountDownNumber"></span> seconds<br>Click to continue<br></center>'
+
+		// insert the inner html into the base div
+		this.afkOverlay = new AfkOverlayBase(this.config.playerElement, afkOverlayHtml, afkOverlayHtmlInner, "afkCountDownNumber");
 	}
 
 	buildInfoOverlay() {

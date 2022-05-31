@@ -82,7 +82,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.dataChannelController.onVideoEncoderAvgQP = this.handleVideoEncoderAvgQP.bind(this);
 		this.dataChannelController.OnInitialSettings = this.handleInitialSettings.bind(this);
 		this.dataChannelController.onQualityControlOwnership = this.handleQualityControlOwnership.bind(this);
-		this.dataChannelController.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer(this.delegate.afkOverlay);
+		this.dataChannelController.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
 
 		this.videoPlayerController = new VideoPlayerController(this.config.playerElement, this.config.startVideoMuted);
 
@@ -97,14 +97,13 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		// set up the final webRtc player controller methods from within our delegate so a connection can be activated
 		this.setUpWebRtcConnectionForActivation();
+		this.afkLogic.showAfkOverlay = () => this.delegate.showAfkOverlay(this.afkLogic.countDown);
+		this.afkLogic.updateAfkCountdown = () => this.delegate.updateAfkOverlay(this.afkLogic.countDown);
+		this.afkLogic.hideCurrentOverlay = () => this.delegate.hideCurrentOverlay();
 	}
 
-	/**
-	 * Expose onAfkEventListener to the delegate without exposing the afk logic
-	 * @param afkOverlay the afk overlay
-	 */
-	onAfkEventListener(afkOverlay: AfkOverlay) {
-		this.afkLogic.onAfkEventListener(afkOverlay);
+	onAfkClick(): void {
+		this.afkLogic.onAfkClick();
 	}
 
 	/**
@@ -149,7 +148,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 				//this.freezeFrame.freezeFrameOverlay.showFreezeFrameOverlay();
 				this.delegate.hideCurrentOverlay();
 				this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
-				this.afkLogic.startAfkWarningTimer(this.delegate.afkOverlay);
+				this.afkLogic.startAfkWarningTimer();
 			}).catch((onRejectedReason: string) => {
 				console.log(onRejectedReason);
 				console.log("Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.")
