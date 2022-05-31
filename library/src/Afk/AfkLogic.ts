@@ -1,5 +1,4 @@
 import { ControlSchemeType } from "../Config/Config";
-import { AfkOverlay } from "../Overlay/AfkOverlay";
 export class AfkLogic {
     // time out logic details 
     controlScheme: number;
@@ -90,10 +89,19 @@ export class AfkLogic {
         }, 1000);
     }
 
+    /**
+     * An override method for updating the afk countdown number in the overlay 
+     */
     updateAfkCountdown() { }
 
+    /**
+     * An override method for showing the afk overlay 
+     */
     showAfkOverlay() { }
 
+    /**
+     * An override method for hiding the afk overlay 
+     */
     hideCurrentOverlay() { }
 
     /**

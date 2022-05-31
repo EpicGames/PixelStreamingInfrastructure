@@ -13,6 +13,7 @@ import { MessageInstanceState, MessageAuthResponse } from "../WebSockets/Message
 */
 export interface IDelegate {
 
+	// placeholders for overlays 
 	currentOverlay: IOverlay;
 	connectOverlay: ActionOverlay;
 	playOverlay: ActionOverlay;
@@ -20,24 +21,58 @@ export interface IDelegate {
 	infoOverlay: ITextOverlay;
 	errorOverlay: ITextOverlay;
 
+	/**
+	 * Hides the current overlay 
+	 */
 	hideCurrentOverlay(): void;
 
+	/**
+	 * Shows the play overlay 
+	 */
 	showPlayOverlay(): void;
 
+	/**
+	 * Shows the connect overlay 
+	 */
 	showConnectOverlay(): void;
 
+	/**
+	 * Shows the afk overlay 
+	 * @param countDown the countdown number for the afk overlay  
+	 */
 	showAfkOverlay(countDown: number): void;
 
+	/**
+	 * Updates the afk overlay countdown number 
+	 * @param countDown the new countdown number 
+	 */
 	updateAfkOverlay(countDown: number): void;
 
+	/**
+	 * Shows the text overlay 
+	 * @param text a string of text to be inserted into the text overlay 
+	 */
 	showTextOverlay(text: string): void;
 
+	/**
+	 * Shows the error overlay 
+	 * @param text a string of text to be inserted into the error overlay 
+	 */
 	showErrorOverlay(text: string): void;
 
+	/**
+	 * Activates the connect overlays action 
+	 */
 	onConnectAction(): void;
 
+	/**
+	 * Activates the play overlays action 
+	 */
 	onPlayAction(): void;
 
+	/**
+	 * Activates the afk overlays action 
+	 */
 	onAfkAction(): void;
 
 	/**

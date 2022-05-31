@@ -8,7 +8,7 @@ import { IOverlay } from "../Overlay/IOverlay";
 import { ITextOverlay } from "../Overlay/ITextOverlay";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { IWebRtcPlayerController } from "../WebRtcPlayer/IWebRtcPlayerController";
-import { MessageInstanceState, InstanceState, MessageAuthResponse, MessageAuthResponseOutcomeType } from '../WebSockets/MessageReceive';
+import { MessageInstanceState, MessageAuthResponse } from '../WebSockets/MessageReceive';
 
 /**
  * Provides common base functionality for delegates that implement the IDelegate interface
@@ -16,12 +16,15 @@ import { MessageInstanceState, InstanceState, MessageAuthResponse, MessageAuthRe
 export class DelegateBase implements IDelegate {
 	public iWebRtcController: IWebRtcPlayerController;
 	public config: Config;
+
+	// set the overlay placeholders 
 	currentOverlay: IOverlay;
 	connectOverlay: ActionOverlay;
 	playOverlay: ActionOverlay;
 	afkOverlay: AfkOverlay;
 	infoOverlay: ITextOverlay;
 	errorOverlay: ITextOverlay;
+
 	shouldShowPlayOverlay = true;
 
 	/**
@@ -32,6 +35,9 @@ export class DelegateBase implements IDelegate {
 		this.config = config;
 	}
 
+	/**
+	 * Hides the current overlay 
+	 */
 	hideCurrentOverlay() {
 		if (this.currentOverlay != null) {
 			this.currentOverlay.hide();
@@ -39,18 +45,27 @@ export class DelegateBase implements IDelegate {
 		}
 	};
 
+	/**
+	 * Shows the connect overlay 
+	 */
 	showConnectOverlay() {
 		this.hideCurrentOverlay();
 		this.connectOverlay.show();
 		this.currentOverlay = this.connectOverlay;
 	};
 
+	/**
+	 * Shows the play overlay 
+	 */
 	showPlayOverlay() {
 		this.hideCurrentOverlay();
 		this.playOverlay.show();
 		this.currentOverlay = this.playOverlay;
 	};
 
+	/**
+	 * Shows the text overlay 
+	 */
 	showTextOverlay(text: string) {
 		this.hideCurrentOverlay();
 		this.infoOverlay.update(text);
@@ -58,6 +73,9 @@ export class DelegateBase implements IDelegate {
 		this.currentOverlay = this.infoOverlay;
 	};
 
+	/**
+	 * Shows the error overlay 
+	 */
 	showErrorOverlay(text: string) {
 		this.hideCurrentOverlay();
 		this.errorOverlay.update(text);
@@ -65,14 +83,24 @@ export class DelegateBase implements IDelegate {
 		this.currentOverlay = this.errorOverlay;
 	};
 
+	/**
+	 * Activates the connect overlays action 
+	 */
 	onConnectAction() {
 		this.connectOverlay.activate();
 	};
 
+	/**
+	 * Activates the play overlays action 
+	 */
 	onPlayAction() {
 		this.playOverlay.activate();
 	};
 
+	/**
+	 * Shows the afk overlay 
+	 * @param countDown the countdown number for the afk countdown 
+	 */
 	showAfkOverlay(countDown: number) {
 		this.hideCurrentOverlay();
 		this.updateAfkOverlay(countDown);
@@ -80,10 +108,17 @@ export class DelegateBase implements IDelegate {
 		this.currentOverlay = this.afkOverlay;
 	};
 
+	/**
+	 * Update the afk overlays countdown number 
+	 * @param countDown the new countdown number 
+	 */
 	updateAfkOverlay(countDown: number) {
 		this.afkOverlay.update(countDown);
 	};
 
+	/**
+	 * Activates the afk overlays action 
+	 */
 	onAfkAction() {
 		this.afkOverlay.activate();
 	};
@@ -100,10 +135,13 @@ export class DelegateBase implements IDelegate {
 		// update the freeze frame object in the webRtc player controller with the new overlay  
 		//this.iWebRtcController.freezeFrame.setFreezeFrameOverlay(//this.freezeFrameOverlay);
 
+		// set up the connect overlays action
 		this.setWebRtcConnectOverlay();
 
+		// set up the afk overlays action 
 		this.afkOverlay.onAction(() => this.iWebRtcController.onAfkClick());
 
+		// set up the play overlays action 
 		this.playOverlay.onAction(() => this.iWebRtcController.playStream());
 	}
 
@@ -117,6 +155,8 @@ export class DelegateBase implements IDelegate {
 			this.connectOverlay.onAction(() => this.iWebRtcController.connectToSignallingSever());
 			this.showConnectOverlay();
 		} else {
+			// if autoplaying show an info overlay while while waiting for the connection to begin 
+			this.showTextOverlay("Auto Connecting Now");
 			this.iWebRtcController.connectToSignallingSever();
 		}
 	}

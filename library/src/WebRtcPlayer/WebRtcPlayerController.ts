@@ -20,7 +20,6 @@ import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
 import { Logger } from "../Logger/Logger";
 import { InputController } from "../Inputs/InputController";
 import { MicController } from "../MicPlayer/MicController";
-import { AfkOverlay } from "../Overlay/AfkOverlay";
 /**
  * Entry point for the Web RTC Player
  */
@@ -66,6 +65,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			offerToReceiveVideo: true
 		}
 
+		// set up the afk logic class and connect up its method for closing the signaling server 
 		this.afkLogic = new AfkLogic(this.config.controlScheme, this.config.afkTimeout);
 		this.afkLogic.closeWebSocket = () => this.closeSignalingServer();
 
@@ -97,11 +97,16 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		// set up the final webRtc player controller methods from within our delegate so a connection can be activated
 		this.setUpWebRtcConnectionForActivation();
+
+		// now that the delegate has finished instantiating connect the rest of the afk methods to the afk logic class
 		this.afkLogic.showAfkOverlay = () => this.delegate.showAfkOverlay(this.afkLogic.countDown);
 		this.afkLogic.updateAfkCountdown = () => this.delegate.updateAfkOverlay(this.afkLogic.countDown);
 		this.afkLogic.hideCurrentOverlay = () => this.delegate.hideCurrentOverlay();
 	}
 
+	/**
+	 * connect up the onAfkClick action with a method so it can be exposed to the delegate
+	 */
 	onAfkClick(): void {
 		this.afkLogic.onAfkClick();
 	}
@@ -181,10 +186,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	connectToSignallingSever() {
 		this.webSocketController.connect();
-	}
-
-	handleWebsocketClose(event: CloseEvent) {
-		this.webSocketController.onWebSocketOncloseOverlayMessage(event);
 	}
 
 	/**
