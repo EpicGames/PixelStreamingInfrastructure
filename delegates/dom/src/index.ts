@@ -25,12 +25,8 @@ if (signallingServerAddress == '')
     }
 }
 
-signallingServerAddress = "ws://myapplication.tenant-tensorworks-testing.lga1.ingress.coreweave.cloud/ws"
-
 // Create a config object
 let config = CreateConfig(signallingServerAddress, "player");
-
-//config.enableSpsAutoplay = true;
 
 // Create a Native DOM delegate instance that implements the Delegate interface class
 let delegate = new NativeDOMDelegate(config);

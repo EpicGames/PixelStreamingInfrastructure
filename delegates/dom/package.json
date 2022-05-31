@@ -8,7 +8,8 @@
     "watch": "npx webpack --watch",
     "start": "npx webpack && open-cli ./dist/index.html",
     "serve": "webpack serve",
-    "symlink": "cd ../../library && npm link && cd ../delegates/dom && npm link @tensorworks/libspsfrontend"
+    "symlink": "cd ../../library && npm link && cd ../delegates/dom && npm link @tensorworks/libspsfrontend",
+    "build-all": "cd ../../library && npm run build && cd ../delegates/dom && npm run symlink && npm run build"
   },
   "author": "TensorWorks Pty Ltd",
   "license": "MIT",
