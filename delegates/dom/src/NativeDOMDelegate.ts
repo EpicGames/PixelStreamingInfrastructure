@@ -505,9 +505,9 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			}
 		};
 
-		// show and hide the optional buttons overlay 
-		document.getElementById("overlayButton").onclick = () => {
-			document.getElementById("overlaySettings").classList.toggle("d-none");
+		// show and hide the optional buttons for stream tools 
+		document.getElementById("streamToolsButton").onclick = () => {
+			document.getElementById("streamToolsSettings").classList.toggle("d-none");
 		}
 	}
 
@@ -581,7 +581,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.iWebRtcController.sendLatencyTest();
 		}
 
-		// Set up overlay header functionality
+		// Set up stream tools header functionality
 		this.viewSettingsHeader.onclick = () => {
 			this.viewSettingsContainer.classList.contains("d-none") ? this.viewSettingsContainer.classList.remove("d-none") : this.viewSettingsContainer.classList.add("d-none")
 		}
@@ -610,7 +610,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	}
 
 	/**
-	 * Extended from the base functionality; displays the text overlay and resets the buttons overlay upon disconnect 
+	 * Extended from the base functionality; displays the error overlay and resets the buttons stream tools upon disconnect 
 	 * @param event 
 	 */
 	onDisconnect(event: CloseEvent) {
@@ -623,7 +623,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		// starting a latency check
 		document.getElementById("btn-start-latency-test").onclick = () => { }
 
-		// Set up overlay header functionality
+		// Set up stream tools header functionality
 		this.viewSettingsHeader.onclick = () => { }
 		this.commandsHeader.onclick = () => { }
 		this.streamingSettingsHeader.onclick = () => { }

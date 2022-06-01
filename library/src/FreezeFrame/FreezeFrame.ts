@@ -17,7 +17,7 @@ export class FreezeFrame {
 
         // create the overlay
         this.rootElement = document.createElement('div');
-        this.rootElement.id = 'freezeFrameOverlay';
+        this.rootElement.id = 'freezeFrame';
         this.rootElement.style.display = 'none';
         this.rootElement.style.pointerEvents = 'none';
         this.rootElement.style.position = 'absolute';

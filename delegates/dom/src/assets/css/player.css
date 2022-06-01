@@ -57,7 +57,7 @@ video{
 	background-color: #000;
 }
 
-#overlay{
+#streamTools{
 	-moz-border-radius-bottomright: 5px;
 	-moz-border-radius-bottomleft: 5px;
 	-webkit-border-bottom-right-radius: 5px;
@@ -83,7 +83,7 @@ video{
 	border-top-width: 0px;
 }
 
-#overlayHeader {
+#streamToolsHeader {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -91,18 +91,18 @@ video{
 	background-color: var(--colour7);
 }
 
-.overlay {
+.streamTools {
 	background-color: var(--colour2);
 	font-family: var(--buttonFont);
 	font-weight: lighter;
 	color: var(--colour4);
 }
 
-.overlay-shown > #overlaySettings {
+.streamTools-shown > #streamToolsSettings {
 	display: block;
 }
 
-.overlay-shown > div > #overlayButton {
+.streamTools-shown > div > #streamToolsButton {
 	transform: rotate(-135deg);
 	-webkit-transform: rotate(-135deg); /* Safari */
 	-moz-transform: rotate(-135deg); /* Firefox */
@@ -110,17 +110,17 @@ video{
 	-o-transform: rotate(-135deg); /* Opera */
 }
 
-#overlayButton:hover{
+#streamToolsButton:hover{
 	cursor: pointer;
 }
 
-#overlayButton{
+#streamToolsButton{
 	transition-duration: 250ms;
 	text-align: right;
 	font-size: 40px;
 }
 
-#overlaytoggle{
+#streamToolstoggle{
 	width:100%;
 }
 
@@ -129,7 +129,7 @@ video{
 	padding-right: 4px;
 }
 
-#overlaySettings{
+#streamToolsSettings{
 	font-size: 1em;
 	width: 400px;
 	/*display: none;*/
