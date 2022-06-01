@@ -1,5 +1,6 @@
 import './assets/css/player.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
+import { EventEmitter } from "events";
 import * as libspsfrontend from '@tensorworks/libspsfrontend'
 
 /**
@@ -8,16 +9,19 @@ import * as libspsfrontend from '@tensorworks/libspsfrontend'
 export class OverlayBase implements libspsfrontend.IOverlay {
 	protected rootElement: HTMLDivElement;
 	protected rootDiv: HTMLDivElement;
+	public textElement: HTMLDivElement;
 
 	/**
 	 * Construct an overlay 
 	 * @param rootDiv the root element this overlay will be inserted into 
 	 * @param rootElement the root element that is the overlay
 	 */
-	protected constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement) {
+	protected constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement, textElement: HTMLDivElement) {
 		this.rootDiv = rootDiv;
 		this.rootElement = rootElement;
-		this.rootElement.classList.add("hiddenState");
+		this.textElement = textElement;
+		this.rootElement.appendChild(this.textElement);
+		this.hide();
 		this.rootDiv.appendChild(this.rootElement);
 	}
 
@@ -39,10 +43,8 @@ export class OverlayBase implements libspsfrontend.IOverlay {
 /**
  * Class for the base action overlay structure 
  */
-export class ActionOverlayBase extends libspsfrontend.ActionOverlay {
-	protected rootElement: HTMLDivElement;
-	protected rootDiv: HTMLDivElement;
-	private textElement: HTMLDivElement;
+export class ActionOverlayBase extends OverlayBase implements libspsfrontend.IActionOverlay {
+	eventEmitter: EventEmitter;
 
 	/**
 	 * Construct an action overlay 
@@ -51,27 +53,23 @@ export class ActionOverlayBase extends libspsfrontend.ActionOverlay {
 	 * @param textElement an element that contains text for the action overlay 
 	 */
 	public constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement, textElement: HTMLDivElement) {
-		super();
-		this.rootDiv = rootDiv;
-		this.rootElement = rootElement;
-		this.textElement = textElement;
-		this.rootElement.appendChild(this.textElement);
-		this.rootElement.classList.add("hiddenState");
-		this.rootDiv.appendChild(this.rootElement);
+		super(rootDiv, rootElement, textElement);
+		this.eventEmitter = new EventEmitter();
 	}
 
 	/**
-	 * Show the overlay 
+	 * Set a method as an event emitter callback 
+	 * @param callBack the method that is to be called when the event is emitted 
 	 */
-	public show(): void {
-		this.rootElement.classList.remove("hiddenState");
+	onAction(callBack: (...args: any[]) => void) {
+		this.eventEmitter.on("action", callBack);
 	}
 
 	/**
-	 * Hide the overlay
+	 * Activate an event that is attached to the event emitter 
 	 */
-	public hide(): void {
-		this.rootElement.classList.add("hiddenState");
+	activate() {
+		this.eventEmitter.emit("action");
 	}
 
 }
@@ -79,10 +77,7 @@ export class ActionOverlayBase extends libspsfrontend.ActionOverlay {
 /**
  * Class for the afk overlay base 
  */
-export class AfkOverlayBase extends libspsfrontend.AfkOverlay {
-	protected rootElement: HTMLDivElement;
-	protected rootDiv: HTMLDivElement;
-	private textElement: HTMLDivElement;
+export class AfkOverlayBase extends ActionOverlayBase implements libspsfrontend.IAfkOverlay {
 	private countDownSpanElementId: string;
 
 	/**
@@ -93,28 +88,8 @@ export class AfkOverlayBase extends libspsfrontend.AfkOverlay {
 	 * @param countDownSpanElementId the id of the span that holds the countdown element 
 	 */
 	public constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement, textElement: HTMLDivElement, countDownSpanElementId: string) {
-		super();
-		this.rootDiv = rootDiv;
-		this.rootElement = rootElement;
+		super(rootDiv, rootElement, textElement);
 		this.countDownSpanElementId = countDownSpanElementId;
-		this.textElement = textElement;
-		this.rootElement.appendChild(this.textElement);
-		this.rootElement.classList.add("hiddenState");
-		this.rootDiv.appendChild(this.rootElement);
-	}
-
-	/**
-	 * Show the overlay 
-	 */
-	public show(): void {
-		this.rootElement.classList.remove("hiddenState");
-	}
-
-	/**
-	 * Hide the overlay 
-	 */
-	public hide(): void {
-		this.rootElement.classList.add("hiddenState");
 	}
 
 	/**
@@ -131,18 +106,15 @@ export class AfkOverlayBase extends libspsfrontend.AfkOverlay {
  * Class for the text overlay base 
  */
 export class TextOverlayBase extends OverlayBase implements libspsfrontend.ITextOverlay {
-	private textElement: HTMLDivElement;
 
 	/**
 	 * Construct a text overlay 
 	 * @param rootDiv the root element this overlay will be inserted into 
 	 * @param rootElement the root element that is the overlay
-	 * @param textElement an element that contains text for the action overlay
+	 * @param textElement an element that contains text for the action overlay  
 	 */
 	public constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement, textElement: HTMLDivElement) {
-		super(rootDiv, rootElement);
-		this.textElement = textElement;
-		this.rootElement.appendChild(this.textElement);
+		super(rootDiv, rootElement, textElement);
 	}
 
 	/**
@@ -178,6 +150,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	forceTurnToggle = document.getElementById("force-turn-tgl") as HTMLInputElement;
 
 	// Viewing
+	enlargeDisplayToFillWindow = document.getElementById("enlarge-display-to-fill-window-tgl") as HTMLInputElement;
 	qualityControlOwnershipCheckBox = document.getElementById("quality-control-ownership-tgl") as HTMLInputElement;
 	toggleMatchViewPortRes = document.getElementById("match-viewport-res-tgl") as HTMLInputElement;
 	controlSchemeToggle = document.getElementById("control-scheme-tgl") as HTMLInputElement;
@@ -489,8 +462,9 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		};
 
 		// make the player fill the window
-		document.getElementById("enlarge-display-to-fill-window-tgl").onchange = () => {
+		this.enlargeDisplayToFillWindow.onchange = () => {
 			this.iWebRtcController.resizePlayerStyle();
+			this.iWebRtcController.setEnlargeToFillDisplay(this.enlargeDisplayToFillWindow.checked);
 		};
 
 		// make the player match the view port resolution 

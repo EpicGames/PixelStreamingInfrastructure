@@ -2,8 +2,8 @@ import { Config } from "..";
 import { IDelegate } from "./IDelegate";
 import { InitialSettings } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults"
-import { ActionOverlay } from "../Overlay/ActionOverlay";
-import { AfkOverlay } from "../Overlay/AfkOverlay";
+import { IActionOverlay } from "../Overlay/IActionOverlay";
+import { IAfkOverlay } from "../Overlay/IAfkOverlay";
 import { IOverlay } from "../Overlay/IOverlay";
 import { ITextOverlay } from "../Overlay/ITextOverlay";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
@@ -19,9 +19,9 @@ export class DelegateBase implements IDelegate {
 
 	// set the overlay placeholders 
 	currentOverlay: IOverlay;
-	connectOverlay: ActionOverlay;
-	playOverlay: ActionOverlay;
-	afkOverlay: AfkOverlay;
+	connectOverlay: IActionOverlay;
+	playOverlay: IActionOverlay;
+	afkOverlay: IAfkOverlay;
 	infoOverlay: ITextOverlay;
 	errorOverlay: ITextOverlay;
 

@@ -1,13 +1,13 @@
-import { ActionOverlay } from "./ActionOverlay";
+import { IActionOverlay } from "./IActionOverlay";
 
 /**
  * The abstract class for the Afk overlay 
  */
-export abstract class AfkOverlay extends ActionOverlay {
+export interface IAfkOverlay extends IActionOverlay {
 
     /**
      * update the countdown number for the afk overlay 
      * @param countdown the countdown number to be updated 
      */
-    public abstract update(countdown: number): void;
+    update(countdown: number): void;
 }

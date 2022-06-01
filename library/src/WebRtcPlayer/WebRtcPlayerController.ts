@@ -139,6 +139,14 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
+	 * Sets if we are enlarging the display to fill the window for freeze frames and ui 
+	 * @param isFilling is the display filling or not
+	 */
+	setEnlargeToFillDisplay(isFilling: boolean){
+		this.freezeFrameController.freezeFrame.enlargeDisplayToFillWindow = isFilling;
+	}
+
+	/**
 	 * Loads a freeze frame if it is required otherwise shows the play overlay
 	 */
 	loadFreezeFrameOrShowPlayOverlay() {

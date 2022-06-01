@@ -1,13 +1,11 @@
 import { Encoder, WebRTC } from "../DataChannel/InitialSettings";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
-//import { FreezeFrameLogic } from "../FreezeFrame/FreezeFrameLogic";
 
 /**
  * Interface for the Web RTC Player Controller
  */
 export interface IWebRtcPlayerController {
     matchViewportResolution: boolean;
-    //freezeFrameLogic: FreezeFrameLogic;
 
     /**
      * Activate the events for when an afk overlay is clicked 
@@ -83,4 +81,9 @@ export interface IWebRtcPlayerController {
      */
     activateRegisterMouse(): void;
 
+    /**
+	 * Sets if we are enlarging the display to fill the window for freeze frames and ui 
+	 * @param isFilling is the display filling or not
+	 */
+	setEnlargeToFillDisplay(isFilling: boolean): void;
 }

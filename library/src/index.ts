@@ -6,8 +6,8 @@ import { IWebRtcPlayerController } from "./WebRtcPlayer/IWebRtcPlayerController"
 
 import { IOverlay } from './Overlay/IOverlay';
 import { ITextOverlay } from './Overlay/ITextOverlay';
-import { ActionOverlay } from "./Overlay/ActionOverlay"
-import { AfkOverlay } from './Overlay/AfkOverlay';
+import { IActionOverlay } from "./Overlay/IActionOverlay"
+import { IAfkOverlay } from './Overlay/IAfkOverlay';
 import { AfkLogic } from './Afk/AfkLogic';
 
 import { LatencyTestResults } from "./DataChannel/LatencyTestResults";
@@ -17,7 +17,7 @@ import { MessageInstanceState, InstanceState, MessageAuthResponse, MessageAuthRe
 import { Logger } from './Logger/Logger';
 
 export { Config, ControlSchemeType, webRtcPlayerController, IDelegate, DelegateBase, IWebRtcPlayerController }
-export { LatencyTestResults, IOverlay, ActionOverlay, ITextOverlay, AfkOverlay, AfkLogic, Encoder, InitialSettings, WebRTC, AggregatedStats, MessageInstanceState, InstanceState, MessageAuthResponse, MessageAuthResponseOutcomeType, Logger }
+export { LatencyTestResults, IOverlay, IActionOverlay, ITextOverlay, IAfkOverlay, AfkLogic, Encoder, InitialSettings, WebRTC, AggregatedStats, MessageInstanceState, InstanceState, MessageAuthResponse, MessageAuthResponseOutcomeType, Logger }
 
 declare var LIBRARY_VERSION: string;
 export const version = LIBRARY_VERSION;

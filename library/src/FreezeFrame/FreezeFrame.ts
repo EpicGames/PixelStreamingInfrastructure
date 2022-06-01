@@ -7,6 +7,7 @@ export class FreezeFrame {
     imageElement: HTMLImageElement;
     freezeFrameHeight = 0;
     freezeFrameWidth = 0;
+    enlargeDisplayToFillWindow: boolean;
 
     /**
      * Construct a freeze frame
@@ -29,7 +30,6 @@ export class FreezeFrame {
 
         // append the image into the root element and append the element to the root div
         this.rootElement.appendChild(this.imageElement);
-        this.rootElement.classList.add("hiddenState");
         this.rootDiv.appendChild(this.rootElement);
     }
 
@@ -37,7 +37,6 @@ export class FreezeFrame {
      * Set the freeze frame element for showing 
      */
     setElementForShow() {
-        this.rootElement.classList.add("freezeframeBackground");
         this.rootElement.style.display = 'block';
     }
 
@@ -46,7 +45,6 @@ export class FreezeFrame {
      */
     setElementForHide() {
         this.rootElement.style.display = 'none';
-        this.rootElement.classList.remove("freezeframeBackground");
     }
 
     /**
@@ -76,8 +74,7 @@ export class FreezeFrame {
             let displayHeight = 0;
             let displayTop = 0;
             let displayLeft = 0;
-            let checkBox = document.getElementById('enlarge-display-to-fill-window-tgl') as HTMLInputElement;;
-            if (checkBox === undefined || (checkBox !== null && checkBox.checked)) {
+            if (this.enlargeDisplayToFillWindow === null || this.enlargeDisplayToFillWindow === true) {
                 let windowAspectRatio = window.innerWidth / window.innerHeight;
                 let videoAspectRatio = this.freezeFrameWidth / this.freezeFrameHeight;
                 if (windowAspectRatio < videoAspectRatio) {
