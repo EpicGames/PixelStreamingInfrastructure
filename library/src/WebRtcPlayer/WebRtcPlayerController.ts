@@ -2,7 +2,7 @@ import { WebSocketController } from "../WebSockets/WebSocketController";
 import { VideoPlayerController } from "../VideoPlayer/VideoPlayerController";
 import { MessageInstanceState, MessageAnswer, MessageAuthResponse, MessageConfig } from "../WebSockets/MessageReceive";
 import { UiController } from "../Ui/UiController";
-//import { FreezeFrameLogic } from "../FreezeFrame/FreezeFrameLogic";
+import { FreezeFrameController } from "../FreezeFrame/FreezeFrameController";
 import { AfkLogic } from "../Afk/AfkLogic";
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { PeerConnectionController } from "../PeerConnectionController/PeerConnectionController"
@@ -38,7 +38,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	peerConnectionController: PeerConnectionController;
 	uiController: UiController;
 	inputController: InputController;
-	//freezeFrameLogic: FreezeFrameLogic;
+	freezeFrameController: FreezeFrameController;
+	shouldShowPlayOverlay: boolean = true;
 	afkLogic: AfkLogic;
 	playerElementClientRect: DOMRect;
 	lastTimeResized = new Date().getTime();
@@ -73,8 +74,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.uiController.setUpMouseAndFreezeFrame = this.setUpMouseAndFreezeFrame.bind(this);
 		this.uiController.registerResizeTickBoxEvent();
 
-		//this.freezeFrame = new FreezeFrame();
-		//this.freezeFrame.freezeFrameOverlay.resizePlayerStyle = this.uiController.resizePlayerStyle.bind(this);
+		this.freezeFrameController = new FreezeFrameController(this.config.playerElement);
 
 		this.dataChannelController = new DataChannelController();
 		this.dataChannelController.handleOnOpen = this.handleDataChannelConnected.bind(this);
@@ -85,8 +85,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.dataChannelController.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
 
 		this.videoPlayerController = new VideoPlayerController(this.config.playerElement, this.config.startVideoMuted);
-
-		//this.freezeFrame.setPlayOverlayEvent(this.playOverlayEvent);
 
 		// set up websocket methods
 		this.webSocketController = new WebSocketController(this.config.signallingServerAddress);
@@ -134,10 +132,35 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
-	 * activate the setIWebRtcPlayerController method within our delegate to set up the final webRtc player controller methods so a webRtc connection can be made 
+	 * Activate the setIWebRtcPlayerController method within our delegate to set up the final webRtc player controller methods so a webRtc connection can be made 
 	 */
 	setUpWebRtcConnectionForActivation() {
 		this.delegate.setIWebRtcPlayerController(this);
+	}
+
+	/**
+	 * Loads a freeze frame if it is required otherwise shows the play overlay
+	 */
+	loadFreezeFrameOrShowPlayOverlay() {
+		if (this.shouldShowPlayOverlay === true) {
+			console.log("showing play overlay")
+			this.delegate.showPlayOverlay();
+			this.resizePlayerStyle();
+		} else {
+			console.log("showing freeze frame")
+			this.freezeFrameController.showFreezeFrame();
+		}
+		this.videoPlayerController.setVideoEnabled(false);
+	}
+
+	/**
+	 * Enable the video after hiding a freeze frame
+	 */
+	InvalidateFreezeFrameAndEnableVideo() {
+		this.freezeFrameController.hideFreezeFrame();
+		if (this.videoPlayerController.videoPlayerDiv) {
+			this.videoPlayerController.setVideoEnabled(true);
+		}
 	}
 
 	/**
@@ -147,10 +170,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		if (this.videoPlayerController && this.videoPlayerController.videoElement) {
 			// handle play() with .then as it is an asynchronous call  
 			this.videoPlayerController.videoElement.play().then(() => {
+				this.shouldShowPlayOverlay = false;
 				this.videoPlayerController.PlayAudioTrack();
 				this.ueControlMessage.SendRequestInitialSettings();
 				this.ueControlMessage.SendRequestQualityControl();
-				//this.freezeFrame.freezeFrameOverlay.showFreezeFrameOverlay();
+				this.freezeFrameController.showFreezeFrame();
 				this.delegate.hideCurrentOverlay();
 				this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
 				this.afkLogic.startAfkWarningTimer();
@@ -323,8 +347,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		Logger.verboseLog("onVideoInitialised");
 
-		//this.dataChannelController.processFreezeFrameMessage = //this.freezeFrame.processFreezeFrameMessage.bind(//this.freezeFrame);
-		//this.dataChannelController.onUnFreezeFrame = //this.freezeFrame.freezeFrameOverlay.invalidateFreezeFrameOverlay.bind(//this.freezeFrame);
+		this.dataChannelController.processFreezeFrameMessage = (view) => this.freezeFrameController.processFreezeFrameMessage(view, () => this.loadFreezeFrameOrShowPlayOverlay());
+		this.dataChannelController.onUnFreezeFrame = () => this.InvalidateFreezeFrameAndEnableVideo();
 
 		setInterval(this.getStats.bind(this), 1000);
 
@@ -332,9 +356,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.autoPlayVideoOrSetUpPlayOverlay();
 
 		this.uiController.resizePlayerStyle();
-
-		//this.freezeFrame.freezeFrameOverlay.checkIfVideoExists = this.checkIfVideoExists.bind(//this.freezeFrame);
-		//this.freezeFrame.freezeFrameOverlay.setVideoEnabled = this.videoPlayerController.setVideoEnabled.bind(this.videoPlayerController);
 
 		this.ueDescriptorUi.sendUpdateVideoStreamSize(this.videoPlayerController.videoElement.clientWidth, this.videoPlayerController.videoElement.clientHeight);
 
@@ -385,23 +406,13 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
-	 * Checks if the video player div exists
-	 * @returns - if Video Exists
-	 */
-	checkIfVideoExists() {
-		if (this.videoPlayerController.videoPlayerDiv) {
-			return true
-		}
-	}
-
-	/**
 	 * Set the freeze frame overlay to the player div
 	 * @param playerElement - The div element of the Player
 	 */
 	setUpMouseAndFreezeFrame(playerElement: HTMLDivElement) {
 		// Calculating and normalizing positions depends on the width and height of the player.
 		this.playerElementClientRect = playerElement.getBoundingClientRect();
-		//this.freezeFrame.freezeFrameOverlay.resizeFreezeFrameOverlay();
+		this.freezeFrameController.freezeFrame.resize();
 	}
 
 	/**

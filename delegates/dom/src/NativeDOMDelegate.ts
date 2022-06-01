@@ -321,7 +321,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		let infoOverlayHtmlInner = document.createElement('div');
 		infoOverlayHtmlInner.id = 'messageOverlayInner';
 
-		/// instantiate the overlay
+		// instantiate the overlay
 		this.infoOverlay = new TextOverlayBase(this.config.playerElement, infoOverlayHtml, infoOverlayHtmlInner);
 	}
 
@@ -509,8 +509,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		document.getElementById("overlayButton").onclick = () => {
 			document.getElementById("overlaySettings").classList.toggle("d-none");
 		}
-
-
 	}
 
 	/**

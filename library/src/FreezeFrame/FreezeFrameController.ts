@@ -1,0 +1,102 @@
+import { FreezeFrame } from "./FreezeFrame";
+
+/**
+ * A class for controlling freeze frame functionality 
+ */
+export class FreezeFrameController {
+    freezeFrame: FreezeFrame;
+    receiving = false;
+    size = 0;
+    jpeg: Uint8Array = undefined;
+    valid = false;
+
+    /**
+     * Construct a freeze frame controller 
+     * @param rootDiv the div that a freeze frame element will be created into
+     */
+    constructor(rootDiv: HTMLDivElement) {
+        this.freezeFrame = new FreezeFrame(rootDiv);
+    }
+
+    /**
+     * Show the freeze frame if it is valid 
+     */
+    showFreezeFrame() {
+        if (this.valid) {
+            this.freezeFrame.setElementForShow();
+        }
+    }
+
+    /**
+     * Hide the freeze frame and set the validity to false
+     */
+    hideFreezeFrame() {
+        this.valid = false;
+        this.freezeFrame.setElementForHide();
+    }
+
+    /**
+     * Update the freeze frames image source and load it  
+     * @param jpeg the freeze frame image as a byte array data
+     * @param onLoadCallBack a call back for managing if the play overlay needs to be shown or not
+     */
+    updateFreezeFrameAndShow(jpeg: Uint8Array, onLoadCallBack: Function) {
+        this.freezeFrame.updateImageElementSource(jpeg);
+        this.freezeFrame.imageElement.onload = () => {
+            this.freezeFrame.setDimensionsFromElementAndResize();
+            onLoadCallBack()
+        };
+    }
+
+    /**
+     * Process the new freeze frame image and update it
+     * @param view the freeze frame image as a byte array data
+     * @param onLoadCallBack a call back for managing if the play overlay needs to be shown or not
+     */
+    processFreezeFrameMessage(view: Uint8Array, onLoadCallBack: Function) {
+        // Reset freeze frame if we got a freeze frame message and we are not "receiving" yet.
+        if (!this.receiving) {
+            this.receiving = true;
+            this.valid = false;
+            this.size = 0;
+            this.jpeg = undefined;
+        }
+
+        // Extract total size of freeze frame (across all chunks)
+        this.size = (new DataView(view.slice(1, 5).buffer)).getInt32(0, true);
+
+        // Get the jpeg part of the payload
+        let jpegBytes = view.slice(1 + 4);
+
+        // Append to existing jpeg that holds the freeze frame
+        if (this.jpeg) {
+            let jpeg = new Uint8Array(this.jpeg.length + jpegBytes.length);
+            jpeg.set(this.jpeg, 0);
+            jpeg.set(jpegBytes, this.jpeg.length);
+            this.jpeg = jpeg;
+        }
+        // No existing freeze frame jpeg, make one
+        else {
+            this.jpeg = jpegBytes;
+            this.receiving = true;
+            console.log(`received first chunk of freeze frame: ${this.jpeg.length}/${this.size}`);
+        }
+
+        // Uncomment for debug
+        //console.log(`Received freeze frame chunk: ${freezeFrame.jpeg.length}/${freezeFrame.size}`);
+
+        // Finished receiving freeze frame, we can show it now
+        if (this.jpeg.length === this.size) {
+            this.receiving = false;
+            this.valid = true;
+            console.log(`received complete freeze frame ${this.size}`);
+            this.updateFreezeFrameAndShow(this.jpeg, onLoadCallBack);
+        }
+        // We received more data than the freeze frame payload message indicate (this is an error)
+        else if (this.jpeg.length > this.size) {
+            console.error(`received bigger freeze frame than advertised: ${this.jpeg.length}/${this.size}`);
+            this.jpeg = undefined;
+            this.receiving = false;
+        }
+    }
+}

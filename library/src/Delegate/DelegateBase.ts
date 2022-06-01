@@ -25,8 +25,6 @@ export class DelegateBase implements IDelegate {
 	infoOverlay: ITextOverlay;
 	errorOverlay: ITextOverlay;
 
-	shouldShowPlayOverlay = true;
-
 	/**
 	 * @param config - A newly instantiated config object  
 	 * returns the base delegate object with the config inside it along with a new instance of the Overlay controller class 
@@ -132,9 +130,6 @@ export class DelegateBase implements IDelegate {
 
 		this.iWebRtcController.resizePlayerStyle();
 
-		// update the freeze frame object in the webRtc player controller with the new overlay  
-		//this.iWebRtcController.freezeFrame.setFreezeFrameOverlay(//this.freezeFrameOverlay);
-
 		// set up the connect overlays action
 		this.setWebRtcConnectOverlay();
 
@@ -178,15 +173,6 @@ export class DelegateBase implements IDelegate {
 	 */
 	onWebRtcAnswer() {
 		this.showTextOverlay("RTC Answer");
-	}
-
-	/**
-	 * Creates the play overlay for playing the video stream
-	 */
-	onShowPlayOverlay() {
-		// set shouldShowPlayOverlay to false in this class and also in the freeze
-		this.shouldShowPlayOverlay = false;
-		//this.iWebRtcController.freezeFrame.setShouldShowPlayOverlay(this.shouldShowPlayOverlay);
 	}
 
 	/**

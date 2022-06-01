@@ -1,9 +1,17 @@
-import { IOverlay } from "../Overlay/IOverlay";
-export class freezeFrame implements IOverlay {
+/**
+ * A class for managing the freeze frame object
+ */
+export class FreezeFrame {
     protected rootDiv: HTMLDivElement;
     protected rootElement: HTMLDivElement;
-    private imageElement: HTMLImageElement;
+    imageElement: HTMLImageElement;
+    freezeFrameHeight = 0;
+    freezeFrameWidth = 0;
 
+    /**
+     * Construct a freeze frame
+     * @param rootDiv the div that a freeze frame element will be created into
+     */
     constructor(rootDiv: HTMLDivElement) {
         this.rootDiv = rootDiv;
 
@@ -19,25 +27,51 @@ export class freezeFrame implements IOverlay {
         this.imageElement = document.createElement('img');
         this.imageElement.style.position = 'absolute';
 
+        // append the image into the root element and append the element to the root div
         this.rootElement.appendChild(this.imageElement);
         this.rootElement.classList.add("hiddenState");
         this.rootDiv.appendChild(this.rootElement);
     }
 
-    show(): void {
-        throw new Error("Method not implemented.");
+    /**
+     * Set the freeze frame element for showing 
+     */
+    setElementForShow() {
+        this.rootElement.classList.add("freezeframeBackground");
+        this.rootElement.style.display = 'block';
     }
 
-    hide(): void {
-        throw new Error("Method not implemented.");
+    /**
+     * Set the freeze frame element for hiding 
+     */
+    setElementForHide() {
+        this.rootElement.style.display = 'none';
+        this.rootElement.classList.remove("freezeframeBackground");
     }
 
-    update(){
-        
+    /**
+     * Update the freeze frames image source
+     * @param jpeg the freeze frame image as a byte array data  
+     */
+    updateImageElementSource(jpeg: Uint8Array) {
+        let base64 = btoa(jpeg.reduce((data, byte) => data + String.fromCharCode(byte), ''));
+        this.imageElement.src = 'data:image/jpeg;base64,' + base64;
     }
 
-    resize(freezeFrameWidth: number, freezeFrameHeight: number) {
-        if (freezeFrameWidth !== 0 && freezeFrameHeight !== 0) {
+    /**
+     * Set the dimensions for the freeze frame from the element and resize it
+     */
+    setDimensionsFromElementAndResize() {
+        this.freezeFrameHeight = this.imageElement.naturalHeight;
+        this.freezeFrameWidth = this.imageElement.naturalWidth;
+        this.resize();
+    }
+
+    /**
+     * Resize a freeze frame element 
+     */
+    resize() {
+        if (this.freezeFrameWidth !== 0 && this.freezeFrameHeight !== 0) {
             let displayWidth = 0;
             let displayHeight = 0;
             let displayTop = 0;
@@ -45,7 +79,7 @@ export class freezeFrame implements IOverlay {
             let checkBox = document.getElementById('enlarge-display-to-fill-window-tgl') as HTMLInputElement;;
             if (checkBox === undefined || (checkBox !== null && checkBox.checked)) {
                 let windowAspectRatio = window.innerWidth / window.innerHeight;
-                let videoAspectRatio = freezeFrameWidth / freezeFrameHeight;
+                let videoAspectRatio = this.freezeFrameWidth / this.freezeFrameHeight;
                 if (windowAspectRatio < videoAspectRatio) {
                     displayWidth = window.innerWidth;
                     displayHeight = Math.floor(window.innerWidth / videoAspectRatio);
@@ -60,7 +94,7 @@ export class freezeFrame implements IOverlay {
             } else {
                 // Video is coming in at native resolution, we care more about the player size
                 let playerAspectRatio = this.rootDiv.offsetWidth / this.rootDiv.offsetHeight;
-                let videoAspectRatio = freezeFrameWidth / freezeFrameHeight;
+                let videoAspectRatio = this.freezeFrameWidth / this.freezeFrameHeight;
                 if (playerAspectRatio < videoAspectRatio) {
                     displayWidth = this.rootDiv.offsetWidth;
                     displayHeight = Math.floor(this.rootDiv.offsetWidth / videoAspectRatio);
@@ -84,132 +118,4 @@ export class freezeFrame implements IOverlay {
             this.imageElement.style.top = displayTop + 'px';
         }
     }
-
-    /**
-     * Override for checking if the video is enabled
-     */
-    setVideoEnabled(enabled: boolean) { }
-
-    /**
-     * Override for checking if the videoPlayer exists
-     */
-    checkIfVideoExists() { }
-
-    /**
-     * Override for calling resizePlayerStyle from the UiController
-     */
-    resizePlayerStyle() { }
-}
-
-export class FreezeFrameLogic {
-    receiving = false;
-    size = 0;
-    jpeg: Uint8Array = undefined;
-    height = 0;
-    width = 0;
-    valid = false;
-
-    freezeFrame: freezeFrame;
-
-    constructor() { }
-
-    /**
-     * resize the freezeFrame accordingly with the screen size
-     */
-
-
-    /**
-    * when we receive a freezeFrame process the byte array data 
-    */
-    processFreezeFrameMessage(view: Uint8Array) {
-        // Reset freeze frame if we got a freeze frame message and we are not "receiving" yet.
-        if (!this.freezeFrame.receiving) {
-            this.freezeFrame.receiving = true;
-            this.freezeFrame.valid = false;
-            this.freezeFrame.size = 0;
-            this.freezeFrame.jpeg = undefined;
-        }
-
-        // Extract total size of freeze frame (across all chunks)
-        this.freezeFrame.size = (new DataView(view.slice(1, 5).buffer)).getInt32(0, true);
-
-        // Get the jpeg part of the payload
-        let jpegBytes = view.slice(1 + 4);
-
-        // Append to existing jpeg that holds the freeze frame
-        if (this.freezeFrame.jpeg) {
-            let jpeg = new Uint8Array(this.freezeFrame.jpeg.length + jpegBytes.length);
-            jpeg.set(this.freezeFrame.jpeg, 0);
-            jpeg.set(jpegBytes, this.freezeFrame.jpeg.length);
-            this.freezeFrame.jpeg = jpeg;
-        }
-        // No existing freeze frame jpeg, make one
-        else {
-            this.freezeFrame.jpeg = jpegBytes;
-            this.freezeFrame.receiving = true;
-            console.log(`received first chunk of freeze frame: ${this.freezeFrame.jpeg.length}/${this.freezeFrame.size}`);
-        }
-
-        // Uncomment for debug
-        //console.log(`Received freeze frame chunk: ${freezeFrame.jpeg.length}/${freezeFrame.size}`);
-
-        // Finished receiving freeze frame, we can show it now
-        if (this.freezeFrame.jpeg.length === this.freezeFrame.size) {
-            this.freezeFrame.receiving = false;
-            this.freezeFrame.valid = true;
-            console.log(`received complete freeze frame ${this.freezeFrame.size}`);
-            this.showFreezeFrame();
-        }
-        // We received more data than the freeze frame payload message indicate (this is an error)
-        else if (this.freezeFrame.jpeg.length > this.freezeFrame.size) {
-            console.error(`received bigger freeze frame than advertised: ${this.freezeFrame.jpeg.length}/${this.freezeFrame.size}`);
-            this.freezeFrame.jpeg = undefined;
-            this.freezeFrame.receiving = false;
-        }
-    }
-
-    /**
-    * show the freezeFrame overlay 
-    */
-    showFreezeFrameOverlay() {
-        if (this.freezeFrame.valid) {
-            this.freezeFrameOverlay.classList.add("freezeframeBackground");
-            this.freezeFrameOverlay.style.display = 'block';
-        }
-    }
-
-    /**
-    * Remove and hide the freezeFrame overlay 
-    */
-    invalidateFreezeFrameOverlay() {
-        this.freezeFrameOverlay.style.display = 'none';
-        this.freezeFrame.valid = false;
-        this.freezeFrameOverlay.classList.remove("freezeframeBackground");
-        if (this.checkIfVideoExists) {
-            this.setVideoEnabled(true);
-        }
-    }
-
-    /**
-     * Show the actual freeze frame Image from the byte array data  
-     */
-    showFreezeFrame() {
-        let base64 = btoa(this.freezeFrame.jpeg.reduce((data, byte) => data + String.fromCharCode(byte), ''));
-        this.freezeFrameImage.src = 'data:image/jpeg;base64,' + base64;
-        this.freezeFrameImage.onload = function () {
-            freezeFrameHeight = this.freezeFrameImage.naturalHeight;
-            freezeFrameWidth = this.freezeFrameImage.naturalWidth;
-            this.resizeFreezeFrameOverlay();
-            if (this.iOverlayController.shouldShowPlayOverlay === true) {
-                console.log("showing play overlay")
-                this.iOverlayController.showPlayOverlay();
-                this.resizePlayerStyle();
-            } else {
-                console.log("showing freeze frame")
-                this.showFreezeFrameOverlay();
-            }
-            this.setVideoEnabled(false);
-        }.bind(this);
-    }
-
 }
