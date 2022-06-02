@@ -2,43 +2,31 @@ import { MouseController } from "../Inputs/MouseController"
 import { IVideoPlayerMouseInterface } from "./VideoPlayerMouseInterface";
 import { UeDescriptorUi } from "../UeInstanceMessage/UeDescriptorUi";
 import { Logger } from "../Logger/Logger";
+import { IVideoPlayer } from "./IVideoPlayer";
 
 /**
  * Video Player Controller handles the creation of the video HTML element and all handlers
  */
 export class VideoPlayerController {
-    videoPlayerDiv: HTMLDivElement;
-    videoElement: any;
+    videoElementProvider: IVideoPlayer;
+    audioElement: HTMLAudioElement;
     mouseController: MouseController;
     ueDescriptorUi: UeDescriptorUi;
     onUpdatePosition: (mouseEvent: MouseEvent) => void;
     videoInputBindings: IVideoPlayerMouseInterface;
-    startVideoMuted: boolean;
-    audioElement: HTMLAudioElement;
 
-    constructor(htmlDivElement: HTMLDivElement, startVideoMuted: boolean) {
-        // set the audio defaults
-        this.startVideoMuted = startVideoMuted;
-
-        // the video element needs to exist before creating the player so assign the div and make the element
-        this.videoPlayerDiv = htmlDivElement;
-        this.videoElement = document.createElement("video");
+    constructor(videoElementProvider: IVideoPlayer) {
+        this.videoElementProvider = videoElementProvider;
         this.audioElement = document.createElement("Audio") as HTMLAudioElement;
     }
 
     /**
      * Create the video Element
      */
-    createVideoPlayer() {
-        this.videoElement.id = "streamingVideo";
-        this.videoElement.muted = this.startVideoMuted;
-        this.videoElement.disablePictureInPicture = true;
-        this.videoElement.playsInline = true;
-        this.videoElement.style.width = "100%";
-        this.videoElement.style.height = "100%";
-        this.videoElement.onmouseenter = this.handleMouseEnter.bind(this);
-        this.videoElement.onmouseleave = this.handleMouseLeave.bind(this);
-        this.videoPlayerDiv.appendChild(this.videoElement);
+    setUpMouseHandlerEvents() {
+        let videoElement = this.videoElementProvider.getVideoElement();
+        videoElement.onmouseenter = (event: MouseEvent) => this.handleMouseEnter(event);
+        videoElement.onmouseleave = (event: MouseEvent) => this.handleMouseLeave(event);
     }
 
     /**
@@ -46,17 +34,17 @@ export class VideoPlayerController {
      */
     handleLockStateChange() {
         Logger.verboseLog("Lock state has changed");
-        if (document.pointerLockElement === this.videoElement /*document.mozPointerLockElement === playerElement*/) {
+        let videoElement = this.videoElementProvider.getVideoElement();
+        if (document.pointerLockElement === videoElement /*document.mozPointerLockElement === playerElement*/) {
             document.onmousemove = this.videoInputBindings.handleMouseMove.bind(this.videoInputBindings);
             document.onwheel = this.videoInputBindings.handleMouseWheel.bind(this.videoInputBindings);
-            this.videoElement.onmousedown = this.videoInputBindings.handleMouseDown.bind(this.videoInputBindings);
-            this.videoElement.onmouseup = this.videoInputBindings.handleMouseUp.bind(this.videoInputBindings);
+            videoElement.onmousedown = this.videoInputBindings.handleMouseDown.bind(this.videoInputBindings);
+            videoElement.onmouseup = this.videoInputBindings.handleMouseUp.bind(this.videoInputBindings);
         } else {
             document.onmousemove = null;
-            this.videoElement.onmousedown = null;
-            this.videoElement.onmouseup = null;
-
-            this.videoElement.onwheel = null;
+            videoElement.onmousedown = null;
+            videoElement.onmouseup = null;
+            videoElement.onwheel = null;
         }
     }
 
@@ -65,10 +53,11 @@ export class VideoPlayerController {
      * @param event - Mouse Event
      */
     handleClick(event: MouseEvent) {
-        if (this.videoElement.paused) {
-            this.videoElement.play();
+        let videoElement = this.videoElementProvider.getVideoElement();
+        if (videoElement.paused) {
+            videoElement.play();
         }
-        this.videoElement.requestPointerLock();
+        videoElement.requestPointerLock();
     }
 
     /**
@@ -103,6 +92,7 @@ export class VideoPlayerController {
      */
     handleOnTrack(rtcTrackEvent: RTCTrackEvent) {
         Logger.verboseLog("handleOnTrack " + JSON.stringify(rtcTrackEvent.streams));
+        let videoElement = this.videoElementProvider.getVideoElement();
 
         if (rtcTrackEvent.track) {
             Logger.verboseLog('Got track - ' + rtcTrackEvent.track.kind + ' id=' + rtcTrackEvent.track.id + ' readyState=' + rtcTrackEvent.track.readyState);
@@ -111,8 +101,8 @@ export class VideoPlayerController {
         if (rtcTrackEvent.track.kind == "audio") {
             this.CreateAudioTrack(rtcTrackEvent.streams[0]);
             return;
-        } else if (rtcTrackEvent.track.kind == "video" && this.videoElement.srcObject !== rtcTrackEvent.streams[0]) {
-            this.videoElement.srcObject = rtcTrackEvent.streams[0];
+        } else if (rtcTrackEvent.track.kind == "video" && videoElement.srcObject !== rtcTrackEvent.streams[0]) {
+            videoElement.srcObject = rtcTrackEvent.streams[0];
             console.log('Set video source from video track ontrack.');
             return;
         }
@@ -123,13 +113,14 @@ export class VideoPlayerController {
     * @param audioMediaStream - Audio Media stream track
     */
     CreateAudioTrack(audioMediaStream: MediaStream) {
+        let videoElement = this.videoElementProvider.getVideoElement();
 
         // do nothing the video has the same media stream as the audio track we have here (they are linked)
-        if (this.videoElement.srcObject == audioMediaStream) {
+        if (videoElement.srcObject == audioMediaStream) {
             return;
         }
         // video element has some other media stream that is not associated with this audio track
-        else if (this.videoElement.srcObject && this.videoElement.srcObject !== audioMediaStream) {
+        else if (videoElement.srcObject && videoElement.srcObject !== audioMediaStream) {
             // create a new audio element
             this.audioElement.srcObject = audioMediaStream;
             console.log('Created new audio element to play separate audio stream.');
@@ -139,7 +130,9 @@ export class VideoPlayerController {
     /**
      * Plays the audio from the audio element or sets up an event listener to play it once an interaction has occurred 
      */
-    PlayAudioTrack(){
+    PlayAudioTrack() {
+        let videoElement = this.videoElementProvider.getVideoElement();
+
         // attempt to auto play the audio from the audio element if not then set up a listener 
         this.audioElement.muted = false;
         this.audioElement.play().catch((onRejectedReason: string) => {
@@ -149,11 +142,11 @@ export class VideoPlayerController {
             let clickToPlayAudio = () => {
                 this.audioElement.muted = false;
                 this.audioElement.play();
-                this.videoElement.removeEventListener("click", clickToPlayAudio);
+                videoElement.removeEventListener("click", clickToPlayAudio);
             };
-    
-            this.videoElement.addEventListener("click", clickToPlayAudio);
-        });    
+
+            videoElement.addEventListener("click", clickToPlayAudio);
+        });
     }
 
     /**
@@ -161,7 +154,8 @@ export class VideoPlayerController {
      * @param enabled - Enable Tracks on the Src Object
      */
     setVideoEnabled(enabled: boolean) {
-        this.videoElement.srcObject.getTracks().forEach((track: MediaStreamTrack) => track.enabled = enabled);
+        let videoElement = this.videoElementProvider.getVideoElement();
+        videoElement.srcObject.getTracks().forEach((track: MediaStreamTrack) => track.enabled = enabled);
     }
 
 }

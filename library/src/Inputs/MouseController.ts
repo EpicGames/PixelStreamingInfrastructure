@@ -3,6 +3,7 @@ import { MouseButtonsMask, MouseButton } from "./MouseButtons";
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { NormaliseAndQuantiseSigned, UnquantisedAndDenormaliseUnsigned, NormaliseAndQuantiseUnsigned } from "./CoordinateData"
 import { Logger } from "../Logger/Logger";
+import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
 
 /**
  * Handles the Mouse Inputs for the document
@@ -13,6 +14,7 @@ export class MouseController {
 	readonly signedOutOfRange: number = 32767;
 
 	ueInputMouseMessage: UeInputMouseMessage;
+	videoElementProvider: IVideoPlayer;
 
 	printInputs: boolean;
 
@@ -20,9 +22,10 @@ export class MouseController {
 	 * 
 	 * @param dataChannelController - Data Channel Controller
 	 */
-	constructor(dataChannelController: DataChannelController) {
+	constructor(dataChannelController: DataChannelController, videoElementProvider: IVideoPlayer) {
 		this.printInputs = false;
 		this.ueInputMouseMessage = new UeInputMouseMessage(dataChannelController);
+		this.videoElementProvider = videoElementProvider;
 	}
 
 	/**
@@ -150,12 +153,13 @@ export class MouseController {
 	 * @returns - Normalize And Quantize Unsigned Data Type
 	 */
 	normaliseAndQuantiseUnsigned(x: number, y: number): NormaliseAndQuantiseUnsigned {
-		let playerElement = document.getElementById('player');
-		let videoElement = playerElement.getElementsByTagName("video");
 
-		if (playerElement && videoElement.length > 0) {
-			let playerAspectRatio = playerElement.clientHeight / playerElement.clientWidth;
-			let videoAspectRatio = videoElement[0].videoHeight / videoElement[0].videoWidth;
+		let rootDiv = this.videoElementProvider.getVideoRootElement();
+		let videoElement = this.videoElementProvider.getVideoElement();
+
+		if (rootDiv && videoElement) {
+			let playerAspectRatio = rootDiv.clientHeight / rootDiv.clientWidth;
+			let videoAspectRatio = videoElement.videoHeight / videoElement.videoWidth;
 
 			// Unsigned XY positions are the ratio (0.0..1.0) along a viewport axis,
 			// quantized into an uint16 (0..65536).
@@ -171,8 +175,8 @@ export class MouseController {
 
 				let ratio = playerAspectRatio / videoAspectRatio;
 				// Unsigned.
-				let normalizedX = x / playerElement.clientWidth;
-				let normalizedY = ratio * (y / playerElement.clientHeight - 0.5) + 0.5;
+				let normalizedX = x / rootDiv.clientWidth;
+				let normalizedY = ratio * (y / rootDiv.clientHeight - 0.5) + 0.5;
 
 				if (normalizedX < 0.0 || normalizedX > 1.0 || normalizedY < 0.0 || normalizedY > 1.0) {
 					return {
@@ -192,8 +196,8 @@ export class MouseController {
 
 				let ratio = videoAspectRatio / playerAspectRatio;
 				// Unsigned.
-				let normalizedX = ratio * (x / playerElement.clientWidth - 0.5) + 0.5;
-				let normalizedY = y / playerElement.clientHeight;
+				let normalizedX = ratio * (x / rootDiv.clientWidth - 0.5) + 0.5;
+				let normalizedY = y / rootDiv.clientHeight;
 				if (normalizedX < 0.0 || normalizedX > 1.0 || normalizedY < 0.0 || normalizedY > 1.0) {
 					return {
 						inRange: false,
@@ -218,12 +222,13 @@ export class MouseController {
 	 * @returns - unquantise and Denormalize Unsigned Data Type
 	 */
 	unquantiseAndDenormaliseUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned {
-		let playerElement = document.getElementById('player');
-		let videoElement = playerElement.getElementsByTagName("video");
 
-		if (playerElement && videoElement.length > 0) {
-			let playerAspectRatio = playerElement.clientHeight / playerElement.clientWidth;
-			let videoAspectRatio = videoElement[0].videoHeight / videoElement[0].videoWidth;
+		let rootDiv = this.videoElementProvider.getVideoRootElement();
+		let videoElement = this.videoElementProvider.getVideoElement();
+
+		if (rootDiv && videoElement.length > 0) {
+			let playerAspectRatio = rootDiv.clientHeight / rootDiv.clientWidth;
+			let videoAspectRatio = videoElement.videoHeight / videoElement.videoWidth;
 
 			// Unsigned XY positions are the ratio (0.0..1.0) along a viewport axis,
 			// quantized into an uint16 (0..65536).
@@ -243,8 +248,8 @@ export class MouseController {
 				let normalizedY = (y / (this.unsignedOutOfRange + 1) - 0.5) / ratio + 0.5;
 
 				return {
-					x: normalizedX * playerElement.clientWidth,
-					y: normalizedY * playerElement.clientHeight
+					x: normalizedX * rootDiv.clientWidth,
+					y: normalizedY * rootDiv.clientHeight
 				}
 
 			} else {
@@ -255,8 +260,8 @@ export class MouseController {
 				let normalizedX = (x / (this.unsignedOutOfRange + 1) - 0.5) / ratio + 0.5;
 				let normalizedY = y / (this.unsignedOutOfRange + 1);
 				return {
-					x: normalizedX * playerElement.clientWidth,
-					y: normalizedY * playerElement.clientHeight
+					x: normalizedX * rootDiv.clientWidth,
+					y: normalizedY * rootDiv.clientHeight
 				}
 			}
 		}
@@ -269,12 +274,13 @@ export class MouseController {
 	 * @returns - Normalize And Quantize Signed Data Type
 	 */
 	normaliseAndQuantiseSigned(x: number, y: number): NormaliseAndQuantiseSigned {
-		let playerElement = document.getElementById('player');
-		let videoElement = playerElement.getElementsByTagName("video");
 
-		if (playerElement && videoElement.length > 0) {
-			let playerAspectRatio = playerElement.clientHeight / playerElement.clientWidth;
-			let videoAspectRatio = videoElement[0].videoHeight / videoElement[0].videoWidth;
+		let rootDiv = this.videoElementProvider.getVideoRootElement();
+		let videoElement = this.videoElementProvider.getVideoElement();
+
+		if (rootDiv && videoElement) {
+			let playerAspectRatio = rootDiv.clientHeight / rootDiv.clientWidth;
+			let videoAspectRatio = videoElement.videoHeight / videoElement.videoWidth;
 
 			// Unsigned XY positions are the ratio (0.0..1.0) along a viewport axis,
 			// quantized into an uint16 (0..65536).
@@ -290,8 +296,8 @@ export class MouseController {
 
 				let ratio = playerAspectRatio / videoAspectRatio;
 				// Unsigned.
-				let normalizedX = x / (0.5 * playerElement.clientWidth);
-				let normalizedY = (ratio * y) / (0.5 * playerElement.clientHeight);
+				let normalizedX = x / (0.5 * rootDiv.clientWidth);
+				let normalizedY = (ratio * y) / (0.5 * rootDiv.clientHeight);
 				return {
 					x: normalizedX * this.signedOutOfRange,
 					y: normalizedY * this.signedOutOfRange
@@ -303,8 +309,8 @@ export class MouseController {
 				}
 				let ratio = videoAspectRatio / playerAspectRatio;
 				// Signed.
-				let normalizedX = (ratio * x) / (0.5 * playerElement.clientWidth);
-				let normalizedY = y / (0.5 * playerElement.clientHeight);
+				let normalizedX = (ratio * x) / (0.5 * rootDiv.clientWidth);
+				let normalizedY = y / (0.5 * rootDiv.clientHeight);
 				return {
 					x: normalizedX * this.signedOutOfRange,
 					y: normalizedY * this.signedOutOfRange

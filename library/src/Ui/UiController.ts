@@ -1,13 +1,17 @@
+import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
+
 /**
  * The Ui Controller class handles all methods that interact with the UI
  */
 export class UiController {
+    videoPlayerProvider: IVideoPlayer;
     playerStyleAttributes: playerStyleAttributes;
     orientationChangeTimeout: ReturnType<typeof setTimeout>;
     lastTimeResized = new Date().getTime();
     resizeTimeout: number;
 
-    constructor() {
+    constructor(videoPlayerProvider: IVideoPlayer) {
+        this.videoPlayerProvider = videoPlayerProvider;
         this.playerStyleAttributes = new playerStyleAttributes();
     }
 
@@ -16,7 +20,7 @@ export class UiController {
      * @param playerElement - the player DOM element 
      */
     resizePlayerStyleToFillWindow(playerElement: HTMLDivElement) {
-        let videoElement = playerElement.getElementsByTagName("VIDEO")[0] as HTMLVideoElement;
+        let videoElement = this.videoPlayerProvider.getVideoElement();
         // Fill the player display in window, keeping picture's aspect ratio.
         let windowAspectRatio = window.innerHeight / window.innerWidth;
         let playerAspectRatio = playerElement.clientHeight / playerElement.clientWidth;
@@ -36,25 +40,20 @@ export class UiController {
             this.playerStyleAttributes.styleTop = 0;
             this.playerStyleAttributes.styleLeft = 0;
             playerElement.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
-            //playerElement.style = "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional;
         } else if (windowAspectRatio < playerAspectRatio) {
             // Window height is the constraining factor so to keep aspect ratio change width appropriately
             this.playerStyleAttributes.styleWidth = Math.floor(window.innerHeight / videoAspectRatio);
             this.playerStyleAttributes.styleHeight = window.innerHeight;
             this.playerStyleAttributes.styleTop = 0;
             this.playerStyleAttributes.styleLeft = Math.floor((window.innerWidth - this.playerStyleAttributes.styleWidth) * 0.5);
-            //Video is now 100% of the playerElement, so set the playerElement style
-            playerElement.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional)
-            //playerElement.style = "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional;
+            playerElement.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
         } else {
             // Window width is the constraining factor so to keep aspect ratio change height appropriately
             this.playerStyleAttributes.styleWidth = window.innerWidth;
             this.playerStyleAttributes.styleHeight = Math.floor(window.innerWidth * videoAspectRatio);
             this.playerStyleAttributes.styleTop = Math.floor((window.innerHeight - this.playerStyleAttributes.styleHeight) * 0.5);
             this.playerStyleAttributes.styleLeft = 0;
-            //Video is now 100% of the playerElement, so set the playerElement style
-            playerElement.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional)
-            //playerElement.style = "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional;
+            playerElement.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
         }
     }
 
@@ -63,7 +62,7 @@ export class UiController {
      * @param playerElement - the player DOM element
      */
     resizePlayerStyleToActualSize(playerElement: HTMLDivElement) {
-        let videoElement = <HTMLVideoElement>playerElement.getElementsByTagName("VIDEO")[0];
+        let videoElement = this.videoPlayerProvider.getVideoElement();
         let videoElementLength;
         if (!videoElement === undefined) {
             videoElementLength = parseInt(videoElement.getAttribute("length"));
@@ -76,9 +75,7 @@ export class UiController {
             let Left = Math.floor((window.innerWidth - this.playerStyleAttributes.styleWidth) * 0.5);
             this.playerStyleAttributes.styleTop = (Top > 0) ? Top : 0;
             this.playerStyleAttributes.styleLeft = (Left > 0) ? Left : 0;
-            //Video is now 100% of the playerElement, so set the playerElement style
-            playerElement.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional)
-            //playerElement.style = "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional;
+            playerElement.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
         }
     }
 
@@ -87,10 +84,7 @@ export class UiController {
      * @param playerElement - the player DOM element
      */
     resizePlayerStyleToArbitrarySize(playerElement: HTMLDivElement) {
-        let videoElement = playerElement.getElementsByTagName("VIDEO")[0];
-        //Video is now 100% of the playerElement, so set the playerElement style
-        playerElement.setAttribute('style', "top: 0px; left: 0px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional)
-        //playerElement.style = "top: 0px; left: 0px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional;
+        playerElement.setAttribute('style', "top: 0px; left: 0px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
     }
 
     /**

@@ -20,6 +20,7 @@ import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
 import { Logger } from "../Logger/Logger";
 import { InputController } from "../Inputs/InputController";
 import { MicController } from "../MicPlayer/MicController";
+import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 /**
  * Entry point for the Web RTC Player
  */
@@ -29,6 +30,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	webSocketController: WebSocketController;
 	dataChannelController: DataChannelController;
 	datachannelOptions: RTCDataChannelInit;
+	videoPlayer: VideoPlayer;
 	videoPlayerController: VideoPlayerController;
 	keyboardController: KeyboardController;
 	mouseController: MouseController
@@ -70,11 +72,14 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.afkLogic = new AfkLogic(this.config.controlScheme, this.config.afkTimeout);
 		this.afkLogic.closeWebSocket = () => this.closeSignalingServer();
 
-		this.uiController = new UiController();
+		this.freezeFrameController = new FreezeFrameController(this.config.playerElement);
+
+		this.videoPlayer = new VideoPlayer(this.config.playerElement, this.config.startVideoMuted);
+		this.videoPlayerController = new VideoPlayerController(this.videoPlayer);
+
+		this.uiController = new UiController(this.videoPlayer);
 		this.uiController.setUpMouseAndFreezeFrame = this.setUpMouseAndFreezeFrame.bind(this);
 		this.uiController.registerResizeTickBoxEvent();
-
-		this.freezeFrameController = new FreezeFrameController(this.config.playerElement);
 
 		this.dataChannelController = new DataChannelController();
 		this.dataChannelController.handleOnOpen = this.handleDataChannelConnected.bind(this);
@@ -83,8 +88,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.dataChannelController.OnInitialSettings = this.handleInitialSettings.bind(this);
 		this.dataChannelController.onQualityControlOwnership = this.handleQualityControlOwnership.bind(this);
 		this.dataChannelController.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
-
-		this.videoPlayerController = new VideoPlayerController(this.config.playerElement, this.config.startVideoMuted);
 
 		// set up websocket methods
 		this.webSocketController = new WebSocketController(this.config.signallingServerAddress);
@@ -142,7 +145,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Sets if we are enlarging the display to fill the window for freeze frames and ui 
 	 * @param isFilling is the display filling or not
 	 */
-	setEnlargeToFillDisplay(isFilling: boolean){
+	setEnlargeToFillDisplay(isFilling: boolean) {
 		this.freezeFrameController.freezeFrame.enlargeDisplayToFillWindow = isFilling;
 	}
 
@@ -166,7 +169,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	InvalidateFreezeFrameAndEnableVideo() {
 		this.freezeFrameController.hideFreezeFrame();
-		if (this.videoPlayerController.videoPlayerDiv) {
+		if (this.videoPlayer.videoElement) {
 			this.videoPlayerController.setVideoEnabled(true);
 		}
 	}
@@ -175,9 +178,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Plays the stream and sets up other pieces while the stream starts also handles if the video cannot play
 	 */
 	playStream() {
-		if (this.videoPlayerController && this.videoPlayerController.videoElement) {
+		if (this.videoPlayer && this.videoPlayer.videoElement) {
 			// handle play() with .then as it is an asynchronous call  
-			this.videoPlayerController.videoElement.play().then(() => {
+			this.videoPlayer.videoElement.play().then(() => {
 				this.shouldShowPlayOverlay = false;
 				this.videoPlayerController.PlayAudioTrack();
 				this.ueControlMessage.SendRequestInitialSettings();
@@ -203,7 +206,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		if (this.config.enableSpsAutoplay === true) {
 
 			// set up the auto play on the video element  
-			this.videoPlayerController.videoElement.autoplay = true;
+			this.videoPlayer.videoElement.autoplay = true;
 
 			// attempt to play the video
 			this.playStream();
@@ -338,12 +341,12 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// show the connected overlay 
 		this.delegate.onWebRtcConnected();
 
-		this.inputController = new InputController(this.dataChannelController);
+		this.inputController = new InputController(this.dataChannelController, this.videoPlayer);
 
 		this.ueControlMessage = new UeControlMessage(this.dataChannelController);
 		this.ueDescriptorUi = new UeDescriptorUi(this.dataChannelController);
 
-		this.videoPlayerController.createVideoPlayer();
+		this.videoPlayerController.setUpMouseHandlerEvents();
 
 		this.activateRegisterMouse()
 		this.inputController.registerKeyBoard(this.config.suppressBrowserKeys);
@@ -365,7 +368,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.uiController.resizePlayerStyle();
 
-		this.ueDescriptorUi.sendUpdateVideoStreamSize(this.videoPlayerController.videoElement.clientWidth, this.videoPlayerController.videoElement.clientHeight);
+		this.ueDescriptorUi.sendUpdateVideoStreamSize(this.videoPlayer.videoElement.clientWidth, this.videoPlayer.videoElement.clientHeight);
 
 		this.delegate.onVideoInitialised();
 
@@ -391,11 +394,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		var now = new Date().getTime();
 		if (now - this.lastTimeResized > 1000) {
-			var playerElement = document.getElementById('player');
-			if (!playerElement) {
+			// get the root div from config 
+			if (!this.config.playerElement) {
 				return;
 			}
-			this.ueDescriptorUi.sendUpdateVideoStreamSize(this.videoPlayerController.videoElement.clientWidth, this.videoPlayerController.videoElement.clientHeight)
+			this.ueDescriptorUi.sendUpdateVideoStreamSize(this.videoPlayer.videoElement.clientWidth, this.videoPlayer.videoElement.clientHeight)
 			this.lastTimeResized = new Date().getTime();
 		}
 		else {

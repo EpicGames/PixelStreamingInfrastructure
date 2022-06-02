@@ -10,12 +10,14 @@ import { VideoPlayerController } from "../VideoPlayer/VideoPlayerController";
 import { VideoPlayerMouseLockedEvents } from "../VideoPlayer/VideoPlayerMouseLockedEvents";
 import { VideoPlayerMouseHoverEvents } from "../VideoPlayer/VideoPlayerMouseHoverEvents";
 import { GyroController } from "./GyroController";
+import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
 
 /**
  * Class for handling inputs for mouse and keyboard   
  */
 export class InputController {
 
+    videoElementProvider: IVideoPlayer;
     dataChannelController: DataChannelController;
     keyboardController: KeyboardController;
     mouseController: MouseController;
@@ -28,8 +30,9 @@ export class InputController {
      * 
      * @param dataChannelController - the data channel controller
      */
-    constructor(dataChannelController: DataChannelController) {
+    constructor(dataChannelController: DataChannelController, videoElementProvider: IVideoPlayer) {
         this.dataChannelController = dataChannelController;
+        this.videoElementProvider = videoElementProvider;
     }
 
     /**
@@ -49,13 +52,14 @@ export class InputController {
      */
     registerMouse(controlScheme: ControlSchemeType, videoPlayerController: VideoPlayerController) {
         console.debug("Register Mouse Events");
-        this.mouseController = new MouseController(this.dataChannelController);
+        let videoElement = this.videoElementProvider.getVideoElement();
+        this.mouseController = new MouseController(this.dataChannelController, this.videoElementProvider);
 
         switch (controlScheme) {
             case ControlSchemeType.LockedMouse:
-                videoPlayerController.videoInputBindings = new VideoPlayerMouseLockedEvents(videoPlayerController.videoElement, this.mouseController);
+                videoPlayerController.videoInputBindings = new VideoPlayerMouseLockedEvents(this.videoElementProvider, this.mouseController);
 
-                videoPlayerController.videoElement.onclick = videoPlayerController.handleClick.bind(videoPlayerController);
+                videoElement.onclick = videoPlayerController.handleClick.bind(videoPlayerController);
 
                 document.addEventListener('pointerlockchange', videoPlayerController.handleLockStateChange.bind(videoPlayerController), false);
                 document.addEventListener('mozpointerlockchange', videoPlayerController.handleLockStateChange.bind(videoPlayerController), false);
@@ -65,13 +69,13 @@ export class InputController {
                 videoPlayerController.videoInputBindings = new VideoPlayerMouseHoverEvents(this.mouseController);
 
                 // set the onclick to null if the input bindings were previously set to pointerlock
-                videoPlayerController.videoElement.onclick = null;
+                videoElement.onclick = null;
 
                 document.onmousemove = videoPlayerController.videoInputBindings.handleMouseMove.bind(videoPlayerController.videoInputBindings);
                 document.onwheel = videoPlayerController.videoInputBindings.handleMouseWheel.bind(videoPlayerController.videoInputBindings);
 
-                videoPlayerController.videoElement.onmousedown = videoPlayerController.videoInputBindings.handleMouseDown.bind(videoPlayerController.videoInputBindings);
-                videoPlayerController.videoElement.onmouseup = videoPlayerController.videoInputBindings.handleMouseUp.bind(videoPlayerController.videoInputBindings);
+                videoElement.onmousedown = videoPlayerController.videoInputBindings.handleMouseDown.bind(videoPlayerController.videoInputBindings);
+                videoElement.onmouseup = videoPlayerController.videoInputBindings.handleMouseUp.bind(videoPlayerController.videoInputBindings);
 
                 break
             default:
@@ -90,7 +94,7 @@ export class InputController {
         if (fakeMouseTouch) {
             this.touchController = new FakeTouchController(this.dataChannelController, (<HTMLVideoElement>playerElement.getElementsByTagName("video")[0]));
         } else {
-            this.touchController = new TouchController(this.dataChannelController, playerElement);
+            this.touchController = new TouchController(this.dataChannelController, playerElement, this.videoElementProvider);
         }
     }
 

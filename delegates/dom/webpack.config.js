@@ -25,7 +25,7 @@ module.exports = (env) => {
       
     ],
     // turn off so we can see the source map for dom delegate so we can debug the library
-    //devtool: 'inline-source-map',
+    devtool: 'inline-source-map',
     module: {
         rules: [
             {

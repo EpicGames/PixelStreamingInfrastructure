@@ -63,10 +63,6 @@ export class DataChannelController {
         if (this.logging) { Logger.verboseLog("Message incoming") }
         if (this.logging) { Logger.verboseLog("Message:" + message) }
 
-        //there is logic for when a freeze frame is sent;
-        // if (this.isReceivingFreezeFrame) {
-        //     this.onReceivingFreezeFrame(message);
-        // }
         switch (message[0]) {
             case DataChannelReceiveMessageType.QualityControlOwnership: {
                 Logger.verboseLog("DataChannelReceiveMessageType.QualityControlOwnership")

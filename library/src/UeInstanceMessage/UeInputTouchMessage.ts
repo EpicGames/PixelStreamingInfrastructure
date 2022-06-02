@@ -1,6 +1,7 @@
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { NormaliseAndQuantiseUnsigned } from "../Inputs/CoordinateData";
 import { Logger } from "../Logger/Logger";
+import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
 import { UeDataMessage } from "./UeDataMessage";
 import { UeMessageType } from "./UeMessageTypes"
 
@@ -17,12 +18,15 @@ export class UeInputTouchMessage extends UeDataMessage {
 
     printInputs: boolean;
 
+    videoElementProvider: IVideoPlayer;
+
 
     /**
      * @param datachannelController - Data channel Controller
      */
-    constructor(datachannelController: DataChannelController) {
+    constructor(datachannelController: DataChannelController, videoElementProvider: IVideoPlayer) {
         super(datachannelController);
+        this.videoElementProvider = videoElementProvider;
         this.fingersIds = {}
         this.fingers = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
         this.printInputs = false;
@@ -93,12 +97,12 @@ export class UeInputTouchMessage extends UeDataMessage {
      * @returns - Normalised and Quantised Unsigned values
      */
     normaliseAndQuantiseUnsigned(x: number, y: number): NormaliseAndQuantiseUnsigned {
-        let playerElement = document.getElementById('player');
-        let videoElement = playerElement.getElementsByTagName("video");
+        let rootDiv = this.videoElementProvider.getVideoRootElement();
+        let videoElement = this.videoElementProvider.getVideoElement();
 
-        if (playerElement && videoElement.length > 0) {
-            let playerAspectRatio = playerElement.clientHeight / playerElement.clientWidth;
-            let videoAspectRatio = videoElement[0].videoHeight / videoElement[0].videoWidth;
+        if (rootDiv && videoElement) {
+            let playerAspectRatio = rootDiv.clientHeight / rootDiv.clientWidth;
+            let videoAspectRatio = videoElement.videoHeight / videoElement.videoWidth;
 
             // Unsigned XY positions are the ratio (0.0..1.0) along a viewport axis,
             // quantized into an uint16 (0..65536).
@@ -113,8 +117,8 @@ export class UeInputTouchMessage extends UeDataMessage {
 
                 let ratio = playerAspectRatio / videoAspectRatio;
                 // Unsigned.
-                let normalizedX = x / playerElement.clientWidth;
-                let normalizedY = ratio * (y / playerElement.clientHeight - 0.5) + 0.5;
+                let normalizedX = x / rootDiv.clientWidth;
+                let normalizedY = ratio * (y / rootDiv.clientHeight - 0.5) + 0.5;
 
                 if (normalizedX < 0.0 || normalizedX > 1.0 || normalizedY < 0.0 || normalizedY > 1.0) {
                     return {
@@ -137,8 +141,8 @@ export class UeInputTouchMessage extends UeDataMessage {
 
                 let ratio = videoAspectRatio / playerAspectRatio;
                 // Unsigned. 
-                let normalizedX = ratio * (x / playerElement.clientWidth - 0.5) + 0.5;
-                let normalizedY = y / playerElement.clientHeight;
+                let normalizedX = ratio * (x / rootDiv.clientWidth - 0.5) + 0.5;
+                let normalizedY = y / rootDiv.clientHeight;
                 if (normalizedX < 0.0 || normalizedX > 1.0 || normalizedY < 0.0 || normalizedY > 1.0) {
                     return {
                         inRange: false,

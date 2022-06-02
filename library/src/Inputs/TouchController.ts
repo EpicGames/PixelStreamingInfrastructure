@@ -1,6 +1,7 @@
 import { UeInputTouchMessage } from "../UeInstanceMessage/UeInputTouchMessage";
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { ITouchController } from "./ITouchController";
+import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
 /** 
  * Handles the Touch input Events
  */
@@ -15,8 +16,8 @@ export class TouchController implements ITouchController {
      * @param dataChannelController - the data channel controller 
      * @param playerElement - the player element DOM
      */
-    constructor(dataChannelController: DataChannelController, playerElement: HTMLDivElement) {
-        this.ueInputTouchMessage = new UeInputTouchMessage(dataChannelController);
+    constructor(dataChannelController: DataChannelController, playerElement: HTMLDivElement, videoElementProvider: IVideoPlayer) {
+        this.ueInputTouchMessage = new UeInputTouchMessage(dataChannelController, videoElementProvider);
         this.playerElement = playerElement;
         document.ontouchstart = this.onTouchStart.bind(this);
         document.ontouchend = this.onTouchEnd.bind(this);
