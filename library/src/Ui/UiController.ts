@@ -9,10 +9,15 @@ export class UiController {
     orientationChangeTimeout: ReturnType<typeof setTimeout>;
     lastTimeResized = new Date().getTime();
     resizeTimeout: number;
+    enlargeDisplayToFillWindow: boolean;
 
     constructor(videoPlayerProvider: IVideoPlayer) {
         this.videoPlayerProvider = videoPlayerProvider;
         this.playerStyleAttributes = new playerStyleAttributes();
+
+        // set resize events to the windows if it is resized or its orientation is changed
+        window.addEventListener('resize', () => this.resizePlayerStyle(), true);
+        window.addEventListener('orientationchange', () => this.onOrientationChange());
     }
 
     /**
@@ -103,7 +108,7 @@ export class UiController {
      * @returns - nil if requirements are satisfied 
      */
     resizePlayerStyle() {
-        var playerElement = document.getElementById('player') as HTMLDivElement;
+        let playerElement = this.videoPlayerProvider.getVideoRootElement() as HTMLDivElement;
 
         if (!playerElement) {
             return;
@@ -116,12 +121,12 @@ export class UiController {
             return;
         }
 
-        let checkBox = document.getElementById('enlarge-display-to-fill-window-tgl') as HTMLInputElement;
+        // controls for resizing the player 
         let videoWidth = parseInt(playerElement.getAttribute("videoWidth"))
         let videoHeight = parseInt(playerElement.getAttribute("videoHeight"))
         let windowSmallerThanPlayer = window.innerWidth < videoWidth || window.innerHeight < videoHeight;
-        if (checkBox !== null) {
-            if (checkBox.checked || windowSmallerThanPlayer) {
+        if (this.enlargeDisplayToFillWindow !== null) {
+            if (this.enlargeDisplayToFillWindow === true || windowSmallerThanPlayer) {
                 this.resizePlayerStyleToFillWindow(playerElement);
             } else {
                 this.resizePlayerStyleToActualSize(playerElement);
@@ -131,21 +136,6 @@ export class UiController {
         }
 
         this.setUpMouseAndFreezeFrame(playerElement)
-    }
-
-    /**
-     * Registers the the resize windows tick box event 
-     */
-    registerResizeTickBoxEvent() {
-        window.addEventListener('resize', this.resizePlayerStyle.bind(this), true);
-        window.addEventListener('orientationchange', this.onOrientationChange);
-
-        let resizeCheckBox = document.getElementById('enlarge-display-to-fill-window-tgl');
-        if (resizeCheckBox !== null) {
-            resizeCheckBox.onchange = function () {
-                this.resizePlayerStyle();
-            }.bind(this);
-        }
     }
 
     /**

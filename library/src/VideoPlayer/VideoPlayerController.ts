@@ -35,7 +35,7 @@ export class VideoPlayerController {
     handleLockStateChange() {
         Logger.verboseLog("Lock state has changed");
         let videoElement = this.videoElementProvider.getVideoElement();
-        if (document.pointerLockElement === videoElement /*document.mozPointerLockElement === playerElement*/) {
+        if (document.pointerLockElement === videoElement) {
             document.onmousemove = this.videoInputBindings.handleMouseMove.bind(this.videoInputBindings);
             document.onwheel = this.videoInputBindings.handleMouseWheel.bind(this.videoInputBindings);
             videoElement.onmousedown = this.videoInputBindings.handleMouseDown.bind(this.videoInputBindings);

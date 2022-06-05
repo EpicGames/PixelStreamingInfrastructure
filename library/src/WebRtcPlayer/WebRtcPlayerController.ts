@@ -79,7 +79,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.uiController = new UiController(this.videoPlayer);
 		this.uiController.setUpMouseAndFreezeFrame = this.setUpMouseAndFreezeFrame.bind(this);
-		this.uiController.registerResizeTickBoxEvent();
 
 		this.dataChannelController = new DataChannelController();
 		this.dataChannelController.handleOnOpen = this.handleDataChannelConnected.bind(this);
@@ -142,11 +141,12 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
-	 * Sets if we are enlarging the display to fill the window for freeze frames and ui 
+	 * Sets if we are enlarging the display to fill the window for freeze frames and ui controller
 	 * @param isFilling is the display filling or not
 	 */
 	setEnlargeToFillDisplay(isFilling: boolean) {
 		this.freezeFrameController.freezeFrame.enlargeDisplayToFillWindow = isFilling;
+		this.uiController.enlargeDisplayToFillWindow = isFilling;
 	}
 
 	/**
@@ -354,7 +354,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.videoPlayerController.mouseController = this.inputController.mouseController;
 
-		this.uiController.resizePlayerStyle();
+		this.resizePlayerStyle();
 
 		Logger.verboseLog("onVideoInitialised");
 
@@ -366,7 +366,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// either autoplay the video or set up the play overlay
 		this.autoPlayVideoOrSetUpPlayOverlay();
 
-		this.uiController.resizePlayerStyle();
+		this.resizePlayerStyle();
 
 		this.ueDescriptorUi.sendUpdateVideoStreamSize(this.videoPlayer.videoElement.clientWidth, this.videoPlayer.videoElement.clientHeight);
 

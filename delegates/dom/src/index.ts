@@ -24,10 +24,11 @@ if (signallingServerAddress == '') {
     }
 }
 
-signallingServerAddress = "ws://sps.tenant-tensorworks-testing.lga1.ingress.coreweave.cloud/ws";
+// prep the player div element 
+let playerElement = document.getElementById("player") as HTMLDivElement;
 
 // Create a config object
-let config = CreateConfig(signallingServerAddress, "player");
+let config = CreateConfig(signallingServerAddress, playerElement);
 
 // Create a Native DOM delegate instance that implements the Delegate interface class
 let delegate = new NativeDOMDelegate(config);
@@ -45,7 +46,7 @@ document.ontouchmove = (event: TouchEvent) => {
 }
 
 // Create a config object instance 
-function CreateConfig(signalingAddress: string, playerElement: string) {
+function CreateConfig(signalingAddress: string, playerElement: HTMLDivElement) {
     let config = new libspsfrontend.Config(signalingAddress, playerElement);
     libspsfrontend.Config._enableVerboseLogging = true;
     return config;
