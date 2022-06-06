@@ -392,7 +392,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			return;
 		}
 
-		var now = new Date().getTime();
+		let now = new Date().getTime();
 		if (now - this.lastTimeResized > 1000) {
 			// get the root div from config 
 			if (!this.config.playerElement) {

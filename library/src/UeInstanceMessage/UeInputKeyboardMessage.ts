@@ -20,7 +20,7 @@ export class UeInputKeyboardMessage extends UeDataMessage{
      * @param keyCode - Key code
      * @param isRepeat - Is the key repeating
      */
-    sendKeyDown(keyCode:number, isRepeat:Boolean){
+    sendKeyDown(keyCode:number, isRepeat:boolean){
         let Payload = new Uint8Array([UeMessageType.keyDown, keyCode, Number(isRepeat).valueOf()]);
         this.sendData(Payload.buffer);
     }

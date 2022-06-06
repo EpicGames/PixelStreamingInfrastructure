@@ -41,7 +41,7 @@ export class DelegateBase implements IDelegate {
 			this.currentOverlay.hide();
 			this.currentOverlay = null;
 		}
-	};
+	}
 
 	/**
 	 * Shows the connect overlay 
@@ -50,7 +50,7 @@ export class DelegateBase implements IDelegate {
 		this.hideCurrentOverlay();
 		this.connectOverlay.show();
 		this.currentOverlay = this.connectOverlay;
-	};
+	}
 
 	/**
 	 * Shows the play overlay 
@@ -59,7 +59,7 @@ export class DelegateBase implements IDelegate {
 		this.hideCurrentOverlay();
 		this.playOverlay.show();
 		this.currentOverlay = this.playOverlay;
-	};
+	}
 
 	/**
 	 * Shows the text overlay 
@@ -69,7 +69,7 @@ export class DelegateBase implements IDelegate {
 		this.infoOverlay.update(text);
 		this.infoOverlay.show();
 		this.currentOverlay = this.infoOverlay;
-	};
+	}
 
 	/**
 	 * Shows the error overlay 
@@ -79,21 +79,21 @@ export class DelegateBase implements IDelegate {
 		this.errorOverlay.update(text);
 		this.errorOverlay.show();
 		this.currentOverlay = this.errorOverlay;
-	};
+	}
 
 	/**
 	 * Activates the connect overlays action 
 	 */
 	onConnectAction() {
 		this.connectOverlay.activate();
-	};
+	}
 
 	/**
 	 * Activates the play overlays action 
 	 */
 	onPlayAction() {
 		this.playOverlay.activate();
-	};
+	}
 
 	/**
 	 * Shows the afk overlay 
@@ -104,7 +104,7 @@ export class DelegateBase implements IDelegate {
 		this.updateAfkOverlay(countDown);
 		this.afkOverlay.show();
 		this.currentOverlay = this.afkOverlay;
-	};
+	}
 
 	/**
 	 * Update the afk overlays countdown number 
@@ -112,14 +112,14 @@ export class DelegateBase implements IDelegate {
 	 */
 	updateAfkOverlay(countDown: number) {
 		this.afkOverlay.update(countDown);
-	};
+	}
 
 	/**
 	 * Activates the afk overlays action 
 	 */
 	onAfkAction() {
 		this.afkOverlay.activate();
-	};
+	}
 
 	/**
 	 * Instantiate the WebRTCPlayerController interface to provide WebRTCPlayerController functionality within this class and set up anything that requires it 
