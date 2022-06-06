@@ -48,7 +48,7 @@ export class AfkLogic {
     resetAfkWarningTimer() {
         if (this.active) {
             clearTimeout(this.warnTimer);
-            this.warnTimer = setTimeout(() => { this.activateAfkEvent() }, this.warnTimeout * 1000);
+            this.warnTimer = setTimeout(() => this.activateAfkEvent(), this.warnTimeout * 1000);
         }
     }
 
@@ -80,8 +80,7 @@ export class AfkLogic {
                 this.closeWebSocket();
 
                 // switch off the afk feature as stream has closed 
-                this.active = false;
-                this.warnTimeout = 0;
+                clearInterval(this.countDownTimer);
             } else {
                 // Update the countDown message.
                 this.updateAfkCountdown();

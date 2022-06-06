@@ -96,7 +96,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.webSocketController.onWebSocketOncloseOverlayMessage = this.delegate.onDisconnect.bind(this.delegate);
 
 		// set up the final webRtc player controller methods from within our delegate so a connection can be activated
-		this.setUpWebRtcConnectionForActivation();
+		this.delegate.setIWebRtcPlayerController(this);
 
 		// now that the delegate has finished instantiating connect the rest of the afk methods to the afk logic class
 		this.afkLogic.showAfkOverlay = () => this.delegate.showAfkOverlay(this.afkLogic.countDown);
@@ -129,15 +129,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.webSocketController.close();
 
 			// wait for the connection to close and restart the connection
-			setTimeout(() => { this.setUpWebRtcConnectionForActivation() }, 3000);
+			setTimeout(() => this.delegate.showConnectOverlay(), 3000);
 		}
-	}
-
-	/**
-	 * Activate the setIWebRtcPlayerController method within our delegate to set up the final webRtc player controller methods so a webRtc connection can be made 
-	 */
-	setUpWebRtcConnectionForActivation() {
-		this.delegate.setIWebRtcPlayerController(this);
 	}
 
 	/**
