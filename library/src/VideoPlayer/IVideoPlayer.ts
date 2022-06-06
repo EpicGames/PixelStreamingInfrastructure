@@ -1,9 +1,9 @@
 export interface IVideoPlayer {
-    
+
     /**
      * return the video player element 
      */
-    getVideoElement(): any;
+    getVideoElement(): HTMLVideoElement;
 
     /**
      * return the video player root element 

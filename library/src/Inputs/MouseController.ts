@@ -226,7 +226,7 @@ export class MouseController {
 		let rootDiv = this.videoElementProvider.getVideoRootElement();
 		let videoElement = this.videoElementProvider.getVideoElement();
 
-		if (rootDiv && videoElement.length > 0) {
+		if (rootDiv && videoElement) {
 			let playerAspectRatio = rootDiv.clientHeight / rootDiv.clientWidth;
 			let videoAspectRatio = videoElement.videoHeight / videoElement.videoWidth;
 
