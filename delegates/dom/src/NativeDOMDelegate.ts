@@ -216,7 +216,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		// add the new event listener 
 		connectOverlayHtml.addEventListener('click', function onOverlayClick(event: Event) {
 			connectOverlayEvent(event);
-			//connectOverlayHtml.removeEventListener('click', onOverlayClick);
 		});
 
 		// build the inner html 
@@ -243,7 +242,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		// add the new event listener 
 		playOverlayHtml.addEventListener('click', function onOverlayClick(event: Event) {
 			playOverlayEvent(event);
-			//playOverlayHtml.removeEventListener('click', onOverlayClick);
 		});
 
 		// build the inner html 
@@ -269,7 +267,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		afkOverlayHtml.addEventListener('click', function onOverlayClick(event: Event) {
 			afkOverlayEvent(event);
-			//playOverlayHtml.removeEventListener('click', onOverlayClick);
 		});
 
 		// build the inner html
@@ -646,7 +643,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		statsText += `<div>Browser receive to composite (ms): ${stats.inboundVideoStats.receiveToCompositeMs}</div>`;
 		statsText += `<div>Video Quantization Parameter: ${this.videoEncoderAvgQP}</div>`;
 
-		//document.getElementById("statsTitle").style.display = "";
 		let statsDiv = document.getElementById("statisticsResult");
 		statsDiv.innerHTML = statsText;
 
@@ -717,7 +713,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		} else if (QP < 0) {
 			this.statusLight.style.color = QualityColour.None;
 			this.statusLight.title += " - Error";
-			console.error("Video Encoder QP can not be less then 0");
+			console.warn("Video Encoder QP can not be less then 0");
 		} else {
 			this.statusLight.title += " - Good";
 			this.statusLight.style.color = QualityColour.Good;

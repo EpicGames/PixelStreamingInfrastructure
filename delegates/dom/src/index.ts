@@ -1,5 +1,5 @@
-import { NativeDOMDelegate } from "./NativeDOMDelegate";
-import * as libspsfrontend from '@tensorworks/libspsfrontend'
+import { NativeDOMDelegate, Images } from "./NativeDOMDelegate";
+import * as libspsfrontend from '@tensorworks/libspsfrontend';
 
 // Determine whether a signalling server WebSocket URL was specified at compile-time or if we need to compute it at runtime
 declare var WEBSOCKET_URL: string;
