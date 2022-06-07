@@ -76,6 +76,11 @@ export interface IDelegate {
 	onAfkAction(): void;
 
 	/**
+	 * Show the Connect Overlay or autoplay 
+	 */
+	showConnectOverlayOrAutoConnect(): void;
+
+	/**
 	 * Acts as an override for instantiating the WebRTCPlayerController interface to provide WebRTCPlayerController functionality  
 	 * @param iWebRtcPlayerController 
 	 */

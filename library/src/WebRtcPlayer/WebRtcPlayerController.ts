@@ -129,7 +129,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.webSocketController.close();
 
 			// wait for the connection to close and restart the connection
-			setTimeout(() => this.delegate.showConnectOverlay(), 3000);
+			setTimeout(() => this.delegate.showConnectOverlayOrAutoConnect(), 3000);
 		}
 	}
 

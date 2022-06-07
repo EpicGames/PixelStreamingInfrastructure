@@ -130,8 +130,11 @@ export class DelegateBase implements IDelegate {
 
 		this.iWebRtcController.resizePlayerStyle();
 
+		// Build the webRtc connect overlay Event Listener and show the connect overlay
+		this.connectOverlay.onAction(() => this.iWebRtcController.connectToSignallingSever());
+
 		// set up the connect overlays action
-		this.setWebRtcConnectOverlay();
+		this.showConnectOverlayOrAutoConnect();
 
 		// set up the afk overlays action 
 		this.afkOverlay.onAction(() => this.iWebRtcController.onAfkClick());
@@ -141,13 +144,11 @@ export class DelegateBase implements IDelegate {
 	}
 
 	/**
-	 * Create the webRtc connect overlay based on the autoplay option. This should be done after iWebRtcController has been instantiated
+	 * Show the Connect Overlay or autoplay 
 	 */
-	setWebRtcConnectOverlay() {
+	showConnectOverlayOrAutoConnect() {
 		// set up if the auto play will be used or regular click to start
 		if (!this.config.enableSpsAutoplay) {
-			// Build the webRtc connect overlay Event Listener and show the connect overlay
-			this.connectOverlay.onAction(() => this.iWebRtcController.connectToSignallingSever());
 			this.showConnectOverlay();
 		} else {
 			// if autoplaying show an info overlay while while waiting for the connection to begin 
