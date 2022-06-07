@@ -78,6 +78,7 @@ export class AfkLogic {
                 // The user failed to click so hide the overlay and disconnect them.
                 this.hideCurrentOverlay();
                 this.closeWebSocket();
+                console.log("you have been disconnected due to inactivity");
 
                 // switch off the afk feature as stream has closed 
                 clearInterval(this.countDownTimer);

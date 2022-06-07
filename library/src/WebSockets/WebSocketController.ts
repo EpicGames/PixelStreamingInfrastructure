@@ -26,10 +26,10 @@ export class WebSocketController {
         Logger.verboseLog(this.address);
         try {
             this.webSocket = new WebSocket(this.address);
-            this.webSocket.onopen = this.handleOnOpen.bind(this);
-            this.webSocket.onerror = this.handleOnError.bind(this);
-            this.webSocket.onclose = this.handleOnClose.bind(this);
-            this.webSocket.onmessage = this.handleOnMessage.bind(this);
+            this.webSocket.onopen = (event) => this.handleOnOpen(event);
+            this.webSocket.onerror = (event) => this.handleOnError(event);
+            this.webSocket.onclose = (event) => this.handleOnClose(event);
+            this.webSocket.onmessage = (event) => this.handleOnMessage(event);
             return true;
         } catch (error) {
             console.error(error);
