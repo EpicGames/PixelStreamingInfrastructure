@@ -152,9 +152,16 @@ export class DelegateBase implements IDelegate {
 			this.showConnectOverlay();
 		} else {
 			// if autoplaying show an info overlay while while waiting for the connection to begin 
-			this.showTextOverlay("Auto Connecting Now");
-			this.iWebRtcController.connectToSignallingSever();
+			this.onWebRtcAutoConnect();
 		}
+	}
+
+	/**
+	 * Show the webRtcAutoConnect Overlay and connect
+	 */
+	onWebRtcAutoConnect() {
+		this.showTextOverlay("Auto Connecting Now");
+		this.iWebRtcController.connectToSignallingSever();
 	}
 
 	/**

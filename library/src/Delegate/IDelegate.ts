@@ -27,6 +27,11 @@ export interface IDelegate {
 	hideCurrentOverlay(): void;
 
 	/**
+	 * Show the webRtcAutoConnect Overlay and connect
+	 */
+	onWebRtcAutoConnect(): void;
+
+	/**
 	 * Shows the play overlay 
 	 */
 	showPlayOverlay(): void;
