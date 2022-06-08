@@ -2,6 +2,12 @@
  * Interface for Mouse Events
  */
 export interface IVideoPlayerMouseInterface {
+
+    /**
+     * Handle when the locked state Changed
+     */
+    handleLockStateChange(): void;
+
     /**
      * Handle when the mouse move
      * @param mouseEvent - Mouse Event

@@ -27,6 +27,25 @@ export class VideoPlayerMouseLockedEvents implements IVideoPlayerMouseInterface 
     }
 
     /**
+     * Handle when the locked state Changed
+     */
+    handleLockStateChange() {
+        console.log("Lock state has changed");
+        let videoElement = this.videoElementProvider.getVideoElement();
+        if (document.pointerLockElement === videoElement) {
+            document.onmousemove = (mouseEvent) => this.handleMouseMove(mouseEvent);
+            document.onwheel = (wheelEvent) => this.handleMouseWheel(wheelEvent);
+            videoElement.onmousedown = (wheelEvent) => this.handleMouseDown(wheelEvent);
+            videoElement.onmouseup = (mouseEvent) => this.handleMouseUp(mouseEvent);
+        } else {
+            document.onmousemove = null;
+            videoElement.onmousedown = null;
+            videoElement.onmouseup = null;
+            videoElement.onwheel = null;
+        }
+    }
+
+    /**
      * Handle the mouse move event, sends the mouse data to the UE Instance
      * @param mouseEvent - Mouse Event
      */

@@ -17,6 +17,11 @@ export class VideoPlayerMouseHoverEvents implements IVideoPlayerMouseInterface {
     }
 
     /**
+     * Satisfies the interfaces handleLockStateChange requirement 
+     */
+    handleLockStateChange(): void { }
+
+    /**
      * Handle the mouse move event, sends the mouse data to the UE Instance
      * @param mouseEvent - Mouse Event
      */

@@ -68,7 +68,10 @@ export class AfkLogic {
 
         // if we are in locked mouse exit pointerlock 
         if (this.controlScheme == ControlSchemeType.LockedMouse) {
-            document.exitPointerLock();
+            // minor hack to alleviate ios not supporting pointerlock
+            if (document.exitPointerLock) {
+                document.exitPointerLock();
+            }
         }
 
         // reset our countDown interval accordingly 

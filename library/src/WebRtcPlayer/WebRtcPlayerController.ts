@@ -354,7 +354,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.dataChannelController.processFreezeFrameMessage = (view) => this.freezeFrameController.processFreezeFrameMessage(view, () => this.loadFreezeFrameOrShowPlayOverlay());
 		this.dataChannelController.onUnFreezeFrame = () => this.InvalidateFreezeFrameAndEnableVideo();
 
-		setInterval(this.getStats.bind(this), 1000);
+		setInterval(() => this.getStats(), 1000);
 
 		// either autoplay the video or set up the play overlay
 		this.autoPlayVideoOrSetUpPlayOverlay();

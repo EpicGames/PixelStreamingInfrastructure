@@ -1,5 +1,4 @@
 import { MouseController } from "../Inputs/MouseController"
-import { IVideoPlayerMouseInterface } from "./VideoPlayerMouseInterface";
 import { UeDescriptorUi } from "../UeInstanceMessage/UeDescriptorUi";
 import { Logger } from "../Logger/Logger";
 import { IVideoPlayer } from "./IVideoPlayer";
@@ -13,7 +12,6 @@ export class VideoPlayerController {
     mouseController: MouseController;
     ueDescriptorUi: UeDescriptorUi;
     onUpdatePosition: (mouseEvent: MouseEvent) => void;
-    videoInputBindings: IVideoPlayerMouseInterface;
 
     constructor(videoElementProvider: IVideoPlayer) {
         this.videoElementProvider = videoElementProvider;
@@ -30,25 +28,6 @@ export class VideoPlayerController {
     }
 
     /**
-     * Handle when the locked state Changed
-     */
-    handleLockStateChange() {
-        Logger.verboseLog("Lock state has changed");
-        let videoElement = this.videoElementProvider.getVideoElement();
-        if (document.pointerLockElement === videoElement) {
-            document.onmousemove = this.videoInputBindings.handleMouseMove.bind(this.videoInputBindings);
-            document.onwheel = this.videoInputBindings.handleMouseWheel.bind(this.videoInputBindings);
-            videoElement.onmousedown = this.videoInputBindings.handleMouseDown.bind(this.videoInputBindings);
-            videoElement.onmouseup = this.videoInputBindings.handleMouseUp.bind(this.videoInputBindings);
-        } else {
-            document.onmousemove = null;
-            videoElement.onmousedown = null;
-            videoElement.onmouseup = null;
-            videoElement.onwheel = null;
-        }
-    }
-
-    /**
      * Handle when the Element is mouse clicked
      * @param event - Mouse Event
      */
@@ -57,7 +36,11 @@ export class VideoPlayerController {
         if (videoElement.paused) {
             videoElement.play();
         }
-        videoElement.requestPointerLock();
+
+        // minor hack to alleviate ios not supporting pointerlock
+        if(videoElement.requestPointerLock){
+            videoElement.requestPointerLock();
+        }
     }
 
     /**

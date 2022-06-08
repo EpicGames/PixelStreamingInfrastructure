@@ -11,6 +11,7 @@ import { VideoPlayerMouseLockedEvents } from "../VideoPlayer/VideoPlayerMouseLoc
 import { VideoPlayerMouseHoverEvents } from "../VideoPlayer/VideoPlayerMouseHoverEvents";
 import { GyroController } from "./GyroController";
 import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
+import { IVideoPlayerMouseInterface } from "../VideoPlayer/VideoPlayerMouseInterface";
 
 /**
  * Class for handling inputs for mouse and keyboard   
@@ -52,30 +53,35 @@ export class InputController {
      */
     registerMouse(controlScheme: ControlSchemeType, videoPlayerController: VideoPlayerController) {
         console.debug("Register Mouse Events");
-        let videoElement = this.videoElementProvider.getVideoElement();
+
+        // casting these as any as they do not have the moz attributes we require
+        let videoElement = this.videoElementProvider.getVideoElement() as any;
+        let videoInputBindings: IVideoPlayerMouseInterface;
+
         this.mouseController = new MouseController(this.dataChannelController, this.videoElementProvider);
 
         switch (controlScheme) {
             case ControlSchemeType.LockedMouse:
-                videoPlayerController.videoInputBindings = new VideoPlayerMouseLockedEvents(this.videoElementProvider, this.mouseController);
 
-                videoElement.onclick = videoPlayerController.handleClick.bind(videoPlayerController);
+                videoInputBindings = new VideoPlayerMouseLockedEvents(this.videoElementProvider, this.mouseController);
 
-                document.addEventListener('pointerlockchange', videoPlayerController.handleLockStateChange.bind(videoPlayerController), false);
-                document.addEventListener('mozpointerlockchange', videoPlayerController.handleLockStateChange.bind(videoPlayerController), false);
+                videoElement.onclick = (event: MouseEvent) => videoPlayerController.handleClick(event);
+
+                document.addEventListener('pointerlockchange', () => videoInputBindings.handleLockStateChange(), false);
+                document.addEventListener('mozpointerlockchange', () => videoInputBindings.handleLockStateChange(), false);
 
                 break
             case ControlSchemeType.HoveringMouse:
-                videoPlayerController.videoInputBindings = new VideoPlayerMouseHoverEvents(this.mouseController);
+                videoInputBindings = new VideoPlayerMouseHoverEvents(this.mouseController);
 
                 // set the onclick to null if the input bindings were previously set to pointerlock
                 videoElement.onclick = null;
 
-                document.onmousemove = videoPlayerController.videoInputBindings.handleMouseMove.bind(videoPlayerController.videoInputBindings);
-                document.onwheel = videoPlayerController.videoInputBindings.handleMouseWheel.bind(videoPlayerController.videoInputBindings);
+                document.onmousemove = (mouseEvent) => videoInputBindings.handleMouseMove(mouseEvent);
+                document.onwheel = (mouseEvent) => videoInputBindings.handleMouseWheel(mouseEvent);
 
-                videoElement.onmousedown = videoPlayerController.videoInputBindings.handleMouseDown.bind(videoPlayerController.videoInputBindings);
-                videoElement.onmouseup = videoPlayerController.videoInputBindings.handleMouseUp.bind(videoPlayerController.videoInputBindings);
+                videoElement.onmousedown = (mouseEvent: MouseEvent) => videoInputBindings.handleMouseDown(mouseEvent);
+                videoElement.onmouseup = (mouseEvent: MouseEvent) => videoInputBindings.handleMouseUp(mouseEvent);
 
                 break
             default:
