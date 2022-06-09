@@ -350,8 +350,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.resizePlayerStyle();
 
-		Logger.verboseLog("onVideoInitialised");
-
 		this.dataChannelController.processFreezeFrameMessage = (view) => this.freezeFrameController.processFreezeFrameMessage(view, () => this.loadFreezeFrameOrShowPlayOverlay());
 		this.dataChannelController.onUnFreezeFrame = () => this.InvalidateFreezeFrameAndEnableVideo();
 

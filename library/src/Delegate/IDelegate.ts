@@ -83,7 +83,7 @@ export interface IDelegate {
 	/**
 	 * Show the Connect Overlay or autoplay 
 	 */
-	showConnectOverlayOrAutoConnect(): void;
+	showConnectOrAutoConnectOverlays(): void;
 
 	/**
 	 * Acts as an override for instantiating the WebRTCPlayerController interface to provide WebRTCPlayerController functionality  
