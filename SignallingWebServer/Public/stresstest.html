@@ -1,0 +1,30 @@
+<!-- Copyright Epic Games, Inc. All Rights Reserved. -->
+
+<!DOCTYPE HTML>
+<html>
+
+    <head>
+        <script type="text/javascript" src="scripts/stressTest.js"></script>
+    </head>
+
+    <body onload="stressTest()">
+        <button id="playPause">Pause</button>
+        <div>Total streams: <span id="nStreamsLabel">0</span></div>
+        <div>
+            <span>Max peers: </span>
+            <span id="nPeerLabel">5</span>
+            <input type="range" min="1" max="8" value="5" class="slider" id="nPeersSlider">
+        </div>
+        <div>
+            <span>Peer creation interval (seconds): </span>
+            <input type="number" id="creationIntervalInput" min="0" max="10" step="1" value="1">
+        </div>
+        <div>
+            <span>Peer deletion interval (seconds): </span>
+            <input type="number" id="deletionIntervalInput" min="0" max="10" step="1" value="2">
+        </div>
+        <div id="streamsContainer"></div>
+
+    </body>
+
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "mediasoup-sdp-bridge",
+  "version": "3.6.5",
+  "description": "Node.js library to allow integration of SDP based clients with mediasoup",
+  "contributors": [
+    "Iñaki Baz Castillo <ibc@aliax.net> (https://inakibaz.me)",
+    "Juan Navarro <juan.navarro@gmx.es> (https://github.com/j1elo)"
+  ],
+  "homepage": "https://mediasoup.org",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/versatica/mediasoup-sdp-bridge.git"
+  },
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/mediasoup"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "engines": {
+    "node": ">=10"
+  },
+  "dependencies": {
+    "mediasoup-client": "^3.6.41"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "cirrus-matchmaker",
+  "version": "0.0.1",
+  "description": "Cirrus servers connect to the Matchmaker which redirects a browser to the next available Cirrus server",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.16.2",
+    "socket.io": "4.4.1",
+    "yargs": "17.3.1"
+  }
+}

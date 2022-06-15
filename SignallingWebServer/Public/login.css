@@ -1,0 +1,49 @@
+/*Copyright Epic Games, Inc. All Rights Reserved.*/
+
+:root {
+	/*Using colour scheme https://color.adobe.com/TD-Colors---Option-3-color-theme-10394433/*/
+	--colour1:#2B3A42;
+	--colour2:#3F5765;
+	--colour3:#BDD4DE;
+	--colour4:#EFEFEF;
+	--colour5:#FF5035;
+}
+
+form{
+	margin: 0px auto;
+	padding: 1em;
+	width: 350px;
+	border-radius: 10px;
+	border: 1px solid #CCC;
+	background-color: var(--colour4) 
+}
+
+.entry{
+	padding: 5px;
+}
+
+label {
+    display: inline-block;
+    width: 25%;
+    text-align: right;
+}
+
+input {
+	text-indent: 5px;
+    font-family: verdana,sans-serif;
+    font-size: 1em;
+
+    width: 65%;
+    box-sizing: border-box;
+    border: 1px solid #999;
+}
+
+.button {
+	margin: 0px auto;
+	width: 70%;
+}
+
+button {
+	width: 100%;
+	font-family: verdana,sans-serif;
+}
