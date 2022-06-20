@@ -68,7 +68,7 @@ let afk = {
     countdownTimer: undefined,   // The timer used to tick the seconds shown on the inactivity warning overlay.
 }
 
-// If the user focuses on a UE4 input widget then we show them a button to open
+// If the user focuses on a UE input widget then we show them a button to open
 // the on-screen keyboard. JavaScript security means we can only show the
 // on-screen keyboard in response to a user interaction.
 let editTextButton = undefined;
@@ -287,6 +287,8 @@ function parseURLParams() {
         let watermark = document.getElementById("unrealengine");
         watermark.style.display = 'none';
     }
+
+    inputOptions.hideBrowserCursor = (urlParams.has('hideBrowserCursor') ?  true : false);
 }
 
 
@@ -317,6 +319,9 @@ function setupHtmlEvents() {
 
     let controlBtn = document.getElementById('control-tgl');
     controlBtn.addEventListener('change', toggleControlScheme);
+
+    let cursorBtn = document.getElementById('cursor-tgl');
+    cursorBtn.addEventListener('change', toggleBrowserCursorVisibility);
 
     let resizeCheckBox = document.getElementById('enlarge-display-to-fill-window-tgl');
     if (resizeCheckBox !== null) {
@@ -369,7 +374,7 @@ function setupHtmlEvents() {
 
     let restartStreamButton = document.getElementById('restart-stream-button');
     if (restartStreamButton !== null) {
-        restartStreamButton.onclick = function (event) {
+        restartStreamButton.onmousedown = function (event) {
             restartStream();
         };
     }
@@ -402,8 +407,9 @@ function setupHtmlEvents() {
     setupToggleWithUrlParams("force-turn-tgl", "ForceTURN");
     setupToggleWithUrlParams("force-mono-tgl", "ForceMonoAudio");
     setupToggleWithUrlParams("control-tgl", "hoveringMouse");
+    setupToggleWithUrlParams("cursor-tgl", "hideBrowserCursor");
 
- 
+
     var streamSelector = document.getElementById('stream-select');
     var trackSelector = document.getElementById('track-select');
     if (streamSelector) {
@@ -1250,15 +1256,19 @@ let inputOptions = {
     controlScheme: ControlSchemeType.LockedMouse,
 
     // Browser keys are those which are typically used by the browser UI. We
-    // usually want to suppress these to allow, for example, UE4 to show shader
+    // usually want to suppress these to allow, for example, UE to show shader
     // complexity with the F5 key without the web page refreshing.
     suppressBrowserKeys: true,
 
-    // UE4 has a faketouches option which fakes a single finger touch when the
+    // UE has a faketouches option which fakes a single finger touch when the
     // user drags with their mouse. We may perform the reverse; a single finger
-    // touch may be converted into a mouse drag UE4 side. This allows a
+    // touch may be converted into a mouse drag UE side. This allows a
     // non-touch application to be controlled partially via a touch device.
-    fakeMouseWithTouches: false
+    fakeMouseWithTouches: false,
+
+    // Hiding the browser cursor enables the use of UE's inbuilt software cursor,
+    // without having the browser cursor display on top
+    hideBrowserCursor: false
 };
 
 function resizePlayerStyleToFillWindow(playerElement) {
@@ -1472,7 +1482,7 @@ function onOrientationChange(event) {
     }, 500);
 }
 
-// Must be kept in sync with PixelStreamingProtocol::EToUE4Msg C++ enum.
+// Must be kept in sync with PixelStreamingProtocol::EToUEMsg C++ enum.
 const MessageType = {
 
     /**********************************************************************/
@@ -1552,7 +1562,7 @@ function emitUIInteraction(descriptor) {
     emitDescriptor(MessageType.UIInteraction, descriptor);
 }
 
-// A build-in command can be sent to UE4 client. The commands are defined by a
+// A build-in command can be sent to UE client. The commands are defined by a
 // JSON descriptor and will be executed automatically.
 // The currently supported commands are:
 //
@@ -1827,7 +1837,7 @@ function showOnScreenKeyboard(command) {
     if (command.showOnScreenKeyboard) {
         // Show the 'edit text' button.
         editTextButton.classList.remove('hiddenState');
-        // Place the 'edit text' button near the UE4 input widget.
+        // Place the 'edit text' button near the UE input widget.
         let pos = unquantizeAndDenormalizeUnsigned(command.x, command.y);
         editTextButton.style.top = pos.y.toString() + 'px';
         editTextButton.style.left = (pos.x - 40).toString() + 'px';
@@ -1865,7 +1875,7 @@ function registerMouseEnterAndLeaveEvents(playerElement) {
 // cursor disappears and is locked. The user moves the cursor and the camera
 // moves, for example. The user presses escape to free the mouse.
 function registerLockedMouseEvents(playerElement) {
-    styleCursor = 'default';  // Showing cursor
+    styleCursor = (inputOptions.hideBrowserCursor ? 'none' : 'default');
     let x = playerElement.width / 2;
     let y = playerElement.height / 2;
 
@@ -1943,8 +1953,7 @@ function registerLockedMouseEvents(playerElement) {
 // the cursor to have an effect over the video. Otherwise the cursor just
 // passes over the browser.
 function registerHoveringMouseEvents(playerElement) {
-    styleCursor = 'none'; // We will rely on UE4 client's software cursor.
-    //styleCursor = 'default';  // Showing cursor
+    styleCursor = (inputOptions.hideBrowserCursor ? 'none' : 'default');
 
     playerElement.onmousemove = function(e) {
         emitMouseMove(e.offsetX, e.offsetY, e.movementX, e.movementY);
@@ -2162,7 +2171,7 @@ function registerKeyboardEvents() {
         sendInputData(new Uint8Array([MessageType.KeyDown, getKeyCode(e), e.repeat]).buffer);
         activeKeys.push(getKeyCode(e));
         // Backspace is not considered a keypress in JavaScript but we need it
-        // to be so characters may be deleted in a UE4 text entry field.
+        // to be so characters may be deleted in a UE text entry field.
         if (e.keyCode === SpecialKeyCodes.BackSpace) {
             document.onkeypress({
                 charCode: SpecialKeyCodes.BackSpace
@@ -2363,8 +2372,7 @@ function clearMouseEvents(playerElement) {
     }
 }
 
-function toggleControlScheme()
-{
+function toggleControlScheme() {
     let schemeToggle = document.getElementById("control-scheme-text");
     
     switch (inputOptions.controlScheme) {
@@ -2388,6 +2396,13 @@ function toggleControlScheme()
     {
         registerMouse(webRtcPlayerObj.video);
     }
+}
+
+function toggleBrowserCursorVisibility() {
+    inputOptions.hideBrowserCursor = !inputOptions.hideBrowserCursor;
+    styleCursor = (inputOptions.hideBrowserCursor ? 'none' : 'default');
+    let player = document.getElementById("player");
+    player.style.cursor = styleCursor;
 }
 
 function restartStream() {
