@@ -125,12 +125,18 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		if (!this.webSocketController.webSocket) {
 			console.log("A websocket connection has not been made yet so we will start the stream");
 			this.delegate.onWebRtcAutoConnect();
+			this.connectToSignallingSever();
+
 		} else {
 			// close the connection 
 			this.webSocketController.close();
 
 			// wait for the connection to close and restart the connection
-			setTimeout(() => this.delegate.onWebRtcAutoConnect(), 3000);
+			let autonConnectTimeout = setTimeout(() => {
+				this.delegate.onWebRtcAutoConnect();
+				this.connectToSignallingSever();
+				clearTimeout(autonConnectTimeout);
+			}, 3000);
 		}
 	}
 
