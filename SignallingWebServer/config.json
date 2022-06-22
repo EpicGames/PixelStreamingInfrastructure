@@ -5,7 +5,7 @@
 	"UseAuthentication": false,
 	"LogToFile": true,
 	"LogVerbose": true,
-	"HomepageFile": "/Public/player.html",
+	"HomepageFile": "player.html",
 	"AdditionalRoutes": {},
 	"EnableWebserver": true,
 	"MatchmakerAddress": "",
