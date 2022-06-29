@@ -2017,6 +2017,8 @@ function registerTouchEvents(playerElement) {
 
     function forgetTouch(touch) {
         fingers.push(fingerIds[touch.identifier]);
+        // Sort array back into descending order. This means if finger '1' were to lift after finger '0', we would ensure that 0 will be the first index to pop
+        fingers.sort(function(a, b){return b - a});
         delete fingerIds[touch.identifier];
     }
 
