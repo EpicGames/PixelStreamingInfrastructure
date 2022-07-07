@@ -8,6 +8,9 @@ let mediasoupRouter;
 let streamer = null;
 let peers = new Map();
 
+
+
+//functionconnectSignalling: is a function which achieves the task of logging the user to server
 function connectSignalling(server) {
   console.log("Connecting to Signalling Server at %s", server);
   signalServer = new WebSocket(server);
@@ -42,6 +45,7 @@ async function onStreamerOffer(sdp) {
   streamer = { transport: transport, producers: producers };
 }
 
+// Accepting StreamerSCTPId 
 function getNextStreamerSCTPId() {
   if(!streamer){
     throw new TypeError('Cannot generate an SCTP stream id - streamer was null.');
