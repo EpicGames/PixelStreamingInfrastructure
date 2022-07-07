@@ -153,7 +153,13 @@ export class WebSocketController {
     handleOnClose(event: CloseEvent) {
         this.onWebSocketOncloseOverlayMessage(event);
         Logger.verboseLog("Disconnected to the signalling server via WebSocket: " + JSON.stringify(event.code) + " - " + event.reason);
+        this.stopAfkWarningTimer();
     }
+
+    /**
+     * An override for stoping the afk warning timer
+     */
+    stopAfkWarningTimer(){}
 
     sendWebRtcOffer(offer: RTCSessionDescriptionInit) {
         let payload = new MessageSend.MessageWebRTCOffer(offer);

@@ -36,9 +36,18 @@ export class AfkLogic {
     }
 
     /**
-     * Stop the timer which when elapsed will warn the user they are inactive.  
+     * Stop the afk warning timer
      */
-    stopAfkWarningTimer() {
+    stopAfkWarningTimer(){
+        this.active = false;
+        clearInterval(this.warnTimer);
+        clearInterval(this.countDownTimer);
+    }
+
+    /**
+     * Pause the timer which when elapsed will warn the user they are inactive.  
+     */
+    pauseAfkWarningTimer() {
         this.active = false;
     }
 
@@ -57,7 +66,7 @@ export class AfkLogic {
      */
     activateAfkEvent() {
         // Pause the timer while the user is looking at the inactivity warning overlay
-        this.stopAfkWarningTimer();
+        this.pauseAfkWarningTimer();
 
         // instantiate a new overlay 
         this.showAfkOverlay();
@@ -84,7 +93,7 @@ export class AfkLogic {
                 console.log("you have been disconnected due to inactivity");
 
                 // switch off the afk feature as stream has closed 
-                clearInterval(this.countDownTimer);
+                this.stopAfkWarningTimer();
             } else {
                 // Update the countDown message.
                 this.updateAfkCountdown();
