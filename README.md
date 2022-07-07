@@ -12,7 +12,7 @@ The goals of this repository are to:
 
 ## Repository contents
 
-Reference implementations for the various pieces of infrastructure needed to support running a PixelStreaming application:
+Reference implementations for the various pieces needed to support a PixelStreaming application:
 - SignallingWebServer (Cirrus)
 - SFU (Single Forwarding Unit)
 - Matchmaker
