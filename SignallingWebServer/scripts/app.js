@@ -106,20 +106,20 @@ function updateStatus() {
             if (currButton.pressed) {
                 // New press
                 if (i == 6) {
-                    sendInputMessage("gamepadAnalog", [ j, 5, currButton.value ]);
+                    sendInputMessage("GamepadAnalog", [ j, 5, currButton.value ]);
                 } else if (i == 7) {
-                    sendInputMessage("gamepadAnalog", [ j, 6, currButton.value ]);
+                    sendInputMessage("GamepadAnalog", [ j, 6, currButton.value ]);
                 } else {
-                    sendInputMessage("gamepadButtonPressed", [ j, i, prevButton.pressed ]);
+                    sendInputMessage("GamepadButtonPressed", [ j, i, prevButton.pressed ]);
                 }
             } else if (!currButton.pressed && prevButton.pressed) {
                 // release
                 if (i == 6) {
-                    sendInputMessage("gamepadAnalog", [ j, 5, 0 ]);
+                    sendInputMessage("GamepadAnalog", [ j, 5, 0 ]);
                 } else if (i == 7) {
-                    sendInputMessage("gamepadAnalog", [ j, 6, 0 ]);
+                    sendInputMessage("GamepadAnalog", [ j, 6, 0 ]);
                 } else {
-                    sendInputMessage("gamepadButtonReleased", [ j, i ]);
+                    sendInputMessage("GamepadButtonReleased", [ j, i ]);
                 }
             }
         }
@@ -131,9 +131,9 @@ function updateStatus() {
             if (i === 0 || i === 2) {
                 // left stick
                 // axis 1 = left horizontal
-                sendInputMessage("gamepadAnalog", [ j, i + 1, x ]);
+                sendInputMessage("GamepadAnalog", [ j, i + 1, x ]);
                 // axis 2 = left vertical
-                sendInputMessage("gamepadAnalog", [ j, i + 2, y ]);
+                sendInputMessage("GamepadAnalog", [ j, i + 2, y ]);
             }
         }
         controllers[j].prevState = currentState;
@@ -147,13 +147,13 @@ function gamepadConnectHandler(e) {
     controllers[gamepad.index] = {};
     controllers[gamepad.index].currentState = gamepad;
     controllers[gamepad.index].prevState = gamepad;
-    console.log("gamepad: " + gamepad.id + " connected");
+    console.log("Gamepad: " + gamepad.id + " connected");
     rAF(updateStatus);
 }
 
 function gamepadDisconnectHandler(e) {
     console.log("Gamepad disconnect handler");
-    console.log("gamepad: " + e.gamepad.id + " disconnected");
+    console.log("Gamepad: " + e.gamepad.id + " disconnected");
     delete controllers[e.gamepad.index];
 }
 
@@ -299,8 +299,8 @@ function setupHtmlEvents() {
             let minQP = document.getElementById('encoder-min-qp-text').value;
             let maxQP = document.getElementById('encoder-max-qp-text').value;
 
-            emitDescriptor("command", { "Encoder.MinQP": minQP });
-            emitDescriptor("command", { "Encoder.MaxQP": maxQP });
+            emitDescriptor("ToStreamerCommand", { "Encoder.MinQP": minQP });
+            emitDescriptor("ToStreamerCommand", { "Encoder.MaxQP": maxQP });
         };
     }
 
@@ -311,9 +311,9 @@ function setupHtmlEvents() {
             let minBitrate = document.getElementById('webrtc-min-bitrate-text').value * 1000;
             let maxBitrate = document.getElementById('webrtc-max-bitrate-text').value * 1000;
 
-            emitDescriptor("command", { 'WebRTC.Fps': FPS });
-            emitDescriptor("command", { 'WebRTC.MinBitrate': minBitrate });
-            emitDescriptor("command", { 'WebRTC.MaxBitrate': maxBitrate });
+            emitDescriptor("ToStreamerCommand", { 'WebRTC.Fps': FPS });
+            emitDescriptor("ToStreamerCommand", { 'WebRTC.MinBitrate': minBitrate });
+            emitDescriptor("ToStreamerCommand", { 'WebRTC.MaxBitrate': maxBitrate });
         };
     }
 
@@ -323,7 +323,7 @@ function setupHtmlEvents() {
             let consoleDescriptor = {
                 
             };
-            emitDescriptor("command", { "Stat.FPS": '' });
+            emitDescriptor("ToStreamerCommand", { "Stat.FPS": '' });
         };
     }
 
@@ -468,7 +468,7 @@ function sendStartLatencyTest() {
         let descriptor = {
             StartTime: StartTimeMs
         };
-        emitDescriptor(MessageType.LatencyTest, descriptor);
+        emitDescriptor("LatencyTest", descriptor);
     };
 
     webRtcPlayerObj.startLatencyTest(onTestStarted);
@@ -541,9 +541,6 @@ function playStream() {
             // Video and audio are combined in the video element
             playVideo();
         }
-        
-        requestInitialSettings();
-        requestQualityControl();
         showFreezeFrameOverlay();
         hideOverlay();
     }
@@ -660,23 +657,6 @@ function removeResponseEventListener(name) {
     responseEventListeners.delete(name);
 }
 
-// Must be kept in sync with PixelStreamingProtocol::EToPlayerMsg C++ enum.
-const ToClientMessageType = {
-    QualityControlOwnership: 0,
-    Response: 1,
-    Command: 2,
-    FreezeFrame: 3,
-    UnfreezeFrame: 4,
-    VideoEncoderAvgQP: 5,
-    LatencyTest: 6,
-    InitialSettings: 7,
-    FileExtension: 8,
-    FileMimeType: 9,
-    FileContents: 10,
-    TestEcho: 11,
-	InputControlOwnership: 12
-};
-
 let VideoEncoderQP = "N/A";
 
 function setupWebRtcPlayer(htmlElement, config) {
@@ -737,12 +717,6 @@ function setupWebRtcPlayer(htmlElement, config) {
                 resizePlayerStyle();
                 playStream();
             }
-        }
-    };
-
-    webRtcPlayerObj.onDataChannelConnected = function() {
-        if (ws && ws.readyState === WS_OPEN_STATE) {
-            requestQualityControl();
         }
     };
 
@@ -908,7 +882,14 @@ function setupWebRtcPlayer(htmlElement, config) {
     webRtcPlayerObj.onDataChannelMessage = function(data) {
         let view = new Uint8Array(data);
 
-        if (view[0] === ToClientMessageType.QualityControlOwnership) {
+        // An ID of 255 represents the protocol message
+        if (view[0] === 255) {
+            let protocolString = new TextDecoder("utf-16").decode(data.slice(1));
+            protocolJSON = JSON.parse(protocolString);
+            // Once the protocol has been received, we can send our control messages
+            requestInitialSettings();
+            requestQualityControl();
+        } else if (view[0] === protocolJSON["QualityControlOwnership"].id) {
             let ownership = view[1] === 0 ? false : true;
             console.log("Received quality controller message, will control quality: " + ownership);
             qualityController = ownership;
@@ -919,31 +900,30 @@ function setupWebRtcPlayer(htmlElement, config) {
                 qualityControlOwnershipCheckBox.checked = ownership;
             }
         } 
-        else if (view[0] === ToClientMessageType.InputControlOwnership) {
+        else if (view[0] === protocolJSON["InputControlOwnership"].id) {
             let ownership = view[1] === 0 ? false : true;
             console.log("Received input controller message - will your input control the stream: " + ownership);
             inputController = ownership;
         } 
-        else if (view[0] === ToClientMessageType.Response) {
+        else if (view[0] === protocolJSON["Response"].id) {
             let response = new TextDecoder("utf-16").decode(data.slice(1));
             for (let listener of responseEventListeners.values()) {
                 listener(response);
             }
-        } else if (view[0] === ToClientMessageType.Command) {
+        } else if (view[0] === protocolJSON["ToClientCommand"].id) {
             let commandAsString = new TextDecoder("utf-16").decode(data.slice(1));
             console.log(commandAsString);
             let command = JSON.parse(commandAsString);
             if (command.command === 'onScreenKeyboard') {
                 showOnScreenKeyboard(command);
             }
-        } else if (view[0] === ToClientMessageType.FreezeFrame) {
+        } else if (view[0] === protocolJSON["FreezeFrame"].id) {
             processFreezeFrameMessage(view);
-        } else if (view[0] === ToClientMessageType.UnfreezeFrame) {
+        } else if (view[0] === protocolJSON["UnfreezeFrame"].id) {
             invalidateFreezeFrameOverlay();
-        } else if (view[0] === ToClientMessageType.VideoEncoderAvgQP) {
+        } else if (view[0] === protocolJSON["VideoEncoderAvgQP"].id) {
             VideoEncoderQP = new TextDecoder("utf-16").decode(data.slice(1));
-            //console.log(`received VideoEncoderAvgQP ${VideoEncoderQP}`);
-        } else if (view[0] == ToClientMessageType.LatencyTest) {
+        } else if (view[0] == protocolJSON["LatencyTest"].id) {
             let latencyTimingsAsString = new TextDecoder("utf-16").decode(data.slice(1));
             console.log("Got latency timings from UE.")
             console.log(latencyTimingsAsString);
@@ -951,7 +931,7 @@ function setupWebRtcPlayer(htmlElement, config) {
             if (webRtcPlayerObj) {
                 webRtcPlayerObj.latencyTestTimings.SetUETimings(latencyTimingsFromUE);
             }
-        } else if (view[0] == ToClientMessageType.InitialSettings) {
+        } else if (view[0] == protocolJSON["InitialSettings"].id) {
             let settingsString = new TextDecoder("utf-16").decode(data.slice(1));
             let settingsJSON = JSON.parse(settingsString);
 
@@ -977,14 +957,14 @@ function setupWebRtcPlayer(htmlElement, config) {
                 document.getElementById("webrtc-min-bitrate-text").value = settingsJSON.WebRTC.MinBitrate / 1000;
                 document.getElementById("webrtc-max-bitrate-text").value = settingsJSON.WebRTC.MaxBitrate / 1000;
             }
-        } else if (view[0] == ToClientMessageType.FileExtension) {
+        } else if (view[0] == protocolJSON["FileExtension"].id) {
             processFileExtension(view);
-        } else if (view[0] == ToClientMessageType.FileMimeType) {
+        } else if (view[0] == protocolJSON["FileMimeType"].id) {
             processFileMimeType(view);
-        } else if (view[0] == ToClientMessageType.FileContents) {
+        } else if (view[0] == protocolJSON["FileContents"].id) {
             processFileContents(view);
         } else {
-            console.error(`Custom data channel message with message type that is unknown to the Pixel Streaming protocol. Does your ToClientMessageType enum need updating? The message type was: ${view[0]}`);
+            console.error(`Custom data channel message with message type that is unknown to the Pixel Streaming protocol. Does your PixelStreamingProtocol need updating? The message type was: ${view[0]}`);
         }
     };
 
@@ -1424,7 +1404,7 @@ function updateVideoStreamSize() {
             "Resolution.Width": playerElement.clientWidth, 
             "Resolution.Height": playerElement.clientHeight
         };
-        emitDescriptor("command", descriptor);
+        emitDescriptor("ToStreamerCommand", descriptor);
         console.log(descriptor);
         lastTimeResized = new Date().getTime();
     } else {
@@ -1446,9 +1426,10 @@ function onOrientationChange(event) {
 }
 
 function sendInputMessage(messageType, indata = []) {
-    messageFormat = messageFormats[messageType];
+    messageFormat = protocolJSON[messageType];
 
-    data = new DataView(new ArrayBuffer(messageFormat.length + 1));
+    console.log(`Calculate size: ${new Blob(JSON.stringify(indata)).size}, Specified size: ${messageFormat.byteLength}`);
+    data = new DataView(new ArrayBuffer(messageFormat.byteLength + 1));
 
     data.setUint8(0, messageFormat.id);
     byteOffset = 1;
@@ -1471,7 +1452,7 @@ function sendInputMessage(messageType, indata = []) {
                 byteOffset += 2;
                 break;
 
-            case "float":
+            case "double":
                 data.setFloat64(byteOffset, element, true);
                 byteOffset += 8;
                 break;
@@ -1482,133 +1463,133 @@ function sendInputMessage(messageType, indata = []) {
 
 function sendControlMessage(messageType) {
     let data = new DataView(new ArrayBuffer(1));
-    data.setUint8(byteIdx, messageFormats[messageType].id);
+    data.setUint8(0, protocolJSON[messageType].id);
     sendInputData(data.buffer);
 }
 
-const messageFormats = {
-    /*
-     * Control Messages. Range = 0..49.
-     */
-    "IFrameRequest": {
-        "id": 0,
-    },
-    "RequestQualityControl": {
-        "id": 1,
-    },
-    "FpsRequest": {
-        "id": 2,
-    },
-    "AverageBitrateRequest": {
-        "id": 3,
-    },
-    "StartStreaming": {
-        "id": 4,
-    },
-    "StopStreaming": {
-        "id": 5,
-    },
-    "LatencyTest": {
-        "id": 6,
-    },
-    "RequestInitialSettings": {
-        "id": 7,
-    },
-    /*
-     * Input Messages. Range = 50..89.
-     */
-    // Generic Input Messages. Range = 50..59.
-    "UIInteraction": {
-        "id": 50,
-    },
-    "command": {
-        "id": 51
-    },
-    // Keyboard Input Message. Range = 60..69.
-    "keyDown": {
-        "id": 60,
-        "length": 2,
-        //             keyCode  isRepeat
-        "structure": [ "uint8", "uint8" ]
-    },
-    "keyUp": {
-        "id": 61,
-        "length": 1,
-        //             keyCode
-        "structure": [ "uint8" ]
-    },
-    "keyPress": {
-        "id": 62,
-        "length": 2,
-        //             charcode
-        "structure": [ "uint16" ]
-    },
-    // Mouse Input Messages. Range = 70..79.
-    "mouseEnter": {
-        "id": 70,
-        "length": 0,
-        "structure": []
-    },
-    "mouseLeave": {
-        "id": 71,
-        "length": 0,
-        "structure": []
-    },
-    "mouseDown": {
-        "id": 72,
-        "length": 5,
-        //              button     x         y
-        "structure": [ "uint8", "uint16", "uint16" ]
-    },
-    "mouseUp": {
-        "id": 73,
-        "length": 5,
-        //              button     x         y
-        "structure": [ "uint8", "uint16", "uint16" ]
-    },
-    "mouseMove": {
-        "id": 74,
-        "length": 8,
-        //              x           y      deltaX    deltaY
-        "structure": [ "uint16", "uint16", "int16", "int16" ]
-    },
-    "mouseWheel": {
-        "id": 75,
-        "length": 6,
-        "structure": [ "int16", "uint16", "uint16"  ]
-    },
-    // Touch Input Messages. Range = 80..89.
-    "touchStart": {
-        "id": 80,
-        "length": 7,
-        "structure": [ "uint16", "uint16", "uint8", "uint8", "uint8"]
-    },
-    "touchEnd": {
-        "id": 81,
-        "length": 7,
-        "structure": [ "uint16", "uint16", "uint8", "uint8", "uint8"]
-    },
-    "touchMove": {
-        "id": 82,
-        "length": 7,
-        "structure": [ "uint16", "uint16", "uint8", "uint8", "uint8"]
-    },
-    // Gamepad Input Messages. Range = 90..99
-    "gamepadButtonPressed": {
-        "id": 90,
-        "length": 3,
-        "structure": [ "uint8", "uint8", "uint8" ]
-    },
-    "gamepadButtonReleased": {
-        "id": 91,
-        "length": 3,
-        "structure": [ "uint8", "uint8", "uint8" ]
-    },
-    "gamepadButtonAnalog": {
-        "id": 92,
-        "length": 10,
-        "structure": [ "uint8", "uint8", "float" ]
-    }
+protocolJSON = {
+    // /*
+    //  * Control Messages. Range = 0..49.
+    //  */
+    // "IFrameRequest": {
+    //     "id": 0,
+    // },
+    // "RequestQualityControl": {
+    //     "id": 1,
+    // },
+    // "FpsRequest": {
+    //     "id": 2,
+    // },
+    // "AverageBitrateRequest": {
+    //     "id": 3,
+    // },
+    // "StartStreaming": {
+    //     "id": 4,
+    // },
+    // "StopStreaming": {
+    //     "id": 5,
+    // },
+    // "LatencyTest": {
+    //     "id": 6,
+    // },
+    // "RequestInitialSettings": {
+    //     "id": 7,
+    // },
+    // /*
+    //  * Input Messages. Range = 50..89.
+    //  */
+    // // Generic Input Messages. Range = 50..59.
+    // "UIInteraction": {
+    //     "id": 50,
+    // },
+    // "ToStreamerCommand": {
+    //     "id": 51
+    // },
+    // // Keyboard Input Message. Range = 60..69.
+    // "keyDown": {
+    //     "id": 60,
+    //     "length": 2,
+    //     //             keyCode  isRepeat
+    //     "structure": [ "uint8", "uint8" ]
+    // },
+    // "KeyUp": {
+    //     "id": 61,
+    //     "length": 1,
+    //     //             keyCode
+    //     "structure": [ "uint8" ]
+    // },
+    // "keyPress": {
+    //     "id": 62,
+    //     "length": 2,
+    //     //             charcode
+    //     "structure": [ "uint16" ]
+    // },
+    // // Mouse Input Messages. Range = 70..79.
+    // "MouseEnter": {
+    //     "id": 70,
+    //     "length": 0,
+    //     "structure": []
+    // },
+    // "MouseLeave": {
+    //     "id": 71,
+    //     "length": 0,
+    //     "structure": []
+    // },
+    // "MouseDown": {
+    //     "id": 72,
+    //     "length": 5,
+    //     //              button     x         y
+    //     "structure": [ "uint8", "uint16", "uint16" ]
+    // },
+    // "MouseUp": {
+    //     "id": 73,
+    //     "length": 5,
+    //     //              button     x         y
+    //     "structure": [ "uint8", "uint16", "uint16" ]
+    // },
+    // "MouseMove": {
+    //     "id": 74,
+    //     "length": 8,
+    //     //              x           y      deltaX    deltaY
+    //     "structure": [ "uint16", "uint16", "int16", "int16" ]
+    // },
+    // "MouseWheel": {
+    //     "id": 75,
+    //     "length": 6,
+    //     "structure": [ "int16", "uint16", "uint16"  ]
+    // },
+    // // Touch Input Messages. Range = 80..89.
+    // "TouchStart": {
+    //     "id": 80,
+    //     "length": 7,
+    //     "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
+    // },
+    // "TouchEnd": {
+    //     "id": 81,
+    //     "length": 7,
+    //     "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
+    // },
+    // "TouchMove": {
+    //     "id": 82,
+    //     "length": 7,
+    //     "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
+    // },
+    // // Gamepad Input Messages. Range = 90..99
+    // "GamepadButtonPressed": {
+    //     "id": 90,
+    //     "length": 3,
+    //     "structure": [ "uint8", "uint8", "uint8" ]
+    // },
+    // "GamepadButtonReleased": {
+    //     "id": 91,
+    //     "length": 3,
+    //     "structure": [ "uint8", "uint8", "uint8" ]
+    // },
+    // "GamepadButtonAnalog": {
+    //     "id": 92,
+    //     "length": 10,
+    //     "structure": [ "uint8", "uint8", "double" ]
+    // }
 };
 
 
@@ -1621,7 +1602,7 @@ function emitDescriptor(messageType, descriptor) {
     // a time.
     let data = new DataView(new ArrayBuffer(1 + 2 + 2 * descriptorAsString.length));
     let byteIdx = 0;
-    data.setUint8(byteIdx, messageFormats[messageType].id);
+    data.setUint8(byteIdx, protocolJSON[messageType].id);
     byteIdx++;
     data.setUint16(byteIdx, descriptorAsString.length, true);
     byteIdx += 2;
@@ -1644,7 +1625,7 @@ function emitDescriptor(messageType, descriptor) {
 //
 function emitCommand(descriptor)
 {
-    emitDescriptor("command", descriptor)
+    emitDescriptor("ToStreamerCommand", descriptor)
 }
 
 // A UI interation will occur when the user presses a button powered by
@@ -1792,39 +1773,39 @@ const MouseButtonsMask = {
 function releaseMouseButtons(buttons, x, y) {
     let coord = normalizeAndQuantizeUnsigned(x, y);
     if (buttons & MouseButtonsMask.PrimaryButton) {
-        sendInputMessage("mouseUp", [ MouseButton.MainButton, coord.x, coord.y ]);
+        sendInputMessage("MouseUp", [ MouseButton.MainButton, coord.x, coord.y ]);
     }
     if (buttons & MouseButtonsMask.SecondaryButton) {
-        sendInputMessage("mouseUp", [ MouseButton.SecondaryButton, coord.x, coord.y ]);
+        sendInputMessage("MouseUp", [ MouseButton.SecondaryButton, coord.x, coord.y ]);
     }
     if (buttons & MouseButtonsMask.AuxiliaryButton) {
-        sendInputMessage("mouseUp", [ MouseButton.AuxiliaryButton, coord.x, coord.y ]);
+        sendInputMessage("MouseUp", [ MouseButton.AuxiliaryButton, coord.x, coord.y ]);
     }
     if (buttons & MouseButtonsMask.FourthButton) {
-        sendInputMessage("mouseUp", [ MouseButton.FourthButton, coord.x, coord.y ]);
+        sendInputMessage("MouseUp", [ MouseButton.FourthButton, coord.x, coord.y ]);
     }
     if (buttons & MouseButtonsMask.FifthButton) {
-        sendInputMessage("mouseUp", [ MouseButton.FifthButton, coord.x, coord.y ]);
+        sendInputMessage("MouseUp", [ MouseButton.FifthButton, coord.x, coord.y ]);
     }
 }
 
-// If the user has any mouse buttons pressed then press them again.
+// If the user has any Mouse buttons pressed then press them again.
 function pressMouseButtons(buttons, x, y) {
     let coord = normalizeAndQuantizeUnsigned(x, y);
     if (buttons & MouseButtonsMask.PrimaryButton) {
-        sendInputMessage("mouseDown", [ MouseButton.MainButton, coord.x, coord.y ]);
+        sendInputMessage("MouseDown", [ MouseButton.MainButton, coord.x, coord.y ]);
     }
     if (buttons & MouseButtonsMask.SecondaryButton) {
-        sendInputMessage("mouseDown", [ MouseButton.SecondaryButton, coord.x, coord.y ]);
+        sendInputMessage("MouseDown", [ MouseButton.SecondaryButton, coord.x, coord.y ]);
     }
     if (buttons & MouseButtonsMask.AuxiliaryButton) {
-        sendInputMessage("mouseDown", [ MouseButton.AuxiliaryButton, coord.x, coord.y ]);
+        sendInputMessage("MouseDown", [ MouseButton.AuxiliaryButton, coord.x, coord.y ]);
     }
     if (buttons & MouseButtonsMask.FourthButton) {
-        sendInputMessage("mouseDown", [ MouseButton.FourthButton, coord.x, coord.y ]);
+        sendInputMessage("MouseDown", [ MouseButton.FourthButton, coord.x, coord.y ]);
     }
     if (buttons & MouseButtonsMask.FifthButton) {
-        sendInputMessage("mouseDown", [ MouseButton.FifthButton, coord.x, coord.y ]);
+        sendInputMessage("MouseDown", [ MouseButton.FifthButton, coord.x, coord.y ]);
     }
 }
 
@@ -1881,7 +1862,7 @@ function registerMouseEnterAndLeaveEvents(playerElement) {
         if (print_inputs) {
             console.log('mouse enter');
         }
-        sendInputMessage("mouseEnter");
+        sendInputMessage("MouseEnter");
         playerElement.pressMouseButtons(e);
     };
 
@@ -1889,7 +1870,7 @@ function registerMouseEnterAndLeaveEvents(playerElement) {
         if (print_inputs) {
             console.log('mouse leave');
         }
-        sendInputMessage("mouseLeave");
+        sendInputMessage("MouseLeave");
         playerElement.releaseMouseButtons(e);
     };
 }
@@ -1927,7 +1908,7 @@ function registerLockedMouseEvents(playerElement) {
             // This is necessary as when the mouse loses focus, the windows stops listening for events and as such
             // the keyup listener won't get fired
             [...new Set(activeKeys)].forEach((uniqueKeycode) => {
-                sendInputMessage("keyUp", [ uniqueKeycode ]);
+                sendInputMessage("KeyUp", [ uniqueKeycode ]);
             });
             // Reset the active keys back to nothing
             activeKeys = [];
@@ -1952,20 +1933,20 @@ function registerLockedMouseEvents(playerElement) {
 
         let coord = normalizeAndQuantizeUnsigned(x, y);
         let delta = normalizeAndQuantizeSigned(e.movementX, e.movementY);
-        sendInputMessage("mouseMove", [ coord.x, coord.y, delta.x, delta.y ]);
+        sendInputMessage("MouseMove", [ coord.x, coord.y, delta.x, delta.y ]);
     }
 
     playerElement.onmousedown = function(e) {
-        sendInputMessage("mouseDown", [ e.button, coord.x, coord.y ]);
+        sendInputMessage("MouseDown", [ e.button, coord.x, coord.y ]);
     };
 
     playerElement.onmouseup = function(e) {
-        sendInputMessage("mouseUp", [ e.button, coord.x, coord.y ]);
+        sendInputMessage("MouseUp", [ e.button, coord.x, coord.y ]);
     };
 
     playerElement.onmousewheel = function(e) {
         let coord = normalizeAndQuantizeUnsigned(x, y);
-        sendInputMessage("mouseWheel", [ e.wheelDelta, coord.x, coord.y ]);
+        sendInputMessage("MouseWheel", [ e.wheelDelta, coord.x, coord.y ]);
     };
 
     playerElement.pressMouseButtons = function(e) {
@@ -1986,19 +1967,19 @@ function registerHoveringMouseEvents(playerElement) {
     playerElement.onmousemove = function(e) {
         let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
         let delta = normalizeAndQuantizeSigned(e.movementX, e.movementY);
-        sendInputMessage("mouseMove", [ coord.x, coord.y, delta.x, delta.y ]);
+        sendInputMessage("MouseMove", [ coord.x, coord.y, delta.x, delta.y ]);
         e.preventDefault();
     };
 
     playerElement.onmousedown = function(e) {
         let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
-        sendInputMessage("mouseDown", [ e.button, coord.x, coord.y ]);
+        sendInputMessage("MouseDown", [ e.button, coord.x, coord.y ]);
         e.preventDefault();
     };
 
     playerElement.onmouseup = function(e) {
         let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
-        sendInputMessage("mouseUp", [ e.button, coord.x, coord.y ]);
+        sendInputMessage("MouseUp", [ e.button, coord.x, coord.y ]);
         e.preventDefault();
     };
 
@@ -2007,24 +1988,22 @@ function registerHoveringMouseEvents(playerElement) {
     // get at least one mouse up corresponding to a mouse down event. Otherwise
     // the mouse can get stuck.
     // https://github.com/facebook/react/issues/5531
-
     playerElement.oncontextmenu = function(e) {
         let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
-        sendInputMessage("mouseUp", [ e.button, coord.x, coord.y ]);
-
+        sendInputMessage("MouseUp", [ e.button, coord.x, coord.y ]);
         e.preventDefault();
     };
 
     if ('onmousewheel' in playerElement) {
         playerElement.onmousewheel = function(e) {
             let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
-            sendInputMessage("mouseWheel", [ e.wheelDelta, coord.x, coord.y ]);
+            sendInputMessage("MouseWheel", [ e.wheelDelta, coord.x, coord.y ]);
             e.preventDefault();
         };
     } else {
         playerElement.addEventListener('DOMMouseScroll', function(e) {
             let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
-            sendInputMessage("mouseWheel", [ e.detail * -120, coord.x, coord.y ]);
+            sendInputMessage("MouseWheel", [ e.detail * -120, coord.x, coord.y ]);
             e.preventDefault();
         }, false);
     }
@@ -2068,7 +2047,7 @@ function registerTouchEvents(playerElement) {
                 console.log(`F${fingerIds[touch.identifier]}=(${x}, ${y})`);
             }
             let coord = normalizeAndQuantizeUnsigned(x, y);
-            sendInputMessage(type, [ coord.x, coord.y, fingerIds[touch.identifier], 255 * touch.force, coord.inRange ? 1 : 0 ]);
+            sendInputMessage(type, [ 1, coord.x, coord.y, fingerIds[touch.identifier], 255 * touch.force, coord.inRange ? 1 : 0 ]);
         }
     }
 
@@ -2089,7 +2068,7 @@ function registerTouchEvents(playerElement) {
                 // is not fired with a touch device.
                 playerElement.onmouseenter(e);
                 let coord = normalizeAndQuantizeUnsigned(finger.x, finger.y);
-                sendInputMessage("mouseDown", [ MouseButton.MainButton, coord.x, coord.y ]);
+                sendInputMessage("MouseDown", [ MouseButton.MainButton, coord.x, coord.y ]);
             }
             e.preventDefault();
         };
@@ -2101,7 +2080,7 @@ function registerTouchEvents(playerElement) {
                     let x = touch.clientX - playerElementClientRect.left;
                     let y = touch.clientY - playerElementClientRect.top;
                     let coord = normalizeAndQuantizeUnsigned(x, y);
-                    sendInputMessage("mouseUp", [ MouseButton.MainButton, coord.x, coord.y ]);
+                    sendInputMessage("MouseUp", [ MouseButton.MainButton, coord.x, coord.y ]);
                     // Hack: Manual mouse leave event.
                     playerElement.onmouseleave(e);
                     finger = undefined;
@@ -2119,7 +2098,7 @@ function registerTouchEvents(playerElement) {
                     let y = touch.clientY - playerElementClientRect.top;
                     let coord = normalizeAndQuantizeUnsigned(x, y);
                     let delta = normalizeAndQuantizeSigned(x - finger.x, y - finger.y);
-                    sendInputMessage("mouseMove", [ coord.x, coord.y, delta.x, delta.y ]);
+                    sendInputMessage("MouseMove", [ coord.x, coord.y, delta.x, delta.y ]);
                     finger.x = x;
                     finger.y = y;
                     break;
@@ -2137,7 +2116,7 @@ function registerTouchEvents(playerElement) {
             if (print_inputs) {
                 console.log('touch start');
             }
-            emitTouchData("touchStart", e.changedTouches);
+            emitTouchData("TouchStart", e.changedTouches);
             e.preventDefault();
         };
 
@@ -2145,7 +2124,7 @@ function registerTouchEvents(playerElement) {
             if (print_inputs) {
                 console.log('touch end');
             }
-            emitTouchData("touchEnd", e.changedTouches);
+            emitTouchData("TouchEnd", e.changedTouches);
 
             // Re-cycle unique identifiers previously assigned to each touch.
             for (let t = 0; t < e.changedTouches.length; t++) {
@@ -2158,7 +2137,7 @@ function registerTouchEvents(playerElement) {
             if (print_inputs) {
                 console.log('touch move');
             }
-            emitTouchData("touchMove", e.touches);
+            emitTouchData("TouchMove", e.touches);
             e.preventDefault();
         };
     }
@@ -2196,7 +2175,7 @@ function registerKeyboardEvents() {
         if (print_inputs) {
             console.log(`key down ${e.keyCode}, repeat = ${e.repeat}`);
         }
-        sendInputMessage("keyDown", [ getKeyCode(e), e.repeat ]);
+        sendInputMessage("KeyDown", [ getKeyCode(e), e.repeat ]);
         activeKeys.push(getKeyCode(e));
         // Backspace is not considered a keypress in JavaScript but we need it
         // to be so characters may be deleted in a UE text entry field.
@@ -2214,7 +2193,7 @@ function registerKeyboardEvents() {
         if (print_inputs) {
             console.log(`key up ${e.keyCode}`);
         }
-        sendInputMessage("keyUp", [ getKeyCode(e) ]);
+        sendInputMessage("KeyUp", [ getKeyCode(e) ]);
         if (inputOptions.suppressBrowserKeys && isKeyCodeBrowserKey(e.keyCode)) {
             e.preventDefault();
         }
@@ -2224,7 +2203,7 @@ function registerKeyboardEvents() {
         if (print_inputs) {
             console.log(`key press ${e.charCode}`);
         }
-        sendInputMessage("keyPress", [ e.charCode ]);
+        sendInputMessage("KeyPress", [ e.charCode ]);
     };
 }
 
@@ -2412,7 +2391,7 @@ function clearMouseEvents(playerElement) {
     } else {
         playerElement.removeEventListener('DOMMouseScroll', function(e) {
             let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
-            sendInputMessage("mouseWheel", [ e.detail * -120, coord.x, coord.y ]);
+            sendInputMessage("MouseWheel", [ e.detail * -120, coord.x, coord.y ]);
             e.preventDefault();
         }, false);
     }
