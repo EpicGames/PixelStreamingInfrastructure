@@ -137,7 +137,10 @@ export class DelegateBase implements IDelegate {
 		this.afkOverlay.onAction(() => this.iWebRtcController.onAfkClick());
 
 		// set up the play overlays action 
-		this.playOverlay.onAction(() => this.iWebRtcController.playStream());
+		this.playOverlay.onAction(() => {
+			this.onStreamLoading();
+			this.iWebRtcController.playStream();
+		});
 
 		// set up the connect overlays action
 		this.showConnectOrAutoConnectOverlays();
@@ -181,6 +184,13 @@ export class DelegateBase implements IDelegate {
 	 */
 	onWebRtcAnswer() {
 		this.showTextOverlay("RTC Answer");
+	}
+
+	/**
+	 * Shows a text overlay to alert the user the stream is currently loading
+	 */
+	onStreamLoading() {
+		this.showTextOverlay("Loading Stream");
 	}
 
 	/**

@@ -314,6 +314,27 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	}
 
 	/**
+	 * Shows a text overlay to alert the user the stream is currently loading
+	 */
+	onStreamLoading() {
+		// build the spinner span
+		var spinnerSpan: HTMLSpanElement = document.createElement('span');
+		spinnerSpan.className = "visually-hidden"
+		spinnerSpan.innerHTML = "Loading..."
+
+		// build the spinner div
+		var spinnerDiv: HTMLDivElement = document.createElement('div');
+		spinnerDiv.id = "loading-spinner"
+		spinnerDiv.className = "spinner-border ms-2"
+		spinnerDiv.setAttribute("role", "status");
+
+		// append the spinner to the element
+		spinnerDiv.appendChild(spinnerSpan);
+
+		this.showTextOverlay("Loading Stream " + spinnerDiv.outerHTML);
+	}
+
+	/**
 	* Set up functionality to happen when an instance state change occurs and updates the info overlay with the response
 	* @param instanceState - the message instance state 
 	*/

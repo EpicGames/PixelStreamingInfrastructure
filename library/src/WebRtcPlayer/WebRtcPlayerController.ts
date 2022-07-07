@@ -187,8 +187,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 				this.ueControlMessage.SendRequestInitialSettings();
 				this.ueControlMessage.SendRequestQualityControl();
 				this.freezeFrameController.showFreezeFrame();
-				this.delegate.hideCurrentOverlay();
 				this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
+				this.delegate.hideCurrentOverlay();
 				this.afkLogic.startAfkWarningTimer();
 			}).catch((onRejectedReason: string) => {
 				console.log(onRejectedReason);

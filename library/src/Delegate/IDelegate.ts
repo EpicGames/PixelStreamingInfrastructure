@@ -27,6 +27,11 @@ export interface IDelegate {
 	hideCurrentOverlay(): void;
 
 	/**
+	 * Shows a text overlay to alert the user the stream is currently loading
+	 */
+	onStreamLoading(): void;
+
+	/**
 	 * Show the webRtcAutoConnect Overlay and connect
 	 */
 	onWebRtcAutoConnect(): void;
