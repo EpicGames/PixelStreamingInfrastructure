@@ -14,5 +14,6 @@
 	"HttpPort": 80,
 	"HttpsPort": 443,
 	"StreamerPort": 8888,
-	"SFUPort": 8889
+	"SFUPort": 8889,
+	"MaxPlayerCount": -1
 }
