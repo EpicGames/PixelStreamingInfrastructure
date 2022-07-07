@@ -383,6 +383,7 @@ function setupHtmlEvents() {
     if (matchViewportResolutionCheckBox !== null) {
         matchViewportResolutionCheckBox.onchange = function (event) {
             matchViewportResolution = matchViewportResolutionCheckBox.checked;
+            updateVideoStreamSize();
         };
     }
 
