@@ -168,6 +168,7 @@ function emitControllerButtonPressed(controllerIndex, buttonIndex, isRepeat) {
     Data.setUint8(1, controllerIndex);
     Data.setUint8(2, buttonIndex);
     Data.setUint8(3, isRepeat);
+    sendInputData(Data.buffer);
 }
 
 function emitControllerButtonReleased(controllerIndex, buttonIndex) {
@@ -175,6 +176,7 @@ function emitControllerButtonReleased(controllerIndex, buttonIndex) {
     Data.setUint8(0, MessageType.GamepadButtonReleased);
     Data.setUint8(1, controllerIndex);
     Data.setUint8(2, buttonIndex);
+    sendInputData(Data.buffer);
 }
 
 function emitControllerAxisMove(controllerIndex, axisIndex, analogValue) {
