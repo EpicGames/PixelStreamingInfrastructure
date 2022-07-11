@@ -35,9 +35,9 @@ export class DataChannelController {
         this.dataChannel = this.peerConnection.createDataChannel(this.label, this.datachannelOptions);
         //We Want an Array Buffer not a blob
         this.dataChannel.binaryType = "arraybuffer";
-        this.dataChannel.onopen = this.handleOnOpen.bind(this);
-        this.dataChannel.onclose = this.handleOnClose.bind(this);
-        this.dataChannel.onmessage = this.handleOnMessage.bind(this);
+        this.dataChannel.onopen = () => this.handleOnOpen();
+        this.dataChannel.onclose = () => this.handleOnClose();
+        this.dataChannel.onmessage = (ev: MessageEvent<any>) => this.handleOnMessage(ev);
     }
 
     /**
@@ -159,7 +159,7 @@ export class DataChannelController {
     sendData(data: ArrayBuffer) {
         // reset the afk inactivity
         this.resetAfkWarningTimerOnDataSend();
-        
+
         if (this.dataChannel && this.dataChannel.readyState == "open") {
             this.dataChannel.send(data);
         } else {

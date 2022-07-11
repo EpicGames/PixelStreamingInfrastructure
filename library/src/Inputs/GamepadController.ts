@@ -17,11 +17,11 @@ export class GamePadController {
         this.logging = true;
 
         if ("GamepadEvent" in window) {
-            window.addEventListener("gamepadconnected", this.gamePadConnectHandler.bind(this));
-            window.addEventListener("gamepaddisconnected", this.gamePadDisconnectHandler.bind(this));
+            window.addEventListener("gamepadconnected", (ev: GamepadEvent) => this.gamePadConnectHandler(ev));
+            window.addEventListener("gamepaddisconnected", (ev: GamepadEvent) => this.gamePadDisconnectHandler(ev));
         } else if ("WebKitGamepadEvent" in window) {
-            window.addEventListener("webkitgamepadconnected", this.gamePadConnectHandler.bind(this));
-            window.addEventListener("webkitgamepaddisconnected", this.gamePadDisconnectHandler.bind(this));
+            window.addEventListener("webkitgamepadconnected", (ev: GamepadEvent) => this.gamePadConnectHandler(ev));
+            window.addEventListener("webkitgamepaddisconnected", (ev: GamepadEvent) => this.gamePadDisconnectHandler(ev));
         }
         this.controllers = [];
 
@@ -46,7 +46,7 @@ export class GamePadController {
         this.controllers[gamepad.index].prevState = gamepad;
         if (this.logging) { console.log("gamepad: " + gamepad.id + " connected"); }
 
-        window.requestAnimationFrame(this.updateStatus.bind(this));
+        window.requestAnimationFrame(() => this.updateStatus());
     }
 
     /**
@@ -85,7 +85,7 @@ export class GamePadController {
             try {
 
                 let currentState = controller.currentState;
-                
+
                 for (let i = 0; i < controller.currentState.buttons.length; i++) {
                     let currentButton = controller.currentState.buttons[i];
                     let previousButton = controller.prevState.buttons[i];
@@ -148,7 +148,7 @@ export class GamePadController {
                 console.error("Oh dear the gamepad poll loop has thrown an error");
             }
         }
-        window.requestAnimationFrame(this.updateStatus.bind(this));
+        window.requestAnimationFrame(() => this.updateStatus());
 
     }
 }

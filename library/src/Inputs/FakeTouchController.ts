@@ -17,9 +17,9 @@ export class FakeTouchController implements ITouchController {
     constructor(dataChannelController: DataChannelController, videoPlayerElement: HTMLVideoElement) {
         this.ueInputMouseMessage = new UeInputMouseMessage(dataChannelController);
         this.videoPlayerElement = videoPlayerElement;
-        document.ontouchstart = this.onTouchStart.bind(this);
-        document.ontouchend = this.onTouchEnd.bind(this);
-        document.ontouchmove = this.onTouchMove.bind(this);
+        document.ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
+        document.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
+        document.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
     }
 
     /**

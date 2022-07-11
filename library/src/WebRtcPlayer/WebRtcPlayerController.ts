@@ -253,11 +253,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.dataChannelController.createDataChannel(this.peerConnectionController.peerConnection, "cirrus", this.datachannelOptions);
 
 		// set up webRtc text overlays 
-		this.peerConnectionController.showTextOverlayConnecting = this.delegate.onWebRtcConnecting.bind(this.delegate);
-		this.peerConnectionController.showTextOverlaySetupFailure = this.delegate.onWebRtcFailed.bind(this.delegate);
+		this.peerConnectionController.showTextOverlayConnecting = () => this.delegate.onWebRtcConnecting();
+		this.peerConnectionController.showTextOverlaySetupFailure = () => this.delegate.onWebRtcFailed();
 
 		/* RTC Peer Connection on Track event -> handle on track */
-		this.peerConnectionController.onTrack = this.videoPlayerController.handleOnTrack.bind(this.videoPlayerController);
+		this.peerConnectionController.onTrack = (trackEvent: RTCTrackEvent) => this.videoPlayerController.handleOnTrack(trackEvent);
 
 		/* Start the Hand shake process by creating an Offer */
 		this.peerConnectionController.createOffer(this.sdpConstraints, this.micController.useMic);

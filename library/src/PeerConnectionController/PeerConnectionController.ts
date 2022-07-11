@@ -26,11 +26,11 @@ export class PeerConnectionController {
 
         // build a new peer connection with the options
         this.peerConnection = new RTCPeerConnection(options);
-        this.peerConnection.onsignalingstatechange = this.handleSignalStateChange.bind(this);
-        this.peerConnection.oniceconnectionstatechange = this.handleIceConnectionStateChange.bind(this);
-        this.peerConnection.onicegatheringstatechange = this.handleIceGatheringStateChange.bind(this);
-        this.peerConnection.ontrack = this.handleOnTrack.bind(this);
-        this.peerConnection.onicecandidate = this.handelIceCandidate.bind(this);
+        this.peerConnection.onsignalingstatechange = (ev: Event) => this.handleSignalStateChange(ev);
+        this.peerConnection.oniceconnectionstatechange = (ev: Event) => this.handleIceConnectionStateChange(ev);
+        this.peerConnection.onicegatheringstatechange = (ev: Event) => this.handleIceGatheringStateChange(ev);
+        this.peerConnection.ontrack = (ev: RTCTrackEvent) => this.handleOnTrack(ev);
+        this.peerConnection.onicecandidate = (ev: RTCPeerConnectionIceEvent) => this.handelIceCandidate(ev);
         this.aggregatedStats = new AggregatedStats();
     }
 

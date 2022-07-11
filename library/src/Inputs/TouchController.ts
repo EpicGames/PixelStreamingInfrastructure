@@ -19,9 +19,9 @@ export class TouchController implements ITouchController {
     constructor(dataChannelController: DataChannelController, playerElement: HTMLDivElement, videoElementProvider: IVideoPlayer) {
         this.ueInputTouchMessage = new UeInputTouchMessage(dataChannelController, videoElementProvider);
         this.playerElement = playerElement;
-        document.ontouchstart = this.onTouchStart.bind(this);
-        document.ontouchend = this.onTouchEnd.bind(this);
-        document.ontouchmove = this.onTouchMove.bind(this);
+        document.ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
+        document.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
+        document.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
         console.log("Touch Events Registered");
         this.logging = false;
     }

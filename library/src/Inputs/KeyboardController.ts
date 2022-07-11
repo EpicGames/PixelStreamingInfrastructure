@@ -26,11 +26,11 @@ export class KeyboardController {
      * Registers document keyboard events with the controller
      */
     registerKeyBoardEvents() {
-        document.onkeydown = this.handleOnKeyDown.bind(this);
-        document.onkeyup = this.handleOnKeyUp.bind(this);
+        document.onkeydown = (ev: KeyboardEvent) => this.handleOnKeyDown(ev);
+        document.onkeyup = (ev: KeyboardEvent) => this.handleOnKeyUp(ev);
 
         //This has been deprecated as at Jun 13 2021
-        document.onkeypress = this.handleOnKeyPress.bind(this);
+        document.onkeypress = (ev: KeyboardEvent) => this.handleOnKeyPress(ev);
     }
 
     /**
