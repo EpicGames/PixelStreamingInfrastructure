@@ -10,6 +10,10 @@ export interface IActionOverlay extends IOverlay {
     // the event emitter object 
     eventEmitter: EventEmitter;
 
+    /**
+     * Update the text content of an action overlay
+     * @param updateText the text to be inserted
+     */
     update(updateText: string): void;
 
     /**

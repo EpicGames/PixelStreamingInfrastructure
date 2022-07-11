@@ -34,6 +34,9 @@ export class DelegateBase implements IDelegate {
 		this.config = config;
 	}
 
+	/**
+	 * Shows the disconnect overlay 
+	 */
 	showDisconnectOverlay(updateText: string) {
 		this.hideCurrentOverlay();
 		this.updateDisconnectOverlay(updateText);
@@ -41,10 +44,17 @@ export class DelegateBase implements IDelegate {
 		this.currentOverlay = this.disconnectOverlay;
 	}
 
+	/**
+	 * Update the disconnect overlays span text 
+	 * @param updateText the new countdown number 
+	 */
 	updateDisconnectOverlay(updateText: string) {
 		this.disconnectOverlay.update(updateText);
 	}
 
+	/**
+	 * Activates the disconnect overlays action 
+	 */
 	onDisconnectionAction() {
 		this.disconnectOverlay.activate();
 	}
@@ -217,7 +227,7 @@ export class DelegateBase implements IDelegate {
 	/**
 	 * Event fired when the video is disconnected
 	 */
-	 onDisconnect(eventString: string) {
+	onDisconnect(eventString: string) {
 		this.showDisconnectOverlay(`Disconnected: ${eventString}`);
 	}
 

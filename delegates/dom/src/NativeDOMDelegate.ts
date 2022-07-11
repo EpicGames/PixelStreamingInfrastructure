@@ -231,17 +231,20 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			disconnectOverlayEvent(event);
 		});
 
-		// build the inner html 
+		// build the inner html container 
 		let disconnectOverlayHtmlInnerContainer = document.createElement('div');
 		disconnectOverlayHtmlInnerContainer.id = 'disconnectButton';
 
+		// build the span that holds error text
 		let disconnectOverlayInnerSpan = document.createElement('span');
 		disconnectOverlayInnerSpan.id = 'disconnectText';
 		disconnectOverlayInnerSpan.innerHTML = 'Click To Restart';
 
+		// build the image element that holds the reconnect element
 		let disconnectOverlayInnerImage = document.createElement('img');
 		disconnectOverlayInnerImage.src = Images.restartButton;
 
+		// append the spand and images to the content container 
 		disconnectOverlayHtmlInnerContainer.appendChild(disconnectOverlayInnerSpan);
 		disconnectOverlayHtmlInnerContainer.appendChild(disconnectOverlayInnerImage);
 

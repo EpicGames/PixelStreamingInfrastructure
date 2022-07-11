@@ -22,10 +22,20 @@ export interface IDelegate {
 	infoOverlay: ITextOverlay;
 	errorOverlay: ITextOverlay;
 
+	/**
+	 * Shows the disconnect overlay 
+	 */
 	showDisconnectOverlay(updateText: string): void;
 
+	/**
+	 * Update the disconnect overlays span text 
+	 * @param updateText the new countdown number 
+	 */
 	updateDisconnectOverlay(updateText: string): void;
 
+	/**
+	 * Activates the disconnect overlays action 
+	 */
 	onDisconnectionAction(): void;
 
 	/**
