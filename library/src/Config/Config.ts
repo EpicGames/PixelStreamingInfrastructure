@@ -4,7 +4,10 @@ export class Config {
 	// TODO: expose config through delegate so we don't need static
 	static _enableVerboseLogging = false;
 
-	// enable the autoplay of the video
+	// enable the auto connect of the websocket 
+	enableSpsAutoConnect = true;
+
+	// enable the autoplay of the video if enabled by browser
 	enableSpsAutoplay = false;
 
 	// start the video muted

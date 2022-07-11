@@ -178,11 +178,11 @@ export class DelegateBase implements IDelegate {
 	}
 
 	/**
-	 * Show the Connect Overlay or autoplay 
+	 * Show the Connect Overlay or auto connect 
 	 */
 	showConnectOrAutoConnectOverlays() {
 		// set up if the auto play will be used or regular click to start
-		if (!this.config.enableSpsAutoplay) {
+		if (!this.config.enableSpsAutoConnect) {
 			this.showConnectOverlay();
 		} else {
 			// if autoplaying show an info overlay while while waiting for the connection to begin 
