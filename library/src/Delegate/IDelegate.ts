@@ -17,9 +17,16 @@ export interface IDelegate {
 	currentOverlay: IOverlay;
 	connectOverlay: IActionOverlay;
 	playOverlay: IActionOverlay;
+	disconnectOverlay: IActionOverlay;
 	afkOverlay: IAfkOverlay;
 	infoOverlay: ITextOverlay;
 	errorOverlay: ITextOverlay;
+
+	showDisconnectOverlay(updateText: string): void;
+
+	updateDisconnectOverlay(updateText: string): void;
+
+	onDisconnectionAction(): void;
 
 	/**
 	 * Hides the current overlay 
@@ -151,7 +158,7 @@ export interface IDelegate {
 	/**
 	 * Event fired when the video is disconnected
 	 */
-	onDisconnect(event: CloseEvent): void;
+	onDisconnect(eventString: string): void;
 
 	/**
 	 * Handles when Web Rtc is connecting 

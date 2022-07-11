@@ -165,7 +165,7 @@ canvas{
 	font-weight: normal;
 }
 
-#connectOverlay, #playOverlay, #infoOverlay, #errorOverlay, #afkOverlay{
+#connectOverlay, #playOverlay, #infoOverlay, #errorOverlay, #afkOverlay, #disconnecyOverlay{
 	z-index: 30;
 	position: absolute;
 	color: var(--colour4);

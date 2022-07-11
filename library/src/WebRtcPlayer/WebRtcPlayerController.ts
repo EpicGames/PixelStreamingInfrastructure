@@ -21,6 +21,7 @@ import { Logger } from "../Logger/Logger";
 import { InputController } from "../Inputs/InputController";
 import { MicController } from "../MicPlayer/MicController";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
+import * as MessageReceive from "../WebSockets/MessageReceive";
 /**
  * Entry point for the Web RTC Player
  */
@@ -78,22 +79,22 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.videoPlayerController = new VideoPlayerController(this.videoPlayer);
 
 		this.uiController = new UiController(this.videoPlayer);
-		this.uiController.setUpMouseAndFreezeFrame = this.setUpMouseAndFreezeFrame.bind(this);
+		this.uiController.setUpMouseAndFreezeFrame = (element: HTMLDivElement) => this.setUpMouseAndFreezeFrame(element);
 
 		this.dataChannelController = new DataChannelController();
-		this.dataChannelController.handleOnOpen = this.handleDataChannelConnected.bind(this);
-		this.dataChannelController.onLatencyTestResult = this.handleLatencyTestResult.bind(this);
-		this.dataChannelController.onVideoEncoderAvgQP = this.handleVideoEncoderAvgQP.bind(this);
-		this.dataChannelController.OnInitialSettings = this.handleInitialSettings.bind(this);
-		this.dataChannelController.onQualityControlOwnership = this.handleQualityControlOwnership.bind(this);
+		this.dataChannelController.handleOnOpen = () => this.handleDataChannelConnected();
+		this.dataChannelController.onLatencyTestResult = (latencyTestResults: LatencyTestResults) => this.handleLatencyTestResult(latencyTestResults);
+		this.dataChannelController.onVideoEncoderAvgQP = (AvgQP: number) => this.handleVideoEncoderAvgQP(AvgQP);
+		this.dataChannelController.OnInitialSettings = (InitialSettings: InitialSettings) => this.handleInitialSettings(InitialSettings);
+		this.dataChannelController.onQualityControlOwnership = (hasQualityOwnership: boolean) => this.handleQualityControlOwnership(hasQualityOwnership);
 		this.dataChannelController.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
 
 		// set up websocket methods
 		this.webSocketController = new WebSocketController(this.config.signallingServerAddress);
-		this.webSocketController.onConfig = this.handleOnConfigMessage.bind(this);
-		this.webSocketController.onInstanceStateChange = this.handleInstanceStateChange.bind(this);
-		this.webSocketController.onAuthenticationResponse = this.handleAuthenticationResponse.bind(this);
-		this.webSocketController.onWebSocketOncloseOverlayMessage = this.delegate.onDisconnect.bind(this.delegate);
+		this.webSocketController.onConfig = (messageConfig: MessageReceive.MessageConfig) => this.handleOnConfigMessage(messageConfig);
+		this.webSocketController.onInstanceStateChange = (instanceState: MessageReceive.MessageInstanceState) => this.handleInstanceStateChange(instanceState);
+		this.webSocketController.onAuthenticationResponse = (authResponse: MessageReceive.MessageAuthResponse) => this.handleAuthenticationResponse(authResponse);
+		this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => this.delegate.onDisconnect(`${event.code} - ${event.reason}`);
 
 		// set up the final webRtc player controller methods from within our delegate so a connection can be activated
 		this.delegate.setIWebRtcPlayerController(this);
@@ -240,13 +241,13 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.micController = new MicController(this.urlParams)
 
 		// set up peer connection controller video stats
-		this.peerConnectionController.onVideoStats = this.handleVideoStats.bind(this);
+		this.peerConnectionController.onVideoStats = (event: AggregatedStats) => this.handleVideoStats(event);
 
 		/* When the Peer Connection Wants to send an offer have it handled */
-		this.peerConnectionController.onSendWebRTCOffer = this.handleSendWebRTCOffer.bind(this);
+		this.peerConnectionController.onSendWebRTCOffer = (offer: RTCSessionDescriptionInit) => this.handleSendWebRTCOffer(offer);
 
 		/* When the Peer connection ice candidate is added have it handled */
-		this.peerConnectionController.onPeerIceCandidate = this.handleSendIceCandidate.bind(this);
+		this.peerConnectionController.onPeerIceCandidate = (peerConnectionIceEvent: RTCPeerConnectionIceEvent) => this.handleSendIceCandidate(peerConnectionIceEvent);
 
 		// handel mic connections with promise
 		this.dataChannelController.createDataChannel(this.peerConnectionController.peerConnection, "cirrus", this.datachannelOptions);
@@ -272,10 +273,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.startSession(messageConfig.peerConnectionOptions);
 
 		/* When the signaling server sends a WebRTC Answer over the websocket connection have the WebRtcController handle the message */
-		this.webSocketController.onWebRtcAnswer = this.handleWebRtcAnswer.bind(this);
+		this.webSocketController.onWebRtcAnswer = (messageAnswer: MessageReceive.MessageAnswer) => this.handleWebRtcAnswer(messageAnswer);
 
 		/* When the signaling server sends a IceCandidate over the websocket connection have the WebRtcController handle the message  */
-		this.webSocketController.onIceCandidate = this.handleIceCandidate.bind(this);
+		this.webSocketController.onIceCandidate = (iceCandidate: RTCIceCandidateInit) => this.handleIceCandidate(iceCandidate);
 	}
 
 	/**
@@ -371,7 +372,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.delegate.onVideoInitialised();
 
-		this.uiController.updateVideoStreamSize = this.updateVideoStreamSize.bind(this);
+		this.uiController.updateVideoStreamSize = () => this.updateVideoStreamSize();
 	}
 
 	/**

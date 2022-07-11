@@ -19,6 +19,7 @@ export class DelegateBase implements IDelegate {
 
 	// set the overlay placeholders 
 	currentOverlay: IOverlay;
+	disconnectOverlay: IActionOverlay;
 	connectOverlay: IActionOverlay;
 	playOverlay: IActionOverlay;
 	afkOverlay: IAfkOverlay;
@@ -31,6 +32,21 @@ export class DelegateBase implements IDelegate {
 	 */
 	constructor(config: Config) {
 		this.config = config;
+	}
+
+	showDisconnectOverlay(updateText: string) {
+		this.hideCurrentOverlay();
+		this.updateDisconnectOverlay(updateText);
+		this.disconnectOverlay.show();
+		this.currentOverlay = this.disconnectOverlay;
+	}
+
+	updateDisconnectOverlay(updateText: string) {
+		this.disconnectOverlay.update(updateText);
+	}
+
+	onDisconnectionAction() {
+		this.disconnectOverlay.activate();
 	}
 
 	/**
@@ -111,7 +127,7 @@ export class DelegateBase implements IDelegate {
 	 * @param countDown the new countdown number 
 	 */
 	updateAfkOverlay(countDown: number) {
-		this.afkOverlay.update(countDown);
+		this.afkOverlay.updateCountdown(countDown);
 	}
 
 	/**
@@ -129,6 +145,11 @@ export class DelegateBase implements IDelegate {
 		this.iWebRtcController = iWebRtcPlayerController;
 
 		this.iWebRtcController.resizePlayerStyle();
+
+		this.disconnectOverlay.onAction(() => {
+			this.onWebRtcAutoConnect();
+			this.iWebRtcController.connectToSignallingSever();
+		});
 
 		// Build the webRtc connect overlay Event Listener and show the connect overlay
 		this.connectOverlay.onAction(() => this.iWebRtcController.connectToSignallingSever());
@@ -196,8 +217,8 @@ export class DelegateBase implements IDelegate {
 	/**
 	 * Event fired when the video is disconnected
 	 */
-	onDisconnect(event: CloseEvent) {
-		this.showErrorOverlay(`Disconnected: ${event.code} -  ${event.reason}`);
+	 onDisconnect(eventString: string) {
+		this.showDisconnectOverlay(`Disconnected: ${eventString}`);
 	}
 
 	/**
