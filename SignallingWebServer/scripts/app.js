@@ -180,6 +180,11 @@ function emitControllerButtonReleased(controllerIndex, buttonIndex) {
 }
 
 function emitControllerAxisMove(controllerIndex, axisIndex, analogValue) {
+    // add a deadzone to the analog axes
+    if(analogValue > -0.1 && analogValue < 0.1)
+    {
+        return;
+    }
     Data = new DataView(new ArrayBuffer(11));
     Data.setUint8(0, MessageType.GamepadAnalog);
     Data.setUint8(1, controllerIndex);
