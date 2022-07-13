@@ -19,7 +19,7 @@ export class VideoPlayer implements IVideoPlayer {
         return this.videoElement;
     }
 
-    getVideoRootElement(): HTMLElement{
+    getVideoParentElement(): HTMLElement{
         return this.videoElement.parentElement;
     }
 

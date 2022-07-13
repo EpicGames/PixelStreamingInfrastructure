@@ -24,205 +24,33 @@
 </head>
 
 <body>
-    <div id="playerUI">
+    <div id="playerUI" class="noselect">
         <div id="player"></div>
-        <div id="streamTools" class="streamTools">
-            <div id="streamToolsHeader">
-                <div id="qualityStatus" class="greyStatus">&#9679</div>
-                <div id="streamToolsButton">+</div>
+        <div id="uiFeatures">
+
+            <div id="connection" class="uiContainer">
+                <svg version="1.1" id="connectionStrength" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 494.45 494.45"
+                    style="enable-background:new 0 0 494.45 494.45;" xml:space="preserve">
+                    <circle id="dot" cx="247.125" cy="398.925" r="35.3" />
+
+                    <path id="middle"
+                        d="M395.225,277.325c-6.8,0-13.5-2.6-18.7-7.8c-71.4-71.3-187.4-71.3-258.8,0c-10.3,10.3-27.1,10.3-37.4,0
+                        s-10.3-27.1,0-37.4c92-92,241.6-92,333.6,0c10.3,10.3,10.3,27.1,0,37.4C408.725,274.725,401.925,277.325,395.225,277.325z" />
+
+                    <path id="outer" d="M467.925,204.625c-6.8,0-13.5-2.6-18.7-7.8c-111.5-111.4-292.7-111.4-404.1,0c-10.3,10.3-27.1,10.3-37.4,0
+                        s-10.3-27.1,0-37.4c64-64,149-99.2,239.5-99.2s175.5,35.2,239.5,99.2c10.3,10.3,10.3,27.1,0,37.4
+                        C481.425,202.025,474.625,204.625,467.925,204.625z" />
+
+                    <path id="inner" d="M323.625,348.825c-6.8,0-13.5-2.6-18.7-7.8c-15.4-15.4-36-23.9-57.8-23.9s-42.4,8.5-57.8,23.9
+                        c-10.3,10.3-27.1,10.3-37.4,0c-10.3-10.3-10.3-27.1,0-37.4c25.4-25.4,59.2-39.4,95.2-39.4s69.8,14,95.2,39.5
+                        c10.3,10.3,10.3,27.1,0,37.4C337.225,346.225,330.425,348.825,323.625,348.825z" />
+
+                </svg>
+                <span class="tooltiptext" id="qualityText">Not connected</span>
             </div>
-            <div id="streamToolsSettings" class="container d-none">
 
-                <!--Controls Box-->
-                <div id="Controls" class="row">
-
-                    <section id="preStreamOptions" class="settingsContainer">
-
-                        <div id="preStreamOptionsHeader" class="settings-text">
-                            <div>Pre Stream Options</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <label class="form-check-label" for="force-turn-tgl">Force TURN</label>
-                            </div>
-                            <div class="form-check form-switch col-auto">
-                                <input class="form-check-input" type="checkbox" role="switch" id="force-turn-tgl">
-                            </div>
-                        </div>
-
-                        <div class="row" style="padding-top:5px; padding-bottom: 5px;">
-                            <div class="col col-auto">
-                                <input id="restart-stream-button" class="streamTools-button btn-flat" type="button"
-                                    value="Restart Stream">
-                            </div>
-                        </div>
-                    </section>
-
-                    <section id="viewSettings" class="settingsContainer">
-                        <div id="viewSettingsHeader" class="settings-text">
-                            <div>Viewing</div>
-                        </div>
-                        <div id="viewSettingsContainer" class="d-none">
-
-                            <div class="row">
-                                <div class="col-sm">
-                                    <label class="form-check-label" for="enlarge-display-to-fill-window-tgl">Enlarge
-                                        display to fill window</label>
-                                </div>
-                                <div class="form-check form-switch col-auto">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                        id="enlarge-display-to-fill-window-tgl" checked>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm">
-                                    <label class="form-check-label" for="quality-control-ownership-tgl">Is Quality
-                                        Controller</label>
-                                </div>
-                                <div class="form-check form-switch col-auto">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                        id="quality-control-ownership-tgl">
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm">
-                                    <label class="form-check-label" for="match-viewport-res-tgl">Match viewport
-                                        resolution</label>
-                                </div>
-                                <div class="form-check form-switch col-auto">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                        id="match-viewport-res-tgl">
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm">
-                                    <label class="form-check-label" for="control-scheme-tgl"
-                                        id="control-scheme-title">Match viewport resolution</label>
-                                </div>
-                                <div class="form-check form-switch col-auto">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                        id="control-scheme-tgl">
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section id="commands" class="settingsContainer">
-                        <div id="commandsHeader" class="settings-text">
-                            <div>Commands</div>
-                        </div>
-                        <div id="commandsContainer" class="d-none">
-                            <div class="row" style="padding-top:5px; padding-bottom: 5px;">
-                                <div class="row" style="padding-top:5px; padding-bottom: 5px;">
-                                    <div class="col col-auto">
-                                        <input id="show-fps-button" class="streamTools-button btn-flat" type="button"
-                                            value="Show FPS">
-                                    </div>
-                                </div>
-                                <div class="col col-auto">
-                                    <label for="ui-descriptor-text" class="settings-text">UI Descriptor</label>
-                                </div>
-                                <div class="col col-auto">
-                                    <input type="text" class="form-control form-control-sm" id="ui-descriptor-text">
-                                </div>
-
-                                <div class="col col-auto">
-                                    <input type="button" id="sendUiDescriptor" class="streamTools-button btn-flat"
-                                        value="Send">
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section id="streamingSettings" class="settingsContainer">
-                        <div id="streamingSettingsHeader" class="settings-text">
-                            <div>Settings</div>
-                        </div>
-                        <div id="streamingSettingsContainer" class="d-none">
-                            <div class="form-group row">
-                                <div class="col-sm">
-                                    <div>Encoder Settings</div>
-                                    <div id="encoderSettings" class="col">
-                                        <div class="form-group row">
-                                            <label for="encoder-min-qp-text">Min QP</label>
-                                            <input type="number" class="form-control form-control-sm"
-                                                id="encoder-min-qp-text" value="0" min="0" max="51" />
-                                        </div>
-
-                                        <div class="form-group row">
-                                            <label for="encoder-max-qp-text">Max QP</label>
-                                            <input type="number" class="form-control form-control-sm"
-                                                id="encoder-max-qp-text" value="51" min="0" max="51" />
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                                <div class="col-sm">
-                                    <div>WebRTC Settings</div>
-                                    <div id="webrtcSettings">
-                                        <div class="form-group row">
-                                            <label for="webrtc-fps-text">FPS</label>
-                                            <input type="number" class="form-control form-control-sm"
-                                                id="webrtc-fps-text" value="0" min="1" max="999" />
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="webrtc-min-bitrate-text">Min bitrate (kbps)</label>
-                                            <input type="number" class="form-control form-control-sm"
-                                                id="webrtc-min-bitrate-text" value="0" min="0" max="100000" />
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="webrtc-max-bitrate-text">Max bitrate (kbps)</label>
-                                            <input type="number" class="form-control form-control-sm"
-                                                id="webrtc-max-bitrate-text" value="0" min="0" max="100000" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <input id="btn-streaming-settings" class="streamTools-button btn-flat" type="button"
-                                    value="Apply">
-                            </div>
-                        </div>
-                    </section>
-
-                    <section id="statistics" class="settingsContainer">
-                        <div id="statisticsHeader" class="settings-text">
-                            <div>Statistics</div>
-                        </div>
-                        <div id="statisticsContainer" class="d-none">
-
-                            <div class="row">
-                                <div class="col-sm">
-                                    <label class="form-check-label" for="send-stats-tgl" id="control-scheme-title">Send
-                                        to server</label>
-                                </div>
-                                <div class="form-check form-switch col-auto">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="send-stats-tgl">
-                                </div>
-                            </div>
-                            <div id="statisticsResult" class="StatsResult"></div>
-                        </div>
-                    </section>
-
-                    <section id="latencyTest" class="settingsContainer">
-                        <div id="latencyTestHeader" class="settings-text">
-                            <div>Latency Test</div>
-                            <input id="btn-start-latency-test" class="streamTools-button btn-flat" type="button"
-                                value="Run Test">
-                        </div>
-                        <div id="latencyTestContainer" class="d-none">
-                            <div id="latencyStatsResults" class="StatsResult"></div>
-                        </div>
-                    </section>
-                </div>
-            </div>
         </div>
-    </div>
     </div>
     <div
         style="position: fixed; bottom: 0; right: 0; padding-right: 10px; padding-bottom: 10px; font-size: 12px; color: #ffffff; z-index: 9999;">

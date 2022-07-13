@@ -97,7 +97,7 @@ export class UeInputTouchMessage extends UeDataMessage {
      * @returns - Normalised and Quantised Unsigned values
      */
     normaliseAndQuantiseUnsigned(x: number, y: number): NormaliseAndQuantiseUnsigned {
-        let rootDiv = this.videoElementProvider.getVideoRootElement();
+        let rootDiv = this.videoElementProvider.getVideoParentElement();
         let videoElement = this.videoElementProvider.getVideoElement();
 
         if (rootDiv && videoElement) {

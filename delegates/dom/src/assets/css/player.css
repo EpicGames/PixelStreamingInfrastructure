@@ -1,149 +1,115 @@
 :root {
 	/*Using colour scheme https://color.adobe.com/TD-Colors---Option-3-color-theme-10394433/*/
-	--colour1:#2B3A42;
-	--colour2:#242424;
-	--colour3:#BDD4DE;
-	--colour4:#b0b0b0;
-	--colour5:#0262c3;
-	--colour6:#0f0f0f;
-	--colour7:#2f2f2f;
-	--colour8:#151515;
-	
-	--buttonFont:Arial;
-	--inputFont:Arial;
+	--colour1: #2B3A42;
+	--colour2: #242424;
+	--colour3: #BDD4DE;
+	--colour4: #b0b0b0;
+	--colour5: #0262c3;
+	--colour6: #0f0f0f;
+	--colour7: #2f2f2f;
+	--colour8: #151515;
+	--colour9: #808080;
+
+	--buttonFont: Arial;
+	--inputFont: Arial;
 }
 
-body{
-    margin: 0px;
+.noselect {
+	-webkit-touch-callout: none; /* iOS Safari */
+	  -webkit-user-select: none; /* Safari */
+	   -khtml-user-select: none; /* Konqueror HTML */
+		 -moz-user-select: none; /* Old versions of Firefox */
+		  -ms-user-select: none; /* Internet Explorer/Edge */
+			  user-select: none; /* Non-prefixed version, currently
+									supported by Chrome, Edge, Opera and Firefox */
+}
+
+body {
+	margin: 0px;
     background-color: black;
+	font-family: 'Montserrat', sans-serif;
 }
 
 #playerUI {
 	width: 100%;
 	height: 100%;
+}
+
+canvas {
+	image-rendering: crisp-edges;
 	position: absolute;
-	bottom: 0;
-	/*top: 0;
-	left: 0;*/
-	z-index: 10;
 }
 
-
-.StatsResult {
-	background-color: rgba(0,0,0,0.8);
-	text-align: left;
-	font-size: 14px;
-	font-weight: bold;
-	padding: 6px;
-	color: lime;
-}
-
-canvas{
-    image-rendering: crisp-edges;
-    position: absolute;
-}
-
-#player{
+#player {
 	width: 100%;
 	height: 100%;
-	bottom: 0;
-	position: relative;
-	background-color: #000;
+	position: absolute;
+	background-color: black;
 }
 
-#streamTools{
-	-moz-border-radius-bottomright: 5px;
-	-moz-border-radius-bottomleft: 5px;
-	-webkit-border-bottom-right-radius: 5px;
-	-webkit-border-bottom-left-radius: 5px;
-	border-bottom-right-radius: 5px; /* future proofing */
-	border-bottom-left-radius: 5px; /* future proofing */
-	-khtml-border-bottom-right-radius: 5px; /* for old Konqueror browsers */
-	-khtml-border-bottom-left-radius: 5px; /* for old Konqueror browsers */
-	
-	-webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome and Opera */
-	
+/* UI STUFF */
+#uiFeatures {
+	width: 100%;
+	height: 100%;
+	z-index: 20;
+	position: absolute;
+	color: var(--colour2);
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.uiContainer .tooltiptext {
+	visibility: hidden;
+	width: auto;
+	color: var(--colour2);
+	text-align: center;
+	border-radius: 15px;
+	padding: 0px 10px;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 0.75rem;
+	letter-spacing: 0.75px;
+	/* Position the tooltip */
 	position: absolute;
 	top: 0;
-	right: 2%;
-	z-index: 100;
-	border: 4px solid var(--colour8);
-	border-top-width: 0px;
+	transform: translateY(25%);
+  	left: 125%;
+	z-index: 20;
 }
 
-#streamToolsHeader {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	border-bottom: 1px solid var(--colour8);
+.uiContainer:hover .tooltiptext {
+	visibility: visible;
 	background-color: var(--colour7);
 }
 
-.streamTools {
-	background-color: var(--colour2);
-	font-family: var(--buttonFont);
-	font-weight: lighter;
-	color: var(--colour4);
+#connection .tooltiptext {
+	top: 125%;
+	transform: translateX(-25%);
+  	left: 0;
+	z-index: 20;
+	padding: 5px 10px;
 }
 
-.streamTools-shown > #streamToolsSettings {
+#connection {
+	position: absolute;
+	bottom: 8%;
+	left: 5%;
+	font-family: 'Michroma', sans-serif;
+	height: 3rem;
+	width: 3rem;
+	pointer-events: all;
+}
+
+#settings-panel .tooltiptext {
 	display: block;
+    top: 125%;
+    transform: translateX(-50%);
+    left: 0;
+    z-index: 20;
+    padding: 5px 10px;
+    border: 3px solid var(--colour5);
+	width: max-content;
 }
-
-.streamTools-shown > div > #streamToolsButton {
-	transform: rotate(-135deg);
-	-webkit-transform: rotate(-135deg); /* Safari */
-	-moz-transform: rotate(-135deg); /* Firefox */
-	-ms-transform: rotate(-135deg); /* IE */
-	-o-transform: rotate(-135deg); /* Opera */
-}
-
-#streamToolsButton:hover{
-	cursor: pointer;
-}
-
-#streamToolsButton{
-	transition-duration: 250ms;
-	text-align: right;
-	font-size: 40px;
-}
-
-#streamToolstoggle{
-	width:100%;
-}
-
-#qualityStatus{
-	font-size: 37px;
-	padding-right: 4px;
-}
-
-#streamToolsSettings{
-	font-size: 1em;
-	width: 400px;
-	/*display: none;*/
-}
-
-.greyStatus {
-	color: grey;
-}
-
-.limeStatus {
-	color: lime;
-}
-
-.orangeStatus {
-	color: orange;
-}
-
-.redStatus {
-	color: red;
-}
+/* UI STUFF */
 
 .setting {
 	display: flex;
@@ -153,19 +119,17 @@ canvas{
 }
 
 .settings-text {
-/*
-	color: var(--colour4);
-	vertical-align: middle;
-	font-size: 18px;
-	font-weight: normal;
-	display: inline-block;
-*/
 	color: var(--colour4);
 	vertical-align: middle;
 	font-weight: normal;
 }
 
-#connectOverlay, #playOverlay, #infoOverlay, #errorOverlay, #afkOverlay, #disconnecyOverlay{
+#connectOverlay,
+#playOverlay,
+#infoOverlay,
+#errorOverlay,
+#afkOverlay,
+#disconnectOverlay {
 	z-index: 30;
 	position: absolute;
 	color: var(--colour4);
@@ -176,10 +140,11 @@ canvas{
 	background-color: #808080;
 	align-items: center;
 	justify-content: center;
+
 }
 
 /* State for element to be clickable */
-.clickableState{
+.clickableState {
 	align-items: center;
 	justify-content: center;
 	display: flex;
@@ -187,61 +152,64 @@ canvas{
 }
 
 /* State for element to show text, this is for informational use*/
-.textDisplayState{
+.textDisplayState {
 	display: flex;
 }
 
 /* State to hide overlay, WebRTC communication is in progress and or is playing */
-.hiddenState{
+.hiddenState {
 	display: none;
 }
 
-#playButton, #connectButton{
+#playButton,
+#connectButton {
 	display: inline-block;
 	height: auto;
+	z-index: 30;
 }
 
-img#playButton{
+img#playButton {
 	max-width: 241px;
 	width: 10%;
 }
 
-#uiInteraction{
+#uiInteraction {
 	position: fixed;
 }
 
-#UIInteractionButtonBoundary{
+#UIInteractionButtonBoundary {
 	padding: 2px;
 }
 
-#UIInteractionButton{
+#UIInteractionButton {
 	cursor: pointer;
 }
 
-#hiddenInput{
+#hiddenInput {
 	position: absolute;
-	left: -10%;   /* Although invisible, push off-screen to prevent user interaction. */
+	left: -10%;
+	/* Although invisible, push off-screen to prevent user interaction. */
 	width: 0px;
 	opacity: 0;
 }
 
-#editTextButton{
+#editTextButton {
 	position: absolute;
 	height: 40px;
 	width: 40px;
 }
 
-.overlay-button{
+.overlay-button {
 	line-height: 1.1;
 	padding: 1px 6px;
 }
 
-.btn-overlay{
+.btn-overlay {
 	vertical-align: middle;
 	display: inline-block;
 }
 
-.btn-flat{
+.btn-flat {
 	background: var(--colour7);
 	border: 2px solid var(--colour8);
 	color: var(--colour4);
@@ -250,25 +218,26 @@ img#playButton{
 	font-family: var(--buttonFont);
 	font-size: 10px;
 	border-radius: 5px;
-	padding:8px;
+	padding: 8px;
 	text-align: center;
 }
 
-.btn-flat:disabled{
+.btn-flat:disabled {
 	background: var(--colour4);
 	border-color: var(--colour3);
 	color: var(--colour3);
 	cursor: default;
 }
 
-.btn-flat:active{
+.btn-flat:active {
 	border-color: var(--colour2);
 	color: var(--colour2);
 }
 
-.btn-flat:focus{
+.btn-flat:focus {
 	outline: none;
 }
+
 /*** Toggle Switch styles ***/
 .tgl-switch {
 	vertical-align: middle;
@@ -276,25 +245,43 @@ img#playButton{
 }
 
 .tgl-switch .tgl {
-	display:none;
+	display: none;
 }
 
-.tgl, .tgl:after, .tgl:before, .tgl *, .tgl *:after, .tgl *:before, .tgl + .tgl-slider {
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-}
-.tgl::-moz-selection, .tgl:after::-moz-selection, .tgl:before::-moz-selection, .tgl *::-moz-selection, .tgl *:after::-moz-selection, .tgl *:before::-moz-selection, .tgl + .tgl-slider::-moz-selection {
-  background: none;
-}
-.tgl::selection, .tgl:after::selection, .tgl:before::selection, .tgl *::selection, .tgl *:after::selection, .tgl *:before::selection, .tgl + .tgl-slider::selection {
-  background: none;
-}
-
-.tgl-slider {
-	
+.tgl,
+.tgl:after,
+.tgl:before,
+.tgl *,
+.tgl *:after,
+.tgl *:before,
+.tgl+.tgl-slider {
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 }
 
-.tgl + .tgl-slider {
+.tgl::-moz-selection,
+.tgl:after::-moz-selection,
+.tgl:before::-moz-selection,
+.tgl *::-moz-selection,
+.tgl *:after::-moz-selection,
+.tgl *:before::-moz-selection,
+.tgl+.tgl-slider::-moz-selection {
+	background: none;
+}
+
+.tgl::selection,
+.tgl:after::selection,
+.tgl:before::selection,
+.tgl *::selection,
+.tgl *:after::selection,
+.tgl *:before::selection,
+.tgl+.tgl-slider::selection {
+	background: none;
+}
+
+.tgl-slider {}
+
+.tgl+.tgl-slider {
 	outline: 0;
 	display: block;
 	width: 40px;
@@ -302,27 +289,30 @@ img#playButton{
 	position: relative;
 	cursor: pointer;
 	-webkit-user-select: none;
-	   -moz-user-select: none;
-		-ms-user-select: none;
-			user-select: none;
-	
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
 }
 
-.tgl + .tgl-slider:after, .tgl + .tgl-slider:before {
-  position: relative;
-  display: block;
-  content: "";
-  width: 50%;
-  height: 100%;
-}
-.tgl + .tgl-slider:after {
-  left: 0;
-}
-.tgl + .tgl-slider:before {
-  display: none;
+.tgl+.tgl-slider:after,
+.tgl+.tgl-slider:before {
+	position: relative;
+	display: block;
+	content: "";
+	width: 50%;
+	height: 100%;
 }
 
-.tgl-flat + .tgl-slider {
+.tgl+.tgl-slider:after {
+	left: 0;
+}
+
+.tgl+.tgl-slider:before {
+	display: none;
+}
+
+.tgl-flat+.tgl-slider {
 	padding: 2px;
 	-webkit-transition: all .2s ease;
 	transition: all .2s ease;
@@ -331,22 +321,23 @@ img#playButton{
 	border-radius: 2em;
 }
 
-.tgl-flat + .tgl-slider:after {
-  -webkit-transition: all .2s ease;
-  transition: all .2s ease;
-  background: var(--colour4);
-  content: "";
-  border-radius: 1em;
+.tgl-flat+.tgl-slider:after {
+	-webkit-transition: all .2s ease;
+	transition: all .2s ease;
+	background: var(--colour4);
+	content: "";
+	border-radius: 1em;
 }
 
-.tgl-flat:checked + .tgl-slider {
-  border: 3px solid var(--colour5);
+.tgl-flat:checked+.tgl-slider {
+	border: 3px solid var(--colour5);
 }
 
-.tgl-flat:checked + .tgl-slider:after {
-  left: 50%;
-  background: var(--colour5);
+.tgl-flat:checked+.tgl-slider:after {
+	left: 50%;
+	background: var(--colour5);
 }
+
 /*** Toggle Switch styles ***/
 
 .btn-apply {
@@ -389,16 +380,16 @@ section {
 	flex-direction: column;
 }
 
-section > :first-child{
+section> :first-child {
 	background-color: var(--colour7);
 	padding: 4px;
 	font-weight: bold;
 	border-top: 1px solid var(--colour8);
 	border-bottom: 1px solid var(--colour8);
 	justify-content: space-between;
-    display: flex;
-    flex-direction: row;
-    align-items: baseline;
+	display: flex;
+	flex-direction: row;
+	align-items: baseline;
 }
 
 .settingsContainer {

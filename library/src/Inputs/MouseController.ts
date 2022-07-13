@@ -154,7 +154,7 @@ export class MouseController {
 	 */
 	normaliseAndQuantiseUnsigned(x: number, y: number): NormaliseAndQuantiseUnsigned {
 
-		let rootDiv = this.videoElementProvider.getVideoRootElement();
+		let rootDiv = this.videoElementProvider.getVideoParentElement();
 		let videoElement = this.videoElementProvider.getVideoElement();
 
 		if (rootDiv && videoElement) {
@@ -223,7 +223,7 @@ export class MouseController {
 	 */
 	unquantiseAndDenormaliseUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned {
 
-		let rootDiv = this.videoElementProvider.getVideoRootElement();
+		let rootDiv = this.videoElementProvider.getVideoParentElement();
 		let videoElement = this.videoElementProvider.getVideoElement();
 
 		if (rootDiv && videoElement) {
@@ -275,7 +275,7 @@ export class MouseController {
 	 */
 	normaliseAndQuantiseSigned(x: number, y: number): NormaliseAndQuantiseSigned {
 
-		let rootDiv = this.videoElementProvider.getVideoRootElement();
+		let rootDiv = this.videoElementProvider.getVideoParentElement();
 		let videoElement = this.videoElementProvider.getVideoElement();
 
 		if (rootDiv && videoElement) {

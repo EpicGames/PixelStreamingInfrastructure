@@ -108,7 +108,7 @@ export class UiController {
      * @returns - nil if requirements are satisfied 
      */
     resizePlayerStyle() {
-        let playerElement = this.videoPlayerProvider.getVideoRootElement() as HTMLDivElement;
+        let playerElement = this.videoPlayerProvider.getVideoParentElement() as HTMLDivElement;
 
         if (!playerElement) {
             return;

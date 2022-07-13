@@ -140,6 +140,110 @@ export class TextOverlayBase extends OverlayBase implements libspsfrontend.IText
 	}
 }
 
+/**
+ * Class for the VideoQp indicator
+ */
+export class VideoQpIndicator {
+
+	// the icon itself
+	qualityStatus: SVGElement; // = document.getElementById("connectionStrength");
+
+	// the text that displays under the icon
+	qualityText: HTMLSpanElement; // = document.getElementById("qualityText");
+
+	// svg paths
+	outer: any; //= document.getElementById("outer");
+	middle: any; //= document.getElementById("middle");
+	inner: any; // = document.getElementById("inner");
+	dot: any; // = document.getElementById("dot");
+
+	// non html elements 
+	statsText: string = "";
+	color: string = "";
+
+	// qp colours 
+	readonly orangeQP = 26;
+	readonly redQP = 35;
+
+	/**
+	 * construct a VideoQpIndicator object
+	 * @param qualityStatusId the html id of the qualityStatus element
+	 * @param qualityTextId the html id of the qualityText element
+	 * @param outerId the html id of the outer element
+	 * @param middleId the html id of the middle element
+	 * @param innerId the html id of the inner element
+	 * @param dotId the html id of the dot element
+	 */
+	constructor(qualityStatusId: string, qualityTextId: string, outerId: string, middleId: string, innerId: string, dotId: string) {
+		this.qualityStatus = document.getElementById(qualityStatusId) as any;
+		this.qualityText = document.getElementById(qualityTextId) as any;
+		this.outer = document.getElementById(outerId) as any;
+		this.middle = document.getElementById(middleId) as any;
+		this.inner = document.getElementById(innerId) as any;
+		this.dot = document.getElementById(dotId) as any;
+	}
+
+	/**
+	 * used to set the speed of the status light
+	 * @param speed - Set the speed of the blink if the status light higher the speed the faster the blink
+	 */
+	blinkVideoQualityStatus(speed: number) {
+		let iteration = speed;
+		let opacity = 1;
+		let tickID = setInterval(() => {
+			opacity -= 0.1;
+			this.qualityText.style.opacity = String(Math.abs((opacity - 0.5) * 2));
+			if (opacity <= 0.1) {
+				if (--iteration == 0) {
+					clearInterval(tickID);
+				} else {
+					opacity = 1;
+				}
+			}
+		}, 100 / speed);
+	}
+
+	/**
+	  * updates the QP tooltip by converting the Video Encoder QP to a colour light
+	  * @param QP - The video encoder QP number needed to find the average
+	  */
+	updateQpTooltip(QP: number) {
+		if (QP > this.redQP) {
+			this.color = "red";
+			this.blinkVideoQualityStatus(2);
+			this.statsText = `<div style="color: ${this.color}">Poor encoding quality</div>`;
+			this.outer.style.fill = "#3c3b40";
+			this.middle.style.fill = "#3c3b40";
+			this.inner.style.fill = this.color;
+			this.dot.style.fill = this.color;
+		} else if (QP > this.orangeQP) {
+			this.color = "orange";
+			this.blinkVideoQualityStatus(1);
+			this.statsText = `<div style="color: ${this.color}">Blocky encoding quality</div>`;
+			this.outer.style.fill = "#3c3b40";
+			this.middle.style.fill = this.color;
+			this.inner.style.fill = this.color;
+			this.dot.style.fill = this.color;
+		} else if (QP <= 0) {
+			this.outer.style.fill = "#3c3b40";
+			this.middle.style.fill = "#3c3b40";
+			this.inner.style.fill = "#3c3b40";
+			this.dot.style.fill = "#3c3b40";
+			this.statsText = `<div>Not connected</div>`;
+		} else {
+			this.color = "lime";
+			this.qualityStatus.style.opacity = '1';
+			this.statsText = `<div style="color: ${this.color}">Clear encoding quality</div>`;
+			this.outer.style.fill = this.color;
+			this.middle.style.fill = this.color;
+			this.inner.style.fill = this.color;
+			this.dot.style.fill = this.color;
+		}
+		this.qualityText.innerHTML = this.statsText;
+	}
+
+}
+
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	config: libspsfrontend.Config;
 	latencyStartTime: number;
@@ -156,7 +260,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	// HTML Elements that are used multiple times
 
 	// Global
-	statusLight = document.getElementById("qualityStatus") as HTMLDivElement;
+	//statusLight = document.getElementById("qualityStatus") as HTMLDivElement;
+	videoQpIndicator: VideoQpIndicator;
 
 	// Pre Stream options
 	forceTurnToggle = document.getElementById("force-turn-tgl") as HTMLInputElement;
@@ -201,6 +306,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.showStats = true;
 		this.logging = false;
 		this.videoEncoderAvgQP = -1;
+		this.videoQpIndicator = new VideoQpIndicator("connectionStrength", "qualityText", "outer", "middle", "inner", "dot");
 
 		// build all of the overlays 
 		this.buildDisconnectOverlay();
@@ -211,7 +317,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.buildErrorOverlay();
 
 		// configure all buttons 
-		this.ConfigureButtons();
+		//this.ConfigureButtons();
 	}
 
 	/**
@@ -220,7 +326,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	buildDisconnectOverlay() {
 		// build the overlay base div 
 		let disconnectOverlayHtml = document.createElement('div');
-		disconnectOverlayHtml.id = "disconnecyOverlay";
+		disconnectOverlayHtml.id = "disconnectOverlay";
 		disconnectOverlayHtml.className = "clickableState";
 
 		// set the event Listener
@@ -661,7 +767,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		super.onDisconnect(`${eventText} \n Click To Restart`);
 
 		// update all of the tools upon disconnect 
-		this.onVideoEncoderAvgQP(-1);
+		this.onVideoEncoderAvgQP(0);
 
 		// starting a latency check
 		document.getElementById("btn-start-latency-test").onclick = () => { }
@@ -765,34 +871,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	}
 
 	/**
-	  * 
-	  * converts the Video Encoder QP to a colour light
-	  * @param QP - The video encoder QP number needed to find the average
-	  */
-	onVideoEncoderAvgQP(QP: number): void {
-		this.videoEncoderAvgQP = QP;
-		this.statusLight.style.color = QualityColour.None;
-		this.statusLight.title = "QP: " + QP;
-
-		if (QP > QualityThresholds.Bad) {
-			this.statusLight.style.color = QualityColour.Bad;
-			this.statusLight.title += " - Bad";
-			this.BlinkVideoQualityStatus(2);
-		} else if (QP > QualityThresholds.Spotty) {
-			this.statusLight.style.color = QualityColour.Spotty;
-			this.statusLight.title += " - Spotty";
-			this.BlinkVideoQualityStatus(1);
-		} else if (QP < 0) {
-			this.statusLight.style.color = QualityColour.None;
-			this.statusLight.title += " - Error";
-			console.warn("Video Encoder QP can not be less then 0");
-		} else {
-			this.statusLight.title += " - Good";
-			this.statusLight.style.color = QualityColour.Good;
-		}
-	}
-
-	/**
 	 * Handles when the ownership flag is sent from the signaling server
 	 * @param hasQualityOwnership - flag if the user has quality ownership
 	 */
@@ -801,44 +879,73 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	}
 
 	/**
+	  * converts the Video Encoder QP to a colour light
+	  * @param QP - The video encoder QP number needed to find the average
+	  */
+	onVideoEncoderAvgQP(QP: number): void {
+		this.videoQpIndicator.updateQpTooltip(QP);
+	}
+	// onVideoEncoderAvgQP(QP: number): void {
+	// 	this.videoEncoderAvgQP = QP;
+	// 	this.statusLight.style.color = QualityColour.None;
+	// 	this.statusLight.title = "QP: " + QP;
+
+	// 	if (QP > QualityThresholds.Bad) {
+	// 		this.statusLight.style.color = QualityColour.Bad;
+	// 		this.statusLight.title += " - Bad";
+	// 		this.BlinkVideoQualityStatus(2);
+	// 	} else if (QP > QualityThresholds.Spotty) {
+	// 		this.statusLight.style.color = QualityColour.Spotty;
+	// 		this.statusLight.title += " - Spotty";
+	// 		this.BlinkVideoQualityStatus(1);
+	// 	} else if (QP < 0) {
+	// 		this.statusLight.style.color = QualityColour.None;
+	// 		this.statusLight.title += " - Error";
+	// 		console.warn("Video Encoder QP can not be less then 0");
+	// 	} else {
+	// 		this.statusLight.title += " - Good";
+	// 		this.statusLight.style.color = QualityColour.Good;
+	// 	}
+	// }
+
+	/**
 	 * used to set the speed of the status light
-	 * 
 	 * @param speed - Set the speed of the blink if the status light higher the speed the faster the blink
 	 */
-	BlinkVideoQualityStatus(speed: number) {
-		let iteration = speed;
-		let opacity = 1;
-		let tickID = setInterval(() => {
-			opacity -= 0.1;
-			this.statusLight.style.opacity = String(Math.abs((opacity - 0.5) * 2));
-			if (opacity <= 0.1) {
-				if (--iteration == 0) {
-					clearInterval(tickID);
-				} else {
-					opacity = 1;
-				}
-			}
-		}, 100 / speed);
-	}
+	// BlinkVideoQualityStatus(speed: number) {
+	// 	let iteration = speed;
+	// 	let opacity = 1;
+	// 	let tickID = setInterval(() => {
+	// 		opacity -= 0.1;
+	// 		this.statusLight.style.opacity = String(Math.abs((opacity - 0.5) * 2));
+	// 		if (opacity <= 0.1) {
+	// 			if (--iteration == 0) {
+	// 				clearInterval(tickID);
+	// 			} else {
+	// 				opacity = 1;
+	// 			}
+	// 		}
+	// 	}, 100 / speed);
+	// }
 }
 
 /**
  * Used for Setting the colour of the Status Light
  */
-enum QualityColour {
-	Good = "lime",
-	Spotty = "orange",
-	Bad = "red",
-	None = "black"
-}
+// enum QualityColour {
+// 	Good = "lime",
+// 	Spotty = "orange",
+// 	Bad = "red",
+// 	None = "black"
+// }
 
 /**
  * Used to set the Quality Thresholds of the Video Encoder QP
  */
-enum QualityThresholds {
-	Spotty = 26,
-	Bad = 35,
-}
+// enum QualityThresholds {
+// 	Spotty = 26,
+// 	Bad = 35,
+// }
 
 
 /**
