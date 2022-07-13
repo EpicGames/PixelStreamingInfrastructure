@@ -2279,7 +2279,25 @@ function connect() {
     ws = new WebSocket(connectionUrl);
     ws.attemptStreamReconnection = true;
 
+    ws.onmessagebinary = function(event) {
+        if(!event || !event.data) { return; }
+
+        event.data.text().then(function(messageString){
+            // send the new stringified event back into `onmessage`
+            ws.onmessage({ data: messageString });
+        }).catch(function(error){
+            console.error(`Failed to parse binary blob from websocket, reason: ${error}`);
+        });
+    }
+
     ws.onmessage = function(event) {
+
+        // Check if websocket message is binary, if so, stringify it.
+        if(event.data && event.data instanceof Blob) {
+            ws.onmessagebinary(event);
+            return;
+        }
+
         let msg = JSON.parse(event.data);
         if (msg.type === 'config') {
             console.log("%c[Inbound SS (config)]", "background: lightblue; color: black", msg);
