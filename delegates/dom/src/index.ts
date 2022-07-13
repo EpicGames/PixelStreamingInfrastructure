@@ -24,6 +24,8 @@ if (signallingServerAddress == '') {
     }
 }
 
+signallingServerAddress = "wss://sps.tenant-tensorworks-testing.lga1.ingress.coreweave.cloud/demo/ws";
+
 // prep the player div element 
 let playerElement = document.getElementById("player") as HTMLDivElement;
 

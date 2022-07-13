@@ -225,11 +225,12 @@ export class VideoQpIndicator {
 			this.inner.style.fill = this.color;
 			this.dot.style.fill = this.color;
 		} else if (QP <= 0) {
+			this.color = "#b0b0b0";
 			this.outer.style.fill = "#3c3b40";
 			this.middle.style.fill = "#3c3b40";
 			this.inner.style.fill = "#3c3b40";
 			this.dot.style.fill = "#3c3b40";
-			this.statsText = `<div>Not connected</div>`;
+			this.statsText = `<div style="color: ${this.color}">Not connected</div>`;
 		} else {
 			this.color = "lime";
 			this.qualityStatus.style.opacity = '1';
@@ -317,7 +318,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.buildErrorOverlay();
 
 		// configure all buttons 
-		//this.ConfigureButtons();
+		this.ConfigureButtons();
 	}
 
 	/**

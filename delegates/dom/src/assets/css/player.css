@@ -51,7 +51,7 @@ canvas {
 #uiFeatures {
 	width: 100%;
 	height: 100%;
-	z-index: 20;
+	z-index: 30;
 	position: absolute;
 	color: var(--colour2);
 	pointer-events: none;
@@ -399,3 +399,98 @@ section> :first-child {
 .collapse {
 	padding-left: 5%;
 }
+
+/* STREAM TOOLS */
+#streamTools {
+	-moz-border-radius-bottomright: 5px;
+	-moz-border-radius-bottomleft: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	/* future proofing */
+	border-bottom-left-radius: 5px;
+	/* future proofing */
+	-khtml-border-bottom-right-radius: 5px;
+	/* for old Konqueror browsers */
+	-khtml-border-bottom-left-radius: 5px;
+	/* for old Konqueror browsers */
+
+	-webkit-touch-callout: none;
+	/* iOS Safari */
+	-webkit-user-select: none;
+	/* Safari */
+	-khtml-user-select: none;
+	/* Konqueror HTML */
+	-moz-user-select: none;
+	/* Firefox */
+	-ms-user-select: none;
+	/* Internet Explorer/Edge */
+	user-select: none;
+	/* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+
+	position: absolute;
+	top: 0;
+	right: 2%;
+	z-index: 100;
+	border: 4px solid var(--colour8);
+	border-top-width: 0px;
+}
+
+#streamToolsHeader {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	border-bottom: 1px solid var(--colour8);
+	background-color: var(--colour7);
+}
+
+.streamTools {
+	background-color: var(--colour2);
+	font-family: var(--buttonFont);
+	font-weight: lighter;
+	color: var(--colour4);
+}
+
+.streamTools-shown>#streamToolsSettings {
+	display: block;
+}
+
+.streamTools-shown>div>#streamToolsButton {
+	transform: rotate(-135deg);
+	-webkit-transform: rotate(-135deg);
+	/* Safari */
+	-moz-transform: rotate(-135deg);
+	/* Firefox */
+	-ms-transform: rotate(-135deg);
+	/* IE */
+	-o-transform: rotate(-135deg);
+	/* Opera */
+}
+
+#streamToolsButton:hover {
+	cursor: pointer;
+}
+
+#streamToolsButton {
+	transition-duration: 250ms;
+	text-align: right;
+	font-size: 40px;
+}
+
+#streamToolsToggle {
+	width: 100%;
+}
+
+#qualityStatus {
+	font-size: 37px;
+	padding-right: 4px;
+}
+
+#streamToolsSettings {
+	font-size: 1em;
+	width: 400px;
+	/*display: none;*/
+}
+
+/* STREAM TOOLS */
