@@ -145,6 +145,8 @@ export class TextOverlayBase extends OverlayBase implements libspsfrontend.IText
  */
 export class VideoQpIndicator {
 
+	videoEncoderAvgQP: number = -1;
+
 	// the icon itself
 	qualityStatus: SVGElement; // = document.getElementById("connectionStrength");
 
@@ -208,6 +210,7 @@ export class VideoQpIndicator {
 	  * @param QP - The video encoder QP number needed to find the average
 	  */
 	updateQpTooltip(QP: number) {
+		this.videoEncoderAvgQP = QP;
 		if (QP > this.redQP) {
 			this.color = "red";
 			this.blinkVideoQualityStatus(2);
@@ -341,7 +344,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	config: libspsfrontend.Config;
 	latencyStartTime: number;
 	videoStartTime: number;
-	videoEncoderAvgQP: number;
 
 	// instantiate the WebRtcPlayerControllers interface var 
 	iWebRtcController: libspsfrontend.IWebRtcPlayerController;
@@ -404,7 +406,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		super(config);
 		this.showStats = true;
 		this.logging = false;
-		this.videoEncoderAvgQP = -1;
 		this.videoQpIndicator = new VideoQpIndicator("connectionStrength", "qualityText", "outer", "middle", "inner", "dot");
 		this.fullScreenLogic = new FullScreenLogic("fullscreen-btn");
 
@@ -782,6 +783,9 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		};
 	}
 
+	/**
+	 * Shows or hides the settings panel if clicked
+	 */
 	settingsClicked() {
 		/**
 		 * Toggle settings panel. If stats panel is already open, close it and then open settings
@@ -793,6 +797,9 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.settingsPanel.classList.toggle("panel-wrap-visible");
 	}
 
+	/**
+	 * Shows or hides the stats panel if clicked
+	 */
 	statsClicked() {
 		/**
 		 * Toggle stats panel. If settings panel is already open, close it and then open stats
@@ -963,7 +970,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		statsText += `<div>Frames dropped: ${stats.inboundVideoStats.framesDropped}</div>`;
 		statsText += `<div>Net RTT (ms): ${stats.candidatePair.currentRoundTripTime}</div>`;
 		statsText += `<div>Browser receive to composite (ms): ${stats.inboundVideoStats.receiveToCompositeMs}</div>`;
-		statsText += `<div>Video Quantization Parameter: ${this.videoEncoderAvgQP}</div>`;
+		statsText += `<div>Video Quantization Parameter: ${this.videoQpIndicator.videoEncoderAvgQP}</div>`;
 
 		let statsDiv = document.getElementById("statisticsResult");
 		statsDiv.innerHTML = statsText;
