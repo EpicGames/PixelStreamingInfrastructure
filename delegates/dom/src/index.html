@@ -28,7 +28,7 @@
         <div id="player"></div>
         <div id="uiFeatures">
 
-            <div id="connection" class="uiContainer">
+            <div id="connection" class="spsUiTool">
                 <svg version="1.1" id="connectionStrength" xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 494.45 494.45"
                     style="enable-background:new 0 0 494.45 494.45;" xml:space="preserve">
@@ -47,14 +47,30 @@
                         c10.3,10.3,10.3,27.1,0,37.4C337.225,346.225,330.425,348.825,323.625,348.825z" />
 
                 </svg>
-                <span class="tooltiptext" id="qualityText" style="color: #b0b0b0">Not connected</span>
+                <span class="tooltiptext" id="qualityText">Not connected</span>
+            </div>
+
+            <div id="controls">
+                <button class="spsUiTool" id="fullscreen-btn">
+                    <object data="images/Minimize.svg" type="image/svg+xml" id="minimize"></object>
+                    <object data="images/Maximize.svg" type="image/svg+xml" id="maximize"></object>
+                    <span class="tooltiptext">Fullscreen</span>
+                </button>
+                <!--button class="spsUiTool" id="settingsBtn">
+                    <object data="images/Settings.svg" type="image/svg+xml"></object>
+                    <span class="tooltiptext">Settings</span>
+                </button>
+                <button class="spsUiTool" id="statsBtn">
+                    <object data="images/Info.svg" type="image/svg+xml"></object>
+                    <span class="tooltiptext">Information</span>
+                </button-->
             </div>
 
         </div>
 
         <div id="streamTools" class="streamTools">
             <div id="streamToolsHeader">
-                <div id="streamToolsButton" class="p3" >+</div>
+                <div id="streamToolsButton" class="p3">+</div>
             </div>
             <div id="streamToolsSettings" class="container d-none">
                 <div id="Controls" class="row">

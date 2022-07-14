@@ -43,7 +43,7 @@ module.exports = (env) => {
       ],
     },
     resolve: {
-      extensions: ['.tsx', '.ts', '.js'],
+      extensions: ['.tsx', '.ts', '.js', '.svg'],
     },
     output: {
       filename: '[name].js',

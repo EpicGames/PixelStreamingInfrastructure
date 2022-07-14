@@ -245,6 +245,98 @@ export class VideoQpIndicator {
 
 }
 
+/**
+ * Class for handling fullscreen logic
+ */
+export class FullScreenLogic {
+	isFullscreen: boolean = false;
+
+	/**
+	 * Construct a FullScreenLogic object
+	 */
+	constructor(fullScreenButtonId: string) {
+		let fullScreenButton = document.getElementById(fullScreenButtonId) as HTMLButtonElement;
+		fullScreenButton.onclick = () => this.fullscreen();
+
+		// set up the full screen events
+		document.addEventListener('webkitfullscreenchange', () => this.onFullscreenChange(), false);
+		document.addEventListener('mozfullscreenchange', () => this.onFullscreenChange(), false);
+		document.addEventListener('fullscreenchange', () => this.onFullscreenChange(), false);
+		document.addEventListener('MSFullscreenChange', () => this.onFullscreenChange(), false);
+	}
+
+	/**
+	 * Makes the document fullscreen 
+	 * @returns 
+	 */
+	fullscreen() {
+		// if already full screen; exit
+		// else go fullscreen
+		if (
+			document.fullscreenElement ||
+			document.webkitFullscreenElement ||
+			document.mozFullScreenElement ||
+			document.msFullscreenElement
+		) {
+			if (document.exitFullscreen) {
+				document.exitFullscreen();
+			} else if (document.mozCancelFullScreen) {
+				document.mozCancelFullScreen();
+			} else if (document.webkitExitFullscreen) {
+				document.webkitExitFullscreen();
+			} else if (document.msExitFullscreen) {
+				document.msExitFullscreen();
+			}
+		} else {
+			let element: any;
+			//HTML elements controls
+			if (!(document.fullscreenEnabled || document.webkitFullscreenEnabled)) {
+				element = document.getElementById("streamingVideo") as any;
+			} else {
+				element = document.getElementById("playerUI") as any;
+			}
+			if (!element) {
+				return;
+			}
+			if (element.requestFullscreen) {
+				element.requestFullscreen();
+			} else if (element.mozRequestFullScreen) {
+				element.mozRequestFullScreen();
+			} else if (element.webkitRequestFullscreen) {
+				element.webkitRequestFullscreen((<any>Element).ALLOW_KEYBOARD_INPUT);
+			} else if (element.msRequestFullscreen) {
+				element.msRequestFullscreen();
+			} else if (element.webkitEnterFullscreen) {
+				element.webkitEnterFullscreen(); //for iphone this code worked
+			}
+		}
+		this.onFullscreenChange();
+	}
+
+	/**
+	 * Handles the fullscreen button on change
+	 */
+	onFullscreenChange() {
+		this.isFullscreen = (document.webkitIsFullScreen
+			|| document.mozFullScreen
+			|| (document.msFullscreenElement && document.msFullscreenElement !== null)
+			|| (document.fullscreenElement && document.fullscreenElement !== null));
+
+		let minimize = document.getElementById('minimize');
+		let maximize = document.getElementById('maximize');
+		if (minimize && maximize) {
+			if (this.isFullscreen) {
+				minimize.style.display = 'inline';
+				maximize.style.display = 'none';
+			} else {
+				minimize.style.display = 'none';
+				maximize.style.display = 'inline';
+			}
+		}
+	}
+
+}
+
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	config: libspsfrontend.Config;
 	latencyStartTime: number;
@@ -263,6 +355,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	// Global
 	//statusLight = document.getElementById("qualityStatus") as HTMLDivElement;
 	videoQpIndicator: VideoQpIndicator;
+	fullScreenLogic: FullScreenLogic;
 
 	// Pre Stream options
 	forceTurnToggle = document.getElementById("force-turn-tgl") as HTMLInputElement;
@@ -308,6 +401,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.logging = false;
 		this.videoEncoderAvgQP = -1;
 		this.videoQpIndicator = new VideoQpIndicator("connectionStrength", "qualityText", "outer", "middle", "inner", "dot");
+		this.fullScreenLogic = new FullScreenLogic("fullscreen-btn");
+
 
 		// build all of the overlays 
 		this.buildDisconnectOverlay();
@@ -359,7 +454,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		let restartSvgPathArrow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 		restartSvgPathArrow.setAttribute('fill-rule', "evenodd");
 		restartSvgPathArrow.setAttribute('d', "M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z");
-		
+
 		// build the circle path
 		let restartSvgPathCircle = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 		restartSvgPathCircle.setAttribute('d', "M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z");
@@ -902,6 +997,29 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	  */
 	onVideoEncoderAvgQP(QP: number): void {
 		this.videoQpIndicator.updateQpTooltip(QP);
+	}
+}
+
+/**
+ * Declare additions to global html objects that do not exist on the bases
+ */
+declare global {
+	interface Document {
+		webkitIsFullScreen?: boolean;
+		mozFullScreen?: boolean;
+		webkitFullscreenEnabled?: boolean;
+		mozCancelFullScreen?: () => Promise<void>;
+		msExitFullscreen?: () => Promise<void>;
+		webkitExitFullscreen?: () => Promise<void>;
+		mozFullScreenElement?: Element;
+		msFullscreenElement?: Element;
+		webkitFullscreenElement?: Element;
+	}
+
+	interface HTMLElement {
+		msRequestFullscreen?: () => Promise<void>;
+		mozRequestFullscreen?: () => Promise<void>;
+		webkitRequestFullscreen?: () => Promise<void>;
 	}
 }
 

@@ -58,10 +58,10 @@ canvas {
 	overflow: hidden;
 }
 
-.uiContainer .tooltiptext {
+.spsUiTool .tooltiptext {
 	visibility: hidden;
 	width: auto;
-	color: var(--colour2);
+	color: var(--colour4);
 	text-align: center;
 	border-radius: 15px;
 	padding: 0px 10px;
@@ -76,7 +76,7 @@ canvas {
 	z-index: 20;
 }
 
-.uiContainer:hover .tooltiptext {
+.spsUiTool:hover .tooltiptext {
 	visibility: visible;
 	background-color: var(--colour7);
 }
@@ -109,6 +109,70 @@ canvas {
     border: 3px solid var(--colour5);
 	width: max-content;
 }
+
+#controls {
+	position: absolute;
+	top: 3%;
+	left: 5%;
+	font-family: 'Michroma', sans-serif;
+	pointer-events: all;
+	display: block;
+}
+
+#controls > * {
+	margin-bottom: 0.5rem;
+	border-radius: 50%;
+	display: block;
+	height: 2rem;
+	line-height: 1.75rem;
+	padding: 0.5rem;
+}
+
+#controls #additionalinfo {
+	text-align: center;
+	font-family: 'Montserrat', sans-serif;
+}
+
+#fullscreen-btn {
+	padding: 0.6rem !important;
+}
+
+#settingsBtn,
+#statsBtn {
+	cursor: pointer;
+}
+
+#uiFeatures button {
+	background-color: var(--colour7);
+	border: 1px solid var(--colour7);
+	color: var(--colour2);
+	position: relative;
+	width: 3rem;
+	height: 3rem;
+	padding: 0.5rem;
+	text-align: center;
+}
+
+#uiFeatures button:hover {
+	background-color: var(--colour3);
+	border: 3px solid var(--colour3);
+	transition: 0.25s ease;
+	padding-left: 0.55rem;
+    padding-top: 0.55rem;
+}
+
+#uiFeatures button:active {
+	border: 3px solid var(--colour3);
+	background-color: var(--colour7);
+	padding-left: 0.55rem;
+    padding-top: 0.55rem;
+}
+
+#uiFeatures img {
+	width: 100%;
+	height: 100%;
+}
+
 /* UI STUFF */
 
 .setting {
