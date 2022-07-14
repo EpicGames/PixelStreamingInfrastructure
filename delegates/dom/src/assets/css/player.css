@@ -15,18 +15,24 @@
 }
 
 .noselect {
-	-webkit-touch-callout: none; /* iOS Safari */
-	  -webkit-user-select: none; /* Safari */
-	   -khtml-user-select: none; /* Konqueror HTML */
-		 -moz-user-select: none; /* Old versions of Firefox */
-		  -ms-user-select: none; /* Internet Explorer/Edge */
-			  user-select: none; /* Non-prefixed version, currently
+	-webkit-touch-callout: none;
+	/* iOS Safari */
+	-webkit-user-select: none;
+	/* Safari */
+	-khtml-user-select: none;
+	/* Konqueror HTML */
+	-moz-user-select: none;
+	/* Old versions of Firefox */
+	-ms-user-select: none;
+	/* Internet Explorer/Edge */
+	user-select: none;
+	/* Non-prefixed version, currently
 									supported by Chrome, Edge, Opera and Firefox */
 }
 
 body {
 	margin: 0px;
-    background-color: black;
+	background-color: black;
 	font-family: 'Montserrat', sans-serif;
 }
 
@@ -72,7 +78,7 @@ canvas {
 	position: absolute;
 	top: 0;
 	transform: translateY(25%);
-  	left: 125%;
+	left: 125%;
 	z-index: 20;
 }
 
@@ -84,7 +90,7 @@ canvas {
 #connection .tooltiptext {
 	top: 125%;
 	transform: translateX(-25%);
-  	left: 0;
+	left: 0;
 	z-index: 20;
 	padding: 5px 10px;
 }
@@ -101,25 +107,25 @@ canvas {
 
 #settings-panel .tooltiptext {
 	display: block;
-    top: 125%;
-    transform: translateX(-50%);
-    left: 0;
-    z-index: 20;
-    padding: 5px 10px;
-    border: 3px solid var(--colour5);
+	top: 125%;
+	transform: translateX(-50%);
+	left: 0;
+	z-index: 20;
+	padding: 5px 10px;
+	border: 3px solid var(--colour5);
 	width: max-content;
 }
 
 #controls {
 	position: absolute;
 	top: 3%;
-	left: 5%;
+	left: 2%;
 	font-family: 'Michroma', sans-serif;
 	pointer-events: all;
 	display: block;
 }
 
-#controls > * {
+#controls>* {
 	margin-bottom: 0.5rem;
 	border-radius: 50%;
 	display: block;
@@ -158,19 +164,97 @@ canvas {
 	border: 3px solid var(--colour3);
 	transition: 0.25s ease;
 	padding-left: 0.55rem;
-    padding-top: 0.55rem;
+	padding-top: 0.55rem;
 }
 
 #uiFeatures button:active {
 	border: 3px solid var(--colour3);
 	background-color: var(--colour7);
 	padding-left: 0.55rem;
-    padding-top: 0.55rem;
+	padding-top: 0.55rem;
 }
 
 #uiFeatures img {
 	width: 100%;
 	height: 100%;
+}
+
+.panel-wrap {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	height: 100%;
+	min-width: 20vw;
+	transform: translateX(100%);
+	transition: .3s ease-out;
+	pointer-events: all;
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	overflow-y: auto;
+	overflow-x: hidden;
+	background-color: rgba(30, 29, 34, 0.5)
+}
+
+.panel-wrap-visible {
+	transform: translateX(0%);
+}
+
+.panel {
+	color: #eee;
+	overflow-y: auto;
+	padding: 1em;
+}
+
+#settingsHeading,
+#statsHeading {
+	display: inline-block;
+	font-size: 2em;
+	margin-block-start: 0.67em;
+	margin-block-end: 0.67em;
+	margin-inline-start: 0px;
+	margin-inline-end: 0px;
+	position: relative;
+	padding: 0 0 0 2rem;
+}
+
+#settingsClose,
+#statsClose {
+	margin: 0.5rem;
+	padding-top: 0.5rem;
+	padding-bottom: 0.5rem;
+	padding-right: 0.5rem;
+	font-size: 2em;
+	float: right;
+}
+
+#settingsClose:after,
+#statsClose:after {
+	padding-left: 0.5rem;
+	display: inline-block;
+	content: "\00d7";
+	/* This will render the 'X' */
+}
+
+#settingsClose:hover,
+#statsClose:hover {
+	color: var(--colour3);
+	transition: ease 0.3s;
+}
+
+#settingsContent, #statsContent {
+	margin: 2rem;
+}
+
+#settings-panel .tooltiptext {
+	display: block;
+	top: 125%;
+	transform: translateX(-50%);
+	left: 0;
+	z-index: 20;
+	padding: 5px 10px;
+	border: 3px solid var(--colour5);
+	width: max-content;
 }
 
 /* UI STUFF */
@@ -516,7 +600,7 @@ section> :first-child {
 	color: var(--colour4);
 }
 
-.streamTools-shown>#streamToolsSettings {
+.streamTools-shown>#streamToolsSettings,  .streamTools-shown>#streamToolsStats{
 	display: block;
 }
 
@@ -551,7 +635,7 @@ section> :first-child {
 	padding-right: 4px;
 }
 
-#streamToolsSettings {
+#streamToolsSettings, #streamToolsStats {
 	font-size: 1em;
 	width: 400px;
 	/*display: none;*/

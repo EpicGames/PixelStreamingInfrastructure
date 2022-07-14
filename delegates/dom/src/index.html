@@ -56,212 +56,232 @@
                     <object data="images/Maximize.svg" type="image/svg+xml" id="maximize"></object>
                     <span class="tooltiptext">Fullscreen</span>
                 </button>
-                <!--button class="spsUiTool" id="settingsBtn">
+                <button class="spsUiTool" id="settingsBtn">
                     <object data="images/Settings.svg" type="image/svg+xml"></object>
                     <span class="tooltiptext">Settings</span>
                 </button>
                 <button class="spsUiTool" id="statsBtn">
                     <object data="images/Info.svg" type="image/svg+xml"></object>
                     <span class="tooltiptext">Information</span>
-                </button-->
+                </button>
             </div>
 
-        </div>
+            <div class="panel-wrap" id="settings-panel">
+                <div class="panel">
+                    <div id="settingsHeading">Settings</div>
+                    <div id="settingsClose"></div>
+                    <div id="settingsContent">
+                        <div id="streamToolsSettings" class="container">
+                            <div id="ControlsSettings" class="row">
+                                <section id="preStreamOptions" class="settingsContainer">
 
-        <div id="streamTools" class="streamTools">
-            <div id="streamToolsHeader">
-                <div id="streamToolsButton" class="p3">+</div>
+                                    <div id="preStreamOptionsHeader" class="settings-text">
+                                        <div>Pre Stream Options</div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm">
+                                            <label class="form-check-label" for="force-turn-tgl">Force TURN</label>
+                                        </div>
+                                        <div class="form-check form-switch col-auto">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                id="force-turn-tgl">
+                                        </div>
+                                    </div>
+
+                                    <div class="row" style="padding-top:5px; padding-bottom: 5px;">
+                                        <div class="col col-auto">
+                                            <input id="restart-stream-button" class="streamTools-button btn-flat"
+                                                type="button" value="Restart Stream">
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section id="viewSettings" class="settingsContainer">
+                                    <div id="viewSettingsHeader" class="settings-text">
+                                        <div>Viewing</div>
+                                    </div>
+                                    <div id="viewSettingsContainer" class="d-none">
+
+                                        <div class="row">
+                                            <div class="col-sm">
+                                                <label class="form-check-label"
+                                                    for="enlarge-display-to-fill-window-tgl">Enlarge
+                                                    display to fill window</label>
+                                            </div>
+                                            <div class="form-check form-switch col-auto">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="enlarge-display-to-fill-window-tgl" checked>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-sm">
+                                                <label class="form-check-label" for="quality-control-ownership-tgl">Is
+                                                    Quality
+                                                    Controller</label>
+                                            </div>
+                                            <div class="form-check form-switch col-auto">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="quality-control-ownership-tgl">
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-sm">
+                                                <label class="form-check-label" for="match-viewport-res-tgl">Match
+                                                    viewport
+                                                    resolution</label>
+                                            </div>
+                                            <div class="form-check form-switch col-auto">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="match-viewport-res-tgl">
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-sm">
+                                                <label class="form-check-label" for="control-scheme-tgl"
+                                                    id="control-scheme-title">Match viewport resolution</label>
+                                            </div>
+                                            <div class="form-check form-switch col-auto">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="control-scheme-tgl">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section id="commands" class="settingsContainer">
+                                    <div id="commandsHeader" class="settings-text">
+                                        <div>Commands</div>
+                                    </div>
+                                    <div id="commandsContainer" class="d-none">
+                                        <div class="row" style="padding-top:5px; padding-bottom: 5px;">
+                                            <div class="row" style="padding-top:5px; padding-bottom: 5px;">
+                                                <div class="col col-auto">
+                                                    <input id="show-fps-button" class="streamTools-button btn-flat"
+                                                        type="button" value="Show FPS">
+                                                </div>
+                                            </div>
+                                            <div class="col col-auto">
+                                                <label for="ui-descriptor-text" class="settings-text">UI
+                                                    Descriptor</label>
+                                            </div>
+                                            <div class="col col-auto">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    id="ui-descriptor-text">
+                                            </div>
+
+                                            <div class="col col-auto">
+                                                <input type="button" id="sendUiDescriptor"
+                                                    class="streamTools-button btn-flat" value="Send">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section id="streamingSettings" class="settingsContainer">
+                                    <div id="streamingSettingsHeader" class="settings-text">
+                                        <div>Settings</div>
+                                    </div>
+                                    <div id="streamingSettingsContainer" class="d-none">
+                                        <div class="form-group row">
+                                            <div class="col-sm">
+                                                <div>Encoder Settings</div>
+                                                <div id="encoderSettings" class="col">
+                                                    <div class="form-group row">
+                                                        <label for="encoder-min-qp-text">Min QP</label>
+                                                        <input type="number" class="form-control form-control-sm"
+                                                            id="encoder-min-qp-text" value="0" min="0" max="51" />
+                                                    </div>
+
+                                                    <div class="form-group row">
+                                                        <label for="encoder-max-qp-text">Max QP</label>
+                                                        <input type="number" class="form-control form-control-sm"
+                                                            id="encoder-max-qp-text" value="51" min="0" max="51" />
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm">
+                                                <div>WebRTC Settings</div>
+                                                <div id="webrtcSettings">
+                                                    <div class="form-group row">
+                                                        <label for="webrtc-fps-text">FPS</label>
+                                                        <input type="number" class="form-control form-control-sm"
+                                                            id="webrtc-fps-text" value="0" min="1" max="999" />
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="webrtc-min-bitrate-text">Min bitrate (kbps)</label>
+                                                        <input type="number" class="form-control form-control-sm"
+                                                            id="webrtc-min-bitrate-text" value="0" min="0"
+                                                            max="100000" />
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="webrtc-max-bitrate-text">Max bitrate (kbps)</label>
+                                                        <input type="number" class="form-control form-control-sm"
+                                                            id="webrtc-max-bitrate-text" value="0" min="0"
+                                                            max="100000" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <input id="btn-streaming-settings" class="streamTools-button btn-flat"
+                                                type="button" value="Apply">
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div id="streamToolsSettings" class="container d-none">
-                <div id="Controls" class="row">
-                    <section id="preStreamOptions" class="settingsContainer">
-
-                        <div id="preStreamOptionsHeader" class="settings-text">
-                            <div>Pre Stream Options</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <label class="form-check-label" for="force-turn-tgl">Force TURN</label>
-                            </div>
-                            <div class="form-check form-switch col-auto">
-                                <input class="form-check-input" type="checkbox" role="switch" id="force-turn-tgl">
-                            </div>
-                        </div>
-
-                        <div class="row" style="padding-top:5px; padding-bottom: 5px;">
-                            <div class="col col-auto">
-                                <input id="restart-stream-button" class="streamTools-button btn-flat" type="button"
-                                    value="Restart Stream">
-                            </div>
-                        </div>
-                    </section>
-
-                    <section id="viewSettings" class="settingsContainer">
-                        <div id="viewSettingsHeader" class="settings-text">
-                            <div>Viewing</div>
-                        </div>
-                        <div id="viewSettingsContainer" class="d-none">
-
-                            <div class="row">
-                                <div class="col-sm">
-                                    <label class="form-check-label" for="enlarge-display-to-fill-window-tgl">Enlarge
-                                        display to fill window</label>
-                                </div>
-                                <div class="form-check form-switch col-auto">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                        id="enlarge-display-to-fill-window-tgl" checked>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm">
-                                    <label class="form-check-label" for="quality-control-ownership-tgl">Is Quality
-                                        Controller</label>
-                                </div>
-                                <div class="form-check form-switch col-auto">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                        id="quality-control-ownership-tgl">
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm">
-                                    <label class="form-check-label" for="match-viewport-res-tgl">Match viewport
-                                        resolution</label>
-                                </div>
-                                <div class="form-check form-switch col-auto">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                        id="match-viewport-res-tgl">
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm">
-                                    <label class="form-check-label" for="control-scheme-tgl"
-                                        id="control-scheme-title">Match viewport resolution</label>
-                                </div>
-                                <div class="form-check form-switch col-auto">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                        id="control-scheme-tgl">
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section id="commands" class="settingsContainer">
-                        <div id="commandsHeader" class="settings-text">
-                            <div>Commands</div>
-                        </div>
-                        <div id="commandsContainer" class="d-none">
-                            <div class="row" style="padding-top:5px; padding-bottom: 5px;">
-                                <div class="row" style="padding-top:5px; padding-bottom: 5px;">
-                                    <div class="col col-auto">
-                                        <input id="show-fps-button" class="streamTools-button btn-flat" type="button"
-                                            value="Show FPS">
+            <div class="panel-wrap" id="stats-panel">
+                <div class="panel">
+                    <div id="statsHeading">Information</div>
+                    <div id="statsClose"></div>
+                    <div id="statsContent">
+                        <div id="streamToolsStats" class="container">
+                            <div id="ControlsStats" class="row">
+                                <section id="statistics" class="settingsContainer">
+                                    <div id="statisticsHeader" class="settings-text">
+                                        <div>Statistics</div>
                                     </div>
-                                </div>
-                                <div class="col col-auto">
-                                    <label for="ui-descriptor-text" class="settings-text">UI Descriptor</label>
-                                </div>
-                                <div class="col col-auto">
-                                    <input type="text" class="form-control form-control-sm" id="ui-descriptor-text">
-                                </div>
-
-                                <div class="col col-auto">
-                                    <input type="button" id="sendUiDescriptor" class="streamTools-button btn-flat"
-                                        value="Send">
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section id="streamingSettings" class="settingsContainer">
-                        <div id="streamingSettingsHeader" class="settings-text">
-                            <div>Settings</div>
-                        </div>
-                        <div id="streamingSettingsContainer" class="d-none">
-                            <div class="form-group row">
-                                <div class="col-sm">
-                                    <div>Encoder Settings</div>
-                                    <div id="encoderSettings" class="col">
-                                        <div class="form-group row">
-                                            <label for="encoder-min-qp-text">Min QP</label>
-                                            <input type="number" class="form-control form-control-sm"
-                                                id="encoder-min-qp-text" value="0" min="0" max="51" />
+                                    <div id="statisticsContainer" class="d-none">
+                                        <div class="row">
+                                            <div class="col-sm">
+                                                <label class="form-check-label" for="send-stats-tgl"
+                                                    id="control-scheme-title">Send
+                                                    to server</label>
+                                            </div>
+                                            <div class="form-check form-switch col-auto">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="send-stats-tgl">
+                                            </div>
                                         </div>
-
-                                        <div class="form-group row">
-                                            <label for="encoder-max-qp-text">Max QP</label>
-                                            <input type="number" class="form-control form-control-sm"
-                                                id="encoder-max-qp-text" value="51" min="0" max="51" />
-                                        </div>
-
+                                        <div id="statisticsResult" class="StatsResult"></div>
                                     </div>
-                                </div>
+                                </section>
 
-                                <div class="col-sm">
-                                    <div>WebRTC Settings</div>
-                                    <div id="webrtcSettings">
-                                        <div class="form-group row">
-                                            <label for="webrtc-fps-text">FPS</label>
-                                            <input type="number" class="form-control form-control-sm"
-                                                id="webrtc-fps-text" value="0" min="1" max="999" />
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="webrtc-min-bitrate-text">Min bitrate (kbps)</label>
-                                            <input type="number" class="form-control form-control-sm"
-                                                id="webrtc-min-bitrate-text" value="0" min="0" max="100000" />
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="webrtc-max-bitrate-text">Max bitrate (kbps)</label>
-                                            <input type="number" class="form-control form-control-sm"
-                                                id="webrtc-max-bitrate-text" value="0" min="0" max="100000" />
-                                        </div>
+                                <section id="latencyTest" class="settingsContainer">
+                                    <div id="latencyTestHeader" class="settings-text">
+                                        <div>Latency Test</div>
+                                        <input id="btn-start-latency-test" class="streamTools-button btn-flat"
+                                            type="button" value="Run Test">
                                     </div>
-                                </div>
+                                    <div id="latencyTestContainer" class="d-none">
+                                        <div id="latencyStatsResults" class="StatsResult"></div>
+                                    </div>
+                                </section>
                             </div>
-                            <div class="form-group row">
-                                <input id="btn-streaming-settings" class="streamTools-button btn-flat" type="button"
-                                    value="Apply">
-                            </div>
                         </div>
-                    </section>
-
-                    <section id="statistics" class="settingsContainer">
-                        <div id="statisticsHeader" class="settings-text">
-                            <div>Statistics</div>
-                        </div>
-                        <div id="statisticsContainer" class="d-none">
-
-                            <div class="row">
-                                <div class="col-sm">
-                                    <label class="form-check-label" for="send-stats-tgl" id="control-scheme-title">Send
-                                        to server</label>
-                                </div>
-                                <div class="form-check form-switch col-auto">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="send-stats-tgl">
-                                </div>
-                            </div>
-                            <div id="statisticsResult" class="StatsResult"></div>
-                        </div>
-                    </section>
-
-                    <section id="latencyTest" class="settingsContainer">
-                        <div id="latencyTestHeader" class="settings-text">
-                            <div>Latency Test</div>
-                            <input id="btn-start-latency-test" class="streamTools-button btn-flat" type="button"
-                                value="Run Test">
-                        </div>
-                        <div id="latencyTestContainer" class="d-none">
-                            <div id="latencyStatsResults" class="StatsResult"></div>
-                        </div>
-                    </section>
+                    </div>
                 </div>
             </div>
         </div>
-
-
     </div>
     <div
         style="position: fixed; bottom: 0; right: 0; padding-right: 10px; padding-bottom: 10px; font-size: 12px; color: #ffffff; z-index: 9999;">

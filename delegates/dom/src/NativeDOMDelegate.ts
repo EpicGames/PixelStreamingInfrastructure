@@ -357,6 +357,11 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	videoQpIndicator: VideoQpIndicator;
 	fullScreenLogic: FullScreenLogic;
 
+	// settings and stats panels
+	settingsPanel = document.getElementById('settings-panel') as HTMLDivElement;
+	statsPanel = document.getElementById('stats-panel') as HTMLDivElement;
+
+
 	// Pre Stream options
 	forceTurnToggle = document.getElementById("force-turn-tgl") as HTMLInputElement;
 
@@ -709,6 +714,15 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 * Set up button click functions and button functionality  
 	 */
 	ConfigureButtons() {
+
+		// set up the settings 
+		document.getElementById('settingsBtn').onclick = () => this.settingsClicked();
+		document.getElementById('settingsClose').onclick = () => this.settingsClicked();
+
+		// setup the stats button
+		document.getElementById('statsBtn').onclick = () => this.statsClicked();
+		document.getElementById('statsClose').onclick = () => this.statsClicked();
+
 		// setup the Force TURN toggle
 		this.setUpToggleWithUrlParams(this.forceTurnToggle, "ForceTURN");
 
@@ -766,11 +780,28 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 				this.iWebRtcController.sendRequestQualityControlOwnership();
 			}
 		};
+	}
 
-		// show and hide the optional buttons for stream tools 
-		document.getElementById("streamToolsButton").onclick = () => {
-			document.getElementById("streamToolsSettings").classList.toggle("d-none");
+	settingsClicked() {
+		/**
+		 * Toggle settings panel. If stats panel is already open, close it and then open settings
+		 */
+		if (this.statsPanel.classList.contains("panel-wrap-visible")) {
+			this.statsPanel.classList.toggle("panel-wrap-visible");
 		}
+
+		this.settingsPanel.classList.toggle("panel-wrap-visible");
+	}
+
+	statsClicked() {
+		/**
+		 * Toggle stats panel. If settings panel is already open, close it and then open stats
+		 */
+		if (this.settingsPanel.classList.contains("panel-wrap-visible")) {
+			this.settingsPanel.classList.toggle("panel-wrap-visible");
+		}
+
+		this.statsPanel.classList.toggle("panel-wrap-visible");
 	}
 
 	/**
