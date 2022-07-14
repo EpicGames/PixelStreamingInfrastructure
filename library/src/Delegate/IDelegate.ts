@@ -21,6 +21,7 @@ export interface IDelegate {
 	afkOverlay: IAfkOverlay;
 	infoOverlay: ITextOverlay;
 	errorOverlay: ITextOverlay;
+	showActionOrErrorOnDisconnect: boolean;
 
 	/**
 	 * Shows the disconnect overlay 
@@ -168,7 +169,7 @@ export interface IDelegate {
 	/**
 	 * Event fired when the video is disconnected
 	 */
-	onDisconnect(eventString: string): void;
+	onDisconnect(eventString: string, showActionOrErrorOnDisconnect?:boolean): void;
 
 	/**
 	 * Handles when Web Rtc is connecting 

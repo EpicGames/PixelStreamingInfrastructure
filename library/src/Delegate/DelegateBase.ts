@@ -16,6 +16,7 @@ import { MessageInstanceState, MessageAuthResponse } from '../WebSockets/Message
 export class DelegateBase implements IDelegate {
 	public iWebRtcController: IWebRtcPlayerController;
 	public config: Config;
+	showActionOrErrorOnDisconnect: boolean = true;
 
 	// set the overlay placeholders 
 	currentOverlay: IOverlay;
@@ -196,6 +197,7 @@ export class DelegateBase implements IDelegate {
 	 */
 	onWebRtcAutoConnect() {
 		this.showTextOverlay("Auto Connecting Now");
+		this.showActionOrErrorOnDisconnect = true;
 	}
 
 	/**
@@ -228,7 +230,12 @@ export class DelegateBase implements IDelegate {
 	 * Event fired when the video is disconnected
 	 */
 	onDisconnect(eventString: string) {
-		this.showDisconnectOverlay(`Disconnected: ${eventString}`);
+		if(this.showActionOrErrorOnDisconnect == false){
+			this.showErrorOverlay(`Disconnected: ${eventString}`);
+			this.showActionOrErrorOnDisconnect = true;
+		}else{
+			this.showDisconnectOverlay(`Disconnected: ${eventString}  \n Click To Restart`);
+		}
 	}
 
 	/**

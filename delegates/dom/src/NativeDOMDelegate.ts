@@ -915,7 +915,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 */
 	onDisconnect(eventText: string) {
 		// display the text overlay by calling its super method so it will use its default behavior first 
-		super.onDisconnect(`${eventText} \n Click To Restart`);
+		super.onDisconnect(`${eventText}`);
 
 		// update all of the tools upon disconnect 
 		this.onVideoEncoderAvgQP(0);

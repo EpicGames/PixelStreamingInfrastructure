@@ -130,6 +130,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.connectToSignallingSever();
 
 		} else {
+			// set the replay status so we get a text overlay over an action overlay
+			this.delegate.showActionOrErrorOnDisconnect = false;
+
 			// close the connection 
 			this.webSocketController.close();
 
