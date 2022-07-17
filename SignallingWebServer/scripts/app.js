@@ -1592,6 +1592,7 @@ function requestQualityControl() {
 let playerElementClientRect = undefined;
 let normalizeAndQuantizeUnsigned = undefined;
 let normalizeAndQuantizeSigned = undefined;
+let unquantizeAndDenormalizeUnsigned = undefined;
 
 function setupNormalizeAndQuantize() {
     let playerElement = document.getElementById('player');
