@@ -97,7 +97,7 @@ function scanGamepads() {
 function updateStatus() {
     scanGamepads();
     // Iterate over multiple controllers in the case the mutiple gamepads are connected
-    for (j in controllers) {
+    for (let j in controllers) {
         let controller = controllers[j];
         let currentState = controller.currentState;
         let prevState = controller.prevState;
@@ -464,7 +464,7 @@ var streamTrackSource = null;
 
 function updateStreamList() {
     const streamSelector = document.getElementById('stream-select');
-    for (i = streamSelector.options.length - 1; i >= 0; i--) {
+    for (let i = streamSelector.options.length - 1; i >= 0; i--) {
         streamSelector.remove(i);
     }
     streamSelector.value = null;
@@ -485,7 +485,7 @@ function updateTrackList() {
     const streamSelector = document.getElementById('stream-select');
     const trackSelector = document.getElementById('track-select');
     const stream = webRtcPlayerObj.availableVideoStreams.get(streamSelector.value);
-    for (i = trackSelector.options.length - 1; i >= 0; i--) {
+    for (let i = trackSelector.options.length - 1; i >= 0; i--) {
         trackSelector.remove(i);
     }
     trackSelector.value = null;
@@ -1551,7 +1551,7 @@ function emitDescriptor(messageType, descriptor) {
     byteIdx++;
     data.setUint16(byteIdx, descriptorAsString.length, true);
     byteIdx += 2;
-    for (i = 0; i < descriptorAsString.length; i++) {
+    for (let i = 0; i < descriptorAsString.length; i++) {
         data.setUint16(byteIdx, descriptorAsString.charCodeAt(i), true);
         byteIdx += 2;
     }
