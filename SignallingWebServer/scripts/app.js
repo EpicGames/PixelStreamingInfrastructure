@@ -699,7 +699,7 @@ function addResponseEventListener(name, listener) {
 }
 
 function removeResponseEventListener(name) {
-    responseEventListeners.remove(name);
+    responseEventListeners.delete(name);
 }
 
 // Must be kept in sync with PixelStreamingProtocol::EToPlayerMsg C++ enum.
