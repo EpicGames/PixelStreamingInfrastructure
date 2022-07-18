@@ -881,9 +881,7 @@ function setupWebRtcPlayer(htmlElement, config) {
 
     webRtcPlayerObj.onDataChannelMessage = function(data) {
         let view = new Uint8Array(data);
-
-        // An ID of 255 represents the protocol message
-        if (view[0] === 255) {
+        if (view[0] === protocolJSON["Protocol"].id) {
             let protocolString = new TextDecoder("utf-16").decode(data.slice(1));
             protocolJSON = JSON.parse(protocolString);
             console.log("Received new protocol. Updating exisiting protocol...");
@@ -1660,6 +1658,9 @@ protocolJSON = {
     },
     "InputControlOwnership": {
         "id": 12,
+    },
+    "Protocol": {
+        "id": 255,
     },
 };
 
