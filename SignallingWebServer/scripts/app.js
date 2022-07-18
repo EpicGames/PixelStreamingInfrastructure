@@ -886,6 +886,7 @@ function setupWebRtcPlayer(htmlElement, config) {
         if (view[0] === 255) {
             let protocolString = new TextDecoder("utf-16").decode(data.slice(1));
             protocolJSON = JSON.parse(protocolString);
+            console.log("Received new protocol. Updating exisiting protocol...");
             // Once the protocol has been received, we can send our control messages
             requestInitialSettings();
             requestQualityControl();
@@ -1474,30 +1475,48 @@ protocolJSON = {
      */
     "IFrameRequest": {
         "id": 0,
+        "byteLength": 0,
+        "structure": []
     },
     "RequestQualityControl": {
         "id": 1,
+        "byteLength": 0,
+        "structure": []
     },
     "FpsRequest": {
         "id": 2,
+        "byteLength": 0,
+        "structure": []
     },
     "AverageBitrateRequest": {
         "id": 3,
+        "byteLength": 0,
+        "structure": []
     },
     "StartStreaming": {
         "id": 4,
+        "byteLength": 0,
+        "structure": []
     },
     "StopStreaming": {
         "id": 5,
+        "byteLength": 0,
+        "structure": []
     },
     "LatencyTest": {
         "id": 6,
+        "byteLength": 0,
+        "structure": []
     },
     "RequestInitialSettings": {
         "id": 7,
+        "byteLength": 0,
+        "structure": []
     },
     "TestEcho": {
         "id": 8,
+        "byteLength": 0,
+        "structure": []
     },
     /*
      * Input Messages. Range = 50..89.
@@ -1510,94 +1529,94 @@ protocolJSON = {
         "id": 51
     },
     // Keyboard Input Message. Range = 60..69.
-    "keyDown": {
+    "KeyDown": {
         "id": 60,
-        "length": 2,
+        "byteLength": 2,
         //             keyCode  isRepeat
         "structure": [ "uint8", "uint8" ]
     },
     "KeyUp": {
         "id": 61,
-        "length": 1,
+        "byteLength": 1,
         //             keyCode
         "structure": [ "uint8" ]
     },
-    "keyPress": {
+    "KeyPress": {
         "id": 62,
-        "length": 2,
+        "byteLength": 2,
         //             charcode
         "structure": [ "uint16" ]
     },
     // Mouse Input Messages. Range = 70..79.
     "MouseEnter": {
         "id": 70,
-        "length": 0,
+        "byteLength": 0,
         "structure": []
     },
     "MouseLeave": {
         "id": 71,
-        "length": 0,
+        "byteLength": 0,
         "structure": []
     },
     "MouseDown": {
         "id": 72,
-        "length": 5,
+        "byteLength": 5,
         //              button     x         y
         "structure": [ "uint8", "uint16", "uint16" ]
     },
     "MouseUp": {
         "id": 73,
-        "length": 5,
+        "byteLength": 5,
         //              button     x         y
         "structure": [ "uint8", "uint16", "uint16" ]
     },
     "MouseMove": {
         "id": 74,
-        "length": 8,
+        "byteLength": 8,
         //              x           y      deltaX    deltaY
         "structure": [ "uint16", "uint16", "int16", "int16" ]
     },
     "MouseWheel": {
         "id": 75,
-        "length": 6,
+        "byteLength": 6,
         //              delta       x        y
         "structure": [ "int16", "uint16", "uint16"  ]
     },
     // Touch Input Messages. Range = 80..89.
     "TouchStart": {
         "id": 80,
-        "length": 7,
+        "byteLength": 7,
         //          numtouches(1)   x         y       idx      force     valid
         "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
     },
     "TouchEnd": {
         "id": 81,
-        "length": 7,
+        "byteLength": 7,
         //          numtouches(1)   x         y       idx      force     valid
         "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
     },
     "TouchMove": {
         "id": 82,
-        "length": 7,
+        "byteLength": 7,
         //          numtouches(1)   x         y       idx      force     valid
         "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
     },
     // Gamepad Input Messages. Range = 90..99
     "GamepadButtonPressed": {
         "id": 90,
-        "length": 3,
+        "byteLength": 3,
         //            ctrlerId   button  isRepeat
         "structure": [ "uint8", "uint8", "uint8" ]
     },
     "GamepadButtonReleased": {
         "id": 91,
-        "length": 3,
+        "byteLength": 3,
         //            ctrlerId   button  isRepeat(0)
         "structure": [ "uint8", "uint8", "uint8" ]
     },
     "GamepadButtonAnalog": {
         "id": 92,
-        "length": 10,
+        "byteLength": 10,
         //            ctrlerId   button  analogValue
         "structure": [ "uint8", "uint8", "double" ]
     },
