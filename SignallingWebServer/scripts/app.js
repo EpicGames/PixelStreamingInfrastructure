@@ -1428,7 +1428,7 @@ function onOrientationChange(event) {
 function sendInputMessage(messageType, indata = []) {
     messageFormat = protocolJSON[messageType];
 
-    console.log(`Calculate size: ${new Blob(JSON.stringify(indata)).size}, Specified size: ${messageFormat.byteLength}`);
+    // console.log(`Calculate size: ${new Blob(JSON.stringify(indata)).size}, Specified size: ${messageFormat.byteLength}`);
     data = new DataView(new ArrayBuffer(messageFormat.byteLength + 1));
 
     data.setUint8(0, messageFormat.id);
@@ -1468,128 +1468,180 @@ function sendControlMessage(messageType) {
 }
 
 protocolJSON = {
-    // /*
-    //  * Control Messages. Range = 0..49.
-    //  */
-    // "IFrameRequest": {
-    //     "id": 0,
-    // },
-    // "RequestQualityControl": {
-    //     "id": 1,
-    // },
-    // "FpsRequest": {
-    //     "id": 2,
-    // },
-    // "AverageBitrateRequest": {
-    //     "id": 3,
-    // },
-    // "StartStreaming": {
-    //     "id": 4,
-    // },
-    // "StopStreaming": {
-    //     "id": 5,
-    // },
-    // "LatencyTest": {
-    //     "id": 6,
-    // },
-    // "RequestInitialSettings": {
-    //     "id": 7,
-    // },
-    // /*
-    //  * Input Messages. Range = 50..89.
-    //  */
-    // // Generic Input Messages. Range = 50..59.
-    // "UIInteraction": {
-    //     "id": 50,
-    // },
-    // "ToStreamerCommand": {
-    //     "id": 51
-    // },
-    // // Keyboard Input Message. Range = 60..69.
-    // "keyDown": {
-    //     "id": 60,
-    //     "length": 2,
-    //     //             keyCode  isRepeat
-    //     "structure": [ "uint8", "uint8" ]
-    // },
-    // "KeyUp": {
-    //     "id": 61,
-    //     "length": 1,
-    //     //             keyCode
-    //     "structure": [ "uint8" ]
-    // },
-    // "keyPress": {
-    //     "id": 62,
-    //     "length": 2,
-    //     //             charcode
-    //     "structure": [ "uint16" ]
-    // },
-    // // Mouse Input Messages. Range = 70..79.
-    // "MouseEnter": {
-    //     "id": 70,
-    //     "length": 0,
-    //     "structure": []
-    // },
-    // "MouseLeave": {
-    //     "id": 71,
-    //     "length": 0,
-    //     "structure": []
-    // },
-    // "MouseDown": {
-    //     "id": 72,
-    //     "length": 5,
-    //     //              button     x         y
-    //     "structure": [ "uint8", "uint16", "uint16" ]
-    // },
-    // "MouseUp": {
-    //     "id": 73,
-    //     "length": 5,
-    //     //              button     x         y
-    //     "structure": [ "uint8", "uint16", "uint16" ]
-    // },
-    // "MouseMove": {
-    //     "id": 74,
-    //     "length": 8,
-    //     //              x           y      deltaX    deltaY
-    //     "structure": [ "uint16", "uint16", "int16", "int16" ]
-    // },
-    // "MouseWheel": {
-    //     "id": 75,
-    //     "length": 6,
-    //     "structure": [ "int16", "uint16", "uint16"  ]
-    // },
-    // // Touch Input Messages. Range = 80..89.
-    // "TouchStart": {
-    //     "id": 80,
-    //     "length": 7,
-    //     "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
-    // },
-    // "TouchEnd": {
-    //     "id": 81,
-    //     "length": 7,
-    //     "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
-    // },
-    // "TouchMove": {
-    //     "id": 82,
-    //     "length": 7,
-    //     "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
-    // },
-    // // Gamepad Input Messages. Range = 90..99
-    // "GamepadButtonPressed": {
-    //     "id": 90,
-    //     "length": 3,
-    //     "structure": [ "uint8", "uint8", "uint8" ]
-    // },
-    // "GamepadButtonReleased": {
-    //     "id": 91,
-    //     "length": 3,
-    //     "structure": [ "uint8", "uint8", "uint8" ]
-    // },
-    // "GamepadButtonAnalog": {
-    //     "id": 92,
-    //     "length": 10,
-    //     "structure": [ "uint8", "uint8", "double" ]
-    // }
+    // Old EToStreamerMsg enum
+    /*
+     * Control Messages. Range = 0..49.
+     */
+    "IFrameRequest": {
+        "id": 0,
+    },
+    "RequestQualityControl": {
+        "id": 1,
+    },
+    "FpsRequest": {
+        "id": 2,
+    },
+    "AverageBitrateRequest": {
+        "id": 3,
+    },
+    "StartStreaming": {
+        "id": 4,
+    },
+    "StopStreaming": {
+        "id": 5,
+    },
+    "LatencyTest": {
+        "id": 6,
+    },
+    "RequestInitialSettings": {
+        "id": 7,
+    },
+    "TestEcho": {
+        "id": 8,
+    },
+    /*
+     * Input Messages. Range = 50..89.
+     */
+    // Generic Input Messages. Range = 50..59.
+    "UIInteraction": {
+        "id": 50,
+    },
+    "ToStreamerCommand": {
+        "id": 51
+    },
+    // Keyboard Input Message. Range = 60..69.
+    "keyDown": {
+        "id": 60,
+        "length": 2,
+        //             keyCode  isRepeat
+        "structure": [ "uint8", "uint8" ]
+    },
+    "KeyUp": {
+        "id": 61,
+        "length": 1,
+        //             keyCode
+        "structure": [ "uint8" ]
+    },
+    "keyPress": {
+        "id": 62,
+        "length": 2,
+        //             charcode
+        "structure": [ "uint16" ]
+    },
+    // Mouse Input Messages. Range = 70..79.
+    "MouseEnter": {
+        "id": 70,
+        "length": 0,
+        "structure": []
+    },
+    "MouseLeave": {
+        "id": 71,
+        "length": 0,
+        "structure": []
+    },
+    "MouseDown": {
+        "id": 72,
+        "length": 5,
+        //              button     x         y
+        "structure": [ "uint8", "uint16", "uint16" ]
+    },
+    "MouseUp": {
+        "id": 73,
+        "length": 5,
+        //              button     x         y
+        "structure": [ "uint8", "uint16", "uint16" ]
+    },
+    "MouseMove": {
+        "id": 74,
+        "length": 8,
+        //              x           y      deltaX    deltaY
+        "structure": [ "uint16", "uint16", "int16", "int16" ]
+    },
+    "MouseWheel": {
+        "id": 75,
+        "length": 6,
+        //              delta       x        y
+        "structure": [ "int16", "uint16", "uint16"  ]
+    },
+    // Touch Input Messages. Range = 80..89.
+    "TouchStart": {
+        "id": 80,
+        "length": 7,
+        //          numtouches(1)   x         y       idx      force     valid
+        "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
+    },
+    "TouchEnd": {
+        "id": 81,
+        "length": 7,
+        //          numtouches(1)   x         y       idx      force     valid
+        "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
+    },
+    "TouchMove": {
+        "id": 82,
+        "length": 7,
+        //          numtouches(1)   x         y       idx      force     valid
+        "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
+    },
+    // Gamepad Input Messages. Range = 90..99
+    "GamepadButtonPressed": {
+        "id": 90,
+        "length": 3,
+        //            ctrlerId   button  isRepeat
+        "structure": [ "uint8", "uint8", "uint8" ]
+    },
+    "GamepadButtonReleased": {
+        "id": 91,
+        "length": 3,
+        //            ctrlerId   button  isRepeat(0)
+        "structure": [ "uint8", "uint8", "uint8" ]
+    },
+    "GamepadButtonAnalog": {
+        "id": 92,
+        "length": 10,
+        //            ctrlerId   button  analogValue
+        "structure": [ "uint8", "uint8", "double" ]
+    },
+
+    // Old EToPlayerMsg enum
+    "QualityControlOwnership": {
+        "id": 0,
+    },
+    "Response": {
+        "id": 1,
+    },
+    "ToClientCommand": {
+        "id": 2,
+    },
+    "FreezeFrame": {
+        "id": 3,
+    },
+    "UnfreezeFrame": {
+        "id": 4,
+    },
+    "VideoEncoderAvgQP": {
+        "id": 5,
+    },
+    "LatencyTest": {
+        "id": 6,
+    },
+    "InitialSettings": {
+        "id": 7,
+    },
+    "FileExtension": {
+        "id": 8,
+    },
+    "FileMimeType": {
+        "id": 9,
+    },
+    "FileContents": {
+        "id": 10,
+    },
+    "TestEcho": {
+        "id": 11,
+    },
+    "InputControlOwnership": {
+        "id": 12,
+    },
 };
 
 
