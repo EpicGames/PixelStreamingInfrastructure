@@ -76,9 +76,36 @@ let editTextButton = undefined;
 // on-screen keyboard.
 let hiddenInput = undefined;
 
-let t0 = Date.now();
+let MaxByteValue = 255;
 
 let activeKeys = [];
+
+// https://w3c.github.io/gamepad/#remapping
+const gamepadLayout = {
+    // Buttons
+    RightClusterBottomButton: 0,
+    RightClusterRightButton: 1,
+    RightClusterLeftButton: 2,
+    RightClusterTopButton: 3,
+    LeftShoulder: 4,
+    RightShoulder: 5,
+    LeftTrigger: 6,
+    RightTrigger: 7,
+    SelectOrBack: 8,
+    StartOrForward: 9,
+    LeftAnalogPress: 10,
+    RightAnalogPress: 11,
+    LeftClusterTopButton: 12,
+    LeftClusterBottomButton: 13,
+    LeftClusterLeftButton: 14,
+    LeftClusterRightButton: 15,
+    CentreButton: 16,
+    // Axes
+    LeftStickHorizontal: 0,
+    LeftStickVertical: 1,
+    RightStickHorizontal: 2,
+    RightStickVertical: 3
+}
 
 function scanGamepads() {
     let gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
@@ -100,41 +127,42 @@ function updateStatus() {
         for (let i = 0; i < currentState.buttons.length; i++) {
             let currButton = currentState.buttons[i];
             let prevButton = prevState.buttons[i];
-            // Button 6 is actually the left trigger, send it to UE as an analog axis
-            // Button 7 is actually the right trigger, send it to UE as an analog axis
-            // The rest are normal buttons. Treat as such
             if (currButton.pressed) {
-                // New press
-                if (i == 6) {
+                // press
+                if (i == gamepadLayout.LeftTrigger) {
+                    //                       UEs left analog has a button index of 5
                     sendInputMessage("GamepadAnalog", [ j, 5, currButton.value ]);
-                } else if (i == 7) {
+                } else if (i == gamepadLayout.RightTrigger) {
+                    //                       UEs right analog has a button index of 6
                     sendInputMessage("GamepadAnalog", [ j, 6, currButton.value ]);
                 } else {
                     sendInputMessage("GamepadButtonPressed", [ j, i, prevButton.pressed ]);
                 }
             } else if (!currButton.pressed && prevButton.pressed) {
                 // release
-                if (i == 6) {
+                if (i == gamepadLayout.LeftTrigger) {
+                    //                       UEs left analog has a button index of 5
                     sendInputMessage("GamepadAnalog", [ j, 5, 0 ]);
-                } else if (i == 7) {
+                } else if (i == gamepadLayout.RightTrigger) {
+                    //                       UEs right analog has a button index of 6
                     sendInputMessage("GamepadAnalog", [ j, 6, 0 ]);
                 } else {
                     sendInputMessage("GamepadButtonReleased", [ j, i ]);
                 }
             }
         }
-        // Iterate over gamepad axes
+        // Iterate over gamepad axes (we will increment in lots of 2 as there is 2 axes per stick)
         for (let i = 0; i < currentState.axes.length; i += 2) {
+            // Horizontal axes are even numbered
             let x = parseFloat(currentState.axes[i].toFixed(4));
-            // https://w3c.github.io/gamepad/#remapping Gamepad broweser side standard mapping has positive down, negative up. This is downright disgusting. So we fix it.
+
+            // Vertical axes are odd numbered
+            // https://w3c.github.io/gamepad/#remapping Gamepad browser side standard mapping has positive down, negative up. This is downright disgusting. So we fix it.
             let y = -parseFloat(currentState.axes[i + 1].toFixed(4));
-            if (i === 0 || i === 2) {
-                // left stick
-                // axis 1 = left horizontal
-                sendInputMessage("GamepadAnalog", [ j, i + 1, x ]);
-                // axis 2 = left vertical
-                sendInputMessage("GamepadAnalog", [ j, i + 2, y ]);
-            }
+
+            // UE's analog axes follow the same order as the browsers, but start at index 1 so we will offset as such
+            sendInputMessage("GamepadAnalog", [ j, i + 1, x ]); // Horizontal axes, only offset by 1
+            sendInputMessage("GamepadAnalog", [ j, i + 2, y ]); // Vertical axes, offset by two (1 to match UEs axes convention and then another 1 for the vertical axes)
         }
         controllers[j].prevState = currentState;
     }
@@ -2016,8 +2044,9 @@ function registerLockedMouseEvents(playerElement) {
         sendInputMessage("MouseUp", [ e.button, coord.x, coord.y ]);
     };
 
-    playerElement.onmousewheel = function(e) {
+    playerElement.onwheel = function(e) {
         let coord = normalizeAndQuantizeUnsigned(x, y);
+        console.log(e.wheelDelta)
         sendInputMessage("MouseWheel", [ e.wheelDelta, coord.x, coord.y ]);
     };
 
@@ -2066,18 +2095,11 @@ function registerHoveringMouseEvents(playerElement) {
         e.preventDefault();
     };
 
-    if ('onmousewheel' in playerElement) {
-        playerElement.onmousewheel = function(e) {
-            let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
-            sendInputMessage("MouseWheel", [ e.wheelDelta, coord.x, coord.y ]);
-            e.preventDefault();
-        };
-    } else {
-        playerElement.addEventListener('DOMMouseScroll', function(e) {
-            let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
-            sendInputMessage("MouseWheel", [ e.detail * -120, coord.x, coord.y ]);
-            e.preventDefault();
-        }, false);
+    playerElement.onwheel = function(e) {
+        let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
+        console.log(e.wheelDelta)
+        sendInputMessage("MouseWheel", [ e.wheelDelta, coord.x, coord.y ]);
+        e.preventDefault();
     }
 
     playerElement.pressMouseButtons = function(e) {
@@ -2112,6 +2134,7 @@ function registerTouchEvents(playerElement) {
 
     function emitTouchData(type, touches) {
         for (let t = 0; t < touches.length; t++) {
+            let numTouches = 1; // the number of touches to be sent this message
             let touch = touches[t];
             let x = touch.clientX - playerElement.offsetLeft;
             let y = touch.clientY - playerElement.offsetTop;
@@ -2119,7 +2142,7 @@ function registerTouchEvents(playerElement) {
                 console.log(`F${fingerIds[touch.identifier]}=(${x}, ${y})`);
             }
             let coord = normalizeAndQuantizeUnsigned(x, y);
-            sendInputMessage(type, [ 1, coord.x, coord.y, fingerIds[touch.identifier], 255 * touch.force, coord.inRange ? 1 : 0 ]);
+            sendInputMessage(type, [ numTouches, coord.x, coord.y, fingerIds[touch.identifier], MaxByteValue * touch.force, coord.inRange ? 1 : 0 ]);
         }
     }
 
@@ -2455,18 +2478,9 @@ function clearMouseEvents(playerElement) {
     playerElement.onclick = null;
     playerElement.onmousedown = null;
     playerElement.onmouseup = null;
-    playerElement.onmousewheel = null;
+    playerElement.onwheel = null;
     playerElement.onmousemove = null;
     playerElement.oncontextmenu = null;
-    if ('onmousewheel' in playerElement) {
-        playerElement.onmousewheel = null
-    } else {
-        playerElement.removeEventListener('DOMMouseScroll', function(e) {
-            let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
-            sendInputMessage("MouseWheel", [ e.detail * -120, coord.x, coord.y ]);
-            e.preventDefault();
-        }, false);
-    }
 }
 
 function toggleControlScheme() {
