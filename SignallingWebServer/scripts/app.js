@@ -10,8 +10,6 @@ let rAF = window.mozRequestAnimationFrame ||
 let kbEvent = document.createEvent("KeyboardEvent");
 let initMethod = typeof kbEvent.initKeyboardEvent !== 'undefined' ? "initKeyboardEvent" : "initKeyEvent";
 
-let offerToReceive = false;
-
 let webRtcPlayerObj = null;
 let print_stats = false;
 let print_inputs = false;
@@ -412,6 +410,7 @@ function setupHtmlEvents() {
     setupToggleWithUrlParams("force-mono-tgl", "ForceMonoAudio");
     setupToggleWithUrlParams("control-tgl", "hoveringMouse");
     setupToggleWithUrlParams("cursor-tgl", "hideBrowserCursor");
+    setupToggleWithUrlParams("offer-receive-tgl", "offerToReceive");
 
 
     var streamSelector = document.getElementById('stream-select');
@@ -459,6 +458,10 @@ function setupToggleWithUrlParams(toggleId, urlParameterKey){
             window.history.replaceState({}, '', urlParams.toString() !== "" ? `${location.pathname}?${urlParams}` : `${location.pathname}`);
         });
     }
+}
+
+function UrlParamsCheck(urlParameterKey) {
+    return new URLSearchParams(window.location.search).has(urlParameterKey);
 }
 
 var streamTrackSource = null;
@@ -1038,7 +1041,7 @@ function setupWebRtcPlayer(htmlElement, config) {
         createOnScreenKeyboardHelpers(htmlElement);
     }
 
-    if (offerToReceive) {
+    if (UrlParamsCheck('offerToReceive')) {
        createWebRtcOffer();
     }
 
@@ -2310,7 +2313,7 @@ function connect() {
             console.log("%c[Inbound SS (playerCount)]", "background: lightblue; color: black", msg);
         } else if (msg.type === 'offer') {
             console.log("%c[Inbound SS (offer)]", "background: lightblue; color: black", msg);
-            if (!offerToReceive) {
+            if (!UrlParamsCheck('offerToReceive')) {
                 onWebRtcOffer(msg);
             }
         } else if (msg.type === 'answer') {
