@@ -42,7 +42,7 @@ module.exports = (env) => {
         },
         {
           test: /\.(png|svg)$/,
-          type: 'asset/resource'
+          type: 'asset/inline'
         },
       ],
     },
