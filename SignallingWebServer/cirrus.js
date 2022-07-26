@@ -30,7 +30,8 @@ const defaultConfig = {
 	HttpPort: 80,
 	HttpsPort: 443,
 	StreamerPort: 8888,
-	SFUPort: 8889
+	SFUPort: 8889,
+	MaxPlayerCount: -1
 };
 
 const argv = require('yargs').argv;
@@ -94,6 +95,7 @@ var matchmakerAddress = '127.0.0.1';
 var matchmakerPort = 9999;
 var matchmakerRetryInterval = 5;
 var matchmakerKeepAliveInterval = 30;
+var maxPlayerCount = -1;
 
 var gameSessionId;
 var userSessionId;
@@ -148,6 +150,10 @@ try {
 
 	if (typeof config.MatchmakerRetryInterval != 'undefined') {
 		matchmakerRetryInterval = config.MatchmakerRetryInterval;
+	}
+
+	if (typeof config.MaxPlayerCount != 'undefined') {
+		maxPlayerCount = config.MaxPlayerCount;
 	}
 } catch (e) {
 	console.error(e);
@@ -523,6 +529,13 @@ playerServer.on('connection', function (ws, req) {
 		ws.send(JSON.stringify({ type: "warning", warning: "Even though ?preferSFU was specified, there is currently no SFU connected." }));
 	}
 
+	if(playerCount + 1 > maxPlayerCount && maxPlayerCount !== -1)
+	{
+		console.logColor(logging.Red, `new connection would exceed number of allowed concurrent connections. Max: ${maxPlayerCount}, Current ${playerCount}`);
+		ws.close(1013, `too many connections. max: ${maxPlayerCount}, current: ${playerCount}`);
+		return;
+	}
+
 	++playerCount;
 	let playerId = (++nextPlayerId).toString();
 	console.logColor(logging.Green, `player ${playerId} (${req.connection.remoteAddress}) connected`);
@@ -593,7 +606,7 @@ playerServer.on('connection', function (ws, req) {
 			sendPlayerDisconnectedToMatchmaker();
 			sendPlayersCount();
 		} catch(err) {
-			console.logColor(loggin.Red, `ERROR:: onPlayerDisconnected error: ${err.message}`);
+			console.logColor(logging.Red, `ERROR:: onPlayerDisconnected error: ${err.message}`);
 		}
 	}
 

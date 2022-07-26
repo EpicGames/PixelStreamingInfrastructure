@@ -98,7 +98,7 @@ function scanGamepads() {
 function updateStatus() {
     scanGamepads();
     // Iterate over multiple controllers in the case the mutiple gamepads are connected
-    for (j in controllers) {
+    for (let j in controllers) {
         let controller = controllers[j];
         let currentState = controller.currentState;
         let prevState = controller.prevState;
@@ -169,6 +169,7 @@ function emitControllerButtonPressed(controllerIndex, buttonIndex, isRepeat) {
     Data.setUint8(1, controllerIndex);
     Data.setUint8(2, buttonIndex);
     Data.setUint8(3, isRepeat);
+    sendInputData(Data.buffer);
 }
 
 function emitControllerButtonReleased(controllerIndex, buttonIndex) {
@@ -176,6 +177,7 @@ function emitControllerButtonReleased(controllerIndex, buttonIndex) {
     Data.setUint8(0, MessageType.GamepadButtonReleased);
     Data.setUint8(1, controllerIndex);
     Data.setUint8(2, buttonIndex);
+    sendInputData(Data.buffer);
 }
 
 function emitControllerAxisMove(controllerIndex, axisIndex, analogValue) {
@@ -384,6 +386,7 @@ function setupHtmlEvents() {
     if (matchViewportResolutionCheckBox !== null) {
         matchViewportResolutionCheckBox.onchange = function (event) {
             matchViewportResolution = matchViewportResolutionCheckBox.checked;
+            updateVideoStreamSize();
         };
     }
 
@@ -462,7 +465,7 @@ var streamTrackSource = null;
 
 function updateStreamList() {
     const streamSelector = document.getElementById('stream-select');
-    for (i = streamSelector.options.length - 1; i >= 0; i--) {
+    for (let i = streamSelector.options.length - 1; i >= 0; i--) {
         streamSelector.remove(i);
     }
     streamSelector.value = null;
@@ -483,7 +486,7 @@ function updateTrackList() {
     const streamSelector = document.getElementById('stream-select');
     const trackSelector = document.getElementById('track-select');
     const stream = webRtcPlayerObj.availableVideoStreams.get(streamSelector.value);
-    for (i = trackSelector.options.length - 1; i >= 0; i--) {
+    for (let i = trackSelector.options.length - 1; i >= 0; i--) {
         trackSelector.remove(i);
     }
     trackSelector.value = null;
@@ -697,7 +700,7 @@ function addResponseEventListener(name, listener) {
 }
 
 function removeResponseEventListener(name) {
-    responseEventListeners.remove(name);
+    responseEventListeners.delete(name);
 }
 
 // Must be kept in sync with PixelStreamingProtocol::EToPlayerMsg C++ enum.
@@ -1551,7 +1554,7 @@ function emitDescriptor(messageType, descriptor) {
     byteIdx++;
     data.setUint16(byteIdx, descriptorAsString.length, true);
     byteIdx += 2;
-    for (i = 0; i < descriptorAsString.length; i++) {
+    for (let i = 0; i < descriptorAsString.length; i++) {
         data.setUint16(byteIdx, descriptorAsString.charCodeAt(i), true);
         byteIdx += 2;
     }
@@ -1592,6 +1595,7 @@ function requestQualityControl() {
 let playerElementClientRect = undefined;
 let normalizeAndQuantizeUnsigned = undefined;
 let normalizeAndQuantizeSigned = undefined;
+let unquantizeAndDenormalizeUnsigned = undefined;
 
 function setupNormalizeAndQuantize() {
     let playerElement = document.getElementById('player');
@@ -2279,7 +2283,25 @@ function connect() {
     ws = new WebSocket(connectionUrl);
     ws.attemptStreamReconnection = true;
 
+    ws.onmessagebinary = function(event) {
+        if(!event || !event.data) { return; }
+
+        event.data.text().then(function(messageString){
+            // send the new stringified event back into `onmessage`
+            ws.onmessage({ data: messageString });
+        }).catch(function(error){
+            console.error(`Failed to parse binary blob from websocket, reason: ${error}`);
+        });
+    }
+
     ws.onmessage = function(event) {
+
+        // Check if websocket message is binary, if so, stringify it.
+        if(event.data && event.data instanceof Blob) {
+            ws.onmessagebinary(event);
+            return;
+        }
+
         let msg = JSON.parse(event.data);
         if (msg.type === 'config') {
             console.log("%c[Inbound SS (config)]", "background: lightblue; color: black", msg);
