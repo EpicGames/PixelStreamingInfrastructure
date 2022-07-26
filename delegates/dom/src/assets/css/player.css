@@ -143,6 +143,14 @@ canvas {
 	padding: 0.6rem !important;
 }
 
+object {
+	pointer-events: none;
+}
+
+#minimizeIcon {
+	display: none;
+}
+
 #settingsBtn,
 #statsBtn {
 	cursor: pointer;

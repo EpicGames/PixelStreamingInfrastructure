@@ -1,7 +1,7 @@
 <svg version="1.1" id="maximize" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	viewBox="0 0 384.97 384.97" style="enable-background:new 0 0 384.97 384.97;" xml:space="preserve">
     <defs>
-        <link href="../player.css" type="text/css" rel="stylesheet" xmlns="http://www.w3.org/1999/xhtml"/>
+        <link href="index.css" type="text/css" rel="stylesheet" xmlns="http://www.w3.org/1999/xhtml"/>
     </defs>
     <g>
         <path d="M384.97,12.03c0-6.713-5.317-12.03-12.03-12.03H264.847c-6.833,0-11.922,5.39-11.934,12.223

@@ -1,4 +1,4 @@
-import { NativeDOMDelegate, Images } from "./NativeDOMDelegate";
+import { NativeDOMDelegate } from "./NativeDOMDelegate";
 import * as libspsfrontend from '@tensorworks/libspsfrontend';
 
 // Determine whether a signalling server WebSocket URL was specified at compile-time or if we need to compute it at runtime
@@ -23,8 +23,6 @@ if (signallingServerAddress == '') {
         signallingServerAddress += (window.location.pathname + '/ws')
     }
 }
-
-signallingServerAddress = "wss://sps.tenant-tensorworks-testing.lga1.ingress.coreweave.cloud/demo/ws";
 
 // prep the player div element 
 let playerElement = document.getElementById("player") as HTMLDivElement;

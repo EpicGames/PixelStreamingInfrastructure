@@ -40,6 +40,10 @@ module.exports = (env) => {
           test: /\.css$/i,
           use: [MiniCssExtractPlugin.loader, 'css-loader'],
         },
+        {
+          test: /\.(png|svg)$/,
+          type: 'asset/resource'
+        },
       ],
     },
     resolve: {
