@@ -7,8 +7,6 @@ let controllers = {};
 let rAF = window.mozRequestAnimationFrame ||
     window.webkitRequestAnimationFrame ||
     window.requestAnimationFrame;
-let kbEvent = document.createEvent("KeyboardEvent");
-let initMethod = typeof kbEvent.initKeyboardEvent !== 'undefined' ? "initKeyboardEvent" : "initKeyEvent";
 
 let webRtcPlayerObj = null;
 let print_stats = false;
@@ -22,11 +20,11 @@ let autoPlayAudio = true;
 let qualityController = false;
 let qualityControlOwnershipCheckBox;
 let matchViewportResolution;
+let VideoEncoderQP = "N/A";
 // TODO: Remove this - workaround because of bug causing UE to crash when switching resolutions too quickly
 let lastTimeResized = new Date().getTime();
 let resizeTimeout;
 
-let onDataChannelConnected;
 let responseEventListeners = new Map();
 
 let freezeFrameOverlay = null;
@@ -97,154 +95,223 @@ const MessageDirection = {
 let toStreamerHandlers = new Map(); // toStreamerHandlers[message](args..)
 let fromStreamerHandlers = new Map(); // fromStreamerHandlers[message](args..)
 function populateDefaultProtocol() {
-    // QualityControlOwnership
-    registerMessageHandler(MessageDirection.FromStreamer, "QualityControlOwnership", (data) => {
-        let view = new Uint8Array(data);
-        let ownership = view[1] === 0 ? false : true;
-        console.log("Received quality controller message, will control quality: " + ownership);
-        qualityController = ownership;
-        // If we own the quality control, we can't relinquish it. We only lose
-        // quality control when another peer asks for it
-        if (qualityControlOwnershipCheckBox !== null) {
-            qualityControlOwnershipCheckBox.disabled = ownership;
-            qualityControlOwnershipCheckBox.checked = ownership;
-        }
+    /*
+     * Control Messages. Range = 0..49.
+     */
+    toStreamerMessages.add("IFrameRequest", {
+        "id": 0,
+        "byteLength": 0,
+        "structure": []
     });
+    toStreamerMessages.add("RequestQualityControl", {
+        "id": 1,
+        "byteLength": 0,
+        "structure": []
+    });
+    toStreamerMessages.add("FpsRequest", {
+        "id": 2,
+        "byteLength": 0,
+        "structure": []
+    });
+    toStreamerMessages.add("AverageBitrateRequest", {
+        "id": 3,
+        "byteLength": 0,
+        "structure": []
+    });
+    toStreamerMessages.add("StartStreaming", {
+        "id": 4,
+        "byteLength": 0,
+        "structure": []
+    });
+    toStreamerMessages.add("StopStreaming", {
+        "id": 5,
+        "byteLength": 0,
+        "structure": []
+    });
+    toStreamerMessages.add("LatencyTest", {
+        "id": 6,
+        "byteLength": 0,
+        "structure": []
+    });
+    toStreamerMessages.add("RequestInitialSettings", {
+        "id": 7,
+        "byteLength": 0,
+        "structure": []
+    });
+    toStreamerMessages.add("TestEcho", {
+        "id": 8,
+        "byteLength": 0,
+        "structure": []
+    });
+    /*
+     * Input Messages. Range = 50..89.
+     */
+    // Generic Input Messages. Range = 50..59.
+    toStreamerMessages.add("UIInteraction", {
+        "id": 50,
+        "byteLength": 0,
+        "structure": []
+    });
+    toStreamerMessages.add("Command", {
+        "id": 51,
+        "byteLength": 0,
+        "structure": []
+    });
+    // Keyboard Input Message. Range = 60..69.
+    toStreamerMessages.add("KeyDown", {
+        "id": 60,
+        "byteLength": 2,
+        //            keyCode  isRepeat
+        "structure": ["uint8", "uint8"]
+    });
+    toStreamerMessages.add("KeyUp", {
+        "id": 61,
+        "byteLength": 1,
+        //            keyCode
+        "structure": ["uint8"]
+    });
+    toStreamerMessages.add("KeyPress", {
+        "id": 62,
+        "byteLength": 2,
+        //            charcode
+        "structure": ["uint16"]
+    });
+    // Mouse Input Messages. Range = 70..79.
+    toStreamerMessages.add("MouseEnter", {
+        "id": 70,
+        "byteLength": 0,
+        "structure": []
+    });
+    toStreamerMessages.add("MouseLeave", {
+        "id": 71,
+        "byteLength": 0,
+        "structure": []
+    });
+    toStreamerMessages.add("MouseDown", {
+        "id": 72,
+        "byteLength": 5,
+        //              button     x         y
+        "structure": ["uint8", "uint16", "uint16"]
+    });
+    toStreamerMessages.add("MouseUp", {
+        "id": 73,
+        "byteLength": 5,
+        //              button     x         y
+        "structure": ["uint8", "uint16", "uint16"]
+    });
+    toStreamerMessages.add("MouseMove", {
+        "id": 74,
+        "byteLength": 8,
+        //              x           y      deltaX    deltaY
+        "structure": ["uint16", "uint16", "int16", "int16"]
+    });
+    toStreamerMessages.add("MouseWheel", {
+        "id": 75,
+        "byteLength": 6,
+        //              delta       x        y
+        "structure": ["int16", "uint16", "uint16"]
+    });
+    // Touch Input Messages. Range = 80..89.
+    toStreamerMessages.add("TouchStart", {
+        "id": 80,
+        "byteLength": 7,
+        //          numtouches(1)   x       y        idx     force     valid
+        "structure": ["uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
+    });
+    toStreamerMessages.add("TouchEnd", {
+        "id": 81,
+        "byteLength": 7,
+        //          numtouches(1)   x       y        idx     force     valid
+        "structure": ["uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
+    });
+    toStreamerMessages.add("TouchMove", {
+        "id": 82,
+        "byteLength": 7,
+        //          numtouches(1)   x       y       idx      force     valid
+        "structure": ["uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
+    });
+    // Gamepad Input Messages. Range = 90..99
+    toStreamerMessages.add("GamepadButtonPressed", {
+        "id": 90,
+        "byteLength": 3,
+        //            ctrlerId   button  isRepeat
+        "structure": ["uint8", "uint8", "uint8"]
+    });
+    toStreamerMessages.add("GamepadButtonReleased", {
+        "id": 91,
+        "byteLength": 3,
+        //            ctrlerId   button  isRepeat(0)
+        "structure": ["uint8", "uint8", "uint8"]
+    });
+    toStreamerMessages.add("GamepadAnalog", {
+        "id": 92,
+        "byteLength": 10,
+        //            ctrlerId   button  analogValue
+        "structure": ["uint8", "uint8", "double"]
+    });
+
     fromStreamerMessages.add("QualityControlOwnership", 0);
-
-    //
-    registerMessageHandler(MessageDirection.FromStreamer, "Response", (data) => {
-        let response = new TextDecoder("utf-16").decode(data.slice(1));
-        for (let listener of responseEventListeners.values()) {
-            listener(response);
-        }
-    });
     fromStreamerMessages.add("Response", 1);
-
-    //
-    registerMessageHandler(MessageDirection.FromStreamer, "ToClientCommand", (data) => {
-        let commandAsString = new TextDecoder("utf-16").decode(data.slice(1));
-        console.log(commandAsString);
-        let command = JSON.parse(commandAsString);
-        if (command.command === 'onScreenKeyboard') {
-            showOnScreenKeyboard(command);
-        }
-    });
-    fromStreamerMessages.add("ToClientCommand", 2);
-
-    //
-    registerMessageHandler(MessageDirection.FromStreamer, "FreezeFrame", (data) => {
-        let view = new Uint8Array(data);
-        processFreezeFrameMessage(view);
-    });
+    fromStreamerMessages.add("Command", 2);
     fromStreamerMessages.add("FreezeFrame", 3);
-
-    //
-    registerMessageHandler(MessageDirection.FromStreamer, "UnfreezeFrame", (data) => {
-        invalidateFreezeFrameOverlay();
-    });
     fromStreamerMessages.add("UnfreezeFrame", 4);
-
-    //
-    registerMessageHandler(MessageDirection.FromStreamer, "VideoEncoderAvgQP", (data) => {
-        VideoEncoderQP = new TextDecoder("utf-16").decode(data.slice(1));
-    });
     fromStreamerMessages.add("VideoEncoderAvgQP", 5);
-
-    //
-    registerMessageHandler(MessageDirection.FromStreamer, "LatencyTest", (data) => {
-        let latencyTimingsAsString = new TextDecoder("utf-16").decode(data.slice(1));
-        console.log("Got latency timings from UE.");
-        console.log(latencyTimingsAsString);
-        let latencyTimingsFromUE = JSON.parse(latencyTimingsAsString);
-        if (webRtcPlayerObj) {
-            webRtcPlayerObj.latencyTestTimings.SetUETimings(latencyTimingsFromUE);
-        }
-    });
     fromStreamerMessages.add("LatencyTest", 6);
-
-    //
-    registerMessageHandler(MessageDirection.FromStreamer, "InitialSettings", (data) => {
-        let settingsString = new TextDecoder("utf-16").decode(data.slice(1));
-        let settingsJSON = JSON.parse(settingsString);
-
-        if (settingsJSON.PixelStreaming) {
-            let allowConsoleCommands = settingsJSON.PixelStreaming.AllowPixelStreamingCommands;
-            if (allowConsoleCommands === false) {
-                console.warn("-AllowPixelStreamingCommands=false, sending arbitray console commands from browser to UE is disabled.");
-            }
-            let disableLatencyTest = settingsJSON.PixelStreaming.DisableLatencyTest;
-            if (disableLatencyTest) {
-                document.getElementById("test-latency-button").disabled = true;
-                document.getElementById("test-latency-button").title = "Disabled by -PixelStreamingDisableLatencyTester=true";
-                console.warn("-PixelStreamingDisableLatencyTester=true, requesting latency report from the the browser to UE is disabled.");
-            }
-        }
-        if (settingsJSON.Encoder) {
-            document.getElementById('encoder-min-qp-text').value = settingsJSON.Encoder.MinQP;
-            document.getElementById('encoder-max-qp-text').value = settingsJSON.Encoder.MaxQP;
-        }
-        if (settingsJSON.WebRTC) {
-            document.getElementById("webrtc-fps-text").value = settingsJSON.WebRTC.FPS;
-            // reminder bitrates are sent in bps but displayed in kbps
-            document.getElementById("webrtc-min-bitrate-text").value = settingsJSON.WebRTC.MinBitrate / 1000;
-            document.getElementById("webrtc-max-bitrate-text").value = settingsJSON.WebRTC.MaxBitrate / 1000;
-        }
-    });
     fromStreamerMessages.add("InitialSettings", 7);
-
-    //
-    registerMessageHandler(MessageDirection.FromStreamer, "FileExtension", (data) => {
-        let view = new Uint8Array(data);
-        processFileExtension(view);
-    });
     fromStreamerMessages.add("FileExtension", 8);
-
-    //
-    registerMessageHandler(MessageDirection.FromStreamer, "FileMimeType", (data) => {
-        let view = new Uint8Array(data);
-        processFileMimeType(view);
-    });
     fromStreamerMessages.add("FileMimeType", 9);
-
-    //
-    registerMessageHandler(MessageDirection.FromStreamer, "FileContents", (data) => {
-        let view = new Uint8Array(data);
-        processFileContents(view);
-    });
     fromStreamerMessages.add("FileContents", 10);
-
-    //
-    registerMessageHandler(MessageDirection.FromStreamer, "TestEcho", (data) => {
-        let view = new Uint8Array(data);
-        processFileContents(view);
-    });
     fromStreamerMessages.add("TestEcho", 11);
-
-    //
-    registerMessageHandler(MessageDirection.FromStreamer, "InputControlOwnership", (data) => {
-        let view = new Uint8Array(data);
-        let ownership = view[1] === 0 ? false : true;
-        console.log("Received input controller message - will your input control the stream: " + ownership);
-        inputController = ownership;
-    });
     fromStreamerMessages.add("InputControlOwnership", 12);
+    fromStreamerMessages.add("Protocol", 255);
+}
 
-    //
-    registerMessageHandler(MessageDirection.FromStreamer, "Protocol", (data) => {
-        // TODO
-        // let protocolString = new TextDecoder("utf-16").decode(data.slice(1));
-        // protocolJSON = JSON.parse(protocolString);
-        console.log("Received new protocol. Updating exisiting protocol...");
-        // Once the protocol has been received, we can send our control messages
-        requestInitialSettings();
-        requestQualityControl();
-    });
-    fromStreamerMessages.add("InputControlOwnership", 255);
+function registerMessageHandlers() {
+    registerMessageHandler(MessageDirection.FromStreamer, "QualityControlOwnership", onQualityControlOwnership);
+    registerMessageHandler(MessageDirection.FromStreamer, "Response", onResponse);
+    registerMessageHandler(MessageDirection.FromStreamer, "Command", onCommand);
+    registerMessageHandler(MessageDirection.FromStreamer, "FreezeFrame", onFreezeFrameMessage);
+    registerMessageHandler(MessageDirection.FromStreamer, "UnfreezeFrame", invalidateFreezeFrameOverlay);
+    registerMessageHandler(MessageDirection.FromStreamer, "VideoEncoderAvgQP", onVideoEncoderAvgQP);
+    registerMessageHandler(MessageDirection.FromStreamer, "LatencyTest", onLatencyTestMessage);
+    registerMessageHandler(MessageDirection.FromStreamer, "InitialSettings", onInitialSettings);
+    registerMessageHandler(MessageDirection.FromStreamer, "FileExtension", onFileExtension);
+    registerMessageHandler(MessageDirection.FromStreamer, "FileMimeType", onFileMimeType);
+    registerMessageHandler(MessageDirection.FromStreamer, "FileContents", onFileContents);
+    registerMessageHandler(MessageDirection.FromStreamer, "TestEcho", () => {/* Do nothing */ });
+    registerMessageHandler(MessageDirection.FromStreamer, "InputControlOwnership", onInputControlOwnership);
+    registerMessageHandler(MessageDirection.FromStreamer, "Protocol", onProtocolMessage);
+
+    registerMessageHandler(MessageDirection.ToStreamer, "IFrameRequest", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "RequestQualityControl", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "FpsRequest", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "AverageBitrateRequest", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "StartStreaming", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "StopStreaming", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "LatencyTest", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "RequestInitialSettings", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "TestEcho", () => { /* Do nothing */});
+    registerMessageHandler(MessageDirection.ToStreamer, "UIInteraction", emitUIInteraction);
+    registerMessageHandler(MessageDirection.ToStreamer, "Command", emitDescriptor);
+    registerMessageHandler(MessageDirection.ToStreamer, "KeyDown", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "KeyUp", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "KeyPress", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "MouseEnter", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "MouseLeave", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "MouseDown", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "MouseUp", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "MouseMove", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "MouseWheel", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "TouchStart", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "TouchEnd", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "TouchMove", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonPressed", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonReleased", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "GamepadAnalog", sendInputMessage);
 }
 
 function registerMessageHandler(messageDirection, messageType, messageHandler) {
-    switch(messageDirection) {
+    switch (messageDirection) {
         case MessageDirection.ToStreamer:
             toStreamerHandlers[messageType] = messageHandler;
             break;
@@ -253,6 +320,168 @@ function registerMessageHandler(messageDirection, messageType, messageHandler) {
             break;
         default:
             console.log(`Unknown message direction ${messageDirection}`);
+    }
+}
+
+function onQualityControlOwnership(data) {
+    let view = new Uint8Array(data);
+    let ownership = view[1] === 0 ? false : true;
+    console.log("Received quality controller message, will control quality: " + ownership);
+    qualityController = ownership;
+    // If we own the quality control, we can't relinquish it. We only lose
+    // quality control when another peer asks for it
+    if (qualityControlOwnershipCheckBox !== null) {
+        qualityControlOwnershipCheckBox.disabled = ownership;
+        qualityControlOwnershipCheckBox.checked = ownership;
+    }
+}
+
+function onResponse(data) {
+    let response = new TextDecoder("utf-16").decode(data.slice(1));
+    for (let listener of responseEventListeners.values()) {
+        listener(response);
+    }
+}
+
+function onCommand(data) {
+    let commandAsString = new TextDecoder("utf-16").decode(data.slice(1));
+    console.log(commandAsString);
+    let command = JSON.parse(commandAsString);
+    if (command.command === 'onScreenKeyboard') {
+        showOnScreenKeyboard(command);
+    }
+}
+
+function onFreezeFrameMessage(data) {
+    let view = new Uint8Array(data);
+    processFreezeFrameMessage(view);
+}
+
+function onVideoEncoderAvgQP(data) {
+    VideoEncoderQP = new TextDecoder("utf-16").decode(data.slice(1));
+}
+
+function onLatencyTestMessage(data) {
+    let latencyTimingsAsString = new TextDecoder("utf-16").decode(data.slice(1));
+    console.log("Got latency timings from UE.");
+    console.log(latencyTimingsAsString);
+    let latencyTimingsFromUE = JSON.parse(latencyTimingsAsString);
+    if (webRtcPlayerObj) {
+        webRtcPlayerObj.latencyTestTimings.SetUETimings(latencyTimingsFromUE);
+    }
+}
+
+function onInitialSettings(data) {
+    let settingsString = new TextDecoder("utf-16").decode(data.slice(1));
+    let settingsJSON = JSON.parse(settingsString);
+
+    if (settingsJSON.PixelStreaming) {
+        let allowConsoleCommands = settingsJSON.PixelStreaming.AllowPixelStreamingCommands;
+        if (allowConsoleCommands === false) {
+            console.warn("-AllowPixelStreamingCommands=false, sending arbitray console commands from browser to UE is disabled.");
+        }
+        let disableLatencyTest = settingsJSON.PixelStreaming.DisableLatencyTest;
+        if (disableLatencyTest) {
+            document.getElementById("test-latency-button").disabled = true;
+            document.getElementById("test-latency-button").title = "Disabled by -PixelStreamingDisableLatencyTester=true";
+            console.warn("-PixelStreamingDisableLatencyTester=true, requesting latency report from the the browser to UE is disabled.");
+        }
+    }
+    if (settingsJSON.Encoder) {
+        document.getElementById('encoder-min-qp-text').value = settingsJSON.Encoder.MinQP;
+        document.getElementById('encoder-max-qp-text').value = settingsJSON.Encoder.MaxQP;
+    }
+    if (settingsJSON.WebRTC) {
+        document.getElementById("webrtc-fps-text").value = settingsJSON.WebRTC.FPS;
+        // reminder bitrates are sent in bps but displayed in kbps
+        document.getElementById("webrtc-min-bitrate-text").value = settingsJSON.WebRTC.MinBitrate / 1000;
+        document.getElementById("webrtc-max-bitrate-text").value = settingsJSON.WebRTC.MaxBitrate / 1000;
+    }
+}
+
+function onFileExtension(data) {
+    let view = new Uint8Array(data);
+    processFileExtension(view);
+}
+
+function onFileMimeType(data) {
+    let view = new Uint8Array(data);
+    processFileMimeType(view);
+}
+
+function onFileContents(data) {
+    let view = new Uint8Array(data);
+    processFileContents(view);
+}
+
+function onInputControlOwnership(data) {
+    let view = new Uint8Array(data);
+    let ownership = view[1] === 0 ? false : true;
+    console.log("Received input controller message - will your input control the stream: " + ownership);
+    inputController = ownership;
+}
+
+function onProtocolMessage(data) {
+    /**
+     * TODO
+     */
+    try {
+        let protocolString = new TextDecoder("utf-16").decode(data.slice(1));
+        let protocolJSON = JSON.parse(protocolString);
+        console.log("Received new protocol. Updating exisiting protocol...");
+        if (!protocolJSON.hasOwnProperty("direction")) {
+            throw new Error('Malformed protocol received');
+        }
+        let direction = protocolJSON.direction;
+        delete protocolJSON.direction;
+        Object.keys(protocolJSON).forEach((messageType) => {
+            let message = protocolJSON[messageType];
+            switch (direction) {
+                case MessageDirection.ToStreamer:
+                    // Check that the message contains all the relevant params
+                    if (!message.hasOwnProperty("id") || !message.hasOwnProperty("byteLength")) {
+                        console.error(`ToStreamer->${messageType} protcol definition was malformed`);
+                        // return in a forEach is equivalent to a continue in a normal for loop
+                        return;
+                    }
+                    if(message.byteLength > 0 && !message.hasOwnProperty("structure")) {
+                        // If we specify a bytelength, will must have a corresponding structure
+                        console.error(`ToStreamer->${messageType} protcol definition was malformed`);
+                        // return in a forEach is equivalent to a continue in a normal for loop
+                        return;
+                    }
+
+                    if (toStreamerHandlers[messageType]) {
+                        // If we've registered a handler for this message type we can add it to our supported messages. ie registerMessageHandler(...)
+                        toStreamerMessages.add(messageType, message);
+                    } else {
+                        console.error(`There was no registered handler for "${messageType}" - try adding one using registerMessageHandler(MessageDirection.ToStreamer, "${messageType}", myHandler)`);
+                    }
+                    break;
+                case MessageDirection.FromStreamer:
+                    // Check that the message contains all the relevant params
+                    if (!!message.hasOwnProperty("id")) {
+                        console.error(`FromStreamer->${messageType} protcol definition was malformed`);
+                        // return in a forEach is equivalent to a continue in a normal for loop
+                        return;
+                    }
+                    if (fromStreamerHandlers[message.id]) {
+                        // If we've registered a handler for this message type. ie registerMessageHandler(...)
+                        fromStreamerMessages.add(messageType, message.id);
+                    } else {
+                        console.error(`There was no registered handler for "${message}" - try adding one using registerMessageHandler(MessageDirection.FromStreamer, "${message}", myHandler)`);
+                    }
+                    break;
+                default:
+                    throw new Error(`Unknown direction: ${direction}`);
+            }
+        });
+
+        // Once the protocol has been received, we can send our control messages
+        requestInitialSettings();
+        requestQualityControl();
+    } catch (e) {
+        console.log(e);
     }
 }
 
@@ -307,23 +536,23 @@ function updateStatus() {
                 // press
                 if (i == gamepadLayout.LeftTrigger) {
                     //                       UEs left analog has a button index of 5
-                    sendInputMessage("GamepadAnalog", [ j, 5, currButton.value ]);
+                    toStreamerHandlers.GamepadAnalog("GamepadAnalog", [j, 5, currButton.value]);
                 } else if (i == gamepadLayout.RightTrigger) {
                     //                       UEs right analog has a button index of 6
-                    sendInputMessage("GamepadAnalog", [ j, 6, currButton.value ]);
+                    toStreamerHandlers.GamepadAnalog("GamepadAnalog", [j, 6, currButton.value]);
                 } else {
-                    sendInputMessage("GamepadButtonPressed", [ j, i, prevButton.pressed ]);
+                    toStreamerHandlers.GamepadButtonPressed("GamepadButtonPressed", [j, i, prevButton.pressed]);
                 }
             } else if (!currButton.pressed && prevButton.pressed) {
                 // release
                 if (i == gamepadLayout.LeftTrigger) {
                     //                       UEs left analog has a button index of 5
-                    sendInputMessage("GamepadAnalog", [ j, 5, 0 ]);
+                    toStreamerHandlers.GamepadAnalog("GamepadAnalog", [j, 5, 0]);
                 } else if (i == gamepadLayout.RightTrigger) {
                     //                       UEs right analog has a button index of 6
-                    sendInputMessage("GamepadAnalog", [ j, 6, 0 ]);
+                    toStreamerHandlers.GamepadAnalog("GamepadAnalog", [j, 6, 0]);
                 } else {
-                    sendInputMessage("GamepadButtonReleased", [ j, i ]);
+                    toStreamerHandlers.GamepadButtonReleased("GamepadButtonReleased", [j, i]);
                 }
             }
         }
@@ -337,8 +566,8 @@ function updateStatus() {
             let y = -parseFloat(currentState.axes[i + 1].toFixed(4));
 
             // UE's analog axes follow the same order as the browsers, but start at index 1 so we will offset as such
-            sendInputMessage("GamepadAnalog", [ j, i + 1, x ]); // Horizontal axes, only offset by 1
-            sendInputMessage("GamepadAnalog", [ j, i + 2, y ]); // Vertical axes, offset by two (1 to match UEs axes convention and then another 1 for the vertical axes)
+            toStreamerHandlers.GamepadAnalog("GamepadAnalog", [j, i + 1, x]); // Horizontal axes, only offset by 1
+            toStreamerHandlers.GamepadAnalog("GamepadAnalog", [j, i + 2, y]); // Vertical axes, offset by two (1 to match UEs axes convention and then another 1 for the vertical axes)
         }
         controllers[j].prevState = currentState;
     }
@@ -503,8 +732,8 @@ function setupHtmlEvents() {
             let minQP = document.getElementById('encoder-min-qp-text').value;
             let maxQP = document.getElementById('encoder-max-qp-text').value;
 
-            emitDescriptor("ToStreamerCommand", { "Encoder.MinQP": minQP });
-            emitDescriptor("ToStreamerCommand", { "Encoder.MaxQP": maxQP });
+            emitCommand({ "Encoder.MinQP": minQP });
+            emitCommand({ "Encoder.MaxQP": maxQP });
         };
     }
 
@@ -515,19 +744,16 @@ function setupHtmlEvents() {
             let minBitrate = document.getElementById('webrtc-min-bitrate-text').value * 1000;
             let maxBitrate = document.getElementById('webrtc-max-bitrate-text').value * 1000;
 
-            emitDescriptor("ToStreamerCommand", { 'WebRTC.Fps': FPS });
-            emitDescriptor("ToStreamerCommand", { 'WebRTC.MinBitrate': minBitrate });
-            emitDescriptor("ToStreamerCommand", { 'WebRTC.MaxBitrate': maxBitrate });
+            emitCommand({ 'WebRTC.Fps': FPS });
+            emitCommand({ 'WebRTC.MinBitrate': minBitrate });
+            emitCommand({ 'WebRTC.MaxBitrate': maxBitrate });
         };
     }
 
     let showFPSButton = document.getElementById('show-fps-button');
     if (showFPSButton !== null) {
         showFPSButton.onclick = function (event) {
-            let consoleDescriptor = {
-                
-            };
-            emitDescriptor("ToStreamerCommand", { "Stat.FPS": '' });
+            emitCommand({ "Stat.FPS": '' });
         };
     }
 
@@ -861,13 +1087,149 @@ function removeResponseEventListener(name) {
     responseEventListeners.delete(name);
 }
 
-let VideoEncoderQP = "N/A";
+function showFreezeFrame() {
+    let base64 = btoa(freezeFrame.jpeg.reduce((data, byte) => data + String.fromCharCode(byte), ''));
+    let freezeFrameImage = document.getElementById("freezeFrameOverlay").childNodes[0];
+    freezeFrameImage.src = 'data:image/jpeg;base64,' + base64;
+    freezeFrameImage.onload = function () {
+        freezeFrame.height = freezeFrameImage.naturalHeight;
+        freezeFrame.width = freezeFrameImage.naturalWidth;
+        resizeFreezeFrameOverlay();
+        if (shouldShowPlayOverlay) {
+            showPlayOverlay();
+            resizePlayerStyle();
+        } else {
+            showFreezeFrameOverlay();
+        }
+        webRtcPlayerObj.setVideoEnabled(false);
+    };
+}
 
-function onProtocolMessage(inProtocolJSON) {
-    protocolJSON = inProtocolJSON;
-    messageHandlers = new Map();
-    for(let message of inProtocolJSON) {
+function processFileExtension(view) {
+    // Reset file if we got a file message and we are not "receiving" it yet
+    if (!file.receiving) {
+        file.mimetype = "";
+        file.extension = "";
+        file.receiving = true;
+        file.valid = false;
+        file.size = 0;
+        file.data = [];
+        file.timestampStart = (new Date()).getTime();
+        console.log('Received first chunk of file');
+    }
 
+    let extensionAsString = new TextDecoder("utf-16").decode(view.slice(1));
+    console.log(extensionAsString);
+    file.extension = extensionAsString;
+}
+
+function processFileMimeType(view) {
+    // Reset file if we got a file message and we are not "receiving" it yet
+    if (!file.receiving) {
+        file.mimetype = "";
+        file.extension = "";
+        file.receiving = true;
+        file.valid = false;
+        file.size = 0;
+        file.data = [];
+        file.timestampStart = (new Date()).getTime();
+        console.log('Received first chunk of file');
+    }
+
+    let mimeAsString = new TextDecoder("utf-16").decode(view.slice(1));
+    console.log(mimeAsString);
+    file.mimetype = mimeAsString;
+}
+
+
+function processFileContents(view) {
+    // If we haven't received the intial setup instructions, return
+    if (!file.receiving) return;
+
+    // Extract the toal size of the file (across all chunks)
+    file.size = Math.ceil((new DataView(view.slice(1, 5).buffer)).getInt32(0, true) / 16379 /* The maximum number of payload bits per message*/);
+
+    // Get the file part of the payload
+    let fileBytes = view.slice(1 + 4);
+
+    // Append to existing data that holds the file
+    file.data.push(fileBytes);
+
+    // Uncomment for debug
+    console.log(`Received file chunk: ${file.data.length}/${file.size}`);
+
+    if (file.data.length === file.size) {
+        file.receiving = false;
+        file.valid = true;
+        console.log("Received complete file");
+        const transferDuration = ((new Date()).getTime() - file.timestampStart);
+        const transferBitrate = Math.round(file.size * 16 * 1024 / transferDuration);
+        console.log(`Average transfer bitrate: ${transferBitrate}kb/s over ${transferDuration / 1000} seconds`);
+
+        // File reconstruction
+        /**
+         * Example code to reconstruct the file
+         * 
+         * This code reconstructs the received data into the original file based on the mime type and extension provided and then downloads the reconstructed file
+         */
+        var received = new Blob(file.data, { type: file.mimetype });
+        var a = document.createElement('a');
+        a.setAttribute('href', URL.createObjectURL(received));
+        a.setAttribute('download', `transfer.${file.extension}`);
+        document.body.append(a);
+        // if you are so inclined to make it auto-download, do something like: a.click();
+        a.remove();
+    }
+    else if (file.data.length > file.size) {
+        file.receiving = false;
+        console.error(`Received bigger file than advertised: ${file.data.length}/${file.size}`);
+    }
+}
+
+function processFreezeFrameMessage(view) {
+    // Reset freeze frame if we got a freeze frame message and we are not "receiving" yet.
+    if (!freezeFrame.receiving) {
+        freezeFrame.receiving = true;
+        freezeFrame.valid = false;
+        freezeFrame.size = 0;
+        freezeFrame.jpeg = undefined;
+    }
+
+    // Extract total size of freeze frame (across all chunks)
+    freezeFrame.size = (new DataView(view.slice(1, 5).buffer)).getInt32(0, true);
+
+    // Get the jpeg part of the payload
+    let jpegBytes = view.slice(1 + 4);
+
+    // Append to existing jpeg that holds the freeze frame
+    if (freezeFrame.jpeg) {
+        let jpeg = new Uint8Array(freezeFrame.jpeg.length + jpegBytes.length);
+        jpeg.set(freezeFrame.jpeg, 0);
+        jpeg.set(jpegBytes, freezeFrame.jpeg.length);
+        freezeFrame.jpeg = jpeg;
+    }
+    // No existing freeze frame jpeg, make one
+    else {
+        freezeFrame.jpeg = jpegBytes;
+        freezeFrame.receiving = true;
+        console.log(`received first chunk of freeze frame: ${freezeFrame.jpeg.length}/${freezeFrame.size}`);
+    }
+
+    // Uncomment for debug
+    //console.log(`Received freeze frame chunk: ${freezeFrame.jpeg.length}/${freezeFrame.size}`);
+
+    // Finished receiving freeze frame, we can show it now
+    if (freezeFrame.jpeg.length === freezeFrame.size) {
+        freezeFrame.receiving = false;
+        freezeFrame.valid = true;
+        console.log(`received complete freeze frame ${freezeFrame.size}`);
+        showFreezeFrame();
+    }
+    // We received more data than the freeze frame payload message indicate (this is an error)
+    else if (freezeFrame.jpeg.length > freezeFrame.size) {
+        console.error(`received bigger freeze frame than advertised: ${freezeFrame.jpeg.length}/${freezeFrame.size}`);
+        freezeFrame.jpeg = undefined;
+        freezeFrame.receiving = false;
     }
 }
 
@@ -932,159 +1294,7 @@ function setupWebRtcPlayer(htmlElement, config) {
         }
     };
 
-    function showFreezeFrame() {
-        let base64 = btoa(freezeFrame.jpeg.reduce((data, byte) => data + String.fromCharCode(byte), ''));
-        let freezeFrameImage = document.getElementById("freezeFrameOverlay").childNodes[0];
-        freezeFrameImage.src = 'data:image/jpeg;base64,' + base64;
-        freezeFrameImage.onload = function() {
-            freezeFrame.height = freezeFrameImage.naturalHeight;
-            freezeFrame.width = freezeFrameImage.naturalWidth;
-            resizeFreezeFrameOverlay();
-            if (shouldShowPlayOverlay) {
-                showPlayOverlay();
-                resizePlayerStyle();
-            } else {
-                showFreezeFrameOverlay();
-            }
-            webRtcPlayerObj.setVideoEnabled(false);
-        };
-    }
-
-    
-
-    function processFileExtension(view) {
-        // Reset file if we got a file message and we are not "receiving" it yet
-        if(!file.receiving)
-        {
-            file.mimetype = "";
-            file.extension = "";
-            file.receiving = true;
-            file.valid = false;
-            file.size = 0;
-            file.data = [];
-            file.timestampStart = (new Date()).getTime();
-            console.log('Received first chunk of file'); 
-        }
-
-        let extensionAsString = new TextDecoder("utf-16").decode(view.slice(1));
-        console.log(extensionAsString);
-        file.extension = extensionAsString;
-    }
-
-    function processFileMimeType(view) {
-        // Reset file if we got a file message and we are not "receiving" it yet
-        if(!file.receiving)
-        {
-            file.mimetype = "";
-            file.extension = "";
-            file.receiving = true;
-            file.valid = false;
-            file.size = 0;
-            file.data = [];
-            file.timestampStart = (new Date()).getTime();
-            console.log('Received first chunk of file'); 
-        }
-
-        let mimeAsString = new TextDecoder("utf-16").decode(view.slice(1));
-        console.log(mimeAsString);
-        file.mimetype = mimeAsString;
-    }
-
-
-    function processFileContents(view) {
-        // If we haven't received the intial setup instructions, return
-        if(!file.receiving) return;
-
-        // Extract the toal size of the file (across all chunks)
-        file.size = Math.ceil((new DataView(view.slice(1, 5).buffer)).getInt32(0, true) / 16379 /* The maximum number of payload bits per message*/);
-        
-        // Get the file part of the payload
-        let fileBytes = view.slice(1 + 4);
-
-        // Append to existing data that holds the file
-        file.data.push(fileBytes);
-        
-        // Uncomment for debug
-        console.log(`Received file chunk: ${ file.data.length }/${ file.size }`);
-
-        if(file.data.length === file.size)
-        {
-            file.receiving = false;
-            file.valid = true;
-            console.log("Received complete file")
-            const transferDuration = ((new Date()).getTime() - file.timestampStart);
-            const transferBitrate = Math.round(file.size * 16 * 1024  / transferDuration);
-            console.log(`Average transfer bitrate: ${transferBitrate}kb/s over ${transferDuration / 1000} seconds`);
-
-            // File reconstruction
-            /**
-             * Example code to reconstruct the file
-             * 
-             * This code reconstructs the received data into the original file based on the mime type and extension provided and then downloads the reconstructed file
-             */
-            var received = new Blob(file.data, { type: file.mimetype })
-            var a = document.createElement('a');
-            a.setAttribute('href', URL.createObjectURL(received));
-            a.setAttribute('download', `transfer.${file.extension}`);
-            document.body.append(a);
-            // if you are so inclined to make it auto-download, do something like: a.click();
-            a.remove();
-        } 
-        else if(file.data.length > file.size)
-        {
-            file.receiving = false;
-            console.error(`Received bigger file than advertised: ${file.data.length}/${file.size}`);
-        }
-    }
-
-    function processFreezeFrameMessage(view) {
-        // Reset freeze frame if we got a freeze frame message and we are not "receiving" yet.
-        if (!freezeFrame.receiving) {
-            freezeFrame.receiving = true;
-            freezeFrame.valid = false;
-            freezeFrame.size = 0;
-            freezeFrame.jpeg = undefined;
-        }
-
-        // Extract total size of freeze frame (across all chunks)
-        freezeFrame.size = (new DataView(view.slice(1, 5).buffer)).getInt32(0, true);
-
-        // Get the jpeg part of the payload
-        let jpegBytes = view.slice(1 + 4);
-
-        // Append to existing jpeg that holds the freeze frame
-        if (freezeFrame.jpeg) {
-            let jpeg = new Uint8Array(freezeFrame.jpeg.length + jpegBytes.length);
-            jpeg.set(freezeFrame.jpeg, 0);
-            jpeg.set(jpegBytes, freezeFrame.jpeg.length);
-            freezeFrame.jpeg = jpeg;
-        }
-        // No existing freeze frame jpeg, make one
-        else {
-            freezeFrame.jpeg = jpegBytes;
-            freezeFrame.receiving = true;
-            console.log(`received first chunk of freeze frame: ${freezeFrame.jpeg.length}/${freezeFrame.size}`);
-        }
-
-        // Uncomment for debug
-        //console.log(`Received freeze frame chunk: ${freezeFrame.jpeg.length}/${freezeFrame.size}`);
-
-        // Finished receiving freeze frame, we can show it now
-        if (freezeFrame.jpeg.length === freezeFrame.size) {
-            freezeFrame.receiving = false;
-            freezeFrame.valid = true;
-            console.log(`received complete freeze frame ${freezeFrame.size}`);
-            showFreezeFrame();
-        }
-        // We received more data than the freeze frame payload message indicate (this is an error)
-        else if (freezeFrame.jpeg.length > freezeFrame.size) {
-            console.error(`received bigger freeze frame than advertised: ${freezeFrame.jpeg.length}/${freezeFrame.size}`);
-            freezeFrame.jpeg = undefined;
-            freezeFrame.receiving = false;
-        }
-    }
-
-    webRtcPlayerObj.onNewVideoTrack = function(streams) {
+    webRtcPlayerObj.onNewVideoTrack = function (streams) {
         if (webRtcPlayerObj.video && webRtcPlayerObj.video.srcObject && webRtcPlayerObj.onVideoInitialised) {
             webRtcPlayerObj.onVideoInitialised();
         }
@@ -1096,7 +1306,7 @@ function setupWebRtcPlayer(htmlElement, config) {
         try {
             let messageType = fromStreamerMessages.getFromValue(view[0]);
             fromStreamerHandlers[messageType](data);
-        } catch(e) {
+        } catch (e) {
             console.error(`Custom data channel message with message type that is unknown to the Pixel Streaming protocol. Does your PixelStreamingProtocol need updating? The message type was: ${view[0]}`);
         }
     };
@@ -1109,7 +1319,7 @@ function setupWebRtcPlayer(htmlElement, config) {
     }
 
     if (UrlParamsCheck('offerToReceive')) {
-       createWebRtcOffer();
+        createWebRtcOffer();
     }
 
     return webRtcPlayerObj.video;
@@ -1537,7 +1747,7 @@ function updateVideoStreamSize() {
             "Resolution.Width": playerElement.clientWidth, 
             "Resolution.Height": playerElement.clientHeight
         };
-        emitDescriptor("ToStreamerCommand", descriptor);
+        emitCommand(descriptor);
         console.log(descriptor);
         lastTimeResized = new Date().getTime();
     } else {
@@ -1559,7 +1769,7 @@ function onOrientationChange(event) {
 }
 
 function sendInputMessage(messageType, indata = []) {
-    messageFormat = protocolJSON[messageType];
+    messageFormat = toStreamerMessages.getFromKey(messageType);
 
     // console.log(`Calculate size: ${new Blob(JSON.stringify(indata)).size}, Specified size: ${messageFormat.byteLength}`);
     data = new DataView(new ArrayBuffer(messageFormat.byteLength + 1));
@@ -1569,10 +1779,10 @@ function sendInputMessage(messageType, indata = []) {
 
     indata.forEach((element, idx) => {
         type = messageFormat.structure[idx];
-        switch(type) {
+        switch (type) {
             case "uint8":
                 data.setUint8(byteOffset, element);
-			    byteOffset += 1;
+                byteOffset += 1;
                 break;
 
             case "uint16":
@@ -1596,164 +1806,9 @@ function sendInputMessage(messageType, indata = []) {
 
 function sendControlMessage(messageType) {
     let data = new DataView(new ArrayBuffer(1));
-    data.setUint8(0, protocolJSON[messageType].id);
+    data.setUint8(0, toStreamerMessages.getFromKey(messageType).id);
     sendInputData(data.buffer);
 }
-
-protocolJSON = {
-    // Old EToStreamerMsg enum
-    /*
-     * Control Messages. Range = 0..49.
-     */
-    "IFrameRequest": {
-        "id": 0,
-        "byteLength": 0,
-        "structure": []
-    },
-    "RequestQualityControl": {
-        "id": 1,
-        "byteLength": 0,
-        "structure": []
-    },
-    "FpsRequest": {
-        "id": 2,
-        "byteLength": 0,
-        "structure": []
-    },
-    "AverageBitrateRequest": {
-        "id": 3,
-        "byteLength": 0,
-        "structure": []
-    },
-    "StartStreaming": {
-        "id": 4,
-        "byteLength": 0,
-        "structure": []
-    },
-    "StopStreaming": {
-        "id": 5,
-        "byteLength": 0,
-        "structure": []
-    },
-    "LatencyTest": {
-        "id": 6,
-        "byteLength": 0,
-        "structure": []
-    },
-    "RequestInitialSettings": {
-        "id": 7,
-        "byteLength": 0,
-        "structure": []
-    },
-    "TestEcho": {
-        "id": 8,
-        "byteLength": 0,
-        "structure": []
-    },
-    /*
-     * Input Messages. Range = 50..89.
-     */
-    // Generic Input Messages. Range = 50..59.
-    "UIInteraction": {
-        "id": 50,
-    },
-    "ToStreamerCommand": {
-        "id": 51
-    },
-    // Keyboard Input Message. Range = 60..69.
-    "KeyDown": {
-        "id": 60,
-        "byteLength": 2,
-        //             keyCode  isRepeat
-        "structure": [ "uint8", "uint8" ]
-    },
-    "KeyUp": {
-        "id": 61,
-        "byteLength": 1,
-        //             keyCode
-        "structure": [ "uint8" ]
-    },
-    "KeyPress": {
-        "id": 62,
-        "byteLength": 2,
-        //             charcode
-        "structure": [ "uint16" ]
-    },
-    // Mouse Input Messages. Range = 70..79.
-    "MouseEnter": {
-        "id": 70,
-        "byteLength": 0,
-        "structure": []
-    },
-    "MouseLeave": {
-        "id": 71,
-        "byteLength": 0,
-        "structure": []
-    },
-    "MouseDown": {
-        "id": 72,
-        "byteLength": 5,
-        //              button     x         y
-        "structure": [ "uint8", "uint16", "uint16" ]
-    },
-    "MouseUp": {
-        "id": 73,
-        "byteLength": 5,
-        //              button     x         y
-        "structure": [ "uint8", "uint16", "uint16" ]
-    },
-    "MouseMove": {
-        "id": 74,
-        "byteLength": 8,
-        //              x           y      deltaX    deltaY
-        "structure": [ "uint16", "uint16", "int16", "int16" ]
-    },
-    "MouseWheel": {
-        "id": 75,
-        "byteLength": 6,
-        //              delta       x        y
-        "structure": [ "int16", "uint16", "uint16"  ]
-    },
-    // Touch Input Messages. Range = 80..89.
-    "TouchStart": {
-        "id": 80,
-        "byteLength": 7,
-        //          numtouches(1)   x         y       idx      force     valid
-        "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
-    },
-    "TouchEnd": {
-        "id": 81,
-        "byteLength": 7,
-        //          numtouches(1)   x         y       idx      force     valid
-        "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
-    },
-    "TouchMove": {
-        "id": 82,
-        "byteLength": 7,
-        //          numtouches(1)   x         y       idx      force     valid
-        "structure": [ "uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
-    },
-    // Gamepad Input Messages. Range = 90..99
-    "GamepadButtonPressed": {
-        "id": 90,
-        "byteLength": 3,
-        //            ctrlerId   button  isRepeat
-        "structure": [ "uint8", "uint8", "uint8" ]
-    },
-    "GamepadButtonReleased": {
-        "id": 91,
-        "byteLength": 3,
-        //            ctrlerId   button  isRepeat(0)
-        "structure": [ "uint8", "uint8", "uint8" ]
-    },
-    "GamepadButtonAnalog": {
-        "id": 92,
-        "byteLength": 10,
-        //            ctrlerId   button  analogValue
-        "structure": [ "uint8", "uint8", "double" ]
-    },
-};
-
 
 // A generic message has a type and a descriptor.
 function emitDescriptor(messageType, descriptor) {
@@ -1764,7 +1819,7 @@ function emitDescriptor(messageType, descriptor) {
     // a time.
     let data = new DataView(new ArrayBuffer(1 + 2 + 2 * descriptorAsString.length));
     let byteIdx = 0;
-    data.setUint8(byteIdx, protocolJSON[messageType].id);
+    data.setUint8(byteIdx, toStreamerMessages.getFromKey(messageType).id);
     byteIdx++;
     data.setUint16(byteIdx, descriptorAsString.length, true);
     byteIdx += 2;
@@ -1785,9 +1840,8 @@ function emitDescriptor(messageType, descriptor) {
 // 2. A command to change the resolution to the given width and height.
 //    "{ Resolution.Width: <value>, Resolution.Height: <value> } }"
 //
-function emitCommand(descriptor)
-{
-    emitDescriptor("ToStreamerCommand", descriptor);
+function emitCommand(descriptor) {
+    toStreamerHandlers.getFromKey("Command")("Command", descriptor);
 }
 
 // A UI interation will occur when the user presses a button powered by
@@ -1802,7 +1856,7 @@ function requestInitialSettings() {
 }
 
 function requestQualityControl() {
-    if(!qualityController){
+    if (!qualityController) {
         sendControlMessage("RequestQualityControl");
     }
 }
@@ -1935,19 +1989,19 @@ const MouseButtonsMask = {
 function releaseMouseButtons(buttons, x, y) {
     let coord = normalizeAndQuantizeUnsigned(x, y);
     if (buttons & MouseButtonsMask.PrimaryButton) {
-        sendInputMessage("MouseUp", [ MouseButton.MainButton, coord.x, coord.y ]);
+        toStreamerHandlers.MouseUp("MouseUp", [MouseButton.MainButton, coord.x, coord.y]);
     }
     if (buttons & MouseButtonsMask.SecondaryButton) {
-        sendInputMessage("MouseUp", [ MouseButton.SecondaryButton, coord.x, coord.y ]);
+        toStreamerHandlers.MouseUp("MouseUp", [MouseButton.SecondaryButton, coord.x, coord.y]);
     }
     if (buttons & MouseButtonsMask.AuxiliaryButton) {
-        sendInputMessage("MouseUp", [ MouseButton.AuxiliaryButton, coord.x, coord.y ]);
+        toStreamerHandlers.MouseUp("MouseUp", [MouseButton.AuxiliaryButton, coord.x, coord.y]);
     }
     if (buttons & MouseButtonsMask.FourthButton) {
-        sendInputMessage("MouseUp", [ MouseButton.FourthButton, coord.x, coord.y ]);
+        toStreamerHandlers.MouseUp("MouseUp", [MouseButton.FourthButton, coord.x, coord.y]);
     }
     if (buttons & MouseButtonsMask.FifthButton) {
-        sendInputMessage("MouseUp", [ MouseButton.FifthButton, coord.x, coord.y ]);
+        toStreamerHandlers.MouseUp("MouseUp", [MouseButton.FifthButton, coord.x, coord.y]);
     }
 }
 
@@ -1955,19 +2009,19 @@ function releaseMouseButtons(buttons, x, y) {
 function pressMouseButtons(buttons, x, y) {
     let coord = normalizeAndQuantizeUnsigned(x, y);
     if (buttons & MouseButtonsMask.PrimaryButton) {
-        sendInputMessage("MouseDown", [ MouseButton.MainButton, coord.x, coord.y ]);
+        toStreamerHandlers.MouseDown("MouseDown", [MouseButton.MainButton, coord.x, coord.y]);
     }
     if (buttons & MouseButtonsMask.SecondaryButton) {
-        sendInputMessage("MouseDown", [ MouseButton.SecondaryButton, coord.x, coord.y ]);
+        toStreamerHandlers.MouseDown("MouseDown", [MouseButton.SecondaryButton, coord.x, coord.y]);
     }
     if (buttons & MouseButtonsMask.AuxiliaryButton) {
-        sendInputMessage("MouseDown", [ MouseButton.AuxiliaryButton, coord.x, coord.y ]);
+        toStreamerHandlers.MouseDown("MouseDown", [MouseButton.AuxiliaryButton, coord.x, coord.y]);
     }
     if (buttons & MouseButtonsMask.FourthButton) {
-        sendInputMessage("MouseDown", [ MouseButton.FourthButton, coord.x, coord.y ]);
+        toStreamerHandlers.MouseDown("MouseDown", [MouseButton.FourthButton, coord.x, coord.y]);
     }
     if (buttons & MouseButtonsMask.FifthButton) {
-        sendInputMessage("MouseDown", [ MouseButton.FifthButton, coord.x, coord.y ]);
+        toStreamerHandlers.MouseDown("MouseDown", [MouseButton.FifthButton, coord.x, coord.y]);
     }
 }
 
@@ -2024,7 +2078,7 @@ function registerMouseEnterAndLeaveEvents(playerElement) {
         if (print_inputs) {
             console.log('mouse enter');
         }
-        sendInputMessage("MouseEnter");
+        toStreamerHandlers.MouseEnter("MouseEnter");
         playerElement.pressMouseButtons(e);
     };
 
@@ -2032,7 +2086,7 @@ function registerMouseEnterAndLeaveEvents(playerElement) {
         if (print_inputs) {
             console.log('mouse leave');
         }
-        sendInputMessage("MouseLeave");
+        toStreamerHandlers.MouseLeave("MouseLeave");
         playerElement.releaseMouseButtons(e);
     };
 }
@@ -2070,7 +2124,7 @@ function registerLockedMouseEvents(playerElement) {
             // This is necessary as when the mouse loses focus, the windows stops listening for events and as such
             // the keyup listener won't get fired
             [...new Set(activeKeys)].forEach((uniqueKeycode) => {
-                sendInputMessage("KeyUp", [ uniqueKeycode ]);
+                toStreamerHandlers.KeyUp("KeyUp", [uniqueKeycode]);
             });
             // Reset the active keys back to nothing
             activeKeys = [];
@@ -2095,20 +2149,21 @@ function registerLockedMouseEvents(playerElement) {
 
         let coord = normalizeAndQuantizeUnsigned(x, y);
         let delta = normalizeAndQuantizeSigned(e.movementX, e.movementY);
-        sendInputMessage("MouseMove", [ coord.x, coord.y, delta.x, delta.y ]);
+        toStreamerHandlers.MouseMove("MouseMove", [coord.x, coord.y, delta.x, delta.y]);
     }
 
-    playerElement.onmousedown = function(e) {
-        sendInputMessage("MouseDown", [ e.button, coord.x, coord.y ]);
+
+    playerElement.onmousedown = function (e) {
+        toStreamerHandlers.MouseDown("MouseDown", [e.button, coord.x, coord.y]);
     };
 
-    playerElement.onmouseup = function(e) {
-        sendInputMessage("MouseUp", [ e.button, coord.x, coord.y ]);
+    playerElement.onmouseup = function (e) {
+        toStreamerHandlers.MouseUp("MouseUp", [e.button, coord.x, coord.y]);
     };
 
-    playerElement.onwheel = function(e) {
+    playerElement.onwheel = function (e) {
         let coord = normalizeAndQuantizeUnsigned(x, y);
-        sendInputMessage("MouseWheel", [ e.wheelDelta, coord.x, coord.y ]);
+        toStreamerHandlers.MouseWheel("MouseWheel", [e.wheelDelta, coord.x, coord.y]);
     };
 
     playerElement.pressMouseButtons = function(e) {
@@ -2126,22 +2181,22 @@ function registerLockedMouseEvents(playerElement) {
 function registerHoveringMouseEvents(playerElement) {
     styleCursor = (inputOptions.hideBrowserCursor ? 'none' : 'default');
 
-    playerElement.onmousemove = function(e) {
+    playerElement.onmousemove = function (e) {
         let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
         let delta = normalizeAndQuantizeSigned(e.movementX, e.movementY);
-        sendInputMessage("MouseMove", [ coord.x, coord.y, delta.x, delta.y ]);
+        toStreamerHandlers.MouseMove("MouseMove", [coord.x, coord.y, delta.x, delta.y]);
         e.preventDefault();
     };
 
-    playerElement.onmousedown = function(e) {
+    playerElement.onmousedown = function (e) {
         let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
-        sendInputMessage("MouseDown", [ e.button, coord.x, coord.y ]);
+        toStreamerHandlers.MouseDown("MouseDown", [e.button, coord.x, coord.y]);
         e.preventDefault();
     };
 
-    playerElement.onmouseup = function(e) {
+    playerElement.onmouseup = function (e) {
         let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
-        sendInputMessage("MouseUp", [ e.button, coord.x, coord.y ]);
+        toStreamerHandlers.MouseUp("MouseUp", [e.button, coord.x, coord.y]);
         e.preventDefault();
     };
 
@@ -2150,15 +2205,15 @@ function registerHoveringMouseEvents(playerElement) {
     // get at least one mouse up corresponding to a mouse down event. Otherwise
     // the mouse can get stuck.
     // https://github.com/facebook/react/issues/5531
-    playerElement.oncontextmenu = function(e) {
+    playerElement.oncontextmenu = function (e) {
         let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
-        sendInputMessage("MouseUp", [ e.button, coord.x, coord.y ]);
+        toStreamerHandlers.MouseUp("MouseUp", [e.button, coord.x, coord.y]);
         e.preventDefault();
     };
 
-    playerElement.onwheel = function(e) {
+    playerElement.onwheel = function (e) {
         let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
-        sendInputMessage("MouseWheel", [ e.wheelDelta, coord.x, coord.y ]);
+        toStreamerHandlers.MouseWheel("MouseWheel", [e.wheelDelta, coord.x, coord.y]);
         e.preventDefault();
     };
 
@@ -2202,7 +2257,7 @@ function registerTouchEvents(playerElement) {
                 console.log(`F${fingerIds[touch.identifier]}=(${x}, ${y})`);
             }
             let coord = normalizeAndQuantizeUnsigned(x, y);
-            sendInputMessage(type, [ numTouches, coord.x, coord.y, fingerIds[touch.identifier], MaxByteValue * touch.force, coord.inRange ? 1 : 0 ]);
+            toStreamerHandlers.type(type, [numTouches, coord.x, coord.y, fingerIds[touch.identifier], MaxByteValue * touch.force, coord.inRange ? 1 : 0]);
         }
     }
 
@@ -2223,7 +2278,7 @@ function registerTouchEvents(playerElement) {
                 // is not fired with a touch device.
                 playerElement.onmouseenter(e);
                 let coord = normalizeAndQuantizeUnsigned(finger.x, finger.y);
-                sendInputMessage("MouseDown", [ MouseButton.MainButton, coord.x, coord.y ]);
+                toStreamerHandlers.MouseDown("MouseDown", [MouseButton.MainButton, coord.x, coord.y]);
             }
             e.preventDefault();
         };
@@ -2235,7 +2290,7 @@ function registerTouchEvents(playerElement) {
                     let x = touch.clientX - playerElementClientRect.left;
                     let y = touch.clientY - playerElementClientRect.top;
                     let coord = normalizeAndQuantizeUnsigned(x, y);
-                    sendInputMessage("MouseUp", [ MouseButton.MainButton, coord.x, coord.y ]);
+                    toStreamerHandlers.MouseUp("MouseUp", [MouseButton.MainButton, coord.x, coord.y]);
                     // Hack: Manual mouse leave event.
                     playerElement.onmouseleave(e);
                     finger = undefined;
@@ -2253,7 +2308,7 @@ function registerTouchEvents(playerElement) {
                     let y = touch.clientY - playerElementClientRect.top;
                     let coord = normalizeAndQuantizeUnsigned(x, y);
                     let delta = normalizeAndQuantizeSigned(x - finger.x, y - finger.y);
-                    sendInputMessage("MouseMove", [ coord.x, coord.y, delta.x, delta.y ]);
+                    toStreamerHandlers.MouseMove("MouseMove", [coord.x, coord.y, delta.x, delta.y]);
                     finger.x = x;
                     finger.y = y;
                     break;
@@ -2330,7 +2385,7 @@ function registerKeyboardEvents() {
         if (print_inputs) {
             console.log(`key down ${e.keyCode}, repeat = ${e.repeat}`);
         }
-        sendInputMessage("KeyDown", [ getKeyCode(e), e.repeat ]);
+        toStreamerHandlers.KeyDown("KeyDown", [getKeyCode(e), e.repeat]);
         activeKeys.push(getKeyCode(e));
         // Backspace is not considered a keypress in JavaScript but we need it
         // to be so characters may be deleted in a UE text entry field.
@@ -2348,7 +2403,7 @@ function registerKeyboardEvents() {
         if (print_inputs) {
             console.log(`key up ${e.keyCode}`);
         }
-        sendInputMessage("KeyUp", [ getKeyCode(e) ]);
+        toStreamerHandlers.KeyUp("KeyUp", [getKeyCode(e), e.repeat]);
         if (inputOptions.suppressBrowserKeys && isKeyCodeBrowserKey(e.keyCode)) {
             e.preventDefault();
         }
@@ -2358,7 +2413,7 @@ function registerKeyboardEvents() {
         if (print_inputs) {
             console.log(`key press ${e.charCode}`);
         }
-        sendInputMessage("KeyPress", [ e.charCode ]);
+        toStreamerHandlers.KeyPress("KeyPress", [e.charCode]);
     };
 }
 
@@ -2620,6 +2675,7 @@ function closeStream() {
 function load() {
     parseURLParams();
     setupHtmlEvents();
+    registerMessageHandlers();
     populateDefaultProtocol();
     setupFreezeFrameOverlay();
     registerKeyboardEvents();
