@@ -1,9 +1,5 @@
 import './assets/css/player.css';
 import playButton from './assets/images/Play.png';
-import svgMinimize from './assets/images/Minimize.svg';
-import svgMaximize from './assets/images/Maximize.svg';
-import svgSettings from './assets/images/Settings.svg';
-import svgInfo from './assets/images/Info.svg';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { EventEmitter } from "events";
 import * as libspsfrontend from '@tensorworks/libspsfrontend'
@@ -362,16 +358,9 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	videoQpIndicator: VideoQpIndicator;
 	fullScreenLogic: FullScreenLogic;
 
-	// svg icons for buttons
-	maximizeIcon = document.getElementById('maximizeIcon') as HTMLObjectElement;
-	minimizeIcon = document.getElementById('minimizeIcon') as HTMLObjectElement;
-	settingsIcon = document.getElementById('settingsIcon') as HTMLObjectElement;
-	infoIcon = document.getElementById('infoIcon') as HTMLObjectElement;
-
 	// settings and stats panels
 	settingsPanel = document.getElementById('settings-panel') as HTMLDivElement;
 	statsPanel = document.getElementById('stats-panel') as HTMLDivElement;
-
 
 	// Pre Stream options
 	forceTurnToggle = document.getElementById("force-turn-tgl") as HTMLInputElement;
@@ -413,17 +402,10 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 	constructor(config: libspsfrontend.Config) {
 		super(config);
-
-		this.maximizeIcon.data = svgMaximize;
-		this.minimizeIcon.data = svgMinimize;
-		this.settingsIcon.data = svgSettings;
-		this.infoIcon.data = svgInfo;
-
 		this.showStats = true;
 		this.logging = false;
 		this.videoQpIndicator = new VideoQpIndicator("connectionStrength", "qualityText", "outer", "middle", "inner", "dot");
 		this.fullScreenLogic = new FullScreenLogic();
-
 
 		// build all of the overlays 
 		this.buildDisconnectOverlay();
@@ -734,9 +716,11 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		// set up the settings 
 		document.getElementById('settingsBtn').onclick = () => this.settingsClicked();
+		document.getElementById('settingsClose').onclick = () => this.settingsClicked();
 
 		// setup the info button
-		document.getElementById('infoBtn').onclick = () => this.statsClicked();
+		document.getElementById('statsBtn').onclick = () => this.statsClicked();
+		document.getElementById('statsClose').onclick = () => this.statsClicked();
 
 		// setup the Force TURN toggle
 		this.setUpToggleWithUrlParams(this.forceTurnToggle, "ForceTURN");

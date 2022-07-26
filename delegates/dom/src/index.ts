@@ -1,5 +1,19 @@
 import { NativeDOMDelegate } from "./NativeDOMDelegate";
 import * as libspsfrontend from '@tensorworks/libspsfrontend';
+import svgMinimize from './assets/images/Minimize.svg';
+import svgMaximize from './assets/images/Maximize.svg';
+import svgSettings from './assets/images/Settings.svg';
+import svgInfo from './assets/images/Info.svg';
+
+// svg icons for buttons
+let maximizeIcon = document.getElementById('maximizeIcon') as HTMLObjectElement;
+maximizeIcon.data = svgMaximize;
+let minimizeIcon = document.getElementById('minimizeIcon') as HTMLObjectElement;
+minimizeIcon.data = svgMinimize;
+let settingsIcon = document.getElementById('settingsIcon') as HTMLObjectElement;
+settingsIcon.data = svgSettings;
+let statsIcon = document.getElementById('statsIcon') as HTMLObjectElement;
+statsIcon.data = svgInfo;
 
 // Determine whether a signalling server WebSocket URL was specified at compile-time or if we need to compute it at runtime
 declare var WEBSOCKET_URL: string;
