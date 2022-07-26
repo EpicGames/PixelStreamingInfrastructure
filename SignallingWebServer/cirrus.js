@@ -554,7 +554,10 @@ playerServer.on('connection', function (ws, req) {
 		
 		logIncoming(`player ${playerId}`, msg.type, msgRaw);
 
-		if (msg.type == 'answer') {
+		if (msg.type == 'offer') {
+			msg.playerId = playerId;
+			sendMessageToController(msg, skipSFU);
+		} else if (msg.type == 'answer') {
 			msg.playerId = playerId;
 			sendMessageToController(msg, skipSFU, skipStreamer);
 		} else if (msg.type == 'iceCandidate') {

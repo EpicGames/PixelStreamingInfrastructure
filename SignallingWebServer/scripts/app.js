@@ -10,6 +10,7 @@ let rAF = window.mozRequestAnimationFrame ||
 let kbEvent = document.createEvent("KeyboardEvent");
 let initMethod = typeof kbEvent.initKeyboardEvent !== 'undefined' ? "initKeyboardEvent" : "initKeyEvent";
 
+let offerToReceive = true;
 
 let webRtcPlayerObj = null;
 let print_stats = false;
@@ -1034,7 +1035,9 @@ function setupWebRtcPlayer(htmlElement, config) {
         createOnScreenKeyboardHelpers(htmlElement);
     }
 
-    //createWebRtcOffer();
+    if (offerToReceive) {
+       createWebRtcOffer();
+    }
 
     return webRtcPlayerObj.video;
 }
@@ -2285,7 +2288,9 @@ function connect() {
             console.log("%c[Inbound SS (playerCount)]", "background: lightblue; color: black", msg);
         } else if (msg.type === 'offer') {
             console.log("%c[Inbound SS (offer)]", "background: lightblue; color: black", msg);
-            onWebRtcOffer(msg);
+            if (!offerToReceive) {
+                onWebRtcOffer(msg);
+            }
         } else if (msg.type === 'answer') {
             console.log("%c[Inbound SS (answer)]", "background: lightblue; color: black", msg);
             onWebRtcAnswer(msg);
