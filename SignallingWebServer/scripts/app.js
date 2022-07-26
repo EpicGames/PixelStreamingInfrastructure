@@ -80,6 +80,182 @@ let MaxByteValue = 255;
 
 let activeKeys = [];
 
+let toStreamerMessages = new TwoWayMap();
+let fromStreamerMessages = new TwoWayMap();
+
+// Old EToPlayerMsg enum
+const MessageDirection = {
+    // A message sent to the streamer. eg Key presses
+    // ie player -> streamer
+    ToStreamer: 0,
+
+    // A message recevied from the streamer. eg Freeze frames
+    // ie streamer -> player
+    FromStreamer: 1
+};
+
+let toStreamerHandlers = new Map(); // toStreamerHandlers[message](args..)
+let fromStreamerHandlers = new Map(); // fromStreamerHandlers[message](args..)
+function populateDefaultProtocol() {
+    // QualityControlOwnership
+    registerMessageHandler(MessageDirection.FromStreamer, "QualityControlOwnership", (data) => {
+        let view = new Uint8Array(data);
+        let ownership = view[1] === 0 ? false : true;
+        console.log("Received quality controller message, will control quality: " + ownership);
+        qualityController = ownership;
+        // If we own the quality control, we can't relinquish it. We only lose
+        // quality control when another peer asks for it
+        if (qualityControlOwnershipCheckBox !== null) {
+            qualityControlOwnershipCheckBox.disabled = ownership;
+            qualityControlOwnershipCheckBox.checked = ownership;
+        }
+    });
+    fromStreamerMessages.add("QualityControlOwnership", 0);
+
+    //
+    registerMessageHandler(MessageDirection.FromStreamer, "Response", (data) => {
+        let response = new TextDecoder("utf-16").decode(data.slice(1));
+        for (let listener of responseEventListeners.values()) {
+            listener(response);
+        }
+    });
+    fromStreamerMessages.add("Response", 1);
+
+    //
+    registerMessageHandler(MessageDirection.FromStreamer, "ToClientCommand", (data) => {
+        let commandAsString = new TextDecoder("utf-16").decode(data.slice(1));
+        console.log(commandAsString);
+        let command = JSON.parse(commandAsString);
+        if (command.command === 'onScreenKeyboard') {
+            showOnScreenKeyboard(command);
+        }
+    });
+    fromStreamerMessages.add("ToClientCommand", 2);
+
+    //
+    registerMessageHandler(MessageDirection.FromStreamer, "FreezeFrame", (data) => {
+        let view = new Uint8Array(data);
+        processFreezeFrameMessage(view);
+    });
+    fromStreamerMessages.add("FreezeFrame", 3);
+
+    //
+    registerMessageHandler(MessageDirection.FromStreamer, "UnfreezeFrame", (data) => {
+        invalidateFreezeFrameOverlay();
+    });
+    fromStreamerMessages.add("UnfreezeFrame", 4);
+
+    //
+    registerMessageHandler(MessageDirection.FromStreamer, "VideoEncoderAvgQP", (data) => {
+        VideoEncoderQP = new TextDecoder("utf-16").decode(data.slice(1));
+    });
+    fromStreamerMessages.add("VideoEncoderAvgQP", 5);
+
+    //
+    registerMessageHandler(MessageDirection.FromStreamer, "LatencyTest", (data) => {
+        let latencyTimingsAsString = new TextDecoder("utf-16").decode(data.slice(1));
+        console.log("Got latency timings from UE.");
+        console.log(latencyTimingsAsString);
+        let latencyTimingsFromUE = JSON.parse(latencyTimingsAsString);
+        if (webRtcPlayerObj) {
+            webRtcPlayerObj.latencyTestTimings.SetUETimings(latencyTimingsFromUE);
+        }
+    });
+    fromStreamerMessages.add("LatencyTest", 6);
+
+    //
+    registerMessageHandler(MessageDirection.FromStreamer, "InitialSettings", (data) => {
+        let settingsString = new TextDecoder("utf-16").decode(data.slice(1));
+        let settingsJSON = JSON.parse(settingsString);
+
+        if (settingsJSON.PixelStreaming) {
+            let allowConsoleCommands = settingsJSON.PixelStreaming.AllowPixelStreamingCommands;
+            if (allowConsoleCommands === false) {
+                console.warn("-AllowPixelStreamingCommands=false, sending arbitray console commands from browser to UE is disabled.");
+            }
+            let disableLatencyTest = settingsJSON.PixelStreaming.DisableLatencyTest;
+            if (disableLatencyTest) {
+                document.getElementById("test-latency-button").disabled = true;
+                document.getElementById("test-latency-button").title = "Disabled by -PixelStreamingDisableLatencyTester=true";
+                console.warn("-PixelStreamingDisableLatencyTester=true, requesting latency report from the the browser to UE is disabled.");
+            }
+        }
+        if (settingsJSON.Encoder) {
+            document.getElementById('encoder-min-qp-text').value = settingsJSON.Encoder.MinQP;
+            document.getElementById('encoder-max-qp-text').value = settingsJSON.Encoder.MaxQP;
+        }
+        if (settingsJSON.WebRTC) {
+            document.getElementById("webrtc-fps-text").value = settingsJSON.WebRTC.FPS;
+            // reminder bitrates are sent in bps but displayed in kbps
+            document.getElementById("webrtc-min-bitrate-text").value = settingsJSON.WebRTC.MinBitrate / 1000;
+            document.getElementById("webrtc-max-bitrate-text").value = settingsJSON.WebRTC.MaxBitrate / 1000;
+        }
+    });
+    fromStreamerMessages.add("InitialSettings", 7);
+
+    //
+    registerMessageHandler(MessageDirection.FromStreamer, "FileExtension", (data) => {
+        let view = new Uint8Array(data);
+        processFileExtension(view);
+    });
+    fromStreamerMessages.add("FileExtension", 8);
+
+    //
+    registerMessageHandler(MessageDirection.FromStreamer, "FileMimeType", (data) => {
+        let view = new Uint8Array(data);
+        processFileMimeType(view);
+    });
+    fromStreamerMessages.add("FileMimeType", 9);
+
+    //
+    registerMessageHandler(MessageDirection.FromStreamer, "FileContents", (data) => {
+        let view = new Uint8Array(data);
+        processFileContents(view);
+    });
+    fromStreamerMessages.add("FileContents", 10);
+
+    //
+    registerMessageHandler(MessageDirection.FromStreamer, "TestEcho", (data) => {
+        let view = new Uint8Array(data);
+        processFileContents(view);
+    });
+    fromStreamerMessages.add("TestEcho", 11);
+
+    //
+    registerMessageHandler(MessageDirection.FromStreamer, "InputControlOwnership", (data) => {
+        let view = new Uint8Array(data);
+        let ownership = view[1] === 0 ? false : true;
+        console.log("Received input controller message - will your input control the stream: " + ownership);
+        inputController = ownership;
+    });
+    fromStreamerMessages.add("InputControlOwnership", 12);
+
+    //
+    registerMessageHandler(MessageDirection.FromStreamer, "Protocol", (data) => {
+        // TODO
+        // let protocolString = new TextDecoder("utf-16").decode(data.slice(1));
+        // protocolJSON = JSON.parse(protocolString);
+        console.log("Received new protocol. Updating exisiting protocol...");
+        // Once the protocol has been received, we can send our control messages
+        requestInitialSettings();
+        requestQualityControl();
+    });
+    fromStreamerMessages.add("InputControlOwnership", 255);
+}
+
+function registerMessageHandler(messageDirection, messageType, messageHandler) {
+    switch(messageDirection) {
+        case MessageDirection.ToStreamer:
+            toStreamerHandlers[messageType] = messageHandler;
+            break;
+        case MessageDirection.FromStreamer:
+            fromStreamerHandlers[messageType] = messageHandler;
+            break;
+        default:
+            console.log(`Unknown message direction ${messageDirection}`);
+    }
+}
+
 // https://w3c.github.io/gamepad/#remapping
 const gamepadLayout = {
     // Buttons
@@ -105,7 +281,7 @@ const gamepadLayout = {
     LeftStickVertical: 1,
     RightStickHorizontal: 2,
     RightStickVertical: 3
-}
+};
 
 function scanGamepads() {
     let gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
@@ -687,6 +863,14 @@ function removeResponseEventListener(name) {
 
 let VideoEncoderQP = "N/A";
 
+function onProtocolMessage(inProtocolJSON) {
+    protocolJSON = inProtocolJSON;
+    messageHandlers = new Map();
+    for(let message of inProtocolJSON) {
+
+    }
+}
+
 function setupWebRtcPlayer(htmlElement, config) {
     webRtcPlayerObj = new webRtcPlayer(config);
     autoPlayAudio = typeof config.autoPlayAudio !== 'undefined' ? config.autoPlayAudio : true;
@@ -909,88 +1093,10 @@ function setupWebRtcPlayer(htmlElement, config) {
 
     webRtcPlayerObj.onDataChannelMessage = function(data) {
         let view = new Uint8Array(data);
-        if (view[0] === protocolJSON["Protocol"].id) {
-            let protocolString = new TextDecoder("utf-16").decode(data.slice(1));
-            protocolJSON = JSON.parse(protocolString);
-            console.log("Received new protocol. Updating exisiting protocol...");
-            // Once the protocol has been received, we can send our control messages
-            requestInitialSettings();
-            requestQualityControl();
-        } else if (view[0] === protocolJSON["QualityControlOwnership"].id) {
-            let ownership = view[1] === 0 ? false : true;
-            console.log("Received quality controller message, will control quality: " + ownership);
-            qualityController = ownership;
-            // If we own the quality control, we can't relinquish it. We only lose
-            // quality control when another peer asks for it
-            if (qualityControlOwnershipCheckBox !== null) {
-                qualityControlOwnershipCheckBox.disabled = ownership;
-                qualityControlOwnershipCheckBox.checked = ownership;
-            }
-        } 
-        else if (view[0] === protocolJSON["InputControlOwnership"].id) {
-            let ownership = view[1] === 0 ? false : true;
-            console.log("Received input controller message - will your input control the stream: " + ownership);
-            inputController = ownership;
-        } 
-        else if (view[0] === protocolJSON["Response"].id) {
-            let response = new TextDecoder("utf-16").decode(data.slice(1));
-            for (let listener of responseEventListeners.values()) {
-                listener(response);
-            }
-        } else if (view[0] === protocolJSON["ToClientCommand"].id) {
-            let commandAsString = new TextDecoder("utf-16").decode(data.slice(1));
-            console.log(commandAsString);
-            let command = JSON.parse(commandAsString);
-            if (command.command === 'onScreenKeyboard') {
-                showOnScreenKeyboard(command);
-            }
-        } else if (view[0] === protocolJSON["FreezeFrame"].id) {
-            processFreezeFrameMessage(view);
-        } else if (view[0] === protocolJSON["UnfreezeFrame"].id) {
-            invalidateFreezeFrameOverlay();
-        } else if (view[0] === protocolJSON["VideoEncoderAvgQP"].id) {
-            VideoEncoderQP = new TextDecoder("utf-16").decode(data.slice(1));
-        } else if (view[0] == protocolJSON["LatencyTest"].id) {
-            let latencyTimingsAsString = new TextDecoder("utf-16").decode(data.slice(1));
-            console.log("Got latency timings from UE.")
-            console.log(latencyTimingsAsString);
-            let latencyTimingsFromUE = JSON.parse(latencyTimingsAsString);
-            if (webRtcPlayerObj) {
-                webRtcPlayerObj.latencyTestTimings.SetUETimings(latencyTimingsFromUE);
-            }
-        } else if (view[0] == protocolJSON["InitialSettings"].id) {
-            let settingsString = new TextDecoder("utf-16").decode(data.slice(1));
-            let settingsJSON = JSON.parse(settingsString);
-
-            if(settingsJSON.PixelStreaming) {
-                let allowConsoleCommands = settingsJSON.PixelStreaming.AllowPixelStreamingCommands;
-                if(allowConsoleCommands === false){
-                    console.warn("-AllowPixelStreamingCommands=false, sending arbitray console commands from browser to UE is disabled.")
-                }
-                let disableLatencyTest = settingsJSON.PixelStreaming.DisableLatencyTest;
-                if(disableLatencyTest) {
-                    document.getElementById("test-latency-button").disabled = true;
-                    document.getElementById("test-latency-button").title = "Disabled by -PixelStreamingDisableLatencyTester=true";
-                    console.warn("-PixelStreamingDisableLatencyTester=true, requesting latency report from the the browser to UE is disabled.")
-                }
-            }
-            if (settingsJSON.Encoder) {
-                document.getElementById('encoder-min-qp-text').value = settingsJSON.Encoder.MinQP;
-                document.getElementById('encoder-max-qp-text').value = settingsJSON.Encoder.MaxQP;
-            }
-            if (settingsJSON.WebRTC) {
-                document.getElementById("webrtc-fps-text").value = settingsJSON.WebRTC.FPS;
-                // reminder bitrates are sent in bps but displayed in kbps
-                document.getElementById("webrtc-min-bitrate-text").value = settingsJSON.WebRTC.MinBitrate / 1000;
-                document.getElementById("webrtc-max-bitrate-text").value = settingsJSON.WebRTC.MaxBitrate / 1000;
-            }
-        } else if (view[0] == protocolJSON["FileExtension"].id) {
-            processFileExtension(view);
-        } else if (view[0] == protocolJSON["FileMimeType"].id) {
-            processFileMimeType(view);
-        } else if (view[0] == protocolJSON["FileContents"].id) {
-            processFileContents(view);
-        } else {
+        try {
+            let messageType = fromStreamerMessages.getFromValue(view[0]);
+            fromStreamerHandlers[messageType](data);
+        } catch(e) {
             console.error(`Custom data channel message with message type that is unknown to the Pixel Streaming protocol. Does your PixelStreamingProtocol need updating? The message type was: ${view[0]}`);
         }
     };
@@ -1646,50 +1752,6 @@ protocolJSON = {
         //            ctrlerId   button  analogValue
         "structure": [ "uint8", "uint8", "double" ]
     },
-
-    // Old EToPlayerMsg enum
-    "QualityControlOwnership": {
-        "id": 0,
-    },
-    "Response": {
-        "id": 1,
-    },
-    "ToClientCommand": {
-        "id": 2,
-    },
-    "FreezeFrame": {
-        "id": 3,
-    },
-    "UnfreezeFrame": {
-        "id": 4,
-    },
-    "VideoEncoderAvgQP": {
-        "id": 5,
-    },
-    "LatencyTest": {
-        "id": 6,
-    },
-    "InitialSettings": {
-        "id": 7,
-    },
-    "FileExtension": {
-        "id": 8,
-    },
-    "FileMimeType": {
-        "id": 9,
-    },
-    "FileContents": {
-        "id": 10,
-    },
-    "TestEcho": {
-        "id": 11,
-    },
-    "InputControlOwnership": {
-        "id": 12,
-    },
-    "Protocol": {
-        "id": 255,
-    },
 };
 
 
@@ -1725,7 +1787,7 @@ function emitDescriptor(messageType, descriptor) {
 //
 function emitCommand(descriptor)
 {
-    emitDescriptor("ToStreamerCommand", descriptor)
+    emitDescriptor("ToStreamerCommand", descriptor);
 }
 
 // A UI interation will occur when the user presses a button powered by
@@ -2046,7 +2108,6 @@ function registerLockedMouseEvents(playerElement) {
 
     playerElement.onwheel = function(e) {
         let coord = normalizeAndQuantizeUnsigned(x, y);
-        console.log(e.wheelDelta)
         sendInputMessage("MouseWheel", [ e.wheelDelta, coord.x, coord.y ]);
     };
 
@@ -2097,10 +2158,9 @@ function registerHoveringMouseEvents(playerElement) {
 
     playerElement.onwheel = function(e) {
         let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
-        console.log(e.wheelDelta)
         sendInputMessage("MouseWheel", [ e.wheelDelta, coord.x, coord.y ]);
         e.preventDefault();
-    }
+    };
 
     playerElement.pressMouseButtons = function(e) {
         pressMouseButtons(e.buttons, e.offsetX, e.offsetY);
@@ -2560,6 +2620,7 @@ function closeStream() {
 function load() {
     parseURLParams();
     setupHtmlEvents();
+    populateDefaultProtocol();
     setupFreezeFrameOverlay();
     registerKeyboardEvents();
     // Example response event listener that logs to console
