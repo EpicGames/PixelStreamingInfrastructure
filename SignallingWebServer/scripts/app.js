@@ -10,7 +10,7 @@ let rAF = window.mozRequestAnimationFrame ||
 let kbEvent = document.createEvent("KeyboardEvent");
 let initMethod = typeof kbEvent.initKeyboardEvent !== 'undefined' ? "initKeyboardEvent" : "initKeyEvent";
 
-let offerToReceive = true;
+let offerToReceive = false;
 
 let webRtcPlayerObj = null;
 let print_stats = false;
