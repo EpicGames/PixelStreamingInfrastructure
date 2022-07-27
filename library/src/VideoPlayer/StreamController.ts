@@ -1,72 +1,18 @@
 import { MouseController } from "../Inputs/MouseController"
-import { UeDescriptorUi } from "../UeInstanceMessage/UeDescriptorUi";
 import { Logger } from "../Logger/Logger";
 import { IVideoPlayer } from "./IVideoPlayer";
 
 /**
  * Video Player Controller handles the creation of the video HTML element and all handlers
  */
-export class VideoPlayerController {
+export class StreamController {
     videoElementProvider: IVideoPlayer;
     audioElement: HTMLAudioElement;
     mouseController: MouseController;
-    ueDescriptorUi: UeDescriptorUi;
-    onUpdatePosition: (mouseEvent: MouseEvent) => void;
 
     constructor(videoElementProvider: IVideoPlayer) {
         this.videoElementProvider = videoElementProvider;
         this.audioElement = document.createElement("Audio") as HTMLAudioElement;
-    }
-
-    /**
-     * Create the video Element
-     */
-    setUpMouseHandlerEvents() {
-        let videoElement = this.videoElementProvider.getVideoElement();
-        videoElement.onmouseenter = (event: MouseEvent) => this.handleMouseEnter(event);
-        videoElement.onmouseleave = (event: MouseEvent) => this.handleMouseLeave(event);
-    }
-
-    /**
-     * Handle when the Element is mouse clicked
-     * @param event - Mouse Event
-     */
-    handleClick(event: MouseEvent) {
-        let videoElement = this.videoElementProvider.getVideoElement();
-        if (videoElement.paused) {
-            videoElement.play();
-        }
-
-        // minor hack to alleviate ios not supporting pointerlock
-        if(videoElement.requestPointerLock){
-            videoElement.requestPointerLock();
-        }
-    }
-
-    /**
-     * Handle when the Mouse has entered the element
-     * @param event - Mouse Event
-     */
-    handleMouseEnter(event: MouseEvent) {
-        Logger.verboseLog("Mouse Entered");
-        this.mouseController.sendMouseEnter();
-    }
-
-    /**
-     * Handles when the mouse has left the element 
-     * @param event - Mouse event
-     */
-    handleMouseLeave(event: MouseEvent) {
-        Logger.verboseLog("Mouse Left");
-        this.mouseController.sendMouseLeave();
-    }
-
-    /**
-     * Handles the Load Meta Data Event
-     * @param event - Event Not used
-     */
-    handleLoadMetaData(event: Event) {
-        Logger.verboseLog("showPlayOverlay \n resizePlayerStyle");
     }
 
     /**

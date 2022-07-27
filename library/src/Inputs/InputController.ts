@@ -6,7 +6,7 @@ import { ITouchController } from "./ITouchController";
 import { TouchController } from "./TouchController";
 import { GamePadController } from "./GamepadController";
 import { ControlSchemeType } from "../Config/Config";
-import { VideoPlayerController } from "../VideoPlayer/VideoPlayerController";
+import { StreamController } from "../VideoPlayer/StreamController";
 import { VideoPlayerMouseLockedEvents } from "../VideoPlayer/VideoPlayerMouseLockedEvents";
 import { VideoPlayerMouseHoverEvents } from "../VideoPlayer/VideoPlayerMouseHoverEvents";
 import { GyroController } from "./GyroController";
@@ -49,9 +49,8 @@ export class InputController {
     /**
      * register mouse events based on a control type 
      * @param controlScheme - if the mouse is either hovering or locked 
-     * @param videoPlayerController - the video player controller 
      */
-    registerMouse(controlScheme: ControlSchemeType, videoPlayerController: VideoPlayerController) {
+    registerMouse(controlScheme: ControlSchemeType) {
         console.debug("Register Mouse Events");
 
         // casting these as any as they do not have the moz attributes we require
@@ -65,7 +64,7 @@ export class InputController {
 
                 videoInputBindings = new VideoPlayerMouseLockedEvents(this.videoElementProvider, this.mouseController);
 
-                videoElement.onclick = (event: MouseEvent) => videoPlayerController.handleClick(event);
+                videoElement.onclick = (event: MouseEvent) => this.videoElementProvider.setClickActions(event);
 
                 document.addEventListener('pointerlockchange', () => videoInputBindings.handleLockStateChange(), false);
                 document.addEventListener('mozpointerlockchange', () => videoInputBindings.handleLockStateChange(), false);

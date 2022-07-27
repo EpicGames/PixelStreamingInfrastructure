@@ -1,12 +1,11 @@
 import { WebSocketController } from "../WebSockets/WebSocketController";
-import { VideoPlayerController } from "../VideoPlayer/VideoPlayerController";
+import { StreamController } from "../VideoPlayer/StreamController";
 import { MessageInstanceState, MessageAnswer, MessageAuthResponse, MessageConfig } from "../WebSockets/MessageReceive";
 import { UiController } from "../Ui/UiController";
 import { FreezeFrameController } from "../FreezeFrame/FreezeFrameController";
 import { AfkLogic } from "../Afk/AfkLogic";
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { PeerConnectionController } from "../PeerConnectionController/PeerConnectionController"
-import { MouseController } from "../Inputs/MouseController";
 import { KeyboardController } from "../Inputs/KeyboardController";
 import { ITouchController } from "../Inputs/ITouchController";
 import { UeDescriptorUi } from "../UeInstanceMessage/UeDescriptorUi";
@@ -32,9 +31,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	dataChannelController: DataChannelController;
 	datachannelOptions: RTCDataChannelInit;
 	videoPlayer: VideoPlayer;
-	videoPlayerController: VideoPlayerController;
+	streamController: StreamController;
 	keyboardController: KeyboardController;
-	mouseController: MouseController
 	touchController: ITouchController;
 	ueControlMessage: UeControlMessage;
 	ueDescriptorUi: UeDescriptorUi;
@@ -76,7 +74,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.freezeFrameController = new FreezeFrameController(this.config.playerElement);
 
 		this.videoPlayer = new VideoPlayer(this.config.playerElement, this.config.startVideoMuted);
-		this.videoPlayerController = new VideoPlayerController(this.videoPlayer);
+		this.streamController = new StreamController(this.videoPlayer);
 
 		this.uiController = new UiController(this.videoPlayer);
 		this.uiController.setUpMouseAndFreezeFrame = (element: HTMLDivElement) => this.setUpMouseAndFreezeFrame(element);
@@ -166,7 +164,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			console.log("showing freeze frame")
 			this.freezeFrameController.showFreezeFrame();
 		}
-		this.videoPlayerController.setVideoEnabled(false);
+		this.streamController.setVideoEnabled(false);
 	}
 
 	/**
@@ -175,7 +173,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	InvalidateFreezeFrameAndEnableVideo() {
 		this.freezeFrameController.hideFreezeFrame();
 		if (this.videoPlayer.videoElement) {
-			this.videoPlayerController.setVideoEnabled(true);
+			this.streamController.setVideoEnabled(true);
 		}
 	}
 
@@ -187,7 +185,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			// handle play() with .then as it is an asynchronous call  
 			this.videoPlayer.videoElement.play().then(() => {
 				this.shouldShowPlayOverlay = false;
-				this.videoPlayerController.PlayAudioTrack();
+				this.streamController.PlayAudioTrack();
 				this.ueControlMessage.SendRequestInitialSettings();
 				this.ueControlMessage.SendRequestQualityControl();
 				this.freezeFrameController.showFreezeFrame();
@@ -260,7 +258,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.peerConnectionController.showTextOverlaySetupFailure = () => this.delegate.onWebRtcFailed();
 
 		/* RTC Peer Connection on Track event -> handle on track */
-		this.peerConnectionController.onTrack = (trackEvent: RTCTrackEvent) => this.videoPlayerController.handleOnTrack(trackEvent);
+		this.peerConnectionController.onTrack = (trackEvent: RTCTrackEvent) => this.streamController.handleOnTrack(trackEvent);
 
 		/* Start the Hand shake process by creating an Offer */
 		this.peerConnectionController.createOffer(this.sdpConstraints, this.micController.useMic);
@@ -334,7 +332,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * registers the mouse for use in IWebRtcPlayerController
 	 */
 	activateRegisterMouse() {
-		this.inputController.registerMouse(this.config.controlScheme, this.videoPlayerController);
+		this.inputController.registerMouse(this.config.controlScheme);
 	}
 
 	/**
@@ -351,13 +349,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.ueControlMessage = new UeControlMessage(this.dataChannelController);
 		this.ueDescriptorUi = new UeDescriptorUi(this.dataChannelController);
 
-		this.videoPlayerController.setUpMouseHandlerEvents();
-
 		this.activateRegisterMouse()
 		this.inputController.registerKeyBoard(this.config.suppressBrowserKeys);
 		this.inputController.registerGamePad();
 
-		this.videoPlayerController.mouseController = this.inputController.mouseController;
+		this.videoPlayer.setMouseEnterAndLeaveEvents(() => this.inputController.mouseController.sendMouseEnter(), () => this.inputController.mouseController.sendMouseLeave());
 
 		this.resizePlayerStyle();
 
