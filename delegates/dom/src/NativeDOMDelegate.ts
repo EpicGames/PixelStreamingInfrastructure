@@ -1,6 +1,5 @@
 import './assets/css/player.css';
 import playButton from './assets/images/Play.png';
-import 'bootstrap/dist/css/bootstrap.min.css'
 import { EventEmitter } from "events";
 import * as libspsfrontend from '@tensorworks/libspsfrontend'
 

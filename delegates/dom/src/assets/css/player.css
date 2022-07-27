@@ -159,7 +159,7 @@ object {
 #uiFeatures button {
 	background-color: var(--colour7);
 	border: 1px solid var(--colour7);
-	color: var(--colour2);
+	color: var(--colour4);
 	position: relative;
 	width: 3rem;
 	height: 3rem;
@@ -250,8 +250,10 @@ object {
 	transition: ease 0.3s;
 }
 
-#settingsContent, #statsContent {
-	margin: 2rem;
+#settingsContent,
+#statsContent {
+	margin-left: 2rem;
+	margin-right: 2rem;
 }
 
 #settings-panel .tooltiptext {
@@ -275,6 +277,7 @@ object {
 }
 
 .settings-text {
+	font-size: 1.1em;
 	color: var(--colour4);
 	vertical-align: middle;
 	font-weight: normal;
@@ -537,11 +540,9 @@ section {
 }
 
 section> :first-child {
-	background-color: var(--colour7);
-	padding: 4px;
+	margin-top: 4px;
+	margin-bottom: 4px;
 	font-weight: bold;
-	border-top: 1px solid var(--colour8);
-	border-bottom: 1px solid var(--colour8);
 	justify-content: space-between;
 	display: flex;
 	flex-direction: row;
@@ -549,7 +550,9 @@ section> :first-child {
 }
 
 .settingsContainer {
-	margin: 10px 0px;
+	border-bottom: 1px solid var(--colour2);
+	padding-top: 10px;
+	padding-bottom: 10px;
 }
 
 .collapse {
@@ -608,7 +611,8 @@ section> :first-child {
 	color: var(--colour4);
 }
 
-.streamTools-shown>#streamToolsSettings,  .streamTools-shown>#streamToolsStats{
+.streamTools-shown>#streamToolsSettings,
+.streamTools-shown>#streamToolsStats {
 	display: block;
 }
 
@@ -643,7 +647,8 @@ section> :first-child {
 	padding-right: 4px;
 }
 
-#streamToolsSettings, #streamToolsStats {
+#streamToolsSettings,
+#streamToolsStats {
 	font-size: 1em;
 	width: 400px;
 	/*display: none;*/
