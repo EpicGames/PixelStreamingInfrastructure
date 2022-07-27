@@ -86,4 +86,9 @@ export interface IWebRtcPlayerController {
 	 * @param isFilling is the display filling or not
 	 */
 	setEnlargeToFillDisplay(isFilling: boolean): void;
+
+    /**
+	 * Handles when the stream size changes
+	 */
+    updateVideoStreamSize(): void;
 }

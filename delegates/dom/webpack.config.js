@@ -18,8 +18,7 @@ module.exports = (env) => {
       new HtmlWebpackPlugin({
         title: 'Development',
         template: './src/index.html',
-        filename: 'index.html',
-        favicon: "./src/assets/images/favicon.png"
+        filename: 'index.html'
       }),
 
       new MiniCssExtractPlugin()

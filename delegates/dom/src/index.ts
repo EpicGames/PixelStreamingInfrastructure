@@ -5,12 +5,18 @@ import 'bootstrap/dist/css/bootstrap-reboot.min.css'
 import 'bootstrap/dist/css/bootstrap-utilities.min.css'
 import { NativeDOMDelegate } from "./NativeDOMDelegate";
 import * as libspsfrontend from '@tensorworks/libspsfrontend';
+import favSvg from './assets/images/favicon.svg';
+import favPng from './assets/images/favicon.png';
 import svgMinimize from './assets/images/Minimize.svg';
 import svgMaximize from './assets/images/Maximize.svg';
 import svgSettings from './assets/images/Settings.svg';
 import svgInfo from './assets/images/Info.svg';
 
-// svg icons for buttons
+// svg icons for favicons and buttons
+let faviconSvg = document.getElementById('favSvg') as HTMLLinkElement;
+faviconSvg.href = favSvg;
+let faviconPng = document.getElementById('favPng') as HTMLLinkElement;
+faviconPng.href = favPng;
 let maximizeIcon = document.getElementById('maximizeIcon') as HTMLObjectElement;
 maximizeIcon.data = svgMaximize;
 let minimizeIcon = document.getElementById('minimizeIcon') as HTMLObjectElement;
