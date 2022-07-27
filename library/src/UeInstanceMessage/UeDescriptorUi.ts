@@ -20,7 +20,7 @@ export class UeDescriptorUi extends UeDescriptor {
      * @param height - Height of res
      */
     sendUpdateVideoStreamSize(width: number, height: number) {
-        this.sendUiConsoleInteraction("setres " + width + "x" + height);
+        this.sendUiConsoleInteraction("r.setres " + width + "x" + height);
     }
 
     /**
