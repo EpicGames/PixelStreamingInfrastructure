@@ -282,32 +282,32 @@ function registerMessageHandlers() {
     registerMessageHandler(MessageDirection.FromStreamer, "InputControlOwnership", onInputControlOwnership);
     registerMessageHandler(MessageDirection.FromStreamer, "Protocol", onProtocolMessage);
 
-    registerMessageHandler(MessageDirection.ToStreamer, "IFrameRequest", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "RequestQualityControl", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "FpsRequest", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "AverageBitrateRequest", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "StartStreaming", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "StopStreaming", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "LatencyTest", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "RequestInitialSettings", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "IFrameRequest", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "RequestQualityControl", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "FpsRequest", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "AverageBitrateRequest", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "StartStreaming", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "StopStreaming", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "LatencyTest", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "RequestInitialSettings", sendMessageToStreamer);
     registerMessageHandler(MessageDirection.ToStreamer, "TestEcho", () => { /* Do nothing */});
     registerMessageHandler(MessageDirection.ToStreamer, "UIInteraction", emitUIInteraction);
-    registerMessageHandler(MessageDirection.ToStreamer, "Command", emitDescriptor);
-    registerMessageHandler(MessageDirection.ToStreamer, "KeyDown", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "KeyUp", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "KeyPress", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "MouseEnter", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "MouseLeave", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "MouseDown", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "MouseUp", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "MouseMove", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "MouseWheel", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "TouchStart", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "TouchEnd", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "TouchMove", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonPressed", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonReleased", sendInputMessage);
-    registerMessageHandler(MessageDirection.ToStreamer, "GamepadAnalog", sendInputMessage);
+    registerMessageHandler(MessageDirection.ToStreamer, "Command", emitCommand);
+    registerMessageHandler(MessageDirection.ToStreamer, "KeyDown", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "KeyUp", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "KeyPress", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "MouseEnter", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "MouseLeave", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "MouseDown", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "MouseUp", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "MouseMove", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "MouseWheel", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "TouchStart", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "TouchEnd", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "TouchMove", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonPressed", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonReleased", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "GamepadAnalog", sendMessageToStreamer);
 }
 
 function registerMessageHandler(messageDirection, messageType, messageHandler) {
@@ -460,7 +460,7 @@ function onProtocolMessage(data) {
                     break;
                 case MessageDirection.FromStreamer:
                     // Check that the message contains all the relevant params
-                    if (!!message.hasOwnProperty("id")) {
+                    if (!message.hasOwnProperty("id")) {
                         console.error(`FromStreamer->${messageType} protcol definition was malformed`);
                         // return in a forEach is equivalent to a continue in a normal for loop
                         return;
@@ -1768,9 +1768,12 @@ function onOrientationChange(event) {
     }, 500);
 }
 
-function sendInputMessage(messageType, indata = []) {
+function sendMessageToStreamer(messageType, indata = []) {
     messageFormat = toStreamerMessages.getFromKey(messageType);
-
+    if(messageFormat === undefined) {
+        console.error(`Attempted to send a message to the streamer with message type: ${messageType}, but the frontend hasn't been configured to send such a message. Check you've added the message type in your cpp`);
+        return;
+    }
     // console.log(`Calculate size: ${new Blob(JSON.stringify(indata)).size}, Specified size: ${messageFormat.byteLength}`);
     data = new DataView(new ArrayBuffer(messageFormat.byteLength + 1));
 
@@ -1804,22 +1807,19 @@ function sendInputMessage(messageType, indata = []) {
     sendInputData(data.buffer);
 }
 
-function sendControlMessage(messageType) {
-    let data = new DataView(new ArrayBuffer(1));
-    data.setUint8(0, toStreamerMessages.getFromKey(messageType).id);
-    sendInputData(data.buffer);
-}
-
 // A generic message has a type and a descriptor.
 function emitDescriptor(messageType, descriptor) {
-    // Convert the dscriptor object into a JSON string.
+    // Convert the descriptor object into a JSON string.
     let descriptorAsString = JSON.stringify(descriptor);
-
+    let messageFormat = toStreamerMessages.getFromKey(messageType);
+    if(messageFormat === undefined) {
+        console.error(`Attempted to emit descriptor with message type: ${messageType}, but the frontend hasn't been configured to send such a message. Check you've added the message type in your cpp`);
+    }
     // Add the UTF-16 JSON string to the array byte buffer, going two bytes at
     // a time.
     let data = new DataView(new ArrayBuffer(1 + 2 + 2 * descriptorAsString.length));
     let byteIdx = 0;
-    data.setUint8(byteIdx, toStreamerMessages.getFromKey(messageType).id);
+    data.setUint8(byteIdx, messageFormat.id);
     byteIdx++;
     data.setUint16(byteIdx, descriptorAsString.length, true);
     byteIdx += 2;
@@ -1841,7 +1841,7 @@ function emitDescriptor(messageType, descriptor) {
 //    "{ Resolution.Width: <value>, Resolution.Height: <value> } }"
 //
 function emitCommand(descriptor) {
-    toStreamerHandlers.getFromKey("Command")("Command", descriptor);
+    emitDescriptor("Command", descriptor);
 }
 
 // A UI interation will occur when the user presses a button powered by
@@ -1852,12 +1852,12 @@ function emitUIInteraction(descriptor) {
 }
 
 function requestInitialSettings() {
-    sendControlMessage("RequestInitialSettings");
+    sendMessageToStreamer("RequestInitialSettings");
 }
 
 function requestQualityControl() {
     if (!qualityController) {
-        sendControlMessage("RequestQualityControl");
+        sendMessageToStreamer("RequestQualityControl");
     }
 }
 
@@ -2676,7 +2676,8 @@ function load() {
     parseURLParams();
     setupHtmlEvents();
     registerMessageHandlers();
-    populateDefaultProtocol();
+    fromStreamerMessages.add("Protocol", 255);
+    // populateDefaultProtocol();
     setupFreezeFrameOverlay();
     registerKeyboardEvents();
     // Example response event listener that logs to console
