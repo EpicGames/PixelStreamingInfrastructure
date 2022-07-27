@@ -1,5 +1,36 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+/**
+ * Class definitions
+ * TODO: Move these to seperate files once we introduce a bundler
+ */
+class TwoWayMap {
+    constructor(map = {}) {
+        this.map = map;
+        this.reverseMap = new Map();
+        for(const key in map) {
+            const value = map[key];
+            this.reverseMap[value] = key;
+        }
+    }
+
+    getFromKey(key) { return this.map[key]; }
+    getFromValue(value) { return this.reverseMap[value]; }
+
+    add(key, value) {
+        this.map[key] = value;
+        this.reverseMap[value] = key;
+    }
+
+    remove(key, value) {
+        delete this.map[key];
+        delete this.reverseMap[value];
+    }
+}
+
+/**
+ * Frontend logic
+ */
 // Window events for a gamepad connecting
 let haveEvents = 'GamepadEvent' in window;
 let haveWebkitEvents = 'WebKitGamepadEvent' in window;
@@ -422,15 +453,12 @@ function onInputControlOwnership(data) {
 }
 
 function onProtocolMessage(data) {
-    /**
-     * TODO
-     */
     try {
         let protocolString = new TextDecoder("utf-16").decode(data.slice(1));
         let protocolJSON = JSON.parse(protocolString);
         console.log("Received new protocol. Updating exisiting protocol...");
         if (!protocolJSON.hasOwnProperty("direction")) {
-            throw new Error('Malformed protocol received');
+            throw new Error('Malformed protocol received. Ensure the protocol message contains a direction');
         }
         let direction = protocolJSON.direction;
         delete protocolJSON.direction;
@@ -440,13 +468,14 @@ function onProtocolMessage(data) {
                 case MessageDirection.ToStreamer:
                     // Check that the message contains all the relevant params
                     if (!message.hasOwnProperty("id") || !message.hasOwnProperty("byteLength")) {
-                        console.error(`ToStreamer->${messageType} protcol definition was malformed`);
+                        console.error(`ToStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id and a byteLength\n
+                                       Definition was: ${JSON.stringify(message, null, 2)}`);
                         // return in a forEach is equivalent to a continue in a normal for loop
                         return;
                     }
                     if(message.byteLength > 0 && !message.hasOwnProperty("structure")) {
                         // If we specify a bytelength, will must have a corresponding structure
-                        console.error(`ToStreamer->${messageType} protcol definition was malformed`);
+                        console.error(`ToStreamer->${messageType} protocol definition was malformed as it specified a byteLength but no accompanying structure`);
                         // return in a forEach is equivalent to a continue in a normal for loop
                         return;
                     }
@@ -461,7 +490,8 @@ function onProtocolMessage(data) {
                 case MessageDirection.FromStreamer:
                     // Check that the message contains all the relevant params
                     if (!message.hasOwnProperty("id")) {
-                        console.error(`FromStreamer->${messageType} protcol definition was malformed`);
+                        console.error(`FromStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id\n
+                        Definition was: ${JSON.stringify(message, null, 2)}`);
                         // return in a forEach is equivalent to a continue in a normal for loop
                         return;
                     }
