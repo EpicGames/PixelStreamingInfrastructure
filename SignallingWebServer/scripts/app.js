@@ -2676,8 +2676,7 @@ function load() {
     parseURLParams();
     setupHtmlEvents();
     registerMessageHandlers();
-    fromStreamerMessages.add("Protocol", 255);
-    // populateDefaultProtocol();
+    populateDefaultProtocol();
     setupFreezeFrameOverlay();
     registerKeyboardEvents();
     // Example response event listener that logs to console
