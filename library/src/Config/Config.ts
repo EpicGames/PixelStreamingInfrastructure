@@ -1,9 +1,6 @@
 export class Config {
 
 	// PRESET OPTIONS
-	// TODO: expose config through delegate so we don't need static
-	static _enableVerboseLogging = false;
-
 	// enable the auto connect of the websocket 
 	enableSpsAutoConnect = false;
 

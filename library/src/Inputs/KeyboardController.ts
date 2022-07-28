@@ -9,7 +9,6 @@ import { Logger } from "../Logger/Logger";
 export class KeyboardController {
     ueInputKeyBoardMessage: UeInputKeyboardMessage;
     suppressBrowserKeys: boolean;
-    logging: boolean;
 
     /**
      * 
@@ -19,7 +18,6 @@ export class KeyboardController {
     constructor(dataChannelController: DataChannelController, suppressBrowserKeys: boolean) {
         this.ueInputKeyBoardMessage = new UeInputKeyboardMessage(dataChannelController);
         this.suppressBrowserKeys = suppressBrowserKeys;
-        this.logging = false;
     }
 
     /**
@@ -38,7 +36,7 @@ export class KeyboardController {
      * @param keyboardEvent - Keyboard event 
      */
     handleOnKeyDown(keyboardEvent: KeyboardEvent) {
-        if (this.logging) { Logger.verboseLog("handleOnKeyDown"); }
+        Logger.Log(Logger.GetStackTrace(), "handleOnKeyDown", 6);
         this.ueInputKeyBoardMessage.sendKeyDown(this.getKeycode(keyboardEvent), keyboardEvent.repeat);
         /* this needs to be tested but it is believed that this is not needed*/
         // backSpace is not considered a keypress in JavaScript but we need it
@@ -58,7 +56,7 @@ export class KeyboardController {
      * @param keyboardEvent - Keyboard event
      */
     handleOnKeyUp(keyboardEvent: KeyboardEvent) {
-        if (this.logging) { Logger.verboseLog("handleOnKeyUp"); }
+        Logger.Log(Logger.GetStackTrace(), "handleOnKeyUp", 6);
         this.ueInputKeyBoardMessage.sendKeyUp(this.getKeycode(keyboardEvent));
 
         if (this.suppressBrowserKeys && this.isKeyCodeBrowserKey(keyboardEvent.keyCode)) {
@@ -71,7 +69,7 @@ export class KeyboardController {
      * @param keyboard - Keyboard Event
      */
     handleOnKeyPress(keyboard: KeyboardEvent) {
-        if (this.logging) { Logger.verboseLog("handleOnkeypress") }
+        Logger.Log(Logger.GetStackTrace(), "handleOnkeypress", 6);
         this.ueInputKeyBoardMessage.sendKeyPress(keyboard.charCode);
     }
 

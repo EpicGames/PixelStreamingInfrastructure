@@ -49,7 +49,7 @@ export class VideoPlayerTouchEvents implements IVideoPlayerTouchInterface {
      * @param touchEvent - Touch Event
      */
     onTouchEnd(touchEvent: TouchEvent) {
-        Logger.verboseLog('touch end');
+        Logger.Log(Logger.GetStackTrace(), 'touch end', 6);
 
         ///this._UEMouseController.sendTouch(UeMessageType.TouchEnd, touchEvent.changedTouches);
 
@@ -65,7 +65,7 @@ export class VideoPlayerTouchEvents implements IVideoPlayerTouchInterface {
      * @param touchEvent - Touch Event
      */
     onTouchMove(touchEvent: TouchEvent) {
-        Logger.verboseLog('touch move');
+        Logger.Log(Logger.GetStackTrace(), 'touch move', 6);
         //this.ueMouseController.sendTouch(UeMessageType.TouchMove, touchEvent.touches);
         touchEvent.preventDefault();
     }
@@ -77,7 +77,7 @@ export class VideoPlayerTouchEvents implements IVideoPlayerTouchInterface {
     rememberTouch(touch: Touch) {
         let finger = this.fingers.pop();
         if (finger === undefined) {
-            Logger.verboseLog('exhausted touch identifiers');
+            Logger.Log(Logger.GetStackTrace(), 'exhausted touch identifiers', 6);
         }
         this.fingerIds[touch.identifier] = finger;
     }

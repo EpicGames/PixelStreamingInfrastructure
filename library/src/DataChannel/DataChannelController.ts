@@ -15,7 +15,7 @@ export class DataChannelController {
     datachannelOptions: RTCDataChannelInit;
     label: string;
     isReceivingFreezeFrame = false;
-    logging: boolean;
+
     /**
      * To Create and Set up a Data Channel
      * @param peerConnection - The RTC Peer Connection
@@ -23,7 +23,6 @@ export class DataChannelController {
      * @param datachannelOptions - Optional RTC DataChannel options
      */
     createDataChannel(peerConnection: RTCPeerConnection, label: string, datachannelOptions?: RTCDataChannelInit) {
-        this.logging = false;
         this.peerConnection = peerConnection;
         this.label = label;
         this.datachannelOptions = datachannelOptions;
@@ -60,46 +59,46 @@ export class DataChannelController {
      */
     handleOnMessage(event: MessageEvent) {
         let message = new Uint8Array(event.data);
-        if (this.logging) { Logger.verboseLog("Message incoming") }
-        if (this.logging) { Logger.verboseLog("Message:" + message) }
+
+        Logger.Log(Logger.GetStackTrace(), "Message incoming", 6);
+        Logger.Log(Logger.GetStackTrace(), "Message:" + message, 6);
 
         switch (message[0]) {
             case DataChannelReceiveMessageType.QualityControlOwnership: {
-                Logger.verboseLog("DataChannelReceiveMessageType.QualityControlOwnership")
+                Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.QualityControlOwnership", 6);
                 let QualityOwnership = new Boolean(message[1]).valueOf();
                 this.onQualityControlOwnership(QualityOwnership);
                 break;
             }
             case DataChannelReceiveMessageType.Response: {
-                Logger.verboseLog("DataChannelReceiveMessageType.Response");
+                Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.Response", 6);
                 this.onResponse(message);
                 break;
             }
             case DataChannelReceiveMessageType.Command: {
-                Logger.verboseLog("DataChannelReceiveMessageType.Command");
+                Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.Command", 6);
                 this.onCommand(message);
                 break;
             }
             case DataChannelReceiveMessageType.FreezeFrame: {
-                Logger.verboseLog("DataChannelReceiveMessageType.FreezeFrame");
+                Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.FreezeFrame", 6);
                 this.processFreezeFrameMessage(message);
                 break;
             }
             case DataChannelReceiveMessageType.UnfreezeFrame: {
-                Logger.verboseLog("DataChannelReceiveMessageType.UnfreezeFrame");
+                Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.FreezeFrame", 6);
                 this.isReceivingFreezeFrame = false;
                 this.onUnFreezeFrame();
                 break;
             }
             case DataChannelReceiveMessageType.VideoEncoderAvgQP: {
-                if (this.logging) { Logger.verboseLog("DataChannelReceiveMessageType.VideoEncoderAvgQP"); }
-
+                Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.VideoEncoderAvgQP", 6);
                 let AvgQP = Number(new TextDecoder("utf-16").decode(message.slice(1)));
                 this.onVideoEncoderAvgQP(AvgQP);
                 break;
             }
             case DataChannelReceiveMessageType.latencyTest: {
-                Logger.verboseLog("DataChannelReceiveMessageType.latencyTest");
+                Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.latencyTest", 6);
                 let latencyAsString = new TextDecoder("utf-16").decode(message.slice(1));
                 let iLatencyTestResults: ILatencyTestResults = JSON.parse(latencyAsString);
                 let latencyTestResults: LatencyTestResults = new LatencyTestResults();
@@ -109,18 +108,18 @@ export class DataChannelController {
                 break;
             }
             case DataChannelReceiveMessageType.InitialSettings: {
-                Logger.verboseLog("DataChannelReceiveMessageType.InitialSettings");
+                Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.InitialSettings", 6);
                 let payloadAsString = new TextDecoder("utf-16").decode(message.slice(1));
                 let iInitialSettings: IInitialSettings = JSON.parse(payloadAsString);
                 let initialSettings: InitialSettings = new InitialSettings();
                 Object.assign(initialSettings, iInitialSettings);
                 initialSettings.ueCompatible()
-                Logger.verboseLog(payloadAsString);
+                Logger.Log(Logger.GetStackTrace(), payloadAsString, 6);
                 this.OnInitialSettings(initialSettings);
                 break;
             }
             default: {
-                console.error("unknown message sent on the Data channel");
+                Logger.Error(Logger.GetStackTrace(), "unknown message sent on the Data channel");
                 break;
             }
         }
@@ -131,9 +130,9 @@ export class DataChannelController {
      * @param message - Message Data Uint8Array
      */
     onResponse(message: Uint8Array) {
-        Logger.verboseLog("DataChannelReceiveMessageType.Response");
+        Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.Response", 6);
         let responses = new TextDecoder("utf-16").decode(message.slice(1));
-        Logger.verboseLog(responses);
+        Logger.Log(Logger.GetStackTrace(), responses, 6);
         //add to response handlers 
     }
 
@@ -142,10 +141,10 @@ export class DataChannelController {
      * @param message - Message Data Uint8Array
      */
     onCommand(message: Uint8Array) {
-        Logger.verboseLog("DataChannelReceiveMessageType.Command");
+        Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.Command", 6);
 
         let commandAsString = new TextDecoder("utf-16").decode(message.slice(1));
-        Logger.verboseLog("Data Channel Command: " + commandAsString);
+        Logger.Log(Logger.GetStackTrace(), "Data Channel Command: " + commandAsString, 6);
         let command: InstanceCommand = JSON.parse(commandAsString);
         if (command.command === "onScreenKeyboard") {
             //show on screen Keyboard;
@@ -163,7 +162,7 @@ export class DataChannelController {
         if (this.dataChannel && this.dataChannel.readyState == "open") {
             this.dataChannel.send(data);
         } else {
-            console.error("Message Failed: " + new Uint8Array(data));
+            Logger.Error(Logger.GetStackTrace(), "Message Failed: " + new Uint8Array(data));
         }
     }
 

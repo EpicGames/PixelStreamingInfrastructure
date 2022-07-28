@@ -53,13 +53,13 @@ export class VideoPlayer implements IVideoPlayer {
     setMouseEnterAndLeaveEvents(mouseEnterCallBack: () => void, mouseLeaveCallBack: () => void) {
         // Handle when the Mouse has entered the element
         this.videoElement.onmouseenter = (event: MouseEvent) => {
-            Logger.verboseLog("Mouse Entered");
+            Logger.Log(Logger.GetStackTrace(), "Mouse Entered", 6);
             mouseEnterCallBack();
         };
 
         // Handles when the mouse has left the element 
         this.videoElement.onmouseleave = (event: MouseEvent) => {
-            Logger.verboseLog("Mouse Left");
+            Logger.Log(Logger.GetStackTrace(), "Mouse Left", 6);
             mouseLeaveCallBack();
         };
     }

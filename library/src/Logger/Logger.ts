@@ -1,26 +1,64 @@
-import { Config } from "../Config/Config";
-
-/**
- * The current logger for the frontend 
- */
 export class Logger {
+    static verboseLogLevel: number = 5;
+
+    /**
+     * Captures the stack and returns it
+     * @returns the current stack
+     */
+    static GetStackTrace() {
+        let obj: any = {};
+        Error.captureStackTrace(obj, Logger.GetStackTrace);
+        let stackAsString = obj.stack.toString();
+        let formattedStack = stackAsString.replace(/Error/g, '');
+        return formattedStack;
+    };
+
+    /**
+     * Set the log verbosity level
+     */
+    static SetLoggerVerbosity(verboseLogLevel: number) {
+        if (this.verboseLogLevel != null) {
+            this.verboseLogLevel = verboseLogLevel;
+        }
+    }
 
     /**
      * The standard logging output 
-     * @param text - the string to be logged 
+     * @param stack - the stack trace
+     * @param message - the message to be logged
+     * @param verbosity - the verbosity level
      */
-    static infoLog(text: string) {
-        console.log(text);
+    static Log(stack: string, message: string, verbosity?: number) {
+        if (verbosity > this.verboseLogLevel) {
+            return;
+        }
+
+        let returnString = `Level: Log, Caller: ${stack}, Msg: ${message}`;
+        console.log(returnString);
     }
 
     /**
-     * The verbose logging output 
-     * @param text - the string to be logged 
+     * The standard logging output 
+     * @param stack - the stack trace
+     * @param message - the message to be logged
+     * @param verbosity - the verbosity level
      */
-    static verboseLog(text: string) {
-        if (Config._enableVerboseLogging === true) {
-            console.log(text);
-       }
+    static Info(stack: string, message: string, verbosity?: number) {
+        if (verbosity > this.verboseLogLevel) {
+            return;
+        }
+
+        let returnString = `Level: Info, Msg: ${message}`;
+        console.info(returnString);
     }
 
+    /**
+     * The standard logging output 
+     * @param stack - the stack trace
+     * @param message - the message to be logged
+     */
+    static Error(stack: string, message: string) {
+        let returnString = `Level: Error, Caller: ${stack}, Msg: ${message}`;
+        console.error(returnString);
+    }
 }

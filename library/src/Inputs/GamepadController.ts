@@ -1,4 +1,5 @@
 import { DataChannelController } from "../DataChannel/DataChannelController";
+import { Logger } from "../Logger/Logger";
 import { UeInputGamePadMessage } from "../UeInstanceMessage/UeInputGamePadMessage"
 
 /**
@@ -6,16 +7,13 @@ import { UeInputGamePadMessage } from "../UeInstanceMessage/UeInputGamePadMessag
  */
 export class GamePadController {
     ueInputGamePadMessage: UeInputGamePadMessage;
-    controllers: Controller[]
-    logging: boolean;
+    controllers: Controller[];
 
     /**
      * @param dataChannelController - the data chanel controller  
      */
     constructor(dataChannelController: DataChannelController) {
-        this.ueInputGamePadMessage = new UeInputGamePadMessage(dataChannelController)
-        this.logging = true;
-
+        this.ueInputGamePadMessage = new UeInputGamePadMessage(dataChannelController);
         if ("GamepadEvent" in window) {
             window.addEventListener("gamepadconnected", (ev: GamepadEvent) => this.gamePadConnectHandler(ev));
             window.addEventListener("gamepaddisconnected", (ev: GamepadEvent) => this.gamePadDisconnectHandler(ev));
@@ -24,7 +22,6 @@ export class GamePadController {
             window.addEventListener("webkitgamepaddisconnected", (ev: GamepadEvent) => this.gamePadDisconnectHandler(ev));
         }
         this.controllers = [];
-
     }
 
     /**
@@ -32,7 +29,7 @@ export class GamePadController {
      * @param gamePadEvent - the activating gamepad event 
      */
     gamePadConnectHandler(gamePadEvent: GamepadEvent) {
-        if (this.logging) { console.log("Gamepad connect handler"); }
+        Logger.Log(Logger.GetStackTrace(), "Gamepad connect handler", 6);
         let gamepad = gamePadEvent.gamepad;
 
         let temp: Controller = {
@@ -41,11 +38,9 @@ export class GamePadController {
         };
 
         this.controllers.push(temp);
-
         this.controllers[gamepad.index].currentState = gamepad;
         this.controllers[gamepad.index].prevState = gamepad;
-        if (this.logging) { console.log("gamepad: " + gamepad.id + " connected"); }
-
+        Logger.Log(Logger.GetStackTrace(), "gamepad: " + gamepad.id + " connected", 6);
         window.requestAnimationFrame(() => this.updateStatus());
     }
 
@@ -54,10 +49,8 @@ export class GamePadController {
      * @param gamePadEvent - the activating gamepad event 
      */
     gamePadDisconnectHandler(gamePadEvent: GamepadEvent) {
-        if (this.logging) {
-            console.log("Gamepad disconnect handler");
-            console.log("gamepad: " + gamePadEvent.gamepad.id + " disconnected");
-        }
+        Logger.Log(Logger.GetStackTrace(), "Gamepad disconnect handler", 6);
+        Logger.Log(Logger.GetStackTrace(), "gamepad: " + gamePadEvent.gamepad.id + " disconnected", 6);
         delete this.controllers[gamePadEvent.gamepad.index];
         this.controllers = this.controllers.filter(controller => controller !== undefined);
     }
@@ -145,7 +138,7 @@ export class GamePadController {
                 this.controllers[currentState.index].prevState = currentState;
             }
             catch (error) {
-                console.error("Oh dear the gamepad poll loop has thrown an error");
+                Logger.Error(Logger.GetStackTrace(), "Oh dear the gamepad poll loop has thrown an error");
             }
         }
         window.requestAnimationFrame(() => this.updateStatus());

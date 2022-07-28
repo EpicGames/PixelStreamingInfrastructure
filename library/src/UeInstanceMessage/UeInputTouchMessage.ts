@@ -136,7 +136,7 @@ export class UeInputTouchMessage extends UeDataMessage {
 
             } else {
                 if (this.printInputs) {
-                    Logger.verboseLog('Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio');
+                    Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio', 6);
                 }
 
                 let ratio = videoAspectRatio / playerAspectRatio;

@@ -20,11 +20,11 @@ export class StreamController {
      * @param rtcTrackEvent - RTC Track Event 
      */
     handleOnTrack(rtcTrackEvent: RTCTrackEvent) {
-        Logger.verboseLog("handleOnTrack " + JSON.stringify(rtcTrackEvent.streams));
+        Logger.Log(Logger.GetStackTrace(), "handleOnTrack " + JSON.stringify(rtcTrackEvent.streams), 6);
         let videoElement = this.videoElementProvider.getVideoElement();
 
         if (rtcTrackEvent.track) {
-            Logger.verboseLog('Got track - ' + rtcTrackEvent.track.kind + ' id=' + rtcTrackEvent.track.id + ' readyState=' + rtcTrackEvent.track.readyState);
+            Logger.Log(Logger.GetStackTrace(), 'Got track - ' + rtcTrackEvent.track.kind + ' id=' + rtcTrackEvent.track.id + ' readyState=' + rtcTrackEvent.track.readyState, 6);
         }
 
         if (rtcTrackEvent.track.kind == "audio") {
@@ -32,7 +32,7 @@ export class StreamController {
             return;
         } else if (rtcTrackEvent.track.kind == "video" && videoElement.srcObject !== rtcTrackEvent.streams[0]) {
             videoElement.srcObject = rtcTrackEvent.streams[0];
-            console.log('Set video source from video track ontrack.');
+            Logger.Log(Logger.GetStackTrace(), 'Set video source from video track ontrack.',);
             return;
         }
     }
@@ -52,7 +52,7 @@ export class StreamController {
         else if (videoElement.srcObject && videoElement.srcObject !== audioMediaStream) {
             // create a new audio element
             this.audioElement.srcObject = audioMediaStream;
-            console.log('Created new audio element to play separate audio stream.');
+            Logger.Log(Logger.GetStackTrace(), 'Created new audio element to play separate audio stream.',);
         }
     }
 
@@ -65,8 +65,8 @@ export class StreamController {
         // attempt to auto play the audio from the audio element if not then set up a listener 
         this.audioElement.muted = false;
         this.audioElement.play().catch((onRejectedReason: string) => {
-            console.log(onRejectedReason);
-            console.log("Browser does not support autoplaying audio without interaction - to resolve this we are going to run the audio until the video is clicked");
+            Logger.Info(Logger.GetStackTrace(), onRejectedReason);
+            Logger.Info(Logger.GetStackTrace(), "Browser does not support autoplaying audio without interaction - to resolve this we are going to run the audio until the video is clicked");
 
             let clickToPlayAudio = () => {
                 this.audioElement.muted = false;

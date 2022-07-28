@@ -117,13 +117,13 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	restartStreamAutomaticity() {
 		// if there is no webSocketController return immediately or this will not work
 		if (!this.webSocketController) {
-			console.log("The Web Socket Controller does not exist so this will not work right now.");
+			Logger.Log(Logger.GetStackTrace(), "The Web Socket Controller does not exist so this will not work right now.");
 			return;
 		}
 
 		// if a websocket object has not been created connect normally without closing 
 		if (!this.webSocketController.webSocket) {
-			console.log("A websocket connection has not been made yet so we will start the stream");
+			Logger.Log(Logger.GetStackTrace(), "A websocket connection has not been made yet so we will start the stream");
 			this.delegate.onWebRtcAutoConnect();
 			this.connectToSignallingSever();
 
@@ -157,11 +157,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	loadFreezeFrameOrShowPlayOverlay() {
 		if (this.shouldShowPlayOverlay === true) {
-			console.log("showing play overlay")
+			Logger.Log(Logger.GetStackTrace(), "showing play overlay");
 			this.delegate.showPlayOverlay();
 			this.resizePlayerStyle();
 		} else {
-			console.log("showing freeze frame")
+			Logger.Log(Logger.GetStackTrace(), "showing freeze frame");
 			this.freezeFrameController.showFreezeFrame();
 		}
 		this.streamController.setVideoEnabled(false);
@@ -193,12 +193,12 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 				this.delegate.hideCurrentOverlay();
 				this.afkLogic.startAfkWarningTimer();
 			}).catch((onRejectedReason: string) => {
-				console.log(onRejectedReason);
-				console.log("Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.")
+				Logger.Log(Logger.GetStackTrace(), onRejectedReason);
+				Logger.Log(Logger.GetStackTrace(), "Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.");
 				this.delegate.showPlayOverlay();
 			});
 		} else {
-			console.error("Could not player video stream because webRtcPlayerObj.video was not valid.")
+			Logger.Error(Logger.GetStackTrace(), "Could not player video stream because webRtcPlayerObj.video was not valid.");
 		}
 	}
 
@@ -285,7 +285,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param Answer - Answer Message from the Signaling server
 	 */
 	handleWebRtcAnswer(Answer: MessageAnswer) {
-		Logger.verboseLog("There is an answer")
+		Logger.Log(Logger.GetStackTrace(), "There is an answer", 6);
 
 		let sdpAnswer: RTCSessionDescriptionInit = {
 			sdp: Answer.sdp,
@@ -302,7 +302,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param iceCandidate - Ice Candidate from Server
 	 */
 	handleIceCandidate(iceCandidate: RTCIceCandidateInit) {
-		Logger.verboseLog("Web RTC Controller: onWebRtcIce");
+		Logger.Log(Logger.GetStackTrace(), "Web RTC Controller: onWebRtcIce", 6);
 
 		let candidate = new RTCIceCandidate(iceCandidate);
 		this.peerConnectionController.handleOnIce(candidate);
@@ -313,7 +313,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	   * @param iceEvent - RTC Peer ConnectionIceEvent) {
 	 */
 	handleSendIceCandidate(iceEvent: RTCPeerConnectionIceEvent) {
-		Logger.verboseLog("OnIceCandidate");
+		Logger.Log(Logger.GetStackTrace(), "OnIceCandidate", 6);
 		if (iceEvent.candidate && iceEvent.candidate.candidate) {
 			this.webSocketController.sendIceCandidate(iceEvent.candidate);
 		}
@@ -324,7 +324,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param offer - RTC Session Description
 	 */
 	handleSendWebRTCOffer(offer: RTCSessionDescriptionInit) {
-		Logger.verboseLog("Sending the offer to the Server");
+		Logger.Log(Logger.GetStackTrace(), "Sending the offer to the Server", 6);
 		this.webSocketController.sendWebRtcOffer(offer);
 	}
 
@@ -339,7 +339,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Sets up the Data channel Keyboard, Mouse, UE Control Message, UE Descriptor
 	 */
 	handleDataChannelConnected() {
-		Logger.verboseLog("Data Channel is open");
+		Logger.Log(Logger.GetStackTrace(), "Data Channel is open", 6);
 
 		// show the connected overlay 
 		this.delegate.onWebRtcConnected();
@@ -401,7 +401,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.lastTimeResized = new Date().getTime();
 		}
 		else {
-			Logger.verboseLog('Resizing too often - skipping');
+			Logger.Log(Logger.GetStackTrace(), 'Resizing too often - skipping', 6);
 			clearTimeout(this.resizeTimeout);
 			this.resizeTimeout = setTimeout(this.updateVideoStreamSize, 1000);
 		}
@@ -452,7 +452,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param encoder - Encoder Settings
 	 */
 	sendEncoderSettings(encoder: Encoder) {
-		console.log("----   Encoder Settings    ----\n" + JSON.stringify(encoder, undefined, 4) + "\n-------------------------------");
+		Logger.Log(Logger.GetStackTrace(), "----   Encoder Settings    ----\n" + JSON.stringify(encoder, undefined, 4) + "\n-------------------------------", 6);
 
 		if (encoder.RateControl != null) {
 			this.ueDescriptorUi.sendEncoderRateControl(encoder.RateControl);
@@ -482,7 +482,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param webRTC - Web RTC Settings 
 	 */
 	sendWebRtcSettings(webRTC: WebRTC) {
-		console.log("----   WebRTC Settings    ----\n" + JSON.stringify(webRTC, undefined, 4) + "\n-------------------------------");
+		Logger.Log(Logger.GetStackTrace(), "----   WebRTC Settings    ----\n" + JSON.stringify(webRTC, undefined, 4) + "\n-------------------------------", 6);
 
 		if (webRTC.DegradationPref != null) {
 			this.ueDescriptorUi.sendWebRtcDegradationPreference(webRTC.DegradationPref)
@@ -512,7 +512,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param stats - Aggregated Stats
 	 */
 	sendStatsToSignallingServer(stats: AggregatedStats) {
-		//console.log("----   Sending Aggregated Stats to Signaling Server   ----\n" + JSON.stringify(stats, undefined, 4) + "\n-----------------------------------------------------------");
+		Logger.Log(Logger.GetStackTrace(), "----   Sending Aggregated Stats to Signaling Server   ----\n" + JSON.stringify(stats, undefined, 4) + "\n-----------------------------------------------------------", 6);
 		this.webSocketController.sendStats(stats);
 	}
 
@@ -521,7 +521,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param message - String to send to the UE Instance
 	 */
 	sendUeUiDescriptor(message: string): void {
-		//console.log("----   UE UI Interaction String   ----\n" + JSON.stringify(message, undefined, 4) + "\n---------------------------------------");
+		Logger.Log(Logger.GetStackTrace(), "----   UE UI Interaction String   ----\n" + JSON.stringify(message, undefined, 4) + "\n---------------------------------------", 6);
 		this.ueDescriptorUi.sendUiInteraction(message);
 	}
 
@@ -529,7 +529,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Sends the UI Descriptor `stat fps` to the UE Instance 
 	 */
 	sendShowFps(): void {
-		//console.log("----   Sending show stat to UE   ----");
+		Logger.Log(Logger.GetStackTrace(), "----   Sending show stat to UE   ----", 6);
 		this.ueDescriptorUi.sendShowFps();
 	}
 
@@ -537,7 +537,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Sends a request to the UE Instance to have ownership of Quality
 	 */
 	sendRequestQualityControlOwnership(): void {
-		//console.log("----   Sending Request to Control Quality  ----");
+		Logger.Log(Logger.GetStackTrace(), "----   Sending Request to Control Quality  ----", 6);
 		this.ueControlMessage.SendRequestQualityControl();
 	}
 

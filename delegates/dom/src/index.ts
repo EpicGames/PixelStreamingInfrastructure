@@ -12,6 +12,9 @@ import svgMaximize from './assets/images/Maximize.svg';
 import svgSettings from './assets/images/Settings.svg';
 import svgInfo from './assets/images/Info.svg';
 
+// set the logger level
+//libspsfrontend.Logger.SetLoggerVerbosity(10);
+
 // svg icons for favicons and buttons
 let faviconSvg = document.getElementById('favSvg') as HTMLLinkElement;
 faviconSvg.href = favSvg;
@@ -49,6 +52,8 @@ if (signallingServerAddress == '') {
     }
 }
 
+signallingServerAddress = "wss://sps.tenant-tensorworks-testing.lga1.ingress.coreweave.cloud/demo/ws";
+
 // prep the player div element 
 let playerElement = document.getElementById("player") as HTMLDivElement;
 
@@ -73,6 +78,5 @@ document.ontouchmove = (event: TouchEvent) => {
 // Create a config object instance 
 function CreateConfig(signalingAddress: string, playerElement: HTMLDivElement) {
     let config = new libspsfrontend.Config(signalingAddress, playerElement);
-    libspsfrontend.Config._enableVerboseLogging = true;
     return config;
 }

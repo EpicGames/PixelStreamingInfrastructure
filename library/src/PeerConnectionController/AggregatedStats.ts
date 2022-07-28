@@ -5,6 +5,7 @@ import { CandidateStat } from "./CandidateStat";
 import { CandidatePairStats } from "./CandidatePairStats";
 import { OutBoundVideoStats } from "./OutBoundVideoStats";
 import { StreamStats } from "./StreamStats";
+import { Logger } from "../Logger/Logger";
 
 /**
  * The Aggregated Stats that is generated from the RTC Stats Report
@@ -20,7 +21,7 @@ export class AggregatedStats {
     localCandidates: Array<CandidateStat>;
     remoteCandidates: Array<CandidateStat>;
     outBoundVideoStats: OutBoundVideoStats;
-    streamStats : StreamStats
+    streamStats: StreamStats
 
     constructor() {
         this.inboundVideoStats = new inboundVideoStats();
@@ -84,7 +85,7 @@ export class AggregatedStats {
                     this.handleStream(stat);
                     break;
                 default:
-                    console.error("un handled Stat Type");
+                    Logger.Error(Logger.GetStackTrace(), "unhandled Stat Type");
                     console.dir(stat);
                     break;
             }
@@ -98,7 +99,7 @@ export class AggregatedStats {
      * 
      * @param stat the stats coming in from webrtc
      */
-    handleStream(stat : any) {
+    handleStream(stat: any) {
         this.streamStats = stat
     }
 
@@ -214,7 +215,7 @@ export class AggregatedStats {
                 this.inboundAudioStats.timestamp = stat.timestamp;
                 break;
             default:
-                console.log("Kind is not handled");
+                Logger.Log(Logger.GetStackTrace(), "Kind is not handled");
                 break;
 
         }

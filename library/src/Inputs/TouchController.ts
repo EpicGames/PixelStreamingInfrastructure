@@ -2,14 +2,13 @@ import { UeInputTouchMessage } from "../UeInstanceMessage/UeInputTouchMessage";
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { ITouchController } from "./ITouchController";
 import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
+import { Logger } from "../Logger/Logger";
 /** 
  * Handles the Touch input Events
  */
 export class TouchController implements ITouchController {
     ueInputTouchMessage: UeInputTouchMessage;
     playerElement: HTMLDivElement;
-
-    logging: boolean;
 
     /**
      * 
@@ -22,8 +21,7 @@ export class TouchController implements ITouchController {
         document.ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
         document.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
         document.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
-        console.log("Touch Events Registered");
-        this.logging = false;
+        Logger.Log(Logger.GetStackTrace(), "Touch Events Registered", 6);
     }
 
     /**
@@ -31,18 +29,17 @@ export class TouchController implements ITouchController {
      * @param event - the touch event being intercepted  
      */
     onTouchStart(event: TouchEvent) {
-        if (this.logging) { console.log("on Touch Start"); }
+        Logger.Log(Logger.GetStackTrace(), "on Touch Start", 6);
         for (let i = 0; i < event.changedTouches.length; i++) {
             let touch: Touch = event.changedTouches[i];
 
             let finger = this.ueInputTouchMessage.fingers.pop();
             if (finger === undefined) {
-                if (this.logging) { console.log("who has more then 10 fingers"); }
+                Logger.Log(Logger.GetStackTrace(), "who has more then 10 fingers", 6);
             }
             this.ueInputTouchMessage.fingersIds[touch.identifier] = finger;
-
-            if (this.logging) { console.log("touch.identifier: " + touch.identifier); }
-            if (this.logging) { console.log("finger: " + finger); }
+            Logger.Log(Logger.GetStackTrace(), "touch.identifier: " + touch.identifier, 6);
+            Logger.Log(Logger.GetStackTrace(), "finger: " + finger, 6);
         }
 
         this.ueInputTouchMessage.sendTouchStart(event.changedTouches);
@@ -53,20 +50,16 @@ export class TouchController implements ITouchController {
      * @param event - the touch event being intercepted  
      */
     onTouchEnd(event: TouchEvent) {
-        if (this.logging) { console.log("on Touch END"); }
+        Logger.Log(Logger.GetStackTrace(), "on Touch END", 6);
 
         for (let i = 0; i < event.changedTouches.length; i++) {
             let touch = event.changedTouches[i];
-            if (this.logging) {
-                console.log("on Forget Touch");
-                console.log("touch id: " + touch.identifier);
-                console.log("Fingers id Touch id: " + this.ueInputTouchMessage.fingersIds[touch.identifier]);
-            }
-
+            Logger.Log(Logger.GetStackTrace(), "on Forget Touch", 6);
+            Logger.Log(Logger.GetStackTrace(), "touch id: " + touch.identifier, 6);
+            Logger.Log(Logger.GetStackTrace(), "Fingers id Touch id: " + this.ueInputTouchMessage.fingersIds[touch.identifier], 6);
             this.ueInputTouchMessage.fingers.push(this.ueInputTouchMessage.fingersIds[touch.identifier]);
-
             delete this.ueInputTouchMessage.fingersIds[touch.identifier];
-            if (this.logging) { console.log("touch.identifier: " + touch.identifier); }
+            Logger.Log(Logger.GetStackTrace(), "touch.identifier: " + touch.identifier, 6);
         }
         this.ueInputTouchMessage.sendTouchEnd(event.changedTouches);
     }
@@ -78,7 +71,7 @@ export class TouchController implements ITouchController {
     onTouchMove(event: TouchEvent) {
         for (let i = 0; i < event.touches.length; i++) {
             let touch = event.touches[i];
-            if (this.logging) { console.log("X: " + touch.clientX + " Y: " + touch.clientY); }
+            Logger.Log(Logger.GetStackTrace(), "X: " + touch.clientX + " Y: " + touch.clientY, 6);
         }
         this.ueInputTouchMessage.sendTouchMove(event.touches);
     }

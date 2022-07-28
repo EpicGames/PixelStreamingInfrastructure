@@ -6,12 +6,12 @@ import { ITouchController } from "./ITouchController";
 import { TouchController } from "./TouchController";
 import { GamePadController } from "./GamepadController";
 import { ControlSchemeType } from "../Config/Config";
-import { StreamController } from "../VideoPlayer/StreamController";
 import { VideoPlayerMouseLockedEvents } from "../VideoPlayer/VideoPlayerMouseLockedEvents";
 import { VideoPlayerMouseHoverEvents } from "../VideoPlayer/VideoPlayerMouseHoverEvents";
 import { GyroController } from "./GyroController";
 import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
 import { IVideoPlayerMouseInterface } from "../VideoPlayer/VideoPlayerMouseInterface";
+import { Logger } from "../Logger/Logger";
 
 /**
  * Class for handling inputs for mouse and keyboard   
@@ -95,7 +95,7 @@ export class InputController {
      * @param playerElement - the player elements DOM 
      */
     registerTouch(fakeMouseTouch: boolean, playerElement: HTMLDivElement) {
-        console.log("Registering Touch");
+        Logger.Log(Logger.GetStackTrace(), "Registering Touch", 6);
         if (fakeMouseTouch) {
             this.touchController = new FakeTouchController(this.dataChannelController, (<HTMLVideoElement>playerElement.getElementsByTagName("video")[0]));
         } else {

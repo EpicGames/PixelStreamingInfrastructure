@@ -1,6 +1,5 @@
 import { Logger } from "../Logger/Logger";
 import { AggregatedStats } from "./AggregatedStats";
-import { MicController } from "../MicPlayer/MicController";
 
 /**
  * Handles the Peer Connection 
@@ -20,7 +19,7 @@ export class PeerConnectionController {
 
         // if using TURN set the ice transport policy to relay for the options
         if (this.forceTurn) {
-            console.log("Forcing TURN usage by setting ICE Transport Policy in peer connection config.");
+            Logger.Log(Logger.GetStackTrace(), "Forcing TURN usage by setting ICE Transport Policy in peer connection config.");
             options.iceTransportPolicy = "relay";
         }
 
@@ -39,7 +38,7 @@ export class PeerConnectionController {
      * @param offerOptions - RTC Offer Options
      */
     createOffer(offerOptions: RTCOfferOptions, useMic: boolean) {
-        Logger.verboseLog("Create Offer");
+        Logger.Log(Logger.GetStackTrace(), "Create Offer", 6);
 
         this.setupTracksToSendAsync(useMic).finally(() => { });
 
@@ -105,13 +104,13 @@ export class PeerConnectionController {
      * @param iceCandidate - RTC Ice Candidate from the Signaling Server
      */
     handleOnIce(iceCandidate: RTCIceCandidate) {
-        Logger.verboseLog("peerconnection handleOnIce")
+        Logger.Log(Logger.GetStackTrace(), "peerconnection handleOnIce", 6);
 
         // // if forcing TURN, reject any candidates not relay
         if (this.forceTurn) {
             // check if no relay address is found, if so, we are assuming it means no TURN server
             if (iceCandidate.candidate.indexOf("relay") < 0) {
-                console.warn("Dropping candidate because it was not TURN relay.", "| Type=", iceCandidate.type, "| Protocol=", iceCandidate.protocol, "| Address=", iceCandidate.address, "| Port=", iceCandidate.port, "|")
+                Logger.Info(Logger.GetStackTrace(), `Dropping candidate because it was not TURN relay. | Type= ${iceCandidate.type} | Protocol= ${iceCandidate.protocol} | Address=${iceCandidate.address} | Port=${iceCandidate.port} |`, 6);
                 return;
             }
         }
@@ -124,7 +123,7 @@ export class PeerConnectionController {
      * @param state - Signaling Server State Change Event
      */
     handleSignalStateChange(state: Event) {
-        Logger.verboseLog('signaling state change: ' + state)
+        Logger.Log(Logger.GetStackTrace(), 'signaling state change: ' + state, 6);
     }
 
     /**
@@ -132,7 +131,7 @@ export class PeerConnectionController {
      * @param state - Ice Connection State
      */
     handleIceConnectionStateChange(state: Event) {
-        Logger.verboseLog('ice connection state change: ' + state);
+        Logger.Log(Logger.GetStackTrace(), 'ice connection state change: ' + state, 6);
     }
 
     /**
@@ -140,7 +139,7 @@ export class PeerConnectionController {
      * @param state - Ice Gathering State Change
      */
     handleIceGatheringStateChange(state: Event) {
-        Logger.verboseLog('ice gathering state change: ' + JSON.stringify(state));
+        Logger.Log(Logger.GetStackTrace(), 'ice gathering state change: ' + JSON.stringify(state), 6);
     }
 
     /**

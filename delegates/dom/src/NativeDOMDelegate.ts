@@ -349,8 +349,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 	showStats: boolean;
 
-	logging: boolean;
-
 	// HTML Elements that are used multiple times
 
 	// Global
@@ -402,7 +400,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	constructor(config: libspsfrontend.Config) {
 		super(config);
 		this.showStats = true;
-		this.logging = false;
 		this.videoQpIndicator = new VideoQpIndicator("connectionStrength", "qualityText", "outer", "middle", "inner", "dot");
 		this.fullScreenLogic = new FullScreenLogic();
 
@@ -973,7 +970,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		let statsDiv = document.getElementById("statisticsResult");
 		statsDiv.innerHTML = statsText;
 
-		if (this.logging) { libspsfrontend.Logger.verboseLog(`--------- Stats ---------\n ${stats}\n------------------------`) }
+		libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), `--------- Stats ---------\n ${stats}\n------------------------`, 6);
 
 		if (this.sendStatsToServer.checked === true) {
 			this.iWebRtcController.sendStatsToSignallingServer(stats);
@@ -1004,7 +1001,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	* @param latencyTimings - Latency Test Timings sent from the UE Instance 
 	*/
 	onLatencyTestResult(latencyTimings: libspsfrontend.LatencyTestResults): void {
-		console.log(latencyTimings);
+		libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), latencyTimings.toString(), 6);
 		let latencyStatsInnerHTML = '';
 		latencyStatsInnerHTML += "<div>Net latency RTT (ms): " + latencyTimings.networkLatency + "</div>";
 		latencyStatsInnerHTML += "<div>UE Encode (ms): " + latencyTimings.EncodeMs + "</div>";
@@ -1057,11 +1054,4 @@ declare global {
 		mozRequestFullscreen?: () => Promise<void>;
 		webkitRequestFullscreen?: () => Promise<void>;
 	}
-}
-
-/**
- * The static check to allow verbose logging
- */
-export class LoggingOptions {
-	static verboseLogging = false;
 }

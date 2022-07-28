@@ -102,7 +102,7 @@ export class MouseController {
 	 * @param Y  - Mouse Y Coordinate
 	 */
 	sendMouseDown(button: number, X: number, Y: number) {
-		Logger.verboseLog(`mouse button ${button} down at (${X}, ${Y})`);
+		Logger.Log(Logger.GetStackTrace(), `mouse button ${button} down at (${X}, ${Y})`, 6);
 		let coord: NormaliseAndQuantiseUnsigned = this.normaliseAndQuantiseUnsigned(X, Y);
 		this.ueInputMouseMessage.sendMouseDown(button, coord.x, coord.y);
 	}
@@ -114,7 +114,7 @@ export class MouseController {
 	 * @param Y  - Mouse Y Coordinate
 	 */
 	sendMouseUp(button: number, X: number, Y: number) {
-		Logger.verboseLog(`mouse button ${button} up at (${X}, ${Y})`);
+		Logger.Log(Logger.GetStackTrace(), `mouse button ${button} up at (${X}, ${Y})`, 6);
 		let coord: NormaliseAndQuantiseUnsigned = this.normaliseAndQuantiseUnsigned(X, Y);
 		this.ueInputMouseMessage.sendMouseUp(button, coord.x, coord.y);
 	}
@@ -126,9 +126,8 @@ export class MouseController {
 	 * @param Y  - Mouse Y Coordinate
 	 */
 	sendMouseWheel(deltaY: number, X: number, Y: number) {
-		Logger.verboseLog(`mouse wheel with delta ${deltaY} at (${X}, ${Y})`);
+		Logger.Log(Logger.GetStackTrace(), `mouse wheel with delta ${deltaY} at (${X}, ${Y})`, 6);
 		let coord: NormaliseAndQuantiseUnsigned = this.normaliseAndQuantiseUnsigned(X, Y);
-
 		this.ueInputMouseMessage.sendMouseWheel(deltaY, coord.x, coord.y);
 	}
 
@@ -171,7 +170,7 @@ export class MouseController {
 			// as we can't yet accurately detect mouse enter and leave events
 			// precisely inside a video with an aspect ratio which causes mattes.
 			if (playerAspectRatio > videoAspectRatio) {
-				Logger.verboseLog('Setup Normalize and Quantize for playerAspectRatio > videoAspectRatio');
+				Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio > videoAspectRatio', 6);
 
 				let ratio = playerAspectRatio / videoAspectRatio;
 				// Unsigned.
@@ -192,7 +191,7 @@ export class MouseController {
 					};
 				}
 			} else {
-				Logger.verboseLog('Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio');
+				Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio', 6);
 
 				let ratio = videoAspectRatio / playerAspectRatio;
 				// Unsigned.
@@ -240,7 +239,7 @@ export class MouseController {
 			// as we can't yet accurately detect mouse enter and leave events
 			// precisely inside a video with an aspect ratio which causes mattes.
 			if (playerAspectRatio > videoAspectRatio) {
-				Logger.verboseLog('Setup Normalize and Quantize for playerAspectRatio > videoAspectRatio');
+				Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio > videoAspectRatio', 6);
 
 				let ratio = playerAspectRatio / videoAspectRatio;
 				// Unsigned.
@@ -253,7 +252,7 @@ export class MouseController {
 				}
 
 			} else {
-				Logger.verboseLog('Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio');
+				Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio', 6);
 
 				let ratio = videoAspectRatio / playerAspectRatio;
 				// Unsigned.
@@ -292,7 +291,7 @@ export class MouseController {
 			// as we can't yet accurately detect mouse enter and leave events
 			// precisely inside a video with an aspect ratio which causes mattes.
 			if (playerAspectRatio > videoAspectRatio) {
-				Logger.verboseLog('Setup Normalize and Quantize for playerAspectRatio > videoAspectRatio');
+				Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio > videoAspectRatio', 6);
 
 				let ratio = playerAspectRatio / videoAspectRatio;
 				// Unsigned.
@@ -305,7 +304,7 @@ export class MouseController {
 
 			} else {
 				if (this.printInputs) {
-					Logger.verboseLog('Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio');
+					Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio', 6);
 				}
 				let ratio = videoAspectRatio / playerAspectRatio;
 				// Signed.

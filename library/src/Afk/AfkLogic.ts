@@ -1,4 +1,5 @@
 import { ControlSchemeType } from "../Config/Config";
+import { Logger } from "../Logger/Logger";
 export class AfkLogic {
     // time out logic details 
     controlScheme: number;
@@ -38,7 +39,7 @@ export class AfkLogic {
     /**
      * Stop the afk warning timer
      */
-    stopAfkWarningTimer(){
+    stopAfkWarningTimer() {
         this.active = false;
         clearInterval(this.warnTimer);
         clearInterval(this.countDownTimer);
@@ -90,7 +91,7 @@ export class AfkLogic {
                 // The user failed to click so hide the overlay and disconnect them.
                 this.hideCurrentOverlay();
                 this.closeWebSocket();
-                console.log("you have been disconnected due to inactivity");
+                Logger.Log(Logger.GetStackTrace(), "You have been disconnected due to inactivity");
 
                 // switch off the afk feature as stream has closed 
                 this.stopAfkWarningTimer();

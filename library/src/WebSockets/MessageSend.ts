@@ -30,7 +30,7 @@ export class MessageSend implements Send {
      * @returns - JSON String of the Message to send
      */
     payload() {
-        Logger.verboseLog("Sending => \n" + JSON.stringify(this, undefined, 4));
+        Logger.Log(Logger.GetStackTrace(), "Sending => \n" + JSON.stringify(this, undefined, 4), 6);
         return JSON.stringify(this);
     }
 }
@@ -140,7 +140,7 @@ export class MessageIceCandidate implements Send {
      * @returns - JSON String of the Message to send
      */
     payload() {
-        Logger.verboseLog("Sending => \n" + JSON.stringify(this, undefined, 4));
+        Logger.Log(Logger.GetStackTrace(), "Sending => \n" + JSON.stringify(this, undefined, 4), 6);
         return JSON.stringify(this);
     }
 }

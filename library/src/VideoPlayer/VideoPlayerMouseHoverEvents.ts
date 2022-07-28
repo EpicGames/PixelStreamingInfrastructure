@@ -26,7 +26,7 @@ export class VideoPlayerMouseHoverEvents implements IVideoPlayerMouseInterface {
      * @param mouseEvent - Mouse Event
      */
     handleMouseMove(mouseEvent: MouseEvent) {
-        Logger.verboseLog("MouseMove");
+        Logger.Log(Logger.GetStackTrace(), "MouseMove", 6);
         this.mouseController.sendMouseMove(mouseEvent.offsetX, mouseEvent.offsetY, mouseEvent.movementX, mouseEvent.movementY);
         mouseEvent.preventDefault();
     }
@@ -36,7 +36,7 @@ export class VideoPlayerMouseHoverEvents implements IVideoPlayerMouseInterface {
      * @param mouseEvent - Mouse Event
      */
     handleMouseDown(mouseEvent: MouseEvent) {
-        Logger.verboseLog("onMouse Down");
+        Logger.Log(Logger.GetStackTrace(), "onMouse Down", 6);
         this.mouseController.sendMouseDown(mouseEvent.button, mouseEvent.offsetX, mouseEvent.offsetY);
         mouseEvent.preventDefault();
     }

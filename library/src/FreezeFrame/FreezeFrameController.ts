@@ -1,3 +1,4 @@
+import { Logger } from "../Logger/Logger";
 import { FreezeFrame } from "./FreezeFrame";
 
 /**
@@ -79,22 +80,19 @@ export class FreezeFrameController {
         else {
             this.jpeg = jpegBytes;
             this.receiving = true;
-            console.log(`received first chunk of freeze frame: ${this.jpeg.length}/${this.size}`);
+            Logger.Log(Logger.GetStackTrace(), `received first chunk of freeze frame: ${this.jpeg.length}/${this.size}`, 6);
         }
-
-        // Uncomment for debug
-        //console.log(`Received freeze frame chunk: ${freezeFrame.jpeg.length}/${freezeFrame.size}`);
 
         // Finished receiving freeze frame, we can show it now
         if (this.jpeg.length === this.size) {
             this.receiving = false;
             this.valid = true;
-            console.log(`received complete freeze frame ${this.size}`);
+            Logger.Log(Logger.GetStackTrace(), `received complete freeze frame ${this.size}`, 6);
             this.updateFreezeFrameAndShow(this.jpeg, onLoadCallBack);
         }
         // We received more data than the freeze frame payload message indicate (this is an error)
         else if (this.jpeg.length > this.size) {
-            console.error(`received bigger freeze frame than advertised: ${this.jpeg.length}/${this.size}`);
+            Logger.Error(Logger.GetStackTrace(), `received bigger freeze frame than advertised: ${this.jpeg.length}/${this.size}`);
             this.jpeg = undefined;
             this.receiving = false;
         }

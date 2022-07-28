@@ -7,14 +7,11 @@ import { UeDataMessage } from "./UeDataMessage";
  */
 export class UeDescriptor extends UeDataMessage {
 
-    logging:boolean;
-
     /**
     * @param datachannelController - Data Channel Controller
     */
     constructor(datachannelController: DataChannelController) {
         super(datachannelController);
-        this.logging = false;
     }
 
     /**
@@ -23,7 +20,7 @@ export class UeDescriptor extends UeDataMessage {
      * @param JSODescriptor - Descriptor Message as JSON
      */
     sendDescriptor(messageType: number, JSODescriptor: string) {
-        Logger.verboseLog("Sending: " + JSODescriptor);
+        Logger.Log(Logger.GetStackTrace(), "Sending: " + JSODescriptor, 6);
         // Add the UTF-16 JSON string to the array byte buffer, going two bytes at
         // a time.
         let data = new DataView(new ArrayBuffer(1 + 2 + 2 * JSODescriptor.length));

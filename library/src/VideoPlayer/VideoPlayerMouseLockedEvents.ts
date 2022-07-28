@@ -1,4 +1,5 @@
 import { MouseController } from "../Inputs/MouseController";
+import { Logger } from "../Logger/Logger";
 import { IVideoPlayer } from "./IVideoPlayer";
 import { IVideoPlayerMouseInterface } from "./VideoPlayerMouseInterface";
 
@@ -30,7 +31,7 @@ export class VideoPlayerMouseLockedEvents implements IVideoPlayerMouseInterface 
      * Handle when the locked state Changed
      */
     handleLockStateChange() {
-        console.log("Lock state has changed");
+        Logger.Log(Logger.GetStackTrace(), "Lock state has changed", 6);
         let videoElement = this.videoElementProvider.getVideoElement();
         if (document.pointerLockElement === videoElement) {
             document.onmousemove = (mouseEvent) => this.handleMouseMove(mouseEvent);
@@ -100,6 +101,6 @@ export class VideoPlayerMouseLockedEvents implements IVideoPlayerMouseInterface 
      * @param mouseEvent - Mouse Event
      */
     handleContextMenu(mouseEvent: MouseEvent) {
-        console.info("onContextMenu");
+        Logger.Info(Logger.GetStackTrace(), "onContextMenu");
     }
 }
