@@ -6,10 +6,14 @@ export class Logger {
      * @returns the current stack
      */
     static GetStackTrace() {
-        let obj: any = {};
-        Error.captureStackTrace(obj, Logger.GetStackTrace);
-        let stackAsString = obj.stack.toString();
-        let formattedStack = stackAsString.replace(/Error/g, '');
+        let error = new Error();
+        let formattedStack = "No Stack Available for this browser";
+
+        // format the error
+        if (error.stack) {
+            formattedStack = error.stack.toString().replace(/Error/g, '');
+        }
+
         return formattedStack;
     };
 

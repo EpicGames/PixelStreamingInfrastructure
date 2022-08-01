@@ -729,7 +729,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		}
 
 		document.getElementById("btn-streaming-settings").onclick = () => {
-			console.debug("--------  Sending Streaming settings  --------");
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending Streaming settings  --------", 7);
 			let encode: libspsfrontend.Encoder = {
 				MinQP: Number(this.encoderMinQpText.value),
 				MaxQP: Number(this.encoderMaxQpText.value),
@@ -743,7 +743,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 			this.iWebRtcController.sendEncoderSettings(encode);
 			this.iWebRtcController.sendWebRtcSettings(webRtcSettings);
-			console.debug("-------------------------------------------");
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
 		}
 
 

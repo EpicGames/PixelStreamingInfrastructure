@@ -41,7 +41,7 @@ export class InputController {
      * @param suppressBrowserKeys - option to suppress browser keys 
      */
     registerKeyBoard(suppressBrowserKeys: boolean) {
-        console.debug("Register Keyboard Events");
+        Logger.Log(Logger.GetStackTrace(), "Register Keyboard Events", 7);
         this.keyboardController = new KeyboardController(this.dataChannelController, suppressBrowserKeys);
         this.keyboardController.registerKeyBoardEvents();
     }
@@ -51,7 +51,7 @@ export class InputController {
      * @param controlScheme - if the mouse is either hovering or locked 
      */
     registerMouse(controlScheme: ControlSchemeType) {
-        console.debug("Register Mouse Events");
+        Logger.Log(Logger.GetStackTrace(), "Register Mouse Events", 7);
 
         // casting these as any as they do not have the moz attributes we require
         let videoElement = this.videoElementProvider.getVideoElement() as any;
@@ -84,7 +84,7 @@ export class InputController {
 
                 break
             default:
-                console.warn("unknown Control Scheme Type Defaulting to Locked Mouse Events");
+                Logger.Info(Logger.GetStackTrace(), "unknown Control Scheme Type Defaulting to Locked Mouse Events");
                 break
         }
     }
@@ -107,7 +107,7 @@ export class InputController {
      * registers a gamepad 
      */
     registerGamePad() {
-        console.debug("Register Game Pad");
+        Logger.Log(Logger.GetStackTrace(), "Register Game Pad", 7);
         this.gamePadController = new GamePadController(this.dataChannelController);
 
 

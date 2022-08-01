@@ -64,18 +64,20 @@ export class StreamController {
 
         // attempt to auto play the audio from the audio element if not then set up a listener 
         this.audioElement.muted = false;
-        this.audioElement.play().catch((onRejectedReason: string) => {
-            Logger.Info(Logger.GetStackTrace(), onRejectedReason);
-            Logger.Info(Logger.GetStackTrace(), "Browser does not support autoplaying audio without interaction - to resolve this we are going to run the audio until the video is clicked");
+        if (this.audioElement.paused === true) {
+            this.audioElement.play().catch((onRejectedReason: string) => {
+                Logger.Info(Logger.GetStackTrace(), onRejectedReason);
+                Logger.Info(Logger.GetStackTrace(), "Browser does not support autoplaying audio without interaction - to resolve this we are going to run the audio until the video is clicked");
 
-            let clickToPlayAudio = () => {
-                this.audioElement.muted = false;
-                this.audioElement.play();
-                videoElement.removeEventListener("click", clickToPlayAudio);
-            };
+                let clickToPlayAudio = () => {
+                    this.audioElement.muted = false;
+                    this.audioElement.play();
+                    videoElement.removeEventListener("click", clickToPlayAudio);
+                };
 
-            videoElement.addEventListener("click", clickToPlayAudio);
-        });
+                videoElement.addEventListener("click", clickToPlayAudio);
+            });
+        }
     }
 
     /**

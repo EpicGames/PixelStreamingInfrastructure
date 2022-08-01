@@ -43,14 +43,14 @@ export class DataChannelController {
      * Handles when the Data Channel is opened
      */
     handleOnOpen() {
-        console.debug("Data Channel: " + this.label + " is opened.")
+        Logger.Log(Logger.GetStackTrace(), "Data Channel: " + this.label + " is opened.", 7);
     }
 
     /**
      * Handles when the Data Channel is closed
      */
     handleOnClose() {
-        console.debug("Data Channel: " + this.label + " is closed.")
+        Logger.Log(Logger.GetStackTrace(), "Data Channel: " + this.label + " is closed.", 7);
     }
 
     /**

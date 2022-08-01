@@ -86,7 +86,7 @@ export class AggregatedStats {
                     break;
                 default:
                     Logger.Error(Logger.GetStackTrace(), "unhandled Stat Type");
-                    console.dir(stat);
+                    Logger.Log(Logger.GetStackTrace(), stat);
                     break;
             }
 

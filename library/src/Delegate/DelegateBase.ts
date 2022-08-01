@@ -171,7 +171,8 @@ export class DelegateBase implements IDelegate {
 		// set up the play overlays action 
 		this.playOverlay.onAction(() => {
 			this.onStreamLoading();
-			this.iWebRtcController.playStream();
+			this.iWebRtcController.playStreamVideo();
+			this.iWebRtcController.playStreamAudio();
 		});
 
 		// set up the connect overlays action
@@ -230,10 +231,10 @@ export class DelegateBase implements IDelegate {
 	 * Event fired when the video is disconnected
 	 */
 	onDisconnect(eventString: string) {
-		if(this.showActionOrErrorOnDisconnect == false){
+		if (this.showActionOrErrorOnDisconnect == false) {
 			this.showErrorOverlay(`Disconnected: ${eventString}`);
 			this.showActionOrErrorOnDisconnect = true;
-		}else{
+		} else {
 			this.showDisconnectOverlay(`Disconnected: ${eventString}  \n Click To Restart`);
 		}
 	}

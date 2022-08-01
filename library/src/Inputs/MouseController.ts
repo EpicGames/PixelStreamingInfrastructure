@@ -85,7 +85,7 @@ export class MouseController {
 	 */
 	sendMouseMove(X: number, Y: number, deltaX: number, deltaY: number) {
 		if (this.printInputs) {
-			console.debug(`x: ${X}, y:${Y}, dX: ${deltaX}, dY: ${deltaY}`);
+			Logger.Log(Logger.GetStackTrace(), `x: ${X}, y:${Y}, dX: ${deltaX}, dY: ${deltaY}`, 7);
 		}
 
 		let mouseCord: NormaliseAndQuantiseUnsigned = this.normaliseAndQuantiseUnsigned(X, Y);

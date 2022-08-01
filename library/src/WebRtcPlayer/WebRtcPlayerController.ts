@@ -178,14 +178,13 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
-	 * Plays the stream and sets up other pieces while the stream starts also handles if the video cannot play
+	 * Plays the streams video source and sets up other pieces while the stream starts also handles if the video cannot play
 	 */
-	playStream() {
+	playStreamVideo() {
 		if (this.videoPlayer && this.videoPlayer.videoElement) {
 			// handle play() with .then as it is an asynchronous call  
 			this.videoPlayer.videoElement.play().then(() => {
 				this.shouldShowPlayOverlay = false;
-				this.streamController.PlayAudioTrack();
 				this.ueControlMessage.SendRequestInitialSettings();
 				this.ueControlMessage.SendRequestQualityControl();
 				this.freezeFrameController.showFreezeFrame();
@@ -203,6 +202,13 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
+	 * Plays the streams audio source
+	 */
+	playStreamAudio() {
+		this.streamController.PlayAudioTrack();
+	}
+
+	/**
 	 * Enable the video to play automaticity if enableSpsAutoplay is true
 	 */
 	autoPlayVideoOrSetUpPlayOverlay() {
@@ -212,7 +218,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.videoPlayer.videoElement.autoplay = true;
 
 			// attempt to play the video
-			this.playStream();
+			this.playStreamVideo();
+			this.playStreamAudio();
 
 		} else {
 			this.delegate.showPlayOverlay();
