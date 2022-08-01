@@ -2,10 +2,10 @@ export class Config {
 
 	// PRESET OPTIONS
 	// enable the auto connect of the websocket 
-	enableSpsAutoConnect = false;
+	enableSpsAutoConnect = true;
 
 	// enable the autoplay of the video if enabled by browser
-	enableSpsAutoplay = false;
+	enableSpsAutoplay = true;
 
 	// start the video muted
 	startVideoMuted = false;
