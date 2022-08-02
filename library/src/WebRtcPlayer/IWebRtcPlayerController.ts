@@ -15,12 +15,7 @@ export interface IWebRtcPlayerController {
     /**
      * Activate the streams video source 
      */
-    playStreamVideo(): void;
-
-    /**
-    * Activate the streams audio source 
-    */
-    playStreamAudio(): void;
+    playStream(): void;
 
     /**
      * Connect to the Signaling server

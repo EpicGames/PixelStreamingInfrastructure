@@ -55,41 +55,4 @@ export class StreamController {
             Logger.Log(Logger.GetStackTrace(), 'Created new audio element to play separate audio stream.',);
         }
     }
-
-    /**
-     * Plays the audio from the audio element or sets up an event listener to play it once an interaction has occurred 
-     */
-    PlayAudioTrack() {
-        let videoElement = this.videoElementProvider.getVideoElement();
-
-        // attempt to auto play the audio from the audio element if not then set up a listener 
-        this.audioElement.muted = false;
-        if (this.audioElement.paused === true) {
-            this.audioElement.play().catch((onRejectedReason: string) => {
-                Logger.Info(Logger.GetStackTrace(), onRejectedReason);
-                Logger.Info(Logger.GetStackTrace(), "Browser does not support autoplaying audio without interaction - to resolve this we are going to run the audio until the video is clicked");
-
-                let clickToPlayAudio = () => {
-                    this.audioElement.muted = false;
-                    this.audioElement.play();
-                    videoElement.removeEventListener("click", clickToPlayAudio);
-                };
-
-                videoElement.addEventListener("click", clickToPlayAudio);
-            });
-        }
-    }
-
-    /**
-     * Set the Video Elements src object tracks to enable
-     * @param enabled - Enable Tracks on the Src Object
-     */
-    setVideoEnabled(enabled: boolean) {
-        // this is a temporary hack until type scripts video element is updated to reflect the need for tracks on a html video element 
-        let videoElement = this.videoElementProvider.getVideoElement() as any;
-        videoElement.srcObject.getTracks().forEach((track: MediaStreamTrack) => track.enabled = enabled);
-    }
-
 }
-
-/* 5457524F4D4D */

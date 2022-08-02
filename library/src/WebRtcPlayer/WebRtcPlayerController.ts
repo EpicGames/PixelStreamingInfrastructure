@@ -164,7 +164,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			Logger.Log(Logger.GetStackTrace(), "showing freeze frame");
 			this.freezeFrameController.showFreezeFrame();
 		}
-		this.streamController.setVideoEnabled(false);
+		this.videoPlayer.setVideoEnabled(false);
 	}
 
 	/**
@@ -173,39 +173,52 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	InvalidateFreezeFrameAndEnableVideo() {
 		this.freezeFrameController.hideFreezeFrame();
 		if (this.videoPlayer.videoElement) {
-			this.streamController.setVideoEnabled(true);
+			this.videoPlayer.setVideoEnabled(true);
 		}
 	}
 
 	/**
-	 * Plays the streams video source and sets up other pieces while the stream starts also handles if the video cannot play
+	 * Plays the stream audio and video source and sets up other pieces while the stream starts
 	 */
-	playStreamVideo() {
-		if (this.videoPlayer && this.videoPlayer.videoElement) {
-			// handle play() with .then as it is an asynchronous call  
-			this.videoPlayer.videoElement.play().then(() => {
-				this.shouldShowPlayOverlay = false;
-				this.ueControlMessage.SendRequestInitialSettings();
-				this.ueControlMessage.SendRequestQualityControl();
-				this.freezeFrameController.showFreezeFrame();
-				this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
-				this.delegate.hideCurrentOverlay();
-				this.afkLogic.startAfkWarningTimer();
-			}).catch((onRejectedReason: string) => {
-				Logger.Log(Logger.GetStackTrace(), onRejectedReason);
-				Logger.Log(Logger.GetStackTrace(), "Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.");
-				this.delegate.showPlayOverlay();
-			});
+	playStream() {
+		if (!this.videoPlayer.videoElement) {
+			this.delegate.showErrorOverlay("Could not player video stream because the video player was not initialised correctly.");
+			Logger.Error(Logger.GetStackTrace(), "Could not player video stream because the video player was not initialised correctly.");
 		} else {
-			Logger.Error(Logger.GetStackTrace(), "Could not player video stream because webRtcPlayerObj.video was not valid.");
+			if (this.streamController.audioElement) {
+				this.streamController.audioElement.play().then(() => {
+					this.playVideo();
+				}).catch((onRejectedReason) => {
+					Logger.Log(Logger.GetStackTrace(), onRejectedReason);
+					Logger.Log(Logger.GetStackTrace(), "Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.");
+					this.delegate.showPlayOverlay();
+				});
+			} else {
+				this.playVideo();
+			}
+			this.shouldShowPlayOverlay = false;
+			this.ueControlMessage.SendRequestInitialSettings();
+			this.ueControlMessage.SendRequestQualityControl();
+			this.freezeFrameController.showFreezeFrame();
+			this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
+			this.delegate.hideCurrentOverlay();
+			this.afkLogic.startAfkWarningTimer();
 		}
 	}
 
 	/**
-	 * Plays the streams audio source
+	 * Plays the video stream
 	 */
-	playStreamAudio() {
-		this.streamController.PlayAudioTrack();
+	private playVideo() {
+		// // handle play() with .then as it is an asynchronous call  
+		this.videoPlayer.videoElement.play().catch((onRejectedReason: string) => {
+			if (this.streamController.audioElement.srcObject) {
+				this.streamController.audioElement.pause();
+			}
+			Logger.Log(Logger.GetStackTrace(), onRejectedReason);
+			Logger.Log(Logger.GetStackTrace(), "Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.");
+			this.delegate.showPlayOverlay();
+		});
 	}
 
 	/**
@@ -218,8 +231,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.videoPlayer.videoElement.autoplay = true;
 
 			// attempt to play the video
-			this.playStreamVideo();
-			this.playStreamAudio();
+			this.playStream();
 
 		} else {
 			this.delegate.showPlayOverlay();

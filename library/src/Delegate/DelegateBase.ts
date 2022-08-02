@@ -171,8 +171,7 @@ export class DelegateBase implements IDelegate {
 		// set up the play overlays action 
 		this.playOverlay.onAction(() => {
 			this.onStreamLoading();
-			this.iWebRtcController.playStreamVideo();
-			this.iWebRtcController.playStreamAudio();
+			this.iWebRtcController.playStream();
 		});
 
 		// set up the connect overlays action

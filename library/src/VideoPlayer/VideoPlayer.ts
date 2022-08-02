@@ -64,4 +64,13 @@ export class VideoPlayer implements IVideoPlayer {
         };
     }
 
+    /**
+    * Set the Video Elements src object tracks to enable
+    * @param enabled - Enable Tracks on the Src Object
+    */
+    setVideoEnabled(enabled: boolean) {
+        // this is a temporary hack until type scripts video element is updated to reflect the need for tracks on a html video element 
+        let videoElement = this.videoElement as any;
+        videoElement.srcObject.getTracks().forEach((track: MediaStreamTrack) => track.enabled = enabled);
+    }
 }
