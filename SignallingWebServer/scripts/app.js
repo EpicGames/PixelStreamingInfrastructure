@@ -245,19 +245,19 @@ function populateDefaultProtocol() {
     // Touch Input Messages. Range = 80..89.
     toStreamerMessages.add("TouchStart", {
         "id": 80,
-        "byteLength": 7,
+        "byteLength": 8,
         //          numtouches(1)   x       y        idx     force     valid
         "structure": ["uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
     });
     toStreamerMessages.add("TouchEnd", {
         "id": 81,
-        "byteLength": 7,
+        "byteLength": 8,
         //          numtouches(1)   x       y        idx     force     valid
         "structure": ["uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
     });
     toStreamerMessages.add("TouchMove", {
         "id": 82,
-        "byteLength": 7,
+        "byteLength": 8,
         //          numtouches(1)   x       y       idx      force     valid
         "structure": ["uint8", "uint16", "uint16", "uint8", "uint8", "uint8"]
     });
@@ -456,12 +456,12 @@ function onProtocolMessage(data) {
     try {
         let protocolString = new TextDecoder("utf-16").decode(data.slice(1));
         let protocolJSON = JSON.parse(protocolString);
-        console.log("Received new protocol. Updating exisiting protocol...");
         if (!protocolJSON.hasOwnProperty("direction")) {
             throw new Error('Malformed protocol received. Ensure the protocol message contains a direction');
         }
         let direction = protocolJSON.direction;
         delete protocolJSON.direction;
+        console.log(`Received new ${ direction == MessageDirection.FromStreamer ? "FromStreamer" : "ToStreamer" } protocol. Updating existing protocol...`);
         Object.keys(protocolJSON).forEach((messageType) => {
             let message = protocolJSON[messageType];
             switch (direction) {
@@ -495,11 +495,11 @@ function onProtocolMessage(data) {
                         // return in a forEach is equivalent to a continue in a normal for loop
                         return;
                     }
-                    if (fromStreamerHandlers[message.id]) {
+                    if (fromStreamerHandlers[messageType]) {
                         // If we've registered a handler for this message type. ie registerMessageHandler(...)
                         fromStreamerMessages.add(messageType, message.id);
                     } else {
-                        console.error(`There was no registered handler for "${message}" - try adding one using registerMessageHandler(MessageDirection.FromStreamer, "${message}", myHandler)`);
+                        console.error(`There was no registered handler for "${message}" - try adding one using registerMessageHandler(MessageDirection.FromStreamer, "${messageType}", myHandler)`);
                     }
                     break;
                 default:
@@ -784,6 +784,13 @@ function setupHtmlEvents() {
     if (showFPSButton !== null) {
         showFPSButton.onclick = function (event) {
             emitCommand({ "Stat.FPS": '' });
+        };
+    }
+
+    let requestKeyframeButton = document.getElementById('request-keyframe-button');
+    if (requestKeyframeButton !== null) {
+        requestKeyframeButton.onclick = function (event) {
+            toStreamerHandlers.IFrameRequest("IFrameRequest");
         };
     }
 
