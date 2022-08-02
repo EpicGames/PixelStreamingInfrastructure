@@ -729,6 +729,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		// set up the restart stream button
 		document.getElementById("restart-stream-button").onclick = () => {
+			this.settingsPanel.classList.toggle("panel-wrap-visible");
 			this.iWebRtcController.restartStreamAutomaticity();
 		}
 
