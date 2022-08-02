@@ -616,28 +616,6 @@ section> :first-child {
 	display: block;
 }
 
-.streamTools-shown>div>#streamToolsButton {
-	transform: rotate(-135deg);
-	-webkit-transform: rotate(-135deg);
-	/* Safari */
-	-moz-transform: rotate(-135deg);
-	/* Firefox */
-	-ms-transform: rotate(-135deg);
-	/* IE */
-	-o-transform: rotate(-135deg);
-	/* Opera */
-}
-
-#streamToolsButton:hover {
-	cursor: pointer;
-}
-
-#streamToolsButton {
-	transition-duration: 250ms;
-	text-align: right;
-	font-size: 40px;
-}
-
 #streamToolsToggle {
 	width: 100%;
 }

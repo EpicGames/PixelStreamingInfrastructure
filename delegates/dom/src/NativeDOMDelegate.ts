@@ -329,10 +329,14 @@ export class FullScreenLogic {
 		if (minimize && maximize) {
 			if (this.isFullscreen) {
 				minimize.style.display = 'inline';
+				//ios disappearing svg fix
+				minimize.style.transform = 'translate(0, 0)';
 				maximize.style.display = 'none';
 			} else {
 				minimize.style.display = 'none';
 				maximize.style.display = 'inline';
+				//ios disappearing svg fix
+				maximize.style.transform = 'translate(0, 0)';
 			}
 		}
 	}

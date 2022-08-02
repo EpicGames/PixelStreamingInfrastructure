@@ -5,29 +5,27 @@ import 'bootstrap/dist/css/bootstrap-reboot.min.css'
 import 'bootstrap/dist/css/bootstrap-utilities.min.css'
 import { NativeDOMDelegate } from "./NativeDOMDelegate";
 import * as libspsfrontend from '@tensorworks/libspsfrontend';
-import favSvg from './assets/images/favicon.svg';
-import favPng from './assets/images/favicon.png';
-import svgMinimize from './assets/images/Minimize.svg';
 import svgMaximize from './assets/images/Maximize.svg';
+let maximizeIcon = document.getElementById('maximizeIcon') as HTMLObjectElement;
+maximizeIcon.data = svgMaximize;
+import svgMinimize from './assets/images/Minimize.svg';
+let minimizeIcon = document.getElementById('minimizeIcon') as HTMLObjectElement;
+minimizeIcon.data = svgMinimize;
+import favSvg from './assets/images/favicon.svg';
+let faviconSvg = document.getElementById('favSvg') as HTMLLinkElement;
+faviconSvg.href = favSvg;
+import favPng from './assets/images/favicon.png';
+let faviconPng = document.getElementById('favPng') as HTMLLinkElement;
+faviconPng.href = favPng;
 import svgSettings from './assets/images/Settings.svg';
+let settingsIcon = document.getElementById('settingsIcon') as HTMLObjectElement;
+settingsIcon.data = svgSettings;
 import svgInfo from './assets/images/Info.svg';
+let statsIcon = document.getElementById('statsIcon') as HTMLObjectElement;
+statsIcon.data = svgInfo;
 
 // set the logger level
 //libspsfrontend.Logger.SetLoggerVerbosity(10);
-
-// svg icons for favicons and buttons
-let faviconSvg = document.getElementById('favSvg') as HTMLLinkElement;
-faviconSvg.href = favSvg;
-let faviconPng = document.getElementById('favPng') as HTMLLinkElement;
-faviconPng.href = favPng;
-let maximizeIcon = document.getElementById('maximizeIcon') as HTMLObjectElement;
-maximizeIcon.data = svgMaximize;
-let minimizeIcon = document.getElementById('minimizeIcon') as HTMLObjectElement;
-minimizeIcon.data = svgMinimize;
-let settingsIcon = document.getElementById('settingsIcon') as HTMLObjectElement;
-settingsIcon.data = svgSettings;
-let statsIcon = document.getElementById('statsIcon') as HTMLObjectElement;
-statsIcon.data = svgInfo;
 
 // Determine whether a signalling server WebSocket URL was specified at compile-time or if we need to compute it at runtime
 declare var WEBSOCKET_URL: string;
@@ -57,8 +55,8 @@ let playerElement = document.getElementById("player") as HTMLDivElement;
 
 // Create a config object
 let config = CreateConfig(signallingServerAddress, playerElement);
-config.enableSpsAutoConnect = true;
-config.enableSpsAutoplay = true;
+//config.enableSpsAutoConnect = true;
+//config.enableSpsAutoplay = true;
 
 // Create a Native DOM delegate instance that implements the Delegate interface class
 let delegate = new NativeDOMDelegate(config);
