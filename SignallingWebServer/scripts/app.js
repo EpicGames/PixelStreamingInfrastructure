@@ -2287,7 +2287,18 @@ function registerTouchEvents(playerElement) {
                 console.log(`F${fingerIds[touch.identifier]}=(${x}, ${y})`);
             }
             let coord = normalizeAndQuantizeUnsigned(x, y);
-            toStreamerHandlers.type(type, [numTouches, coord.x, coord.y, fingerIds[touch.identifier], MaxByteValue * touch.force, coord.inRange ? 1 : 0]);
+            
+            switch(type) {
+                case "TouchStart":
+                    toStreamerHandlers.TouchStart("TouchStart", [numTouches, coord.x, coord.y, fingerIds[touch.identifier], MaxByteValue * touch.force, coord.inRange ? 1 : 0]);
+                    break;
+                case "TouchEnd":
+                    toStreamerHandlers.TouchStart("TouchEnd", [numTouches, coord.x, coord.y, fingerIds[touch.identifier], MaxByteValue * touch.force, coord.inRange ? 1 : 0]);
+                    break;
+                case "TouchMove":
+                    toStreamerHandlers.TouchStart("TouchMove", [numTouches, coord.x, coord.y, fingerIds[touch.identifier], MaxByteValue * touch.force, coord.inRange ? 1 : 0]);
+                    break;
+            }
         }
     }
 
