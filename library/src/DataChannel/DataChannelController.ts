@@ -119,8 +119,8 @@ export class DataChannelController {
                 break;
             }
             default: {
-                Logger.Error(Logger.GetStackTrace(), "unknown message sent on the Data channel");
                 Logger.Log(Logger.GetStackTrace(), message[0].toString());
+                Logger.Error(Logger.GetStackTrace(), "unknown message sent on the Data channel");
                 break;
             }
         }
