@@ -112,7 +112,6 @@ let activeKeys = [];
 let toStreamerMessages = new TwoWayMap();
 let fromStreamerMessages = new TwoWayMap();
 
-// Old EToPlayerMsg enum
 const MessageDirection = {
     // A message sent to the streamer. eg Key presses
     // ie player -> streamer
@@ -643,8 +642,10 @@ function fullscreen() {
     let element;
     //HTML elements controls
     if(!(document.fullscreenEnabled || document.webkitFullscreenEnabled)) {
+        // Chrome and FireFox on iOS can only fullscreen a <video>
         element = document.getElementById("streamingVideo");
     } else {
+        // Everywhere else can fullscreen a <div>
         element = document.getElementById("playerUI");
     }
     if(!element) {
