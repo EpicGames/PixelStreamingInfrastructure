@@ -570,6 +570,9 @@ playerServer.on('connection', function (ws, req) {
 		if (msg.type == 'answer') {
 			msg.playerId = playerId;
 			sendMessageToController(msg, skipSFU, skipStreamer);
+		} else if (msg.type == 'offer') {
+			msg.playerId = playerId;
+			sendMessageToController(msg, skipSFU, skipStreamer);
 		} else if (msg.type == 'iceCandidate') {
 			msg.playerId = playerId;
 			sendMessageToController(msg, skipSFU, skipStreamer);
@@ -626,7 +629,8 @@ playerServer.on('connection', function (ws, req) {
 
 	ws.send(JSON.stringify(clientConfig));
 
-	sendMessageToController({ type: "playerConnected", playerId: playerId, dataChannel: true, sfu: false }, skipSFU, skipStreamer);
+	// skip streamer as 4.27/4.26 don't support the playerConnected message
+	sendMessageToController({ type: "playerConnected", playerId: playerId, dataChannel: true, sfu: false }, skipSFU, true);
 	sendPlayersCount();
 });
 

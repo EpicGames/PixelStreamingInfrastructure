@@ -1037,7 +1037,7 @@ function setupWebRtcPlayer(htmlElement, config) {
         createOnScreenKeyboardHelpers(htmlElement);
     }
 
-    //createWebRtcOffer();
+    createWebRtcOffer();
 
     return webRtcPlayerObj.video;
 }
