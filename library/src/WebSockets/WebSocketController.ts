@@ -46,6 +46,15 @@ export class WebSocketController {
         Logger.Log(Logger.GetStackTrace(), "received => \n" + JSON.stringify(JSON.parse(event.data), undefined, 4), 6);
 
         switch (message.type) {
+            case MessageReceive.MessageRecvTypes.PING: {
+
+                // send our pong payload back to the signalling server
+                const payload = new MessageSend.MessagePong(new Date().getTime()).payload()
+                Logger.Log(Logger.GetStackTrace(), MessageReceive.MessageRecvTypes.PING + ": " + payload, 6);
+                this.webSocket.send(payload)
+
+                break;
+            }
             case MessageReceive.MessageRecvTypes.AUTHENTICATION_REQUIRED: {
                 Logger.Log(Logger.GetStackTrace(), "AUTHENTICATION_REQUIRED", 6);
                 let authenticationRequired: MessageReceive.MessageAuthRequired = JSON.parse(event.data);

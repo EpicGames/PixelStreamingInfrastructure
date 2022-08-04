@@ -8,7 +8,8 @@ export enum MessageRecvTypes {
     CONFIG = "config",
     PLAYER_COUNT = "playerCount",
     ANSWER = "answer",
-    ICE_CANDIDATE = "iceCandidate"
+    ICE_CANDIDATE = "iceCandidate",
+    PING = "ping"
 }
 
 /**

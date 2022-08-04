@@ -15,7 +15,8 @@ export enum MessageSendTypes {
     STATS = "stats",
     AUTHENTICATION_REQUEST = "authenticationRequest",
     REQUEST_INSTANCE = "requestInstance",
-    OFFER = "offer"
+    OFFER = "offer",
+    PONG = "pong"
 }
 
 /**
@@ -59,6 +60,20 @@ export class MessageAuthRequest extends MessageSend {
         this.type = MessageSendTypes.AUTHENTICATION_REQUEST;
         this.token = token;
         this.provider = provider;
+    }
+}
+
+/**
+ * Instance Request Message Wrapper
+ */
+export class MessagePong extends MessageSend {
+
+    time: number;
+
+    constructor(time: number) {
+        super();
+        this.type = MessageSendTypes.PONG;
+        this.time = time
     }
 }
 
