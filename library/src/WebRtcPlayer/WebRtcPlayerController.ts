@@ -185,6 +185,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.delegate.showErrorOverlay("Could not player video stream because the video player was not initialised correctly.");
 			Logger.Error(Logger.GetStackTrace(), "Could not player video stream because the video player was not initialised correctly.");
 		} else {
+			this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.videoPlayer.videoElement);
 			if (this.streamController.audioElement) {
 				this.streamController.audioElement.play().then(() => {
 					this.playVideo();
@@ -200,7 +201,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.ueControlMessage.SendRequestInitialSettings();
 			this.ueControlMessage.SendRequestQualityControl();
 			this.freezeFrameController.showFreezeFrame();
-			this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.config.playerElement);
 			this.delegate.hideCurrentOverlay();
 			this.afkLogic.startAfkWarningTimer();
 		}

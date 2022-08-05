@@ -94,7 +94,7 @@ export class InputController {
      * @param fakeMouseTouch - the faked mouse touch event 
      * @param playerElement - the player elements DOM 
      */
-    registerTouch(fakeMouseTouch: boolean, playerElement: HTMLDivElement) {
+    registerTouch(fakeMouseTouch: boolean, playerElement: HTMLVideoElement) {
         Logger.Log(Logger.GetStackTrace(), "Registering Touch", 6);
         if (fakeMouseTouch) {
             this.touchController = new FakeTouchController(this.dataChannelController, (<HTMLVideoElement>playerElement.getElementsByTagName("video")[0]));
