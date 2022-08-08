@@ -325,6 +325,15 @@ function webRtcPlayer(parOptions) {
 
         // We use the line 'useinbandfec=1' (which Opus uses) to set our Opus specific audio parameters.
         offer.sdp = offer.sdp.replace('useinbandfec=1', audioSDP);
+
+        // This attribute not supported in 4.26 SDP parser
+        offer.sdp = offer.sdp.replace(/^a=extmap-allow-mixed\r*\n/gm, "");
+
+        // Comments grabbed verbatim from 4.26 version of WebServers
+        // (andriy): increase start bitrate from 300 kbps to 20 mbps and max bitrate from 2.5 mbps to 100 mbps
+        // (100 mbps means we don't restrict encoder at all)
+        // after we `setLocalDescription` because other browsers are not c happy to see google-specific config
+        offer.sdp = offer.sdp.replace(/(a=fmtp:\d+ .*level-asymmetry-allowed=.*)\r\n/gm, "$1;x-google-start-bitrate=10000;x-google-max-bitrate=20000\r\n");
     }
     
     setupPeerConnection = function (pc) {
