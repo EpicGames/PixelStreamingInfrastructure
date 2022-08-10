@@ -194,6 +194,7 @@ object {
 	right: 0;
 	height: 100%;
 	min-width: 20vw;
+	max-width: 100vw;
 	transform: translateX(100%);
 	transition: .3s ease-out;
 	pointer-events: all;
