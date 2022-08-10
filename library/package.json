@@ -1,6 +1,6 @@
 {
   "name": "@tensorworks/libspsfrontend",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "Frontend library for Scalable Pixel Streaming",
   "main": "dist/libspsfrontend.min.js",
   "types": "types/index.d.ts",
