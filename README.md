@@ -14,7 +14,7 @@ The goals of this repository are to:
 
 Reference implementations for the various pieces needed to support a PixelStreaming application:
 - SignallingWebServer (Cirrus)
-- SFU (Single Forwarding Unit)
+- SFU (Selective Forwarding Unit)
 - Matchmaker
 
 
