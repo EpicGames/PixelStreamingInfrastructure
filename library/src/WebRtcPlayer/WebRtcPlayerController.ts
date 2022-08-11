@@ -109,6 +109,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	onAfkClick(): void {
 		this.afkLogic.onAfkClick();
+
+		// if the stream is paused play it
+		if (this.videoPlayer.videoElement.paused === true) {
+			this.playStream();
+		}
 	}
 
 	/**
@@ -132,7 +137,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.delegate.showActionOrErrorOnDisconnect = false;
 
 			// close the connection 
-			this.webSocketController.close();
+			this.closeSignalingServer();
 
 			// wait for the connection to close and restart the connection
 			let autoConnectTimeout = setTimeout(() => {
@@ -184,6 +189,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		if (!this.videoPlayer.videoElement) {
 			this.delegate.showErrorOverlay("Could not player video stream because the video player was not initialised correctly.");
 			Logger.Error(Logger.GetStackTrace(), "Could not player video stream because the video player was not initialised correctly.");
+			// close the connection 
+			this.closeSignalingServer();
 		} else {
 			this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.videoPlayer.videoElement);
 			if (this.streamController.audioElement) {
@@ -198,11 +205,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 				this.playVideo();
 			}
 			this.shouldShowPlayOverlay = false;
-			this.ueControlMessage.SendRequestInitialSettings();
-			this.ueControlMessage.SendRequestQualityControl();
 			this.freezeFrameController.showFreezeFrame();
 			this.delegate.hideCurrentOverlay();
-			this.afkLogic.startAfkWarningTimer();
 		}
 	}
 
@@ -232,10 +236,16 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 			// attempt to play the video
 			this.playStream();
-
 		} else {
 			this.delegate.showPlayOverlay();
 		}
+
+		// start the afk warning timer as the container is now running
+		this.afkLogic.startAfkWarningTimer();
+
+		// send and request initial stats
+		this.ueControlMessage.SendRequestInitialSettings();
+		this.ueControlMessage.SendRequestQualityControl();
 	}
 
 	/**
