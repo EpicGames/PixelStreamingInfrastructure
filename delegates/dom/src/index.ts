@@ -5,24 +5,6 @@ import 'bootstrap/dist/css/bootstrap-reboot.min.css'
 import 'bootstrap/dist/css/bootstrap-utilities.min.css'
 import { NativeDOMDelegate } from "./NativeDOMDelegate";
 import * as libspsfrontend from '@tensorworks/libspsfrontend';
-import svgMaximize from './assets/images/Maximize.svg';
-let maximizeIcon = document.getElementById('maximizeIcon') as HTMLObjectElement;
-maximizeIcon.data = svgMaximize;
-import svgMinimize from './assets/images/Minimize.svg';
-let minimizeIcon = document.getElementById('minimizeIcon') as HTMLObjectElement;
-minimizeIcon.data = svgMinimize;
-import favSvg from './assets/images/favicon.svg';
-let faviconSvg = document.getElementById('favSvg') as HTMLLinkElement;
-faviconSvg.href = favSvg;
-import favPng from './assets/images/favicon.png';
-let faviconPng = document.getElementById('favPng') as HTMLLinkElement;
-faviconPng.href = favPng;
-import svgSettings from './assets/images/Settings.svg';
-let settingsIcon = document.getElementById('settingsIcon') as HTMLObjectElement;
-settingsIcon.data = svgSettings;
-import svgInfo from './assets/images/Info.svg';
-let statsIcon = document.getElementById('statsIcon') as HTMLObjectElement;
-statsIcon.data = svgInfo;
 
 // set the logger level
 //libspsfrontend.Logger.SetLoggerVerbosity(10);

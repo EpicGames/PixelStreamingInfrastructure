@@ -36,12 +36,19 @@ module.exports = (env) => {
           ],
         },
         {
+          test: /\.html$/i,
+          use: 'html-loader'
+        },
+        {
           test: /\.css$/i,
           use: [MiniCssExtractPlugin.loader, 'css-loader'],
         },
         {
-          test: /\.(png|svg)$/,
-          type: 'asset/inline'
+          test: /\.(png|svg)$/i,
+          type: 'asset/resource',
+          generator: {
+            filename: 'images/[name]-[hash][ext]'
+          }
         },
       ],
     },
