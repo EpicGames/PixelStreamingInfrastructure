@@ -241,6 +241,12 @@ function populateDefaultProtocol() {
         //              delta       x        y
         "structure": ["int16", "uint16", "uint16"]
     });
+    toStreamerMessages.add("MouseDouble", {
+        "id": 76,
+        "byteLength": 5,
+        //              button     x         y
+        "structure": ["uint8", "uint16", "uint16"]
+    });
     // Touch Input Messages. Range = 80..89.
     toStreamerMessages.add("TouchStart", {
         "id": 80,
@@ -332,6 +338,7 @@ function registerMessageHandlers() {
     registerMessageHandler(MessageDirection.ToStreamer, "MouseUp", sendMessageToStreamer);
     registerMessageHandler(MessageDirection.ToStreamer, "MouseMove", sendMessageToStreamer);
     registerMessageHandler(MessageDirection.ToStreamer, "MouseWheel", sendMessageToStreamer);
+    registerMessageHandler(MessageDirection.ToStreamer, "MouseDouble", sendMessageToStreamer);
     registerMessageHandler(MessageDirection.ToStreamer, "TouchStart", sendMessageToStreamer);
     registerMessageHandler(MessageDirection.ToStreamer, "TouchEnd", sendMessageToStreamer);
     registerMessageHandler(MessageDirection.ToStreamer, "TouchMove", sendMessageToStreamer);
@@ -455,11 +462,11 @@ function onProtocolMessage(data) {
     try {
         let protocolString = new TextDecoder("utf-16").decode(data.slice(1));
         let protocolJSON = JSON.parse(protocolString);
-        if (!protocolJSON.hasOwnProperty("direction")) {
+        if (!protocolJSON.hasOwnProperty("Direction")) {
             throw new Error('Malformed protocol received. Ensure the protocol message contains a direction');
         }
-        let direction = protocolJSON.direction;
-        delete protocolJSON.direction;
+        let direction = protocolJSON.Direction;
+        delete protocolJSON.Direction;
         console.log(`Received new ${ direction == MessageDirection.FromStreamer ? "FromStreamer" : "ToStreamer" } protocol. Updating existing protocol...`);
         Object.keys(protocolJSON).forEach((messageType) => {
             let message = protocolJSON[messageType];
@@ -2200,8 +2207,11 @@ function registerLockedMouseEvents(playerElement) {
     };
 
     playerElement.onwheel = function (e) {
-        let coord = normalizeAndQuantizeUnsigned(x, y);
         toStreamerHandlers.MouseWheel("MouseWheel", [e.wheelDelta, coord.x, coord.y]);
+    };
+
+    playerElement.ondblclick = function (e) {
+        toStreamerHandlers.MouseDown("MouseDouble", [e.button, coord.x, coord.y]);
     };
 
     playerElement.pressMouseButtons = function(e) {
@@ -2253,6 +2263,11 @@ function registerHoveringMouseEvents(playerElement) {
         let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
         toStreamerHandlers.MouseWheel("MouseWheel", [e.wheelDelta, coord.x, coord.y]);
         e.preventDefault();
+    };
+
+    playerElement.ondblclick = function (e) {
+        let coord = normalizeAndQuantizeUnsigned(e.offsetX, e.offsetY);
+        toStreamerHandlers.MouseDown("MouseDouble", [e.button, coord.x, coord.y]);
     };
 
     playerElement.pressMouseButtons = function(e) {
