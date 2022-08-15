@@ -27,6 +27,7 @@ export class UeInputGamePadMessage extends UeDataMessage {
         Data.setUint8(1, controllerIndex);
         Data.setUint8(2, buttonIndex);
         Data.setUint8(3, Number(isRepeat).valueOf());
+        this.sendData(Data.buffer);
     }
 
     /**
@@ -39,6 +40,7 @@ export class UeInputGamePadMessage extends UeDataMessage {
         Data.setUint8(0, UeMessageType.gamepadButtonReleased);
         Data.setUint8(1, controllerIndex);
         Data.setUint8(2, buttonIndex);
+        this.sendData(Data.buffer);
     }
 
     /**
