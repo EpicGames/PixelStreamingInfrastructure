@@ -299,6 +299,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	handleOnConfigMessage(messageConfig: MessageConfig) {
 
+		console.log("WHERE HERE NOW");
+		console.log(messageConfig);
+
 		/* Tell the WebRtcController to start a session with the peer options sent from the signaling server */
 		this.startSession(messageConfig.peerConnectionOptions);
 
