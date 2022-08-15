@@ -3,6 +3,13 @@ import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import * as MessageReceive from "./MessageReceive";
 import * as MessageSend from "./MessageSend";
 
+// declare the new method for the websocket interface
+declare global {
+    interface WebSocket {
+        onmessagebinary?(event?: MessageEvent): void;
+    }
+}
+
 /**
  * The controller for the WebSocket and all associated methods 
  */
@@ -30,6 +37,7 @@ export class WebSocketController {
             this.webSocket.onerror = (event) => this.handleOnError(event);
             this.webSocket.onclose = (event) => this.handleOnClose(event);
             this.webSocket.onmessage = (event) => this.handleOnMessage(event);
+            this.webSocket.onmessagebinary = (event) => this.handelOnMessageBinary(event);
             return true;
         } catch (error) {
             Logger.Error(error, error);
@@ -38,10 +46,43 @@ export class WebSocketController {
     }
 
     /**
+     * Handles what happens when a message is received in binary form
+     * @param event - Message Received
+     */
+    handelOnMessageBinary(event: MessageEvent) {
+        // if the event is empty return
+        if (!event || !event.data) {
+            return;
+        }
+
+        // handel the binary and then handel the message
+        event.data.text().then((messageString: any) => {
+
+            // build a new message
+            let constructedMessage = new MessageEvent('messageFromBinary', {
+                data: messageString
+            });
+
+            // send the new stringified event back into `onmessage`
+            this.handelOnMessageBinary(constructedMessage);
+
+        }).catch((error: Error) => {
+            Logger.Error(Logger.GetStackTrace(), `Failed to parse binary blob from websocket, reason: ${error}`);
+        });
+    }
+
+    /**
      * Handles what happens when a message is received
      * @param event - Message Received
      */
     handleOnMessage(event: MessageEvent) {
+
+        // Check if websocket message is binary, if so, stringify it.
+        if (event.data && event.data instanceof Blob) {
+            this.handelOnMessageBinary(event);
+            return;
+        }
+
         let message: MessageReceive.MessageRecv = JSON.parse(event.data);
         Logger.Log(Logger.GetStackTrace(), "received => \n" + JSON.stringify(JSON.parse(event.data), undefined, 4), 6);
 
