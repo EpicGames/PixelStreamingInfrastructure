@@ -14,13 +14,12 @@ export class PeerConnectionController {
      * @param options - Peer connection Options
      */
     constructor(options: RTCConfiguration, urlParams: URLSearchParams) {
-        // set the turn status 
-        this.forceTurn = urlParams.has('ForceTURN');
 
-        // if using TURN set the ice transport policy to relay for the options
-        if (this.forceTurn) {
-            Logger.Log(Logger.GetStackTrace(), "Forcing TURN usage by setting ICE Transport Policy in peer connection config.");
-            options.iceTransportPolicy = "relay";
+        // check for forcing turn
+        if (urlParams.has('ForceTURN')) {
+            this.activateForceTurn(options);
+        } else {
+            this.forceTurn = false;
         }
 
         // build a new peer connection with the options
@@ -31,6 +30,52 @@ export class PeerConnectionController {
         this.peerConnection.ontrack = (ev: RTCTrackEvent) => this.handleOnTrack(ev);
         this.peerConnection.onicecandidate = (ev: RTCPeerConnectionIceEvent) => this.handelIceCandidate(ev);
         this.aggregatedStats = new AggregatedStats();
+    }
+
+    /**
+     * Activates the force turn feature if there is a turn server 
+     */
+    activateForceTurn(options: RTCConfiguration) {
+
+        // check for a turn server
+        const hasTurnServer = this.checkTurnServerAvailability(options);
+
+        // act on the result
+        if (!hasTurnServer) {
+            this.forceTurn = false;
+            Logger.Info(Logger.GetStackTrace(), "No turn server was found in the Peer Connection Options from your signaling server. Turn cannot be forced");
+            return;
+        } else {
+            // if using TURN set the ice transport policy to relay for the options
+            this.forceTurn = true;
+            options.iceTransportPolicy = "relay";
+            Logger.Log(Logger.GetStackTrace(), "Forcing TURN usage by setting ICE Transport Policy in peer connection config.");
+        }
+    }
+
+    /**
+     * Checks the peer connection options for a turn server and returns true or false
+     */
+    checkTurnServerAvailability(options: RTCConfiguration) {
+
+        // if iceServers is empty return false this should not be the general use case but is here incase
+        if (!options.iceServers) {
+            Logger.Info(Logger.GetStackTrace(), 'A turn sever was not found');
+            return false;
+        }
+
+        // loop through the ice servers to check for a turn url
+        for (const iceServer of options.iceServers) {
+            for (const url of iceServer.urls) {
+                if (url.includes('turn')) {
+                    Logger.Log(Logger.GetStackTrace(), `A turn sever was found at ${url}`);
+                    return true;
+                }
+            }
+        }
+
+        Logger.Info(Logger.GetStackTrace(), 'A turn sever was not found');
+        return false;
     }
 
     /**

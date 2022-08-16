@@ -240,9 +240,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.delegate.showPlayOverlay();
 		}
 
-		// start the afk warning timer as the container is now running
-		this.afkLogic.startAfkWarningTimer();
-
 		// send and request initial stats
 		this.ueControlMessage.SendRequestInitialSettings();
 		this.ueControlMessage.SendRequestQualityControl();
@@ -299,16 +296,13 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	handleOnConfigMessage(messageConfig: MessageConfig) {
 
-		console.log("WHERE HERE NOW");
-		console.log(messageConfig);
-
-		/* Tell the WebRtcController to start a session with the peer options sent from the signaling server */
+		// Tell the WebRtcController to start a session with the peer options sent from the signaling server
 		this.startSession(messageConfig.peerConnectionOptions);
 
-		/* When the signaling server sends a WebRTC Answer over the websocket connection have the WebRtcController handle the message */
+		// When the signaling server sends a WebRTC Answer over the websocket connection have the WebRtcController handle the message
 		this.webSocketController.onWebRtcAnswer = (messageAnswer: MessageReceive.MessageAnswer) => this.handleWebRtcAnswer(messageAnswer);
 
-		/* When the signaling server sends a IceCandidate over the websocket connection have the WebRtcController handle the message  */
+		// When the signaling server sends a IceCandidate over the websocket connection have the WebRtcController handle the message
 		this.webSocketController.onIceCandidate = (iceCandidate: RTCIceCandidateInit) => this.handleIceCandidate(iceCandidate);
 	}
 
@@ -325,8 +319,12 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		}
 
 		this.peerConnectionController.handleAnswer(sdpAnswer);
-		this.delegate.onWebRtcAnswer();
 
+		// start the afk warning timer as the container is now running
+		this.afkLogic.startAfkWarningTimer();
+
+		// show the overlay that we have an answer
+		this.delegate.onWebRtcAnswer();
 	}
 
 	/**
