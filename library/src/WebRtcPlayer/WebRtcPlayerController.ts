@@ -358,6 +358,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.peerConnectionController.handleAnswer(sdpAnswer);
 
+		// start the afk warning timer as the container is now running
+		this.afkLogic.startAfkWarningTimer();
+
 		// show the overlay that we have an answer
 		this.delegate.onWebRtcAnswer();
 	}
