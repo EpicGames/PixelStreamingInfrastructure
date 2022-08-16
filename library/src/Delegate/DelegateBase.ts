@@ -232,7 +232,7 @@ export class DelegateBase implements IDelegate {
 	onDisconnect(eventString: string) {
 		
 		// if we have overridden the default disconnection messsage, assign the new value here
-		if (this.iWebRtcController.getDisconnectMessageOverride() != "") {
+		if (this.iWebRtcController.getDisconnectMessageOverride() != "" && this.iWebRtcController.getDisconnectMessageOverride() !== undefined && this.iWebRtcController.getDisconnectMessageOverride() != null) {
 			eventString = this.iWebRtcController.getDisconnectMessageOverride();
 			this.iWebRtcController.setDisconnectMessageOverride('');
 		}
