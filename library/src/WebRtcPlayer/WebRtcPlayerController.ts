@@ -49,6 +49,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	latencyStartTime: number;
 	delegate: IDelegate;
 
+	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
+	// it will use this property to store the override message string
+	disconnectMessageOverride: string;
+
 	// for mic support 
 	urlParams: URLSearchParams;
 	micController: MicController;
@@ -269,6 +273,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			// close and error if turn is forced and there is no turn server
 			if (!hasTurnServer) {
 				Logger.Info(Logger.GetStackTrace(), "No turn server was found in the Peer Connection Options. TURN cannot be forced closing connection; Please use STUN instead");
+				this.setDisconnectMessageOverride("TURN cannot be forced closing connection; Please use STUN instead.");
 				this.closeSignalingServer();
 				return;
 			}
@@ -664,5 +669,19 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	*/
 	resizePlayerStyle(): void {
 		this.uiController.resizePlayerStyle();
+	}
+
+    /**
+     * Get the overridden disconnect message
+     */
+	getDisconnectMessageOverride(): string {
+		return this.disconnectMessageOverride;
+	}
+
+    /**
+     * Set the override for the disconnect message
+     */
+	setDisconnectMessageOverride(message: string) : void {
+		this.disconnectMessageOverride = message;
 	}
 }

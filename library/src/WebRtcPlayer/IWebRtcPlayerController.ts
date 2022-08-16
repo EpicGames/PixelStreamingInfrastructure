@@ -91,4 +91,14 @@ export interface IWebRtcPlayerController {
      * Handles when the stream size changes
      */
     updateVideoStreamSize(): void;
+
+    /**
+     * Get the overridden disconnect message
+     */
+    getDisconnectMessageOverride(): string;
+
+    /**
+     * Set the override for the disconnect message
+     */
+    setDisconnectMessageOverride(message: string): void;
 }
