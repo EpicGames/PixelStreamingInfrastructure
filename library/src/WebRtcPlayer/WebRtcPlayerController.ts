@@ -73,6 +73,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		// set up the afk logic class and connect up its method for closing the signaling server 
 		this.afkLogic = new AfkLogic(this.config.controlScheme, this.config.afkTimeout);
+		this.afkLogic.setDisconnectMessageOverride = (message: string) => this.setDisconnectMessageOverride(message);
 		this.afkLogic.closeWebSocket = () => this.closeSignalingServer();
 
 		this.freezeFrameController = new FreezeFrameController(this.config.playerElement);
@@ -140,6 +141,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			// set the replay status so we get a text overlay over an action overlay
 			this.delegate.showActionOrErrorOnDisconnect = false;
 
+			// set the disconnect message
+			this.setDisconnectMessageOverride("Restarting stream manually");
+
 			// close the connection 
 			this.closeSignalingServer();
 
@@ -193,6 +197,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		if (!this.videoPlayer.videoElement) {
 			this.delegate.showErrorOverlay("Could not player video stream because the video player was not initialised correctly.");
 			Logger.Error(Logger.GetStackTrace(), "Could not player video stream because the video player was not initialised correctly.");
+
+			// set the disconnect message
+			this.setDisconnectMessageOverride("Stream not initialised correctly");
+
 			// close the connection 
 			this.closeSignalingServer();
 		} else {
@@ -671,17 +679,17 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.uiController.resizePlayerStyle();
 	}
 
-    /**
-     * Get the overridden disconnect message
-     */
+	/**
+	 * Get the overridden disconnect message
+	 */
 	getDisconnectMessageOverride(): string {
 		return this.disconnectMessageOverride;
 	}
 
-    /**
-     * Set the override for the disconnect message
-     */
-	setDisconnectMessageOverride(message: string) : void {
+	/**
+	 * Set the override for the disconnect message
+	 */
+	setDisconnectMessageOverride(message: string): void {
 		this.disconnectMessageOverride = message;
 	}
 }

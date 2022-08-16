@@ -90,6 +90,7 @@ export class AfkLogic {
             if (this.countDown == 0) {
                 // The user failed to click so hide the overlay and disconnect them.
                 this.hideCurrentOverlay();
+                this.setDisconnectMessageOverride("You have been disconnected due to inactivity");
                 this.closeWebSocket();
                 Logger.Log(Logger.GetStackTrace(), "You have been disconnected due to inactivity");
 
@@ -116,6 +117,11 @@ export class AfkLogic {
      * An override method for hiding the afk overlay 
      */
     hideCurrentOverlay() { }
+
+    /**
+     * An  override method for setting the override for the disconnect message
+     */
+    setDisconnectMessageOverride(message: string) { }
 
     /**
      * An override method for closing the websocket connection from the clients side
