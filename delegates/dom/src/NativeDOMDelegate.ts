@@ -635,7 +635,11 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 				}
 				break;
 			case libspsfrontend.InstanceState.READY:
-				instanceStateMessage = "Instance is Ready: " + instanceState.details;
+				if (instanceState.details == undefined || instanceState.details == null) {
+					instanceStateMessage = "Instance is Ready: " + instanceState.details;
+				} else {
+					instanceStateMessage = "Instance is Ready";
+				}
 				break;
 			default:
 				instanceStateMessage = "Unhandled Instance State" + instanceState.state + " " + instanceState.details;
