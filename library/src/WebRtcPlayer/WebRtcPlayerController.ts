@@ -268,8 +268,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 			// close and error if turn is forced and there is no turn server
 			if (!hasTurnServer) {
-				Logger.Error(Logger.GetStackTrace(), "No turn server was found in the Peer Connection Options from your signaling server. Turn cannot be forced");
+				Logger.Info(Logger.GetStackTrace(), "No turn server was found in the Peer Connection Options. TURN cannot be forced closing connection; Please use STUN instead");
 				this.closeSignalingServer();
+				return;
 			}
 		}
 
@@ -356,9 +357,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		}
 
 		this.peerConnectionController.handleAnswer(sdpAnswer);
-
-		// start the afk warning timer as the container is now running
-		this.afkLogic.startAfkWarningTimer();
 
 		// show the overlay that we have an answer
 		this.delegate.onWebRtcAnswer();
