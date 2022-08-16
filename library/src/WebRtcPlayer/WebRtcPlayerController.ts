@@ -272,8 +272,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 			// close and error if turn is forced and there is no turn server
 			if (!hasTurnServer) {
-				Logger.Info(Logger.GetStackTrace(), "No turn server was found in the Peer Connection Options. TURN cannot be forced closing connection; Please use STUN instead");
-				this.setDisconnectMessageOverride("TURN cannot be forced closing connection; Please use STUN instead.");
+				Logger.Info(Logger.GetStackTrace(), "No turn server was found in the Peer Connection Options. TURN cannot be forced, closing connection. Please use STUN instead");
+				this.setDisconnectMessageOverride("TURN cannot be forced, closing connection. Please use STUN instead.");
 				this.closeSignalingServer();
 				return;
 			}
