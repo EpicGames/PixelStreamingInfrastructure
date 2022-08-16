@@ -14,7 +14,7 @@
   "author": "TensorWorks Pty Ltd",
   "license": "MIT",
   "devDependencies": {
-    "@tensorworks/libspsfrontend": "0.1.1",
+    "@tensorworks/libspsfrontend": "0.1.2",
     "bootstrap": "^5.0.2",
     "css-loader": "^6.2.0",
     "html-loader": "^4.1.0",
