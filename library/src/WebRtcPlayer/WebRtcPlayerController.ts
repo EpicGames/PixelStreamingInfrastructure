@@ -261,8 +261,20 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// set up url params for STUN, Mic and SFU
 		this.urlParams = new URLSearchParams(window.location.search);
 
+		// check for forcing turn
+		if (this.urlParams.has('ForceTURN')) {
+			// check for a turn server
+			const hasTurnServer = this.checkTurnServerAvailability(peerConfig);
+
+			// close and error if turn is forced and there is no turn server
+			if (!hasTurnServer) {
+				Logger.Error(Logger.GetStackTrace(), "No turn server was found in the Peer Connection Options from your signaling server. Turn cannot be forced");
+				this.closeSignalingServer();
+			}
+		}
+
 		// set up the peer connection controller
-		this.peerConnectionController = new PeerConnectionController(peerConfig, this.urlParams);
+		this.peerConnectionController = new PeerConnectionController(peerConfig, this.urlParams.has('ForceTURN'));
 
 		//set up mic controller
 		this.micController = new MicController(this.urlParams)
@@ -288,6 +300,31 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		/* Start the Hand shake process by creating an Offer */
 		this.peerConnectionController.createOffer(this.sdpConstraints, this.micController.useMic);
+	}
+
+	/**
+	 * Checks the peer connection options for a turn server and returns true or false
+	 */
+	checkTurnServerAvailability(options: RTCConfiguration) {
+
+		// if iceServers is empty return false this should not be the general use case but is here incase
+		if (!options.iceServers) {
+			Logger.Info(Logger.GetStackTrace(), 'A turn sever was not found');
+			return false;
+		}
+
+		// loop through the ice servers to check for a turn url
+		for (const iceServer of options.iceServers) {
+			for (const url of iceServer.urls) {
+				if (url.includes('turn')) {
+					Logger.Log(Logger.GetStackTrace(), `A turn sever was found at ${url}`);
+					return true;
+				}
+			}
+		}
+
+		Logger.Info(Logger.GetStackTrace(), 'A turn sever was not found');
+		return false;
 	}
 
 	/**
