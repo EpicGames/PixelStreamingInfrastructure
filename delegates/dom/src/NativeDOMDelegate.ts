@@ -635,7 +635,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 				}
 				break;
 			case libspsfrontend.InstanceState.READY:
-				if (instanceState.details == undefined || instanceState.details == null) {\
+				if (instanceState.details == undefined || instanceState.details == null) {
 					instanceStateMessage = "Instance is Ready";
 					
 				} else {
