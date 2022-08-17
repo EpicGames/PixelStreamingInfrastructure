@@ -1146,7 +1146,9 @@ function showFreezeFrame() {
         } else {
             showFreezeFrameOverlay();
         }
-        webRtcPlayerObj.setVideoEnabled(false);
+        setTimeout(() => {
+            webRtcPlayerObj.setVideoEnabled(false);
+        }, 50);
     };
 }
 
@@ -1679,9 +1681,11 @@ function showFreezeFrameOverlay() {
 }
 
 function invalidateFreezeFrameOverlay() {
-    freezeFrameOverlay.style.display = 'none';
-    freezeFrame.valid = false;
-    freezeFrameOverlay.classList.remove("freezeframeBackground");
+    setTimeout(() => {
+        freezeFrameOverlay.style.display = 'none';
+        freezeFrame.valid = false;
+        freezeFrameOverlay.classList.remove("freezeframeBackground");
+    }, 50);
     
     if (webRtcPlayerObj) {
         webRtcPlayerObj.setVideoEnabled(true);
