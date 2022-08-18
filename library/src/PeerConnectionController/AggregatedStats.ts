@@ -247,13 +247,24 @@ export class AggregatedStats {
      * Process the Inbound Video Track Data  
      */
     handleTrack(stat: any) {
-        this.inboundVideoStats.framesDropped = stat.framesDropped;
-        this.inboundVideoStats.framesReceived = stat.framesReceived;
-        this.inboundVideoStats.framesDroppedPercentage = stat.framesDropped / stat.framesReceived * 100;
-        this.inboundVideoStats.frameHeight = stat.frameHeight;
-        this.inboundVideoStats.frameWidth = stat.frameWidth;
-        this.inboundVideoStats.frameHeightStart = (this.inboundVideoStats.frameHeightStart == null) ? stat.frameHeight : this.inboundVideoStats.frameHeightStart;
-        this.inboundVideoStats.frameWidthStart = (this.inboundVideoStats.frameWidthStart == null) ? stat.frameWidth : this.inboundVideoStats.frameWidthStart
+
+        // we only want to extract stats from the video track
+        if(stat.type === 'track' && (stat.trackIdentifier === 'video_label' || stat.kind === 'video')) {
+            this.inboundVideoStats.framesDropped = stat.framesDropped;
+            this.inboundVideoStats.framesReceived = stat.framesReceived;
+            this.inboundVideoStats.framesDroppedPercentage = stat.framesDropped / stat.framesReceived * 100;
+            this.inboundVideoStats.frameHeight = stat.frameHeight;
+            this.inboundVideoStats.frameWidth = stat.frameWidth;
+            this.inboundVideoStats.frameHeightStart = (this.inboundVideoStats.frameHeightStart == null) ? stat.frameHeight : this.inboundVideoStats.frameHeightStart;
+            this.inboundVideoStats.frameWidthStart = (this.inboundVideoStats.frameWidthStart == null) ? stat.frameWidth : this.inboundVideoStats.frameWidthStart;
+        }
+    }
+
+    /** 
+     * Check if a value coming in from our stats is actually a number  
+     */
+    isNumber(value: any): boolean {
+        return typeof value === 'number' && isFinite(value);
     }
 }
 

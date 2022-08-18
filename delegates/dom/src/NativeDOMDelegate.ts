@@ -967,13 +967,27 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		let statsText = "";
 		let inboundData = this.formatBytes(stats.inboundVideoStats.bytesReceived, 2);
 
+		// format numbering based on the browser language
+		let numberFormat = new Intl.NumberFormat(window.navigator.language, {
+            maximumFractionDigits: 0
+        });
+
+		// ensure that we have a currentRoundTripTime coming in from stats and format it if it's a number
+		let netRTT = stats.candidatePair.hasOwnProperty('currentRoundTripTime') && stats.isNumber(stats.candidatePair.currentRoundTripTime) ? numberFormat.format(stats.candidatePair.currentRoundTripTime * 1000) : 'Can\'t calculate';
+
 		statsText += `<div>Duration: ${runTime}</div>`;
-		statsText += `<div>Inbound Video Data Received: ${inboundData}</div>`;
+		statsText += `<div>Received: ${inboundData}</div>`;
 		statsText += `<div>Packets Lost: ${stats.inboundVideoStats.packetsLost}</div>`;
 		statsText += `<div>Bitrate (kbps): ${stats.inboundVideoStats.bitrate}</div>`;
+		statsText += `<div>Video Resolution: ${
+            stats.inboundVideoStats.hasOwnProperty('frameWidth') && stats.inboundVideoStats.frameWidth && stats.inboundVideoStats.hasOwnProperty('frameHeight') && stats.inboundVideoStats.frameHeight ?
+                stats.inboundVideoStats.frameWidth + 'x' + stats.inboundVideoStats.frameHeight : 'Chrome only'
+            }</div>`;
+		statsText += `<div>Frames Decoded: ${stats.inboundVideoStats.hasOwnProperty('framesDecoded') ? numberFormat.format(stats.inboundVideoStats.framesDecoded) : 'Chrome only'}</div>`;
+		statsText += `<div>Packets Lost: ${stats.inboundVideoStats.hasOwnProperty('packetsLost') ? numberFormat.format(stats.inboundVideoStats.packetsLost) : 'Chrome only'}</div>`;
 		statsText += `<div>Framerate: ${stats.inboundVideoStats.framerate}</div>`;
 		statsText += `<div>Frames dropped: ${stats.inboundVideoStats.framesDropped}</div>`;
-		statsText += `<div>Net RTT (ms): ${stats.candidatePair.currentRoundTripTime}</div>`;
+		statsText += `<div>Net RTT (ms): ${netRTT}</div>`;
 		statsText += `<div>Browser receive to composite (ms): ${stats.inboundVideoStats.receiveToCompositeMs}</div>`;
 		statsText += `<div>Video Quantization Parameter: ${this.videoQpIndicator.videoEncoderAvgQP}</div>`;
 
