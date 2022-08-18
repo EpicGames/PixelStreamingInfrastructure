@@ -988,7 +988,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		statsText += `<div>Framerate: ${stats.inboundVideoStats.framerate}</div>`;
 		statsText += `<div>Frames dropped: ${stats.inboundVideoStats.framesDropped}</div>`;
 		statsText += `<div>Net RTT (ms): ${netRTT}</div>`;
-		statsText += `<div>Browser receive to composite (ms): ${stats.inboundVideoStats.receiveToCompositeMs}</div>`;
+		//statsText += `<div>Browser receive to composite (ms): ${stats.inboundVideoStats.receiveToCompositeMs}</div>`;
 		statsText += `<div>Video Quantization Parameter: ${this.videoQpIndicator.videoEncoderAvgQP}</div>`;
 
 		let statsDiv = document.getElementById("statisticsResult");
