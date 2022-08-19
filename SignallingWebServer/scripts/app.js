@@ -1148,7 +1148,7 @@ function showFreezeFrame() {
         }
         setTimeout(() => {
             webRtcPlayerObj.setVideoEnabled(false);
-        }, 50);
+        }, webRtcPlayerObj.freezeFrameDelay);
     };
 }
 
@@ -1685,7 +1685,7 @@ function invalidateFreezeFrameOverlay() {
         freezeFrameOverlay.style.display = 'none';
         freezeFrame.valid = false;
         freezeFrameOverlay.classList.remove("freezeframeBackground");
-    }, 50);
+    }, webRtcPlayerObj.freezeFrameDelay);
     
     if (webRtcPlayerObj) {
         webRtcPlayerObj.setVideoEnabled(true);
