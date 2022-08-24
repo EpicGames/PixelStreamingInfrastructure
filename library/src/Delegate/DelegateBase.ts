@@ -36,6 +36,14 @@ export class DelegateBase implements IDelegate {
 	}
 
 	/**
+	 * Set the input control ownership 
+	 * @param inputControlOwnership does the user have input control ownership
+	 */
+	onInputControlOwnership(inputControlOwnership: boolean): void {
+		throw new Error("Method not implemented.");
+	}
+
+	/**
 	 * Shows the disconnect overlay 
 	 */
 	showDisconnectOverlay(updateText: string) {
@@ -230,7 +238,7 @@ export class DelegateBase implements IDelegate {
 	 * Event fired when the video is disconnected
 	 */
 	onDisconnect(eventString: string) {
-		
+
 		// if we have overridden the default disconnection messsage, assign the new value here
 		if (this.iWebRtcController.getDisconnectMessageOverride() != "" && this.iWebRtcController.getDisconnectMessageOverride() !== undefined && this.iWebRtcController.getDisconnectMessageOverride() != null) {
 			eventString = this.iWebRtcController.getDisconnectMessageOverride();

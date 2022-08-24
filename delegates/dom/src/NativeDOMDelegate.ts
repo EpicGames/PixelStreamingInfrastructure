@@ -382,6 +382,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	webRtcFpsText = document.getElementById("webrtc-fps-text") as HTMLInputElement;
 	webRtcMinBitrateText = document.getElementById("webrtc-min-bitrate-text") as HTMLInputElement;
 	webRtcMaxBitrateText = document.getElementById("webrtc-max-bitrate-text") as HTMLInputElement;
+	latencyTestButton = document.getElementById("btn-start-latency-test") as HTMLButtonElement;
 
 	// Statistics
 	sendStatsToServer = document.getElementById("send-stats-tgl") as HTMLInputElement;
@@ -637,7 +638,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			case libspsfrontend.InstanceState.READY:
 				if (instanceState.details == undefined || instanceState.details == null) {
 					instanceStateMessage = "Instance is Ready";
-					
+
 				} else {
 					instanceStateMessage = "Instance is Ready: " + instanceState.details;
 				}
@@ -882,7 +883,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 */
 	onVideoInitialised() {
 		// starting a latency check
-		document.getElementById("btn-start-latency-test").onclick = () => {
+		this.latencyTestButton.onclick = () => {
 			this.iWebRtcController.sendLatencyTest();
 		}
 
@@ -926,7 +927,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.onVideoEncoderAvgQP(0);
 
 		// starting a latency check
-		document.getElementById("btn-start-latency-test").onclick = () => { }
+		this.latencyTestButton.onclick = () => { }
 
 		// Set up stream tools header functionality
 		this.viewSettingsHeader.onclick = () => { }
@@ -943,10 +944,22 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	}
 
 	/**
-	 * `Takes the InitialSettings and wired to frontend
-	 * @param settings - Settings sent from the UE Instance`
+	 * Takes the InitialSettings and wired to frontend
+	 * @param settings - Settings sent from the UE Instance
 	 */
 	onInitialSettings(settings: libspsfrontend.InitialSettings): void {
+		if (settings.PixelStreaming) {
+			let allowConsoleCommands = settings.PixelStreaming.AllowPixelStreamingCommands;
+			if (allowConsoleCommands === false) {
+				libspsfrontend.Logger.Info(libspsfrontend.Logger.GetStackTrace(), "-AllowPixelStreamingCommands=false, sending arbitrary console commands from browser to UE is disabled.");
+			}
+			let disableLatencyTest = settings.PixelStreaming.DisableLatencyTest;
+			if (disableLatencyTest) {
+				this.latencyTestButton.disabled = true;
+				this.latencyTestButton.title = "Disabled by -PixelStreamingDisableLatencyTester=true";
+				libspsfrontend.Logger.Info(libspsfrontend.Logger.GetStackTrace(), "-PixelStreamingDisableLatencyTester=true, requesting latency report from the the browser to UE is disabled.");
+			}
+		}
 		if (settings.Encoder) {
 			this.encoderMinQpText.value = settings.Encoder.MinQP.toString();
 			this.encoderMaxQpText.value = settings.Encoder.MaxQP.toString();
@@ -969,8 +982,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		// format numbering based on the browser language
 		let numberFormat = new Intl.NumberFormat(window.navigator.language, {
-            maximumFractionDigits: 0
-        });
+			maximumFractionDigits: 0
+		});
 
 		// ensure that we have a currentRoundTripTime coming in from stats and format it if it's a number
 		let netRTT = stats.candidatePair.hasOwnProperty('currentRoundTripTime') && stats.isNumber(stats.candidatePair.currentRoundTripTime) ? numberFormat.format(stats.candidatePair.currentRoundTripTime * 1000) : 'Can\'t calculate';
@@ -979,10 +992,9 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		statsText += `<div>Received: ${inboundData}</div>`;
 		statsText += `<div>Packets Lost: ${stats.inboundVideoStats.packetsLost}</div>`;
 		statsText += `<div>Bitrate (kbps): ${stats.inboundVideoStats.bitrate}</div>`;
-		statsText += `<div>Video Resolution: ${
-            stats.inboundVideoStats.hasOwnProperty('frameWidth') && stats.inboundVideoStats.frameWidth && stats.inboundVideoStats.hasOwnProperty('frameHeight') && stats.inboundVideoStats.frameHeight ?
-                stats.inboundVideoStats.frameWidth + 'x' + stats.inboundVideoStats.frameHeight : 'Chrome only'
-            }</div>`;
+		statsText += `<div>Video Resolution: ${stats.inboundVideoStats.hasOwnProperty('frameWidth') && stats.inboundVideoStats.frameWidth && stats.inboundVideoStats.hasOwnProperty('frameHeight') && stats.inboundVideoStats.frameHeight ?
+			stats.inboundVideoStats.frameWidth + 'x' + stats.inboundVideoStats.frameHeight : 'Chrome only'
+			}</div>`;
 		statsText += `<div>Frames Decoded: ${stats.inboundVideoStats.hasOwnProperty('framesDecoded') ? numberFormat.format(stats.inboundVideoStats.framesDecoded) : 'Chrome only'}</div>`;
 		statsText += `<div>Packets Lost: ${stats.inboundVideoStats.hasOwnProperty('packetsLost') ? numberFormat.format(stats.inboundVideoStats.packetsLost) : 'Chrome only'}</div>`;
 		statsText += `<div>Framerate: ${stats.inboundVideoStats.framerate}</div>`;

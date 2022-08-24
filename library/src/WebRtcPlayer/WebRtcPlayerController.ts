@@ -17,15 +17,24 @@ import { Config } from "../Config/Config";
 import { Encoder, InitialSettings, WebRTC } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
 import { Logger } from "../Logger/Logger";
+import { FileLogic } from "../FileManager/FileLogic";
 import { InputController } from "../Inputs/InputController";
 import { MicController } from "../MicPlayer/MicController";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
+import { StreamMessageController, MessageDirection } from "../UeInstanceMessage/StreamMessageController";
+import { CommandController } from "../UeInstanceMessage/CommandController";
+import { ResponseController } from "../UeInstanceMessage/ResponseController";
 import * as MessageReceive from "../WebSockets/MessageReceive";
+import { IInitialSettings } from "../DataChannel/IInitialSettings";
+import { ILatencyTestResults } from "../DataChannel/ILatencyTestResults";
 /**
  * Entry point for the Web RTC Player
  */
 export class webRtcPlayerController implements IWebRtcPlayerController {
 	config: Config;
+	streamMessageController: StreamMessageController;
+	commandController: CommandController;
+	responseController: ResponseController;
 	sdpConstraints: RTCOfferOptions;
 	webSocketController: WebSocketController;
 	dataChannelController: DataChannelController;
@@ -48,6 +57,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	resizeTimeout: ReturnType<typeof setTimeout>;
 	latencyStartTime: number;
 	delegate: IDelegate;
+	fileLogic: FileLogic;
 
 	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
 	// it will use this property to store the override message string
@@ -65,6 +75,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	constructor(config: Config, delegate: IDelegate) {
 		this.config = config;
 		this.delegate = delegate;
+		this.streamMessageController = new StreamMessageController();
+		this.commandController = new CommandController();
+		this.responseController = new ResponseController();
+		this.fileLogic = new FileLogic();
 
 		this.sdpConstraints = {
 			offerToReceiveAudio: true,
@@ -86,10 +100,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.dataChannelController = new DataChannelController();
 		this.dataChannelController.handleOnOpen = () => this.handleDataChannelConnected();
-		this.dataChannelController.onLatencyTestResult = (latencyTestResults: LatencyTestResults) => this.handleLatencyTestResult(latencyTestResults);
-		this.dataChannelController.onVideoEncoderAvgQP = (AvgQP: number) => this.handleVideoEncoderAvgQP(AvgQP);
-		this.dataChannelController.OnInitialSettings = (InitialSettings: InitialSettings) => this.handleInitialSettings(InitialSettings);
-		this.dataChannelController.onQualityControlOwnership = (hasQualityOwnership: boolean) => this.handleQualityControlOwnership(hasQualityOwnership);
 		this.dataChannelController.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
 
 		// set up websocket methods
@@ -101,12 +111,130 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		// set up the final webRtc player controller methods from within our delegate so a connection can be activated
 		this.delegate.setIWebRtcPlayerController(this);
+		this.registerMessageHandlers();
 
 		// now that the delegate has finished instantiating connect the rest of the afk methods to the afk logic class
 		this.afkLogic.showAfkOverlay = () => this.delegate.showAfkOverlay(this.afkLogic.countDown);
 		this.afkLogic.updateAfkCountdown = () => this.delegate.updateAfkOverlay(this.afkLogic.countDown);
 		this.afkLogic.hideCurrentOverlay = () => this.delegate.hideCurrentOverlay();
 		this.webSocketController.stopAfkWarningTimer = () => this.afkLogic.stopAfkWarningTimer();
+	}
+
+	/**
+	 * Register message all handlers 
+	 */
+	registerMessageHandlers() {
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "QualityControlOwnership", this.onQualityControlOwnership);
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Response", this.responseController.onResponse);
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Command", this.commandController.onCommand);
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "FreezeFrame", this.onFreezeFrameMessage);
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "UnfreezeFrame", this.invalidateFreezeFrameAndEnableVideo);
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "VideoEncoderAvgQP", this.handleVideoEncoderAvgQP);
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "LatencyTest", this.handleLatencyTestResult);
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "InitialSettings", this.handleInitialSettings);
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "FileExtension", this.onFileExtension);
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "FileMimeType", this.onFileMimeType);
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "FileContents", this.onFileContents);
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "TestEcho", () => {/* Do nothing */ });
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "InputControlOwnership", this.onInputControlOwnership);
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Protocol", this.onProtocolMessage);
+
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "IFrameRequest", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "RequestQualityControl", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "FpsRequest", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "AverageBitrateRequest", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "StartStreaming", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "StopStreaming", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "LatencyTest", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "RequestInitialSettings", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TestEcho", () => { /* Do nothing */ });
+		// this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "UIInteraction", emitUIInteraction);
+		// this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "Command", emitCommand);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyDown", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyUp", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyPress", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseEnter", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseLeave", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseDown", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseUp", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseMove", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseWheel", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchStart", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchEnd", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchMove", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonPressed", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonReleased", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadAnalog", this.streamMessageController.sendMessageToStreamer);
+	}
+
+	onProtocolMessage(message: Uint8Array) {
+		try {
+			let protocolString = new TextDecoder("utf-16").decode(message.slice(1));
+			let protocolJSON = JSON.parse(protocolString);
+			if (!protocolJSON.hasOwnProperty("Direction")) {
+				throw new Error('Malformed protocol received. Ensure the protocol message contains a direction');
+			}
+			let direction = protocolJSON.Direction;
+			delete protocolJSON.Direction;
+			console.log(`Received new ${direction == MessageDirection.FromStreamer ? "FromStreamer" : "ToStreamer"} protocol. Updating existing protocol...`);
+			Object.keys(protocolJSON).forEach((messageType) => {
+				let message = protocolJSON[messageType];
+				switch (direction) {
+					case MessageDirection.ToStreamer:
+						// Check that the message contains all the relevant params
+						if (!message.hasOwnProperty("id") || !message.hasOwnProperty("byteLength")) {
+							console.error(`ToStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id and a byteLength\n
+										   Definition was: ${JSON.stringify(message, null, 2)}`);
+							// return in a forEach is equivalent to a continue in a normal for loop
+							return;
+						}
+						if (message.byteLength > 0 && !message.hasOwnProperty("structure")) {
+							// If we specify a bytelength, will must have a corresponding structure
+							console.error(`ToStreamer->${messageType} protocol definition was malformed as it specified a byteLength but no accompanying structure`);
+							// return in a forEach is equivalent to a continue in a normal for loop
+							return;
+						}
+
+						if (this.streamMessageController.toStreamerHandlers[messageType]) {
+							// If we've registered a handler for this message type we can add it to our supported messages. ie registerMessageHandler(...)
+							this.streamMessageController.toStreamerMessages.add(messageType, message);
+						} else {
+							console.error(`There was no registered handler for "${messageType}" - try adding one using registerMessageHandler(MessageDirection.ToStreamer, "${messageType}", myHandler)`);
+						}
+						break;
+					case MessageDirection.FromStreamer:
+						// Check that the message contains all the relevant params
+						if (!message.hasOwnProperty("id")) {
+							console.error(`FromStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id\n
+							Definition was: ${JSON.stringify(message, null, 2)}`);
+							// return in a forEach is equivalent to a continue in a normal for loop
+							return;
+						}
+						if (this.streamMessageController.fromStreamerHandlers[messageType]) {
+							// If we've registered a handler for this message type. ie registerMessageHandler(...)
+							this.streamMessageController.fromStreamerMessages.add(messageType, message.id);
+						} else {
+							console.error(`There was no registered handler for "${message}" - try adding one using registerMessageHandler(MessageDirection.FromStreamer, "${messageType}", myHandler)`);
+						}
+						break;
+					default:
+						throw new Error(`Unknown direction: ${direction}`);
+				}
+			});
+
+			// Once the protocol has been received, we can send our control messages
+			requestInitialSettings();
+			requestQualityControl();
+		} catch (e) {
+			console.log(e);
+		}
+	}
+
+	onInputControlOwnership(message: Uint8Array) {
+		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.InputControlOwnership", 6);
+		let inputControlOwnership = new Boolean(message[1]).valueOf();
+		Logger.Log(Logger.GetStackTrace(), `Received input controller message - will your input control the stream: ${inputControlOwnership}`);
+		this.delegate.onInputControlOwnership(inputControlOwnership);
 	}
 
 	/**
@@ -181,13 +309,53 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
+	 * Process the freeze frame and load it
+	 * @param message The freeze frame data in bytes 
+	 */
+	onFreezeFrameMessage(message: Uint8Array) {
+		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.FreezeFrame", 6);
+		let view = new Uint8Array(message);
+		this.freezeFrameController.processFreezeFrameMessage(view, () => this.loadFreezeFrameOrShowPlayOverlay());
+	}
+
+	/**
 	 * Enable the video after hiding a freeze frame
 	 */
-	InvalidateFreezeFrameAndEnableVideo() {
+	invalidateFreezeFrameAndEnableVideo() {
+		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.FreezeFrame", 6);
+		//this.isReceivingFreezeFrame = false;
+
 		this.freezeFrameController.hideFreezeFrame();
 		if (this.videoPlayer.videoElement) {
 			this.videoPlayer.setVideoEnabled(true);
 		}
+	}
+
+	/**
+	 * Prep datachannel data for processing file extension
+	 * @param data the file extension data  
+	 */
+	onFileExtension(data: any) {
+		let view = new Uint8Array(data);
+		this.fileLogic.processFileExtension(view);
+	}
+
+	/**
+	 * Prep datachannel data for processing the file mime type
+	 * @param data the file mime type data  
+	 */
+	onFileMimeType(data: any) {
+		let view = new Uint8Array(data);
+		this.fileLogic.processFileMimeType(view);
+	}
+
+	/**
+	 * Prep datachannel data for processing the file contents 
+	 * @param data the file contents data  
+	 */
+	onFileContents(data: any) {
+		let view = new Uint8Array(data);
+		this.fileLogic.processFileContents(view);
 	}
 
 	/**
@@ -438,9 +606,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.resizePlayerStyle();
 
-		this.dataChannelController.processFreezeFrameMessage = (view) => this.freezeFrameController.processFreezeFrameMessage(view, () => this.loadFreezeFrameOrShowPlayOverlay());
-		this.dataChannelController.onUnFreezeFrame = () => this.InvalidateFreezeFrameAndEnableVideo();
-
 		setInterval(() => this.getStats(), 1000);
 
 		// either autoplay the video or set up the play overlay
@@ -624,44 +789,64 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 	/**
 	 * Handles when a Latency Test Result are received from the UE Instance
-	 * @param latencyTimings - Latency Test Timings
+	 * @param message - Latency Test Timings
 	 */
-	handleLatencyTestResult(latencyTimings: LatencyTestResults) {
-		latencyTimings.testStartTimeMs = this.latencyStartTime;
-		latencyTimings.browserReceiptTimeMs = Date.now();
+	handleLatencyTestResult(message: Uint8Array) {
+		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.latencyTest", 6);
+		let latencyAsString = new TextDecoder("utf-16").decode(message.slice(1));
+		let iLatencyTestResults: ILatencyTestResults = JSON.parse(latencyAsString);
+		let latencyTestResults: LatencyTestResults = new LatencyTestResults();
+		Object.assign(latencyTestResults, iLatencyTestResults);
+		latencyTestResults.processFields();
 
-		latencyTimings.latencyExcludingDecode = ~~(latencyTimings.browserReceiptTimeMs - latencyTimings.testStartTimeMs);
-		latencyTimings.testDuration = ~~(latencyTimings.TransmissionTimeMs - latencyTimings.ReceiptTimeMs);
-		latencyTimings.networkLatency = ~~(latencyTimings.latencyExcludingDecode - latencyTimings.testDuration);
+		latencyTestResults.testStartTimeMs = this.latencyStartTime;
+		latencyTestResults.browserReceiptTimeMs = Date.now();
 
-		if (latencyTimings.frameDisplayDeltaTimeMs && latencyTimings.browserReceiptTimeMs) {
-			latencyTimings.endToEndLatency = ~~(latencyTimings.frameDisplayDeltaTimeMs + latencyTimings.networkLatency, + latencyTimings.CaptureToSendMs);
+		latencyTestResults.latencyExcludingDecode = ~~(latencyTestResults.browserReceiptTimeMs - latencyTestResults.testStartTimeMs);
+		latencyTestResults.testDuration = ~~(latencyTestResults.TransmissionTimeMs - latencyTestResults.ReceiptTimeMs);
+		latencyTestResults.networkLatency = ~~(latencyTestResults.latencyExcludingDecode - latencyTestResults.testDuration);
+
+		if (latencyTestResults.frameDisplayDeltaTimeMs && latencyTestResults.browserReceiptTimeMs) {
+			latencyTestResults.endToEndLatency = ~~(latencyTestResults.frameDisplayDeltaTimeMs + latencyTestResults.networkLatency, + latencyTestResults.CaptureToSendMs);
 		}
-		this.delegate.onLatencyTestResult(latencyTimings);
+		this.delegate.onLatencyTestResult(latencyTestResults);
 	}
 
 	/**
 	 * Handles when the Encoder and Web RTC Settings are received from the UE Instance
-	 * @param settings - Initial Encoder and Web RTC Settings
+	 * @param message - Initial Encoder and Web RTC Settings
 	 */
-	handleInitialSettings(settings: InitialSettings) {
-		this.delegate.onInitialSettings(settings);
+	handleInitialSettings(message: Uint8Array) {
+		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.InitialSettings", 6);
+		let payloadAsString = new TextDecoder("utf-16").decode(message.slice(1));
+		let iInitialSettings: IInitialSettings = JSON.parse(payloadAsString);
+		let initialSettings: InitialSettings = new InitialSettings();
+		Object.assign(initialSettings, iInitialSettings);
+		initialSettings.ueCompatible()
+		Logger.Log(Logger.GetStackTrace(), payloadAsString, 6);
+
+		this.delegate.onInitialSettings(initialSettings);
 	}
 
 	/**
 	 * Handles when the Quantization Parameter are received from the UE Instance
-	 * @param AvgQP - Encoders Quantization Parameter
+	 * @param message - Encoders Quantization Parameter
 	 */
-	handleVideoEncoderAvgQP(AvgQP: number) {
+	handleVideoEncoderAvgQP(message: Uint8Array) {
+		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.VideoEncoderAvgQP", 6);
+		let AvgQP = Number(new TextDecoder("utf-16").decode(message.slice(1)));
 		this.delegate.onVideoEncoderAvgQP(AvgQP);
 	}
 
 	/**
 	 * Flag set if the user has Quality Ownership
-	 * @param hasQualityOwnership - Does the current client have Quality Ownership
+	 * @param message - Does the current client have Quality Ownership
 	 */
-	handleQualityControlOwnership(hasQualityOwnership: boolean) {
-		this.delegate.onQualityControlOwnership(hasQualityOwnership);
+	onQualityControlOwnership(message: Uint8Array) {
+		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.QualityControlOwnership", 6);
+		let QualityOwnership = new Boolean(message[1]).valueOf();
+		Logger.Log(Logger.GetStackTrace(), `Received quality controller message, will control quality: ${QualityOwnership}`);
+		this.delegate.onQualityControlOwnership(QualityOwnership);
 	}
 
 	/**

@@ -24,6 +24,12 @@ export interface IDelegate {
 	showActionOrErrorOnDisconnect: boolean;
 
 	/**
+	 * Set the input control ownership 
+	 * @param inputControlOwnership does the user have input control ownership
+	 */
+	onInputControlOwnership(inputControlOwnership: boolean): void;
+
+	/**
 	 * Shows the disconnect overlay 
 	 */
 	showDisconnectOverlay(updateText: string): void;
@@ -169,7 +175,7 @@ export interface IDelegate {
 	/**
 	 * Event fired when the video is disconnected
 	 */
-	onDisconnect(eventString: string, showActionOrErrorOnDisconnect?:boolean): void;
+	onDisconnect(eventString: string, showActionOrErrorOnDisconnect?: boolean): void;
 
 	/**
 	 * Handles when Web Rtc is connecting 
