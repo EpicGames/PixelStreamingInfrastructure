@@ -1,6 +1,14 @@
+//export interface TwoWayMapForward { [key: string]: { [key: string]: null | undefined | number | Array<null | undefined | string> } }
+
+import { Logger } from "../Logger/Logger";
+
+//export interface TwoWayMapReverse { [key: { [key: string]: null | undefined | number | Array<null | undefined | string> }]: string }
+
+//export interface StreamHandlerType { [key: string]: (messageType: any, messageData?: any[] | undefined) => void; }
+
 export class StreamMessageController {
-    toStreamerHandlers = new Map();
-    fromStreamerHandlers = new Map();
+    toStreamerHandlers: Map<string, (messageType: any, messageData?: any[] | undefined) => void>;
+    fromStreamerHandlers: Map<string, (messageType: any, messageData?: any[] | undefined) => void>;
 
     toStreamerMessages: TwoWayMap;
     fromStreamerMessages: TwoWayMap;
@@ -8,7 +16,6 @@ export class StreamMessageController {
     constructor() {
         this.toStreamerMessages = new TwoWayMap();
         this.fromStreamerMessages = new TwoWayMap();
-
     }
 
     populateDefaultProtocol() {
@@ -186,13 +193,13 @@ export class StreamMessageController {
     registerMessageHandler(messageDirection: MessageDirection, messageType: string, messageHandler: (messageType: any, messageData?: any[] | undefined) => void) {
         switch (messageDirection) {
             case MessageDirection.ToStreamer:
-                this.toStreamerHandlers[messageType] = messageHandler;
+                this.toStreamerHandlers.set(messageType, messageHandler);
                 break;
             case MessageDirection.FromStreamer:
-                this.fromStreamerHandlers[messageType] = messageHandler;
+                this.fromStreamerHandlers.set(messageType, messageHandler);
                 break;
             default:
-                console.log(`Unknown message direction ${messageDirection}`);
+                Logger.Log(Logger.GetStackTrace(), `Unknown message direction ${messageDirection}`);
         }
     }
 
@@ -204,12 +211,11 @@ export class StreamMessageController {
 
         let messageFormat = this.toStreamerMessages.getFromKey(messageType);
         if (messageFormat === undefined) {
-            console.error(`Attempted to send a message to the streamer with message type: ${messageType}, but the frontend hasn't been configured to send such a message. Check you've added the message type in your cpp`);
+            Logger.Error(Logger.GetStackTrace(), `Attempted to send a message to the streamer with message type: ${messageType}, but the frontend hasn't been configured to send such a message. Check you've added the message type in your cpp`);
             return;
         }
-        // console.log(`Calculate size: ${new Blob(JSON.stringify(indata)).size}, Specified size: ${messageFormat.byteLength}`);
-        let data = new DataView(new ArrayBuffer(messageFormat.byteLength + 1));
 
+        let data = new DataView(new ArrayBuffer(messageFormat.byteLength + 1));
         data.setUint8(0, messageFormat.id);
         let byteOffset = 1;
 
@@ -248,7 +254,7 @@ export enum MessageDirection {
 
 export class TwoWayMap {
     map: Map<string, any>;
-    reverseMap: Map<string, any>;
+    reverseMap: Map<any, string>;
 
     constructor(map?: Map<string, any>) {
         if (map === undefined) {
@@ -259,27 +265,27 @@ export class TwoWayMap {
 
         this.reverseMap = new Map();
         for (const key in map) {
-            const value = map[key];
-            this.reverseMap[value] = key;
+            const value = map.get(key);
+            this.reverseMap.set(value, key);
         }
     }
 
     getFromKey(key: string) {
-        return this.map[key];
+        return this.map.get(key);
     }
 
     getFromValue(value: any) {
-        return this.reverseMap[value];
+        return this.reverseMap.get(value);
     }
 
     add(key: string, value: any) {
-        this.map[key] = value;
-        this.reverseMap[value] = key;
+        this.map.set(key, value);
+        this.reverseMap.set(value, key);
     }
 
     remove(key: string, value: any) {
-        delete this.map[key];
-        delete this.reverseMap[value];
+        this.map.delete(key);
+        this.reverseMap.delete(value);
     }
 
 }

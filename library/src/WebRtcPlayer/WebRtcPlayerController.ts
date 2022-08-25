@@ -195,7 +195,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 							return;
 						}
 
-						if (this.streamMessageController.toStreamerHandlers[messageType]) {
+						if (this.streamMessageController.toStreamerHandlers.get(messageType)) {
 							// If we've registered a handler for this message type we can add it to our supported messages. ie registerMessageHandler(...)
 							this.streamMessageController.toStreamerMessages.add(messageType, message);
 						} else {
@@ -210,7 +210,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 							// return in a forEach is equivalent to a continue in a normal for loop
 							return;
 						}
-						if (this.streamMessageController.fromStreamerHandlers[messageType]) {
+						if (this.streamMessageController.fromStreamerHandlers.get(messageType)) {
 							// If we've registered a handler for this message type. ie registerMessageHandler(...)
 							this.streamMessageController.fromStreamerMessages.add(messageType, message.id);
 						} else {
@@ -223,8 +223,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			});
 
 			// Once the protocol has been received, we can send our control messages
-			requestInitialSettings();
-			requestQualityControl();
+			this.ueControlMessage.SendRequestInitialSettings();
+			this.ueControlMessage.SendRequestQualityControl();
 		} catch (e) {
 			console.log(e);
 		}
@@ -419,10 +419,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		} else {
 			this.delegate.showPlayOverlay();
 		}
-
-		// send and request initial stats
-		this.ueControlMessage.SendRequestInitialSettings();
-		this.ueControlMessage.SendRequestQualityControl();
 	}
 
 	/**

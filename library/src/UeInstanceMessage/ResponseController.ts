@@ -2,7 +2,7 @@ import { Logger } from "../Logger/Logger";
 
 export class ResponseController {
 
-    responseEventListeners: Map<string, (response: string) => {}> = new Map();
+    responseEventListeners: Map<string, (response: string) => void> = new Map();
 
     constructor() { }
 
@@ -30,9 +30,10 @@ export class ResponseController {
     onResponse(message: Uint16Array) {
         Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.Response", 6);
         let responses = new TextDecoder("utf-16").decode(message.slice(1));
+
         Logger.Log(Logger.GetStackTrace(), responses, 6);
-        for (let listener of this.responseEventListeners.values()) {
+        this.responseEventListeners.forEach((listener: (response: string) => void, key: string) => {
             listener(responses);
-        }
+        });
     }
 }
