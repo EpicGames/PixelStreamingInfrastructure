@@ -75,7 +75,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	constructor(config: Config, delegate: IDelegate) {
 		this.config = config;
 		this.delegate = delegate;
-		this.streamMessageController = new StreamMessageController();
 		this.commandController = new CommandController();
 		this.responseController = new ResponseController();
 		this.fileLogic = new FileLogic();
@@ -102,6 +101,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.dataChannelController.handleOnOpen = () => this.handleDataChannelConnected();
 		this.dataChannelController.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
 
+		this.streamMessageController = new StreamMessageController(this.dataChannelController);
+
 		// set up websocket methods
 		this.webSocketController = new WebSocketController(this.config.signallingServerAddress);
 		this.webSocketController.onConfig = (messageConfig: MessageReceive.MessageConfig) => this.handleOnConfigMessage(messageConfig);
@@ -112,6 +113,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// set up the final webRtc player controller methods from within our delegate so a connection can be activated
 		this.delegate.setIWebRtcPlayerController(this);
 		this.registerMessageHandlers();
+		this.streamMessageController.populateDefaultProtocol();
 
 		// now that the delegate has finished instantiating connect the rest of the afk methods to the afk logic class
 		this.afkLogic.showAfkOverlay = () => this.delegate.showAfkOverlay(this.afkLogic.countDown);
@@ -124,6 +126,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Register message all handlers 
 	 */
 	registerMessageHandlers() {
+		// From Streamer
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "QualityControlOwnership", this.onQualityControlOwnership);
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Response", this.responseController.onResponse);
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Command", this.commandController.onCommand);
@@ -139,6 +142,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "InputControlOwnership", this.onInputControlOwnership);
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Protocol", this.onProtocolMessage);
 
+		// To Streamer 
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "IFrameRequest", this.streamMessageController.sendMessageToStreamer);
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "RequestQualityControl", this.streamMessageController.sendMessageToStreamer);
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "FpsRequest", this.streamMessageController.sendMessageToStreamer);
@@ -148,8 +152,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "LatencyTest", this.streamMessageController.sendMessageToStreamer);
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "RequestInitialSettings", this.streamMessageController.sendMessageToStreamer);
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TestEcho", () => { /* Do nothing */ });
-		// this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "UIInteraction", emitUIInteraction);
-		// this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "Command", emitCommand);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "UIInteraction", this.streamMessageController.emitUIInteraction); // 50
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "Command", this.streamMessageController.emitCommand); // 51
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyDown", this.streamMessageController.sendMessageToStreamer);
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyUp", this.streamMessageController.sendMessageToStreamer);
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyPress", this.streamMessageController.sendMessageToStreamer);
@@ -172,25 +176,25 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			let protocolString = new TextDecoder("utf-16").decode(message.slice(1));
 			let protocolJSON = JSON.parse(protocolString);
 			if (!protocolJSON.hasOwnProperty("Direction")) {
-				throw new Error('Malformed protocol received. Ensure the protocol message contains a direction');
+				Logger.Error(Logger.GetStackTrace(), 'Malformed protocol received. Ensure the protocol message contains a direction');
 			}
 			let direction = protocolJSON.Direction;
 			delete protocolJSON.Direction;
-			console.log(`Received new ${direction == MessageDirection.FromStreamer ? "FromStreamer" : "ToStreamer"} protocol. Updating existing protocol...`);
+			Logger.Log(Logger.GetStackTrace(), `Received new ${direction == MessageDirection.FromStreamer ? "FromStreamer" : "ToStreamer"} protocol. Updating existing protocol...`);
 			Object.keys(protocolJSON).forEach((messageType) => {
 				let message = protocolJSON[messageType];
 				switch (direction) {
 					case MessageDirection.ToStreamer:
 						// Check that the message contains all the relevant params
 						if (!message.hasOwnProperty("id") || !message.hasOwnProperty("byteLength")) {
-							console.error(`ToStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id and a byteLength\n
+							Logger.Error(Logger.GetStackTrace(), `ToStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id and a byteLength\n
 										   Definition was: ${JSON.stringify(message, null, 2)}`);
 							// return in a forEach is equivalent to a continue in a normal for loop
 							return;
 						}
 						if (message.byteLength > 0 && !message.hasOwnProperty("structure")) {
 							// If we specify a bytelength, will must have a corresponding structure
-							console.error(`ToStreamer->${messageType} protocol definition was malformed as it specified a byteLength but no accompanying structure`);
+							Logger.Error(Logger.GetStackTrace(), `ToStreamer->${messageType} protocol definition was malformed as it specified a byteLength but no accompanying structure`);
 							// return in a forEach is equivalent to a continue in a normal for loop
 							return;
 						}
@@ -199,13 +203,13 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 							// If we've registered a handler for this message type we can add it to our supported messages. ie registerMessageHandler(...)
 							this.streamMessageController.toStreamerMessages.add(messageType, message);
 						} else {
-							console.error(`There was no registered handler for "${messageType}" - try adding one using registerMessageHandler(MessageDirection.ToStreamer, "${messageType}", myHandler)`);
+							Logger.Error(Logger.GetStackTrace(), `There was no registered handler for "${messageType}" - try adding one using registerMessageHandler(MessageDirection.ToStreamer, "${messageType}", myHandler)`);
 						}
 						break;
 					case MessageDirection.FromStreamer:
 						// Check that the message contains all the relevant params
 						if (!message.hasOwnProperty("id")) {
-							console.error(`FromStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id\n
+							Logger.Error(Logger.GetStackTrace(), `FromStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id\n
 							Definition was: ${JSON.stringify(message, null, 2)}`);
 							// return in a forEach is equivalent to a continue in a normal for loop
 							return;
@@ -214,11 +218,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 							// If we've registered a handler for this message type. ie registerMessageHandler(...)
 							this.streamMessageController.fromStreamerMessages.add(messageType, message.id);
 						} else {
-							console.error(`There was no registered handler for "${message}" - try adding one using registerMessageHandler(MessageDirection.FromStreamer, "${messageType}", myHandler)`);
+							Logger.Error(Logger.GetStackTrace(), `There was no registered handler for "${message}" - try adding one using registerMessageHandler(MessageDirection.FromStreamer, "${messageType}", myHandler)`);
 						}
 						break;
 					default:
-						throw new Error(`Unknown direction: ${direction}`);
+						Logger.Error(Logger.GetStackTrace(), `Unknown direction: ${direction}`);
 				}
 			});
 
@@ -226,7 +230,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.ueControlMessage.SendRequestInitialSettings();
 			this.ueControlMessage.SendRequestQualityControl();
 		} catch (e) {
-			console.log(e);
+			Logger.Log(Logger.GetStackTrace(), e);
 		}
 	}
 

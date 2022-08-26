@@ -2,6 +2,10 @@ import { DataChannelController } from "../DataChannel/DataChannelController";
 import { UeDescriptor } from "./UeDescriptor";
 import { UeMessageType } from "./UeMessageTypes";
 
+export enum UiConsoleCommands {
+
+}
+
 /**
  * Handles the Sending of a UI Descriptor to the UE Instance
  */
@@ -143,22 +147,22 @@ export class UeDescriptorUi extends UeDescriptor {
     }
 
     /**
-     * Sends a descriptor string to the UE Interaction Instance
-     * @param descriptor - the String descriptor to send
-     */
-    sendUiInteraction(descriptor: string) {
-        this.sendDescriptor(UeMessageType.uiInteraction, descriptor);
-    }
-
-    /**
-     * Sends a console descriptor
-     * @param descriptor - The string descriptor to send
-     */
+    * Sends a console descriptor
+    * @param descriptor - The string descriptor to send
+    */
     sendUiConsoleInteraction(descriptor: string) {
         let payload = {
             Console: descriptor
         }
         this.sendUiInteraction(JSON.stringify(payload));
+    }
+
+    /**
+     * Sends a descriptor string to the UE Interaction Instance
+     * @param descriptor - the String descriptor to send
+     */
+    sendUiInteraction(descriptor: string) {
+        this.sendDescriptor(UeMessageType.uiInteraction, descriptor);
     }
 }
 
