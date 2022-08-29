@@ -204,11 +204,17 @@ export class StreamMessageController extends UeDataMessage {
     }
 
     emitUIInteraction(descriptor: string) {
-        this.sendDescriptor("UIInteraction", descriptor);
+        let payload = {
+            Console: descriptor
+        }
+        this.sendDescriptor("UIInteraction", JSON.stringify(payload));
     }
 
     emitCommand(descriptor: string) {
-        this.sendDescriptor("Command", descriptor);
+        let payload = {
+            Console: descriptor
+        }
+        this.sendDescriptor("Command", JSON.stringify(payload));
     }
 
     sendMessageToStreamer(messageType: string, messageData?: Array<any>) {
