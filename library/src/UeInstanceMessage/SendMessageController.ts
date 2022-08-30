@@ -12,6 +12,55 @@ export class SendMessageController extends UeDataMessage {
         this.toStreamerMessagesMapProvider = toStreamerMessagesMapProvider;
     }
 
+    /**
+     * Send IFrame Request to the UE Instance
+     */
+    SendIFrameRequest() {
+        this.sendMessageToStreamer("IFrameRequest");
+    }
+
+    /**
+     * Send Request to Take Quality Control to the UE Instance
+     */
+    SendRequestQualityControl() {
+        this.sendMessageToStreamer("RequestQualityControl");
+    }
+
+    /**
+     * Send Max FPS Request to the UE Instance
+     */
+    SendMaxFpsRequest() {
+        this.sendMessageToStreamer("FpsRequest");
+    }
+
+    /**
+     * Send Average Bitrate Request to the UE Instance
+     */
+    SendAverageBitrateRequest() {
+        this.sendMessageToStreamer("AverageBitrateRequest");
+    }
+
+    /**
+     * Send a Start Streaming Message to the UE Instance
+     */
+    SendStartStreaming() {
+        this.sendMessageToStreamer("StartStreaming");
+    }
+
+    /**
+     * Send a Stop Streaming Message to the UE Instance
+     */
+    SendStopStreaming() {
+        this.sendMessageToStreamer("StopStreaming");
+    }
+
+    /**
+     * Send a Request Initial Settings to the UE Instance
+     */
+    SendRequestInitialSettings() {
+        this.sendMessageToStreamer("RequestInitialSettings");
+    }
+
     sendMessageToStreamer(messageType: string, messageData?: Array<any>) {
         if (messageData === undefined) {
             messageData = [];
@@ -54,5 +103,4 @@ export class SendMessageController extends UeDataMessage {
         });
         this.sendData(data.buffer);
     }
-
 }
