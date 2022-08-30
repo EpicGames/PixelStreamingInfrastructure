@@ -1,21 +1,20 @@
-import { DataChannelController } from "../DataChannel/DataChannelController";
+import { TwoWayMap } from "./TwoWayMap";
+import { IStreamMessageController } from "./IStreamMessageController";
 import { Logger } from "../Logger/Logger";
-import { UeDataMessage } from "./UeDataMessage";
 
-export class StreamMessageController extends UeDataMessage {
+export class StreamMessageController implements IStreamMessageController {
     toStreamerHandlers: Map<string, (messageType: any, messageData?: any[] | undefined) => void>;
     fromStreamerHandlers: Map<string, (messageType: any, messageData?: any[] | undefined) => void>;
-
     toStreamerMessages: TwoWayMap;
     fromStreamerMessages: TwoWayMap;
 
-    /**
-    * @param datachannelController - Data Channel Controller
-    */
-    constructor(datachannelController: DataChannelController) {
-        super(datachannelController);
+    constructor() {
         this.toStreamerMessages = new TwoWayMap();
         this.fromStreamerMessages = new TwoWayMap();
+    }
+
+    getToStreamerMessageMap(): TwoWayMap {
+        return this.toStreamerMessages;
     }
 
     populateDefaultProtocol() {
@@ -202,133 +201,9 @@ export class StreamMessageController extends UeDataMessage {
                 Logger.Log(Logger.GetStackTrace(), `Unknown message direction ${messageDirection}`);
         }
     }
-
-    emitUIInteraction(descriptor: string) {
-        let payload = {
-            Console: descriptor
-        }
-        this.sendDescriptor("UIInteraction", JSON.stringify(payload));
-    }
-
-    emitCommand(descriptor: string) {
-        let payload = {
-            Console: descriptor
-        }
-        this.sendDescriptor("Command", JSON.stringify(payload));
-    }
-
-    sendMessageToStreamer(messageType: string, messageData?: Array<any>) {
-        if (messageData === undefined) {
-            messageData = [];
-        }
-
-        let messageFormat = this.toStreamerMessages.getFromKey(messageType);
-        if (messageFormat === undefined) {
-            Logger.Error(Logger.GetStackTrace(), `Attempted to send a message to the streamer with message type: ${messageType}, but the frontend hasn't been configured to send such a message. Check you've added the message type in your cpp`);
-            return;
-        }
-
-        let data = new DataView(new ArrayBuffer(messageFormat.byteLength + 1));
-        data.setUint8(0, messageFormat.id);
-        let byteOffset = 1;
-
-        messageData.forEach((element: any, idx: any) => {
-            let type = messageFormat.structure[idx];
-            switch (type) {
-                case "uint8":
-                    data.setUint8(byteOffset, element);
-                    byteOffset += 1;
-                    break;
-
-                case "uint16":
-                    data.setUint16(byteOffset, element, true);
-                    byteOffset += 2;
-                    break;
-
-                case "int16":
-                    data.setInt16(byteOffset, element, true);
-                    byteOffset += 2;
-                    break;
-
-                case "double":
-                    data.setFloat64(byteOffset, element, true);
-                    byteOffset += 8;
-                    break;
-            }
-        });
-        this.sendData(data.buffer);
-    }
-
-    /**
-     * Send a Descriptor to the UE Instances
-     * @param messageType - UE Message Type
-     * @param descriptor - Descriptor Message as JSON
-     */
-    sendDescriptor(messageType: string, descriptor: string) {
-        // Convert the descriptor object into a JSON string.
-        let descriptorAsString = JSON.stringify(descriptor);
-        let messageFormat = this.toStreamerMessages.getFromKey(messageType);
-        if (messageFormat === undefined) {
-            Logger.Error(Logger.GetStackTrace(), `Attempted to emit descriptor with message type: ${messageType}, but the frontend hasn't been configured to send such a message. Check you've added the message type in your cpp`);
-        }
-
-        Logger.Log(Logger.GetStackTrace(), "Sending: " + descriptor, 6);
-        // Add the UTF-16 JSON string to the array byte buffer, going two bytes at
-        // a time.
-        let data = new DataView(new ArrayBuffer(1 + 2 + 2 * descriptorAsString.length));
-        let byteIdx = 0;
-        data.setUint8(byteIdx, messageFormat.id);
-        byteIdx++;
-        data.setUint16(byteIdx, descriptorAsString.length, true);
-        byteIdx += 2;
-        for (let i = 0; i < descriptorAsString.length; i++) {
-            data.setUint16(byteIdx, descriptorAsString.charCodeAt(i), true);
-            byteIdx += 2;
-        }
-
-        this.sendData(data.buffer);
-    }
 }
 
 export enum MessageDirection {
     ToStreamer = 0,
     FromStreamer = 1
-}
-
-export class TwoWayMap {
-    map: Map<string, any>;
-    reverseMap: Map<any, string>;
-
-    constructor(map?: Map<string, any>) {
-        if (map === undefined) {
-            this.map = new Map();
-        } else {
-            this.map = map;
-        }
-
-        this.reverseMap = new Map();
-        for (const key in map) {
-            const value = map.get(key);
-            this.reverseMap.set(value, key);
-        }
-    }
-
-    getFromKey(key: string) {
-        return this.map.get(key);
-    }
-
-    getFromValue(value: any) {
-        return this.reverseMap.get(value);
-    }
-
-    add(key: string, value: any) {
-        this.map.set(key, value);
-        this.reverseMap.set(value, key);
-    }
-
-    remove(key: string, value: any) {
-        this.map.delete(key);
-        this.reverseMap.delete(value);
-    }
-
 }

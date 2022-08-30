@@ -27,12 +27,14 @@ import { ResponseController } from "../UeInstanceMessage/ResponseController";
 import * as MessageReceive from "../WebSockets/MessageReceive";
 import { IInitialSettings } from "../DataChannel/IInitialSettings";
 import { ILatencyTestResults } from "../DataChannel/ILatencyTestResults";
+import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
+import { SendDescriptorController } from "../UeInstanceMessage/SendDescriptorController";
+import { SendMessageController } from "../UeInstanceMessage/SendMessageController";
 /**
  * Entry point for the Web RTC Player
  */
 export class webRtcPlayerController implements IWebRtcPlayerController {
 	config: Config;
-	streamMessageController: StreamMessageController;
 	commandController: CommandController;
 	responseController: ResponseController;
 	sdpConstraints: RTCOfferOptions;
@@ -58,6 +60,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	latencyStartTime: number;
 	delegate: IDelegate;
 	fileLogic: FileLogic;
+	streamMessageController: IStreamMessageController;
+	sendDescriptorController: SendDescriptorController;
+	sendMessageController: SendMessageController;
 
 	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
 	// it will use this property to store the override message string
@@ -101,7 +106,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.dataChannelController.handleOnOpen = () => this.handleDataChannelConnected();
 		this.dataChannelController.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
 
-		this.streamMessageController = new StreamMessageController(this.dataChannelController);
+		this.streamMessageController = new StreamMessageController();
 
 		// set up websocket methods
 		this.webSocketController = new WebSocketController(this.config.signallingServerAddress);
@@ -114,6 +119,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.delegate.setIWebRtcPlayerController(this);
 		this.registerMessageHandlers();
 		this.streamMessageController.populateDefaultProtocol();
+		this.sendDescriptorController = new SendDescriptorController(this.dataChannelController, this.streamMessageController);
+		this.sendMessageController = new SendMessageController(this.dataChannelController, this.streamMessageController);
+
 
 		// now that the delegate has finished instantiating connect the rest of the afk methods to the afk logic class
 		this.afkLogic.showAfkOverlay = () => this.delegate.showAfkOverlay(this.afkLogic.countDown);
@@ -143,32 +151,32 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Protocol", this.onProtocolMessage);
 
 		// To Streamer 
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "IFrameRequest", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "RequestQualityControl", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "FpsRequest", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "AverageBitrateRequest", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "StartStreaming", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "StopStreaming", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "LatencyTest", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "RequestInitialSettings", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "IFrameRequest", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "RequestQualityControl", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "FpsRequest", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "AverageBitrateRequest", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "StartStreaming", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "StopStreaming", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "LatencyTest", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "RequestInitialSettings", this.sendMessageController.sendMessageToStreamer);
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TestEcho", () => { /* Do nothing */ });
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "UIInteraction", this.streamMessageController.emitUIInteraction); // 50
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "Command", this.streamMessageController.emitCommand); // 51
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyDown", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyUp", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyPress", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseEnter", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseLeave", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseDown", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseUp", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseMove", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseWheel", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchStart", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchEnd", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchMove", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonPressed", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonReleased", this.streamMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadAnalog", this.streamMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "UIInteraction", this.sendDescriptorController.emitUIInteraction); // 50
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "Command", this.sendDescriptorController.emitCommand); // 51
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyDown", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyUp", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyPress", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseEnter", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseLeave", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseDown", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseUp", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseMove", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseWheel", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchStart", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchEnd", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchMove", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonPressed", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonReleased", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadAnalog", this.sendMessageController.sendMessageToStreamer);
 	}
 
 	onProtocolMessage(message: Uint8Array) {
@@ -613,7 +621,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.resizePlayerStyle();
 
-		this.streamMessageController.emitCommand(`r.setres ${this.videoPlayer.videoElement.clientWidth} x ${this.videoPlayer.videoElement.clientHeight}`);
+		this.sendDescriptorController.emitCommand(`r.setres ${this.videoPlayer.videoElement.clientWidth} x ${this.videoPlayer.videoElement.clientHeight}`);
 
 		this.delegate.onVideoInitialised();
 
@@ -643,7 +651,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			if (!this.config.playerElement) {
 				return;
 			}
-			this.streamMessageController.emitCommand(`r.setres ${this.videoPlayer.videoElement.clientWidth} x ${this.videoPlayer.videoElement.clientHeight}`);
+			this.sendDescriptorController.emitCommand(`r.setres ${this.videoPlayer.videoElement.clientWidth} x ${this.videoPlayer.videoElement.clientHeight}`);
 			this.lastTimeResized = new Date().getTime();
 		}
 		else {
@@ -701,25 +709,25 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		Logger.Log(Logger.GetStackTrace(), "----   Encoder Settings    ----\n" + JSON.stringify(encoder, undefined, 4) + "\n-------------------------------", 6);
 
 		if (encoder.RateControl != null && (encoder.RateControl == "CBR" || "VBR" || "ConstQP")) {
-			this.streamMessageController.emitCommand("PixelStreaming.Encoder.RateControl " + encoder.RateControl);
+			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.RateControl " + encoder.RateControl);
 		}
 		if (encoder.TargetBitrate != null) {
-			this.streamMessageController.emitCommand("PixelStreaming.Encoder.TargetBitrate " + (encoder.TargetBitrate > 0 ? encoder.TargetBitrate : -1));
+			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.TargetBitrate " + (encoder.TargetBitrate > 0 ? encoder.TargetBitrate : -1));
 		}
 		if (encoder.MaxBitrate != null) {
-			this.streamMessageController.emitCommand("PixelStreaming.Encoder.MaxBitrateVBR " + (encoder.MaxBitrate > 0 ? encoder.MaxBitrate : 1));
+			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.MaxBitrateVBR " + (encoder.MaxBitrate > 0 ? encoder.MaxBitrate : 1));
 		}
 		if (encoder.MinQP != null) {
-			this.streamMessageController.emitCommand("PixelStreaming.Encoder.MinQP " + encoder.MinQP);
+			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.MinQP " + encoder.MinQP);
 		}
 		if (encoder.MaxQP != null) {
-			this.streamMessageController.emitCommand("PixelStreaming.Encoder.MaxQP " + encoder.MaxQP);
+			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.MaxQP " + encoder.MaxQP);
 		}
 		if (encoder.FillerData != null) {
-			this.streamMessageController.emitCommand("PixelStreaming.Encoder.EnableFillerData " + Number(encoder.FillerData).valueOf());
+			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.EnableFillerData " + Number(encoder.FillerData).valueOf());
 		}
 		if (encoder.MultiPass != null && (encoder.MultiPass == "DISABLED" || "QUARTER" || "FULL")) {
-			this.streamMessageController.emitCommand("PixelStreaming.Encoder.Multipass " + encoder.MultiPass);
+			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.Multipass " + encoder.MultiPass);
 		}
 	}
 
@@ -731,25 +739,25 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		Logger.Log(Logger.GetStackTrace(), "----   WebRTC Settings    ----\n" + JSON.stringify(webRTC, undefined, 4) + "\n-------------------------------", 6);
 
 		if (webRTC.DegradationPref != null && (webRTC.DegradationPref == "BALANCED" || "MAINTAIN_FRAMERATE" || "MAINTAIN_RESOLUTION")) {
-			this.streamMessageController.emitCommand("PixelStreaming.WebRTC.DegradationPreference " + webRTC.DegradationPref);
+			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.DegradationPreference " + webRTC.DegradationPref);
 		}
 
 		if (webRTC.FPS != null) {
-			this.streamMessageController.emitCommand("PixelStreaming.WebRTC.Fps " + webRTC.FPS);
-			this.streamMessageController.emitCommand("PixelStreaming.WebRTC.MaxFps " + webRTC.FPS);
+			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.Fps " + webRTC.FPS);
+			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.MaxFps " + webRTC.FPS);
 		}
 
 		if (webRTC.MinBitrate != null) {
-			this.streamMessageController.emitCommand("PixelStreaming.WebRTC.MinBitrate " + webRTC.MinBitrate);
+			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.MinBitrate " + webRTC.MinBitrate);
 		}
 		if (webRTC.MaxBitrate != null) {
-			this.streamMessageController.emitCommand("PixelStreaming.WebRTC.MaxBitrate " + webRTC.MaxBitrate);
+			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.MaxBitrate " + webRTC.MaxBitrate);
 		}
 		if (webRTC.LowQP != null) {
-			this.streamMessageController.emitCommand("PixelStreaming.WebRTC.LowQpThreshold " + webRTC.LowQP);
+			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.LowQpThreshold " + webRTC.LowQP);
 		}
 		if (webRTC.HighQP != null) {
-			this.streamMessageController.emitCommand("PixelStreaming.WebRTC.HighQpThreshold " + webRTC.HighQP);
+			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.HighQpThreshold " + webRTC.HighQP);
 		}
 	}
 
@@ -768,7 +776,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	sendUeUiDescriptor(message: string): void {
 		Logger.Log(Logger.GetStackTrace(), "----   UE UI Interaction String   ----\n" + JSON.stringify(message, undefined, 4) + "\n---------------------------------------", 6);
-		this.streamMessageController.emitUIInteraction(message);
+		this.sendDescriptorController.emitUIInteraction(message);
 	}
 
 	/**
@@ -776,7 +784,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	sendShowFps(): void {
 		Logger.Log(Logger.GetStackTrace(), "----   Sending show stat to UE   ----", 6);
-		this.streamMessageController.emitCommand("stat fps");
+		this.sendDescriptorController.emitCommand("stat fps");
 	}
 
 	/**
