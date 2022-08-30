@@ -99,6 +99,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.uiController.setUpMouseAndFreezeFrame = (element: HTMLDivElement) => this.setUpMouseAndFreezeFrame(element);
 
 		this.dataChannelController = new DataChannelController();
+		this.dataChannelController.handleOnMessage = (ev: MessageEvent<any>) => this.handelOnMessage(ev);
 		this.dataChannelController.handleOnOpen = () => this.handleDataChannelConnected();
 		this.dataChannelController.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
 
@@ -124,6 +125,22 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.afkLogic.updateAfkCountdown = () => this.delegate.updateAfkOverlay(this.afkLogic.countDown);
 		this.afkLogic.hideCurrentOverlay = () => this.delegate.hideCurrentOverlay();
 		this.webSocketController.stopAfkWarningTimer = () => this.afkLogic.stopAfkWarningTimer();
+	}
+
+	/**
+	 * Handles when a message is received 
+	 * @param event - Message Event
+	 */
+	handelOnMessage(event: MessageEvent) {
+		let message = new Uint8Array(event.data);
+		Logger.Log(Logger.GetStackTrace(), "Message incoming:" + message, 6);
+
+		try {
+			let messageType = this.streamMessageController.fromStreamerMessages.getFromValue(message[0]);
+			this.streamMessageController.fromStreamerHandlers.get(messageType)(event.data);
+		} catch (e) {
+			Logger.Error(Logger.GetStackTrace(), `Custom data channel message with message type that is unknown to the Pixel Streaming protocol. Does your PixelStreamingProtocol need updating? The message type was: ${message[0]}`);
+		}
 	}
 
 	/**

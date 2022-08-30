@@ -58,72 +58,7 @@ export class DataChannelController {
      * @param event - Message Event
      */
     handleOnMessage(event: MessageEvent) {
-        let message = new Uint8Array(event.data);
-
-        Logger.Log(Logger.GetStackTrace(), "Message incoming", 6);
-        Logger.Log(Logger.GetStackTrace(), "Message:" + message, 6);
-
-        switch (message[0]) {
-            case DataChannelReceiveMessageType.QualityControlOwnership: {
-                // Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.QualityControlOwnership", 6);
-                // let QualityOwnership = new Boolean(message[1]).valueOf();
-                // this.onQualityControlOwnership(QualityOwnership);
-                break;
-            }
-            case DataChannelReceiveMessageType.Response: {
-                // Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.Response", 6);
-                // this.onResponse(message);
-                break;
-            }
-            case DataChannelReceiveMessageType.Command: {
-                // Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.Command", 6);
-                // this.onCommand(message);
-                break;
-            }
-            case DataChannelReceiveMessageType.FreezeFrame: {
-                // Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.FreezeFrame", 6);
-                // this.processFreezeFrameMessage(message);
-                break;
-            }
-            case DataChannelReceiveMessageType.UnfreezeFrame: {
-                // Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.FreezeFrame", 6);
-                // this.isReceivingFreezeFrame = false;
-                // this.onUnFreezeFrame();
-                break;
-            }
-            case DataChannelReceiveMessageType.VideoEncoderAvgQP: {
-                // Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.VideoEncoderAvgQP", 6);
-                // let AvgQP = Number(new TextDecoder("utf-16").decode(message.slice(1)));
-                // this.onVideoEncoderAvgQP(AvgQP);
-                break;
-            }
-            case DataChannelReceiveMessageType.latencyTest: {
-                // Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.latencyTest", 6);
-                // let latencyAsString = new TextDecoder("utf-16").decode(message.slice(1));
-                // let iLatencyTestResults: ILatencyTestResults = JSON.parse(latencyAsString);
-                // let latencyTestResults: LatencyTestResults = new LatencyTestResults();
-                // Object.assign(latencyTestResults, iLatencyTestResults);
-                // latencyTestResults.processFields();
-                // this.onLatencyTestResult(latencyTestResults);
-                break;
-            }
-            case DataChannelReceiveMessageType.InitialSettings: {
-                // Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.InitialSettings", 6);
-                // let payloadAsString = new TextDecoder("utf-16").decode(message.slice(1));
-                // let iInitialSettings: IInitialSettings = JSON.parse(payloadAsString);
-                // let initialSettings: InitialSettings = new InitialSettings();
-                // Object.assign(initialSettings, iInitialSettings);
-                // initialSettings.ueCompatible()
-                // Logger.Log(Logger.GetStackTrace(), payloadAsString, 6);
-                // this.OnInitialSettings(initialSettings);
-                break;
-            }
-            default: {
-                Logger.Log(Logger.GetStackTrace(), message[0].toString());
-                Logger.Error(Logger.GetStackTrace(), "unknown message sent on the Data channel");
-                break;
-            }
-        }
+        Logger.Log(Logger.GetStackTrace(), "Data Channel: " + this.label + " has received message.", 7);
     }
 
     /**
