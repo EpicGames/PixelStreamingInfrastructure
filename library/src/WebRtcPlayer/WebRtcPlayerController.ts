@@ -621,7 +621,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.resizePlayerStyle();
 
-		this.sendDescriptorController.emitCommand(`r.setres ${this.videoPlayer.videoElement.clientWidth} x ${this.videoPlayer.videoElement.clientHeight}`);
+		this.sendDescriptorController.sendUpdateVideoStreamSize(this.videoPlayer.videoElement.clientWidth, this.videoPlayer.videoElement.clientHeight);
 
 		this.delegate.onVideoInitialised();
 
@@ -651,7 +651,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			if (!this.config.playerElement) {
 				return;
 			}
-			this.sendDescriptorController.emitCommand(`r.setres ${this.videoPlayer.videoElement.clientWidth} x ${this.videoPlayer.videoElement.clientHeight}`);
+			this.sendDescriptorController.sendUpdateVideoStreamSize(this.videoPlayer.videoElement.clientWidth, this.videoPlayer.videoElement.clientHeight);
 			this.lastTimeResized = new Date().getTime();
 		}
 		else {
@@ -708,26 +708,26 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	sendEncoderSettings(encoder: Encoder) {
 		Logger.Log(Logger.GetStackTrace(), "----   Encoder Settings    ----\n" + JSON.stringify(encoder, undefined, 4) + "\n-------------------------------", 6);
 
-		if (encoder.RateControl != null && (encoder.RateControl == "CBR" || "VBR" || "ConstQP")) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.RateControl " + encoder.RateControl);
+		if (encoder.RateControl != null) {
+			this.sendDescriptorController.sendEncoderRateControl(encoder.RateControl);
 		}
 		if (encoder.TargetBitrate != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.TargetBitrate " + (encoder.TargetBitrate > 0 ? encoder.TargetBitrate : -1));
+			this.sendDescriptorController.sendEncoderTargetBitRate(encoder.TargetBitrate);
 		}
 		if (encoder.MaxBitrate != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.MaxBitrateVBR " + (encoder.MaxBitrate > 0 ? encoder.MaxBitrate : 1));
+			this.sendDescriptorController.sendEncoderMaxBitrateVbr(encoder.MaxBitrate);
 		}
 		if (encoder.MinQP != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.MinQP " + encoder.MinQP);
+			this.sendDescriptorController.sendEncoderMinQP(encoder.MinQP);
 		}
 		if (encoder.MaxQP != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.MaxQP " + encoder.MaxQP);
+			this.sendDescriptorController.sendEncoderMaxQP(encoder.MaxQP);
 		}
 		if (encoder.FillerData != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.EnableFillerData " + Number(encoder.FillerData).valueOf());
+			this.sendDescriptorController.sendEncoderEnableFillerData(encoder.FillerData);
 		}
-		if (encoder.MultiPass != null && (encoder.MultiPass == "DISABLED" || "QUARTER" || "FULL")) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.Multipass " + encoder.MultiPass);
+		if (encoder.MultiPass != null) {
+			this.sendDescriptorController.sendEncoderMultiPass(encoder.MultiPass);
 		}
 	}
 
@@ -738,26 +738,26 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	sendWebRtcSettings(webRTC: WebRTC) {
 		Logger.Log(Logger.GetStackTrace(), "----   WebRTC Settings    ----\n" + JSON.stringify(webRTC, undefined, 4) + "\n-------------------------------", 6);
 
-		if (webRTC.DegradationPref != null && (webRTC.DegradationPref == "BALANCED" || "MAINTAIN_FRAMERATE" || "MAINTAIN_RESOLUTION")) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.DegradationPreference " + webRTC.DegradationPref);
+		if (webRTC.DegradationPref != null) {
+			this.sendDescriptorController.sendWebRtcDegradationPreference(webRTC.DegradationPref)
 		}
 
 		if (webRTC.FPS != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.Fps " + webRTC.FPS);
-			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.MaxFps " + webRTC.FPS);
+			this.sendDescriptorController.sendWebRtcFps(webRTC.FPS);
+			this.sendDescriptorController.sendWebRtcMaxFps(webRTC.FPS);
 		}
 
 		if (webRTC.MinBitrate != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.MinBitrate " + webRTC.MinBitrate);
+			this.sendDescriptorController.sendWebRtcMinBitrate(webRTC.MinBitrate);
 		}
 		if (webRTC.MaxBitrate != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.MaxBitrate " + webRTC.MaxBitrate);
+			this.sendDescriptorController.sendWebRtcMaxBitrate(webRTC.MaxBitrate);
 		}
 		if (webRTC.LowQP != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.LowQpThreshold " + webRTC.LowQP);
+			this.sendDescriptorController.sendWebRtcLowQpThreshold(webRTC.LowQP);
 		}
 		if (webRTC.HighQP != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.HighQpThreshold " + webRTC.HighQP);
+			this.sendDescriptorController.sendWebRtcHighQpThreshold(webRTC.HighQP);
 		}
 	}
 
@@ -784,7 +784,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	sendShowFps(): void {
 		Logger.Log(Logger.GetStackTrace(), "----   Sending show stat to UE   ----", 6);
-		this.sendDescriptorController.emitCommand("stat fps");
+		this.sendDescriptorController.sendShowFps();
 	}
 
 	/**
