@@ -9,6 +9,8 @@ export class StreamMessageController implements IStreamMessageController {
     fromStreamerMessages: TwoWayMap;
 
     constructor() {
+        this.toStreamerHandlers = new Map();
+        this.fromStreamerHandlers = new Map();
         this.toStreamerMessages = new TwoWayMap();
         this.fromStreamerMessages = new TwoWayMap();
     }

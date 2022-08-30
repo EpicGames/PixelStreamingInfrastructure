@@ -113,12 +113,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => this.delegate.onDisconnect(`${event.code} - ${event.reason}`);
 
 		// set up the final webRtc player controller methods from within our delegate so a connection can be activated
+		this.sendDescriptorController = new SendDescriptorController(this.dataChannelController, this.streamMessageController);
+		this.sendMessageController = new SendMessageController(this.dataChannelController, this.streamMessageController);
 		this.delegate.setIWebRtcPlayerController(this);
 		this.registerMessageHandlers();
 		this.streamMessageController.populateDefaultProtocol();
-		this.sendDescriptorController = new SendDescriptorController(this.dataChannelController, this.streamMessageController);
-		this.sendMessageController = new SendMessageController(this.dataChannelController, this.streamMessageController);
-
 
 		// now that the delegate has finished instantiating connect the rest of the afk methods to the afk logic class
 		this.afkLogic.showAfkOverlay = () => this.delegate.showAfkOverlay(this.afkLogic.countDown);
