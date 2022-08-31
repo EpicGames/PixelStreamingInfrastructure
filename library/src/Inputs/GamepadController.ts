@@ -1,19 +1,22 @@
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { Logger } from "../Logger/Logger";
-import { UeInputGamePadMessage } from "../UeInstanceMessage/UeInputGamePadMessage"
+import { SendMessageController } from "../UeInstanceMessage/SendMessageController";
 
 /**
  * The class that handles the functionality of gamepads and controllers 
  */
 export class GamePadController {
-    ueInputGamePadMessage: UeInputGamePadMessage;
     controllers: Controller[];
+    requestAnimationFrame: any;
+    sendMessageController: SendMessageController;
 
     /**
      * @param dataChannelController - the data chanel controller  
      */
     constructor(dataChannelController: DataChannelController) {
-        this.ueInputGamePadMessage = new UeInputGamePadMessage(dataChannelController);
+        
+
+        this.requestAnimationFrame = window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.requestAnimationFrame;
         if ("GamepadEvent" in window) {
             window.addEventListener("gamepadconnected", (ev: GamepadEvent) => this.gamePadConnectHandler(ev));
             window.addEventListener("gamepaddisconnected", (ev: GamepadEvent) => this.gamePadDisconnectHandler(ev));
@@ -59,7 +62,7 @@ export class GamePadController {
      * Scan for connected gamepads 
      */
     scanGamePads() {
-        var gamepads = ((navigator.getGamepads) ? navigator.getGamepads() : []);//  : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+        var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
         for (var i = 0; i < gamepads.length; i++) {
             if (gamepads[i] && (gamepads[i].index in this.controllers)) {
                 this.controllers[gamepads[i].index].currentState = gamepads[i];
@@ -73,77 +76,89 @@ export class GamePadController {
     updateStatus() {
         this.scanGamePads();
         // Iterate over multiple controllers in the case the multiple gamepads are connected
-
         for (let controller of this.controllers) {
-            try {
-
-                let currentState = controller.currentState;
-
-                for (let i = 0; i < controller.currentState.buttons.length; i++) {
-                    let currentButton = controller.currentState.buttons[i];
-                    let previousButton = controller.prevState.buttons[i];
-
-                    // Button 6 is actually the left trigger, send it to UE as an analog axis
-                    // Button 7 is actually the right trigger, send it to UE as an analog axis
-                    // The rest are normal buttons. Treat as such
-                    if (currentButton.pressed && !previousButton.pressed) {
-                        // New press
-                        if (i == 6) {
-                            this.ueInputGamePadMessage.sendControllerAxisMove(currentState.index, 5, currentButton.value);
-                        } else if (i == 7) {
-                            this.ueInputGamePadMessage.sendControllerAxisMove(currentState.index, 6, currentButton.value);
-                        } else {
-                            this.ueInputGamePadMessage.sendControllerButtonPressed(currentState.index, i, false);
-                        }
-                    } else if (!currentButton.pressed && previousButton.pressed) {
-                        // release
-                        if (i == 6) {
-                            this.ueInputGamePadMessage.sendControllerAxisMove(currentState.index, 5, 0);
-                        } else if (i == 7) {
-                            this.ueInputGamePadMessage.sendControllerAxisMove(currentState.index, 6, 0);
-                        } else {
-                            this.ueInputGamePadMessage.sendControllerButtonReleased(currentState.index, i);
-                        }
-                    } else if (currentButton.pressed && previousButton.pressed) {
-                        // repeat press / hold
-                        if (i == 6) {
-                            this.ueInputGamePadMessage.sendControllerAxisMove(currentState.index, 5, currentButton.value);
-                        } else if (i == 7) {
-                            this.ueInputGamePadMessage.sendControllerAxisMove(currentState.index, 6, currentButton.value);
-                        } else {
-                            this.ueInputGamePadMessage.sendControllerButtonPressed(currentState.index, i, true);
-                        }
+            let controllerIndex = this.controllers.indexOf(controller);
+            let currentState = controller.currentState;
+            for (let i = 0; i < controller.currentState.buttons.length; i++) {
+                let currentButton = controller.currentState.buttons[i];
+                let previousButton = controller.prevState.buttons[i];
+                if (currentButton.pressed) {
+                    // press
+                    if (i == gamepadLayout.LeftTrigger) {
+                        //                       UEs left analog has a button index of 5
+                        toStreamerHandlers.GamepadAnalog("GamepadAnalog", [controllerIndex, 5, currentButton.value]);
+                    } else if (i == gamepadLayout.RightTrigger) {
+                        //                       UEs right analog has a button index of 6
+                        toStreamerHandlers.GamepadAnalog("GamepadAnalog", [controllerIndex, 6, currentButton.value]);
+                    } else {
+                        toStreamerHandlers.GamepadButtonPressed("GamepadButtonPressed", [controllerIndex, i, previousButton.pressed]);
                     }
-                    // Last case is button isn't currently pressed and wasn't pressed before. This doesn't need an else block
-                }
-
-                for (let i = 0; i < currentState.axes.length; i += 2) {
-                    let x = parseFloat(currentState.axes[i].toFixed(4));
-                    // https://w3c.github.io/gamepad/#remapping Gamepad browser side standard mapping has positive down, negative up. This is downright disgusting. So we fix it.
-                    let y = -parseFloat(currentState.axes[i + 1].toFixed(4));
-                    if (i === 0) {
-                        // left stick
-                        // axis 1 = left horizontal
-                        this.ueInputGamePadMessage.sendControllerAxisMove(currentState.index, 1, x);
-                        // axis 2 = left vertical
-                        this.ueInputGamePadMessage.sendControllerAxisMove(currentState.index, 2, y);
-                    } else if (i === 2) {
-                        // right stick
-                        // axis 3 = right horizontal
-                        this.ueInputGamePadMessage.sendControllerAxisMove(currentState.index, 3, x);
-                        // axis 4 = right vertical
-                        this.ueInputGamePadMessage.sendControllerAxisMove(currentState.index, 4, y);
+                } else if (!currentButton.pressed && previousButton.pressed) {
+                    // release
+                    if (i == gamepadLayout.LeftTrigger) {
+                        //                       UEs left analog has a button index of 5
+                        toStreamerHandlers.GamepadAnalog("GamepadAnalog", [controllerIndex, 5, 0]);
+                    } else if (i == gamepadLayout.RightTrigger) {
+                        //                       UEs right analog has a button index of 6
+                        toStreamerHandlers.GamepadAnalog("GamepadAnalog", [controllerIndex, 6, 0]);
+                    } else {
+                        toStreamerHandlers.GamepadButtonReleased("GamepadButtonReleased", [controllerIndex, i]);
                     }
                 }
-                this.controllers[currentState.index].prevState = currentState;
             }
-            catch (error) {
-                Logger.Error(Logger.GetStackTrace(), "Oh dear the gamepad poll loop has thrown an error");
+            // Iterate over gamepad axes (we will increment in lots of 2 as there is 2 axes per stick)
+            for (let i = 0; i < currentState.axes.length; i += 2) {
+                // Horizontal axes are even numbered
+                let x = parseFloat(currentState.axes[i].toFixed(4));
+
+                // Vertical axes are odd numbered
+                // https://w3c.github.io/gamepad/#remapping Gamepad browser side standard mapping has positive down, negative up. This is downright disgusting. So we fix it.
+                let y = -parseFloat(currentState.axes[i + 1].toFixed(4));
+
+                // UE's analog axes follow the same order as the browsers, but start at index 1 so we will offset as such
+                toStreamerHandlers.GamepadAnalog("GamepadAnalog", [controllerIndex, i + 1, x]); // Horizontal axes, only offset by 1
+                toStreamerHandlers.GamepadAnalog("GamepadAnalog", [controllerIndex, i + 2, y]); // Vertical axes, offset by two (1 to match UEs axes convention and then another 1 for the vertical axes)
             }
+            this.controllers[controllerIndex].prevState = currentState;
         }
-        window.requestAnimationFrame(() => this.updateStatus());
-
+        this.requestAnimationFrame(() => this.updateStatus());
     }
+}
+
+declare global {
+    interface Window {
+        mozRequestAnimationFrame(callback: FrameRequestCallback): number;
+        webkitRequestAnimationFrame(callback: FrameRequestCallback): number
+    }
+
+    interface Navigator {
+        webkitGetGamepads(): Gamepad[];
+    }
+}
+
+export enum gamepadLayout {
+    RightClusterBottomButton = 0,
+    RightClusterRightButton = 1,
+    RightClusterLeftButton = 2,
+    RightClusterTopButton = 3,
+    LeftShoulder = 4,
+    RightShoulder = 5,
+    LeftTrigger = 6,
+    RightTrigger = 7,
+    SelectOrBack = 8,
+    StartOrForward = 9,
+    LeftAnalogPress = 10,
+    RightAnalogPress = 11,
+    LeftClusterTopButton = 12,
+    LeftClusterBottomButton = 13,
+    LeftClusterLeftButton = 14,
+    LeftClusterRightButton = 15,
+    CentreButton = 16,
+    // Axes
+    LeftStickHorizontal = 0,
+    LeftStickVertical = 1,
+    RightStickHorizontal = 2,
+    RightStickVertical = 3
 }
 
 /**

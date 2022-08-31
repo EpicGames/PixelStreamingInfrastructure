@@ -16,7 +16,7 @@ import { Encoder, InitialSettings, WebRTC } from "../DataChannel/InitialSettings
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
 import { Logger } from "../Logger/Logger";
 import { FileLogic } from "../FileManager/FileLogic";
-import { InputController } from "../Inputs/InputController";
+import { InputController } from "../Inputs/InputClassesFactory";
 import { MicController } from "../MicPlayer/MicController";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 import { StreamMessageController, MessageDirection } from "../UeInstanceMessage/StreamMessageController";
@@ -28,6 +28,7 @@ import { ILatencyTestResults } from "../DataChannel/ILatencyTestResults";
 import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
 import { SendDescriptorController } from "../UeInstanceMessage/SendDescriptorController";
 import { SendMessageController } from "../UeInstanceMessage/SendMessageController";
+import { ToStreamerMessagesController } from "../UeInstanceMessage/ToStreamerMessagesController";
 /**
  * Entry point for the Web RTC Player
  */
@@ -59,6 +60,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	streamMessageController: IStreamMessageController;
 	sendDescriptorController: SendDescriptorController;
 	sendMessageController: SendMessageController;
+	toStreamerMessagesController: ToStreamerMessagesController;
 
 	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
 	// it will use this property to store the override message string
@@ -115,6 +117,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// set up the final webRtc player controller methods from within our delegate so a connection can be activated
 		this.sendDescriptorController = new SendDescriptorController(this.dataChannelController, this.streamMessageController);
 		this.sendMessageController = new SendMessageController(this.dataChannelController, this.streamMessageController);
+		this.toStreamerMessagesController = new ToStreamerMessagesController(this.sendMessageController);
 		this.delegate.setIWebRtcPlayerController(this);
 		this.registerMessageHandlers();
 		this.streamMessageController.populateDefaultProtocol();
@@ -247,8 +250,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			});
 
 			// Once the protocol has been received, we can send our control messages
-			this.sendMessageController.SendRequestInitialSettings();
-			this.sendMessageController.SendRequestQualityControl();
+			this.toStreamerMessagesController.SendRequestInitialSettings();
+			this.toStreamerMessagesController.SendRequestQualityControl();
 		} catch (e) {
 			Logger.Log(Logger.GetStackTrace(), e);
 		}
@@ -801,7 +804,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	sendRequestQualityControlOwnership(): void {
 		Logger.Log(Logger.GetStackTrace(), "----   Sending Request to Control Quality  ----", 6);
-		this.sendMessageController.SendRequestQualityControl();
+		this.toStreamerMessagesController.SendRequestQualityControl();
 	}
 
 	/**

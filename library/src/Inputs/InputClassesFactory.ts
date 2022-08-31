@@ -16,25 +16,12 @@ import { Logger } from "../Logger/Logger";
 /**
  * Class for handling inputs for mouse and keyboard   
  */
-export class InputController {
+export class InputClassesFactory {
 
-    videoElementProvider: IVideoPlayer;
-    dataChannelController: DataChannelController;
-    keyboardController: KeyboardController;
-    mouseController: MouseController;
-    touchController: ITouchController
-    fakeTouchController: FakeTouchController;
-    gamePadController: GamePadController;
-    gyroController: GyroController;
+    dataChannelProvider: DataChannelController;
+    
 
-    /**
-     * 
-     * @param dataChannelController - the data channel controller
-     */
-    constructor(dataChannelController: DataChannelController, videoElementProvider: IVideoPlayer) {
-        this.dataChannelController = dataChannelController;
-        this.videoElementProvider = videoElementProvider;
-    }
+    constructor() { }
 
     /**
      * registers browser key events  
@@ -42,8 +29,9 @@ export class InputController {
      */
     registerKeyBoard(suppressBrowserKeys: boolean) {
         Logger.Log(Logger.GetStackTrace(), "Register Keyboard Events", 7);
-        this.keyboardController = new KeyboardController(this.dataChannelController, suppressBrowserKeys);
-        this.keyboardController.registerKeyBoardEvents();
+        let keyboardController = new KeyboardController(this.dataChannelController, suppressBrowserKeys);
+        keyboardController.registerKeyBoardEvents();
+        return keyboardController;
     }
 
     /**
@@ -109,8 +97,6 @@ export class InputController {
     registerGamePad() {
         Logger.Log(Logger.GetStackTrace(), "Register Game Pad", 7);
         this.gamePadController = new GamePadController(this.dataChannelController);
-
-
     }
 
     /**
@@ -118,7 +104,6 @@ export class InputController {
      */
     registerGyro() {
         this.gyroController = new GyroController(this.dataChannelController);
-
     }
 
 }
