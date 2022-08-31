@@ -134,12 +134,12 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		let message = new Uint8Array(event.data);
 		Logger.Log(Logger.GetStackTrace(), "Message incoming:" + message, 6);
 
-		try {
-			let messageType = this.streamMessageController.fromStreamerMessages.getFromValue(message[0]);
-			this.streamMessageController.fromStreamerHandlers.get(messageType)(event.data);
-		} catch (e) {
-			Logger.Error(Logger.GetStackTrace(), `Custom data channel message with message type that is unknown to the Pixel Streaming protocol. Does your PixelStreamingProtocol need updating? The message type was: ${message[0]}`);
-		}
+		//try {
+		let messageType = this.streamMessageController.fromStreamerMessages.getFromValue(message[0]);
+		this.streamMessageController.fromStreamerHandlers.get(messageType)(event.data);
+		//} catch (e) {
+		//Logger.Error(Logger.GetStackTrace(), `Custom data channel message with message type that is unknown to the Pixel Streaming protocol. Does your PixelStreamingProtocol need updating? The message type was: ${message[0]}`);
+		//}
 	}
 
 	/**
@@ -147,48 +147,48 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	registerMessageHandlers() {
 		// From Streamer
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "QualityControlOwnership", this.onQualityControlOwnership);
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Response", this.responseController.onResponse);
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Command", this.commandController.onCommand);
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "FreezeFrame", this.onFreezeFrameMessage);
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "UnfreezeFrame", this.invalidateFreezeFrameAndEnableVideo);
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "VideoEncoderAvgQP", this.handleVideoEncoderAvgQP);
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "LatencyTest", this.handleLatencyTestResult);
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "InitialSettings", this.handleInitialSettings);
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "FileExtension", this.onFileExtension);
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "FileMimeType", this.onFileMimeType);
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "FileContents", this.onFileContents);
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "QualityControlOwnership", (data: any) => this.onQualityControlOwnership(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Response", (data: any) => this.responseController.onResponse(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Command", (data: any) => this.commandController.onCommand(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "FreezeFrame", (data: any) => this.onFreezeFrameMessage(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "UnfreezeFrame", () => this.invalidateFreezeFrameAndEnableVideo());
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "VideoEncoderAvgQP", (data: any) => this.handleVideoEncoderAvgQP(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "LatencyTest", (data: any) => this.handleLatencyTestResult(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "InitialSettings", (data: any) => this.handleInitialSettings(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "FileExtension", (data: any) => this.onFileExtension(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "FileMimeType", (data: any) => this.onFileMimeType(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "FileContents", (data: any) => this.onFileContents(data));
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "TestEcho", () => {/* Do nothing */ });
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "InputControlOwnership", this.onInputControlOwnership);
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Protocol", this.onProtocolMessage);
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "InputControlOwnership", (data: any) => this.onInputControlOwnership(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Protocol", (data: any) => this.onProtocolMessage(data));
 
 		// To Streamer 
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "IFrameRequest", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "RequestQualityControl", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "FpsRequest", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "AverageBitrateRequest", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "StartStreaming", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "StopStreaming", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "LatencyTest", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "RequestInitialSettings", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "IFrameRequest", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "RequestQualityControl", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "FpsRequest", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "AverageBitrateRequest", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "StartStreaming", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "StopStreaming", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "LatencyTest", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "RequestInitialSettings", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TestEcho", () => { /* Do nothing */ });
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "UIInteraction", this.sendDescriptorController.emitUIInteraction);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "Command", this.sendDescriptorController.emitCommand);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyDown", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyUp", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyPress", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseEnter", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseLeave", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseDown", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseUp", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseMove", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseWheel", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchStart", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchEnd", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchMove", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonPressed", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonReleased", this.sendMessageController.sendMessageToStreamer);
-		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadAnalog", this.sendMessageController.sendMessageToStreamer);
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "UIInteraction", (data: any) => this.sendDescriptorController.emitUIInteraction(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "Command", (data: any) => this.sendDescriptorController.emitCommand(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyDown", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyUp", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "KeyPress", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseEnter", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseLeave", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseDown", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseUp", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseMove", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseWheel", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchStart", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchEnd", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchMove", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonPressed", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonReleased", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadAnalog", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
 	}
 
 	onProtocolMessage(message: Uint8Array) {
