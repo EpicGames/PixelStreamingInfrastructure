@@ -1,8 +1,8 @@
+import { IDataChannelController } from "../DataChannel/IDataChannelController";
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { FakeTouchController } from "./FakeTouchController";
 import { KeyboardController } from "./KeyboardController";
 import { MouseController } from "./MouseController";
-import { ITouchController } from "./ITouchController";
 import { TouchController } from "./TouchController";
 import { GamePadController } from "./GamepadController";
 import { ControlSchemeType } from "../Config/Config";
@@ -18,10 +18,13 @@ import { Logger } from "../Logger/Logger";
  */
 export class InputClassesFactory {
 
-    dataChannelProvider: DataChannelController;
-    
+    dataChannelProvider: IDataChannelController;
+    videoElementProvider: IVideoPlayer;
 
-    constructor() { }
+    constructor(dataChannelProvider: DataChannelController, videoElementProvider: IVideoPlayer) {
+        this.dataChannelProvider = dataChannelProvider;
+        this.videoElementProvider = videoElementProvider;
+    }
 
     /**
      * registers browser key events  
@@ -29,7 +32,7 @@ export class InputClassesFactory {
      */
     registerKeyBoard(suppressBrowserKeys: boolean) {
         Logger.Log(Logger.GetStackTrace(), "Register Keyboard Events", 7);
-        let keyboardController = new KeyboardController(this.dataChannelController, suppressBrowserKeys);
+        let keyboardController = new KeyboardController(this.dataChannelProvider.getDataChannelInstance(), suppressBrowserKeys);
         keyboardController.registerKeyBoardEvents();
         return keyboardController;
     }
@@ -42,15 +45,14 @@ export class InputClassesFactory {
         Logger.Log(Logger.GetStackTrace(), "Register Mouse Events", 7);
 
         // casting these as any as they do not have the moz attributes we require
-        let videoElement = this.videoElementProvider.getVideoElement() as any;
+        let videoElement = this.videoElementProvider.getVideoElement() as HTMLVideoElement;
         let videoInputBindings: IVideoPlayerMouseInterface;
-
-        this.mouseController = new MouseController(this.dataChannelController, this.videoElementProvider);
+        let mouseController = new MouseController(this.dataChannelProvider.getDataChannelInstance(), this.videoElementProvider);
 
         switch (controlScheme) {
             case ControlSchemeType.LockedMouse:
 
-                videoInputBindings = new VideoPlayerMouseLockedEvents(this.videoElementProvider, this.mouseController);
+                videoInputBindings = new VideoPlayerMouseLockedEvents(this.videoElementProvider, mouseController);
 
                 videoElement.onclick = (event: MouseEvent) => this.videoElementProvider.setClickActions(event);
 
@@ -59,7 +61,7 @@ export class InputClassesFactory {
 
                 break
             case ControlSchemeType.HoveringMouse:
-                videoInputBindings = new VideoPlayerMouseHoverEvents(this.mouseController);
+                videoInputBindings = new VideoPlayerMouseHoverEvents(mouseController);
 
                 // set the onclick to null if the input bindings were previously set to pointerlock
                 videoElement.onclick = null;
@@ -75,19 +77,20 @@ export class InputClassesFactory {
                 Logger.Info(Logger.GetStackTrace(), "unknown Control Scheme Type Defaulting to Locked Mouse Events");
                 break
         }
+
+        return mouseController;
     }
 
     /**
      * register touch events 
      * @param fakeMouseTouch - the faked mouse touch event 
-     * @param playerElement - the player elements DOM 
      */
-    registerTouch(fakeMouseTouch: boolean, playerElement: HTMLVideoElement) {
+    registerTouch(fakeMouseTouch: boolean) {
         Logger.Log(Logger.GetStackTrace(), "Registering Touch", 6);
         if (fakeMouseTouch) {
-            this.touchController = new FakeTouchController(this.dataChannelController, (<HTMLVideoElement>playerElement.getElementsByTagName("video")[0]));
+            return new FakeTouchController(this.dataChannelProvider.getDataChannelInstance(), this.videoElementProvider.getVideoElement());
         } else {
-            this.touchController = new TouchController(this.dataChannelController, playerElement, this.videoElementProvider);
+            return new TouchController(this.dataChannelProvider.getDataChannelInstance(), this.videoElementProvider);
         }
     }
 
@@ -96,14 +99,16 @@ export class InputClassesFactory {
      */
     registerGamePad() {
         Logger.Log(Logger.GetStackTrace(), "Register Game Pad", 7);
-        this.gamePadController = new GamePadController(this.dataChannelController);
+        let gamePadController = new GamePadController(this.dataChannelProvider.getDataChannelInstance());
+        return gamePadController;
     }
 
     /**
      * registers a gyro device 
      */
     registerGyro() {
-        this.gyroController = new GyroController(this.dataChannelController);
+        let gyroController = new GyroController(this.dataChannelProvider.getDataChannelInstance());
+        return gyroController;
     }
 
 }

@@ -1,17 +1,17 @@
-import { DataChannelController } from "../DataChannel/DataChannelController";
+import { DataChannelSender } from "../DataChannel/DataChannelSender";
 import { IStreamMessageController } from "./IStreamMessageController";
 import { Logger } from "../Logger/Logger";
-import { UeDataMessage } from "./UeDataMessage";
 
-export class SendDescriptorController extends UeDataMessage {
+export class SendDescriptorController {
 
     toStreamerMessagesMapProvider: IStreamMessageController;
+    dataChannelSender: DataChannelSender;
 
-    constructor(datachannelController: DataChannelController, toStreamerMessagesMapProvider: IStreamMessageController) {
-        super(datachannelController);
+    constructor(dataChannelSender: DataChannelSender, toStreamerMessagesMapProvider: IStreamMessageController) {
+        this.dataChannelSender = dataChannelSender;
         this.toStreamerMessagesMapProvider = toStreamerMessagesMapProvider;
     }
-    
+
     /**
      * Send a Latency Test to the UE Instance
      * @param StartTimeMs - Start Time of the Latency test
@@ -65,8 +65,7 @@ export class SendDescriptorController extends UeDataMessage {
             data.setUint16(byteIdx, descriptorAsString.charCodeAt(i), true);
             byteIdx += 2;
         }
-
-        this.sendData(data.buffer);
+        this.dataChannelSender.sendData(data.buffer);
     }
 
 }

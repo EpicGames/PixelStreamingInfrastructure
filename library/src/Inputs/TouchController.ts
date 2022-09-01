@@ -13,11 +13,11 @@ export class TouchController implements ITouchController {
     /**
      * 
      * @param dataChannelController - the data channel controller 
-     * @param playerElement - the player element DOM
+     * @param videoElementProvider - the provider of the video element 
      */
-    constructor(dataChannelController: DataChannelController, playerElement: HTMLVideoElement, videoElementProvider: IVideoPlayer) {
+    constructor(dataChannelController: DataChannelController, videoElementProvider: IVideoPlayer) {
         this.ueInputTouchMessage = new UeInputTouchMessage(dataChannelController, videoElementProvider);
-        this.playerElement = playerElement;
+        this.playerElement = videoElementProvider.getVideoElement();
         this.playerElement.ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
         this.playerElement.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
         this.playerElement.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
@@ -48,7 +48,7 @@ export class TouchController implements ITouchController {
 
     /**
      * When a touch event ends 
-     * @param event - the touch event being intercepted  
+     * @param touchEvent - the touch event being intercepted  
      */
     onTouchEnd(touchEvent: TouchEvent) {
         Logger.Log(Logger.GetStackTrace(), "on Touch END", 6);
@@ -59,7 +59,7 @@ export class TouchController implements ITouchController {
             Logger.Log(Logger.GetStackTrace(), "touch id: " + touch.identifier, 6);
             Logger.Log(Logger.GetStackTrace(), "Fingers id Touch id: " + this.ueInputTouchMessage.fingersIds[touch.identifier], 6);
             this.ueInputTouchMessage.fingers.push(this.ueInputTouchMessage.fingersIds[touch.identifier]);
-            this.ueInputTouchMessage.fingers.sort(function(a,b){return b-a});
+            this.ueInputTouchMessage.fingers.sort(function (a, b) { return b - a });
             delete this.ueInputTouchMessage.fingersIds[touch.identifier];
             Logger.Log(Logger.GetStackTrace(), "touch.identifier: " + touch.identifier, 6);
         }

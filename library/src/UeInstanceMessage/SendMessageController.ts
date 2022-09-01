@@ -1,14 +1,14 @@
-import { DataChannelController } from "../DataChannel/DataChannelController";
+import { DataChannelSender } from "../DataChannel/DataChannelSender";
 import { IStreamMessageController } from "./IStreamMessageController";
 import { Logger } from "../Logger/Logger";
-import { UeDataMessage } from "./UeDataMessage";
 
-export class SendMessageController extends UeDataMessage {
+export class SendMessageController {
 
     toStreamerMessagesMapProvider: IStreamMessageController;
+    dataChannelSender: DataChannelSender;
 
-    constructor(datachannelController: DataChannelController, toStreamerMessagesMapProvider: IStreamMessageController) {
-        super(datachannelController);
+    constructor(dataChannelSender: DataChannelSender, toStreamerMessagesMapProvider: IStreamMessageController) {
+        this.dataChannelSender = dataChannelSender;
         this.toStreamerMessagesMapProvider = toStreamerMessagesMapProvider;
     }
 
@@ -52,6 +52,6 @@ export class SendMessageController extends UeDataMessage {
                     break;
             }
         });
-        this.sendData(data.buffer);
+        this.dataChannelSender.sendData(data.buffer);
     }
 }

@@ -7,7 +7,7 @@ import { AfkLogic } from "../Afk/AfkLogic";
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { PeerConnectionController } from "../PeerConnectionController/PeerConnectionController"
 import { KeyboardController } from "../Inputs/KeyboardController";
-import { ITouchController } from "../Inputs/ITouchController";
+import { TouchController } from "../Inputs/TouchController";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { IWebRtcPlayerController } from "./IWebRtcPlayerController";
 import { IDelegate } from "../Delegate/IDelegate";
@@ -16,7 +16,7 @@ import { Encoder, InitialSettings, WebRTC } from "../DataChannel/InitialSettings
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
 import { Logger } from "../Logger/Logger";
 import { FileLogic } from "../FileManager/FileLogic";
-import { InputController } from "../Inputs/InputClassesFactory";
+import { InputClassesFactory } from "../Inputs/InputClassesFactory";
 import { MicController } from "../MicPlayer/MicController";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 import { StreamMessageController, MessageDirection } from "../UeInstanceMessage/StreamMessageController";
@@ -29,6 +29,11 @@ import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageCon
 import { SendDescriptorController } from "../UeInstanceMessage/SendDescriptorController";
 import { SendMessageController } from "../UeInstanceMessage/SendMessageController";
 import { ToStreamerMessagesController } from "../UeInstanceMessage/ToStreamerMessagesController";
+import { MouseController } from "../Inputs/MouseController";
+import { FakeTouchController } from "../Inputs/FakeTouchController";
+import { GamePadController } from "../Inputs/GamepadController";
+import { GyroController } from "../Inputs/GyroController";
+import { DataChannelSender } from "../DataChannel/DataChannelSender";
 /**
  * Entry point for the Web RTC Player
  */
@@ -39,14 +44,13 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	sdpConstraints: RTCOfferOptions;
 	webSocketController: WebSocketController;
 	dataChannelController: DataChannelController;
+	dataChannelSender: DataChannelSender;
 	datachannelOptions: RTCDataChannelInit;
 	videoPlayer: VideoPlayer;
 	streamController: StreamController;
-	keyboardController: KeyboardController;
-	touchController: ITouchController;
 	peerConnectionController: PeerConnectionController;
 	uiController: UiController;
-	inputController: InputController;
+	inputClassesFactory: InputClassesFactory;
 	freezeFrameController: FreezeFrameController;
 	shouldShowPlayOverlay: boolean = true;
 	afkLogic: AfkLogic;
@@ -61,6 +65,12 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	sendDescriptorController: SendDescriptorController;
 	sendMessageController: SendMessageController;
 	toStreamerMessagesController: ToStreamerMessagesController;
+	keyboardController: KeyboardController;
+	mouseController: MouseController;
+	touchController: TouchController | FakeTouchController;
+	gamePadController: GamePadController;
+	gyroController: GyroController;
+
 
 	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
 	// it will use this property to store the override message string
@@ -101,9 +111,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.uiController.setUpMouseAndFreezeFrame = (element: HTMLDivElement) => this.setUpMouseAndFreezeFrame(element);
 
 		this.dataChannelController = new DataChannelController();
-		this.dataChannelController.handleOnMessage = (ev: MessageEvent<any>) => this.handelOnMessage(ev);
-		this.dataChannelController.handleOnOpen = () => this.handleDataChannelConnected();
-		this.dataChannelController.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
+		this.dataChannelController.dataChannel.onmessage = (ev: MessageEvent<any>) => this.handelOnMessage(ev);
+		this.dataChannelController.dataChannel.onopen = () => this.handleDataChannelConnected();
+		this.dataChannelSender = new DataChannelSender(this.dataChannelController);
+		this.dataChannelSender.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
 
 		this.streamMessageController = new StreamMessageController();
 
@@ -115,8 +126,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => this.delegate.onDisconnect(`${event.code} - ${event.reason}`);
 
 		// set up the final webRtc player controller methods from within our delegate so a connection can be activated
-		this.sendDescriptorController = new SendDescriptorController(this.dataChannelController, this.streamMessageController);
-		this.sendMessageController = new SendMessageController(this.dataChannelController, this.streamMessageController);
+		this.sendDescriptorController = new SendDescriptorController(this.dataChannelSender, this.streamMessageController);
+		this.sendMessageController = new SendMessageController(this.dataChannelSender, this.streamMessageController);
 		this.toStreamerMessagesController = new ToStreamerMessagesController(this.sendMessageController);
 		this.delegate.setIWebRtcPlayerController(this);
 		this.registerMessageHandlers();
@@ -127,6 +138,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.afkLogic.updateAfkCountdown = () => this.delegate.updateAfkOverlay(this.afkLogic.countDown);
 		this.afkLogic.hideCurrentOverlay = () => this.delegate.hideCurrentOverlay();
 		this.webSocketController.stopAfkWarningTimer = () => this.afkLogic.stopAfkWarningTimer();
+
+		this.inputClassesFactory = new InputClassesFactory(this.dataChannelController, this.videoPlayer);
 	}
 
 	/**
@@ -399,7 +412,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			// close the connection 
 			this.closeSignalingServer();
 		} else {
-			this.inputController.registerTouch(this.config.fakeMouseWithTouches, this.videoPlayer.videoElement);
+			this.touchController = this.inputClassesFactory.registerTouch(this.config.fakeMouseWithTouches);
 			if (this.streamController.audioElement) {
 				this.streamController.audioElement.play().then(() => {
 					this.playVideo();
@@ -604,7 +617,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * registers the mouse for use in IWebRtcPlayerController
 	 */
 	activateRegisterMouse() {
-		this.inputController.registerMouse(this.config.controlScheme);
+		this.mouseController = this.inputClassesFactory.registerMouse(this.config.controlScheme);
 	}
 
 	/**
@@ -616,13 +629,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// show the connected overlay 
 		this.delegate.onWebRtcConnected();
 
-		this.inputController = new InputController(this.dataChannelController, this.videoPlayer);
-
 		this.activateRegisterMouse()
-		this.inputController.registerKeyBoard(this.config.suppressBrowserKeys);
-		this.inputController.registerGamePad();
+		this.keyboardController = this.inputClassesFactory.registerKeyBoard(this.config.suppressBrowserKeys);
+		this.gamePadController = this.inputClassesFactory.registerGamePad();
 
-		this.videoPlayer.setMouseEnterAndLeaveEvents(() => this.inputController.mouseController.sendMouseEnter(), () => this.inputController.mouseController.sendMouseLeave());
+		this.videoPlayer.setMouseEnterAndLeaveEvents(() => this.mouseController.sendMouseEnter(), () => this.mouseController.sendMouseLeave());
 
 		this.resizePlayerStyle();
 
