@@ -1,11 +1,10 @@
 import { DataChannelController } from "../DataChannel/DataChannelController";
-import { UeDataMessage } from "./UeDataMessage";
 import { UeMessageType } from "./UeMessageTypes"
 
 /**
  * Handles sending Mouse Messages to the UE Instance
  */
-export class UeInputMouseMessage extends UeDataMessage {
+export class UeInputMouseMessage {
 
 	/**
 	* @param datachannelController - Data channel Controller

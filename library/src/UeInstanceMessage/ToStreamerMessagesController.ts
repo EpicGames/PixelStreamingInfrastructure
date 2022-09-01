@@ -9,13 +9,6 @@ export class ToStreamerMessagesController {
     }
 
     /**
-     * Send IFrame Request to the UE Instance
-     */
-    SendIFrameRequest() {
-        this.sendMessageController.sendMessageToStreamer("IFrameRequest");
-    }
-
-    /**
      * Send Request to Take Quality Control to the UE Instance
      */
     SendRequestQualityControl() {

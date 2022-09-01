@@ -15,6 +15,10 @@ export class StreamMessageController implements IStreamMessageController {
         this.fromStreamerMessages = new TwoWayMap();
     }
 
+    getToStreamHandlersMap(): Map<string, (messageType: any, messageData?: any[] | undefined) => void> {
+        return this.toStreamerHandlers;
+    }
+
     getToStreamerMessageMap(): TwoWayMap {
         return this.toStreamerMessages;
     }

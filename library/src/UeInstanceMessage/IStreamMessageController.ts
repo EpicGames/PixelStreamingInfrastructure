@@ -11,6 +11,8 @@ export interface IStreamMessageController {
 
     registerMessageHandler(messageDirection: MessageDirection, messageType: string, messageHandler: (messageType: any, messageData?: any[] | undefined) => void): void;
 
+    getToStreamHandlersMap(): Map<string, (messageType: any, messageData?: any[] | undefined) => void>;
+
     /**
      * Get the current twoWayMap for to streamer messages
      */

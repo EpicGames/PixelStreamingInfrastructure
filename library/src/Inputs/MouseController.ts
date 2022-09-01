@@ -1,30 +1,26 @@
-import { UeInputMouseMessage } from "../UeInstanceMessage/UeInputMouseMessage";
 import { MouseButtonsMask, MouseButton } from "./MouseButtons";
-import { DataChannelController } from "../DataChannel/DataChannelController";
 import { NormaliseAndQuantiseSigned, UnquantisedAndDenormaliseUnsigned, NormaliseAndQuantiseUnsigned } from "./CoordinateData"
 import { Logger } from "../Logger/Logger";
 import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
+import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
 
 /**
  * Handles the Mouse Inputs for the document
  */
 export class MouseController {
-
 	readonly unsignedOutOfRange: number = 65535;
 	readonly signedOutOfRange: number = 32767;
-
-	ueInputMouseMessage: UeInputMouseMessage;
 	videoElementProvider: IVideoPlayer;
-
 	printInputs: boolean;
+	toStreamerMessagesProvider: IStreamMessageController;
 
 	/**
 	 * 
-	 * @param dataChannelController - Data Channel Controller
+	 * @param toStreamerMessagesProvider - Stream message controller provider
 	 */
-	constructor(dataChannelController: DataChannelController, videoElementProvider: IVideoPlayer) {
+	constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer) {
+		this.toStreamerMessagesProvider = toStreamerMessagesProvider;
 		this.printInputs = false;
-		this.ueInputMouseMessage = new UeInputMouseMessage(dataChannelController);
 		this.videoElementProvider = videoElementProvider;
 	}
 
@@ -104,7 +100,8 @@ export class MouseController {
 	sendMouseDown(button: number, X: number, Y: number) {
 		Logger.Log(Logger.GetStackTrace(), `mouse button ${button} down at (${X}, ${Y})`, 6);
 		let coord: NormaliseAndQuantiseUnsigned = this.normaliseAndQuantiseUnsigned(X, Y);
-		this.ueInputMouseMessage.sendMouseDown(button, coord.x, coord.y);
+		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+		toStreamerHandlers.get("MouseDown")("MouseDown", [button, coord.x, coord.y]);
 	}
 
 	/**
@@ -116,7 +113,8 @@ export class MouseController {
 	sendMouseUp(button: number, X: number, Y: number) {
 		Logger.Log(Logger.GetStackTrace(), `mouse button ${button} up at (${X}, ${Y})`, 6);
 		let coord: NormaliseAndQuantiseUnsigned = this.normaliseAndQuantiseUnsigned(X, Y);
-		this.ueInputMouseMessage.sendMouseUp(button, coord.x, coord.y);
+		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+		toStreamerHandlers.get("MouseUp")("MouseUp", [button, coord.x, coord.y]);
 	}
 
 	/**
@@ -135,6 +133,10 @@ export class MouseController {
 	 * Handles mouse enter
 	 */
 	sendMouseEnter() {
+		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+		toStreamerHandlers.get("MouseEnter")("MouseEnter", [button, coord.x, coord.y]);
+		
+		
 		this.ueInputMouseMessage.sendMouseEnter();
 	}
 

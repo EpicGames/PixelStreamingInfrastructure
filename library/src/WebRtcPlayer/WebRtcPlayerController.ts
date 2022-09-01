@@ -810,6 +810,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.sendDescriptorController.emitCommand("stat fps");
 	}
 
+	sendIframeRequest(): void {
+		Logger.Log(Logger.GetStackTrace(), "----   Sending Request for an IFrame  ----", 6);
+		this.streamMessageController.toStreamerHandlers.get("IFrameRequest");
+	}
+
 	/**
 	 * Sends a request to the UE Instance to have ownership of Quality
 	 */

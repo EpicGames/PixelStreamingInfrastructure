@@ -1,14 +1,13 @@
-import { DataChannelController } from "../DataChannel/DataChannelController";
+import { DataChannelSender } from "../DataChannel/DataChannelSender";
 import { NormaliseAndQuantiseUnsigned } from "../Inputs/CoordinateData";
 import { Logger } from "../Logger/Logger";
 import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
-import { UeDataMessage } from "./UeDataMessage";
 import { UeMessageType } from "./UeMessageTypes"
 
 /**
  * Handles Sending Touch messages to the UE Instance
  */
-export class UeInputTouchMessage extends UeDataMessage {
+export class UeInputTouchMessage {
 
     fingers: number[];
     fingersIds: { [key: number]: number };
@@ -19,13 +18,14 @@ export class UeInputTouchMessage extends UeDataMessage {
     printInputs: boolean;
 
     videoElementProvider: IVideoPlayer;
+    dataChannelSender: DataChannelSender;
 
 
     /**
-     * @param datachannelController - Data channel Controller
+     * @param dataChannelSender - Data channel sender
      */
-    constructor(datachannelController: DataChannelController, videoElementProvider: IVideoPlayer) {
-        super(datachannelController);
+    constructor(dataChannelSender: DataChannelSender, videoElementProvider: IVideoPlayer) {
+        this.dataChannelSender = dataChannelSender;
         this.videoElementProvider = videoElementProvider;
         this.fingersIds = {}
         this.fingers = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
@@ -87,7 +87,7 @@ export class UeInputTouchMessage extends UeDataMessage {
             data.setUint8(byte, coord.inRange ? 1 : 0); // mark the touch as in the player or not
             byte += 1;
         }
-        this.sendData(data.buffer);
+        this.dataChannelSender.sendData(data.buffer);
     }
 
     /**

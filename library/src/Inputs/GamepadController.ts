@@ -1,6 +1,5 @@
-import { DataChannelController } from "../DataChannel/DataChannelController";
 import { Logger } from "../Logger/Logger";
-import { SendMessageController } from "../UeInstanceMessage/SendMessageController";
+import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
 
 /**
  * The class that handles the functionality of gamepads and controllers 
@@ -8,13 +7,13 @@ import { SendMessageController } from "../UeInstanceMessage/SendMessageControlle
 export class GamePadController {
     controllers: Controller[];
     requestAnimationFrame: any;
-    sendMessageController: SendMessageController;
+    toStreamerMessagesProvider: IStreamMessageController;
 
     /**
-     * @param dataChannelController - the data chanel controller  
+     * @param toStreamerMessagesProvider - the   
      */
-    constructor(dataChannelController: DataChannelController) {
-        
+    constructor(toStreamerMessagesProvider: IStreamMessageController) {
+        this.toStreamerMessagesProvider = toStreamerMessagesProvider;
 
         this.requestAnimationFrame = window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.requestAnimationFrame;
         if ("GamepadEvent" in window) {
@@ -75,6 +74,8 @@ export class GamePadController {
      */
     updateStatus() {
         this.scanGamePads();
+        let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+
         // Iterate over multiple controllers in the case the multiple gamepads are connected
         for (let controller of this.controllers) {
             let controllerIndex = this.controllers.indexOf(controller);
@@ -86,23 +87,23 @@ export class GamePadController {
                     // press
                     if (i == gamepadLayout.LeftTrigger) {
                         //                       UEs left analog has a button index of 5
-                        toStreamerHandlers.GamepadAnalog("GamepadAnalog", [controllerIndex, 5, currentButton.value]);
+                        toStreamerHandlers.get("GamepadAnalog")([controllerIndex, 5, currentButton.value]);
                     } else if (i == gamepadLayout.RightTrigger) {
                         //                       UEs right analog has a button index of 6
-                        toStreamerHandlers.GamepadAnalog("GamepadAnalog", [controllerIndex, 6, currentButton.value]);
+                        toStreamerHandlers.get("GamepadAnalog")([controllerIndex, 6, currentButton.value]);
                     } else {
-                        toStreamerHandlers.GamepadButtonPressed("GamepadButtonPressed", [controllerIndex, i, previousButton.pressed]);
+                        toStreamerHandlers.get("GamepadButtonPressed")([controllerIndex, i, previousButton.pressed]);
                     }
                 } else if (!currentButton.pressed && previousButton.pressed) {
                     // release
                     if (i == gamepadLayout.LeftTrigger) {
                         //                       UEs left analog has a button index of 5
-                        toStreamerHandlers.GamepadAnalog("GamepadAnalog", [controllerIndex, 5, 0]);
+                        toStreamerHandlers.get("GamepadAnalog")([controllerIndex, 5, 0]);
                     } else if (i == gamepadLayout.RightTrigger) {
                         //                       UEs right analog has a button index of 6
-                        toStreamerHandlers.GamepadAnalog("GamepadAnalog", [controllerIndex, 6, 0]);
+                        toStreamerHandlers.get("GamepadAnalog")([controllerIndex, 6, 0]);
                     } else {
-                        toStreamerHandlers.GamepadButtonReleased("GamepadButtonReleased", [controllerIndex, i]);
+                        toStreamerHandlers.get("GamepadButtonReleased")([controllerIndex, i]);
                     }
                 }
             }
@@ -116,8 +117,8 @@ export class GamePadController {
                 let y = -parseFloat(currentState.axes[i + 1].toFixed(4));
 
                 // UE's analog axes follow the same order as the browsers, but start at index 1 so we will offset as such
-                toStreamerHandlers.GamepadAnalog("GamepadAnalog", [controllerIndex, i + 1, x]); // Horizontal axes, only offset by 1
-                toStreamerHandlers.GamepadAnalog("GamepadAnalog", [controllerIndex, i + 2, y]); // Vertical axes, offset by two (1 to match UEs axes convention and then another 1 for the vertical axes)
+                toStreamerHandlers.get("GamepadAnalog")([controllerIndex, i + 1, x]); // Horizontal axes, only offset by 1
+                toStreamerHandlers.get("GamepadAnalog")([controllerIndex, i + 2, y]); // Vertical axes, offset by two (1 to match UEs axes convention and then another 1 for the vertical axes)
             }
             this.controllers[controllerIndex].prevState = currentState;
         }
