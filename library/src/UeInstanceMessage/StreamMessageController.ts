@@ -140,6 +140,12 @@ export class StreamMessageController implements IStreamMessageController {
             //              delta       x        y
             "structure": ["int16", "uint16", "uint16"]
         });
+        this.toStreamerMessages.add("MouseDouble", {
+            "id": 76,
+            "byteLength": 5,
+            //              button     x         y
+            "structure": ["uint8", "uint16", "uint16"]
+        });
         // Touch Input Messages. Range = 80..89.
         this.toStreamerMessages.add("TouchStart", {
             "id": 80,

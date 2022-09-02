@@ -1,7 +1,7 @@
-import { UeInputMouseMessage } from "../UeInstanceMessage/UeInputMouseMessage";
-import { DataChannelController } from "../DataChannel/DataChannelController";
 import { ITouchController } from "./ITouchController";
 import { MouseButton } from "./MouseButtons";
+import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
+import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
 
 
 /**
@@ -11,12 +11,12 @@ import { MouseButton } from "./MouseButtons";
  */
 export class FakeTouchController implements ITouchController {
     finger: Finger;
-    ueInputMouseMessage: UeInputMouseMessage;
-    videoPlayerElement: HTMLVideoElement;
+    toStreamerMessagesProvider: IStreamMessageController;
+    videoElementProvider: IVideoPlayer;
 
-    constructor(dataChannelController: DataChannelController, videoPlayerElement: HTMLVideoElement) {
-        this.ueInputMouseMessage = new UeInputMouseMessage(dataChannelController);
-        this.videoPlayerElement = videoPlayerElement;
+    constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer) {
+        this.toStreamerMessagesProvider = toStreamerMessagesProvider;
+        this.videoElementProvider = videoElementProvider;
         document.ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
         document.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
         document.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
@@ -27,18 +27,21 @@ export class FakeTouchController implements ITouchController {
      * @param touch - the activating touch event 
      */
     onTouchStart(touch: TouchEvent): void {
+        let videoElementParent = this.videoElementProvider.getVideoParentElement();
+        let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+
         if (this.finger == null) {
             let first_touch = touch.changedTouches[0];
             this.finger = {
                 ID: first_touch.identifier,
-                X: first_touch.clientX - this.videoPlayerElement.getBoundingClientRect().left,
-                Y: first_touch.clientY - - this.videoPlayerElement.getBoundingClientRect().top
+                X: first_touch.clientX - videoElementParent.getBoundingClientRect().left,
+                Y: first_touch.clientY - - videoElementParent.getBoundingClientRect().top
             }
 
             let mouseEvent = new MouseEvent(touch.type, first_touch)
 
-            this.videoPlayerElement.onmouseenter(mouseEvent);
-            this.ueInputMouseMessage.sendMouseDown(MouseButton.mainButton, this.finger.X, this.finger.Y);
+            videoElementParent.onmouseenter(mouseEvent);
+            toStreamerHandlers.get("MouseDown")("MouseDown", [MouseButton.mainButton, this.finger.X, this.finger.Y]);
         }
     }
 
@@ -47,16 +50,19 @@ export class FakeTouchController implements ITouchController {
      * @param touchEvent - the activating touch event 
      */
     onTouchEnd(touchEvent: TouchEvent): void {
+        let videoElementParent = this.videoElementProvider.getVideoParentElement();
+        let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+
         for (let i = 0; i < touchEvent.changedTouches.length; i++) {
             let touch = touchEvent.changedTouches[i];
 
             if (touch.identifier === this.finger.ID) {
-                let x = touch.clientX - this.videoPlayerElement.getBoundingClientRect().left;
-                let y = touch.clientY - this.videoPlayerElement.getBoundingClientRect().top;
-                this.ueInputMouseMessage.sendMouseUp(MouseButton.mainButton, x, y);
+                let x = touch.clientX - videoElementParent.getBoundingClientRect().left;
+                let y = touch.clientY - videoElementParent.getBoundingClientRect().top;
+                toStreamerHandlers.get("MouseUp")("MouseUp", [MouseButton.mainButton, x, y]);
 
                 let mouseEvent = new MouseEvent(touchEvent.type, touch)
-                this.videoPlayerElement.onmouseleave(mouseEvent);
+                videoElementParent.onmouseleave(mouseEvent);
                 this.finger = null;
             }
         }

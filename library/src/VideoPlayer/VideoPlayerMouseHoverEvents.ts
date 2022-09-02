@@ -17,11 +17,6 @@ export class VideoPlayerMouseHoverEvents implements IVideoPlayerMouseInterface {
     }
 
     /**
-     * Satisfies the interfaces handleLockStateChange requirement 
-     */
-    handleLockStateChange(): void { }
-
-    /**
      * Handle the mouse move event, sends the mouse data to the UE Instance
      * @param mouseEvent - Mouse Event
      */
@@ -51,6 +46,15 @@ export class VideoPlayerMouseHoverEvents implements IVideoPlayerMouseInterface {
     }
 
     /**
+    * Handle the mouse context menu event, sends the mouse data to the UE Instance
+    * @param mouseEvent - Mouse Event
+    */
+    handleContextMenu(mouseEvent: MouseEvent) {
+        this.mouseController.sendMouseUp(mouseEvent.button, mouseEvent.offsetX, mouseEvent.offsetY);
+        mouseEvent.preventDefault();
+    }
+
+    /**
      * Handle the mouse wheel event, sends the mouse wheel data to the UE Instance
      * @param wheelEvent - Mouse Event
      */
@@ -60,11 +64,26 @@ export class VideoPlayerMouseHoverEvents implements IVideoPlayerMouseInterface {
     }
 
     /**
-     * Handle the mouse context menu event, sends the mouse data to the UE Instance
+     * Handle the mouse double click event, sends the mouse data to the UE Instance
      * @param mouseEvent - Mouse Event
      */
-    handleContextMenu(mouseEvent: MouseEvent) {
-        this.mouseController.sendMouseUp(mouseEvent.button, mouseEvent.offsetX, mouseEvent.offsetY);
-        mouseEvent.preventDefault();
+    handleMouseDouble(mouseEvent: MouseEvent) {
+        this.mouseController.sendMouseDouble(mouseEvent.button, mouseEvent.offsetX, mouseEvent.offsetY);
+    }
+
+    /**
+     * Handle the press mouse buttons event, sends the mouse data to the UE Instance
+     * @param mouseEvent - Mouse Event
+     */
+    handelPressMouseButtons(mouseEvent: MouseEvent) {
+        this.mouseController.pressMouseButtons(mouseEvent.buttons, mouseEvent.offsetX, mouseEvent.offsetY);
+    }
+
+    /**
+     * Handle the release mouse buttons event, sends the mouse data to the UE Instance
+     * @param mouseEvent - Mouse Event
+     */
+    handelReleaseMouseButtons(mouseEvent: MouseEvent) {
+        this.mouseController.releaseMouseButtons(mouseEvent.buttons, mouseEvent.offsetX, mouseEvent.offsetY);
     }
 }

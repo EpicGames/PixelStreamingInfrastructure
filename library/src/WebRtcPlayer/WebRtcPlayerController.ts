@@ -139,7 +139,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.afkLogic.hideCurrentOverlay = () => this.delegate.hideCurrentOverlay();
 		this.webSocketController.stopAfkWarningTimer = () => this.afkLogic.stopAfkWarningTimer();
 
-		this.inputClassesFactory = new InputClassesFactory(this.dataChannelController, this.videoPlayer);
+		this.inputClassesFactory = new InputClassesFactory(this.streamMessageController, this.videoPlayer);
 	}
 
 	/**
@@ -199,6 +199,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseUp", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseMove", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseWheel", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "MouseDouble", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchStart", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchEnd", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "TouchMove", (data: any) => this.sendMessageController.sendMessageToStreamer(data));
@@ -629,11 +630,17 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// show the connected overlay 
 		this.delegate.onWebRtcConnected();
 
+		this.videoPlayer.setMouseEnterAndLeaveEvents((event: any) => {
+			this.mouseController.sendMouseEnter();
+			this.mouseController.pressMouseButtons(event.buttons, event.x, event.y);
+		}, (event: any) => {
+			this.mouseController.sendMouseLeave();
+			this.mouseController.releaseMouseButtons(event.buttons, event.x, event.y);
+		});
+
 		this.activateRegisterMouse()
 		this.keyboardController = this.inputClassesFactory.registerKeyBoard(this.config.suppressBrowserKeys);
 		this.gamePadController = this.inputClassesFactory.registerGamePad();
-
-		this.videoPlayer.setMouseEnterAndLeaveEvents(() => this.mouseController.sendMouseEnter(), () => this.mouseController.sendMouseLeave());
 
 		this.resizePlayerStyle();
 

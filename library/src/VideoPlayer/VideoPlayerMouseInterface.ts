@@ -6,7 +6,7 @@ export interface IVideoPlayerMouseInterface {
     /**
      * Handle when the locked state Changed
      */
-    handleLockStateChange(): void;
+    handleLockStateChange?(): void;
 
     /**
      * Handle when the mouse move
@@ -33,8 +33,26 @@ export interface IVideoPlayerMouseInterface {
     handleMouseWheel(wheelEvent: WheelEvent): void;
 
     /**
+    * Handle when the button double click
+    * @param mouseEvent - Mouse Event
+    */
+    handleMouseDouble(mouseEvent: MouseEvent): void;
+
+    /**
+    * Handle the press mouse buttons event, sends the mouse data to the UE Instance
+    * @param mouseEvent - Mouse Event
+    */
+    handelPressMouseButtons(mouseEvent: MouseEvent): void;
+
+    /**
+     * Handle the release mouse buttons event, sends the mouse data to the UE Instance
+     * @param mouseEvent - Mouse Event
+     */
+    handelReleaseMouseButtons(mouseEvent: MouseEvent): void;
+
+    /**
     * Handle the mouse context menu
     * @param mouseEvent - mouse event
     */
-    handleContextMenu(mouseEvent: MouseEvent): void;
+    handleContextMenu?(mouseEvent: MouseEvent): void;
 }

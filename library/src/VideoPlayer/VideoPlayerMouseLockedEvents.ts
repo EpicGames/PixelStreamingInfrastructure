@@ -97,10 +97,26 @@ export class VideoPlayerMouseLockedEvents implements IVideoPlayerMouseInterface 
     }
 
     /**
-     * Handle the mouse context menu event, sends the mouse data to the UE Instance
+    * Handle the mouse double click event, sends the mouse data to the UE Instance
+    * @param mouseEvent - Mouse Event
+    */
+    handleMouseDouble(mouseEvent: MouseEvent) {
+        this.mouseController.sendMouseDouble(mouseEvent.button, mouseEvent.x, mouseEvent.y)
+    }
+
+    /**
+     * Handle the press mouse buttons event, sends the mouse data to the UE Instance
      * @param mouseEvent - Mouse Event
      */
-    handleContextMenu(mouseEvent: MouseEvent) {
-        Logger.Info(Logger.GetStackTrace(), "onContextMenu");
+    handelPressMouseButtons(mouseEvent: MouseEvent) {
+        this.mouseController.pressMouseButtons(mouseEvent.buttons, mouseEvent.x, mouseEvent.y);
+    }
+
+    /**
+     * Handle the release mouse buttons event, sends the mouse data to the UE Instance
+     * @param mouseEvent - Mouse Event
+     */
+    handelReleaseMouseButtons(mouseEvent: MouseEvent) {
+        this.mouseController.releaseMouseButtons(mouseEvent.buttons, mouseEvent.x, mouseEvent.x);
     }
 }

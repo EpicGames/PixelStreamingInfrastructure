@@ -1,22 +1,22 @@
 import { SpecialKeyCodes } from "./SpecialKeyCodes";
-import { DataChannelController } from "../DataChannel/DataChannelController";
-import { UeInputKeyboardMessage } from "../UeInstanceMessage/UeInputKeyboardMessage";
 import { Logger } from "../Logger/Logger";
+import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
 
 /**
  * Handles the Keyboard Inputs for the document
  */
 export class KeyboardController {
-    ueInputKeyBoardMessage: UeInputKeyboardMessage;
+
+    toStreamerMessagesProvider: IStreamMessageController;
     suppressBrowserKeys: boolean;
 
     /**
      * 
-     * @param dataChannelController - Data Channel Controller
+     * @param toStreamerMessagesProvider - streamer messages provider
      * @param suppressBrowserKeys - Suppress Browser Keys
      */
-    constructor(dataChannelController: DataChannelController, suppressBrowserKeys: boolean) {
-        this.ueInputKeyBoardMessage = new UeInputKeyboardMessage(dataChannelController);
+    constructor(toStreamerMessagesProvider: IStreamMessageController, suppressBrowserKeys: boolean) {
+        this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.suppressBrowserKeys = suppressBrowserKeys;
     }
 
@@ -37,7 +37,8 @@ export class KeyboardController {
      */
     handleOnKeyDown(keyboardEvent: KeyboardEvent) {
         Logger.Log(Logger.GetStackTrace(), "handleOnKeyDown", 6);
-        this.ueInputKeyBoardMessage.sendKeyDown(this.getKeycode(keyboardEvent), keyboardEvent.repeat);
+        let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+        toStreamerHandlers.get("KeyDown")("KeyDown", [this.getKeycode(keyboardEvent), keyboardEvent.repeat]);
         /* this needs to be tested but it is believed that this is not needed*/
         // backSpace is not considered a keypress in JavaScript but we need it
         // to be so characters may be deleted in a UE4 text entry field.
@@ -57,7 +58,8 @@ export class KeyboardController {
      */
     handleOnKeyUp(keyboardEvent: KeyboardEvent) {
         Logger.Log(Logger.GetStackTrace(), "handleOnKeyUp", 6);
-        this.ueInputKeyBoardMessage.sendKeyUp(this.getKeycode(keyboardEvent));
+        let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+        toStreamerHandlers.get("KeyUp")("KeyUp", [this.getKeycode(keyboardEvent), keyboardEvent.repeat]);
 
         if (this.suppressBrowserKeys && this.isKeyCodeBrowserKey(keyboardEvent.keyCode)) {
             keyboardEvent.preventDefault();
@@ -70,7 +72,8 @@ export class KeyboardController {
      */
     handleOnKeyPress(keyboard: KeyboardEvent) {
         Logger.Log(Logger.GetStackTrace(), "handleOnkeypress", 6);
-        this.ueInputKeyBoardMessage.sendKeyPress(keyboard.charCode);
+        let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+        toStreamerHandlers.get("KeyPress")("KeyPress", [keyboard.charCode]);
     }
 
     /**

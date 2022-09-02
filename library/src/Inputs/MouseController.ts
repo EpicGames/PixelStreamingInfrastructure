@@ -87,7 +87,8 @@ export class MouseController {
 		let mouseCord: NormaliseAndQuantiseUnsigned = this.normaliseAndQuantiseUnsigned(X, Y);
 		let deltaCode: NormaliseAndQuantiseSigned = this.normaliseAndQuantiseSigned(deltaX, deltaY);
 
-		this.ueInputMouseMessage.sendMouseMove(mouseCord.x, mouseCord.y, deltaCode.x, deltaCode.y);
+		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+		toStreamerHandlers.get("MouseMove")("MouseMove", [mouseCord.x, mouseCord.y, deltaCode.x, deltaCode.y]);
 	}
 
 
@@ -126,7 +127,21 @@ export class MouseController {
 	sendMouseWheel(deltaY: number, X: number, Y: number) {
 		Logger.Log(Logger.GetStackTrace(), `mouse wheel with delta ${deltaY} at (${X}, ${Y})`, 6);
 		let coord: NormaliseAndQuantiseUnsigned = this.normaliseAndQuantiseUnsigned(X, Y);
-		this.ueInputMouseMessage.sendMouseWheel(deltaY, coord.x, coord.y);
+		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+		toStreamerHandlers.get("MouseWheel")("MouseWheel", [deltaY, coord.x, coord.y]);
+	}
+
+	/**
+	 * Handles when a mouse button is double clicked
+	 * @param button - Mouse Button Pressed
+	 * @param X  - Mouse X Coordinate
+	 * @param Y  - Mouse Y Coordinate
+	 */
+	sendMouseDouble(button: number, X: number, Y: number) {
+		Logger.Log(Logger.GetStackTrace(), `mouse button ${button} up at (${X}, ${Y})`, 6);
+		let coord: NormaliseAndQuantiseUnsigned = this.normaliseAndQuantiseUnsigned(X, Y);
+		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+		toStreamerHandlers.get("MouseDouble")("MouseDouble", [button, coord.x, coord.y]);
 	}
 
 	/**
@@ -134,17 +149,15 @@ export class MouseController {
 	 */
 	sendMouseEnter() {
 		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
-		toStreamerHandlers.get("MouseEnter")("MouseEnter", [button, coord.x, coord.y]);
-		
-		
-		this.ueInputMouseMessage.sendMouseEnter();
+		toStreamerHandlers.get("MouseEnter")("MouseEnter");
 	}
 
 	/**
 	 * Handles mouse Leave
 	 */
 	sendMouseLeave() {
-		this.ueInputMouseMessage.sendMouseLeave();
+		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+		toStreamerHandlers.get("MouseLeave")("MouseLeave");
 	}
 
 	/**
