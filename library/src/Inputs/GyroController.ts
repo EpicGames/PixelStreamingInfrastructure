@@ -1,16 +1,13 @@
-import { DataChannelController } from "../DataChannel/DataChannelController"
+import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
 
 /**
  * The Class that handles gyro input 
  */
 export class GyroController {
- 
-    dataChannelController: DataChannelController;
- 
-    constructor(dataChannelController: DataChannelController) {
-        this.dataChannelController = dataChannelController;
+
+    toStreamerMessagesProvider: IStreamMessageController;
+
+    constructor(toStreamerMessagesProvider: IStreamMessageController) {
+        this.toStreamerMessagesProvider = toStreamerMessagesProvider;
     }
-
-    
-
 }

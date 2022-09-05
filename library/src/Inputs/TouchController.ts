@@ -1,27 +1,33 @@
-import { UeInputTouchMessage } from "../UeInstanceMessage/UeInputTouchMessage";
-import { DataChannelController } from "../DataChannel/DataChannelController";
 import { ITouchController } from "./ITouchController";
 import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
 import { Logger } from "../Logger/Logger";
+import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
 /** 
  * Handles the Touch input Events
  */
 export class TouchController implements ITouchController {
-    ueInputTouchMessage: UeInputTouchMessage;
+    toStreamerMessagesProvider: IStreamMessageController;
     playerElement: HTMLVideoElement;
 
     /**
      * 
-     * @param dataChannelController - the data channel controller 
      * @param videoElementProvider - the provider of the video element 
      */
-    constructor(dataChannelController: DataChannelController, videoElementProvider: IVideoPlayer) {
-        this.ueInputTouchMessage = new UeInputTouchMessage(dataChannelController, videoElementProvider);
+    constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer) {
+        this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.playerElement = videoElementProvider.getVideoElement();
         this.playerElement.ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
         this.playerElement.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
         this.playerElement.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
         Logger.Log(Logger.GetStackTrace(), "Touch Events Registered", 6);
+    }
+
+    rememberTouch(){
+
+    }
+
+    forgetTouch(){
+        
     }
 
     /**

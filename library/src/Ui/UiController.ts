@@ -117,7 +117,7 @@ export class UiController {
         this.updateVideoStreamSize();
 
         if (playerElement.classList.contains('fixed-size')) {
-            this.setUpMouseAndFreezeFrame(playerElement)
+            this.setUpMouseAndFreezeFrame(playerElement);
             return;
         }
 
@@ -135,7 +135,7 @@ export class UiController {
             this.resizePlayerStyleToArbitrarySize(playerElement);
         }
 
-        this.setUpMouseAndFreezeFrame(playerElement)
+        this.setUpMouseAndFreezeFrame(playerElement);
     }
 
     /**

@@ -2,6 +2,7 @@ import { ITouchController } from "./ITouchController";
 import { MouseButton } from "./MouseButtons";
 import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
 import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
+import { INormalizeAndQuantize } from "../NormalizeAndQuantize/INormalizeAndQuantize";
 
 
 /**
@@ -13,10 +14,12 @@ export class FakeTouchController implements ITouchController {
     finger: Finger;
     toStreamerMessagesProvider: IStreamMessageController;
     videoElementProvider: IVideoPlayer;
+    normalizeAndQuantize: INormalizeAndQuantize;
 
-    constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer) {
+    constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer, normalizeAndQuantize: INormalizeAndQuantize) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.videoElementProvider = videoElementProvider;
+        this.normalizeAndQuantize = normalizeAndQuantize;
         document.ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
         document.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
         document.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
@@ -33,15 +36,15 @@ export class FakeTouchController implements ITouchController {
         if (this.finger == null) {
             let first_touch = touch.changedTouches[0];
             this.finger = {
-                ID: first_touch.identifier,
-                X: first_touch.clientX - videoElementParent.getBoundingClientRect().left,
-                Y: first_touch.clientY - - videoElementParent.getBoundingClientRect().top
+                id: first_touch.identifier,
+                x: first_touch.clientX - videoElementParent.getBoundingClientRect().left,
+                y: first_touch.clientY - - videoElementParent.getBoundingClientRect().top
             }
 
-            let mouseEvent = new MouseEvent(touch.type, first_touch)
-
+            let mouseEvent = new MouseEvent(touch.type, first_touch);
             videoElementParent.onmouseenter(mouseEvent);
-            toStreamerHandlers.get("MouseDown")("MouseDown", [MouseButton.mainButton, this.finger.X, this.finger.Y]);
+            let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.finger.x, this.finger.y);
+            toStreamerHandlers.get("MouseDown")("MouseDown", [MouseButton.mainButton, coord.x, coord.y]);
         }
     }
 
@@ -56,12 +59,13 @@ export class FakeTouchController implements ITouchController {
         for (let i = 0; i < touchEvent.changedTouches.length; i++) {
             let touch = touchEvent.changedTouches[i];
 
-            if (touch.identifier === this.finger.ID) {
+            if (touch.identifier === this.finger.id) {
                 let x = touch.clientX - videoElementParent.getBoundingClientRect().left;
                 let y = touch.clientY - videoElementParent.getBoundingClientRect().top;
-                toStreamerHandlers.get("MouseUp")("MouseUp", [MouseButton.mainButton, x, y]);
+                let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.finger.x, this.finger.y);
+                toStreamerHandlers.get("MouseUp")("MouseUp", [MouseButton.mainButton, coord.x, coord.y]);
 
-                let mouseEvent = new MouseEvent(touchEvent.type, touch)
+                let mouseEvent = new MouseEvent(touchEvent.type, touch);
                 videoElementParent.onmouseleave(mouseEvent);
                 this.finger = null;
             }
@@ -74,14 +78,19 @@ export class FakeTouchController implements ITouchController {
      * @param touchEvent - the activating touch event 
      */
     onTouchMove(touchEvent: TouchEvent): void {
+        let videoElementParent = this.videoElementProvider.getVideoParentElement();
+        let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+
         for (let i = 0; i < touchEvent.touches.length; i++) {
             let touch = touchEvent.touches[i];
-            if (touch.identifier === this.finger.ID) {
-                let x = touch.clientX - this.videoPlayerElement.getBoundingClientRect().left;
-                let y = touch.clientY - this.videoPlayerElement.getBoundingClientRect().top;
-                this.ueInputMouseMessage.sendMouseMove(x, y, x - this.finger.X, y - this.finger.Y);
-                this.finger.X = x;
-                this.finger.Y = y;
+            if (touch.identifier === this.finger.id) {
+                let x = touch.clientX - videoElementParent.getBoundingClientRect().left;
+                let y = touch.clientY - videoElementParent.getBoundingClientRect().top;
+                let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(x, y);
+                let delta = this.normalizeAndQuantize.normalizeAndQuantizeSigned(x - this.finger.x, y - this.finger.y);
+                toStreamerHandlers.get("MoveMouse")("MouseMove", [coord.x, coord.y, delta.x, delta.y]);
+                this.finger.x = x;
+                this.finger.y = y;
             }
         }
     }
@@ -91,7 +100,7 @@ export class FakeTouchController implements ITouchController {
  * The interface for finger position mapping 
  */
 export interface Finger {
-    ID: number;
-    X: number;
-    Y: number;
+    id: number;
+    x: number;
+    y: number;
 }

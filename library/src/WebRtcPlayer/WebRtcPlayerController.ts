@@ -34,6 +34,7 @@ import { FakeTouchController } from "../Inputs/FakeTouchController";
 import { GamePadController } from "../Inputs/GamepadController";
 import { GyroController } from "../Inputs/GyroController";
 import { DataChannelSender } from "../DataChannel/DataChannelSender";
+import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuantize";
 /**
  * Entry point for the Web RTC Player
  */
@@ -70,6 +71,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	touchController: TouchController | FakeTouchController;
 	gamePadController: GamePadController;
 	gyroController: GyroController;
+	normalizeAndQuantize: NormalizeAndQuantize;
 
 
 	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
@@ -106,6 +108,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.videoPlayer = new VideoPlayer(this.config.playerElement, this.config.startVideoMuted);
 		this.streamController = new StreamController(this.videoPlayer);
+
+		this.normalizeAndQuantize = new NormalizeAndQuantize(this.videoPlayer);
 
 		this.uiController = new UiController(this.videoPlayer);
 		this.uiController.setUpMouseAndFreezeFrame = (element: HTMLDivElement) => this.setUpMouseAndFreezeFrame(element);
@@ -706,6 +710,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	setUpMouseAndFreezeFrame(playerElement: HTMLDivElement) {
 		// Calculating and normalizing positions depends on the width and height of the player.
 		this.playerElementClientRect = playerElement.getBoundingClientRect();
+		this.normalizeAndQuantize.setupNormalizeAndQuantize();
 		this.freezeFrameController.freezeFrame.resize();
 	}
 
