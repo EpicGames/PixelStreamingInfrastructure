@@ -1,7 +1,7 @@
 /**
  * Interface for Mouse Events
  */
-export interface IVideoPlayerMouseInterface {
+export interface IMouseEvents {
 
     /**
      * Handle when the locked state Changed

@@ -1,7 +1,7 @@
 /**
  * Interface for Touch Events
  */
-export interface IVideoPlayerTouchInterface {
+export interface ITouchEvents {
 
     /**
      * Fire when a touch event starts

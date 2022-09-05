@@ -1,8 +1,8 @@
 import { MouseButtonsMask, MouseButton } from "./MouseButtons";
-import { NormaliseAndQuantiseSigned, UnquantisedAndDenormaliseUnsigned, NormaliseAndQuantiseUnsigned } from "./CoordinateData"
 import { Logger } from "../Logger/Logger";
 import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
 import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
+import { INormalizeAndQuantize } from "../NormalizeAndQuantize/INormalizeAndQuantize";
 
 /**
  * Handles the Mouse Inputs for the document
@@ -13,13 +13,15 @@ export class MouseController {
 	videoElementProvider: IVideoPlayer;
 	printInputs: boolean;
 	toStreamerMessagesProvider: IStreamMessageController;
+	normalizeAndQuantize: INormalizeAndQuantize;
 
 	/**
 	 * 
 	 * @param toStreamerMessagesProvider - Stream message controller provider
 	 */
-	constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer) {
+	constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer, normalizeAndQuantize: INormalizeAndQuantize) {
 		this.toStreamerMessagesProvider = toStreamerMessagesProvider;
+		this.normalizeAndQuantize = normalizeAndQuantize;
 		this.printInputs = false;
 		this.videoElementProvider = videoElementProvider;
 	}
@@ -31,20 +33,21 @@ export class MouseController {
 	 * @param Y - Mouse pointer Y coordinate
 	 */
 	releaseMouseButtons(buttons: number, X: number, Y: number) {
+		let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
 		if (buttons & MouseButtonsMask.primaryButton) {
-			this.sendMouseUp(MouseButton.mainButton, X, Y);
+			this.sendMouseUp(MouseButton.mainButton, coord.x, coord.y);
 		}
 		if (buttons & MouseButtonsMask.secondaryButton) {
-			this.sendMouseUp(MouseButton.secondaryButton, X, Y);
+			this.sendMouseUp(MouseButton.secondaryButton, coord.x, coord.y);
 		}
 		if (buttons & MouseButtonsMask.auxiliaryButton) {
-			this.sendMouseUp(MouseButton.auxiliaryButton, X, Y);
+			this.sendMouseUp(MouseButton.auxiliaryButton, coord.x, coord.y);
 		}
 		if (buttons & MouseButtonsMask.fourthButton) {
-			this.sendMouseUp(MouseButton.fourthButton, X, Y);
+			this.sendMouseUp(MouseButton.fourthButton, coord.x, coord.y);
 		}
 		if (buttons & MouseButtonsMask.fifthButton) {
-			this.sendMouseUp(MouseButton.fifthButton, X, Y);
+			this.sendMouseUp(MouseButton.fifthButton, coord.x, coord.y);
 		}
 	}
 
@@ -55,20 +58,21 @@ export class MouseController {
 	 * @param Y - Mouse pointer Y coordinate
 	 */
 	pressMouseButtons(buttons: number, X: number, Y: number) {
+		let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
 		if (buttons & MouseButtonsMask.primaryButton) {
-			this.sendMouseDown(MouseButton.mainButton, X, Y);
+			this.sendMouseDown(MouseButton.mainButton, coord.x, coord.y);
 		}
 		if (buttons & MouseButtonsMask.secondaryButton) {
-			this.sendMouseDown(MouseButton.secondaryButton, X, Y);
+			this.sendMouseDown(MouseButton.secondaryButton, coord.x, coord.y);
 		}
 		if (buttons & MouseButtonsMask.auxiliaryButton) {
-			this.sendMouseDown(MouseButton.auxiliaryButton, X, Y);
+			this.sendMouseDown(MouseButton.auxiliaryButton, coord.x, coord.y);
 		}
 		if (buttons & MouseButtonsMask.fourthButton) {
-			this.sendMouseDown(MouseButton.fourthButton, X, Y);
+			this.sendMouseDown(MouseButton.fourthButton, coord.x, coord.y);
 		}
 		if (buttons & MouseButtonsMask.fifthButton) {
-			this.sendMouseDown(MouseButton.fifthButton, X, Y);
+			this.sendMouseDown(MouseButton.fifthButton, coord.x, coord.y);
 		}
 	}
 
@@ -84,8 +88,8 @@ export class MouseController {
 			Logger.Log(Logger.GetStackTrace(), `x: ${X}, y:${Y}, dX: ${deltaX}, dY: ${deltaY}`, 7);
 		}
 
-		let mouseCord: NormaliseAndQuantiseUnsigned = this.normaliseAndQuantiseUnsigned(X, Y);
-		let deltaCode: NormaliseAndQuantiseSigned = this.normaliseAndQuantiseSigned(deltaX, deltaY);
+		let mouseCord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
+		let deltaCode = this.normalizeAndQuantize.normalizeAndQuantizeSigned(deltaX, deltaY);
 
 		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 		toStreamerHandlers.get("MouseMove")("MouseMove", [mouseCord.x, mouseCord.y, deltaCode.x, deltaCode.y]);
@@ -100,9 +104,8 @@ export class MouseController {
 	 */
 	sendMouseDown(button: number, X: number, Y: number) {
 		Logger.Log(Logger.GetStackTrace(), `mouse button ${button} down at (${X}, ${Y})`, 6);
-		let coord: NormaliseAndQuantiseUnsigned = this.normaliseAndQuantiseUnsigned(X, Y);
 		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
-		toStreamerHandlers.get("MouseDown")("MouseDown", [button, coord.x, coord.y]);
+		toStreamerHandlers.get("MouseDown")("MouseDown", [button, X, Y]);
 	}
 
 	/**
@@ -113,7 +116,7 @@ export class MouseController {
 	 */
 	sendMouseUp(button: number, X: number, Y: number) {
 		Logger.Log(Logger.GetStackTrace(), `mouse button ${button} up at (${X}, ${Y})`, 6);
-		let coord: NormaliseAndQuantiseUnsigned = this.normaliseAndQuantiseUnsigned(X, Y);
+		let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
 		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 		toStreamerHandlers.get("MouseUp")("MouseUp", [button, coord.x, coord.y]);
 	}
@@ -126,7 +129,7 @@ export class MouseController {
 	 */
 	sendMouseWheel(deltaY: number, X: number, Y: number) {
 		Logger.Log(Logger.GetStackTrace(), `mouse wheel with delta ${deltaY} at (${X}, ${Y})`, 6);
-		let coord: NormaliseAndQuantiseUnsigned = this.normaliseAndQuantiseUnsigned(X, Y);
+		let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
 		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 		toStreamerHandlers.get("MouseWheel")("MouseWheel", [deltaY, coord.x, coord.y]);
 	}
@@ -139,7 +142,7 @@ export class MouseController {
 	 */
 	sendMouseDouble(button: number, X: number, Y: number) {
 		Logger.Log(Logger.GetStackTrace(), `mouse button ${button} up at (${X}, ${Y})`, 6);
-		let coord: NormaliseAndQuantiseUnsigned = this.normaliseAndQuantiseUnsigned(X, Y);
+		let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
 		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 		toStreamerHandlers.get("MouseDouble")("MouseDouble", [button, coord.x, coord.y]);
 	}
@@ -158,178 +161,5 @@ export class MouseController {
 	sendMouseLeave() {
 		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 		toStreamerHandlers.get("MouseLeave")("MouseLeave");
-	}
-
-	/**
-	 * Normalises and Quantised the Mouse Coordinates	
-	 * @param x - Mouse X Coordinate
-	 * @param y - Mouse Y Coordinate
-	 * @returns - Normalize And Quantize Unsigned Data Type
-	 */
-	normaliseAndQuantiseUnsigned(x: number, y: number): NormaliseAndQuantiseUnsigned {
-
-		let rootDiv = this.videoElementProvider.getVideoParentElement();
-		let videoElement = this.videoElementProvider.getVideoElement();
-
-		if (rootDiv && videoElement) {
-			let playerAspectRatio = rootDiv.clientHeight / rootDiv.clientWidth;
-			let videoAspectRatio = videoElement.videoHeight / videoElement.videoWidth;
-
-			// Unsigned XY positions are the ratio (0.0..1.0) along a viewport axis,
-			// quantized into an uint16 (0..65536).
-			// Signed XY deltas are the ratio (-1.0..1.0) along a viewport axis,
-			// quantized into an int16 (-32767..32767).
-			// This allows the browser viewport and client viewport to have a different
-			// size.
-			// Hack: Currently we set an out-of-range position to an extreme (65535)
-			// as we can't yet accurately detect mouse enter and leave events
-			// precisely inside a video with an aspect ratio which causes mattes.
-			if (playerAspectRatio > videoAspectRatio) {
-				Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio > videoAspectRatio', 6);
-
-				let ratio = playerAspectRatio / videoAspectRatio;
-				// Unsigned.
-				let normalizedX = x / rootDiv.clientWidth;
-				let normalizedY = ratio * (y / rootDiv.clientHeight - 0.5) + 0.5;
-
-				if (normalizedX < 0.0 || normalizedX > 1.0 || normalizedY < 0.0 || normalizedY > 1.0) {
-					return {
-						inRange: false,
-						x: this.unsignedOutOfRange,
-						y: this.unsignedOutOfRange
-					}
-				} else {
-					return {
-						inRange: true,
-						x: normalizedX * (this.unsignedOutOfRange + 1),
-						y: normalizedY * (this.unsignedOutOfRange + 1)
-					};
-				}
-			} else {
-				Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio', 6);
-
-				let ratio = videoAspectRatio / playerAspectRatio;
-				// Unsigned.
-				let normalizedX = ratio * (x / rootDiv.clientWidth - 0.5) + 0.5;
-				let normalizedY = y / rootDiv.clientHeight;
-				if (normalizedX < 0.0 || normalizedX > 1.0 || normalizedY < 0.0 || normalizedY > 1.0) {
-					return {
-						inRange: false,
-						x: this.unsignedOutOfRange,
-						y: this.unsignedOutOfRange
-					};
-				} else {
-					return {
-						inRange: true,
-						x: normalizedX * (this.unsignedOutOfRange + 1),
-						y: normalizedY * (this.unsignedOutOfRange + 1)
-					};
-				}
-			}
-		}
-	}
-
-	/**
-	 * Denormalises and unquantised the Mouse Coordinates	
-	 * @param x - Mouse X Coordinate
-	 * @param y - Mouse Y Coordinate
-	 * @returns - unquantise and Denormalize Unsigned Data Type
-	 */
-	unquantiseAndDenormaliseUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned {
-
-		let rootDiv = this.videoElementProvider.getVideoParentElement();
-		let videoElement = this.videoElementProvider.getVideoElement();
-
-		if (rootDiv && videoElement) {
-			let playerAspectRatio = rootDiv.clientHeight / rootDiv.clientWidth;
-			let videoAspectRatio = videoElement.videoHeight / videoElement.videoWidth;
-
-			// Unsigned XY positions are the ratio (0.0..1.0) along a viewport axis,
-			// quantized into an uint16 (0..65536).
-			// Signed XY deltas are the ratio (-1.0..1.0) along a viewport axis,
-			// quantized into an int16 (-32767..32767).
-			// This allows the browser viewport and client viewport to have a different
-			// size.
-			// Hack: Currently we set an out-of-range position to an extreme (65535)
-			// as we can't yet accurately detect mouse enter and leave events
-			// precisely inside a video with an aspect ratio which causes mattes.
-			if (playerAspectRatio > videoAspectRatio) {
-				Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio > videoAspectRatio', 6);
-
-				let ratio = playerAspectRatio / videoAspectRatio;
-				// Unsigned.
-				let normalizedX = x / (this.unsignedOutOfRange + 1);
-				let normalizedY = (y / (this.unsignedOutOfRange + 1) - 0.5) / ratio + 0.5;
-
-				return {
-					x: normalizedX * rootDiv.clientWidth,
-					y: normalizedY * rootDiv.clientHeight
-				}
-
-			} else {
-				Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio', 6);
-
-				let ratio = videoAspectRatio / playerAspectRatio;
-				// Unsigned.
-				let normalizedX = (x / (this.unsignedOutOfRange + 1) - 0.5) / ratio + 0.5;
-				let normalizedY = y / (this.unsignedOutOfRange + 1);
-				return {
-					x: normalizedX * rootDiv.clientWidth,
-					y: normalizedY * rootDiv.clientHeight
-				}
-			}
-		}
-	}
-
-	/**
-	 * Normalises and Quantised the Mouse Coordinates	
-	 * @param x - Mouse X Coordinate
-	 * @param y - Mouse Y Coordinate
-	 * @returns - Normalize And Quantize Signed Data Type
-	 */
-	normaliseAndQuantiseSigned(x: number, y: number): NormaliseAndQuantiseSigned {
-
-		let rootDiv = this.videoElementProvider.getVideoParentElement();
-		let videoElement = this.videoElementProvider.getVideoElement();
-
-		if (rootDiv && videoElement) {
-			let playerAspectRatio = rootDiv.clientHeight / rootDiv.clientWidth;
-			let videoAspectRatio = videoElement.videoHeight / videoElement.videoWidth;
-
-			// Unsigned XY positions are the ratio (0.0..1.0) along a viewport axis,
-			// quantized into an uint16 (0..65536).
-			// Signed XY deltas are the ratio (-1.0..1.0) along a viewport axis,
-			// quantized into an int16 (-32767..32767).
-			// This allows the browser viewport and client viewport to have a different
-			// size.
-			// Hack: Currently we set an out-of-range position to an extreme (65535)
-			// as we can't yet accurately detect mouse enter and leave events
-			// precisely inside a video with an aspect ratio which causes mattes.
-			if (playerAspectRatio > videoAspectRatio) {
-				Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio > videoAspectRatio', 6);
-
-				let ratio = playerAspectRatio / videoAspectRatio;
-				// Unsigned.
-				let normalizedX = x / (0.5 * rootDiv.clientWidth);
-				let normalizedY = (ratio * y) / (0.5 * rootDiv.clientHeight);
-				return {
-					x: normalizedX * this.signedOutOfRange,
-					y: normalizedY * this.signedOutOfRange
-				}
-
-			} else {
-				if (this.printInputs) {
-					Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio', 6);
-				}
-				let ratio = videoAspectRatio / playerAspectRatio;
-				// Signed.
-				let normalizedX = (ratio * x) / (0.5 * rootDiv.clientWidth);
-				let normalizedY = y / (0.5 * rootDiv.clientHeight);
-				return {
-					x: normalizedX * this.signedOutOfRange,
-					y: normalizedY * this.signedOutOfRange
-				}
-			}
-		}
 	}
 }

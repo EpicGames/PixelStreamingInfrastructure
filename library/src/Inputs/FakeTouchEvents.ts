@@ -1,6 +1,6 @@
-import { MouseButton } from "../Inputs/MouseButtons";
-import { MouseController } from "../Inputs/MouseController";
-import { IVideoPlayerTouchInterface } from "./VideoTouchEventInterfaces";
+import { MouseButton } from "./MouseButtons";
+import { MouseController } from "./MouseController";
+import { ITouchEvents } from "./ITouchEvents";
 
 /**
  * Storage for finger Data
@@ -15,7 +15,7 @@ interface fingerInterface {
 /**
  * Fake touch event handler
  */
-export class VideoPlayerTouchFakeEvents implements IVideoPlayerTouchInterface {
+export class FakeTouchEvents implements ITouchEvents {
 
     mouseController: MouseController;
     htmlVideoElement: HTMLVideoElement;

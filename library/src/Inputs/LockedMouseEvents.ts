@@ -1,12 +1,12 @@
-import { MouseController } from "../Inputs/MouseController";
+import { MouseController } from "./MouseController";
 import { Logger } from "../Logger/Logger";
-import { IVideoPlayer } from "./IVideoPlayer";
-import { IVideoPlayerMouseInterface } from "./VideoPlayerMouseInterface";
+import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
+import { IMouseEvents } from "./IMouseEvents";
 
 /**
  * Handle the mouse locked events
  */
-export class VideoPlayerMouseLockedEvents implements IVideoPlayerMouseInterface {
+export class LockedMouseEvents implements IMouseEvents {
 
     x: number;
     y: number;

@@ -1,6 +1,6 @@
-import { MouseController } from "../Inputs/MouseController";
+import { MouseController } from "./MouseController";
 import { Logger } from "../Logger/Logger";
-import { IVideoPlayerTouchInterface } from "./VideoTouchEventInterfaces";
+import { ITouchEvents } from "./ITouchEvents";
 
 /**
  * Storage for finger Data
@@ -14,7 +14,7 @@ interface fingerInterface {
 /**
  * Real Touch Event Handler
  */
-export class VideoPlayerTouchEvents implements IVideoPlayerTouchInterface {
+export class TouchEvents implements ITouchEvents {
 
     mouseController: MouseController;
     htmlVideoElement: HTMLVideoElement;

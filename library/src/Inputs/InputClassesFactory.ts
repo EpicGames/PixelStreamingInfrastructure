@@ -4,11 +4,11 @@ import { MouseController } from "./MouseController";
 import { TouchController } from "./TouchController";
 import { GamePadController } from "./GamepadController";
 import { ControlSchemeType } from "../Config/Config";
-import { VideoPlayerMouseLockedEvents } from "../VideoPlayer/VideoPlayerMouseLockedEvents";
-import { VideoPlayerMouseHoverEvents } from "../VideoPlayer/VideoPlayerMouseHoverEvents";
+import { LockedMouseEvents } from "./LockedMouseEvents";
+import { HoveringMouseEvents } from "./HoveringMouseEvents";
 import { GyroController } from "./GyroController";
 import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
-import { IVideoPlayerMouseInterface } from "../VideoPlayer/VideoPlayerMouseInterface";
+import { IMouseEvents } from "./IMouseEvents";
 import { Logger } from "../Logger/Logger";
 import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
 
@@ -45,53 +45,52 @@ export class InputClassesFactory {
 
         let videoElement = this.videoElementProvider.getVideoElement() as HTMLVideoElement;
         let videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
-        let videoInputBindings: IVideoPlayerMouseInterface;
         let mouseController = new MouseController(this.toStreamerMessagesProvider, this.videoElementProvider);
 
         switch (controlScheme) {
             case ControlSchemeType.LockedMouse:
 
-                videoInputBindings = new VideoPlayerMouseLockedEvents(this.videoElementProvider, mouseController);
+                let lockedMouseEvents: IMouseEvents = new LockedMouseEvents(this.videoElementProvider, mouseController);
 
                 videoElement.onclick = (event: MouseEvent) => this.videoElementProvider.setClickActions(event);
 
-                document.addEventListener('pointerlockchange', () => videoInputBindings.handleLockStateChange(), false);
-                document.addEventListener('mozpointerlockchange', () => videoInputBindings.handleLockStateChange(), false);
+                document.addEventListener('pointerlockchange', () => lockedMouseEvents.handleLockStateChange(), false);
+                document.addEventListener('mozpointerlockchange', () => lockedMouseEvents.handleLockStateChange(), false);
 
-                videoElementParent.onmousedown = (mouseEvent: MouseEvent) => videoInputBindings.handleMouseDown(mouseEvent);
+                videoElementParent.onmousedown = (mouseEvent: MouseEvent) => lockedMouseEvents.handleMouseDown(mouseEvent);
 
-                videoElementParent.onmouseup = (mouseEvent: MouseEvent) => videoInputBindings.handleMouseUp(mouseEvent);
+                videoElementParent.onmouseup = (mouseEvent: MouseEvent) => lockedMouseEvents.handleMouseUp(mouseEvent);
 
-                videoElementParent.onwheel = (wheelEvent: WheelEvent) => videoInputBindings.handleMouseWheel(wheelEvent);
+                videoElementParent.onwheel = (wheelEvent: WheelEvent) => lockedMouseEvents.handleMouseWheel(wheelEvent);
 
-                videoElementParent.ondblclick = (mouseEvent: MouseEvent) => videoInputBindings.handleMouseDouble(mouseEvent);
+                videoElementParent.ondblclick = (mouseEvent: MouseEvent) => lockedMouseEvents.handleMouseDouble(mouseEvent);
 
-                videoElementParent.pressMouseButtons = (mouseEvent: MouseEvent) => videoInputBindings.handelPressMouseButtons(mouseEvent);
+                videoElementParent.pressMouseButtons = (mouseEvent: MouseEvent) => lockedMouseEvents.handelPressMouseButtons(mouseEvent);
 
-                videoElementParent.releaseMouseButtons = (mouseEvent: MouseEvent) => videoInputBindings.handelReleaseMouseButtons(mouseEvent);
+                videoElementParent.releaseMouseButtons = (mouseEvent: MouseEvent) => lockedMouseEvents.handelReleaseMouseButtons(mouseEvent);
 
                 break
             case ControlSchemeType.HoveringMouse:
-                videoInputBindings = new VideoPlayerMouseHoverEvents(mouseController);
+                let hoveringMouseEvents = new HoveringMouseEvents(mouseController);
 
                 // set the onclick to null if the input bindings were previously set to pointerlock
                 videoElement.onclick = null;
 
-                videoElementParent.onmousemove = (mouseEvent: MouseEvent) => videoInputBindings.handleMouseMove(mouseEvent);
+                videoElementParent.onmousemove = (mouseEvent: MouseEvent) => hoveringMouseEvents.handleMouseMove(mouseEvent);
 
-                videoElementParent.onmousedown = (mouseEvent: MouseEvent) => videoInputBindings.handleMouseDown(mouseEvent);
+                videoElementParent.onmousedown = (mouseEvent: MouseEvent) => hoveringMouseEvents.handleMouseDown(mouseEvent);
 
-                videoElementParent.onmouseup = (mouseEvent: MouseEvent) => videoInputBindings.handleMouseUp(mouseEvent);
+                videoElementParent.onmouseup = (mouseEvent: MouseEvent) => hoveringMouseEvents.handleMouseUp(mouseEvent);
 
-                videoElementParent.oncontextmenu = (mouseEvent: MouseEvent) => videoInputBindings.handleContextMenu(mouseEvent);
+                videoElementParent.oncontextmenu = (mouseEvent: MouseEvent) => hoveringMouseEvents.handleContextMenu(mouseEvent);
 
-                videoElementParent.onwheel = (wheelEvent: WheelEvent) => videoInputBindings.handleMouseWheel(wheelEvent);
+                videoElementParent.onwheel = (wheelEvent: WheelEvent) => hoveringMouseEvents.handleMouseWheel(wheelEvent);
 
-                videoElementParent.ondblclick = (mouseEvent: MouseEvent) => videoInputBindings.handleMouseDouble(mouseEvent);
+                videoElementParent.ondblclick = (mouseEvent: MouseEvent) => hoveringMouseEvents.handleMouseDouble(mouseEvent);
 
-                videoElementParent.pressMouseButtons = (mouseEvent: MouseEvent) => videoInputBindings.handelPressMouseButtons(mouseEvent);
+                videoElementParent.pressMouseButtons = (mouseEvent: MouseEvent) => hoveringMouseEvents.handelPressMouseButtons(mouseEvent);
 
-                videoElementParent.releaseMouseButtons = (mouseEvent: MouseEvent) => videoInputBindings.handelReleaseMouseButtons(mouseEvent);
+                videoElementParent.releaseMouseButtons = (mouseEvent: MouseEvent) => hoveringMouseEvents.handelReleaseMouseButtons(mouseEvent);
 
                 break
             default:

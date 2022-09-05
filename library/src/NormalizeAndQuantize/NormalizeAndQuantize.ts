@@ -13,15 +13,15 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
     }
 
     normalizeAndQuantizeUnsigned(x: number, y: number): NormaliseAndQuantiseUnsigned {
-        throw new Error("Method not implemented.");
+        return this.setterNormalizeAndQuantizeUnsigned(x, y);
     }
 
     unquantizeAndDenormalizeUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned {
-        throw new Error("Method not implemented.");
+        return this.setterUnquantizeAndDenormalizeUnsigned(x, y);
     }
 
     normalizeAndQuantizeSigned(x: number, y: number): NormaliseAndQuantiseSigned {
-        throw new Error("Method not implemented.");
+        return this.setterNormalizeAndQuantizeSigned(x, y);
     }
 
     setupNormalizeAndQuantize() {
@@ -35,18 +35,30 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
             if (playerAspectRatio > videoAspectRatio) {
                 Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio > videoAspectRatio');
                 this.ratio = playerAspectRatio / videoAspectRatio;
-                this.normalizeAndQuantizeUnsigned = (x: number, y: number) => this.overRideNormalizeAndQuantizeUnsigned(x, y);
-                this.unquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.overRideUnquantizeAndDenormalizeUnsigned(x, y);
-                this.normalizeAndQuantizeSigned = (x: number, y: number) => this.overRideNormalizeAndQuantizeSigned(x, y);
+                this.setterNormalizeAndQuantizeUnsigned = (x: number, y: number) => this.overRideNormalizeAndQuantizeUnsigned(x, y);
+                this.setterUnquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.overRideUnquantizeAndDenormalizeUnsigned(x, y);
+                this.setterNormalizeAndQuantizeSigned = (x: number, y: number) => this.overRideNormalizeAndQuantizeSigned(x, y);
             } else {
                 Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio');
                 this.ratio = videoAspectRatio / playerAspectRatio;
-                this.normalizeAndQuantizeUnsigned = (x: number, y: number) => this.overRideNormalizeAndQuantizeUnsignedAlt(x, y);
-                this.unquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.overRideUnquantizeAndDenormalizeUnsignedAlt(x, y);
-                this.normalizeAndQuantizeSigned = (x: number, y: number) => this.overRideNormalizeAndQuantizeSignedAlt(x, y);
+                this.setterNormalizeAndQuantizeUnsigned = (x: number, y: number) => this.overRideNormalizeAndQuantizeUnsignedAlt(x, y);
+                this.setterUnquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.overRideUnquantizeAndDenormalizeUnsignedAlt(x, y);
+                this.setterNormalizeAndQuantizeSigned = (x: number, y: number) => this.overRideNormalizeAndQuantizeSignedAlt(x, y);
             }
 
         }
+    }
+
+    setterNormalizeAndQuantizeUnsigned(x: number, y: number): NormaliseAndQuantiseUnsigned {
+        throw new Error("Method not implemented.");
+    }
+
+    setterUnquantizeAndDenormalizeUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned {
+        throw new Error("Method not implemented.");
+    }
+
+    setterNormalizeAndQuantizeSigned(x: number, y: number): NormaliseAndQuantiseSigned {
+        throw new Error("Method not implemented.");
     }
 
     // overrides 

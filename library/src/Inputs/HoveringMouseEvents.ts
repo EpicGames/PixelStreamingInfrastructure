@@ -1,11 +1,11 @@
-import { MouseController } from "../Inputs/MouseController";
+import { MouseController } from "./MouseController";
 import { Logger } from "../Logger/Logger";
-import { IVideoPlayerMouseInterface } from "./VideoPlayerMouseInterface";
+import { IMouseEvents } from "./IMouseEvents";
 
 /**
  * Video Player mouse Hover handler
  */
-export class VideoPlayerMouseHoverEvents implements IVideoPlayerMouseInterface {
+export class HoveringMouseEvents implements IMouseEvents {
 
     mouseController: MouseController;
 
