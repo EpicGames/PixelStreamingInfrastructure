@@ -22,7 +22,10 @@ export class HoveringMouseEvents implements IMouseEvents {
      */
     updateMouseMovePosition(mouseEvent: MouseEvent) {
         Logger.Log(Logger.GetStackTrace(), "MouseMove", 6);
-        this.mouseController.sendMouseMove(mouseEvent.offsetX, mouseEvent.offsetY, mouseEvent.movementX, mouseEvent.movementY);
+        let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
+        let delta = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeSigned(mouseEvent.movementX, mouseEvent.movementY);
+        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        toStreamerHandlers.get("MouseMove")("MouseMove", [coord.x, coord.y, delta.x, delta.y]);
         mouseEvent.preventDefault();
     }
 
@@ -32,7 +35,9 @@ export class HoveringMouseEvents implements IMouseEvents {
      */
     handleMouseDown(mouseEvent: MouseEvent) {
         Logger.Log(Logger.GetStackTrace(), "onMouse Down", 6);
-        this.mouseController.sendMouseDown(mouseEvent.button, mouseEvent.offsetX, mouseEvent.offsetY);
+        let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
+        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        toStreamerHandlers.get("MouseDown")("MouseDown", [mouseEvent.button, coord.x, coord.y]);
         mouseEvent.preventDefault();
     }
 
@@ -41,7 +46,9 @@ export class HoveringMouseEvents implements IMouseEvents {
      * @param mouseEvent - Mouse Event
      */
     handleMouseUp(mouseEvent: MouseEvent) {
-        this.mouseController.sendMouseUp(mouseEvent.button, mouseEvent.offsetX, mouseEvent.offsetY);
+        let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
+        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        toStreamerHandlers.get("MouseUp")("MouseUp", [mouseEvent.button, coord.x, coord.y]);
         mouseEvent.preventDefault();
     }
 
@@ -50,7 +57,9 @@ export class HoveringMouseEvents implements IMouseEvents {
     * @param mouseEvent - Mouse Event
     */
     handleContextMenu(mouseEvent: MouseEvent) {
-        this.mouseController.sendMouseUp(mouseEvent.button, mouseEvent.offsetX, mouseEvent.offsetY);
+        let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
+        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        toStreamerHandlers.get("MouseUp")("MouseUp", [mouseEvent.button, coord.x, coord.y]);
         mouseEvent.preventDefault();
     }
 
@@ -59,7 +68,9 @@ export class HoveringMouseEvents implements IMouseEvents {
      * @param wheelEvent - Mouse Event
      */
     handleMouseWheel(wheelEvent: WheelEvent) {
-        this.mouseController.sendMouseWheel(wheelEvent.detail * -120, wheelEvent.offsetX, wheelEvent.offsetY);
+        let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(wheelEvent.offsetX, wheelEvent.offsetY);
+        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        toStreamerHandlers.get("MouseWheel")("MouseWheel", [wheelEvent.wheelDelta, coord.x, coord.y]);
         wheelEvent.preventDefault();
     }
 
@@ -68,7 +79,9 @@ export class HoveringMouseEvents implements IMouseEvents {
      * @param mouseEvent - Mouse Event
      */
     handleMouseDouble(mouseEvent: MouseEvent) {
-        this.mouseController.sendMouseDouble(mouseEvent.button, mouseEvent.offsetX, mouseEvent.offsetY);
+        let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
+        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        toStreamerHandlers.get("MouseDouble")("MouseDouble", [mouseEvent.button, coord.x, coord.y]);
     }
 
     /**
