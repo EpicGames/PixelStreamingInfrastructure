@@ -11,7 +11,7 @@ import { INormalizeAndQuantize } from "../NormalizeAndQuantize/INormalizeAndQuan
  * @param videoPlayerElement - The video player DOM element 
  */
 export class FakeTouchController implements ITouchController {
-    finger: Finger;
+    fakeTouchFinger: FakeTouchFinger;
     toStreamerMessagesProvider: IStreamMessageController;
     videoElementProvider: IVideoPlayer;
     normalizeAndQuantize: INormalizeAndQuantize;
@@ -35,15 +35,15 @@ export class FakeTouchController implements ITouchController {
      * @param touch - the activating touch event 
      */
     onTouchStart(touch: TouchEvent): void {
-        if (this.finger == null) {
+        if (this.fakeTouchFinger == null) {
             let first_touch = touch.changedTouches[0];
-            this.finger = new Finger(first_touch.identifier, first_touch.clientX - this.playerElementClientRect.left, first_touch.clientY - this.playerElementClientRect.top);
+            this.fakeTouchFinger = new FakeTouchFinger(first_touch.identifier, first_touch.clientX - this.playerElementClientRect.left, first_touch.clientY - this.playerElementClientRect.top);
 
             let playerElement = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
             let mouseEvent = new MouseEvent(touch.type, first_touch);
             playerElement.onmouseenter(mouseEvent);
 
-            let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.finger.x, this.finger.y);
+            let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.fakeTouchFinger.x, this.fakeTouchFinger.y);
             let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
             toStreamerHandlers.get("MouseDown")("MouseDown", [MouseButton.mainButton, coord.x, coord.y]);
         }
@@ -60,7 +60,7 @@ export class FakeTouchController implements ITouchController {
 
         for (let t = 0; t < touchEvent.changedTouches.length; t++) {
             let touch = touchEvent.changedTouches[t];
-            if (touch.identifier === this.finger.id) {
+            if (touch.identifier === this.fakeTouchFinger.id) {
                 let x = touch.clientX - this.playerElementClientRect.left;
                 let y = touch.clientY - this.playerElementClientRect.top;
                 let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(x, y);
@@ -68,7 +68,7 @@ export class FakeTouchController implements ITouchController {
 
                 let mouseEvent = new MouseEvent(touchEvent.type, touch);
                 playerElement.onmouseleave(mouseEvent);
-                this.finger = null;
+                this.fakeTouchFinger = null;
                 break;
             }
         }
@@ -84,14 +84,14 @@ export class FakeTouchController implements ITouchController {
 
         for (let t = 0; t < touchEvent.touches.length; t++) {
             let touch = touchEvent.touches[t];
-            if (touch.identifier === this.finger.id) {
+            if (touch.identifier === this.fakeTouchFinger.id) {
                 let x = touch.clientX - this.playerElementClientRect.left;
                 let y = touch.clientY - this.playerElementClientRect.top;
                 let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(x, y);
-                let delta = this.normalizeAndQuantize.normalizeAndQuantizeSigned(x - this.finger.x, y - this.finger.y);
+                let delta = this.normalizeAndQuantize.normalizeAndQuantizeSigned(x - this.fakeTouchFinger.x, y - this.fakeTouchFinger.y);
                 toStreamerHandlers.get("MoveMouse")("MouseMove", [coord.x, coord.y, delta.x, delta.y]);
-                this.finger.x = x;
-                this.finger.y = y;
+                this.fakeTouchFinger.x = x;
+                this.fakeTouchFinger.y = y;
                 break;
             }
         }
@@ -102,7 +102,7 @@ export class FakeTouchController implements ITouchController {
 /**
  * The interface for finger position mapping 
  */
-export class Finger {
+export class FakeTouchFinger {
     id: number;
     x: number;
     y: number;

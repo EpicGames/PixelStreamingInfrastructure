@@ -113,7 +113,7 @@ export class InputClassesFactory {
         if (fakeMouseTouch) {
             return new FakeTouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
         } else {
-            return new TouchController(this.toStreamerMessagesProvider, this.videoElementProvider);
+            return new TouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
         }
     }
 
