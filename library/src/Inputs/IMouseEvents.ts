@@ -6,13 +6,13 @@ export interface IMouseEvents {
     /**
      * Handle when the locked state Changed
      */
-    handleLockStateChange?(): void;
+    lockStateChange?(): void;
 
     /**
      * Handle when the mouse move
      * @param mouseEvent - Mouse Event
      */
-    handleMouseMove(mouseEvent: MouseEvent): void;
+    updateMouseMovePosition?(mouseEvent: MouseEvent): void;
 
     /**
      * Handle when the Button Down

@@ -20,7 +20,7 @@ export class HoveringMouseEvents implements IMouseEvents {
      * Handle the mouse move event, sends the mouse data to the UE Instance
      * @param mouseEvent - Mouse Event
      */
-    handleMouseMove(mouseEvent: MouseEvent) {
+    updateMouseMovePosition(mouseEvent: MouseEvent) {
         Logger.Log(Logger.GetStackTrace(), "MouseMove", 6);
         this.mouseController.sendMouseMove(mouseEvent.offsetX, mouseEvent.offsetY, mouseEvent.movementX, mouseEvent.movementY);
         mouseEvent.preventDefault();

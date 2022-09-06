@@ -8,10 +8,7 @@ import { INormalizeAndQuantize } from "../NormalizeAndQuantize/INormalizeAndQuan
  * Handles the Mouse Inputs for the document
  */
 export class MouseController {
-	readonly unsignedOutOfRange: number = 65535;
-	readonly signedOutOfRange: number = 32767;
 	videoElementProvider: IVideoPlayer;
-	printInputs: boolean;
 	toStreamerMessagesProvider: IStreamMessageController;
 	normalizeAndQuantize: INormalizeAndQuantize;
 
@@ -22,8 +19,39 @@ export class MouseController {
 	constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer, normalizeAndQuantize: INormalizeAndQuantize) {
 		this.toStreamerMessagesProvider = toStreamerMessagesProvider;
 		this.normalizeAndQuantize = normalizeAndQuantize;
-		this.printInputs = false;
 		this.videoElementProvider = videoElementProvider;
+		this.registerMouseEnterAndLeaveEvents();
+	}
+
+	clearMouseEvents() {
+		let playerElement = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
+		playerElement.onclick = null;
+		playerElement.onmousedown = null;
+		playerElement.onmouseup = null;
+		playerElement.onwheel = null;
+		playerElement.onmousemove = null;
+		playerElement.oncontextmenu = null;
+	}
+
+	/**
+	* Set the mouse enter and mouse leave events 
+	*/
+	registerMouseEnterAndLeaveEvents() {
+		let playerElement = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
+
+		// Handle when the Mouse has entered the element
+		playerElement.onmouseenter = (event: MouseEvent) => {
+			Logger.Log(Logger.GetStackTrace(), "Mouse Entered", 6);
+			this.sendMouseEnter();
+			this.pressMouseButtons(event.buttons, event.x, event.y);
+		};
+
+		// Handles when the mouse has left the element 
+		playerElement.onmouseleave = (event: MouseEvent) => {
+			Logger.Log(Logger.GetStackTrace(), "Mouse Left", 6);
+			this.sendMouseLeave();
+			this.releaseMouseButtons(event.buttons, event.x, event.y);
+		};
 	}
 
 	/**
@@ -77,24 +105,20 @@ export class MouseController {
 	}
 
 	/**
-	 * Handle when a mouse is moved
-	 * @param X - Mouse X Coordinate
-	 * @param Y - Mouse Y Coordinate
-	 * @param deltaX - Mouse Delta X Coordinate
-	 * @param deltaY - Mouse Delta Y Coordinate
+	 * Handles mouse enter
 	 */
-	sendMouseMove(X: number, Y: number, deltaX: number, deltaY: number) {
-		if (this.printInputs) {
-			Logger.Log(Logger.GetStackTrace(), `x: ${X}, y:${Y}, dX: ${deltaX}, dY: ${deltaY}`, 7);
-		}
-
-		let mouseCord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
-		let deltaCode = this.normalizeAndQuantize.normalizeAndQuantizeSigned(deltaX, deltaY);
-
+	sendMouseEnter() {
 		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
-		toStreamerHandlers.get("MouseMove")("MouseMove", [mouseCord.x, mouseCord.y, deltaCode.x, deltaCode.y]);
+		toStreamerHandlers.get("MouseEnter")("MouseEnter");
 	}
 
+	/**
+	 * Handles mouse Leave
+	 */
+	sendMouseLeave() {
+		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+		toStreamerHandlers.get("MouseLeave")("MouseLeave");
+	}
 
 	/**
 	 * Handles when a mouse button is pressed down
@@ -119,47 +143,5 @@ export class MouseController {
 		let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
 		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 		toStreamerHandlers.get("MouseUp")("MouseUp", [button, coord.x, coord.y]);
-	}
-
-	/**
-	 * Handles when a mouse wheel event
-	 * @param deltaY - Mouse Wheel data
-	 * @param X  - Mouse X Coordinate
-	 * @param Y  - Mouse Y Coordinate
-	 */
-	sendMouseWheel(deltaY: number, X: number, Y: number) {
-		Logger.Log(Logger.GetStackTrace(), `mouse wheel with delta ${deltaY} at (${X}, ${Y})`, 6);
-		let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
-		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
-		toStreamerHandlers.get("MouseWheel")("MouseWheel", [deltaY, coord.x, coord.y]);
-	}
-
-	/**
-	 * Handles when a mouse button is double clicked
-	 * @param button - Mouse Button Pressed
-	 * @param X  - Mouse X Coordinate
-	 * @param Y  - Mouse Y Coordinate
-	 */
-	sendMouseDouble(button: number, X: number, Y: number) {
-		Logger.Log(Logger.GetStackTrace(), `mouse button ${button} up at (${X}, ${Y})`, 6);
-		let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
-		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
-		toStreamerHandlers.get("MouseDouble")("MouseDouble", [button, coord.x, coord.y]);
-	}
-
-	/**
-	 * Handles mouse enter
-	 */
-	sendMouseEnter() {
-		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
-		toStreamerHandlers.get("MouseEnter")("MouseEnter");
-	}
-
-	/**
-	 * Handles mouse Leave
-	 */
-	sendMouseLeave() {
-		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
-		toStreamerHandlers.get("MouseLeave")("MouseLeave");
 	}
 }

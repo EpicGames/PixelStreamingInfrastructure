@@ -1,6 +1,7 @@
 import { SpecialKeyCodes } from "./SpecialKeyCodes";
 import { Logger } from "../Logger/Logger";
 import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
+import { IActiveKeys } from "./InputClassesFactory";
 
 /**
  * Handles the Keyboard Inputs for the document
@@ -9,15 +10,17 @@ export class KeyboardController {
 
     toStreamerMessagesProvider: IStreamMessageController;
     suppressBrowserKeys: boolean;
+    activeKeysProvider: IActiveKeys;
 
     /**
      * 
      * @param toStreamerMessagesProvider - streamer messages provider
      * @param suppressBrowserKeys - Suppress Browser Keys
      */
-    constructor(toStreamerMessagesProvider: IStreamMessageController, suppressBrowserKeys: boolean) {
+    constructor(toStreamerMessagesProvider: IStreamMessageController, suppressBrowserKeys: boolean, activeKeysProvider: IActiveKeys) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.suppressBrowserKeys = suppressBrowserKeys;
+        this.activeKeysProvider = activeKeysProvider;
     }
 
     /**

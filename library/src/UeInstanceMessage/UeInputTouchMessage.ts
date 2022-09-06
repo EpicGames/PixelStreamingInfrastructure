@@ -1,6 +1,4 @@
 import { DataChannelSender } from "../DataChannel/DataChannelSender";
-import { NormaliseAndQuantiseUnsigned } from "../Inputs/CoordinateData";
-import { Logger } from "../Logger/Logger";
 import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
 import { UeMessageType } from "./UeMessageTypes"
 
@@ -11,11 +9,6 @@ export class UeInputTouchMessage {
 
     fingers: number[];
     fingersIds: { [key: number]: number };
-
-    readonly unsignedOutOfRange: number = 65535;
-    readonly signedOutOfRange: number = 32767;
-
-    printInputs: boolean;
 
     videoElementProvider: IVideoPlayer;
     dataChannelSender: DataChannelSender;
@@ -29,7 +22,6 @@ export class UeInputTouchMessage {
         this.videoElementProvider = videoElementProvider;
         this.fingersIds = {}
         this.fingers = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
-        this.printInputs = false;
     }
 
     /**
@@ -88,75 +80,5 @@ export class UeInputTouchMessage {
             byte += 1;
         }
         this.dataChannelSender.sendData(data.buffer);
-    }
-
-    /**
-     * TO DO
-     * @param x - X Coordinate
-     * @param y - Y Coordinate
-     * @returns - Normalised and Quantised Unsigned values
-     */
-    normaliseAndQuantiseUnsigned(x: number, y: number): NormaliseAndQuantiseUnsigned {
-        let rootDiv = this.videoElementProvider.getVideoParentElement();
-        let videoElement = this.videoElementProvider.getVideoElement();
-
-        if (rootDiv && videoElement) {
-            let playerAspectRatio = rootDiv.clientHeight / rootDiv.clientWidth;
-            let videoAspectRatio = videoElement.videoHeight / videoElement.videoWidth;
-
-            // Unsigned XY positions are the ratio (0.0..1.0) along a viewport axis,
-            // quantized into an uint16 (0..65536).
-            // Signed XY deltas are the ratio (-1.0..1.0) along a viewport axis,
-            // quantized into an int16 (-32767..32767).
-            // This allows the browser viewport and client viewport to have a different
-            // size.
-            // Hack: Currently we set an out-of-range position to an extreme (65535)
-            // as we can't yet accurately detect mouse enter and leave events
-            // precisely inside a video with an aspect ratio which causes mattes.
-            if (playerAspectRatio > videoAspectRatio) {
-
-                let ratio = playerAspectRatio / videoAspectRatio;
-                // Unsigned.
-                let normalizedX = x / rootDiv.clientWidth;
-                let normalizedY = ratio * (y / rootDiv.clientHeight - 0.5) + 0.5;
-
-                if (normalizedX < 0.0 || normalizedX > 1.0 || normalizedY < 0.0 || normalizedY > 1.0) {
-                    return {
-                        inRange: false,
-                        x: this.unsignedOutOfRange,
-                        y: this.unsignedOutOfRange
-                    }
-                } else {
-                    return {
-                        inRange: true,
-                        x: normalizedX * (this.unsignedOutOfRange + 1),
-                        y: normalizedY * (this.unsignedOutOfRange + 1)
-                    };
-                }
-
-            } else {
-                if (this.printInputs) {
-                    Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio', 6);
-                }
-
-                let ratio = videoAspectRatio / playerAspectRatio;
-                // Unsigned. 
-                let normalizedX = ratio * (x / rootDiv.clientWidth - 0.5) + 0.5;
-                let normalizedY = y / rootDiv.clientHeight;
-                if (normalizedX < 0.0 || normalizedX > 1.0 || normalizedY < 0.0 || normalizedY > 1.0) {
-                    return {
-                        inRange: false,
-                        x: this.unsignedOutOfRange,
-                        y: this.unsignedOutOfRange
-                    };
-                } else {
-                    return {
-                        inRange: true,
-                        x: normalizedX * (this.unsignedOutOfRange + 1),
-                        y: normalizedY * (this.unsignedOutOfRange + 1)
-                    };
-                }
-            }
-        }
     }
 }

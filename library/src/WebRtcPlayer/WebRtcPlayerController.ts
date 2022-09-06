@@ -143,7 +143,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.afkLogic.hideCurrentOverlay = () => this.delegate.hideCurrentOverlay();
 		this.webSocketController.stopAfkWarningTimer = () => this.afkLogic.stopAfkWarningTimer();
 
-		this.inputClassesFactory = new InputClassesFactory(this.streamMessageController, this.videoPlayer);
+		this.inputClassesFactory = new InputClassesFactory(this.streamMessageController, this.videoPlayer, this.normalizeAndQuantize);
 	}
 
 	/**
@@ -633,14 +633,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		// show the connected overlay 
 		this.delegate.onWebRtcConnected();
-
-		this.videoPlayer.setMouseEnterAndLeaveEvents((event: any) => {
-			this.mouseController.sendMouseEnter();
-			this.mouseController.pressMouseButtons(event.buttons, event.x, event.y);
-		}, (event: any) => {
-			this.mouseController.sendMouseLeave();
-			this.mouseController.releaseMouseButtons(event.buttons, event.x, event.y);
-		});
 
 		this.activateRegisterMouse()
 		this.keyboardController = this.inputClassesFactory.registerKeyBoard(this.config.suppressBrowserKeys);

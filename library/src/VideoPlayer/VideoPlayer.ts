@@ -5,6 +5,7 @@ declare global {
     interface HTMLDivElement {
         pressMouseButtons?(mouseEvent: MouseEvent): void;
         releaseMouseButtons?(mouseEvent: MouseEvent): void;
+        mozRequestPointerLock?(): void;
     }
 }
 export class VideoPlayer implements IVideoPlayer {
@@ -51,23 +52,6 @@ export class VideoPlayer implements IVideoPlayer {
         if (this.videoElement.requestPointerLock) {
             this.videoElement.requestPointerLock();
         }
-    }
-
-    /**
-    * Set the mouse enter and mouse leave events 
-    */
-    setMouseEnterAndLeaveEvents(mouseEnterCallBack: (event: any) => void, mouseLeaveCallBack: (event: any) => void) {
-        // Handle when the Mouse has entered the element
-        this.videoElement.onmouseenter = (event: MouseEvent) => {
-            Logger.Log(Logger.GetStackTrace(), "Mouse Entered", 6);
-            mouseEnterCallBack(event);
-        };
-
-        // Handles when the mouse has left the element 
-        this.videoElement.onmouseleave = (event: MouseEvent) => {
-            Logger.Log(Logger.GetStackTrace(), "Mouse Left", 6);
-            mouseLeaveCallBack(event);
-        };
     }
 
     /**
