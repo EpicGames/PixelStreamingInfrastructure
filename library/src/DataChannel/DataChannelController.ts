@@ -33,13 +33,31 @@ export class DataChannelController implements IDataChannelController {
         this.dataChannel = this.peerConnection.createDataChannel(this.label, this.datachannelOptions);
         //We Want an Array Buffer not a blob
         this.dataChannel.binaryType = "arraybuffer";
+        this.dataChannel.onopen = () => this.handleOnOpen();
         this.dataChannel.onclose = () => this.handleOnClose();
+        this.dataChannel.onmessage = (ev: MessageEvent<any>) => this.handleOnMessage(ev);
     }
+
+    /**
+     * Handles when the Data Channel is opened
+     */
+    handleOnOpen() {
+        Logger.Log(Logger.GetStackTrace(), `Data Channel: ${this.label} is opened.`, 7);
+    }
+
 
     /**
      * Handles when the Data Channel is closed
      */
     handleOnClose() {
-        Logger.Log(Logger.GetStackTrace(), "Data Channel: " + this.label + " is closed.", 7);
+        Logger.Log(Logger.GetStackTrace(), `Data Channel: ${this.label} is closed.`, 7);
+    }
+
+    /**
+     * Handles when a message is received 
+     * @param event - Message Event
+     */
+    handleOnMessage(event: MessageEvent) {
+        Logger.Log(Logger.GetStackTrace(), `Data Channel event message has been received: ${event}`, 7);
     }
 }

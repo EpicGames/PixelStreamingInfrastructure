@@ -72,7 +72,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	gyroController: GyroController;
 	normalizeAndQuantize: NormalizeAndQuantize;
 
-
 	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
 	// it will use this property to store the override message string
 	disconnectMessageOverride: string;
@@ -114,8 +113,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.uiController.setUpMouseAndFreezeFrame = (element: HTMLDivElement) => this.setUpMouseAndFreezeFrame(element);
 
 		this.dataChannelController = new DataChannelController();
-		this.dataChannelController.dataChannel.onmessage = (ev: MessageEvent<any>) => this.handelOnMessage(ev);
-		this.dataChannelController.dataChannel.onopen = () => this.handleDataChannelConnected();
+		this.dataChannelController.handleOnOpen = () => this.handleDataChannelConnected();
+		this.dataChannelController.handleOnMessage = (ev: MessageEvent<any>) => this.handelOnMessage(ev);
 		this.dataChannelSender = new DataChannelSender(this.dataChannelController);
 		this.dataChannelSender.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
 
@@ -416,7 +415,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			// close the connection 
 			this.closeSignalingServer();
 		} else {
-			this.touchController = this.inputClassesFactory.registerTouch(this.config.fakeMouseWithTouches);
+			this.touchController = this.inputClassesFactory.registerTouch(this.config.fakeMouseWithTouches, this.playerElementClientRect);
 			if (this.streamController.audioElement) {
 				this.streamController.audioElement.play().then(() => {
 					this.playVideo();
@@ -510,12 +509,12 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		/* When the Peer connection ice candidate is added have it handled */
 		this.peerConnectionController.onPeerIceCandidate = (peerConnectionIceEvent: RTCPeerConnectionIceEvent) => this.handleSendIceCandidate(peerConnectionIceEvent);
 
-		// handel mic connections with promise
-		this.dataChannelController.createDataChannel(this.peerConnectionController.peerConnection, "cirrus", this.datachannelOptions);
-
 		// set up webRtc text overlays 
 		this.peerConnectionController.showTextOverlayConnecting = () => this.delegate.onWebRtcConnecting();
 		this.peerConnectionController.showTextOverlaySetupFailure = () => this.delegate.onWebRtcFailed();
+
+		// handel mic connections with promise
+		this.dataChannelController.createDataChannel(this.peerConnectionController.peerConnection, "cirrus", this.datachannelOptions);
 
 		/* RTC Peer Connection on Track event -> handle on track */
 		this.peerConnectionController.onTrack = (trackEvent: RTCTrackEvent) => this.streamController.handleOnTrack(trackEvent);
@@ -700,9 +699,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	setUpMouseAndFreezeFrame(playerElement: HTMLDivElement) {
 		// Calculating and normalizing positions depends on the width and height of the player.
-		if (this.touchController.hasOwnProperty("playerElementClientRect")) {
-			this.touchController.setPlayerElementClientRect(playerElement.getBoundingClientRect());
-		}
+		this.playerElementClientRect = playerElement.getBoundingClientRect();
 		this.normalizeAndQuantize.setupNormalizeAndQuantize();
 		this.freezeFrameController.freezeFrame.resize();
 	}

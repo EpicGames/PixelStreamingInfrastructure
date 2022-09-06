@@ -2,11 +2,6 @@
  * Interface for Touch Events
  */
 export interface ITouchController {
-
-    playerElementClientRect?: DOMRect;
-
-    setPlayerElementClientRect?(playerElementClientRect: any): void;
-
     /**
      * Fire when a touch event starts
      * @param touchEvent - Touch Event Data

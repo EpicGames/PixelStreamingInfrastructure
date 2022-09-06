@@ -108,10 +108,12 @@ export class InputClassesFactory {
      * register touch events 
      * @param fakeMouseTouch - the faked mouse touch event 
      */
-    registerTouch(fakeMouseTouch: boolean) {
+    registerTouch(fakeMouseTouch: boolean, playerElementClientRect: DOMRect) {
         Logger.Log(Logger.GetStackTrace(), "Registering Touch", 6);
         if (fakeMouseTouch) {
-            return new FakeTouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
+            let fakeTouchController = new FakeTouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
+            fakeTouchController.setPlayerElementClientRect(playerElementClientRect);
+            return fakeTouchController;
         } else {
             return new TouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
         }
