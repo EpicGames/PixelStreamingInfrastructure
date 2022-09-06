@@ -7,7 +7,6 @@ import { AfkLogic } from "../Afk/AfkLogic";
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { PeerConnectionController } from "../PeerConnectionController/PeerConnectionController"
 import { KeyboardController } from "../Inputs/KeyboardController";
-import { TouchController } from "../Inputs/TouchController";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { IWebRtcPlayerController } from "./IWebRtcPlayerController";
 import { IDelegate } from "../Delegate/IDelegate";
@@ -30,11 +29,11 @@ import { SendDescriptorController } from "../UeInstanceMessage/SendDescriptorCon
 import { SendMessageController } from "../UeInstanceMessage/SendMessageController";
 import { ToStreamerMessagesController } from "../UeInstanceMessage/ToStreamerMessagesController";
 import { MouseController } from "../Inputs/MouseController";
-import { FakeTouchController } from "../Inputs/FakeTouchController";
 import { GamePadController } from "../Inputs/GamepadController";
 import { GyroController } from "../Inputs/GyroController";
 import { DataChannelSender } from "../DataChannel/DataChannelSender";
 import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+import { ITouchController } from "../Inputs/ITouchController";
 /**
  * Entry point for the Web RTC Player
  */
@@ -68,7 +67,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	toStreamerMessagesController: ToStreamerMessagesController;
 	keyboardController: KeyboardController;
 	mouseController: MouseController;
-	touchController: TouchController | FakeTouchController;
+	touchController: ITouchController;
 	gamePadController: GamePadController;
 	gyroController: GyroController;
 	normalizeAndQuantize: NormalizeAndQuantize;
@@ -701,7 +700,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	setUpMouseAndFreezeFrame(playerElement: HTMLDivElement) {
 		// Calculating and normalizing positions depends on the width and height of the player.
-		this.playerElementClientRect = playerElement.getBoundingClientRect();
+		if (this.touchController.hasOwnProperty("playerElementClientRect")) {
+			this.touchController.setPlayerElementClientRect(playerElement.getBoundingClientRect());
+		}
 		this.normalizeAndQuantize.setupNormalizeAndQuantize();
 		this.freezeFrameController.freezeFrame.resize();
 	}
