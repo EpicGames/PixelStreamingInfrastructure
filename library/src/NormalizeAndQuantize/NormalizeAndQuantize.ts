@@ -4,7 +4,7 @@ import { INormalizeAndQuantize } from "./INormalizeAndQuantize";
 
 export class NormalizeAndQuantize implements INormalizeAndQuantize {
     videoElementProvider: IVideoPlayer;
-    playerElement: HTMLElement;
+    videoElementParent: HTMLElement;
     videoElement: HTMLVideoElement;
     ratio: number;
 
@@ -25,11 +25,11 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
     }
 
     setupNormalizeAndQuantize() {
-        this.playerElement = this.videoElementProvider.getVideoParentElement();
+        this.videoElementParent = this.videoElementProvider.getVideoParentElement();
         this.videoElement = this.videoElementProvider.getVideoElement() as any;
 
-        if (this.playerElement && this.videoElement) {
-            let playerAspectRatio = this.playerElement.clientHeight / this.playerElement.clientWidth;
+        if (this.videoElementParent && this.videoElement) {
+            let playerAspectRatio = this.videoElementParent.clientHeight / this.videoElementParent.clientWidth;
             let videoAspectRatio = this.videoElement.videoHeight / this.videoElement.videoWidth;
 
             if (playerAspectRatio > videoAspectRatio) {
@@ -63,8 +63,8 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
 
     // overrides 
     overRideNormalizeAndQuantizeUnsigned(x: number, y: number): NormaliseAndQuantiseUnsigned {
-        let normalizedX = x / this.playerElement.clientWidth;
-        let normalizedY = this.ratio * (y / this.playerElement.clientHeight - 0.5) + 0.5;
+        let normalizedX = x / this.videoElementParent.clientWidth;
+        let normalizedY = this.ratio * (y / this.videoElementParent.clientHeight - 0.5) + 0.5;
         if (normalizedX < 0.0 || normalizedX > 1.0 || normalizedY < 0.0 || normalizedY > 1.0) {
             return new NormaliseAndQuantiseUnsigned(false, 65535, 65535);
         } else {
@@ -75,19 +75,19 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
     overRideUnquantizeAndDenormalizeUnsigned(x: number, y: number) {
         let normalizedX = x / 65536;
         let normalizedY = (y / 65536 - 0.5) / this.ratio + 0.5;
-        return new UnquantisedAndDenormaliseUnsigned(normalizedX * this.playerElement.clientWidth, normalizedY * this.playerElement.clientHeight);
+        return new UnquantisedAndDenormaliseUnsigned(normalizedX * this.videoElementParent.clientWidth, normalizedY * this.videoElementParent.clientHeight);
     }
 
     overRideNormalizeAndQuantizeSigned(x: number, y: number) {
-        let normalizedX = x / (0.5 * this.playerElement.clientWidth);
-        let normalizedY = (this.ratio * y) / (0.5 * this.playerElement.clientHeight);
+        let normalizedX = x / (0.5 * this.videoElementParent.clientWidth);
+        let normalizedY = (this.ratio * y) / (0.5 * this.videoElementParent.clientHeight);
         return new NormaliseAndQuantiseSigned(normalizedX * 32767, normalizedY * 32767);
     }
 
     // Overrides alt
     overRideNormalizeAndQuantizeUnsignedAlt(x: number, y: number) {
-        let normalizedX = this.ratio * (x / this.playerElement.clientWidth - 0.5) + 0.5;
-        let normalizedY = y / this.playerElement.clientHeight;
+        let normalizedX = this.ratio * (x / this.videoElementParent.clientWidth - 0.5) + 0.5;
+        let normalizedY = y / this.videoElementParent.clientHeight;
         if (normalizedX < 0.0 || normalizedX > 1.0 || normalizedY < 0.0 || normalizedY > 1.0) {
             return new NormaliseAndQuantiseUnsigned(false, 65535, 65535);
         } else {
@@ -98,12 +98,12 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
     overRideUnquantizeAndDenormalizeUnsignedAlt(x: number, y: number) {
         let normalizedX = (x / 65536 - 0.5) / this.ratio + 0.5;
         let normalizedY = y / 65536;
-        return new UnquantisedAndDenormaliseUnsigned(normalizedX * this.playerElement.clientWidth, normalizedY * this.playerElement.clientHeight);
+        return new UnquantisedAndDenormaliseUnsigned(normalizedX * this.videoElementParent.clientWidth, normalizedY * this.videoElementParent.clientHeight);
     }
 
     overRideNormalizeAndQuantizeSignedAlt(x: number, y: number) {
-        let normalizedX = (this.ratio * x) / (0.5 * this.playerElement.clientWidth);
-        let normalizedY = y / (0.5 * this.playerElement.clientHeight);
+        let normalizedX = (this.ratio * x) / (0.5 * this.videoElementParent.clientWidth);
+        let normalizedY = y / (0.5 * this.videoElementParent.clientHeight);
         return new NormaliseAndQuantiseSigned(normalizedX * 32767, normalizedY * 32767);
     }
 }

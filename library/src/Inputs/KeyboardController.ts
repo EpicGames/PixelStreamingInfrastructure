@@ -83,10 +83,15 @@ export class KeyboardController {
      * @returns the key code of the Key
      */
     getKeycode(keyboardEvent: KeyboardEvent) {
-        if (keyboardEvent.keyCode === SpecialKeyCodes.shift && keyboardEvent.code === 'ShiftRight') return SpecialKeyCodes.rightShift;
-        else if (keyboardEvent.keyCode === SpecialKeyCodes.control && keyboardEvent.code === 'ControlRight') return SpecialKeyCodes.rightControl;
-        else if (keyboardEvent.keyCode === SpecialKeyCodes.alt && keyboardEvent.code === 'AltRight') return SpecialKeyCodes.rightAlt;
-        else return keyboardEvent.keyCode;
+        if (keyboardEvent.keyCode === SpecialKeyCodes.shift && keyboardEvent.code === 'ShiftRight') {
+            return SpecialKeyCodes.rightShift;
+        } else if (keyboardEvent.keyCode === SpecialKeyCodes.control && keyboardEvent.code === 'ControlRight') {
+            return SpecialKeyCodes.rightControl;
+        } else if (keyboardEvent.keyCode === SpecialKeyCodes.alt && keyboardEvent.code === 'AltRight') {
+            return SpecialKeyCodes.rightAlt;
+        } else {
+            return keyboardEvent.keyCode;
+        }
     }
 
     /**

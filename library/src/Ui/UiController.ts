@@ -22,13 +22,13 @@ export class UiController {
 
     /**
      * Resizes the player element to fill the window 
-     * @param playerElement - the player DOM element 
+     * @param videoElementParent - the player DOM element 
      */
-    resizePlayerStyleToFillWindow(playerElement: HTMLDivElement) {
+    resizePlayerStyleToFillWindow(videoElementParent: HTMLDivElement) {
         let videoElement = this.videoPlayerProvider.getVideoElement();
         // Fill the player display in window, keeping picture's aspect ratio.
         let windowAspectRatio = window.innerHeight / window.innerWidth;
-        let playerAspectRatio = playerElement.clientHeight / playerElement.clientWidth;
+        let playerAspectRatio = videoElementParent.clientHeight / videoElementParent.clientWidth;
         // We want to keep the video ratio correct for the video stream
         let videoWidth;
         let videoHeight;
@@ -39,34 +39,34 @@ export class UiController {
         let videoAspectRatio = videoHeight / videoWidth;
 
         if (isNaN(videoAspectRatio)) {
-            //Video is not initialised yet so set playerElement to size of window
+            //Video is not initialised yet so set videoElementParent to size of window
             this.playerStyleAttributes.styleWidth = window.innerWidth;
             this.playerStyleAttributes.styleHeight = window.innerHeight;
             this.playerStyleAttributes.styleTop = 0;
             this.playerStyleAttributes.styleLeft = 0;
-            playerElement.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
+            videoElementParent.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
         } else if (windowAspectRatio < playerAspectRatio) {
             // Window height is the constraining factor so to keep aspect ratio change width appropriately
             this.playerStyleAttributes.styleWidth = Math.floor(window.innerHeight / videoAspectRatio);
             this.playerStyleAttributes.styleHeight = window.innerHeight;
             this.playerStyleAttributes.styleTop = 0;
             this.playerStyleAttributes.styleLeft = Math.floor((window.innerWidth - this.playerStyleAttributes.styleWidth) * 0.5);
-            playerElement.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
+            videoElementParent.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
         } else {
             // Window width is the constraining factor so to keep aspect ratio change height appropriately
             this.playerStyleAttributes.styleWidth = window.innerWidth;
             this.playerStyleAttributes.styleHeight = Math.floor(window.innerWidth * videoAspectRatio);
             this.playerStyleAttributes.styleTop = Math.floor((window.innerHeight - this.playerStyleAttributes.styleHeight) * 0.5);
             this.playerStyleAttributes.styleLeft = 0;
-            playerElement.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
+            videoElementParent.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
         }
     }
 
     /**
      * Resizes the player element to fit the actual size of the stream
-     * @param playerElement - the player DOM element
+     * @param videoElementParent - the player DOM element
      */
-    resizePlayerStyleToActualSize(playerElement: HTMLDivElement) {
+    resizePlayerStyleToActualSize(videoElementParent: HTMLDivElement) {
         let videoElement = this.videoPlayerProvider.getVideoElement();
         let videoElementLength;
         if (!videoElement === undefined) {
@@ -80,16 +80,16 @@ export class UiController {
             let Left = Math.floor((window.innerWidth - this.playerStyleAttributes.styleWidth) * 0.5);
             this.playerStyleAttributes.styleTop = (Top > 0) ? Top : 0;
             this.playerStyleAttributes.styleLeft = (Left > 0) ? Left : 0;
-            playerElement.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
+            videoElementParent.setAttribute('style', "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
         }
     }
 
     /**
      * Resizes the player element to fit an arbitrary size 
-     * @param playerElement - the player DOM element
+     * @param videoElementParent - the player DOM element
      */
-    resizePlayerStyleToArbitrarySize(playerElement: HTMLDivElement) {
-        playerElement.setAttribute('style', "top: 0px; left: 0px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
+    resizePlayerStyleToArbitrarySize(videoElementParent: HTMLDivElement) {
+        videoElementParent.setAttribute('style', "top: 0px; left: 0px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
     }
 
     /**
@@ -108,34 +108,34 @@ export class UiController {
      * @returns - nil if requirements are satisfied 
      */
     resizePlayerStyle() {
-        let playerElement = this.videoPlayerProvider.getVideoParentElement() as HTMLDivElement;
+        let videoElementParent = this.videoPlayerProvider.getVideoParentElement() as HTMLDivElement;
 
-        if (!playerElement) {
+        if (!videoElementParent) {
             return;
         }
 
         this.updateVideoStreamSize();
 
-        if (playerElement.classList.contains('fixed-size')) {
-            this.setUpMouseAndFreezeFrame(playerElement);
+        if (videoElementParent.classList.contains('fixed-size')) {
+            this.setUpMouseAndFreezeFrame(videoElementParent);
             return;
         }
 
         // controls for resizing the player 
-        let videoWidth = parseInt(playerElement.getAttribute("videoWidth"))
-        let videoHeight = parseInt(playerElement.getAttribute("videoHeight"))
+        let videoWidth = parseInt(videoElementParent.getAttribute("videoWidth"))
+        let videoHeight = parseInt(videoElementParent.getAttribute("videoHeight"))
         let windowSmallerThanPlayer = window.innerWidth < videoWidth || window.innerHeight < videoHeight;
         if (this.enlargeDisplayToFillWindow !== null) {
             if (this.enlargeDisplayToFillWindow === true || windowSmallerThanPlayer) {
-                this.resizePlayerStyleToFillWindow(playerElement);
+                this.resizePlayerStyleToFillWindow(videoElementParent);
             } else {
-                this.resizePlayerStyleToActualSize(playerElement);
+                this.resizePlayerStyleToActualSize(videoElementParent);
             }
         } else {
-            this.resizePlayerStyleToArbitrarySize(playerElement);
+            this.resizePlayerStyleToArbitrarySize(videoElementParent);
         }
 
-        this.setUpMouseAndFreezeFrame(playerElement);
+        this.setUpMouseAndFreezeFrame(videoElementParent);
     }
 
     /**

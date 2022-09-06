@@ -25,18 +25,18 @@ export class Config {
 
 	//compulsory options and DOMs 
 	signallingServerAddress: string;
-	playerElement: HTMLDivElement;
+	videoElementParent: HTMLDivElement;
 
 	//this is a video element variable to be assigned when the video element is created
-	videoPlayerElement: HTMLVideoElement;
+	videovideoElementParent: HTMLVideoElement;
 
 	/**
 	 * @param signallingServerAddress - the address of the signaling server 
-	 * @param playerElement - the player element ID 
+	 * @param videoElementParent - the player element ID 
 	 */
-	constructor(signallingServerAddress: string, playerElement: HTMLDivElement) {
+	constructor(signallingServerAddress: string, videoElementParent: HTMLDivElement) {
 		this.signallingServerAddress = signallingServerAddress;
-		this.playerElement = playerElement;
+		this.videoElementParent = videoElementParent;
 	}
 }
 

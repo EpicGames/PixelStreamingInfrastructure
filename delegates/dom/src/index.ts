@@ -32,11 +32,11 @@ if (signallingServerAddress == '') {
     }
 }
 
-// prep the player div element 
-let playerElement = document.getElementById("player") as HTMLDivElement;
+// prep the video element parent div element 
+let videoElementParent = document.getElementById("videoElementParent") as HTMLDivElement;
 
 // Create a config object
-let config = CreateConfig(signallingServerAddress, playerElement);
+let config = CreateConfig(signallingServerAddress, videoElementParent);
 config.enableSpsAutoConnect = false;
 config.enableSpsAutoplay = false;
 
@@ -56,7 +56,7 @@ document.ontouchmove = (event: TouchEvent) => {
 }
 
 // Create a config object instance 
-function CreateConfig(signalingAddress: string, playerElement: HTMLDivElement) {
-    let config = new libspsfrontend.Config(signalingAddress, playerElement);
+function CreateConfig(signalingAddress: string, videoElementParent: HTMLDivElement) {
+    let config = new libspsfrontend.Config(signalingAddress, videoElementParent);
     return config;
 }

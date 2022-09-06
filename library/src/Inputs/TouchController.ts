@@ -10,7 +10,7 @@ export class TouchController implements ITouchController {
     toStreamerMessagesProvider: IStreamMessageController;
     videoElementProvider: IVideoPlayer;
     normalizeAndQuantize: INormalizeAndQuantize;
-    playerElement: HTMLVideoElement;
+    videoElementParent: HTMLVideoElement;
     fingers = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
     fingerIds = new Map();
     maxByteValue: number = 255;
@@ -23,10 +23,10 @@ export class TouchController implements ITouchController {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.videoElementProvider = videoElementProvider;
         this.normalizeAndQuantize = normalizeAndQuantize;
-        this.playerElement = videoElementProvider.getVideoElement();
-        this.playerElement.ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
-        this.playerElement.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
-        this.playerElement.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
+        this.videoElementParent = videoElementProvider.getVideoElement();
+        this.videoElementParent.ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
+        this.videoElementParent.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
+        this.videoElementParent.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
         Logger.Log(Logger.GetStackTrace(), "Touch Events Registered", 6);
     }
 
@@ -84,14 +84,14 @@ export class TouchController implements ITouchController {
     }
 
     emitTouchData(type: string, touches: TouchList) {
-        let playerElement = this.videoElementProvider.getVideoParentElement();
+        let videoElementParent = this.videoElementProvider.getVideoParentElement();
         let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 
         for (let t = 0; t < touches.length; t++) {
             let numTouches = 1; // the number of touches to be sent this message
             let touch = touches[t];
-            let x = touch.clientX - playerElement.offsetLeft;
-            let y = touch.clientY - playerElement.offsetTop;
+            let x = touch.clientX - videoElementParent.offsetLeft;
+            let y = touch.clientY - videoElementParent.offsetTop;
             Logger.Log(Logger.GetStackTrace(), `F${this.fingerIds.get(touch.identifier)}=(${x}, ${y})`, 6);
 
             let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(x, y);

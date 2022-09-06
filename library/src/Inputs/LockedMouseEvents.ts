@@ -25,9 +25,9 @@ export class LockedMouseEvents implements IMouseEvents {
         this.mouseController = mouseController;
         this.activeKeysProvider = activeKeysProvider;
 
-        let playerElement = this.videoElementProvider.getVideoParentElement() as any;
-        this.x = playerElement.width / 2;
-        this.y = playerElement.height / 2;
+        let videoElementParent = this.videoElementProvider.getVideoParentElement() as any;
+        this.x = videoElementParent.width / 2;
+        this.y = videoElementParent.height / 2;
         this.coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.x, this.y);
     }
 
@@ -35,15 +35,14 @@ export class LockedMouseEvents implements IMouseEvents {
      * Handle when the locked state Changed
      */
     lockStateChange() {
-        let playerElement = this.videoElementProvider.getVideoParentElement();
+        let videoElementParent = this.videoElementProvider.getVideoParentElement();
         let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
 
-        if (document.pointerLockElement === playerElement ||
-            document.mozPointerLockElement === playerElement) {
-            console.log('Pointer locked');
+        if (document.pointerLockElement === videoElementParent || document.mozPointerLockElement === videoElementParent) {
+            Logger.Log(Logger.GetStackTrace(), 'Pointer locked');
             document.addEventListener("mousemove", (mouseEvent: MouseEvent) => this.updateMouseMovePosition(mouseEvent), false);
         } else {
-            console.log('The pointer lock status is now unlocked');
+            Logger.Log(Logger.GetStackTrace(), 'The pointer lock status is now unlocked');
             document.removeEventListener("mousemove", (mouseEvent: MouseEvent) => this.updateMouseMovePosition(mouseEvent), false);
 
             // If mouse loses focus, send a key up for all of the currently held-down keys

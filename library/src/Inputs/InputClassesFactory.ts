@@ -73,6 +73,13 @@ export class InputClassesFactory {
         videoElementParent.requestPointerLock = videoElementParent.requestPointerLock || videoElementParent.mozRequestPointerLock;
         document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
 
+        // minor hack to alleviate ios not supporting pointerlock
+        if (videoElementParent.requestPointerLock) {
+            videoElementParent.onclick = function () {
+                videoElementParent.requestPointerLock();
+            };
+        }
+
         videoElement.onclick = (event: MouseEvent) => this.videoElementProvider.setClickActions(event);
 
         document.addEventListener('pointerlockchange', () => lockedMouseEvents.lockStateChange(), false);
@@ -108,11 +115,11 @@ export class InputClassesFactory {
      * register touch events 
      * @param fakeMouseTouch - the faked mouse touch event 
      */
-    registerTouch(fakeMouseTouch: boolean, playerElementClientRect: DOMRect) {
+    registerTouch(fakeMouseTouch: boolean, videoElementParentClientRect: DOMRect) {
         Logger.Log(Logger.GetStackTrace(), "Registering Touch", 6);
         if (fakeMouseTouch) {
             let fakeTouchController = new FakeTouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
-            fakeTouchController.setPlayerElementClientRect(playerElementClientRect);
+            fakeTouchController.setvideoElementParentClientRect(videoElementParentClientRect);
             return fakeTouchController;
         } else {
             return new TouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);

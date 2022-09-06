@@ -24,30 +24,30 @@ export class MouseController {
 	}
 
 	clearMouseEvents() {
-		let playerElement = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
-		playerElement.onclick = null;
-		playerElement.onmousedown = null;
-		playerElement.onmouseup = null;
-		playerElement.onwheel = null;
-		playerElement.onmousemove = null;
-		playerElement.oncontextmenu = null;
+		let videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
+		videoElementParent.onclick = null;
+		videoElementParent.onmousedown = null;
+		videoElementParent.onmouseup = null;
+		videoElementParent.onwheel = null;
+		videoElementParent.onmousemove = null;
+		videoElementParent.oncontextmenu = null;
 	}
 
 	/**
 	* Set the mouse enter and mouse leave events 
 	*/
 	registerMouseEnterAndLeaveEvents() {
-		let playerElement = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
+		let videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
 
 		// Handle when the Mouse has entered the element
-		playerElement.onmouseenter = (event: MouseEvent) => {
+		videoElementParent.onmouseenter = (event: MouseEvent) => {
 			Logger.Log(Logger.GetStackTrace(), "Mouse Entered", 6);
 			this.sendMouseEnter();
 			this.pressMouseButtons(event.buttons, event.x, event.y);
 		};
 
 		// Handles when the mouse has left the element 
-		playerElement.onmouseleave = (event: MouseEvent) => {
+		videoElementParent.onmouseleave = (event: MouseEvent) => {
 			Logger.Log(Logger.GetStackTrace(), "Mouse Left", 6);
 			this.sendMouseLeave();
 			this.releaseMouseButtons(event.buttons, event.x, event.y);

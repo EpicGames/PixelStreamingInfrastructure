@@ -47,11 +47,6 @@ export class VideoPlayer implements IVideoPlayer {
         if (this.videoElement.paused) {
             this.videoElement.play();
         }
-
-        // minor hack to alleviate ios not supporting pointerlock
-        if (this.videoElement.requestPointerLock) {
-            this.videoElement.requestPointerLock();
-        }
     }
 
     /**

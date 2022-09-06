@@ -19,9 +19,10 @@ export class DataChannelSender {
 
         if (dataChannelInstance.dataChannel.readyState == "open") {
             dataChannelInstance.dataChannel.send(data);
+            Logger.Log(Logger.GetStackTrace(), `Message Sent: ${new Uint8Array(data)}`);
             this.resetAfkWarningTimerOnDataSend();
         } else {
-            Logger.Error(Logger.GetStackTrace(), "Message Failed: " + new Uint8Array(data));
+            Logger.Error(Logger.GetStackTrace(), `Message Failed: ${new Uint8Array(data)}`);
         }
     }
 

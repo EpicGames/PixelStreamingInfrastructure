@@ -472,7 +472,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		disconnectOverlayHtmlInnerContainer.appendChild(restartSvg);
 
 		// instantiate the overlay
-		this.disconnectOverlay = new ActionOverlayBase(this.config.playerElement, disconnectOverlayHtml, disconnectOverlayHtmlInnerContainer, "disconnectText");
+		this.disconnectOverlay = new ActionOverlayBase(this.config.videoElementParent, disconnectOverlayHtml, disconnectOverlayHtmlInnerContainer, "disconnectText");
 	}
 
 	/**
@@ -498,7 +498,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		connectOverlayHtmlInner.innerHTML = 'Click to start';
 
 		// instantiate the overlay
-		this.connectOverlay = new ActionOverlayBase(this.config.playerElement, connectOverlayHtml, connectOverlayHtmlInner);
+		this.connectOverlay = new ActionOverlayBase(this.config.videoElementParent, connectOverlayHtml, connectOverlayHtmlInner);
 	}
 
 	/**
@@ -526,7 +526,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		playOverlayHtmlInner.alt = 'Start Streaming';
 
 		// instantiate the overlay
-		this.playOverlay = new ActionOverlayBase(this.config.playerElement, playOverlayHtml, playOverlayHtmlInner);
+		this.playOverlay = new ActionOverlayBase(this.config.videoElementParent, playOverlayHtml, playOverlayHtmlInner);
 	}
 
 	/**
@@ -550,7 +550,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		afkOverlayHtmlInner.innerHTML = '<center>No activity detected<br>Disconnecting in <span id="afkCountDownNumber"></span> seconds<br>Click to continue<br></center>'
 
 		// instantiate the overlay
-		this.afkOverlay = new AfkOverlayBase(this.config.playerElement, afkOverlayHtml, afkOverlayHtmlInner, "afkCountDownNumber");
+		this.afkOverlay = new AfkOverlayBase(this.config.videoElementParent, afkOverlayHtml, afkOverlayHtmlInner, "afkCountDownNumber");
 	}
 
 	/**
@@ -567,7 +567,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		infoOverlayHtmlInner.id = 'messageOverlayInner';
 
 		// instantiate the overlay
-		this.infoOverlay = new TextOverlayBase(this.config.playerElement, infoOverlayHtml, infoOverlayHtmlInner);
+		this.infoOverlay = new TextOverlayBase(this.config.videoElementParent, infoOverlayHtml, infoOverlayHtmlInner);
 	}
 
 	/**
@@ -585,7 +585,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		errorOverlayHtmlInner.classList.add(".text-danger");
 
 		// instantiate the overlay
-		this.errorOverlay = new TextOverlayBase(this.config.playerElement, errorOverlayHtml, errorOverlayHtmlInner);
+		this.errorOverlay = new TextOverlayBase(this.config.videoElementParent, errorOverlayHtml, errorOverlayHtmlInner);
 	}
 
 	/**
