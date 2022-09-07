@@ -21,6 +21,13 @@ export class VideoPlayer implements IVideoPlayer {
         this.videoElement.style.height = "100%";
         this.videoElement.style.position = "absolute";
         rootDiv.appendChild(this.videoElement);
+
+        // set play for video
+        this.videoElement.onclick = () => {
+            if (this.videoElement.paused) {
+                this.videoElement.play();
+            }
+        }
     }
 
     /**
@@ -37,16 +44,6 @@ export class VideoPlayer implements IVideoPlayer {
      */
     getVideoParentElement(): HTMLElement {
         return this.videoElement.parentElement;
-    }
-
-    /**
-     * Set the click actions for when the Element is mouse clicked
-     * @param event - Mouse Event
-     */
-    setClickActions(event: MouseEvent) {
-        if (this.videoElement.paused) {
-            this.videoElement.play();
-        }
     }
 
     /**

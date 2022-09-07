@@ -80,8 +80,6 @@ export class InputClassesFactory {
             };
         }
 
-        videoElement.onclick = (event: MouseEvent) => this.videoElementProvider.setClickActions(event);
-
         document.addEventListener('pointerlockchange', () => lockedMouseEvents.lockStateChange(), false);
         document.addEventListener('mozpointerlockchange', () => lockedMouseEvents.lockStateChange(), false);
 
