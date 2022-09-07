@@ -32,6 +32,8 @@ if (signallingServerAddress == '') {
     }
 }
 
+signallingServerAddress = "wss://sps.tenant-tensorworks-testing.lga1.ingress.coreweave.cloud/qa-5-small/ws";
+
 // prep the video element parent div element 
 let videoElementParent = document.getElementById("videoElementParent") as HTMLDivElement;
 

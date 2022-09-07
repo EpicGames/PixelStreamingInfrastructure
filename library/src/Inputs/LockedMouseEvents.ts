@@ -15,6 +15,7 @@ export class LockedMouseEvents implements IMouseEvents {
     videoElementProvider: IVideoPlayer;
     mouseController: MouseController;
     activeKeysProvider: IActiveKeys;
+    updateMouseMovePositionEvent = (mouseEvent: MouseEvent) => { this.updateMouseMovePosition(mouseEvent) };
 
     /**
      * @param videoElementProvider - The HTML Video Element provider
@@ -40,10 +41,11 @@ export class LockedMouseEvents implements IMouseEvents {
 
         if (document.pointerLockElement === videoElementParent || document.mozPointerLockElement === videoElementParent) {
             Logger.Log(Logger.GetStackTrace(), 'Pointer locked');
-            document.addEventListener("mousemove", (mouseEvent: MouseEvent) => this.updateMouseMovePosition(mouseEvent), false);
+            document.addEventListener("mousemove", this.updateMouseMovePositionEvent, false);
         } else {
             Logger.Log(Logger.GetStackTrace(), 'The pointer lock status is now unlocked');
-            document.removeEventListener("mousemove", (mouseEvent: MouseEvent) => this.updateMouseMovePosition(mouseEvent), false);
+            // !a new arrow function must not be used here as it will be counted as a new function that cannot be removed
+            document.removeEventListener("mousemove", this.updateMouseMovePositionEvent, false);
 
             // If mouse loses focus, send a key up for all of the currently held-down keys
             // This is necessary as when the mouse loses focus, the windows stops listening for events and as such

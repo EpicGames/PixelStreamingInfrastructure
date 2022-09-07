@@ -66,7 +66,6 @@ export class InputClassesFactory {
     }
 
     registerLockedMouseEvents(mouseController: MouseController) {
-        let videoElement = this.videoElementProvider.getVideoElement() as HTMLVideoElement;
         let videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
         let lockedMouseEvents: IMouseEvents = new LockedMouseEvents(this.videoElementProvider, mouseController, this.activeKeys);
 
@@ -75,13 +74,14 @@ export class InputClassesFactory {
 
         // minor hack to alleviate ios not supporting pointerlock
         if (videoElementParent.requestPointerLock) {
-            videoElementParent.onclick = function () {
+            videoElementParent.onclick = () => {
                 videoElementParent.requestPointerLock();
             };
         }
 
-        document.addEventListener('pointerlockchange', () => lockedMouseEvents.lockStateChange(), false);
-        document.addEventListener('mozpointerlockchange', () => lockedMouseEvents.lockStateChange(), false);
+        const lockStateChangeListener = () => lockedMouseEvents.lockStateChange();
+        document.addEventListener('pointerlockchange', lockStateChangeListener, false);
+        document.addEventListener('mozpointerlockchange', lockStateChangeListener, false);
 
         videoElementParent.onmousedown = (mouseEvent: MouseEvent) => lockedMouseEvents.handleMouseDown(mouseEvent);
         videoElementParent.onmouseup = (mouseEvent: MouseEvent) => lockedMouseEvents.handleMouseUp(mouseEvent);
@@ -93,12 +93,9 @@ export class InputClassesFactory {
     }
 
     registerHoveringMouseEvents(mouseController: MouseController) {
-        let videoElement = this.videoElementProvider.getVideoElement() as HTMLVideoElement;
         let videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
         let hoveringMouseEvents = new HoveringMouseEvents(mouseController);
 
-        // set the onclick to null if the input bindings were previously set to pointerlock
-        videoElement.onclick = null;
         videoElementParent.onmousemove = (mouseEvent: MouseEvent) => hoveringMouseEvents.updateMouseMovePosition(mouseEvent);
         videoElementParent.onmousedown = (mouseEvent: MouseEvent) => hoveringMouseEvents.handleMouseDown(mouseEvent);
         videoElementParent.onmouseup = (mouseEvent: MouseEvent) => hoveringMouseEvents.handleMouseUp(mouseEvent);
