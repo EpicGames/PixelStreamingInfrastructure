@@ -20,6 +20,7 @@ export class VideoPlayer implements IVideoPlayer {
         this.videoElement.style.width = "100%";
         this.videoElement.style.height = "100%";
         this.videoElement.style.position = "absolute";
+        this.videoElement.style.pointerEvents = "all";
         rootDiv.appendChild(this.videoElement);
 
         // set play for video

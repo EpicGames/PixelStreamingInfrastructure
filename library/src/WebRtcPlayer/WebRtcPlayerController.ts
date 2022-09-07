@@ -110,7 +110,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.normalizeAndQuantize = new NormalizeAndQuantize(this.videoPlayer);
 
 		this.uiController = new UiController(this.videoPlayer);
-		this.uiController.setUpMouseAndFreezeFrame = (element: HTMLDivElement) => this.setUpMouseAndFreezeFrame(element);
+		this.uiController.setUpMouseAndFreezeFrame = () => this.setUpMouseAndFreezeFrame();
 
 		this.dataChannelController = new DataChannelController();
 		this.dataChannelController.handleOnOpen = () => this.handleDataChannelConnected();
@@ -366,7 +366,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	invalidateFreezeFrameAndEnableVideo() {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.FreezeFrame", 6);
-		//this.isReceivingFreezeFrame = false;
 
 		this.freezeFrameController.hideFreezeFrame();
 		if (this.videoPlayer.videoElement) {
@@ -462,6 +461,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		} else {
 			this.delegate.showPlayOverlay();
 		}
+		this.resizePlayerStyle();
 	}
 
 	/**
@@ -553,6 +553,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param messageConfig - Config Message received from the signaling server
 	 */
 	handleOnConfigMessage(messageConfig: MessageConfig) {
+		this.setEnlargeToFillDisplay(true);
+		this.resizePlayerStyle();
 
 		// Tell the WebRtcController to start a session with the peer options sent from the signaling server
 		this.startSession(messageConfig.peerConnectionOptions);
@@ -636,13 +638,12 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.keyboardController = this.inputClassesFactory.registerKeyBoard(this.config.suppressBrowserKeys);
 		this.gamePadController = this.inputClassesFactory.registerGamePad();
 
-		this.resizePlayerStyle();
-
 		setInterval(() => this.getStats(), 1000);
 
 		// either autoplay the video or set up the play overlay
 		this.autoPlayVideoOrSetUpPlayOverlay();
 
+		this.setEnlargeToFillDisplay(true);
 		this.resizePlayerStyle();
 
 		this.sendDescriptorController.emitCommand(`r.setres ${this.videoPlayer.videoElement.clientWidth} x ${this.videoPlayer.videoElement.clientHeight}`);
@@ -695,11 +696,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 	/**
 	 * Set the freeze frame overlay to the player div
-	 * @param videoElementParent - The div element of the Player
 	 */
-	setUpMouseAndFreezeFrame(videoElementParent: HTMLDivElement) {
+	setUpMouseAndFreezeFrame() {
 		// Calculating and normalizing positions depends on the width and height of the player.
-		this.videoElementParentClientRect = videoElementParent.getBoundingClientRect();
+		this.videoElementParentClientRect = this.videoPlayer.getVideoParentElement().getBoundingClientRect();
 		this.normalizeAndQuantize.setupNormalizeAndQuantize();
 		this.freezeFrameController.freezeFrame.resize();
 	}

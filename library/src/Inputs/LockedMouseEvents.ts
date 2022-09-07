@@ -91,6 +91,11 @@ export class LockedMouseEvents implements IMouseEvents {
 
         let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.x, this.y);
         let delta = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeSigned(mouseEvent.movementX, mouseEvent.movementY);
+
+        console.log("look here");
+        console.log(coord);
+        console.log(delta);
+
         toStreamerHandlers.get("MouseMove")("MouseMove", [coord.x, coord.y, delta.x, delta.y]);
     }
 

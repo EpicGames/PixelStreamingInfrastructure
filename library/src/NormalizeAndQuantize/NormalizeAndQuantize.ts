@@ -32,14 +32,17 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
             let playerAspectRatio = this.videoElementParent.clientHeight / this.videoElementParent.clientWidth;
             let videoAspectRatio = this.videoElement.videoHeight / this.videoElement.videoWidth;
 
+            console.log(playerAspectRatio);
+            console.log(videoAspectRatio);
+
             if (playerAspectRatio > videoAspectRatio) {
-                Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio > videoAspectRatio', 6);
+                Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio > videoAspectRatio');
                 this.ratio = playerAspectRatio / videoAspectRatio;
                 this.setterNormalizeAndQuantizeUnsigned = (x: number, y: number) => this.overRideNormalizeAndQuantizeUnsigned(x, y);
                 this.setterUnquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.overRideUnquantizeAndDenormalizeUnsigned(x, y);
                 this.setterNormalizeAndQuantizeSigned = (x: number, y: number) => this.overRideNormalizeAndQuantizeSigned(x, y);
             } else {
-                Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio', 6);
+                Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio <= videoAspectRatio');
                 this.ratio = videoAspectRatio / playerAspectRatio;
                 this.setterNormalizeAndQuantizeUnsigned = (x: number, y: number) => this.overRideNormalizeAndQuantizeUnsignedAlt(x, y);
                 this.setterUnquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.overRideUnquantizeAndDenormalizeUnsignedAlt(x, y);

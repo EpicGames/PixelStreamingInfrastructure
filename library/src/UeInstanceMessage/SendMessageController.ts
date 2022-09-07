@@ -17,8 +17,6 @@ export class SendMessageController {
             messageData = [];
         }
 
-        console.log(messageData);
-
         let toStreamerMessages = this.toStreamerMessagesMapProvider.getToStreamerMessageMap();
         let messageFormat = toStreamerMessages.getFromKey(messageType);
         if (messageFormat === undefined) {
