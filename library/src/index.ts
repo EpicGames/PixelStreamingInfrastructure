@@ -1,23 +1,20 @@
-import { webRtcPlayerController } from "./WebRtcPlayer/WebRtcPlayerController"
-import { Config, ControlSchemeType } from "./Config/Config"
-import { IDelegate } from "./Delegate/IDelegate"
-import { DelegateBase } from "./Delegate/DelegateBase"
-import { IWebRtcPlayerController } from "./WebRtcPlayer/IWebRtcPlayerController"
+export { webRtcPlayerController } from "./WebRtcPlayer/WebRtcPlayerController"
+export { Config, ControlSchemeType } from "./Config/Config"
+export { IDelegate } from "./Delegate/IDelegate"
+export { DelegateBase } from "./Delegate/DelegateBase"
+export { IWebRtcPlayerController } from "./WebRtcPlayer/IWebRtcPlayerController"
 
-import { IOverlay } from './Overlay/IOverlay';
-import { ITextOverlay } from './Overlay/ITextOverlay';
-import { IActionOverlay } from "./Overlay/IActionOverlay"
-import { IAfkOverlay } from './Overlay/IAfkOverlay';
-import { AfkLogic } from './Afk/AfkLogic';
+export { IOverlay } from './Overlay/IOverlay';
+export { ITextOverlay } from './Overlay/ITextOverlay';
+export { IActionOverlay } from "./Overlay/IActionOverlay"
+export { IAfkOverlay } from './Overlay/IAfkOverlay';
+export { AfkLogic } from './Afk/AfkLogic';
 
-import { LatencyTestResults } from "./DataChannel/LatencyTestResults";
-import { Encoder, InitialSettings, WebRTC } from './DataChannel/InitialSettings';
-import { AggregatedStats } from './PeerConnectionController/AggregatedStats';
-import { MessageInstanceState, InstanceState, MessageAuthResponse, MessageAuthResponseOutcomeType } from './WebSockets/MessageReceive';
-import { Logger } from './Logger/Logger';
-
-export { Config, ControlSchemeType, webRtcPlayerController, IDelegate, DelegateBase, IWebRtcPlayerController }
-export { LatencyTestResults, IOverlay, IActionOverlay, ITextOverlay, IAfkOverlay, AfkLogic, Encoder, InitialSettings, WebRTC, AggregatedStats, MessageInstanceState, InstanceState, MessageAuthResponse, MessageAuthResponseOutcomeType, Logger }
+export { LatencyTestResults } from "./DataChannel/LatencyTestResults";
+export { Encoder, InitialSettings, WebRTC } from './DataChannel/InitialSettings';
+export { AggregatedStats } from './PeerConnectionController/AggregatedStats';
+export { MessageInstanceState, InstanceState, MessageAuthResponse, MessageAuthResponseOutcomeType } from './WebSockets/MessageReceive';
+export { Logger } from './Logger/Logger';
 
 declare var LIBRARY_VERSION: string;
 export const version = LIBRARY_VERSION;
