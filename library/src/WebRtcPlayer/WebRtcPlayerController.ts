@@ -34,6 +34,8 @@ import { GyroController } from "../Inputs/GyroController";
 import { DataChannelSender } from "../DataChannel/DataChannelSender";
 import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuantize";
 import { ITouchController } from "../Inputs/ITouchController";
+import { IPlayerStyleAttributes } from "../Ui/IPlayerStyleAttributes";
+import { PlayerStyleAttributes } from "../Ui/PlayerStyleAttributes";
 /**
  * Entry point for the Web RTC Player
  */
@@ -71,6 +73,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	gamePadController: GamePadController;
 	gyroController: GyroController;
 	normalizeAndQuantize: NormalizeAndQuantize;
+	playerStyleAttributes: IPlayerStyleAttributes = new PlayerStyleAttributes();
 
 	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
 	// it will use this property to store the override message string
@@ -109,7 +112,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.normalizeAndQuantize = new NormalizeAndQuantize(this.videoPlayer);
 
-		this.uiController = new UiController(this.videoPlayer);
+		this.uiController = new UiController(this.videoPlayer, this.playerStyleAttributes);
 		this.uiController.setUpMouseAndFreezeFrame = () => this.setUpMouseAndFreezeFrame();
 
 		this.dataChannelController = new DataChannelController();
@@ -622,7 +625,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * registers the mouse for use in IWebRtcPlayerController
 	 */
 	activateRegisterMouse() {
-		this.mouseController = this.inputClassesFactory.registerMouse(this.config.controlScheme);
+		this.mouseController = this.inputClassesFactory.registerMouse(this.config.controlScheme, this.playerStyleAttributes);
 	}
 
 	/**
@@ -645,8 +648,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.setEnlargeToFillDisplay(true);
 		this.resizePlayerStyle();
-
-		this.sendDescriptorController.emitCommand(`r.setres ${this.videoPlayer.videoElement.clientWidth} x ${this.videoPlayer.videoElement.clientHeight}`);
 
 		this.delegate.onVideoInitialised();
 
@@ -672,11 +673,17 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		let now = new Date().getTime();
 		if (now - this.lastTimeResized > 1000) {
-			// get the root div from config 
-			if (!this.config.videoElementParent) {
+			let videoElementParent = this.config.videoElementParent;
+			if (!videoElementParent) {
 				return;
 			}
-			this.sendDescriptorController.emitCommand(`r.setres ${this.videoPlayer.videoElement.clientWidth} x ${this.videoPlayer.videoElement.clientHeight}`);
+
+			let descriptor = {
+				"Resolution.Width": videoElementParent.clientWidth,
+				"Resolution.Height": videoElementParent.clientHeight
+			};
+
+			this.sendDescriptorController.emitCommand(descriptor);
 			this.lastTimeResized = new Date().getTime();
 		}
 		else {
@@ -743,10 +750,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.MaxBitrateVBR " + (encoder.MaxBitrate > 0 ? encoder.MaxBitrate : 1));
 		}
 		if (encoder.MinQP != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.MinQP " + encoder.MinQP);
+			this.sendDescriptorController.emitCommand({ "Encoder.MinQP": encoder.MinQP });
 		}
 		if (encoder.MaxQP != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.MaxQP " + encoder.MaxQP);
+			this.sendDescriptorController.emitCommand({ "Encoder.MaxQP": encoder.MaxQP });
 		}
 		if (encoder.FillerData != null) {
 			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.EnableFillerData " + Number(encoder.FillerData).valueOf());
@@ -767,16 +774,17 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.DegradationPreference " + webRTC.DegradationPref);
 		}
 
+		// 4.27 and 5 compatibility
 		if (webRTC.FPS != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.Fps " + webRTC.FPS);
-			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.MaxFps " + webRTC.FPS);
+			this.sendDescriptorController.emitCommand({ "WebRTC.Fps": webRTC.FPS });
+			this.sendDescriptorController.emitCommand({ "WebRTC.MaxFps": webRTC.FPS });
 		}
 
 		if (webRTC.MinBitrate != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.MinBitrate " + webRTC.MinBitrate);
+			this.sendDescriptorController.emitCommand({ "PixelStreaming.WebRTC.MinBitrate": webRTC.MinBitrate });
 		}
 		if (webRTC.MaxBitrate != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.MaxBitrate " + webRTC.MaxBitrate);
+			this.sendDescriptorController.emitCommand({ "PixelStreaming.WebRTC.MaxBitrate ": webRTC.MaxBitrate });
 		}
 		if (webRTC.LowQP != null) {
 			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.LowQpThreshold " + webRTC.LowQP);

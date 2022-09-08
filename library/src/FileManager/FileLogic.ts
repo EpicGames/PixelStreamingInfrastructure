@@ -27,7 +27,7 @@ export class FileLogic {
         }
 
         let extensionAsString = new TextDecoder("utf-16").decode(view.slice(1));
-        console.log(extensionAsString);
+        Logger.Log(Logger.GetStackTrace(), extensionAsString, 6);
         this.extension = extensionAsString;
     }
 
@@ -46,7 +46,7 @@ export class FileLogic {
         }
 
         let mimeAsString = new TextDecoder("utf-16").decode(view.slice(1));
-        console.log(mimeAsString);
+        Logger.Log(Logger.GetStackTrace(), mimeAsString, 6);
         this.mimetype = mimeAsString;
     }
 

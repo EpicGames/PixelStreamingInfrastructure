@@ -27,9 +27,6 @@ export class Config {
 	signallingServerAddress: string;
 	videoElementParent: HTMLDivElement;
 
-	//this is a video element variable to be assigned when the video element is created
-	videovideoElementParent: HTMLVideoElement;
-
 	/**
 	 * @param signallingServerAddress - the address of the signaling server 
 	 * @param videoElementParent - the player element ID 

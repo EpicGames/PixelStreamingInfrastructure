@@ -1,19 +1,20 @@
 import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
+import { PlayerStyleAttributes } from "./PlayerStyleAttributes";
 
 /**
  * The Ui Controller class handles all methods that interact with the UI
  */
 export class UiController {
     videoPlayerProvider: IVideoPlayer;
-    playerStyleAttributes: playerStyleAttributes;
+    playerStyleAttributes: PlayerStyleAttributes;
     orientationChangeTimeout: ReturnType<typeof setTimeout>;
     lastTimeResized = new Date().getTime();
     resizeTimeout: number;
-    enlargeDisplayToFillWindow: boolean;
+    enlargeDisplayToFillWindow: boolean = true;
 
-    constructor(videoPlayerProvider: IVideoPlayer) {
+    constructor(videoPlayerProvider: IVideoPlayer, playerStyleAttributes: PlayerStyleAttributes) {
         this.videoPlayerProvider = videoPlayerProvider;
-        this.playerStyleAttributes = new playerStyleAttributes();
+        this.playerStyleAttributes = playerStyleAttributes;
 
         // set resize events to the windows if it is resized or its orientation is changed
         window.addEventListener('resize', () => this.resizePlayerStyle(), true);
@@ -113,20 +114,15 @@ export class UiController {
 
         // controls for resizing the player 
         let windowSmallerThanPlayer = window.innerWidth < videoElementParent.videoWidth || window.innerHeight < videoElementParent.videoHeight;
-        console.log(this.enlargeDisplayToFillWindow);
         if (this.enlargeDisplayToFillWindow !== null) {
             if (this.enlargeDisplayToFillWindow === true || windowSmallerThanPlayer) {
-                console.log("resize to fill");
                 this.resizePlayerStyleToFillWindow();
             } else {
-                console.log("resize to actual");
                 this.resizePlayerStyleToActualSize();
             }
         } else {
-            console.log("resize to arbitrary");
             this.resizePlayerStyleToArbitrarySize();
         }
-
         this.setUpMouseAndFreezeFrame();
     }
 
@@ -138,16 +134,4 @@ export class UiController {
         this.orientationChangeTimeout = setTimeout(() => { this.resizePlayerStyle() }, 500);
     }
 
-}
-
-/**
- * Handles the player style attributes so they can be instantiated
- */
-export class playerStyleAttributes {
-    styleWidth: number;
-    styleHeight: number;
-    styleTop: number;
-    styleLeft: number;
-    styleCursor = 'default';
-    styleAdditional: number;
 }

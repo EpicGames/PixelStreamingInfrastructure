@@ -16,26 +16,16 @@ export class SendDescriptorController {
      * Send a Latency Test to the UE Instance
      * @param StartTimeMs - Start Time of the Latency test
      */
-    sendLatencyTest(StartTimeMs: number) {
-        let payload = {
-            StartTime: StartTimeMs,
-        };
-
-        this.sendDescriptor("LatencyTest", JSON.stringify(payload));
+    sendLatencyTest(descriptor: Object) {
+        this.sendDescriptor("LatencyTest", descriptor);
     }
 
-    emitCommand(descriptor: string) {
-        let payload = {
-            Console: descriptor
-        }
-        this.sendDescriptor("Command", JSON.stringify(payload));
+    emitCommand(descriptor: Object) {
+        this.sendDescriptor("Command", descriptor);
     }
 
-    emitUIInteraction(descriptor: string) {
-        let payload = {
-            Console: descriptor
-        }
-        this.sendDescriptor("UIInteraction", JSON.stringify(payload));
+    emitUIInteraction(descriptor: Object) {
+        this.sendDescriptor("UIInteraction", descriptor);
     }
 
     /**
@@ -43,7 +33,7 @@ export class SendDescriptorController {
      * @param messageType - UE Message Type
      * @param descriptor - Descriptor Message as JSON
      */
-    sendDescriptor(messageType: string, descriptor: string) {
+    sendDescriptor(messageType: string, descriptor: Object) {
         // Convert the descriptor object into a JSON string.
         let descriptorAsString = JSON.stringify(descriptor);
         let toStreamerMessages = this.toStreamerMessagesMapProvider.getToStreamerMessageMap();

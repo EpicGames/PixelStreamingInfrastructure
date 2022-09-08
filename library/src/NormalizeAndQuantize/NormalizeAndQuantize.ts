@@ -31,10 +31,6 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
         if (this.videoElementParent && this.videoElement) {
             let playerAspectRatio = this.videoElementParent.clientHeight / this.videoElementParent.clientWidth;
             let videoAspectRatio = this.videoElement.videoHeight / this.videoElement.videoWidth;
-
-            console.log(playerAspectRatio);
-            console.log(videoAspectRatio);
-
             if (playerAspectRatio > videoAspectRatio) {
                 Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio > videoAspectRatio');
                 this.ratio = playerAspectRatio / videoAspectRatio;

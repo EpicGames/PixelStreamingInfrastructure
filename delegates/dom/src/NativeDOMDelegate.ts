@@ -771,8 +771,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		// make the player fill the window
 		this.enlargeDisplayToFillWindow.onchange = () => {
-			this.iWebRtcController.resizePlayerStyle();
 			this.iWebRtcController.setEnlargeToFillDisplay(this.enlargeDisplayToFillWindow.checked);
+			this.iWebRtcController.resizePlayerStyle();
 		};
 
 		// make the player match the view port resolution 

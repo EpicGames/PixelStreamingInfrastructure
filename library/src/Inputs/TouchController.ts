@@ -33,7 +33,7 @@ export class TouchController implements ITouchController {
     rememberTouch(touch: Touch) {
         let finger = this.fingers.pop();
         if (finger === undefined) {
-            console.log('exhausted touch identifiers');
+            Logger.Log(Logger.GetStackTrace(), 'exhausted touch identifiers', 6);
         }
         this.fingerIds.set(touch.identifier, finger);
     }

@@ -12,6 +12,7 @@ import { IMouseEvents } from "./IMouseEvents";
 import { Logger } from "../Logger/Logger";
 import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
 import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+import { IPlayerStyleAttributes } from "../Ui/IPlayerStyleAttributes";
 
 /**
  * Class for handling inputs for mouse and keyboard   
@@ -44,30 +45,30 @@ export class InputClassesFactory {
      * register mouse events based on a control type 
      * @param controlScheme - if the mouse is either hovering or locked 
      */
-    registerMouse(controlScheme: ControlSchemeType) {
+    registerMouse(controlScheme: ControlSchemeType, playerStyleAttributesProvider: IPlayerStyleAttributes) {
         Logger.Log(Logger.GetStackTrace(), "Register Mouse Events", 7);
         let mouseController = new MouseController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
         mouseController.clearMouseEvents();
 
         switch (controlScheme) {
             case ControlSchemeType.LockedMouse:
-                this.registerLockedMouseEvents(mouseController);
+                this.registerLockedMouseEvents(mouseController, playerStyleAttributesProvider);
                 break
             case ControlSchemeType.HoveringMouse:
                 this.registerHoveringMouseEvents(mouseController);
                 break
             default:
                 Logger.Info(Logger.GetStackTrace(), "unknown Control Scheme Type Defaulting to Locked Mouse Events");
-                this.registerLockedMouseEvents(mouseController);
+                this.registerLockedMouseEvents(mouseController, playerStyleAttributesProvider);
                 break
         }
 
         return mouseController;
     }
 
-    registerLockedMouseEvents(mouseController: MouseController) {
+    registerLockedMouseEvents(mouseController: MouseController, playerStyleAttributesProvider: IPlayerStyleAttributes) {
         let videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
-        let lockedMouseEvents: IMouseEvents = new LockedMouseEvents(this.videoElementProvider, mouseController, this.activeKeys);
+        let lockedMouseEvents: IMouseEvents = new LockedMouseEvents(this.videoElementProvider, mouseController, this.activeKeys, playerStyleAttributesProvider);
 
         videoElementParent.requestPointerLock = videoElementParent.requestPointerLock || videoElementParent.mozRequestPointerLock;
         document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;

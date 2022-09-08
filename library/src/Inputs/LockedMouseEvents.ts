@@ -4,31 +4,33 @@ import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
 import { IMouseEvents } from "./IMouseEvents";
 import { NormaliseAndQuantiseUnsigned } from "../NormalizeAndQuantize/NormalizeAndQuantize";
 import { IActiveKeys } from "./InputClassesFactory";
+import { IPlayerStyleAttributes } from "../Ui/IPlayerStyleAttributes";
 
 /**
  * Handle the mouse locked events
  */
 export class LockedMouseEvents implements IMouseEvents {
-    x: number;
-    y: number;
+    x: number = 0;
+    y: number = 0;
     coord: NormaliseAndQuantiseUnsigned;
     videoElementProvider: IVideoPlayer;
     mouseController: MouseController;
     activeKeysProvider: IActiveKeys;
+    playerStyleAttributesProvider: IPlayerStyleAttributes;
     updateMouseMovePositionEvent = (mouseEvent: MouseEvent) => { this.updateMouseMovePosition(mouseEvent) };
 
     /**
      * @param videoElementProvider - The HTML Video Element provider
      * @param mouseController  - Mouse Controller
      */
-    constructor(videoElementProvider: IVideoPlayer, mouseController: MouseController, activeKeysProvider: IActiveKeys) {
+    constructor(videoElementProvider: IVideoPlayer, mouseController: MouseController, activeKeysProvider: IActiveKeys, playerStyleAttributesProvider: IPlayerStyleAttributes) {
         this.videoElementProvider = videoElementProvider;
         this.mouseController = mouseController;
         this.activeKeysProvider = activeKeysProvider;
-
+        this.playerStyleAttributesProvider = playerStyleAttributesProvider;
         let videoElementParent = this.videoElementProvider.getVideoParentElement() as any;
-        this.x = videoElementParent.width / 2;
-        this.y = videoElementParent.height / 2;
+        this.x = videoElementParent.getBoundingClientRect().width / 2;
+        this.y = videoElementParent.getBoundingClientRect().height / 2;
         this.coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.x, this.y);
     }
 
@@ -72,30 +74,27 @@ export class LockedMouseEvents implements IMouseEvents {
      */
     updateMouseMovePosition(mouseEvent: MouseEvent) {
         let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        let videoElement = this.videoElementProvider.getVideoElement();
+        let styleWidth = this.playerStyleAttributesProvider.getStyleWidth();
+        let styleHeight = this.playerStyleAttributesProvider.getStyleHeight();
 
         this.x += mouseEvent.movementX;
         this.y += mouseEvent.movementY;
-        if (this.x > videoElement.clientWidth) {
-            this.x -= videoElement.clientWidth;
+
+        if (this.x > styleWidth) {
+            this.x -= styleWidth;
         }
-        if (this.y > videoElement.clientHeight) {
-            this.y -= videoElement.clientHeight;
+        if (this.y > styleHeight) {
+            this.y -= styleHeight;
         }
         if (this.x < 0) {
-            this.x = videoElement.clientWidth + this.x;
+            this.x = styleWidth + this.x;
         }
         if (this.y < 0) {
-            this.y = videoElement.clientHeight - this.y;
+            this.y = styleHeight - this.y;
         }
 
         let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.x, this.y);
         let delta = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeSigned(mouseEvent.movementX, mouseEvent.movementY);
-
-        console.log("look here");
-        console.log(coord);
-        console.log(delta);
-
         toStreamerHandlers.get("MouseMove")("MouseMove", [coord.x, coord.y, delta.x, delta.y]);
     }
 
