@@ -331,6 +331,13 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
+	 * Send an Iframe request to the streamer
+	 */
+	requestKeyFrame() {
+		this.streamMessageController.toStreamerHandlers.get("IFrameRequest")("IFrameRequest");
+	}
+
+	/**
 	 * Sets if we are enlarging the display to fill the window for freeze frames and ui controller
 	 * @param isFilling is the display filling or not
 	 */
@@ -740,26 +747,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	sendEncoderSettings(encoder: Encoder) {
 		Logger.Log(Logger.GetStackTrace(), "----   Encoder Settings    ----\n" + JSON.stringify(encoder, undefined, 4) + "\n-------------------------------", 6);
 
-		if (encoder.RateControl != null && (encoder.RateControl == "CBR" || "VBR" || "ConstQP")) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.RateControl " + encoder.RateControl);
-		}
-		if (encoder.TargetBitrate != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.TargetBitrate " + (encoder.TargetBitrate > 0 ? encoder.TargetBitrate : -1));
-		}
-		if (encoder.MaxBitrate != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.MaxBitrateVBR " + (encoder.MaxBitrate > 0 ? encoder.MaxBitrate : 1));
-		}
 		if (encoder.MinQP != null) {
 			this.sendDescriptorController.emitCommand({ "Encoder.MinQP": encoder.MinQP });
 		}
 		if (encoder.MaxQP != null) {
 			this.sendDescriptorController.emitCommand({ "Encoder.MaxQP": encoder.MaxQP });
-		}
-		if (encoder.FillerData != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.EnableFillerData " + Number(encoder.FillerData).valueOf());
-		}
-		if (encoder.MultiPass != null && (encoder.MultiPass == "DISABLED" || "QUARTER" || "FULL")) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.Encoder.Multipass " + encoder.MultiPass);
 		}
 	}
 
@@ -770,27 +762,16 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	sendWebRtcSettings(webRTC: WebRTC) {
 		Logger.Log(Logger.GetStackTrace(), "----   WebRTC Settings    ----\n" + JSON.stringify(webRTC, undefined, 4) + "\n-------------------------------", 6);
 
-		if (webRTC.DegradationPref != null && (webRTC.DegradationPref == "BALANCED" || "MAINTAIN_FRAMERATE" || "MAINTAIN_RESOLUTION")) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.DegradationPreference " + webRTC.DegradationPref);
-		}
-
 		// 4.27 and 5 compatibility
 		if (webRTC.FPS != null) {
 			this.sendDescriptorController.emitCommand({ "WebRTC.Fps": webRTC.FPS });
 			this.sendDescriptorController.emitCommand({ "WebRTC.MaxFps": webRTC.FPS });
 		}
-
 		if (webRTC.MinBitrate != null) {
 			this.sendDescriptorController.emitCommand({ "PixelStreaming.WebRTC.MinBitrate": webRTC.MinBitrate });
 		}
 		if (webRTC.MaxBitrate != null) {
 			this.sendDescriptorController.emitCommand({ "PixelStreaming.WebRTC.MaxBitrate ": webRTC.MaxBitrate });
-		}
-		if (webRTC.LowQP != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.LowQpThreshold " + webRTC.LowQP);
-		}
-		if (webRTC.HighQP != null) {
-			this.sendDescriptorController.emitCommand("PixelStreaming.WebRTC.HighQpThreshold " + webRTC.HighQP);
 		}
 	}
 
@@ -801,15 +782,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	sendStatsToSignallingServer(stats: AggregatedStats) {
 		Logger.Log(Logger.GetStackTrace(), "----   Sending Aggregated Stats to Signaling Server   ----\n" + JSON.stringify(stats, undefined, 4) + "\n-----------------------------------------------------------", 6);
 		this.webSocketController.sendStats(stats);
-	}
-
-	/**
-	 * Sends a UI Interaction Descriptor to the UE Instance
-	 * @param message - String to send to the UE Instance
-	 */
-	sendUeUiDescriptor(message: string): void {
-		Logger.Log(Logger.GetStackTrace(), "----   UE UI Interaction String   ----\n" + JSON.stringify(message, undefined, 4) + "\n---------------------------------------", 6);
-		this.sendDescriptorController.emitUIInteraction(message);
 	}
 
 	/**

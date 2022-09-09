@@ -33,6 +33,11 @@ export interface IWebRtcPlayerController {
     restartStreamAutomaticity(): void;
 
     /**
+     * Send an Iframe request to the streamer
+     */
+    requestKeyFrame(): void;
+
+    /**
      * Send the Encoder Settings to the UE Instance as a UE UI Descriptor.
      * @param encoder - Encoder Settings
      */
@@ -43,12 +48,6 @@ export interface IWebRtcPlayerController {
    * @param webRTC - Web RTC Settings 
    */
     sendWebRtcSettings(webRTC: WebRTC): void;
-
-    /**
-     * Sends a UI Interaction Descriptor to the UE Instance
-     * @param message - String to send to the UE Instance
-     */
-    sendUeUiDescriptor(message: string): void;
 
     /**
      * Sends the UI Descriptor `stat fps` to the UE Instance 

@@ -364,7 +364,12 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	statsPanel = document.getElementById('stats-panel') as HTMLDivElement;
 
 	// Pre Stream options
+	offerToReceiveToggle = document.getElementById("offer-to-receive-tgl") as HTMLInputElement;
+	preferSfuToggle = document.getElementById("prefer-sfu-tgl") as HTMLInputElement;
+	useMicrophoneToggle = document.getElementById("use-mirophone-tgl") as HTMLInputElement;
+	forceMonoAudioToggle = document.getElementById("force-mono-audio-tgl") as HTMLInputElement;
 	forceTurnToggle = document.getElementById("force-turn-tgl") as HTMLInputElement;
+	hideBrowserCursorToggle = document.getElementById("hide-browser-cursor-tgl") as HTMLInputElement;
 
 	// Viewing
 	enlargeDisplayToFillWindow = document.getElementById("enlarge-display-to-fill-window-tgl") as HTMLInputElement;
@@ -728,8 +733,18 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		document.getElementById('statsBtn').onclick = () => this.statsClicked();
 		document.getElementById('statsClose').onclick = () => this.statsClicked();
 
-		// setup the Force TURN toggle
+		// setup the url toggles
+		this.setUpToggleWithUrlParams(this.offerToReceiveToggle, "offerToReceive");
+
+		this.setUpToggleWithUrlParams(this.preferSfuToggle, "preferSFU");
+
+		this.setUpToggleWithUrlParams(this.useMicrophoneToggle, "useMic");
+
+		this.setUpToggleWithUrlParams(this.forceMonoAudioToggle, "ForceMonoAudio");
+
 		this.setUpToggleWithUrlParams(this.forceTurnToggle, "ForceTURN");
+
+		this.setUpToggleWithUrlParams(this.hideBrowserCursorToggle, "hideBrowserCursor");
 
 		this.setUpControlSchemeTypeToggle(this.controlSchemeToggle);
 
@@ -739,30 +754,31 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.iWebRtcController.restartStreamAutomaticity();
 		}
 
-		document.getElementById("btn-streaming-settings").onclick = () => {
-			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending Streaming settings  --------", 7);
+		document.getElementById("request-keyframe-button").onclick = () => {
+			this.settingsPanel.classList.toggle("panel-wrap-visible");
+			this.iWebRtcController.requestKeyFrame();
+		}
+
+		document.getElementById("btn-encoder-settings").onclick = () => {
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending encoder settings  --------", 7);
 			let encode: libspsfrontend.Encoder = {
 				MinQP: Number(this.encoderMinQpText.value),
 				MaxQP: Number(this.encoderMaxQpText.value),
 			}
+			this.iWebRtcController.sendEncoderSettings(encode);
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
+		}
 
+		document.getElementById("btn-webrtc-settings").onclick = () => {
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending web rtc settings  --------", 7);
 			let webRtcSettings: libspsfrontend.WebRTC = {
 				FPS: Number(this.webRtcFpsText.value),
 				MinBitrate: Number(this.webRtcMinBitrateText.value) * 1000,
 				MaxBitrate: Number(this.webRtcMaxBitrateText.value) * 1000,
 			}
-
-			this.iWebRtcController.sendEncoderSettings(encode);
 			this.iWebRtcController.sendWebRtcSettings(webRtcSettings);
 			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
 		}
-
-
-		// sending UI descriptors 
-		document.getElementById("sendUiDescriptor").onclick = () => {
-			this.iWebRtcController.sendUeUiDescriptor(this.uiDescriptorText.value);
-
-		};
 
 		// show the current fps on screen 
 		document.getElementById("show-fps-button").onclick = () => {

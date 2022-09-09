@@ -82,11 +82,65 @@
 
                                     <div class="row pt-1">
                                         <div class="col-sm me-3" style="width: 80%">
+                                            <label class="form-check-label" for="offer-to-receive-tgl">Offer To
+                                                Receive</label>
+                                        </div>
+                                        <div class="form-check form-switch col-auto">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                id="offer-to-receive-tgl">
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-1">
+                                        <div class="col-sm me-3" style="width: 80%">
+                                            <label class="form-check-label" for="prefer-sfu-tgl">Prefer SFU</label>
+                                        </div>
+                                        <div class="form-check form-switch col-auto">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                id="prefer-sfu-tgl">
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-1">
+                                        <div class="col-sm me-3" style="width: 80%">
+                                            <label class="form-check-label" for="use-mirophone-tgl">Use
+                                                Microphone</label>
+                                        </div>
+                                        <div class="form-check form-switch col-auto">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                id="use-mirophone-tgl">
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-1">
+                                        <div class="col-sm me-3" style="width: 80%">
+                                            <label class="form-check-label" for="force-mono-audio-tgl">Force Mono
+                                                Audio</label>
+                                        </div>
+                                        <div class="form-check form-switch col-auto">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                id="force-mono-audio-tgl">
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-1">
+                                        <div class="col-sm me-3" style="width: 80%">
                                             <label class="form-check-label" for="force-turn-tgl">Force TURN</label>
                                         </div>
                                         <div class="form-check form-switch col-auto">
                                             <input class="form-check-input" type="checkbox" role="switch"
                                                 id="force-turn-tgl">
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-1">
+                                        <div class="col-sm me-3" style="width: 80%">
+                                            <label class="form-check-label" for="hide-browser-cursor-tgl">Hide Browser
+                                                Cursor</label>
+                                        </div>
+                                        <div class="form-check form-switch col-auto">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                id="hide-browser-cursor-tgl">
                                         </div>
                                     </div>
 
@@ -165,18 +219,12 @@
                                                         type="button" value="Show FPS">
                                                 </div>
                                             </div>
-                                            <div class="col col-auto">
-                                                <label for="ui-descriptor-text" class="settings-text">UI
-                                                    Descriptor</label>
-                                            </div>
-                                            <div class="col col-auto">
-                                                <input type="text" class="form-control form-control-sm"
-                                                    id="ui-descriptor-text">
-                                            </div>
-
-                                            <div class="col col-auto">
-                                                <input type="button" id="sendUiDescriptor"
-                                                    class="streamTools-button btn-flat" value="Send">
+                                            <div class="row" style="padding-top:5px; padding-bottom: 5px;">
+                                                <div class="col col-auto">
+                                                    <input id="request-keyframe-button"
+                                                        class="streamTools-button btn-flat" type="button"
+                                                        value="Request Keyframe">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -202,10 +250,12 @@
                                                         <input type="number" class="form-control form-control-sm"
                                                             id="encoder-max-qp-text" value="51" min="0" max="51" />
                                                     </div>
-
+                                                    <input id="btn-encoder-settings" class="streamTools-button btn-flat"
+                                                        type="button" value="Send">
                                                 </div>
                                             </div>
-
+                                        </div>
+                                        <div class="form-group row">
                                             <div class="col-sm">
                                                 <div>WebRTC Settings</div>
                                                 <div id="webrtcSettings">
@@ -226,12 +276,10 @@
                                                             id="webrtc-max-bitrate-text" value="0" min="0"
                                                             max="100000" />
                                                     </div>
+                                                    <input id="btn-webrtc-settings" class="streamTools-button btn-flat"
+                                                        type="button" value="Send">
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <input id="btn-streaming-settings" class="streamTools-button btn-flat"
-                                                type="button" value="Apply">
                                         </div>
                                     </div>
                                 </section>
