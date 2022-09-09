@@ -32,7 +32,7 @@ import { MouseController } from "../Inputs/MouseController";
 import { GamePadController } from "../Inputs/GamepadController";
 import { GyroController } from "../Inputs/GyroController";
 import { DataChannelSender } from "../DataChannel/DataChannelSender";
-import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+import { NormalizeAndQuantize, UnquantisedAndDenormaliseUnsigned } from "../NormalizeAndQuantize/NormalizeAndQuantize";
 import { ITouchController } from "../Inputs/ITouchController";
 import { IPlayerStyleAttributes } from "../Ui/IPlayerStyleAttributes";
 import { PlayerStyleAttributes } from "../Ui/PlayerStyleAttributes";
@@ -148,6 +148,15 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
+	 * Make a request to UnquantisedAndDenormaliseUnsigned coordinates 
+	 * @param x x axis coordinate 
+	 * @param y y axis coordinate
+	 */
+	requestUnquantisedAndDenormaliseUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned {
+		return this.normalizeAndQuantize.unquantizeAndDenormalizeUnsigned(x, y);
+	}
+
+	/**
 	 * Handles when a message is received 
 	 * @param event - Message Event
 	 */
@@ -170,7 +179,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// From Streamer
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "QualityControlOwnership", (data: any) => this.onQualityControlOwnership(data));
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Response", (data: any) => this.responseController.onResponse(data));
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Command", (data: any) => this.commandController.onCommand(data));
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Command", (data: any) => { this.commandController.onCommand(data) });
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "FreezeFrame", (data: any) => this.onFreezeFrameMessage(data));
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "UnfreezeFrame", () => this.invalidateFreezeFrameAndEnableVideo());
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "VideoEncoderAvgQP", (data: any) => this.handleVideoEncoderAvgQP(data));
@@ -211,6 +220,21 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonPressed", (key: any, data: any) => this.sendMessageController.sendMessageToStreamer(key, data));
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadButtonReleased", (key: any, data: any) => this.sendMessageController.sendMessageToStreamer(key, data));
 		this.streamMessageController.registerMessageHandler(MessageDirection.ToStreamer, "GamepadAnalog", (key: any, data: any) => this.sendMessageController.sendMessageToStreamer(key, data));
+	}
+
+	/**
+	 * Activate the logic associated with a command from UE
+	 * @param message 
+	 */
+	onCommand(message: Uint16Array) {
+		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.Command", 6);
+		let commandAsString = new TextDecoder("utf-16").decode(message.slice(1));
+
+		Logger.Log(Logger.GetStackTrace(), "Data Channel Command: " + commandAsString, 6);
+		let command = JSON.parse(commandAsString);
+		if (command.command === "onScreenKeyboard") {
+			this.delegate.activateOnScreenKeyboard(command);
+		}
 	}
 
 	onProtocolMessage(message: Uint8Array) {

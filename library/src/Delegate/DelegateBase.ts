@@ -36,6 +36,14 @@ export class DelegateBase implements IDelegate {
 	}
 
 	/**
+	 * Activate the on screen keyboard when receiving the command from the streamer
+	 * @param command the keyboard command
+	 */
+	activateOnScreenKeyboard(command: any): void {
+		throw new Error("Method not implemented.");
+	}
+
+	/**
 	 * Set the input control ownership 
 	 * @param inputControlOwnership does the user have input control ownership
 	 */

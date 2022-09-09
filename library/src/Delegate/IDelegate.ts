@@ -24,6 +24,12 @@ export interface IDelegate {
 	showActionOrErrorOnDisconnect: boolean;
 
 	/**
+	 * Activate the on screen keyboard when receiving the command from the streamer
+	 * @param command the keyboard command
+	 */
+	activateOnScreenKeyboard(command: any): void;
+
+	/**
 	 * Set the input control ownership 
 	 * @param inputControlOwnership does the user have input control ownership
 	 */
