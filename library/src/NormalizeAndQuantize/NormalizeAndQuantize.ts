@@ -8,22 +8,43 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
     videoElement: HTMLVideoElement;
     ratio: number;
 
+    /**
+     * @param videoElementProvider - the div element that the video player will be injected into 
+     */
     constructor(videoElementProvider: IVideoPlayer) {
         this.videoElementProvider = videoElementProvider;
     }
 
+    /**
+     * The surface method for setterNormalizeAndQuantizeUnsigned
+     * @param x - x axis point
+     * @param y - y axis point 
+     */
     normalizeAndQuantizeUnsigned(x: number, y: number): NormaliseAndQuantiseUnsigned {
         return this.setterNormalizeAndQuantizeUnsigned(x, y);
     }
 
+    /**
+     * The surface method for setterUnquantizeAndDenormalizeUnsigned
+     * @param x - x axis point
+     * @param y - y axis point 
+     */
     unquantizeAndDenormalizeUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned {
         return this.setterUnquantizeAndDenormalizeUnsigned(x, y);
     }
 
+    /**
+     * The surface method for setterNormalizeAndQuantizeSigned
+     * @param x - x axis point
+     * @param y - y axis point 
+     */
     normalizeAndQuantizeSigned(x: number, y: number): NormaliseAndQuantiseSigned {
         return this.setterNormalizeAndQuantizeSigned(x, y);
     }
 
+    /**
+     * set up the Normalize And Quantize methods based on the aspect ratio and the video player ratio
+     */
     setupNormalizeAndQuantize() {
         this.videoElementParent = this.videoElementProvider.getVideoParentElement();
         this.videoElement = this.videoElementProvider.getVideoElement() as any;
@@ -48,19 +69,38 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
         }
     }
 
+    /**
+    * A setter method for normalizeAndQuantizeUnsigned
+    * @param x - x axis point
+    * @param y - y axis point 
+    */
     setterNormalizeAndQuantizeUnsigned(x: number, y: number): NormaliseAndQuantiseUnsigned {
         throw new Error("Method not implemented.");
     }
 
+    /**
+     * A setter method for unquantizeAndDenormalizeUnsigned
+     * @param x - x axis point
+     * @param y - y axis point 
+     */
     setterUnquantizeAndDenormalizeUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned {
         throw new Error("Method not implemented.");
     }
 
+    /**
+     * A setter method for normalizeAndQuantizeSigned
+     * @param x - x axis point
+     * @param y - y axis point 
+     */
     setterNormalizeAndQuantizeSigned(x: number, y: number): NormaliseAndQuantiseSigned {
         throw new Error("Method not implemented.");
     }
 
-    // overrides 
+    /**
+    * normalizeAndQuantizeUnsigned for playerAspectRatio > videoAspectRatio
+    * @param x - x axis point
+    * @param y - y axis point 
+    */
     overRideNormalizeAndQuantizeUnsigned(x: number, y: number): NormaliseAndQuantiseUnsigned {
         let normalizedX = x / this.videoElementParent.clientWidth;
         let normalizedY = this.ratio * (y / this.videoElementParent.clientHeight - 0.5) + 0.5;
@@ -71,19 +111,33 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
         }
     }
 
+    /**
+    * unquantizeAndDenormalizeUnsigned for playerAspectRatio > videoAspectRatio
+    * @param x - x axis point
+    * @param y - y axis point 
+    */
     overRideUnquantizeAndDenormalizeUnsigned(x: number, y: number) {
         let normalizedX = x / 65536;
         let normalizedY = (y / 65536 - 0.5) / this.ratio + 0.5;
         return new UnquantisedAndDenormaliseUnsigned(normalizedX * this.videoElementParent.clientWidth, normalizedY * this.videoElementParent.clientHeight);
     }
 
+    /**
+    * normalizeAndQuantizeSigned for playerAspectRatio > videoAspectRatio
+    * @param x - x axis point
+    * @param y - y axis point 
+    */
     overRideNormalizeAndQuantizeSigned(x: number, y: number) {
         let normalizedX = x / (0.5 * this.videoElementParent.clientWidth);
         let normalizedY = (this.ratio * y) / (0.5 * this.videoElementParent.clientHeight);
         return new NormaliseAndQuantiseSigned(normalizedX * 32767, normalizedY * 32767);
     }
 
-    // Overrides alt
+    /**
+    * normalizeAndQuantizeUnsigned for playerAspectRatio <= videoAspectRatio
+    * @param x - x axis point
+    * @param y - y axis point 
+    */
     overRideNormalizeAndQuantizeUnsignedAlt(x: number, y: number) {
         let normalizedX = this.ratio * (x / this.videoElementParent.clientWidth - 0.5) + 0.5;
         let normalizedY = y / this.videoElementParent.clientHeight;
@@ -94,12 +148,22 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
         }
     }
 
+    /**
+    * unquantizeAndDenormalizeUnsigned for playerAspectRatio <= videoAspectRatio
+    * @param x - x axis point
+    * @param y - y axis point 
+    */
     overRideUnquantizeAndDenormalizeUnsignedAlt(x: number, y: number) {
         let normalizedX = (x / 65536 - 0.5) / this.ratio + 0.5;
         let normalizedY = y / 65536;
         return new UnquantisedAndDenormaliseUnsigned(normalizedX * this.videoElementParent.clientWidth, normalizedY * this.videoElementParent.clientHeight);
     }
 
+    /**
+    * normalizeAndQuantizeSigned for playerAspectRatio <= videoAspectRatio
+    * @param x - x axis point
+    * @param y - y axis point 
+    */
     overRideNormalizeAndQuantizeSignedAlt(x: number, y: number) {
         let normalizedX = (this.ratio * x) / (0.5 * this.videoElementParent.clientWidth);
         let normalizedY = y / (0.5 * this.videoElementParent.clientHeight);
@@ -107,6 +171,9 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
     }
 }
 
+/**
+ * A class for NormaliseAndQuantiseUnsigned objects
+ */
 export class NormaliseAndQuantiseUnsigned {
     inRange: boolean;
     x: number;
@@ -120,7 +187,7 @@ export class NormaliseAndQuantiseUnsigned {
 }
 
 /**
- * Denormalised and unquantised Unsigned Data
+ * A class for UnquantisedAndDenormaliseUnsigned objects
  */
 export class UnquantisedAndDenormaliseUnsigned {
     x: number;
@@ -133,7 +200,7 @@ export class UnquantisedAndDenormaliseUnsigned {
 }
 
 /**
- * Normalised and Quantised Signed Data
+ * A class for NormaliseAndQuantiseSigned objects
  */
 export class NormaliseAndQuantiseSigned {
     x: number;

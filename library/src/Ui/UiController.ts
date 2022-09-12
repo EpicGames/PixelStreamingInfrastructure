@@ -12,6 +12,10 @@ export class UiController {
     resizeTimeout: number;
     enlargeDisplayToFillWindow: boolean = true;
 
+    /**
+     * @param videoPlayerProvider Video Player instance  
+     * @param playerStyleAttributes Player style attributes instance 
+     */
     constructor(videoPlayerProvider: IVideoPlayer, playerStyleAttributes: PlayerStyleAttributes) {
         this.videoPlayerProvider = videoPlayerProvider;
         this.playerStyleAttributes = playerStyleAttributes;

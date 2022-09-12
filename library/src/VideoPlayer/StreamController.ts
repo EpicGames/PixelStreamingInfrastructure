@@ -10,6 +10,9 @@ export class StreamController {
     audioElement: HTMLAudioElement;
     mouseController: MouseController;
 
+    /**
+     * @param videoElementProvider Video Player instance  
+     */
     constructor(videoElementProvider: IVideoPlayer) {
         this.videoElementProvider = videoElementProvider;
         this.audioElement = document.createElement("Audio") as HTMLAudioElement;

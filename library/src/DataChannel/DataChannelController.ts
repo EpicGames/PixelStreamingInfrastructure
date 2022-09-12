@@ -11,6 +11,10 @@ export class DataChannelController implements IDataChannelController {
     label: string;
     isReceivingFreezeFrame = false;
 
+    /**
+     * return the current state of a datachannel controller instance
+     * @returns the current DataChannelController instance
+     */
     getDataChannelInstance(): DataChannelController {
         return this;
     }

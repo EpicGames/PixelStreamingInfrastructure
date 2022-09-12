@@ -1,5 +1,8 @@
 import { Logger } from "../Logger/Logger";
 
+/**
+ * A class for file downloader logic 
+ */
 export class FileLogic {
     file: FileTemplate;
 
@@ -7,6 +10,10 @@ export class FileLogic {
         this.file = new FileTemplate();
     }
 
+    /**
+     * Processes a files extension when received over data channel 
+     * @param view - the file extension data
+     */
     processFileExtension(view: any) {
         // Reset file if we got a file message and we are not "receiving" it yet
         if (!this.file.receiving) {
@@ -25,7 +32,10 @@ export class FileLogic {
         this.file.extension = extensionAsString;
     }
 
-
+    /**
+     * Processes a files mime type when received over data channel 
+     * @param view - the file mime type data
+     */
     processFileMimeType(view: any) {
         // Reset file if we got a file message and we are not "receiving" it yet
         if (!this.file.receiving) {
@@ -44,7 +54,10 @@ export class FileLogic {
         this.file.mimetype = mimeAsString;
     }
 
-
+    /**
+     * Processes a files contents when received over data channel 
+     * @param view - the file contents data
+     */
     processFileContents(view: any) {
         // If we haven't received the initial setup instructions, return
         if (!this.file.receiving) return;
@@ -90,6 +103,9 @@ export class FileLogic {
     }
 }
 
+/**
+ * A class that represents a template for a downloaded file
+ */
 export class FileTemplate {
     mimetype: string = "";
     extension: string = "";
@@ -98,6 +114,4 @@ export class FileTemplate {
     data: Array<any> = [];
     valid: boolean = false;
     timestampStart: any = undefined;
-
-    constructor() { }
 }

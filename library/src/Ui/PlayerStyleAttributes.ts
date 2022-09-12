@@ -1,5 +1,7 @@
 import { IPlayerStyleAttributes } from "./IPlayerStyleAttributes";
-
+/**
+ * A class for managing the current player windows attributes
+ */
 export class PlayerStyleAttributes implements IPlayerStyleAttributes {
     styleWidth: number;
     styleHeight: number;
@@ -8,12 +10,18 @@ export class PlayerStyleAttributes implements IPlayerStyleAttributes {
     styleCursor = 'default';
     styleAdditional: number;
 
-    constructor() { }
-
+    /**
+     * Get the width of the current player window
+     * @returns - the width of the current player window
+     */
     getStyleWidth() {
         return this.styleWidth;
     }
 
+    /**
+     * Get the height of the current player window
+     * @returns - the height of the current player window
+     */
     getStyleHeight() {
         return this.styleHeight;
     }

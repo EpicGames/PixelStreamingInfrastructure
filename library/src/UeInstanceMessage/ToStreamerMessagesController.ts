@@ -4,6 +4,9 @@ export class ToStreamerMessagesController {
 
     sendMessageController: SendMessageController;
 
+    /**
+     * @param sendMessageController - Stream message controller instance 
+     */
     constructor(sendMessageController: SendMessageController) {
         this.sendMessageController = sendMessageController;
     }

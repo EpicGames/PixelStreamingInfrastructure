@@ -17,6 +17,11 @@ export class FakeTouchController implements ITouchController {
     normalizeAndQuantize: INormalizeAndQuantize;
     videoElementParentClientRect: DOMRect;
 
+    /**
+     * @param toStreamerMessagesProvider - Stream message instance
+     * @param videoElementProvider - Video element instance
+     * @param normalizeAndQuantize - Normalise and Quantize instance
+     */
     constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer, normalizeAndQuantize: INormalizeAndQuantize) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.videoElementProvider = videoElementProvider;
@@ -26,7 +31,11 @@ export class FakeTouchController implements ITouchController {
         document.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
     }
 
-    setvideoElementParentClientRect(videoElementParentClientRect: any) {
+    /**
+     * Sets the video Element Parent Client Rect numbers for this class 
+     * @param videoElementParentClientRect - a html ElementParentClientRect object
+     */
+    setVideoElementParentClientRect(videoElementParentClientRect: any) {
         this.videoElementParentClientRect = videoElementParentClientRect;
     }
 
@@ -107,6 +116,11 @@ export class FakeTouchFinger {
     x: number;
     y: number;
 
+    /**
+     * @param id - the button id 
+     * @param x - the x axis value 
+     * @param y - the y axis value
+     */
     constructor(id: number, x: number, y: number) {
         this.id = id;
         this.x = x;

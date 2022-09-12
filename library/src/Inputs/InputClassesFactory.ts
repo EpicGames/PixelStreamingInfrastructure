@@ -6,7 +6,6 @@ import { GamePadController } from "./GamepadController";
 import { ControlSchemeType } from "../Config/Config";
 import { LockedMouseEvents } from "./LockedMouseEvents";
 import { HoveringMouseEvents } from "./HoveringMouseEvents";
-import { GyroController } from "./GyroController";
 import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
 import { IMouseEvents } from "./IMouseEvents";
 import { Logger } from "../Logger/Logger";
@@ -15,7 +14,7 @@ import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuanti
 import { IPlayerStyleAttributes } from "../Ui/IPlayerStyleAttributes";
 
 /**
- * Class for handling inputs for mouse and keyboard   
+ * Class for making and setting up input class types 
  */
 export class InputClassesFactory {
 
@@ -24,6 +23,11 @@ export class InputClassesFactory {
     normalizeAndQuantize: NormalizeAndQuantize;
     activeKeys: IActiveKeys = new ActiveKeys();
 
+    /**
+     * @param toStreamerMessagesProvider - Stream message instance  
+     * @param videoElementProvider - Video Player instance
+     * @param normalizeAndQuantize - A normalize and quantize instance 
+     */
     constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer, normalizeAndQuantize: NormalizeAndQuantize) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.videoElementProvider = videoElementProvider;
@@ -66,6 +70,11 @@ export class InputClassesFactory {
         return mouseController;
     }
 
+    /**
+     * Register a locked mouse class 
+     * @param mouseController - a mouse controller instance 
+     * @param playerStyleAttributesProvider - a player style attributes instance
+     */
     registerLockedMouseEvents(mouseController: MouseController, playerStyleAttributesProvider: IPlayerStyleAttributes) {
         let videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
         let lockedMouseEvents: IMouseEvents = new LockedMouseEvents(this.videoElementProvider, mouseController, this.activeKeys, playerStyleAttributesProvider);
@@ -93,6 +102,10 @@ export class InputClassesFactory {
 
     }
 
+    /**
+     * Register a hovering mouse class
+     * @param mouseController - A mouse controller object 
+     */
     registerHoveringMouseEvents(mouseController: MouseController) {
         let videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
         let hoveringMouseEvents = new HoveringMouseEvents(mouseController);
@@ -115,7 +128,7 @@ export class InputClassesFactory {
         Logger.Log(Logger.GetStackTrace(), "Registering Touch", 6);
         if (fakeMouseTouch) {
             let fakeTouchController = new FakeTouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
-            fakeTouchController.setvideoElementParentClientRect(videoElementParentClientRect);
+            fakeTouchController.setVideoElementParentClientRect(videoElementParentClientRect);
             return fakeTouchController;
         } else {
             return new TouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
@@ -130,25 +143,28 @@ export class InputClassesFactory {
         let gamePadController = new GamePadController(this.toStreamerMessagesProvider);
         return gamePadController;
     }
-
-    /**
-     * registers a gyro device 
-     */
-    registerGyro() {
-        let gyroController = new GyroController(this.toStreamerMessagesProvider);
-        return gyroController;
-    }
 }
 
+/**
+ * An interface for the active keys class
+ */
 export interface IActiveKeys {
     getActiveKeys(): Array<any>;
 }
 
+/**
+ * A class that keeps track of current active keys
+ */
 export class ActiveKeys implements IActiveKeys {
     activeKeys: Array<any> = [];
     constructor() {
-        this.activeKeys = new Array();
+        this.activeKeys = [];
     }
+
+    /**
+     * Get the current array of active keys 
+     * @returns - an array of active keys 
+     */
     getActiveKeys(): any[] {
         return this.activeKeys;
     }

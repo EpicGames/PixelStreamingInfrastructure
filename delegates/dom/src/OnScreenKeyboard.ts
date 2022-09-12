@@ -1,5 +1,7 @@
 import * as libspsfrontend from '@tensorworks/libspsfrontend'
-
+/**
+ * Class for handling on screen keyboard usage
+ */
 export class OnScreenKeyboard {
     // If the user focuses on a UE input widget then we show them a button to open
     // the on-screen keyboard. JavaScript security means we can only show the
@@ -10,16 +12,30 @@ export class OnScreenKeyboard {
     // on-screen keyboard.
     hiddenInput: HTMLInputElement;
 
+    /**
+     * 
+     * @param videoElementParent The div element the video player is injected into 
+     */
     constructor(videoElementParent: HTMLDivElement) {
         if ('ontouchstart' in document.documentElement) {
             this.createOnScreenKeyboardHelpers(videoElementParent);
         }
     }
 
+    /**
+     * An override for unquantizeAndDenormalizeUnsigned
+     * @param x the x axis point 
+     * @param y the y axis point 
+     * @returns unquantizeAndDenormalizeUnsigned object 
+     */
     unquantizeAndDenormalizeUnsigned(x: number, y: number): libspsfrontend.UnquantisedAndDenormaliseUnsigned {
         return null;
     };
 
+    /**
+     * Creates on screen keyboard helpers 
+     * @param videoElementParent The div element the video player i injected into
+     */
     createOnScreenKeyboardHelpers(videoElementParent: HTMLDivElement) {
         if (document.getElementById('hiddenInput') === null) {
             this.hiddenInput = document.createElement('input');
@@ -44,6 +60,10 @@ export class OnScreenKeyboard {
         }
     }
 
+    /**
+     * Shows the on screen keyboard 
+     * @param command the command received via the data channel containing keyboard positions
+     */
     showOnScreenKeyboard(command: any) {
         if (command.showOnScreenKeyboard) {
             // Show the 'edit text' button.

@@ -19,7 +19,6 @@ import { InputClassesFactory } from "../Inputs/InputClassesFactory";
 import { MicController } from "../MicPlayer/MicController";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 import { StreamMessageController, MessageDirection } from "../UeInstanceMessage/StreamMessageController";
-import { CommandController } from "../UeInstanceMessage/CommandController";
 import { ResponseController } from "../UeInstanceMessage/ResponseController";
 import * as MessageReceive from "../WebSockets/MessageReceive";
 import { IInitialSettings } from "../DataChannel/IInitialSettings";
@@ -30,7 +29,6 @@ import { SendMessageController } from "../UeInstanceMessage/SendMessageControlle
 import { ToStreamerMessagesController } from "../UeInstanceMessage/ToStreamerMessagesController";
 import { MouseController } from "../Inputs/MouseController";
 import { GamePadController } from "../Inputs/GamepadController";
-import { GyroController } from "../Inputs/GyroController";
 import { DataChannelSender } from "../DataChannel/DataChannelSender";
 import { NormalizeAndQuantize, UnquantisedAndDenormaliseUnsigned } from "../NormalizeAndQuantize/NormalizeAndQuantize";
 import { ITouchController } from "../Inputs/ITouchController";
@@ -41,7 +39,6 @@ import { PlayerStyleAttributes } from "../Ui/PlayerStyleAttributes";
  */
 export class webRtcPlayerController implements IWebRtcPlayerController {
 	config: Config;
-	commandController: CommandController;
 	responseController: ResponseController;
 	sdpConstraints: RTCOfferOptions;
 	webSocketController: WebSocketController;
@@ -71,7 +68,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	mouseController: MouseController;
 	touchController: ITouchController;
 	gamePadController: GamePadController;
-	gyroController: GyroController;
 	normalizeAndQuantize: NormalizeAndQuantize;
 	playerStyleAttributes: IPlayerStyleAttributes = new PlayerStyleAttributes();
 
@@ -91,7 +87,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	constructor(config: Config, delegate: IDelegate) {
 		this.config = config;
 		this.delegate = delegate;
-		this.commandController = new CommandController();
 		this.responseController = new ResponseController();
 		this.fileLogic = new FileLogic();
 
@@ -179,7 +174,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// From Streamer
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "QualityControlOwnership", (data: any) => this.onQualityControlOwnership(data));
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Response", (data: any) => this.responseController.onResponse(data));
-		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Command", (data: any) => { this.commandController.onCommand(data) });
+		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "Command", (data: any) => { this.onCommand(data) });
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "FreezeFrame", (data: any) => this.onFreezeFrameMessage(data));
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "UnfreezeFrame", () => this.invalidateFreezeFrameAndEnableVideo());
 		this.streamMessageController.registerMessageHandler(MessageDirection.FromStreamer, "VideoEncoderAvgQP", (data: any) => this.handleVideoEncoderAvgQP(data));
@@ -237,6 +232,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		}
 	}
 
+	/**
+	 * Handles a protocol message received from the streamer
+	 * @param message the message data from the streamer
+	 */
 	onProtocolMessage(message: Uint8Array) {
 		try {
 			let protocolString = new TextDecoder("utf-16").decode(message.slice(1));
@@ -300,6 +299,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		}
 	}
 
+	/**
+	 * Handles an input control message when it is received from the streamer
+	 * @param message The input control message 
+	 */
 	onInputControlOwnership(message: Uint8Array) {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.InputControlOwnership", 6);
 		let inputControlOwnership = new Boolean(message[1]).valueOf();
@@ -382,7 +385,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			Logger.Log(Logger.GetStackTrace(), "showing freeze frame");
 			this.freezeFrameController.showFreezeFrame();
 		}
-		this.videoPlayer.setVideoEnabled(false);
+		setTimeout(() => {
+			this.videoPlayer.setVideoEnabled(false);
+		}, this.freezeFrameController.freezeFrameDelay);
 	}
 
 	/**
@@ -400,8 +405,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	invalidateFreezeFrameAndEnableVideo() {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.FreezeFrame", 6);
-
-		this.freezeFrameController.hideFreezeFrame();
+		setTimeout(() => {
+			this.freezeFrameController.hideFreezeFrame();
+		}, this.freezeFrameController.freezeFrameDelay);
 		if (this.videoPlayer.videoElement) {
 			this.videoPlayer.setVideoEnabled(true);
 		}
@@ -634,7 +640,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 	/**
 	 * Send the ice Candidate to the signaling server via websocket
-	   * @param iceEvent - RTC Peer ConnectionIceEvent) {
+	 * @param iceEvent - RTC Peer ConnectionIceEvent) {
 	 */
 	handleSendIceCandidate(iceEvent: RTCPeerConnectionIceEvent) {
 		Logger.Log(Logger.GetStackTrace(), "OnIceCandidate", 6);
@@ -667,21 +673,16 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		// show the connected overlay 
 		this.delegate.onWebRtcConnected();
-
 		this.activateRegisterMouse()
 		this.keyboardController = this.inputClassesFactory.registerKeyBoard(this.config.suppressBrowserKeys);
 		this.gamePadController = this.inputClassesFactory.registerGamePad();
-
 		setInterval(() => this.getStats(), 1000);
 
 		// either autoplay the video or set up the play overlay
 		this.autoPlayVideoOrSetUpPlayOverlay();
-
 		this.setEnlargeToFillDisplay(true);
 		this.resizePlayerStyle();
-
 		this.delegate.onVideoInitialised();
-
 		this.uiController.updateVideoStreamSize = () => this.updateVideoStreamSize();
 	}
 
@@ -816,6 +817,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.sendDescriptorController.emitCommand("stat fps");
 	}
 
+	/**
+	 * Send an Iframe request to the streamer
+	 */
 	sendIframeRequest(): void {
 		Logger.Log(Logger.GetStackTrace(), "----   Sending Request for an IFrame  ----", 6);
 		this.streamMessageController.toStreamerHandlers.get("IFrameRequest");

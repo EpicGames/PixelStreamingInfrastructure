@@ -12,9 +12,9 @@ export class KeyboardController {
     activeKeysProvider: IActiveKeys;
 
     /**
-     * 
-     * @param toStreamerMessagesProvider - streamer messages provider
-     * @param suppressBrowserKeys - Suppress Browser Keys
+     * @param toStreamerMessagesProvider Stream message provider class object
+     * @param suppressBrowserKeys Suppress Browser Keys
+     * @param activeKeysProvider Active keys provider class object
      */
     constructor(toStreamerMessagesProvider: IStreamMessageController, suppressBrowserKeys: boolean, activeKeysProvider: IActiveKeys) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
@@ -80,7 +80,7 @@ export class KeyboardController {
     /**
      * Gets the Keycode of the Key pressed
      * @param keyboardEvent - Key board Event
-     * @returns the key code of the Key
+     * @returns - the key code of the Key
      */
     getKeycode(keyboardEvent: KeyboardEvent) {
         if (keyboardEvent.keyCode === SpecialKeyCodes.shift && keyboardEvent.code === 'ShiftRight') {
@@ -96,10 +96,10 @@ export class KeyboardController {
 
     /**
      * Browser keys do not have a charCode so we only need to test keyCode.
+     * @param keyCode - the browser keycode number 
      */
     isKeyCodeBrowserKey(keyCode: number) {
         // Function keys or tab key.
         return keyCode >= 112 && keyCode <= 123 || keyCode === 9;
     }
 }
-/* 5457524f4d4d */

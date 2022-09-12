@@ -20,8 +20,10 @@ export class LockedMouseEvents implements IMouseEvents {
     updateMouseMovePositionEvent = (mouseEvent: MouseEvent) => { this.updateMouseMovePosition(mouseEvent) };
 
     /**
-     * @param videoElementProvider - The HTML Video Element provider
-     * @param mouseController  - Mouse Controller
+     * @param videoElementProvider - Video Player instance  
+     * @param mouseController - Mouse controller instance
+     * @param activeKeysProvider - Active keys provider instance 
+     * @param playerStyleAttributesProvider - Player style attributes instance
      */
     constructor(videoElementProvider: IVideoPlayer, mouseController: MouseController, activeKeysProvider: IActiveKeys, playerStyleAttributesProvider: IPlayerStyleAttributes) {
         this.videoElementProvider = videoElementProvider;
@@ -152,6 +154,9 @@ export class LockedMouseEvents implements IMouseEvents {
     }
 }
 
+/**
+ * Extra types for Document and WheelEvent
+ */
 declare global {
     interface Document {
         mozPointerLockElement: any;

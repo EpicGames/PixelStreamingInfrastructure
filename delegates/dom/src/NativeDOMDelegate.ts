@@ -773,7 +773,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 }
 
 /**
- * Declare additions to global html objects that do not exist on the bases
+ * Declare additions to base types 
  */
 declare global {
 	interface Document {

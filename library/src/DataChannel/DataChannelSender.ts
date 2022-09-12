@@ -1,10 +1,16 @@
 import { Logger } from "../Logger/Logger";
 import { IDataChannelController } from "./IDataChannelController";
 
+/**
+ * A class for sending data channel messages 
+ */
 export class DataChannelSender {
 
     dataChannelProvider: IDataChannelController;
 
+    /**
+     * @param dataChannelProvider - Data channel object type 
+     */
     constructor(dataChannelProvider: IDataChannelController) {
         this.dataChannelProvider = dataChannelProvider;
     }

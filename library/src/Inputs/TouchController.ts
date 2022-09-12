@@ -16,8 +16,9 @@ export class TouchController implements ITouchController {
     maxByteValue: number = 255;
 
     /**
-     * 
-     * @param videoElementProvider - the provider of the video element 
+     * @param toStreamerMessagesProvider - Stream message instance  
+     * @param videoElementProvider - Video Player instance
+     * @param normalizeAndQuantize - A normalize and quantize instance 
      */
     constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer, normalizeAndQuantize: INormalizeAndQuantize) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
@@ -30,6 +31,10 @@ export class TouchController implements ITouchController {
         Logger.Log(Logger.GetStackTrace(), "Touch Events Registered", 6);
     }
 
+    /**
+     * Remember a touch command
+     * @param touch - the touch command 
+     */
     rememberTouch(touch: Touch) {
         let finger = this.fingers.pop();
         if (finger === undefined) {
@@ -38,6 +43,10 @@ export class TouchController implements ITouchController {
         this.fingerIds.set(touch.identifier, finger);
     }
 
+    /**
+     * Forgets a touch command
+     * @param touch - the touch command 
+     */
     forgetTouch(touch: Touch) {
         this.fingers.push(this.fingerIds.get(touch.identifier));
         // Sort array back into descending order. This means if finger '1' were to lift after finger '0', we would ensure that 0 will be the first index to pop

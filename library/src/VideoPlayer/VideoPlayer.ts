@@ -1,6 +1,8 @@
 import { IVideoPlayer } from "./IVideoPlayer";
-import { Logger } from "../Logger/Logger";
 
+/**
+ * Extra types for the HTMLDivElement 
+ */
 declare global {
     interface HTMLDivElement {
         pressMouseButtons?(mouseEvent: MouseEvent): void;
@@ -8,10 +10,18 @@ declare global {
         mozRequestPointerLock?(): void;
     }
 }
+
+/**
+ * Class for the video player html element 
+ */
 export class VideoPlayer implements IVideoPlayer {
     videoElement: HTMLVideoElement;
 
-    constructor(rootDiv: HTMLDivElement, startVideoMuted: boolean) {
+    /**
+     * @param videoElementParent the html div the the video player will be injected into 
+     * @param startVideoMuted will the video be started muted 
+     */
+    constructor(videoElementParent: HTMLDivElement, startVideoMuted: boolean) {
         this.videoElement = document.createElement("video");
         this.videoElement.id = "streamingVideo";
         this.videoElement.muted = startVideoMuted;
@@ -21,7 +31,7 @@ export class VideoPlayer implements IVideoPlayer {
         this.videoElement.style.height = "100%";
         this.videoElement.style.position = "absolute";
         this.videoElement.style.pointerEvents = "all";
-        rootDiv.appendChild(this.videoElement);
+        videoElementParent.appendChild(this.videoElement);
 
         // set play for video
         this.videoElement.onclick = () => {
@@ -33,7 +43,7 @@ export class VideoPlayer implements IVideoPlayer {
 
     /**
      * Get the current context of the html video element
-     * @returns the current context of the video element
+     * @returns - the current context of the video element
      */
     getVideoElement(): HTMLVideoElement {
         return this.videoElement;
@@ -41,7 +51,7 @@ export class VideoPlayer implements IVideoPlayer {
 
     /**
      * Get the current context of the html video elements parent
-     * @returns the current context of the video elements parent
+     * @returns - the current context of the video elements parent
      */
     getVideoParentElement(): HTMLElement {
         return this.videoElement.parentElement;

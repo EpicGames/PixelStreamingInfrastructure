@@ -13,9 +13,10 @@ export class MouseController {
 	normalizeAndQuantize: INormalizeAndQuantize;
 
 	/**
-	 * 
-	 * @param toStreamerMessagesProvider - Stream message controller provider
-	 */
+     * @param toStreamerMessagesProvider - Stream message instance  
+     * @param videoElementProvider - Video Player instance
+     * @param normalizeAndQuantize - A normalize and quantize instance 
+     */
 	constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer, normalizeAndQuantize: INormalizeAndQuantize) {
 		this.toStreamerMessagesProvider = toStreamerMessagesProvider;
 		this.normalizeAndQuantize = normalizeAndQuantize;
@@ -23,6 +24,9 @@ export class MouseController {
 		this.registerMouseEnterAndLeaveEvents();
 	}
 
+	/**
+	 * Clears all the click events on the current video element parent div
+	 */
 	clearMouseEvents() {
 		let videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
 		videoElementParent.onclick = null;

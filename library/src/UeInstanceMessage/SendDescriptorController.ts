@@ -14,16 +14,24 @@ export class SendDescriptorController {
 
     /**
      * Send a Latency Test to the UE Instance
-     * @param StartTimeMs - Start Time of the Latency test
+     * @param descriptor - the descriptor for a latency test 
      */
     sendLatencyTest(descriptor: Object) {
         this.sendDescriptor("LatencyTest", descriptor);
     }
 
+    /**
+     * Send a Latency Test to the UE Instance
+     * @param descriptor - the descriptor for a command 
+     */
     emitCommand(descriptor: Object) {
         this.sendDescriptor("Command", descriptor);
     }
 
+    /**
+     * Send a Latency Test to the UE Instance
+     * @param descriptor - the descriptor for a UI Interaction 
+     */
     emitUIInteraction(descriptor: Object) {
         this.sendDescriptor("UIInteraction", descriptor);
     }

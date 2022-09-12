@@ -15,14 +15,23 @@ export class StreamMessageController implements IStreamMessageController {
         this.fromStreamerMessages = new TwoWayMap();
     }
 
+    /**
+     * Get the current map for to streamer handlers
+     */
     getToStreamHandlersMap(): Map<string, (messageType: any, messageData?: any[] | undefined) => void> {
         return this.toStreamerHandlers;
     }
 
+    /**
+     * Get the current twoWayMap for to streamer messages
+     */
     getToStreamerMessageMap(): TwoWayMap {
         return this.toStreamerMessages;
     }
 
+    /**
+     * Populate the Default message protocol 
+     */
     populateDefaultProtocol() {
         /*
          * Control Messages. Range = 0..49.
@@ -201,6 +210,12 @@ export class StreamMessageController implements IStreamMessageController {
         this.fromStreamerMessages.add("Protocol", 255);
     }
 
+    /**
+     * Register a message handler 
+     * @param messageDirection - the direction of the message; toStreamer or fromStreamer
+     * @param messageType - the type of the message 
+     * @param messageHandler - the function or method to be executed when this handler is called
+     */
     registerMessageHandler(messageDirection: MessageDirection, messageType: string, messageHandler: (messageType: any, messageData?: any[] | undefined) => void) {
         switch (messageDirection) {
             case MessageDirection.ToStreamer:
@@ -215,6 +230,9 @@ export class StreamMessageController implements IStreamMessageController {
     }
 }
 
+/**
+ * The enum for message directions
+ */
 export enum MessageDirection {
     ToStreamer = 0,
     FromStreamer = 1

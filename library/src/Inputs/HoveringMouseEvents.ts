@@ -10,7 +10,7 @@ export class HoveringMouseEvents implements IMouseEvents {
     mouseController: MouseController;
 
     /**
-     * @param mouseController - Mouse Controller
+     * @param mouseController - Mouse Controller instance
      */
     constructor(mouseController: MouseController) {
         this.mouseController = mouseController;

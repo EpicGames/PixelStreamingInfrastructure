@@ -10,7 +10,7 @@ export class GamePadController {
     toStreamerMessagesProvider: IStreamMessageController;
 
     /**
-     * @param toStreamerMessagesProvider - the   
+     * @param toStreamerMessagesProvider - Stream message instance   
      */
     constructor(toStreamerMessagesProvider: IStreamMessageController) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
@@ -126,6 +126,9 @@ export class GamePadController {
     }
 }
 
+/**
+ * Additional types for Window and Navigator 
+ */
 declare global {
     interface Window {
         mozRequestAnimationFrame(callback: FrameRequestCallback): number;
@@ -137,6 +140,9 @@ declare global {
     }
 }
 
+/**
+ * Gamepad layout codes enum
+ */
 export enum gamepadLayout {
     RightClusterBottomButton = 0,
     RightClusterRightButton = 1,
