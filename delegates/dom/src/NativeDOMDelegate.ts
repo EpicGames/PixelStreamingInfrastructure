@@ -342,11 +342,25 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		if (isError) {
 			this.showErrorOverlay(instanceStateMessage);
 		} else if (isInstancePending) {
+
 			//check if there is already and instance pending if so return 
 			let preExistingPendingMessage = document.getElementById('loading-spinner') as HTMLDivElement;
 			if (preExistingPendingMessage) {
+
+				// only update our text div
+				let textDiv = document.getElementById("text-"+instanceState.id) as HTMLSpanElement;
+				textDiv.innerHTML = instanceStateMessage;
+
 				return;
 			}
+
+			// build a wrapper to hold our text and our spinner
+			var wrapperDiv: HTMLDivElement = document.createElement('div');
+
+			// build a text div to hold our text message
+			var textSpan: HTMLSpanElement = document.createElement('span');
+			textSpan.id = "text-" + instanceState.id
+			textSpan.innerHTML = instanceStateMessage;
 
 			// build the spinner span
 			var spinnerSpan: HTMLSpanElement = document.createElement('span');
@@ -359,11 +373,12 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			spinnerDiv.className = "spinner-border ms-2"
 			spinnerDiv.setAttribute("role", "status");
 
-			// append the spinner to the element
-			spinnerDiv.appendChild(spinnerSpan);
+			// append wrapper and the spinner to the element
+			wrapperDiv.appendChild(textSpan);
+			wrapperDiv.appendChild(spinnerDiv).appendChild(spinnerSpan);
 
 			// insert the inner html into the base div
-			this.showTextOverlay(instanceStateMessage + spinnerDiv.outerHTML);
+			this.showTextOverlay(wrapperDiv.outerHTML);
 		} else {
 			this.showTextOverlay(instanceStateMessage);
 		}
