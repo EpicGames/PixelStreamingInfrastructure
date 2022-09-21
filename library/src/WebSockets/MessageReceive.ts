@@ -37,6 +37,7 @@ export enum InstanceState {
  */
 export class MessageRecv {
     type: string;
+    id: string;
 }
 
 /**
