@@ -106,6 +106,9 @@ let editTextButton = undefined;
 let hiddenInput = undefined;
 
 let MaxByteValue = 255;
+// The delay between the showing/unshowing of a freeze frame and when the stream will stop/start
+// eg showing freeze frame -> delay -> stop stream OR show stream -> delay -> unshow freeze frame
+freezeFrameDelay = 50; // ms
 
 let activeKeys = [];
 
@@ -1148,7 +1151,7 @@ function showFreezeFrame() {
         }
         setTimeout(() => {
             webRtcPlayerObj.setVideoEnabled(false);
-        }, webRtcPlayerObj.freezeFrameDelay);
+        }, freezeFrameDelay);
     };
 }
 
@@ -1685,7 +1688,7 @@ function invalidateFreezeFrameOverlay() {
         freezeFrameOverlay.style.display = 'none';
         freezeFrame.valid = false;
         freezeFrameOverlay.classList.remove("freezeframeBackground");
-    }, webRtcPlayerObj.freezeFrameDelay);
+    }, freezeFrameDelay);
     
     if (webRtcPlayerObj) {
         webRtcPlayerObj.setVideoEnabled(true);
