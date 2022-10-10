@@ -27,11 +27,13 @@ We maintain the following in branches right now:
 
 [Master](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/master) (This is our dev branch.)
 
-[UE4.26](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.26)
+[UE5.1](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.1)
+
+[UE5.0](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.0)
 
 [UE4.27](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.27)
 
-[UE5.0](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.0)
+[UE4.26](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.26)
 
 ## Legal
 © 2004-2022, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere. 
