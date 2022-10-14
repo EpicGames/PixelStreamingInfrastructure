@@ -60,12 +60,12 @@ function timeToString() {
 
 function RegisterFileLogger(path) {
 	if(path == null)
-		path = './';
+		path = './logs/';
 	
 	if (!fs.existsSync(path))
 		fs.mkdirSync(path);
 	
-	var output = fs.createWriteStream(`./logs/${dateTimeToString()}.log`);
+	var output = fs.createWriteStream(`${path}${dateTimeToString()}.log`);
 	var fileLogger = new Console(output);
 	logFunctions.push(function(msg, ...args) {
 		fileLogger.log(`${timeToString()} ${msg}`, ...args);
