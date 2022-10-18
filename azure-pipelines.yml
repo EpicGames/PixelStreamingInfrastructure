@@ -17,4 +17,4 @@ stages:
     pool:
       vmImage: 'windows-latest'
     jobs:
-    - template: unreal_sigsrv_mm/build_template.yml@cicd
+    - template: unreal_sigsrv_mm/build_template_aws.yml@cicd
