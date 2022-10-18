@@ -1,0 +1,20 @@
+trigger: 
+  - main
+pr: none
+
+resources:
+  repositories:
+  - repository: cicd # The name used to reference this repository in the checkout step
+    type: github
+    endpoint: Beemup
+    name: Beemup/yom_ado_cicd_templates
+    ref: main
+
+
+stages:
+  - stage: MM_SS_Package
+    displayName: "MM and SS Pckg Push"
+    pool:
+      vmImage: 'windows-latest'
+    jobs:
+    - template: unreal_sigsrv_mm/build_template.yml@cicd
