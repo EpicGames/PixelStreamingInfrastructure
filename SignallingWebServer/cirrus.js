@@ -31,6 +31,7 @@ const defaultConfig = {
 	HttpsPort: 443,
 	StreamerPort: 8888,
 	SFUPort: 8889,
+	DisableRedirection: true,
 	MaxPlayerCount: -1
 };
 
@@ -79,6 +80,9 @@ if (config.UseFrontend) {
 	var httpsPort = 8000;
 
 	//Required for self signed certs otherwise just get an error back when sending request to frontend see https://stackoverflow.com/a/35633993
+	//WARNING: This is extremely dangereous as it allows for pretty much anyone to manipulate the requests.
+	//Makes the environment quite susceptible to Man in the Middle Attacks.
+	//Don't enable in any public setting
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
 	const httpsClient = require('./modules/httpsClient.js');
@@ -107,7 +111,7 @@ var serverPublicIp;
 var clientConfig = { type: 'config', peerConnectionOptions: {} };
 
 // Parse public server address from command line
-// --publicIp <public address>
+// --PublicIp <public address>
 try {
 	if (typeof config.PublicIp != 'undefined') {
 		serverPublicIp = config.PublicIp.toString();
@@ -160,6 +164,58 @@ try {
 	process.exit(2);
 }
 
+function isValidURL(str) {
+    var regex = /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
+    if(!regex .test(str)) {      
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+let whitelist = ""
+
+const httpss = require('https');
+
+// Pending to move to an external config service (Az AppConfig?)
+// -------------------------------------------------------------
+const domains_list = [
+	{
+		"message": "hello from localhost",
+		"matchmaker_url": "http://experience.yom.ooo/",
+		"whitelisted_domain": "https://localhost:*"
+	},
+	{
+		"message": "hello from backup",
+		"matchmaker_url": "http://experience.yom.ooo/",
+		"whitelisted_domain": "http://localhost:*"
+	},
+	{
+		"message": "YOM Experience",
+		"matchmaker_url": "https://investor-demo-prd.beemup.com/",
+		"whitelisted_domain": "https://experience.yom.ooo/"
+	},
+	{
+		"message": "YOM Webflow Experience",
+		"matchmaker_url": "https://yom-experience.webflow.io/",
+		"whitelisted_domain": "https://yom-experience.webflow.io/"
+	}
+]
+// -------------------------------------------------------------
+ 
+whitelist = domains_list.reduce((res, current) => {    
+return current.whitelisted_domain !== undefined && isValidURL(current.whitelisted_domain) ? res = res + " " + current.whitelisted_domain : res;
+}, "");
+
+// Add the current site to the whitelisted domains so that images can be displayed properly
+whitelist += " " + config.PublicIp;
+console.log('whitelisted domain: ', whitelist);
+
+
+app.use(function (req, res, next) {
+	res.header("Content-Security-Policy", "frame-ancestors " + whitelist);
+	next();
+});
 if (config.UseHTTPS) {
 	app.use(helmet());
 
@@ -167,6 +223,12 @@ if (config.UseHTTPS) {
 		maxAge: 15552000  // 180 days in seconds
 	}));
 
+	// set the http header x-frame-options to sameorigin
+	app.use(function (req, res, next) {
+		res.header("X-Frame-Options", null);
+		next();
+	});
+	
 	//Setup http -> https redirect
 	console.log('Redirecting http->https');
 	app.use(function (req, res, next) {
@@ -676,7 +738,7 @@ if (config.UseMatchmaker) {
 		message = {
 			type: 'connect',
 			address: typeof serverPublicIp === 'undefined' ? '127.0.0.1' : serverPublicIp,
-			port: httpPort,
+			port: config.DisableRedirection && config.UseHTTPS ? httpsPort : httpPort,
 			ready: streamer && streamer.readyState === 1,
 			playerConnected: playerConnected
 		};

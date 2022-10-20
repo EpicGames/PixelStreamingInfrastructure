@@ -4,7 +4,7 @@
  * Class definitions
  * TODO: Move these to seperate files once we introduce a bundler
  */
-class TwoWayMap {
+ class TwoWayMap {
     constructor(map = {}) {
         this.map = map;
         this.reverseMap = new Map();
@@ -63,6 +63,8 @@ let shouldShowPlayOverlay = true;
 
 let isFullscreen = false;
 let isMuted = false;
+let isInIFrame = false;
+
 // A freeze frame is a still JPEG image shown instead of the video.
 let freezeFrame = {
     receiving: false,
@@ -85,7 +87,7 @@ let file = {
 
 // Optionally detect if the user is not interacting (AFK) and disconnect them.
 let afk = {
-    enabled: false,   // Set to true to enable the AFK system.
+    enabled: true,   // Set to true to enable the AFK system.
     warnTimeout: 120,   // The time to elapse before warning the user they are inactive.
     closeTimeout: 10,   // The time after the warning when we disconnect the user.
 
@@ -988,7 +990,10 @@ function setOverlay(htmlClass, htmlElement, onClickFunction) {
 function showConnectOverlay() {
     let startText = document.createElement('div');
     startText.id = 'playButton';
-    startText.innerHTML = 'Click to start'.toUpperCase();
+
+    // If the play just teleported in, change the shown message
+    let urlParams = new URLSearchParams(window.location.search);
+    startText.innerHTML = urlParams.has("teleported") ? 'Click to enter'.toUpperCase() : 'Click to start'.toUpperCase();
 
     setOverlay('clickableState', startText, event => {
         connect();
@@ -1003,6 +1008,9 @@ function showTextOverlay(text) {
     setOverlay('textDisplayState', textOverlay);
 }
 
+// track if we have already emitted init commands for this player
+let initCommandsEmitted = false
+
 function playStream() {
     if(webRtcPlayerObj && webRtcPlayerObj.video) {
         if(webRtcPlayerObj.audio.srcObject && autoPlayAudio) {
@@ -1015,11 +1023,47 @@ function playStream() {
                 console.log("Browser does not support autoplaying audio without interaction - to resolve this we are going to show the play button overlay.")
                 showPlayOverlay();
             });
+
         } else {
             // Video and audio are combined in the video element
             playVideo();
         }
         showFreezeFrameOverlay();
+
+        // get solana key
+        let urlParams = new URLSearchParams(window.location.search);
+        let solanaPublicKey = urlParams.getAll('solanaPublicKey');
+
+        console.log("checking if we already emitted init commands: " + initCommandsEmitted + " for " + solanaPublicKey)
+        if (!initCommandsEmitted) {
+
+            // config launching commands
+            emitCommand({
+                ConsoleCommand: 'DisableAllScreenMessages'
+            });
+
+            emitCommand({
+                Resolution: {
+                    Width: 1280,
+                    Height: 720
+                }
+            });
+
+            // send solana key to streamer
+            let solPKeyToJSON = {
+                key: solanaPublicKey.toString()
+            };
+            emitUIInteraction(solPKeyToJSON);
+            console.log(solPKeyToJSON);
+
+            emitCommand({
+                Encoder: {
+                    BitrateReduction: 20,
+                }
+            });
+
+            initCommandsEmitted=true
+        }
         hideOverlay();
     }
 }
@@ -1077,6 +1121,7 @@ function showAfkOverlay() {
             // The user failed to click so disconnect them.
             hideOverlay();
             ws.close();
+            window.parent.location.href="http://experience.yom.ooo"
         } else {
             // Update the countdown message.
             updateAfkOverlayText();
@@ -1109,10 +1154,19 @@ function resetAfkWarningTimer() {
     }
 }
 
+let connectionStuckTimeout;
+
+function connectionStuckWebRtcOffer() {
+    console.log("Connection is not established in time");
+    isInIFrame ? window.parent.postMessage({event: "UDP_failed"},'*') : ""; 
+    showTextOverlay("Sorry, we couldn't start your experience. Please check your connection and firewall settings to establish a connection to the streaming server and try again.");
+}
+
 function createWebRtcOffer() {
     if (webRtcPlayerObj) {
         console.log('Creating offer');
         showTextOverlay('Starting connection to server, please wait');
+        connectionStuckTimeout = setTimeout(connectionStuckWebRtcOffer, 15000);
         webRtcPlayerObj.createOffer();
     } else {
         console.log('WebRTC player not setup, cannot create offer');
@@ -1600,7 +1654,7 @@ let inputOptions = {
     // user drags with their mouse. We may perform the reverse; a single finger
     // touch may be converted into a mouse drag UE side. This allows a
     // non-touch application to be controlled partially via a touch device.
-    fakeMouseWithTouches: false,
+    fakeMouseWithTouches: true,
 
     // Hiding the browser cursor enables the use of UE's inbuilt software cursor,
     // without having the browser cursor display on top
@@ -2168,9 +2222,15 @@ function registerLockedMouseEvents(playerElement) {
             document.mozPointerLockElement === playerElement) {
             console.log('Pointer locked');
             document.addEventListener("mousemove", updatePosition, false);
+            
+            // Disable scrolling when the pointer is locked
+            document.addEventListener('wheel', toggleScrolling, {passive: false});
         } else {
             console.log('The pointer lock status is now unlocked');
             document.removeEventListener("mousemove", updatePosition, false);
+
+            // Enable scrolling when the pointer is unlocked
+            document.removeEventListener("wheel", toggleScrolling, {passive: false});
 
             // If mouse loses focus, send a key up for all of the currently held-down keys
             // This is necessary as when the mouse loses focus, the windows stops listening for events and as such
@@ -2183,9 +2243,24 @@ function registerLockedMouseEvents(playerElement) {
         }
     }
 
+    function toggleScrolling (e) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+    } 
+
     function updatePosition(e) {
         x += e.movementX;
         y += e.movementY;
+
+        let userAgent = navigator.userAgent;    
+        
+        //  Check for Firefox browser.
+        // We observed that on some machines, with Firefox browser and 150% scaling, the mouse/view automatically points downward.
+        // TODO: We need to findout why the "mousemove" event is called repeatedly. 
+        if(userAgent.match(/firefox|fxios/i)){
+            if(e.movementY === 1 && e.movementX === 0) return;
+        }
+
         if (x > styleWidth) {
             x -= styleWidth;
         }
@@ -2660,6 +2735,54 @@ function registerMouse(playerElement) {
     player.style.cursor = styleCursor;
 }
 
+function redirect(data) {
+    console.log("redirect to url: ", data.url);
+    window.parent.location.href= data.url.startsWith("http") ? data.url : "https://" + data.url;
+}
+
+function teleportPlayer(data) {
+    // Fade for 0.5 seconds and then redirect to another url
+    if (!window.AnimationEvent) { return; }
+    var fader = document.getElementById('fader');
+    fader.classList.add('fade-in');
+
+
+    setTimeout(() => {
+        console.log("redirect to url: ", data.url + "?solanaPublicKey=" + data.walletID + "&teleported");
+        window.parent.location.href=data.url + "?solanaPublicKey=" + data.walletID + "&teleported";
+    }, 500);
+}
+
+// Handle the events sent by UE
+function handleUEEvents(data) {
+    console.warn("Response received from UE! : ", data);
+
+    if (isInIFrame) {
+        window.parent.postMessage({event: data},'*');
+        console.log("Message posted to parent", {event: data});
+    }
+
+    const eventData = JSON.parse(data);
+
+    // Handle different cases, ideally move this out to a new module
+    switch (eventData.function) {
+        case "Redirect":
+            console.log("Redirect event received");
+            !isInIFrame ? redirect(eventData.data) : "";
+            break;
+        case "EmitTrackingInfo":
+            console.log("EmitTrackingInfo event received");
+            !isInIFrame ? console.log(eventData.data) : "";
+            break;
+        case "TeleportPlayer":
+            console.log("TeleportPlayer event received");
+            !isInIFrame ? teleportPlayer(eventData.data) : "";
+            break;
+        default:
+            break;
+    }
+}
+
 function clearMouseEvents(playerElement) {
     playerElement.onclick = null;
     playerElement.onmousedown = null;
@@ -2744,6 +2867,16 @@ function closeStream() {
 }
 
 function load() {
+
+    if ( window.location !== window.parent.location ) {
+        // The page is in an iframe
+        console.log("The page is in an iframe");
+        isInIFrame = true;       
+      } else {
+        // The page is not in an iframe
+        console.log("The page is not in an iframe");
+    }
+    
     parseURLParams();
     setupHtmlEvents();
     registerMessageHandlers();
@@ -2752,5 +2885,6 @@ function load() {
     registerKeyboardEvents();
     // Example response event listener that logs to console
     addResponseEventListener('logListener', (response) => {console.log(`Received response message from streamer: "${response}"`)})
+    addResponseEventListener('handle_ue_events', handleUEEvents);
     start(false);
 }

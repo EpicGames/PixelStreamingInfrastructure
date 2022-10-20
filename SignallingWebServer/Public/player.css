@@ -44,7 +44,7 @@ video {
 	font-size: 1.8em;
 	width: 100%;
 	height: 100%;
-	color: var(--colour2)
+	color: var(--colour2);
 }
 
 /* State for element to be clickable */
@@ -556,4 +556,28 @@ object {
 	display: inline-block;
     line-height: 1.5;
     height: 100vh;
+}
+
+#fader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999999;
+	pointer-events: none;
+	background: black;
+	animation-duration: 500ms;
+    animation-timing-function: ease-in-out;
+	opacity: 0;
+}
+
+@keyframes fade-in {
+    from { opacity: 0 }
+      to { opacity: 1 }
+}
+
+#fader.fade-in {
+    opacity: 1;
+    animation-name: fade-in;
 }

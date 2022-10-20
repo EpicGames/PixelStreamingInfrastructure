@@ -22,11 +22,15 @@ const config = require('./modules/config.js').init(configFile, defaultConfig);
 console.log("Config: " + JSON.stringify(config, null, '\t'));
 
 const express = require('express');
+const bodyParser = require('body-parser');
 var cors = require('cors');
 const app = express();
 const http = require('http').Server(app);
 const fs = require('fs');
 const path = require('path');
+app.use('/images', express.static(path.join(__dirname, './images')))
+
+const httpHelper = require('./modules/httpHelper.js');
 const logging = require('./modules/logging.js');
 logging.RegisterConsoleLogger();
 
@@ -89,19 +93,38 @@ if (config.UseHTTPS) {
 // No servers are available so send some simple JavaScript to the client to make
 // it retry after a short period of time.
 function sendRetryResponse(res) {
-	res.send(`All ${cirrusServers.size} Cirrus servers are in use. Retrying in <span id="countdown">3</span> seconds.
+	res.send(`<body style="background-color:black">
+	<center style="margin: 70px 0; color:white">Unfortunately, the Metaspace you are trying to visit is currently full. Retrying in <span id="countdown">15</span> seconds.</center>
+	<center><img src="images/mark_white.png" class="spin" width="49" height="49" style="margin: 30px 0"/></center>
 	<script>
 		var countdown = document.getElementById("countdown").textContent;
 		setInterval(function() {
 			countdown--;
-			if (countdown == 0) {
+			if (countdown < 1) {
 				window.location.reload(1);
 			} else {
 				document.getElementById("countdown").textContent = countdown;
 			}
 		}, 1000);
-	</script>`);
+	</script>
+	<style>
+	@keyframes spinning {
+		from { transform: rotate(0deg) }
+		to { transform: rotate(360deg) }
+	  }
+	  .spin {
+		animation-name: spinning;
+		animation-duration: 1s;
+		animation-iteration-count: infinite;
+		animation-timing-function: linear;
+	  }
+	</style>
+	</body>`);
 }
+
+function removeTrailingSlash(str) {
+	return str.replace(/\/+$/, '');
+  }
 
 // Get a Cirrus server if there is one available which has no clients connected.
 function getAvailableCirrusServer() {
@@ -117,6 +140,18 @@ function getAvailableCirrusServer() {
 			}
 			cirrusServer.lastRedirect = Date.now();
 
+			return cirrusServer;
+		}
+	}
+	
+	console.log('WARNING: No empty Cirrus servers are available');
+	return undefined;
+}
+
+// Get a Cirrus server if there is one available which has no clients connected.
+function getAvailableCirrusServerCheck() {
+	for (cirrusServer of cirrusServers.values()) {
+		if (cirrusServer.numConnectedClients === 0 && cirrusServer.ready === true) {
 			return cirrusServer;
 		}
 	}
@@ -144,9 +179,16 @@ if(enableRedirectionLinks) {
 	app.get('/', (req, res) => {
 		cirrusServer = getAvailableCirrusServer();
 		if (cirrusServer != undefined) {
-			res.redirect(`http://${cirrusServer.address}:${cirrusServer.port}/`);
+			let url = `${config.DisableRedirection ? "https" : "http"}://${removeTrailingSlash(cirrusServer.address)}:${cirrusServer.port}`
+
+			// determine the public key from the http query string and pass it on
+			var solanaPublicKey;
+			req.url.slice(2).split('&').forEach(item => {if (item.split('=')[0].search('solanaPublicKey') == 0) solanaPublicKey = (item.split('=')[1])});
+			if (solanaPublicKey) url = url + `?solanaPublicKey=${solanaPublicKey}`
+
+			console.log("Redirect to: " + url);
+			res.redirect(url);
 			//console.log(req);
-			console.log(`Redirect to ${cirrusServer.address}:${cirrusServer.port}`);
 		} else {
 			sendRetryResponse(res);
 		}
@@ -163,6 +205,151 @@ if(enableRedirectionLinks) {
 		}
 	});
 }
+
+const imageFolder = path.join(require('os').homedir(), 'PortalImages');
+
+// Make a slide show
+let portalImageArray = [];
+fs.readdirSync(imageFolder).forEach(file => {
+	portalImageArray.push(path.join(imageFolder, file));
+});
+
+// Middleware for parsing JSON body
+app.use(bodyParser.json());
+
+app.get('/getPreviewImage', (req, res) => {
+	// No avaliable images 
+	if (portalImageArray.length === 0) {
+		res.statusStatus(404);
+		return;
+	}
+
+	// Current strategy for images is to simply cycle to next one for each request, 
+	// we might want to customize this for each client or simply randomize it.
+	res.sendFile(portalImageArray[0]);
+});
+
+app.get('/getMetaspaceData', (req, res) => {
+	let previewImageUrl = "https://" + req.get('host') + "/getPreviewImage";
+
+	let avaliableInstance = false;
+	let cirrusServer = getAvailableCirrusServerCheck();
+
+	if (cirrusServer !== undefined) {
+		avaliableInstance = true;
+	} 
+
+	res.json({
+		"data": {
+		  "engine": "5.0",
+		  "gatedAccess": false,
+		  "isOnline": true,
+		  "previewImage": previewImageUrl,
+		  "availableInstance": avaliableInstance
+		}	
+	  });
+})
+
+// Internal communication methods between MM and UE Server
+app.post('/matchmaker/getMetaspaceData', (req, res) => {
+	// do url validation 
+	let url;
+	try {
+		url = new URL(req.body.url);
+	}
+	catch (e) {
+		console.log("ERROR: Could not parse URL.");
+		res.sendStatus(400);
+		return;
+	}
+
+	let options = {
+		hostname: url.hostname,
+		port: url.port,
+		path: "/getMetaspaceData",
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	}
+	
+	httpHelper(options, undefined, (resIn, resInData) => {
+		res.send(resInData);
+	})
+})
+
+// control room for inspecting registered signalling servers
+// FIXME: implement basic authentication as this is a public address
+app.get('/controlroom/', (req, res) => {
+
+	const reject = () => {
+		res.setHeader("www-authenticate", "Basic");
+		res.sendStatus(401);
+	};
+
+	const authorization = req.headers.authorization;
+
+	if (!authorization) {
+		return reject();
+	}
+
+	const [username, password] = Buffer.from(
+			authorization.replace("Basic ", ""),
+			"base64"
+		)
+		.toString()
+		.split(":");
+
+	if (!(username === "admin" && password === "fdsfd-423fg-2msaf")) {
+		return reject();
+	}
+
+	let response = ""
+	response += ("<h1>Control room</h1>")
+
+	if (!cirrusServers) {
+		response += "<p>No servers found.</p>"
+		res.send(response)
+		return
+	}
+
+	response += ("<p>Servers found: " + cirrusServers.size + "</p>")
+	response += ("<ul>")
+
+	for (const [connection, cirrusServer] of cirrusServers.entries()) {
+		// Add additional functionality to check pinging, if more than 30 seconds, close the connection.
+		if (Math.round((Date.now() - cirrusServer.lastPingReceived) / 1000) > 30) {
+			disconnect(connection);
+		}
+
+		address = removeTrailingSlash(cirrusServer.address)
+		// calculate how long ago we sent someone to this server if we did
+		let lastRedirectSecondsPast = typeof cirrusServer.lastRedirect != 'undefined' ? Math.round((Date.now() - cirrusServer.lastRedirect) / 1000) : -1
+
+		response += "<li>"
+		response += `<a href=\"${config.DisableRedirection ? "https" : "http"}://` + address + ":" + cirrusServer.port + "\">" + address + ":" + cirrusServer.port + "</a> (" + cirrusServer.numConnectedClients + " connected clients) - ready: " + cirrusServer.ready + ""
+		if (lastRedirectSecondsPast > -1) response += " - last redirect: " + lastRedirectSecondsPast + " seconds ago."
+		response += "</li>"
+	}
+
+	response += ("</ul>")
+
+	response += "<p style=\"margin: 50px 0; font-size: smaller\">Refreshing page in <span id=\"countdown\">5</span> seconds...</p>"
+	response += "<script>"
+		response += "var countdown = document.getElementById(\"countdown\").textContent;"
+		response += "setInterval(function() {"
+			response += "countdown--;"
+			response += "if (countdown < 1) {"
+				response += "window.location.reload(1);"
+			response += "} else {"
+				response += "document.getElementById(\"countdown\").textContent = countdown;"
+			response += "}"
+		response += "}, 1000);"
+	response += "</script>"
+
+
+	res.send(response)
+})
 
 //
 // Connection to Cirrus.
@@ -258,10 +445,13 @@ const matchmaker = net.createServer((connection) => {
 			if(cirrusServer) {
 				cirrusServer.numConnectedClients--;
 				console.log(`Client disconnected from Cirrus server ${cirrusServer.address}:${cirrusServer.port}`);
-				if(cirrusServer.numConnectedClients === 0) {
-					// this make this server immediately available for a new client
-					cirrusServer.lastRedirect = 0;
-				}
+
+				// Currently greyed out because it interferes with the controlroom redirection showcase
+
+				// if(cirrusServer.numConnectedClients === 0) {
+				// 	// this make this server immediately available for a new client
+				// 	cirrusServer.lastRedirect = 0;
+				// }
 			} else {				
 				disconnect(connection);
 			}
