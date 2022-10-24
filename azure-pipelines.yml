@@ -1,5 +1,5 @@
 trigger: 
-  - main
+  - master
 pr: none
 
 resources:
