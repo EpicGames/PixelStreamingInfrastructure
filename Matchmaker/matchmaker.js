@@ -206,18 +206,43 @@ if(enableRedirectionLinks) {
 	});
 }
 
-const imageFolder = path.join(require('os').homedir(), 'PortalImages');
+// It is constant accross metaspaces
+const isWindows = process.platform === "win32";
+
+let imageFolder;
+
+if (isWindows) {
+	imageFolder = path.join("C:\\Users\\", process.env["USERNAME"], "metaspaceConfig", "PortalImages");
+} else {
+	// If the script is running under SUDO, findout which user has initiated the command
+	imageFolder = path.join("/home", process.env["USER"] === "root" ? process.env["SUDO_USER"] : process.env["USER"], "metaspaceConfig", "PortalImages");
+}
+ 
 
 // Make a slide show
 let portalImageArray = [];
-fs.readdirSync(imageFolder).forEach(file => {
-	portalImageArray.push(path.join(imageFolder, file));
-});
+let imagesRead = false;
+
+function readImagesFolder(portalImageArray) {
+	try {
+		fs.readdirSync(imageFolder).forEach(file => {
+			portalImageArray.push(path.join(imageFolder, file));
+		});
+
+		// If successfully read then make it true
+		imagesRead = true;
+	} catch (err) {
+		console.warn("PortalImages folder was not found");
+		console.warn(`ERROR : ${err}`);
+	}
+}
 
 // Middleware for parsing JSON body
 app.use(bodyParser.json());
 
 app.get('/getPreviewImage', (req, res) => {
+	
+	if (!imagesRead) readImagesFolder(portalImageArray);
 	// No avaliable images 
 	if (portalImageArray.length === 0) {
 		res.statusStatus(404);

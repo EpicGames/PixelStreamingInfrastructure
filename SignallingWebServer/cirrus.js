@@ -98,7 +98,7 @@ var sfuPort = config.SFUPort;
 var matchmakerAddress = '127.0.0.1';
 var matchmakerPort = 9999;
 var matchmakerRetryInterval = 5;
-var matchmakerKeepAliveInterval = 30;
+var matchmakerKeepAliveInterval = 5;
 var maxPlayerCount = -1;
 
 var gameSessionId;
