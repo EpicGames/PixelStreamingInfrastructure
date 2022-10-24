@@ -15,6 +15,10 @@ function initConfig(configFile, defaultConfig){
 	try{
 		let configData = fs.readFileSync(configFile, 'UTF8');
 		fileConfig = JSON.parse(configData);	
+
+		// Capitilize the config options 
+		fileConfig = capitalizeConfig(fileConfig);
+
 		config = {...config, ...fileConfig}
 		// Update config file with any additional defaults (does not override existing values if default has changed)
 		fs.writeFileSync(configFile, JSON.stringify(config, null, '\t'), 'UTF8');
@@ -42,6 +46,28 @@ function initConfig(configFile, defaultConfig){
 		console.log(`ERROR: ${err}`);
 	}
 	return config;
+}
+
+function capitalizeConfig(configData) {
+    let key, newKey;
+
+    for (key in configData) {
+        if (configData.hasOwnProperty(key)) {
+            newKey = key.charAt(0).toUpperCase() + key.slice(1);
+
+            if (newKey !== key) {
+                configData[newKey] = configData[key];
+                delete(configData[key]);
+            }
+
+            // recurse
+            if (typeof configData[newKey] === "object") {
+                capitalizeConfig(configData[newKey]);
+            }
+        }
+    }
+
+    return configData;
 }
 
 module.exports = {
