@@ -1,10 +1,27 @@
 import { IVideoPlayer } from "./IVideoPlayer";
-import { Logger } from "../Logger/Logger";
 
+/**
+ * Extra types for the HTMLDivElement 
+ */
+declare global {
+    interface HTMLDivElement {
+        pressMouseButtons?(mouseEvent: MouseEvent): void;
+        releaseMouseButtons?(mouseEvent: MouseEvent): void;
+        mozRequestPointerLock?(): void;
+    }
+}
+
+/**
+ * Class for the video player html element 
+ */
 export class VideoPlayer implements IVideoPlayer {
     videoElement: HTMLVideoElement;
 
-    constructor(rootDiv: HTMLDivElement, startVideoMuted: boolean) {
+    /**
+     * @param videoElementParent the html div the the video player will be injected into 
+     * @param startVideoMuted will the video be started muted 
+     */
+    constructor(videoElementParent: HTMLDivElement, startVideoMuted: boolean) {
         this.videoElement = document.createElement("video");
         this.videoElement.id = "streamingVideo";
         this.videoElement.muted = startVideoMuted;
@@ -13,12 +30,20 @@ export class VideoPlayer implements IVideoPlayer {
         this.videoElement.style.width = "100%";
         this.videoElement.style.height = "100%";
         this.videoElement.style.position = "absolute";
-        rootDiv.appendChild(this.videoElement);
+        this.videoElement.style.pointerEvents = "all";
+        videoElementParent.appendChild(this.videoElement);
+
+        // set play for video
+        this.videoElement.onclick = () => {
+            if (this.videoElement.paused) {
+                this.videoElement.play();
+            }
+        }
     }
 
     /**
      * Get the current context of the html video element
-     * @returns the current context of the video element
+     * @returns - the current context of the video element
      */
     getVideoElement(): HTMLVideoElement {
         return this.videoElement;
@@ -26,42 +51,10 @@ export class VideoPlayer implements IVideoPlayer {
 
     /**
      * Get the current context of the html video elements parent
-     * @returns the current context of the video elements parent
+     * @returns - the current context of the video elements parent
      */
     getVideoParentElement(): HTMLElement {
         return this.videoElement.parentElement;
-    }
-
-    /**
-     * Set the click actions for when the Element is mouse clicked
-     * @param event - Mouse Event
-     */
-    setClickActions(event: MouseEvent) {
-        if (this.videoElement.paused) {
-            this.videoElement.play();
-        }
-
-        // minor hack to alleviate ios not supporting pointerlock
-        if (this.videoElement.requestPointerLock) {
-            this.videoElement.requestPointerLock();
-        }
-    }
-
-    /**
-    * Set the mouse enter and mouse leave events 
-    */
-    setMouseEnterAndLeaveEvents(mouseEnterCallBack: () => void, mouseLeaveCallBack: () => void) {
-        // Handle when the Mouse has entered the element
-        this.videoElement.onmouseenter = (event: MouseEvent) => {
-            Logger.Log(Logger.GetStackTrace(), "Mouse Entered", 6);
-            mouseEnterCallBack();
-        };
-
-        // Handles when the mouse has left the element 
-        this.videoElement.onmouseleave = (event: MouseEvent) => {
-            Logger.Log(Logger.GetStackTrace(), "Mouse Left", 6);
-            mouseLeaveCallBack();
-        };
     }
 
     /**

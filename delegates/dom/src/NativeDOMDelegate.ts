@@ -1,352 +1,16 @@
 import './assets/css/player.css';
 import playButton from './assets/images/Play.png';
-import { EventEmitter } from "events";
 import * as libspsfrontend from '@tensorworks/libspsfrontend'
-
-/**
- * Class for the base overlay structure 
- */
-export class OverlayBase implements libspsfrontend.IOverlay {
-	protected rootElement: HTMLDivElement;
-	protected rootDiv: HTMLDivElement;
-	public textElement: HTMLDivElement;
-
-	/**
-	 * Construct an overlay 
-	 * @param rootDiv the root element this overlay will be inserted into 
-	 * @param rootElement the root element that is the overlay
-	 */
-	protected constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement, textElement: HTMLDivElement) {
-		this.rootDiv = rootDiv;
-		this.rootElement = rootElement;
-		this.textElement = textElement;
-		this.rootElement.appendChild(this.textElement);
-		this.hide();
-		this.rootDiv.appendChild(this.rootElement);
-	}
-
-	/**
-	 * Show the overlay 
-	 */
-	public show(): void {
-		this.rootElement.classList.remove("hiddenState");
-	}
-
-	/**
-	 * Hide the overlay
-	 */
-	public hide(): void {
-		this.rootElement.classList.add("hiddenState");
-	}
-}
-
-/**
- * Class for the base action overlay structure 
- */
-export class ActionOverlayBase extends OverlayBase implements libspsfrontend.IActionOverlay {
-	eventEmitter: EventEmitter;
-	contentElementSpanId: string;
-
-	/**
-	 * Construct an action overlay 
-	 * @param rootDiv the root element this overlay will be inserted into 
-	 * @param rootElement the root element that is the overlay
-	 * @param contentElement an element that contains text for the action overlay 
-	 */
-	public constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement, contentElement: HTMLDivElement, contentElementSpanId?: string) {
-		super(rootDiv, rootElement, contentElement);
-		this.eventEmitter = new EventEmitter();
-		this.contentElementSpanId = contentElementSpanId;
-	}
-
-	/**
-	 * Update the text overlays inner text 
-	 * @param text the update text to be inserted into the overlay 
-	 */
-	public update(text: string): void {
-		if ((text != null || text != undefined) && (this.contentElementSpanId != null || this.contentElementSpanId != undefined)) {
-			document.getElementById(this.contentElementSpanId).innerHTML = text;
-		}
-	}
-
-	/**
-	 * Set a method as an event emitter callback 
-	 * @param callBack the method that is to be called when the event is emitted 
-	 */
-	onAction(callBack: (...args: any[]) => void) {
-		this.eventEmitter.on("action", callBack);
-	}
-
-	/**
-	 * Activate an event that is attached to the event emitter 
-	 */
-	activate() {
-		this.eventEmitter.emit("action");
-	}
-
-}
-
-/**
- * Class for the afk overlay base 
- */
-export class AfkOverlayBase extends ActionOverlayBase implements libspsfrontend.IAfkOverlay {
-	private countDownSpanElementId: string;
-
-	/**
-	 * Construct an Afk overlay 
-	 * @param rootDiv the root element this overlay will be inserted into 
-	 * @param rootElement the root element that is the overlay
-	 * @param textElement an element that contains text for the action overlay  
-	 * @param countDownSpanElementId the id of the span that holds the countdown element 
-	 */
-	public constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement, textElement: HTMLDivElement, countDownSpanElementId: string) {
-		super(rootDiv, rootElement, textElement);
-		this.countDownSpanElementId = countDownSpanElementId;
-	}
-
-	/**
-	 * Update the count down spans number for the overlay 
-	 * @param countdown the count down number to be inserted into the span for updating
-	 */
-	public updateCountdown(countdown: number): void {
-		document.getElementById(this.countDownSpanElementId).innerHTML = countdown.toString();
-	}
-
-}
-
-/**
- * Class for the text overlay base 
- */
-export class TextOverlayBase extends OverlayBase implements libspsfrontend.ITextOverlay {
-
-	/**
-	 * Construct a text overlay 
-	 * @param rootDiv the root element this overlay will be inserted into 
-	 * @param rootElement the root element that is the overlay
-	 * @param textElement an element that contains text for the action overlay  
-	 */
-	public constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement, textElement: HTMLDivElement) {
-		super(rootDiv, rootElement, textElement);
-	}
-
-	/**
-	 * Update the text overlays inner text 
-	 * @param text the update text to be inserted into the overlay 
-	 */
-	public update(text: string): void {
-		if (text != null || text != undefined) {
-			this.textElement.innerHTML = text;
-		}
-	}
-}
-
-/**
- * Class for the VideoQp indicator
- */
-export class VideoQpIndicator {
-
-	videoEncoderAvgQP: number = -1;
-
-	// the icon itself
-	qualityStatus: SVGElement; // = document.getElementById("connectionStrength");
-
-	// the text that displays under the icon
-	qualityText: HTMLSpanElement; // = document.getElementById("qualityText");
-
-	// svg paths
-	outer: any; //= document.getElementById("outer");
-	middle: any; //= document.getElementById("middle");
-	inner: any; // = document.getElementById("inner");
-	dot: any; // = document.getElementById("dot");
-
-	// non html elements 
-	statsText: string = "";
-	color: string = "";
-
-	// qp colours 
-	readonly orangeQP = 26;
-	readonly redQP = 35;
-
-	/**
-	 * construct a VideoQpIndicator object
-	 * @param qualityStatusId the html id of the qualityStatus element
-	 * @param qualityTextId the html id of the qualityText element
-	 * @param outerId the html id of the outer element
-	 * @param middleId the html id of the middle element
-	 * @param innerId the html id of the inner element
-	 * @param dotId the html id of the dot element
-	 */
-	constructor(qualityStatusId: string, qualityTextId: string, outerId: string, middleId: string, innerId: string, dotId: string) {
-		this.qualityStatus = document.getElementById(qualityStatusId) as any;
-		this.qualityText = document.getElementById(qualityTextId) as any;
-		this.outer = document.getElementById(outerId) as any;
-		this.middle = document.getElementById(middleId) as any;
-		this.inner = document.getElementById(innerId) as any;
-		this.dot = document.getElementById(dotId) as any;
-	}
-
-	/**
-	 * used to set the speed of the status light
-	 * @param speed - Set the speed of the blink if the status light higher the speed the faster the blink
-	 */
-	blinkVideoQualityStatus(speed: number) {
-		let iteration = speed;
-		let opacity = 1;
-		let tickID = setInterval(() => {
-			opacity -= 0.1;
-			this.qualityText.style.opacity = String(Math.abs((opacity - 0.5) * 2));
-			if (opacity <= 0.1) {
-				if (--iteration == 0) {
-					clearInterval(tickID);
-				} else {
-					opacity = 1;
-				}
-			}
-		}, 100 / speed);
-	}
-
-	/**
-	  * updates the QP tooltip by converting the Video Encoder QP to a colour light
-	  * @param QP - The video encoder QP number needed to find the average
-	  */
-	updateQpTooltip(QP: number) {
-		this.videoEncoderAvgQP = QP;
-		if (QP > this.redQP) {
-			this.color = "red";
-			this.blinkVideoQualityStatus(2);
-			this.statsText = `<div style="color: ${this.color}">Poor encoding quality</div>`;
-			this.outer.style.fill = "#3c3b40";
-			this.middle.style.fill = "#3c3b40";
-			this.inner.style.fill = this.color;
-			this.dot.style.fill = this.color;
-		} else if (QP > this.orangeQP) {
-			this.color = "orange";
-			this.blinkVideoQualityStatus(1);
-			this.statsText = `<div style="color: ${this.color}">Blocky encoding quality</div>`;
-			this.outer.style.fill = "#3c3b40";
-			this.middle.style.fill = this.color;
-			this.inner.style.fill = this.color;
-			this.dot.style.fill = this.color;
-		} else if (QP <= 0) {
-			this.color = "#b0b0b0";
-			this.outer.style.fill = "#3c3b40";
-			this.middle.style.fill = "#3c3b40";
-			this.inner.style.fill = "#3c3b40";
-			this.dot.style.fill = "#3c3b40";
-			this.statsText = `<div style="color: ${this.color}">Not connected</div>`;
-		} else {
-			this.color = "lime";
-			this.qualityStatus.style.opacity = '1';
-			this.statsText = `<div style="color: ${this.color}">Clear encoding quality</div>`;
-			this.outer.style.fill = this.color;
-			this.middle.style.fill = this.color;
-			this.inner.style.fill = this.color;
-			this.dot.style.fill = this.color;
-		}
-		this.qualityText.innerHTML = this.statsText;
-	}
-
-}
-
-/**
- * Class for handling fullscreen logic
- */
-export class FullScreenLogic {
-	isFullscreen: boolean = false;
-
-	/**
-	 * Construct a FullScreenLogic object
-	 */
-	constructor() {
-		document.getElementById("fullscreen-btn").onclick = () => this.fullscreen();
-
-		// set up the full screen events
-		document.addEventListener('webkitfullscreenchange', () => this.onFullscreenChange(), false);
-		document.addEventListener('mozfullscreenchange', () => this.onFullscreenChange(), false);
-		document.addEventListener('fullscreenchange', () => this.onFullscreenChange(), false);
-		document.addEventListener('MSFullscreenChange', () => this.onFullscreenChange(), false);
-	}
-
-	/**
-	 * Makes the document fullscreen 
-	 * @returns 
-	 */
-	fullscreen() {
-		// if already full screen; exit
-		// else go fullscreen
-		if (
-			document.fullscreenElement ||
-			document.webkitFullscreenElement ||
-			document.mozFullScreenElement ||
-			document.msFullscreenElement
-		) {
-			if (document.exitFullscreen) {
-				document.exitFullscreen();
-			} else if (document.mozCancelFullScreen) {
-				document.mozCancelFullScreen();
-			} else if (document.webkitExitFullscreen) {
-				document.webkitExitFullscreen();
-			} else if (document.msExitFullscreen) {
-				document.msExitFullscreen();
-			}
-		} else {
-			let element: any;
-			//HTML elements controls
-			if (!(document.fullscreenEnabled || document.webkitFullscreenEnabled)) {
-				element = document.getElementById("streamingVideo") as any;
-			} else {
-				element = document.getElementById("playerUI") as any;
-			}
-			if (!element) {
-				return;
-			}
-			if (element.requestFullscreen) {
-				element.requestFullscreen();
-			} else if (element.mozRequestFullScreen) {
-				element.mozRequestFullScreen();
-			} else if (element.webkitRequestFullscreen) {
-				element.webkitRequestFullscreen((<any>Element).ALLOW_KEYBOARD_INPUT);
-			} else if (element.msRequestFullscreen) {
-				element.msRequestFullscreen();
-			} else if (element.webkitEnterFullscreen) {
-				element.webkitEnterFullscreen(); //for iphone this code worked
-			}
-		}
-		this.onFullscreenChange();
-	}
-
-	/**
-	 * Handles the fullscreen button on change
-	 */
-	onFullscreenChange() {
-		this.isFullscreen = (document.webkitIsFullScreen
-			|| document.mozFullScreen
-			|| (document.msFullscreenElement && document.msFullscreenElement !== null)
-			|| (document.fullscreenElement && document.fullscreenElement !== null));
-
-		let minimize = document.getElementById('minimizeIcon');
-		let maximize = document.getElementById('maximizeIcon');
-		if (minimize && maximize) {
-			if (this.isFullscreen) {
-				minimize.style.display = 'inline';
-				//ios disappearing svg fix
-				minimize.style.transform = 'translate(0, 0)';
-				maximize.style.display = 'none';
-			} else {
-				minimize.style.display = 'none';
-				maximize.style.display = 'inline';
-				//ios disappearing svg fix
-				maximize.style.transform = 'translate(0, 0)';
-			}
-		}
-	}
-
-}
-
+import { VideoQpIndicator } from './VideoQpIndicator';
+import { ActionOverlayBase, AfkOverlayBase, TextOverlayBase } from './Overlays';
+import { FullScreenLogic } from './Fullscreen';
+import { OnScreenKeyboard } from './OnScreenKeyboard';
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	config: libspsfrontend.Config;
 	latencyStartTime: number;
 	videoStartTime: number;
+	onScreenKeyboardHelper: OnScreenKeyboard;
+	inputController: boolean;
 
 	// instantiate the WebRtcPlayerControllers interface var 
 	iWebRtcController: libspsfrontend.IWebRtcPlayerController;
@@ -364,7 +28,12 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	statsPanel = document.getElementById('stats-panel') as HTMLDivElement;
 
 	// Pre Stream options
+	offerToReceiveToggle = document.getElementById("offer-to-receive-tgl") as HTMLInputElement;
+	preferSfuToggle = document.getElementById("prefer-sfu-tgl") as HTMLInputElement;
+	useMicrophoneToggle = document.getElementById("use-mirophone-tgl") as HTMLInputElement;
+	forceMonoAudioToggle = document.getElementById("force-mono-audio-tgl") as HTMLInputElement;
 	forceTurnToggle = document.getElementById("force-turn-tgl") as HTMLInputElement;
+	hideBrowserCursorToggle = document.getElementById("hide-browser-cursor-tgl") as HTMLInputElement;
 
 	// Viewing
 	enlargeDisplayToFillWindow = document.getElementById("enlarge-display-to-fill-window-tgl") as HTMLInputElement;
@@ -382,6 +51,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	webRtcFpsText = document.getElementById("webrtc-fps-text") as HTMLInputElement;
 	webRtcMinBitrateText = document.getElementById("webrtc-min-bitrate-text") as HTMLInputElement;
 	webRtcMaxBitrateText = document.getElementById("webrtc-max-bitrate-text") as HTMLInputElement;
+	latencyTestButton = document.getElementById("btn-start-latency-test") as HTMLButtonElement;
 
 	// Statistics
 	sendStatsToServer = document.getElementById("send-stats-tgl") as HTMLInputElement;
@@ -417,6 +87,28 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		// configure all buttons 
 		this.ConfigureButtons();
+	}
+
+	/**
+	 * Set the input control ownership 
+	 * @param inputControlOwnership does the user have input control ownership
+	 */
+	onInputControlOwnership(inputControlOwnership: boolean): void {
+		this.inputController = inputControlOwnership;
+	}
+
+	/**
+	 * Instantiate the WebRTCPlayerController interface to provide WebRTCPlayerController functionality within this class and set up anything that requires it 
+	 * @param iWebRtcPlayerController 
+	 */
+	setIWebRtcPlayerController(iWebRtcPlayerController: libspsfrontend.IWebRtcPlayerController) {
+		// do base class stuff first
+		super.setIWebRtcPlayerController(iWebRtcPlayerController);
+
+		// set up the on screen keyboard
+		this.onScreenKeyboardHelper = new OnScreenKeyboard(this.config.videoElementParent);
+		this.onScreenKeyboardHelper.unquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.iWebRtcController.requestUnquantisedAndDenormaliseUnsigned(x, y);
+		this.activateOnScreenKeyboard = (command: any) => this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
 	}
 
 	/**
@@ -471,7 +163,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		disconnectOverlayHtmlInnerContainer.appendChild(restartSvg);
 
 		// instantiate the overlay
-		this.disconnectOverlay = new ActionOverlayBase(this.config.playerElement, disconnectOverlayHtml, disconnectOverlayHtmlInnerContainer, "disconnectText");
+		this.disconnectOverlay = new ActionOverlayBase(this.config.videoElementParent, disconnectOverlayHtml, disconnectOverlayHtmlInnerContainer, "disconnectText");
 	}
 
 	/**
@@ -497,7 +189,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		connectOverlayHtmlInner.innerHTML = 'Click to start';
 
 		// instantiate the overlay
-		this.connectOverlay = new ActionOverlayBase(this.config.playerElement, connectOverlayHtml, connectOverlayHtmlInner);
+		this.connectOverlay = new ActionOverlayBase(this.config.videoElementParent, connectOverlayHtml, connectOverlayHtmlInner);
 	}
 
 	/**
@@ -525,7 +217,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		playOverlayHtmlInner.alt = 'Start Streaming';
 
 		// instantiate the overlay
-		this.playOverlay = new ActionOverlayBase(this.config.playerElement, playOverlayHtml, playOverlayHtmlInner);
+		this.playOverlay = new ActionOverlayBase(this.config.videoElementParent, playOverlayHtml, playOverlayHtmlInner);
 	}
 
 	/**
@@ -549,7 +241,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		afkOverlayHtmlInner.innerHTML = '<center>No activity detected<br>Disconnecting in <span id="afkCountDownNumber"></span> seconds<br>Click to continue<br></center>'
 
 		// instantiate the overlay
-		this.afkOverlay = new AfkOverlayBase(this.config.playerElement, afkOverlayHtml, afkOverlayHtmlInner, "afkCountDownNumber");
+		this.afkOverlay = new AfkOverlayBase(this.config.videoElementParent, afkOverlayHtml, afkOverlayHtmlInner, "afkCountDownNumber");
 	}
 
 	/**
@@ -566,7 +258,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		infoOverlayHtmlInner.id = 'messageOverlayInner';
 
 		// instantiate the overlay
-		this.infoOverlay = new TextOverlayBase(this.config.playerElement, infoOverlayHtml, infoOverlayHtmlInner);
+		this.infoOverlay = new TextOverlayBase(this.config.videoElementParent, infoOverlayHtml, infoOverlayHtmlInner);
 	}
 
 	/**
@@ -584,7 +276,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		errorOverlayHtmlInner.classList.add(".text-danger");
 
 		// instantiate the overlay
-		this.errorOverlay = new TextOverlayBase(this.config.playerElement, errorOverlayHtml, errorOverlayHtmlInner);
+		this.errorOverlay = new TextOverlayBase(this.config.videoElementParent, errorOverlayHtml, errorOverlayHtmlInner);
 	}
 
 	/**
@@ -637,7 +329,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			case libspsfrontend.InstanceState.READY:
 				if (instanceState.details == undefined || instanceState.details == null) {
 					instanceStateMessage = "Instance is Ready";
-					
+
 				} else {
 					instanceStateMessage = "Instance is Ready: " + instanceState.details;
 				}
@@ -650,6 +342,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		if (isError) {
 			this.showErrorOverlay(instanceStateMessage);
 		} else if (isInstancePending) {
+
 			//check if there is already and instance pending if so return 
 			let preExistingPendingMessage = document.getElementById('loading-spinner') as HTMLDivElement;
 			if (preExistingPendingMessage) {
@@ -657,7 +350,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 				// only update our text div
 				let textDiv = document.getElementById("text-"+instanceState.id) as HTMLSpanElement;
 				textDiv.innerHTML = instanceStateMessage;
-	
 				return;
 			}
 
@@ -741,8 +433,18 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		document.getElementById('statsBtn').onclick = () => this.statsClicked();
 		document.getElementById('statsClose').onclick = () => this.statsClicked();
 
-		// setup the Force TURN toggle
+		// setup the url toggles
+		this.setUpToggleWithUrlParams(this.offerToReceiveToggle, "offerToReceive");
+
+		this.setUpToggleWithUrlParams(this.preferSfuToggle, "preferSFU");
+
+		this.setUpToggleWithUrlParams(this.useMicrophoneToggle, "useMic");
+
+		this.setUpToggleWithUrlParams(this.forceMonoAudioToggle, "ForceMonoAudio");
+
 		this.setUpToggleWithUrlParams(this.forceTurnToggle, "ForceTURN");
+
+		this.setUpToggleWithUrlParams(this.hideBrowserCursorToggle, "hideBrowserCursor");
 
 		this.setUpControlSchemeTypeToggle(this.controlSchemeToggle);
 
@@ -752,30 +454,31 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.iWebRtcController.restartStreamAutomaticity();
 		}
 
-		document.getElementById("btn-streaming-settings").onclick = () => {
-			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending Streaming settings  --------", 7);
+		document.getElementById("request-keyframe-button").onclick = () => {
+			this.settingsPanel.classList.toggle("panel-wrap-visible");
+			this.iWebRtcController.requestKeyFrame();
+		}
+
+		document.getElementById("btn-encoder-settings").onclick = () => {
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending encoder settings  --------", 7);
 			let encode: libspsfrontend.Encoder = {
 				MinQP: Number(this.encoderMinQpText.value),
 				MaxQP: Number(this.encoderMaxQpText.value),
 			}
+			this.iWebRtcController.sendEncoderSettings(encode);
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
+		}
 
+		document.getElementById("btn-webrtc-settings").onclick = () => {
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending web rtc settings  --------", 7);
 			let webRtcSettings: libspsfrontend.WebRTC = {
 				FPS: Number(this.webRtcFpsText.value),
 				MinBitrate: Number(this.webRtcMinBitrateText.value) * 1000,
 				MaxBitrate: Number(this.webRtcMaxBitrateText.value) * 1000,
 			}
-
-			this.iWebRtcController.sendEncoderSettings(encode);
 			this.iWebRtcController.sendWebRtcSettings(webRtcSettings);
 			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
 		}
-
-
-		// sending UI descriptors 
-		document.getElementById("sendUiDescriptor").onclick = () => {
-			this.iWebRtcController.sendUeUiDescriptor(this.uiDescriptorText.value);
-
-		};
 
 		// show the current fps on screen 
 		document.getElementById("show-fps-button").onclick = () => {
@@ -784,8 +487,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		// make the player fill the window
 		this.enlargeDisplayToFillWindow.onchange = () => {
-			this.iWebRtcController.resizePlayerStyle();
 			this.iWebRtcController.setEnlargeToFillDisplay(this.enlargeDisplayToFillWindow.checked);
+			this.iWebRtcController.resizePlayerStyle();
 		};
 
 		// make the player match the view port resolution 
@@ -896,7 +599,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 */
 	onVideoInitialised() {
 		// starting a latency check
-		document.getElementById("btn-start-latency-test").onclick = () => {
+		this.latencyTestButton.onclick = () => {
 			this.iWebRtcController.sendLatencyTest();
 		}
 
@@ -940,7 +643,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.onVideoEncoderAvgQP(0);
 
 		// starting a latency check
-		document.getElementById("btn-start-latency-test").onclick = () => { }
+		this.latencyTestButton.onclick = () => { }
 
 		// Set up stream tools header functionality
 		this.viewSettingsHeader.onclick = () => { }
@@ -957,10 +660,22 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	}
 
 	/**
-	 * `Takes the InitialSettings and wired to frontend
-	 * @param settings - Settings sent from the UE Instance`
+	 * Takes the InitialSettings and wired to frontend
+	 * @param settings - Settings sent from the UE Instance
 	 */
 	onInitialSettings(settings: libspsfrontend.InitialSettings): void {
+		if (settings.PixelStreaming) {
+			let allowConsoleCommands = settings.PixelStreaming.AllowPixelStreamingCommands;
+			if (allowConsoleCommands === false) {
+				libspsfrontend.Logger.Info(libspsfrontend.Logger.GetStackTrace(), "-AllowPixelStreamingCommands=false, sending arbitrary console commands from browser to UE is disabled.");
+			}
+			let disableLatencyTest = settings.PixelStreaming.DisableLatencyTest;
+			if (disableLatencyTest) {
+				this.latencyTestButton.disabled = true;
+				this.latencyTestButton.title = "Disabled by -PixelStreamingDisableLatencyTester=true";
+				libspsfrontend.Logger.Info(libspsfrontend.Logger.GetStackTrace(), "-PixelStreamingDisableLatencyTester=true, requesting latency report from the the browser to UE is disabled.");
+			}
+		}
 		if (settings.Encoder) {
 			this.encoderMinQpText.value = settings.Encoder.MinQP.toString();
 			this.encoderMaxQpText.value = settings.Encoder.MaxQP.toString();
@@ -983,20 +698,20 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		// format numbering based on the browser language
 		let numberFormat = new Intl.NumberFormat(window.navigator.language, {
-            maximumFractionDigits: 0
-        });
+			maximumFractionDigits: 0
+		});
 
 		// ensure that we have a currentRoundTripTime coming in from stats and format it if it's a number
 		let netRTT = stats.candidatePair.hasOwnProperty('currentRoundTripTime') && stats.isNumber(stats.candidatePair.currentRoundTripTime) ? numberFormat.format(stats.candidatePair.currentRoundTripTime * 1000) : 'Can\'t calculate';
 
 		statsText += `<div>Duration: ${runTime}</div>`;
+		statsText += `<div>Controls stream input: ${this.inputController === null ? "Not sent yet" : (this.inputController ? "true" : "false")}</div>`;
 		statsText += `<div>Received: ${inboundData}</div>`;
 		statsText += `<div>Packets Lost: ${stats.inboundVideoStats.packetsLost}</div>`;
 		statsText += `<div>Bitrate (kbps): ${stats.inboundVideoStats.bitrate}</div>`;
-		statsText += `<div>Video Resolution: ${
-            stats.inboundVideoStats.hasOwnProperty('frameWidth') && stats.inboundVideoStats.frameWidth && stats.inboundVideoStats.hasOwnProperty('frameHeight') && stats.inboundVideoStats.frameHeight ?
-                stats.inboundVideoStats.frameWidth + 'x' + stats.inboundVideoStats.frameHeight : 'Chrome only'
-            }</div>`;
+		statsText += `<div>Video Resolution: ${stats.inboundVideoStats.hasOwnProperty('frameWidth') && stats.inboundVideoStats.frameWidth && stats.inboundVideoStats.hasOwnProperty('frameHeight') && stats.inboundVideoStats.frameHeight ?
+			stats.inboundVideoStats.frameWidth + 'x' + stats.inboundVideoStats.frameHeight : 'Chrome only'
+			}</div>`;
 		statsText += `<div>Frames Decoded: ${stats.inboundVideoStats.hasOwnProperty('framesDecoded') ? numberFormat.format(stats.inboundVideoStats.framesDecoded) : 'Chrome only'}</div>`;
 		statsText += `<div>Packets Lost: ${stats.inboundVideoStats.hasOwnProperty('packetsLost') ? numberFormat.format(stats.inboundVideoStats.packetsLost) : 'Chrome only'}</div>`;
 		statsText += `<div>Framerate: ${stats.inboundVideoStats.framerate}</div>`;
@@ -1072,7 +787,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 }
 
 /**
- * Declare additions to global html objects that do not exist on the bases
+ * Declare additions to base types 
  */
 declare global {
 	interface Document {

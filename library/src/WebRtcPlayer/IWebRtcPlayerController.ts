@@ -1,4 +1,5 @@
 import { Encoder, WebRTC } from "../DataChannel/InitialSettings";
+import { UnquantisedAndDenormaliseUnsigned } from "../NormalizeAndQuantize/NormalizeAndQuantize";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 
 /**
@@ -6,6 +7,13 @@ import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
  */
 export interface IWebRtcPlayerController {
     matchViewportResolution: boolean;
+
+    /**
+     * Make a request to UnquantisedAndDenormaliseUnsigned coordinates 
+     * @param x x axis coordinate 
+     * @param y y axis coordinate
+     */
+    requestUnquantisedAndDenormaliseUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned;
 
     /**
      * Activate the events for when an afk overlay is clicked 
@@ -33,6 +41,11 @@ export interface IWebRtcPlayerController {
     restartStreamAutomaticity(): void;
 
     /**
+     * Send an Iframe request to the streamer
+     */
+    requestKeyFrame(): void;
+
+    /**
      * Send the Encoder Settings to the UE Instance as a UE UI Descriptor.
      * @param encoder - Encoder Settings
      */
@@ -43,12 +56,6 @@ export interface IWebRtcPlayerController {
    * @param webRTC - Web RTC Settings 
    */
     sendWebRtcSettings(webRTC: WebRTC): void;
-
-    /**
-     * Sends a UI Interaction Descriptor to the UE Instance
-     * @param message - String to send to the UE Instance
-     */
-    sendUeUiDescriptor(message: string): void;
 
     /**
      * Sends the UI Descriptor `stat fps` to the UE Instance 

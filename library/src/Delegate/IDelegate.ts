@@ -24,7 +24,20 @@ export interface IDelegate {
 	showActionOrErrorOnDisconnect: boolean;
 
 	/**
+	 * Activate the on screen keyboard when receiving the command from the streamer
+	 * @param command - the keyboard command
+	 */
+	activateOnScreenKeyboard(command: any): void;
+
+	/**
+	 * Set the input control ownership 
+	 * @param inputControlOwnership - does the user have input control ownership
+	 */
+	onInputControlOwnership(inputControlOwnership: boolean): void;
+
+	/**
 	 * Shows the disconnect overlay 
+	 * @param updateText the new overlay text 
 	 */
 	showDisconnectOverlay(updateText: string): void;
 
@@ -66,25 +79,25 @@ export interface IDelegate {
 
 	/**
 	 * Shows the afk overlay 
-	 * @param countDown the countdown number for the afk overlay  
+	 * @param countDown - the countdown number for the afk overlay  
 	 */
 	showAfkOverlay(countDown: number): void;
 
 	/**
 	 * Updates the afk overlay countdown number 
-	 * @param countDown the new countdown number 
+	 * @param countDown - the new countdown number 
 	 */
 	updateAfkOverlay(countDown: number): void;
 
 	/**
 	 * Shows the text overlay 
-	 * @param text a string of text to be inserted into the text overlay 
+	 * @param text - a string of text to be inserted into the text overlay 
 	 */
 	showTextOverlay(text: string): void;
 
 	/**
 	 * Shows the error overlay 
-	 * @param text a string of text to be inserted into the error overlay 
+	 * @param text - a string of text to be inserted into the error overlay 
 	 */
 	showErrorOverlay(text: string): void;
 
@@ -110,7 +123,7 @@ export interface IDelegate {
 
 	/**
 	 * Acts as an override for instantiating the WebRTCPlayerController interface to provide WebRTCPlayerController functionality  
-	 * @param iWebRtcPlayerController 
+	 * @param iWebRtcPlayerController - a WebRtcPlayerController instance
 	 */
 	setIWebRtcPlayerController(iWebRtcPlayerController: IWebRtcPlayerController): void;
 
@@ -169,7 +182,7 @@ export interface IDelegate {
 	/**
 	 * Event fired when the video is disconnected
 	 */
-	onDisconnect(eventString: string, showActionOrErrorOnDisconnect?:boolean): void;
+	onDisconnect(eventString: string, showActionOrErrorOnDisconnect?: boolean): void;
 
 	/**
 	 * Handles when Web Rtc is connecting 

@@ -11,7 +11,7 @@ export class Config {
 	startVideoMuted = false;
 
 	// set the amount of wait time in seconds while there is inactivity for afk to occur 
-	afkTimeout: number = 120;
+	afkTimeout = 120;
 
 	// The control scheme controls the behaviour of the mouse when it interacts with the WebRTC player.
 	controlScheme = ControlSchemeType.LockedMouse;
@@ -25,18 +25,15 @@ export class Config {
 
 	//compulsory options and DOMs 
 	signallingServerAddress: string;
-	playerElement: HTMLDivElement;
-
-	//this is a video element variable to be assigned when the video element is created
-	videoPlayerElement: HTMLVideoElement;
+	videoElementParent: HTMLDivElement;
 
 	/**
 	 * @param signallingServerAddress - the address of the signaling server 
-	 * @param playerElement - the player element ID 
+	 * @param videoElementParent - the player element ID 
 	 */
-	constructor(signallingServerAddress: string, playerElement: HTMLDivElement) {
+	constructor(signallingServerAddress: string, videoElementParent: HTMLDivElement) {
 		this.signallingServerAddress = signallingServerAddress;
-		this.playerElement = playerElement;
+		this.videoElementParent = videoElementParent;
 	}
 }
 

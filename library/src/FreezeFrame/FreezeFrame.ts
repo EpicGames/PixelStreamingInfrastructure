@@ -11,7 +11,7 @@ export class FreezeFrame {
 
     /**
      * Construct a freeze frame
-     * @param rootDiv the div that a freeze frame element will be created into
+     * @param rootDiv the div that a freeze frame element will be injected into
      */
     constructor(rootDiv: HTMLDivElement) {
         this.rootDiv = rootDiv;
@@ -49,7 +49,7 @@ export class FreezeFrame {
 
     /**
      * Update the freeze frames image source
-     * @param jpeg the freeze frame image as a byte array data  
+     * @param jpeg - the freeze frame image as a byte array data  
      */
     updateImageElementSource(jpeg: Uint8Array) {
         let base64 = btoa(jpeg.reduce((data, byte) => data + String.fromCharCode(byte), ''));

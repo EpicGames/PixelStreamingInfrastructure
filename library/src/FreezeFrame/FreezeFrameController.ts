@@ -10,10 +10,11 @@ export class FreezeFrameController {
     size = 0;
     jpeg: Uint8Array = undefined;
     valid = false;
+    freezeFrameDelay = 50;
 
     /**
      * Construct a freeze frame controller 
-     * @param rootDiv the div that a freeze frame element will be created into
+     * @param rootDiv - the div that a freeze frame element will be injected into
      */
     constructor(rootDiv: HTMLDivElement) {
         this.freezeFrame = new FreezeFrame(rootDiv);
@@ -38,8 +39,8 @@ export class FreezeFrameController {
 
     /**
      * Update the freeze frames image source and load it  
-     * @param jpeg the freeze frame image as a byte array data
-     * @param onLoadCallBack a call back for managing if the play overlay needs to be shown or not
+     * @param jpeg - the freeze frame image as a byte array data
+     * @param onLoadCallBack - a call back for managing if the play overlay needs to be shown or not
      */
     updateFreezeFrameAndShow(jpeg: Uint8Array, onLoadCallBack: Function) {
         this.freezeFrame.updateImageElementSource(jpeg);
@@ -51,8 +52,8 @@ export class FreezeFrameController {
 
     /**
      * Process the new freeze frame image and update it
-     * @param view the freeze frame image as a byte array data
-     * @param onLoadCallBack a call back for managing if the play overlay needs to be shown or not
+     * @param view - the freeze frame image as a byte array data
+     * @param onLoadCallBack - a call back for managing if the play overlay needs to be shown or not
      */
     processFreezeFrameMessage(view: Uint8Array, onLoadCallBack: Function) {
         // Reset freeze frame if we got a freeze frame message and we are not "receiving" yet.

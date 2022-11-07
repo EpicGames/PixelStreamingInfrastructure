@@ -1,23 +1,25 @@
 import { SpecialKeyCodes } from "./SpecialKeyCodes";
-import { DataChannelController } from "../DataChannel/DataChannelController";
-import { UeInputKeyboardMessage } from "../UeInstanceMessage/UeInputKeyboardMessage";
 import { Logger } from "../Logger/Logger";
+import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
+import { IActiveKeys } from "./InputClassesFactory";
 
 /**
  * Handles the Keyboard Inputs for the document
  */
 export class KeyboardController {
-    ueInputKeyBoardMessage: UeInputKeyboardMessage;
+    toStreamerMessagesProvider: IStreamMessageController;
     suppressBrowserKeys: boolean;
+    activeKeysProvider: IActiveKeys;
 
     /**
-     * 
-     * @param dataChannelController - Data Channel Controller
-     * @param suppressBrowserKeys - Suppress Browser Keys
+     * @param toStreamerMessagesProvider Stream message provider class object
+     * @param suppressBrowserKeys Suppress Browser Keys
+     * @param activeKeysProvider Active keys provider class object
      */
-    constructor(dataChannelController: DataChannelController, suppressBrowserKeys: boolean) {
-        this.ueInputKeyBoardMessage = new UeInputKeyboardMessage(dataChannelController);
+    constructor(toStreamerMessagesProvider: IStreamMessageController, suppressBrowserKeys: boolean, activeKeysProvider: IActiveKeys) {
+        this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.suppressBrowserKeys = suppressBrowserKeys;
+        this.activeKeysProvider = activeKeysProvider;
     }
 
     /**
@@ -36,16 +38,16 @@ export class KeyboardController {
      * @param keyboardEvent - Keyboard event 
      */
     handleOnKeyDown(keyboardEvent: KeyboardEvent) {
-        Logger.Log(Logger.GetStackTrace(), "handleOnKeyDown", 6);
-        this.ueInputKeyBoardMessage.sendKeyDown(this.getKeycode(keyboardEvent), keyboardEvent.repeat);
-        /* this needs to be tested but it is believed that this is not needed*/
-        // backSpace is not considered a keypress in JavaScript but we need it
-        // to be so characters may be deleted in a UE4 text entry field.
+        Logger.Log(Logger.GetStackTrace(), `key down ${keyboardEvent.keyCode}, repeat = ${keyboardEvent.repeat}`, 6);
+        let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+        toStreamerHandlers.get("KeyDown")("KeyDown", [this.getKeycode(keyboardEvent), keyboardEvent.repeat]);
+        let activeKeys = this.activeKeysProvider.getActiveKeys();
+        activeKeys.push(this.getKeycode(keyboardEvent));
+        // Backspace is not considered a keypress in JavaScript but we need it
+        // to be so characters may be deleted in a UE text entry field.
         if (keyboardEvent.keyCode === SpecialKeyCodes.backSpace) {
-            //let temp: KeyboardEvent = {charCode: SpecialKeyCodes.backSpace};
-            //document.onkeypress({ charCode: SpecialKeyCodes.backSpace });
+            document.onkeypress.apply("charCode", SpecialKeyCodes.backSpace);
         }
-
         if (this.suppressBrowserKeys && this.isKeyCodeBrowserKey(keyboardEvent.keyCode)) {
             keyboardEvent.preventDefault();
         }
@@ -56,8 +58,9 @@ export class KeyboardController {
      * @param keyboardEvent - Keyboard event
      */
     handleOnKeyUp(keyboardEvent: KeyboardEvent) {
-        Logger.Log(Logger.GetStackTrace(), "handleOnKeyUp", 6);
-        this.ueInputKeyBoardMessage.sendKeyUp(this.getKeycode(keyboardEvent));
+        Logger.Log(Logger.GetStackTrace(), `key up ${keyboardEvent.keyCode}`, 6);
+        let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+        toStreamerHandlers.get("KeyUp")("KeyUp", [this.getKeycode(keyboardEvent), keyboardEvent.repeat]);
 
         if (this.suppressBrowserKeys && this.isKeyCodeBrowserKey(keyboardEvent.keyCode)) {
             keyboardEvent.preventDefault();
@@ -69,30 +72,34 @@ export class KeyboardController {
      * @param keyboard - Keyboard Event
      */
     handleOnKeyPress(keyboard: KeyboardEvent) {
-        Logger.Log(Logger.GetStackTrace(), "handleOnkeypress", 6);
-        this.ueInputKeyBoardMessage.sendKeyPress(keyboard.charCode);
+        Logger.Log(Logger.GetStackTrace(), `key press ${keyboard.charCode}`, 6);
+        let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+        toStreamerHandlers.get("KeyPress")("KeyPress", [keyboard.charCode]);
     }
 
     /**
      * Gets the Keycode of the Key pressed
      * @param keyboardEvent - Key board Event
-     * @returns the key code of the Key
+     * @returns - the key code of the Key
      */
     getKeycode(keyboardEvent: KeyboardEvent) {
-        //Need to move this to a newer version using keyboard event location. as keyboardEvent.keycode is deprecated
-
-        if (keyboardEvent.keyCode === SpecialKeyCodes.shift && keyboardEvent.code === 'ShiftRight') return SpecialKeyCodes.rightShift;
-        else if (keyboardEvent.keyCode === SpecialKeyCodes.control && keyboardEvent.code === 'ControlRight') return SpecialKeyCodes.rightControl;
-        else if (keyboardEvent.keyCode === SpecialKeyCodes.alt && keyboardEvent.code === 'AltRight') return SpecialKeyCodes.rightAlt;
-        else return keyboardEvent.keyCode;
+        if (keyboardEvent.keyCode === SpecialKeyCodes.shift && keyboardEvent.code === 'ShiftRight') {
+            return SpecialKeyCodes.rightShift;
+        } else if (keyboardEvent.keyCode === SpecialKeyCodes.control && keyboardEvent.code === 'ControlRight') {
+            return SpecialKeyCodes.rightControl;
+        } else if (keyboardEvent.keyCode === SpecialKeyCodes.alt && keyboardEvent.code === 'AltRight') {
+            return SpecialKeyCodes.rightAlt;
+        } else {
+            return keyboardEvent.keyCode;
+        }
     }
 
     /**
      * Browser keys do not have a charCode so we only need to test keyCode.
+     * @param keyCode - the browser keycode number 
      */
     isKeyCodeBrowserKey(keyCode: number) {
         // Function keys or tab key.
         return keyCode >= 112 && keyCode <= 123 || keyCode === 9;
     }
 }
-/* 5457524f4d4d */

@@ -36,7 +36,24 @@ export class DelegateBase implements IDelegate {
 	}
 
 	/**
+	 * Activate the on screen keyboard when receiving the command from the streamer
+	 * @param command - the keyboard command
+	 */
+	activateOnScreenKeyboard(command: any): void {
+		throw new Error("Method not implemented.");
+	}
+
+	/**
+	 * Set the input control ownership 
+	 * @param inputControlOwnership - does the user have input control ownership
+	 */
+	onInputControlOwnership(inputControlOwnership: boolean): void {
+		throw new Error("Method not implemented.");
+	}
+
+	/**
 	 * Shows the disconnect overlay 
+	 * @param updateText - the text that will be displayed in the overlay
 	 */
 	showDisconnectOverlay(updateText: string) {
 		this.hideCurrentOverlay();
@@ -47,7 +64,7 @@ export class DelegateBase implements IDelegate {
 
 	/**
 	 * Update the disconnect overlays span text 
-	 * @param updateText the new countdown number 
+	 * @param updateText - the new countdown number 
 	 */
 	updateDisconnectOverlay(updateText: string) {
 		this.disconnectOverlay.update(updateText);
@@ -90,6 +107,7 @@ export class DelegateBase implements IDelegate {
 
 	/**
 	 * Shows the text overlay 
+	 * @param text - the text that will be shown in the overlay
 	 */
 	showTextOverlay(text: string) {
 		this.hideCurrentOverlay();
@@ -99,7 +117,8 @@ export class DelegateBase implements IDelegate {
 	}
 
 	/**
-	 * Shows the error overlay 
+	 * Shows the error overlay
+	 * @param text - the text that will be shown in the overlay
 	 */
 	showErrorOverlay(text: string) {
 		this.hideCurrentOverlay();
@@ -124,7 +143,7 @@ export class DelegateBase implements IDelegate {
 
 	/**
 	 * Shows the afk overlay 
-	 * @param countDown the countdown number for the afk countdown 
+	 * @param countDown - the countdown number for the afk countdown 
 	 */
 	showAfkOverlay(countDown: number) {
 		this.hideCurrentOverlay();
@@ -135,7 +154,7 @@ export class DelegateBase implements IDelegate {
 
 	/**
 	 * Update the afk overlays countdown number 
-	 * @param countDown the new countdown number 
+	 * @param countDown - the new countdown number 
 	 */
 	updateAfkOverlay(countDown: number) {
 		this.afkOverlay.updateCountdown(countDown);
@@ -150,7 +169,7 @@ export class DelegateBase implements IDelegate {
 
 	/**
 	 * Instantiate the WebRTCPlayerController interface to provide WebRTCPlayerController functionality within this class and set up anything that requires it 
-	 * @param iWebRtcPlayerController 
+	 * @param iWebRtcPlayerController - a WebRtcPlayerController controller instance 
 	 */
 	setIWebRtcPlayerController(iWebRtcPlayerController: IWebRtcPlayerController) {
 		this.iWebRtcController = iWebRtcPlayerController;
@@ -228,10 +247,10 @@ export class DelegateBase implements IDelegate {
 
 	/**
 	 * Event fired when the video is disconnected
+	 * @param eventString - the event text that will be shown in the overlay 
 	 */
 	onDisconnect(eventString: string) {
-		
-		// if we have overridden the default disconnection messsage, assign the new value here
+		// if we have overridden the default disconnection message, assign the new value here
 		if (this.iWebRtcController.getDisconnectMessageOverride() != "" && this.iWebRtcController.getDisconnectMessageOverride() !== undefined && this.iWebRtcController.getDisconnectMessageOverride() != null) {
 			eventString = this.iWebRtcController.getDisconnectMessageOverride();
 			this.iWebRtcController.setDisconnectMessageOverride('');

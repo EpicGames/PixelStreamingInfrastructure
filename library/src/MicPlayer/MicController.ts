@@ -5,6 +5,9 @@ export class MicController {
     isLocalhostConnection: boolean;
     isHttpsConnection: boolean;
 
+    /**
+     * @param urlParams - the url search parameters 
+     */
     constructor(urlParams: URLSearchParams) {
         // get the mic status from the url 
         this.useMic = urlParams.has('useMic');

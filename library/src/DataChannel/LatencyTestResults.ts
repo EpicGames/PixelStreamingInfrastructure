@@ -44,6 +44,9 @@ export class LatencyTestResults implements ILatencyTestResults {
         }
     }
 
+    /**
+     * Process the encoder times and set them
+     */
     processFields() {
         if (this.EncodeMs == null && (this.PreEncodeTimeMs != null || this.PostEncodeTimeMs != null)) {
             Logger.Log(Logger.GetStackTrace(), `Setting Encode Ms \n ${this.PostEncodeTimeMs} \n ${this.PreEncodeTimeMs}`, 6);

@@ -1,25 +1,42 @@
-import { UeInputMouseMessage } from "../UeInstanceMessage/UeInputMouseMessage";
-import { DataChannelController } from "../DataChannel/DataChannelController";
 import { ITouchController } from "./ITouchController";
 import { MouseButton } from "./MouseButtons";
+import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
+import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
+import { INormalizeAndQuantize } from "../NormalizeAndQuantize/INormalizeAndQuantize";
 
 
 /**
  * Allows for the usage of fake touch events and implements ITouchController
  * @param dataChannelController - The controller for the Data channel 
- * @param videoPlayerElement - The video player DOM element 
+ * @param videovideoElementParent - The video player DOM element 
  */
 export class FakeTouchController implements ITouchController {
-    finger: Finger;
-    ueInputMouseMessage: UeInputMouseMessage;
-    videoPlayerElement: HTMLVideoElement;
+    fakeTouchFinger: FakeTouchFinger;
+    toStreamerMessagesProvider: IStreamMessageController;
+    videoElementProvider: IVideoPlayer;
+    normalizeAndQuantize: INormalizeAndQuantize;
+    videoElementParentClientRect: DOMRect;
 
-    constructor(dataChannelController: DataChannelController, videoPlayerElement: HTMLVideoElement) {
-        this.ueInputMouseMessage = new UeInputMouseMessage(dataChannelController);
-        this.videoPlayerElement = videoPlayerElement;
+    /**
+     * @param toStreamerMessagesProvider - Stream message instance
+     * @param videoElementProvider - Video element instance
+     * @param normalizeAndQuantize - Normalise and Quantize instance
+     */
+    constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer, normalizeAndQuantize: INormalizeAndQuantize) {
+        this.toStreamerMessagesProvider = toStreamerMessagesProvider;
+        this.videoElementProvider = videoElementProvider;
+        this.normalizeAndQuantize = normalizeAndQuantize;
         document.ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
         document.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
         document.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
+    }
+
+    /**
+     * Sets the video Element Parent Client Rect numbers for this class 
+     * @param videoElementParentClientRect - a html ElementParentClientRect object
+     */
+    setVideoElementParentClientRect(videoElementParentClientRect: any) {
+        this.videoElementParentClientRect = videoElementParentClientRect;
     }
 
     /**
@@ -27,19 +44,19 @@ export class FakeTouchController implements ITouchController {
      * @param touch - the activating touch event 
      */
     onTouchStart(touch: TouchEvent): void {
-        if (this.finger == null) {
+        if (this.fakeTouchFinger == null) {
             let first_touch = touch.changedTouches[0];
-            this.finger = {
-                ID: first_touch.identifier,
-                X: first_touch.clientX - this.videoPlayerElement.getBoundingClientRect().left,
-                Y: first_touch.clientY - - this.videoPlayerElement.getBoundingClientRect().top
-            }
+            this.fakeTouchFinger = new FakeTouchFinger(first_touch.identifier, first_touch.clientX - this.videoElementParentClientRect.left, first_touch.clientY - this.videoElementParentClientRect.top);
 
-            let mouseEvent = new MouseEvent(touch.type, first_touch)
+            let videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
+            let mouseEvent = new MouseEvent(touch.type, first_touch);
+            videoElementParent.onmouseenter(mouseEvent);
 
-            this.videoPlayerElement.onmouseenter(mouseEvent);
-            this.ueInputMouseMessage.sendMouseDown(MouseButton.mainButton, this.finger.X, this.finger.Y);
+            let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.fakeTouchFinger.x, this.fakeTouchFinger.y);
+            let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+            toStreamerHandlers.get("MouseDown")("MouseDown", [MouseButton.mainButton, coord.x, coord.y]);
         }
+        touch.preventDefault();
     }
 
     /**
@@ -47,20 +64,24 @@ export class FakeTouchController implements ITouchController {
      * @param touchEvent - the activating touch event 
      */
     onTouchEnd(touchEvent: TouchEvent): void {
-        for (let i = 0; i < touchEvent.changedTouches.length; i++) {
-            let touch = touchEvent.changedTouches[i];
+        let videoElementParent = this.videoElementProvider.getVideoParentElement();
+        let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 
-            if (touch.identifier === this.finger.ID) {
-                let x = touch.clientX - this.videoPlayerElement.getBoundingClientRect().left;
-                let y = touch.clientY - this.videoPlayerElement.getBoundingClientRect().top;
-                this.ueInputMouseMessage.sendMouseUp(MouseButton.mainButton, x, y);
+        for (let t = 0; t < touchEvent.changedTouches.length; t++) {
+            let touch = touchEvent.changedTouches[t];
+            if (touch.identifier === this.fakeTouchFinger.id) {
+                let x = touch.clientX - this.videoElementParentClientRect.left;
+                let y = touch.clientY - this.videoElementParentClientRect.top;
+                let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(x, y);
+                toStreamerHandlers.get("MouseUp")("MouseUp", [MouseButton.mainButton, coord.x, coord.y]);
 
-                let mouseEvent = new MouseEvent(touchEvent.type, touch)
-                this.videoPlayerElement.onmouseleave(mouseEvent);
-                this.finger = null;
+                let mouseEvent = new MouseEvent(touchEvent.type, touch);
+                videoElementParent.onmouseleave(mouseEvent);
+                this.fakeTouchFinger = null;
+                break;
             }
         }
-
+        touchEvent.preventDefault();
     }
 
     /**
@@ -68,24 +89,41 @@ export class FakeTouchController implements ITouchController {
      * @param touchEvent - the activating touch event 
      */
     onTouchMove(touchEvent: TouchEvent): void {
-        for (let i = 0; i < touchEvent.touches.length; i++) {
-            let touch = touchEvent.touches[i];
-            if (touch.identifier === this.finger.ID) {
-                let x = touch.clientX - this.videoPlayerElement.getBoundingClientRect().left;
-                let y = touch.clientY - this.videoPlayerElement.getBoundingClientRect().top;
-                this.ueInputMouseMessage.sendMouseMove(x, y, x - this.finger.X, y - this.finger.Y);
-                this.finger.X = x;
-                this.finger.Y = y;
+        let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+
+        for (let t = 0; t < touchEvent.touches.length; t++) {
+            let touch = touchEvent.touches[t];
+            if (touch.identifier === this.fakeTouchFinger.id) {
+                let x = touch.clientX - this.videoElementParentClientRect.left;
+                let y = touch.clientY - this.videoElementParentClientRect.top;
+                let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(x, y);
+                let delta = this.normalizeAndQuantize.normalizeAndQuantizeSigned(x - this.fakeTouchFinger.x, y - this.fakeTouchFinger.y);
+                toStreamerHandlers.get("MoveMouse")("MouseMove", [coord.x, coord.y, delta.x, delta.y]);
+                this.fakeTouchFinger.x = x;
+                this.fakeTouchFinger.y = y;
+                break;
             }
         }
+        touchEvent.preventDefault();
     }
 }
 
 /**
  * The interface for finger position mapping 
  */
-export interface Finger {
-    ID: number;
-    X: number;
-    Y: number;
+export class FakeTouchFinger {
+    id: number;
+    x: number;
+    y: number;
+
+    /**
+     * @param id - the button id 
+     * @param x - the x axis value 
+     * @param y - the y axis value
+     */
+    constructor(id: number, x: number, y: number) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+    }
 }

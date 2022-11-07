@@ -12,6 +12,7 @@ export class PeerConnectionController {
     /**
      * Create a new RTC Peer Connection client
      * @param options - Peer connection Options
+     * @param turnState - if turn is being enforced
      */
     constructor(options: RTCConfiguration, turnState: boolean) {
 
@@ -173,6 +174,7 @@ export class PeerConnectionController {
 
     /**
      * Setup tracks on the RTC Peer Connection 
+     * @param useMic - is mic in use
      */
     async setupTracksToSendAsync(useMic: boolean) {
 

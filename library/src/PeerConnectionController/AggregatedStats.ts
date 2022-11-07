@@ -97,7 +97,7 @@ export class AggregatedStats {
     /**
      * Process stream stats data from webrtc
      * 
-     * @param stat the stats coming in from webrtc
+     * @param stat - the stats coming in from webrtc
      */
     handleStream(stat: any) {
         this.streamStats = stat
@@ -105,6 +105,7 @@ export class AggregatedStats {
 
     /** 
      * Process the Ice Candidate Pair Data 
+     * @param stat - the stats coming in from ice candidates
      */
     handleCandidatePair(stat: any) {
         this.candidatePair.bytesReceived = stat.bytesReceived;
@@ -121,6 +122,7 @@ export class AggregatedStats {
 
     /** 
      * Process the Data Channel Data 
+     * @param stat - the stats coming in from the data channel
      */
     handleDataChannel(stat: any) {
         this.dataChannelStats.bytesReceived = stat.dataytesReceived;
@@ -137,6 +139,7 @@ export class AggregatedStats {
 
     /** 
      * Process the Local Ice Candidate Data 
+     * @param stat - local stats
      */
     handleLocalCandidate(stat: any) {
         let localCandidate = new CandidateStat();
@@ -151,6 +154,7 @@ export class AggregatedStats {
 
     /**
      * Process the Remote Ice Candidate Data 
+     * @param stat - ice candidate stats 
      */
     handleRemoteCandidate(stat: any) {
         let RemoteCandidate = new CandidateStat();
@@ -164,7 +168,8 @@ export class AggregatedStats {
     }
 
     /** 
-     * Process the Inbound RTP Audio and Video Data  
+     * Process the Inbound RTP Audio and Video Data 
+     * @param stat - inbound rtp stats 
      */
     handleInBoundRTP(stat: any) {
         switch (stat.kind) {
@@ -224,6 +229,7 @@ export class AggregatedStats {
 
     /** 
      * Process the outbound RTP Audio and Video Data  
+     * @param stat - remote outbound stats
      */
     handleRemoteOutBound(stat: any) {
         switch (stat.kind) {
@@ -245,11 +251,12 @@ export class AggregatedStats {
 
     /** 
      * Process the Inbound Video Track Data  
+     * @param stat - video track stats
      */
     handleTrack(stat: any) {
 
         // we only want to extract stats from the video track
-        if(stat.type === 'track' && (stat.trackIdentifier === 'video_label' || stat.kind === 'video')) {
+        if (stat.type === 'track' && (stat.trackIdentifier === 'video_label' || stat.kind === 'video')) {
             this.inboundVideoStats.framesDropped = stat.framesDropped;
             this.inboundVideoStats.framesReceived = stat.framesReceived;
             this.inboundVideoStats.framesDroppedPercentage = stat.framesDropped / stat.framesReceived * 100;
@@ -261,7 +268,8 @@ export class AggregatedStats {
     }
 
     /** 
-     * Check if a value coming in from our stats is actually a number  
+     * Check if a value coming in from our stats is actually a number
+     * @param value - the number to be checked  
      */
     isNumber(value: any): boolean {
         return typeof value === 'number' && isFinite(value);

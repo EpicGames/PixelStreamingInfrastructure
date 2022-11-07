@@ -10,12 +10,15 @@ export class InitialSettings implements IInitialSettings {
     WebRTC?: IWebRTC;
 
 
-    constructor(){
+    constructor() {
         this.PixelStreaming = new PixelStreaming()
         this.Encoder = new Encoder()
         this.WebRTC = new WebRTC()
     }
 
+    /**
+     * Checks for compatibility with the FPS and MaxFPS stats between 4.27 and 5
+     */
     ueCompatible() {
         if (this.WebRTC.MaxFPS != null) {
             this.WebRTC.FPS = this.WebRTC.MaxFPS
@@ -24,13 +27,17 @@ export class InitialSettings implements IInitialSettings {
 
 }
 
-
-
+/**
+ * A class for handling pixel streaming details 
+ */
 export class PixelStreaming implements IPixelStreaming {
     AllowPixelStreamingCommands?: boolean;
     DisableLatencyTest?: boolean;
 }
 
+/**
+ * A class for handling enoder stats 
+ */
 export class Encoder implements IEncoder {
     TargetBitrate?: number;
     MaxBitrate?: number;
@@ -43,6 +50,9 @@ export class Encoder implements IEncoder {
 
 }
 
+/**
+ * A class for handling web rtc stats 
+ */
 export class WebRTC implements IWebRTC {
     DegradationPref?: "BALANCED" | "MAINTAIN_FRAMERATE" | "MAINTAIN_RESOLUTION";
     MinBitrate?: number;
