@@ -520,8 +520,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// set up url params for STUN, Mic and SFU
 		this.urlParams = new URLSearchParams(window.location.search);
 
+		const hasForceTURN = this.urlParams.has('ForceTURN');
+		const hasForceMonoAudio = this.urlParams.has('ForceMonoAudio');
+
 		// check for forcing turn
-		if (this.urlParams.has('ForceTURN')) {
+		if (hasForceTURN) {
 			// check for a turn server
 			const hasTurnServer = this.checkTurnServerAvailability(peerConfig);
 
@@ -535,7 +538,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		}
 
 		// set up the peer connection controller
-		this.peerConnectionController = new PeerConnectionController(peerConfig, this.urlParams.has('ForceTURN'));
+		this.peerConnectionController = new PeerConnectionController(peerConfig, hasForceTURN, hasForceMonoAudio);
 
 		//set up mic controller
 		this.micController = new MicController(this.urlParams)

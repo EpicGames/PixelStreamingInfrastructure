@@ -44,6 +44,7 @@ export class FakeTouchController implements ITouchController {
      * @param touch - the activating touch event 
      */
     onTouchStart(touch: TouchEvent): void {
+        if(!this.videoElementProvider.isVideoReady()){ return; }
         if (this.fakeTouchFinger == null) {
             let first_touch = touch.changedTouches[0];
             this.fakeTouchFinger = new FakeTouchFinger(first_touch.identifier, first_touch.clientX - this.videoElementParentClientRect.left, first_touch.clientY - this.videoElementParentClientRect.top);
@@ -64,6 +65,7 @@ export class FakeTouchController implements ITouchController {
      * @param touchEvent - the activating touch event 
      */
     onTouchEnd(touchEvent: TouchEvent): void {
+        if(!this.videoElementProvider.isVideoReady()){ return; }
         let videoElementParent = this.videoElementProvider.getVideoParentElement();
         let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 
@@ -89,6 +91,7 @@ export class FakeTouchController implements ITouchController {
      * @param touchEvent - the activating touch event 
      */
     onTouchMove(touchEvent: TouchEvent): void {
+        if(!this.videoElementProvider.isVideoReady()){ return; }
         let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 
         for (let t = 0; t < touchEvent.touches.length; t++) {

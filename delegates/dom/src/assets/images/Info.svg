@@ -1,8 +1,7 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	viewBox="0 0 330 330" style="enable-background:new 0 0 330 330;" xml:space="preserve">
      <defs>
-        <link href="../index.css" type="text/css" rel="stylesheet" 
-            xmlns="http://www.w3.org/1999/xhtml"/>
+        <link href="../css/player.css" type="text/css" rel="stylesheet" xmlns="http://www.w3.org/1999/xhtml"/>
     </defs>
     <g>
 		<path d="M165,0.008C74.019,0.008,0,74.024,0,164.999c0,90.977,74.019,164.992,165,164.992s165-74.015,165-164.992

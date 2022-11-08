@@ -62,6 +62,14 @@ export class SendMessageController {
                     break;
             }
         });
-        this.dataChannelSender.sendData(data.buffer);
+
+        if(!this.dataChannelSender.canSend()){
+            console.log(`Data channel cannot send yet, skipping sending message: ${messageType} - ${new Uint8Array(data.buffer)}`);
+            return;
+        }
+        else{
+            this.dataChannelSender.sendData(data.buffer);
+        }
+
     }
 }

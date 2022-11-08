@@ -63,6 +63,12 @@ export class SendDescriptorController {
             data.setUint16(byteIdx, descriptorAsString.charCodeAt(i), true);
             byteIdx += 2;
         }
+
+        if(!this.dataChannelSender.canSend()){
+            console.log(`Data channel cannot send yet, skipping sending descriptor message: ${messageType} - ${descriptorAsString}`);
+            return;
+        }
+
         this.dataChannelSender.sendData(data.buffer);
     }
 

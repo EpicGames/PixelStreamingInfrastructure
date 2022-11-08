@@ -8,16 +8,18 @@ export class PeerConnectionController {
     peerConnection: RTCPeerConnection;
     aggregatedStats: AggregatedStats;
     forceTurn: boolean;
+    forceMonoAudio: boolean;
 
     /**
      * Create a new RTC Peer Connection client
      * @param options - Peer connection Options
-     * @param turnState - if turn is being enforced
+     * @param forceTurn - if turn is being enforced
      */
-    constructor(options: RTCConfiguration, turnState: boolean) {
+    constructor(options: RTCConfiguration, forceTurn: boolean, forceMonoAudio: boolean) {
 
         // Set the turn state to true or false for rtc options
-        this.forceTurn = turnState;
+        this.forceTurn = forceTurn;
+        this.forceMonoAudio = forceMonoAudio;
 
         if (this.forceTurn === true) {
             options.iceTransportPolicy = "relay";
@@ -80,16 +82,30 @@ export class PeerConnectionController {
      * @returns A modified Session Descriptor
      */
     mungeOffer(sdp: string, useMic: boolean) {
-        let temp = sdp;
-        temp.replace(/(a=fmtp:\d+ .*level-asymmetry-allowed=.*)\r\n/gm, "$1;x-google-start-bitrate=10000;x-google-max-bitrate=100000\r\n");
-        temp.replace('useinbandfec=1', 'useinbandfec=1;stereo=1;sprop-maxcapturerate=48000');
+        const mungedSDP = sdp;
+        mungedSDP.replace(/(a=fmtp:\d+ .*level-asymmetry-allowed=.*)\r\n/gm, "$1;x-google-start-bitrate=10000;x-google-max-bitrate=100000\r\n");
+        mungedSDP.replace('useinbandfec=1', 'useinbandfec=1;stereo=1;sprop-maxcapturerate=48000');
 
-        // Increase the capture rate of audio so we can have higher quality audio over mic
-        if (useMic) {
-            temp = temp.replace('useinbandfec=1', 'useinbandfec=1;sprop-maxcapturerate=48000;maxaveragebitrate=510000');
+        let audioSDP = '';
+
+        // set max bitrate to highest bitrate Opus supports
+        audioSDP += 'maxaveragebitrate=510000;';
+
+        if(useMic){
+            // set the max capture rate to 48khz (so we can send high quality audio from mic)
+            audioSDP += 'sprop-maxcapturerate=48000;';
         }
 
-        return temp;
+        // Force mono or stereo based on whether ?forceMono was passed or not
+        audioSDP += this.forceMonoAudio ? 'sprop-stereo=0;stereo=0;' : 'sprop-stereo=1;stereo=1;';
+
+        // enable in-band forward error correction for opus audio
+        audioSDP += 'useinbandfec=1';
+
+        // We use the line 'useinbandfec=1' (which Opus uses) to set our Opus specific audio parameters.
+        mungedSDP.replace('useinbandfec=1', audioSDP);
+
+        return mungedSDP;
     }
 
     /**

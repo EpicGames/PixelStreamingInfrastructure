@@ -59,6 +59,7 @@ export class TouchController implements ITouchController {
      * @param touchEvent - the touch event being intercepted  
      */
     onTouchStart(touchEvent: TouchEvent) {
+        if(!this.videoElementProvider.isVideoReady()){ return; }
         for (let t = 0; t < touchEvent.changedTouches.length; t++) {
             this.rememberTouch(touchEvent.changedTouches[t]);
         }
@@ -73,6 +74,7 @@ export class TouchController implements ITouchController {
      * @param touchEvent - the touch event being intercepted  
      */
     onTouchEnd(touchEvent: TouchEvent) {
+        if(!this.videoElementProvider.isVideoReady()){ return; }
         Logger.Log(Logger.GetStackTrace(), 'touch end', 6);
         this.emitTouchData("TouchEnd", touchEvent.changedTouches);
         // Re-cycle unique identifiers previously assigned to each touch.
@@ -87,12 +89,14 @@ export class TouchController implements ITouchController {
      * @param touchEvent - the touch event being intercepted  
      */
     onTouchMove(touchEvent: TouchEvent) {
+        if(!this.videoElementProvider.isVideoReady()){ return; }
         Logger.Log(Logger.GetStackTrace(), 'touch move', 6);
         this.emitTouchData("TouchMove", touchEvent.touches);
         touchEvent.preventDefault();
     }
 
     emitTouchData(type: string, touches: TouchList) {
+        if(!this.videoElementProvider.isVideoReady()){ return; }
         let videoElementParent = this.videoElementProvider.getVideoParentElement();
         let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 

@@ -1,4 +1,3 @@
-import './assets/css/player.css';
 import playButton from './assets/images/Play.png';
 import * as libspsfrontend from '@tensorworks/libspsfrontend'
 import { VideoQpIndicator } from './VideoQpIndicator';
@@ -28,12 +27,12 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	statsPanel = document.getElementById('stats-panel') as HTMLDivElement;
 
 	// Pre Stream options
-	offerToReceiveToggle = document.getElementById("offer-to-receive-tgl") as HTMLInputElement;
+	offerToReceiveToggle = document.getElementById("offer-receive-tgl") as HTMLInputElement;
 	preferSfuToggle = document.getElementById("prefer-sfu-tgl") as HTMLInputElement;
-	useMicrophoneToggle = document.getElementById("use-mirophone-tgl") as HTMLInputElement;
-	forceMonoAudioToggle = document.getElementById("force-mono-audio-tgl") as HTMLInputElement;
+	useMicrophoneToggle = document.getElementById("use-microphone-tgl") as HTMLInputElement;
+	forceMonoAudioToggle = document.getElementById("force-mono-tgl") as HTMLInputElement;
 	forceTurnToggle = document.getElementById("force-turn-tgl") as HTMLInputElement;
-	hideBrowserCursorToggle = document.getElementById("hide-browser-cursor-tgl") as HTMLInputElement;
+	hideBrowserCursorToggle = document.getElementById("cursor-tgl") as HTMLInputElement;
 
 	// Viewing
 	enlargeDisplayToFillWindow = document.getElementById("enlarge-display-to-fill-window-tgl") as HTMLInputElement;
@@ -447,6 +446,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.setUpToggleWithUrlParams(this.hideBrowserCursorToggle, "hideBrowserCursor");
 
 		this.setUpControlSchemeTypeToggle(this.controlSchemeToggle);
+		this.setUpToggleWithUrlParams(this.controlSchemeToggle, "hoveringMouse");
 
 		// set up the restart stream button
 		document.getElementById("restart-stream-button").onclick = () => {
@@ -459,7 +459,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.iWebRtcController.requestKeyFrame();
 		}
 
-		document.getElementById("btn-encoder-settings").onclick = () => {
+		document.getElementById("encoder-params-submit").onclick = () => {
 			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending encoder settings  --------", 7);
 			let encode: libspsfrontend.Encoder = {
 				MinQP: Number(this.encoderMinQpText.value),
@@ -469,7 +469,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
 		}
 
-		document.getElementById("btn-webrtc-settings").onclick = () => {
+		document.getElementById("webrtc-params-submit").onclick = () => {
 			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending web rtc settings  --------", 7);
 			let webRtcSettings: libspsfrontend.WebRTC = {
 				FPS: Number(this.webRtcFpsText.value),
@@ -539,6 +539,9 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 */
 	setUpControlSchemeTypeToggle(toggleElement: HTMLInputElement) {
 		if (toggleElement) {
+
+			const urlParams = new URLSearchParams(window.location.search);
+			this.config.controlScheme = (urlParams.has('hoveringMouse') ?  libspsfrontend.ControlSchemeType.HoveringMouse : libspsfrontend.ControlSchemeType.LockedMouse);
 
 			// set the state for the toggle based on the config
 			if (this.config.controlScheme === libspsfrontend.ControlSchemeType.LockedMouse) {

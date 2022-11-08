@@ -3,12 +3,13 @@
 	--colour1: #2B3A42;
 	--colour2: #242424;
 	--colour3: #BDD4DE;
-	--colour4: #b0b0b0;
-	--colour5: #0262c3;
+	--colour4: #3c3b40;
+	--colour5: #0585fe;
 	--colour6: #0f0f0f;
 	--colour7: #2f2f2f;
 	--colour8: #151515;
 	--colour9: #808080;
+	--colour10: #FFFFFF;
 
 	--buttonFont: Arial;
 	--inputFont: Arial;
@@ -28,6 +29,10 @@
 	user-select: none;
 	/* Non-prefixed version, currently
 									supported by Chrome, Edge, Opera and Firefox */
+}
+
+input {
+    font-family: 'Montserrat';
 }
 
 body {
@@ -67,7 +72,7 @@ canvas {
 .spsUiTool .tooltiptext {
 	visibility: hidden;
 	width: auto;
-	color: var(--colour4);
+	color: var(--colour10);
 	text-align: center;
 	border-radius: 15px;
 	padding: 0px 10px;
@@ -159,7 +164,7 @@ object {
 #uiFeatures button {
 	background-color: var(--colour7);
 	border: 1px solid var(--colour7);
-	color: var(--colour4);
+	color: var(--colour10);
 	position: relative;
 	width: 3rem;
 	height: 3rem;
@@ -168,18 +173,54 @@ object {
 }
 
 #uiFeatures button:hover {
-	background-color: var(--colour3);
-	border: 3px solid var(--colour3);
+	background-color: var(--colour5);
+	border: 3px solid var(--colour5);
 	transition: 0.25s ease;
 	padding-left: 0.55rem;
 	padding-top: 0.55rem;
 }
 
 #uiFeatures button:active {
-	border: 3px solid var(--colour3);
+	border: 3px solid var(--colour5);
 	background-color: var(--colour7);
 	padding-left: 0.55rem;
 	padding-top: 0.55rem;
+}
+
+/* Flat buttons */
+
+.btn-flat {
+	background-color: transparent;
+    color: var(--colour10);
+    font-family: 'Montserrat';
+	font-weight: bold;
+    border: 3px solid var(--colour5);
+    border-radius: 1rem;
+    font-size: 0.75rem;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	cursor: pointer;
+	text-align: center;
+}
+
+.btn-flat:hover {
+	background-color: var(--colour5);
+	transition: ease 0.3s;
+}
+
+.btn-flat:disabled {
+	background: var(--colour4);
+	border-color: var(--colour3);
+	color: var(--colour3);
+	cursor: default;
+}
+
+.btn-flat:active {
+	background-color: transparent;
+}
+
+.btn-flat:focus {
+	outline: none;
 }
 
 #uiFeatures img {
@@ -274,12 +315,11 @@ object {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	padding: 2px 10px 2px 10px;
+	padding: 0.15rem 10px 0.15rem 10px;
 }
 
 .settings-text {
-	font-size: 1.1em;
-	color: var(--colour4);
+	color: var(--colour10);
 	vertical-align: middle;
 	font-weight: normal;
 }
@@ -359,43 +399,9 @@ img#playButton {
 	width: 40px;
 }
 
-.overlay-button {
-	line-height: 1.1;
-	padding: 1px 6px;
-}
-
 .btn-overlay {
 	vertical-align: middle;
 	display: inline-block;
-}
-
-.btn-flat {
-	background: var(--colour7);
-	border: 2px solid var(--colour8);
-	color: var(--colour4);
-	font-weight: bold;
-	cursor: pointer;
-	font-family: var(--buttonFont);
-	font-size: 10px;
-	border-radius: 5px;
-	padding: 8px;
-	text-align: center;
-}
-
-.btn-flat:disabled {
-	background: var(--colour4);
-	border-color: var(--colour3);
-	color: var(--colour3);
-	cursor: default;
-}
-
-.btn-flat:active {
-	border-color: var(--colour2);
-	color: var(--colour2);
-}
-
-.btn-flat:focus {
-	outline: none;
 }
 
 /*** Toggle Switch styles ***/
@@ -510,10 +516,11 @@ img#playButton {
 /*** Form Controls ***/
 
 .form-control {
-	background-color: var(--colour6);
-	border: 2px solid var(--colour7);
+	background-color: var(--colour4);
+	border: 2px solid var(--colour4);
 	border-radius: 4px;
-	color: var(--colour4);
+	color: var(--colour10);
+	text-align: right;
 }
 
 .form-control:hover {
@@ -530,7 +537,6 @@ img#playButton {
 }
 
 .form-group label {
-	color: var(--colour4);
 	vertical-align: middle;
 	font-weight: normal;
 }
@@ -597,6 +603,10 @@ section> :first-child {
 	border-top-width: 0px;
 }
 
+.settingsHeader {
+	font-style: italic;
+}
+
 #streamToolsHeader {
 	display: flex;
 	flex-direction: row;
@@ -628,8 +638,12 @@ section> :first-child {
 
 #streamToolsSettings,
 #streamToolsStats {
-	font-size: 1em;
 	/*display: none;*/
+}
+
+/* For SVG graphics paths */
+g {
+	fill: var(--colour10);
 }
 
 /* STREAM TOOLS */

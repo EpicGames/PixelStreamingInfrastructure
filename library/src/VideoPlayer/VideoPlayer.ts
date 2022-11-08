@@ -42,6 +42,13 @@ export class VideoPlayer implements IVideoPlayer {
     }
 
     /**
+     * @returns - whether the video element is playing.
+     */
+    isVideoReady(): boolean {
+        return this.videoElement.readyState !== undefined && this.videoElement.readyState > 0;
+    }
+
+    /**
      * Get the current context of the html video element
      * @returns - the current context of the video element
      */

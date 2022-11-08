@@ -75,6 +75,7 @@ export class LockedMouseEvents implements IMouseEvents {
      * @param mouseEvent - Mouse Event
      */
     updateMouseMovePosition(mouseEvent: MouseEvent) {
+        if(!this.videoElementProvider.isVideoReady()){ return; }
         let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         let styleWidth = this.playerStyleAttributesProvider.getStyleWidth();
         let styleHeight = this.playerStyleAttributesProvider.getStyleHeight();
@@ -105,6 +106,7 @@ export class LockedMouseEvents implements IMouseEvents {
      * @param mouseEvent - Mouse Event
      */
     handleMouseDown(mouseEvent: MouseEvent) {
+        if(!this.videoElementProvider.isVideoReady()){ return; }
         let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("MouseDown")("MouseDown", [mouseEvent.button, this.coord.x, this.coord.y]);
     }
@@ -115,6 +117,7 @@ export class LockedMouseEvents implements IMouseEvents {
      * @param mouseEvent - Mouse Event
      */
     handleMouseUp(mouseEvent: MouseEvent) {
+        if(!this.videoElementProvider.isVideoReady()){ return; }
         let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("MouseUp")("MouseUp", [mouseEvent.button, this.coord.x, this.coord.y]);
     }
@@ -124,6 +127,7 @@ export class LockedMouseEvents implements IMouseEvents {
      * @param wheelEvent - Mouse Event
      */
     handleMouseWheel(wheelEvent: WheelEvent) {
+        if(!this.videoElementProvider.isVideoReady()){ return; }
         let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("MouseWheel")("MouseWheel", [wheelEvent.wheelDelta, this.coord.x, this.coord.y]);
     }
@@ -133,6 +137,7 @@ export class LockedMouseEvents implements IMouseEvents {
     * @param mouseEvent - Mouse Event
     */
     handleMouseDouble(mouseEvent: MouseEvent) {
+        if(!this.videoElementProvider.isVideoReady()){ return; }
         let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("MouseDouble")("MouseDouble", [mouseEvent.button, this.coord.x, this.coord.y]);
     }
@@ -142,6 +147,7 @@ export class LockedMouseEvents implements IMouseEvents {
      * @param mouseEvent - Mouse Event
      */
     handelPressMouseButtons(mouseEvent: MouseEvent) {
+        if(!this.videoElementProvider.isVideoReady()){ return; }
         this.mouseController.pressMouseButtons(mouseEvent.buttons, this.x, this.y);
     }
 
@@ -150,6 +156,7 @@ export class LockedMouseEvents implements IMouseEvents {
      * @param mouseEvent - Mouse Event
      */
     handelReleaseMouseButtons(mouseEvent: MouseEvent) {
+        if(!this.videoElementProvider.isVideoReady()){ return; }
         this.mouseController.releaseMouseButtons(mouseEvent.buttons, this.x, this.y);
     }
 }

@@ -15,13 +15,17 @@ export class DataChannelSender {
         this.dataChannelProvider = dataChannelProvider;
     }
 
+    canSend() : boolean {
+        return this.dataChannelProvider.getDataChannelInstance().dataChannel !== undefined;
+    }
+
     /**
      * Send Data over the Data channel to the UE Instance
      * @param data - Message Data Array Buffer
      */
     sendData(data: ArrayBuffer) {
         // reset the afk inactivity
-        let dataChannelInstance = this.dataChannelProvider.getDataChannelInstance();
+        const dataChannelInstance = this.dataChannelProvider.getDataChannelInstance();
 
         if (dataChannelInstance.dataChannel.readyState == "open") {
             dataChannelInstance.dataChannel.send(data);

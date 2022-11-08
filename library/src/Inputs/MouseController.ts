@@ -45,6 +45,7 @@ export class MouseController {
 
 		// Handle when the Mouse has entered the element
 		videoElementParent.onmouseenter = (event: MouseEvent) => {
+			if(!this.videoElementProvider.isVideoReady()){ return; }
 			Logger.Log(Logger.GetStackTrace(), "Mouse Entered", 6);
 			this.sendMouseEnter();
 			this.pressMouseButtons(event.buttons, event.x, event.y);
@@ -52,6 +53,7 @@ export class MouseController {
 
 		// Handles when the mouse has left the element 
 		videoElementParent.onmouseleave = (event: MouseEvent) => {
+			if(!this.videoElementProvider.isVideoReady()){ return; }
 			Logger.Log(Logger.GetStackTrace(), "Mouse Left", 6);
 			this.sendMouseLeave();
 			this.releaseMouseButtons(event.buttons, event.x, event.y);
@@ -90,6 +92,7 @@ export class MouseController {
 	 * @param Y - Mouse pointer Y coordinate
 	 */
 	pressMouseButtons(buttons: number, X: number, Y: number) {
+		if(!this.videoElementProvider.isVideoReady()){ return; }
 		let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
 		if (buttons & MouseButtonsMask.primaryButton) {
 			this.sendMouseDown(MouseButton.mainButton, coord.x, coord.y);
@@ -112,6 +115,7 @@ export class MouseController {
 	 * Handles mouse enter
 	 */
 	sendMouseEnter() {
+		if(!this.videoElementProvider.isVideoReady()){ return; }
 		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 		toStreamerHandlers.get("MouseEnter")("MouseEnter");
 	}
@@ -120,6 +124,7 @@ export class MouseController {
 	 * Handles mouse Leave
 	 */
 	sendMouseLeave() {
+		if(!this.videoElementProvider.isVideoReady()){ return; }
 		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 		toStreamerHandlers.get("MouseLeave")("MouseLeave");
 	}
@@ -131,6 +136,7 @@ export class MouseController {
 	 * @param Y  - Mouse Y Coordinate
 	 */
 	sendMouseDown(button: number, X: number, Y: number) {
+		if(!this.videoElementProvider.isVideoReady()){ return; }
 		Logger.Log(Logger.GetStackTrace(), `mouse button ${button} down at (${X}, ${Y})`, 6);
 		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 		toStreamerHandlers.get("MouseDown")("MouseDown", [button, X, Y]);
@@ -143,6 +149,7 @@ export class MouseController {
 	 * @param Y  - Mouse Y Coordinate
 	 */
 	sendMouseUp(button: number, X: number, Y: number) {
+		if(!this.videoElementProvider.isVideoReady()){ return; }
 		Logger.Log(Logger.GetStackTrace(), `mouse button ${button} up at (${X}, ${Y})`, 6);
 		let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
 		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();

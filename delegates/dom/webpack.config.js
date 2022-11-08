@@ -1,6 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+//const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
 
 module.exports = (env) => {
@@ -21,8 +21,6 @@ module.exports = (env) => {
         filename: 'index.html'
       }),
 
-      new MiniCssExtractPlugin()
-
     ],
     // turn off so we can see the source map for dom delegate so we can debug the library
     devtool: 'inline-source-map',
@@ -40,14 +38,17 @@ module.exports = (env) => {
           use: 'html-loader'
         },
         {
-          test: /\.css$/i,
-          use: [MiniCssExtractPlugin.loader, 'css-loader'],
+          test: /\.css$/,
+          type: 'asset/resource',
+          generator: {
+            filename: 'css/[name][ext]'
+          }
         },
         {
           test: /\.(png|svg)$/i,
           type: 'asset/resource',
           generator: {
-            filename: 'images/[name]-[hash][ext]'
+            filename: 'images/[name][ext]'
           }
         },
       ],
@@ -61,10 +62,14 @@ module.exports = (env) => {
       libraryTarget: 'umd',
       path: path.resolve(__dirname, 'dist'),
       clean: true,
-      globalObject: 'this'
+      globalObject: 'this',
+      hashFunction: 'xxhash64',
+    },
+    experiments: {
+      futureDefaults: true
     },
     optimization: {
       minimize: false
-    },
+    }
   };
 }
