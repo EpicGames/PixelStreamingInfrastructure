@@ -173,7 +173,7 @@ export class WebSocketController {
                 break;
             }
             default: {
-                Logger.Error(Logger.GetStackTrace(), "Error Message type not Defined");
+                Logger.Error(Logger.GetStackTrace(), `Error Message type of ${message.type} not defined.`);
                 break;
             }
         }

@@ -7,6 +7,7 @@ export enum MessageRecvTypes {
     INSTANCE_STATE = "instanceState",
     CONFIG = "config",
     PLAYER_COUNT = "playerCount",
+    OFFER = "offer",
     ANSWER = "answer",
     ICE_CANDIDATE = "iceCandidate",
     PING = "ping"
