@@ -185,7 +185,7 @@ export class DelegateBase implements IDelegate {
 		this.connectOverlay.onAction(() => this.iWebRtcController.connectToSignallingSever());
 
 		// set up the afk overlays action 
-		this.afkOverlay.onAction(() => this.iWebRtcController.onAfkClick());
+		this.afkOverlay.onAction(() => this.iWebRtcController.onAfkTriggered());
 
 		// set up the play overlays action 
 		this.playOverlay.onAction(() => {

@@ -32,7 +32,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	useMicrophoneToggle = document.getElementById("use-microphone-tgl") as HTMLInputElement;
 	forceMonoAudioToggle = document.getElementById("force-mono-tgl") as HTMLInputElement;
 	forceTurnToggle = document.getElementById("force-turn-tgl") as HTMLInputElement;
-	hideBrowserCursorToggle = document.getElementById("cursor-tgl") as HTMLInputElement;
+	afkToggle = document.getElementById("afk-toggle") as HTMLInputElement;
 
 	// Viewing
 	enlargeDisplayToFillWindow = document.getElementById("enlarge-display-to-fill-window-tgl") as HTMLInputElement;
@@ -56,19 +56,19 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	sendStatsToServer = document.getElementById("send-stats-tgl") as HTMLInputElement;
 
 	// Containers Headers
-	preStreamContainer = document.getElementById("preStreamOptionsHeader") as HTMLDivElement;
-	viewSettingsHeader = document.getElementById("viewSettingsHeader") as HTMLDivElement;
-	commandsHeader = document.getElementById("commandsHeader") as HTMLDivElement;
-	streamingSettingsHeader = document.getElementById("streamingSettingsHeader") as HTMLDivElement;
-	statsHeader = document.getElementById("statisticsHeader") as HTMLDivElement;
-	latencyHeader = document.getElementById("latencyTestHeader") as HTMLDivElement;
+	// preStreamContainer = document.getElementById("preStreamOptionsHeader") as HTMLDivElement;
+	// viewSettingsHeader = document.getElementById("viewSettingsHeader") as HTMLDivElement;
+	// commandsHeader = document.getElementById("commandsHeader") as HTMLDivElement;
+	// streamingSettingsHeader = document.getElementById("streamingSettingsHeader") as HTMLDivElement;
+	// statsHeader = document.getElementById("statisticsHeader") as HTMLDivElement;
+	// latencyHeader = document.getElementById("latencyTestHeader") as HTMLDivElement;
 
-	// Containers
-	viewSettingsContainer = document.getElementById("viewSettingsContainer") as HTMLDivElement;
-	commandsContainer = document.getElementById("commandsContainer") as HTMLDivElement;
-	streamingSettingsContainer = document.getElementById("streamingSettingsContainer") as HTMLDivElement;
-	statsContainer = document.getElementById("statisticsContainer") as HTMLDivElement;
-	latencyContainer = document.getElementById("latencyTestContainer") as HTMLDivElement;
+	// // Containers
+	// viewSettingsContainer = document.getElementById("viewSettingsContainer") as HTMLDivElement;
+	// commandsContainer = document.getElementById("commandsContainer") as HTMLDivElement;
+	// streamingSettingsContainer = document.getElementById("streamingSettingsContainer") as HTMLDivElement;
+	// statsContainer = document.getElementById("statisticsContainer") as HTMLDivElement;
+	// latencyContainer = document.getElementById("latencyTestContainer") as HTMLDivElement;
 
 	constructor(config: libspsfrontend.Config) {
 		super(config);
@@ -223,6 +223,11 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 * Builds the Afk overlay 
 	 */
 	buildAfkOverlay() {
+
+		// Determine if afk timeout is enabled by checking the /?TimeoutIfIdle=true
+		const urlParams = new URLSearchParams(window.location.search);
+		this.config.afkDetectionEnabled = urlParams.has('TimeoutIfIdle') ? true : this.config.afkDetectionEnabled;
+
 		// build the overlay base div 
 		let afkOverlayHtml = document.createElement('div');
 		afkOverlayHtml.id = "afkOverlay";
@@ -443,19 +448,17 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		this.setUpToggleWithUrlParams(this.forceTurnToggle, "ForceTURN");
 
-		this.setUpToggleWithUrlParams(this.hideBrowserCursorToggle, "hideBrowserCursor");
+		this.setUpToggleWithUrlParams(this.afkToggle, "TimeoutIfIdle");
 
 		this.setUpControlSchemeTypeToggle(this.controlSchemeToggle);
 		this.setUpToggleWithUrlParams(this.controlSchemeToggle, "hoveringMouse");
 
 		// set up the restart stream button
 		document.getElementById("restart-stream-button").onclick = () => {
-			this.settingsPanel.classList.toggle("panel-wrap-visible");
 			this.iWebRtcController.restartStreamAutomaticity();
 		}
 
 		document.getElementById("request-keyframe-button").onclick = () => {
-			this.settingsPanel.classList.toggle("panel-wrap-visible");
 			this.iWebRtcController.requestKeyFrame();
 		}
 
@@ -503,6 +506,10 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 				this.iWebRtcController.sendRequestQualityControlOwnership();
 			}
 		};
+
+		this.afkToggle.onchange = () => {
+			this.iWebRtcController.setAfkEnabled(this.afkToggle.checked);
+		}
 	}
 
 	/**
@@ -553,7 +560,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			}
 
 			// set the onChange event 
-			toggleElement.onchange = () => {
+			toggleElement.addEventListener("change", () => {
 				if (toggleElement.checked === true) {
 					this.controlSchemeToggleTitle.innerHTML = "Control Scheme: Hovering Mouse"
 					this.config.controlScheme = libspsfrontend.ControlSchemeType.HoveringMouse;
@@ -563,7 +570,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 					this.config.controlScheme = libspsfrontend.ControlSchemeType.LockedMouse;
 					this.iWebRtcController.activateRegisterMouse();
 				}
-			};
+			});
 		}
 	}
 
@@ -577,7 +584,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			//Check if the element has been set from the URL Params 
 			toggleElement.checked = new URLSearchParams(window.location.search).has(urlParameterKey);
 
-			toggleElement.onchange = () => {
+			toggleElement.addEventListener("change", () => {
 				const urlParams = new URLSearchParams(window.location.search);
 				if (toggleElement.checked === true) {
 					urlParams.set(urlParameterKey, "true");
@@ -585,7 +592,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 					urlParams.delete(urlParameterKey);
 				}
 				window.history.replaceState({}, '', urlParams.toString() !== "" ? `${location.pathname}?${urlParams}` : `${location.pathname}`);
-			};
+			});
 		}
 	}
 
@@ -606,30 +613,30 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.iWebRtcController.sendLatencyTest();
 		}
 
-		// Set up stream tools header functionality
-		this.viewSettingsHeader.onclick = () => {
-			this.viewSettingsContainer.classList.contains("d-none") ? this.viewSettingsContainer.classList.remove("d-none") : this.viewSettingsContainer.classList.add("d-none")
-		}
+		// // Set up stream tools header functionality
+		// this.viewSettingsHeader.onclick = () => {
+		// 	this.viewSettingsContainer.classList.contains("d-none") ? this.viewSettingsContainer.classList.remove("d-none") : this.viewSettingsContainer.classList.add("d-none")
+		// }
 
-		this.commandsHeader.onclick = () => {
-			this.commandsContainer.classList.contains("d-none") ? this.commandsContainer.classList.remove("d-none") : this.commandsContainer.classList.add("d-none")
-		}
+		// this.commandsHeader.onclick = () => {
+		// 	this.commandsContainer.classList.contains("d-none") ? this.commandsContainer.classList.remove("d-none") : this.commandsContainer.classList.add("d-none")
+		// }
 
-		this.streamingSettingsHeader.onclick = () => {
-			this.streamingSettingsContainer.classList.contains("d-none") ? this.streamingSettingsContainer.classList.remove("d-none") : this.streamingSettingsContainer.classList.add("d-none")
-		}
-		this.statsHeader.onclick = () => {
-			this.statsContainer.classList.contains("d-none") ? this.statsContainer.classList.remove("d-none") : this.statsContainer.classList.add("d-none")
-		}
-		this.latencyHeader.onclick = () => {
-			this.latencyContainer.classList.contains("d-none") ? this.latencyContainer.classList.remove("d-none") : this.latencyContainer.classList.add("d-none")
-		}
+		// this.streamingSettingsHeader.onclick = () => {
+		// 	this.streamingSettingsContainer.classList.contains("d-none") ? this.streamingSettingsContainer.classList.remove("d-none") : this.streamingSettingsContainer.classList.add("d-none")
+		// }
+		// this.statsHeader.onclick = () => {
+		// 	this.statsContainer.classList.contains("d-none") ? this.statsContainer.classList.remove("d-none") : this.statsContainer.classList.add("d-none")
+		// }
+		// this.latencyHeader.onclick = () => {
+		// 	this.latencyContainer.classList.contains("d-none") ? this.latencyContainer.classList.remove("d-none") : this.latencyContainer.classList.add("d-none")
+		// }
 
 		// Reveal all the container
-		this.viewSettingsContainer.classList.remove("d-none");
-		this.commandsContainer.classList.remove("d-none");
-		this.streamingSettingsContainer.classList.remove("d-none");
-		this.statsContainer.classList.remove("d-none");
+		// this.viewSettingsContainer.classList.remove("d-none");
+		// this.commandsContainer.classList.remove("d-none");
+		// this.streamingSettingsContainer.classList.remove("d-none");
+		// this.statsContainer.classList.remove("d-none");
 
 		this.videoStartTime = Date.now();
 	}
@@ -649,17 +656,17 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.latencyTestButton.onclick = () => { }
 
 		// Set up stream tools header functionality
-		this.viewSettingsHeader.onclick = () => { }
-		this.commandsHeader.onclick = () => { }
-		this.streamingSettingsHeader.onclick = () => { }
-		this.statsHeader.onclick = () => { }
-		this.latencyHeader.onclick = () => { }
+		// this.viewSettingsHeader.onclick = () => { }
+		// this.commandsHeader.onclick = () => { }
+		// this.streamingSettingsHeader.onclick = () => { }
+		// this.statsHeader.onclick = () => { }
+		// this.latencyHeader.onclick = () => { }
 
 		// Hide all the containers
-		this.viewSettingsContainer.classList.add("d-none");
-		this.commandsContainer.classList.add("d-none");
-		this.streamingSettingsContainer.classList.add("d-none");
-		this.statsContainer.classList.add("d-none");
+		// this.viewSettingsContainer.classList.add("d-none");
+		// this.commandsContainer.classList.add("d-none");
+		// this.streamingSettingsContainer.classList.add("d-none");
+		// this.statsContainer.classList.add("d-none");
 	}
 
 	/**
@@ -766,8 +773,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		latencyStatsInnerHTML += latencyTimings.frameDisplayDeltaTimeMs && latencyTimings.browserReceiptTimeMs ? "<div>Browser receive latency (ms): " + latencyTimings.frameDisplayDeltaTimeMs + "</div>" : "";
 		latencyStatsInnerHTML += "<div>Total latency (excluding browser) (ms): " + latencyTimings.latencyExcludingDecode + "</div>";
 		latencyStatsInnerHTML += latencyTimings.endToEndLatency ? "<div>Total latency (ms): " + latencyTimings.endToEndLatency + "</div>" : "";
-
-		this.latencyContainer.classList.remove("d-none")
 
 		document.getElementById("latencyStatsResults").innerHTML = latencyStatsInnerHTML;
 	}

@@ -1,18 +1,16 @@
-import { ControlSchemeType } from "../Config/Config";
+import { Config, ControlSchemeType } from "../Config/Config";
 import { Logger } from "../Logger/Logger";
 export class AfkLogic {
     // time out logic details 
-    controlScheme: number;
-    warnTimeout = 0;
     closeTimeout = 10;
     active = false;
     warnTimer: ReturnType<typeof setTimeout> = undefined;
     countDown = 0;
     countDownTimer: ReturnType<typeof setInterval> = undefined;
+    config: Config;
 
-    constructor(controlScheme: number, afkTimeout: number) {
-        this.warnTimeout = afkTimeout;
-        this.controlScheme = controlScheme;
+    constructor(config: Config) {
+        this.config = config;
     }
 
     /**
@@ -28,7 +26,7 @@ export class AfkLogic {
      * Start the warning timer if a timeout is set greater that 0 seconds   
      */
     startAfkWarningTimer() {
-        if (this.warnTimeout > 0) {
+        if (this.config.afkTimeout > 0 && this.config.afkDetectionEnabled) {
             this.active = true;
         } else {
             this.active = false;
@@ -56,9 +54,9 @@ export class AfkLogic {
      * If the user interacts then reset the warning timer.  
      */
     resetAfkWarningTimer() {
-        if (this.active) {
+        if (this.active && this.config.afkDetectionEnabled) {
             clearTimeout(this.warnTimer);
-            this.warnTimer = setTimeout(() => this.activateAfkEvent(), this.warnTimeout * 1000);
+            this.warnTimer = setTimeout(() => this.activateAfkEvent(), this.config.afkTimeout * 1000);
         }
     }
 
@@ -77,7 +75,7 @@ export class AfkLogic {
         this.updateAfkCountdown();
 
         // if we are in locked mouse exit pointerlock 
-        if (this.controlScheme == ControlSchemeType.LockedMouse) {
+        if (this.config.controlScheme == ControlSchemeType.LockedMouse) {
             // minor hack to alleviate ios not supporting pointerlock
             if (document.exitPointerLock) {
                 document.exitPointerLock();

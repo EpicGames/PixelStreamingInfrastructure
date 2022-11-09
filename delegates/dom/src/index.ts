@@ -16,7 +16,7 @@ if (signallingServerAddress == '') {
     }
 
     // build the websocket endpoint based on the protocol used to load the frontend
-    signallingServerAddress = signallingServerProtocol + '//' + window.location.hostname
+    signallingServerAddress = signallingServerProtocol + '//' + "sps.pixelstreaming.co/demo/ws"; // window.location.hostname
 
     // if the frontend for an application is served from a base-level domain
     // it has a trailing slash, so we need to account for this when appending the 'ws' for the websocket ingress

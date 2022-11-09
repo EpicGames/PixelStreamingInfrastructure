@@ -5,7 +5,7 @@ export class Config {
 	enableSpsAutoConnect = false;
 
 	// enable the autoplay of the video if enabled by browser
-	enableSpsAutoplay = false;
+	enableSpsAutoplay = true;
 
 	// start the video muted
 	startVideoMuted = false;
@@ -13,14 +13,17 @@ export class Config {
 	// set the amount of wait time in seconds while there is inactivity for afk to occur 
 	afkTimeout = 120;
 
+	// afk enabled
+	afkDetectionEnabled = false;
+
 	// The control scheme controls the behaviour of the mouse when it interacts with the WebRTC player.
 	controlScheme = ControlSchemeType.LockedMouse;
 
 	// Browser keys are those which are typically used by the browser UI. We usually want to suppress these to allow, for example, UE4 to show shader complexity with the F5 key without the web page refreshing.
 	suppressBrowserKeys = true;
 
-	// UE4 has a fake touches option which fakes a single finger touch when the user drags with their mouse. 
-	// We may perform the reverse; a single finger touch may be converted into a mouse drag UE4 side. This allows a non-touch application to be controlled partially via a touch device.
+	// UE has a fake touches option which fakes a single finger touch when the user drags with their mouse. 
+	// We may perform the reverse; a single finger touch may be converted into a mouse drag UE side. This allows a non-touch application to be controlled partially via a touch device.
 	fakeMouseWithTouches = false;
 
 	//compulsory options and DOMs 

@@ -15,10 +15,16 @@ export interface IWebRtcPlayerController {
      */
     requestUnquantisedAndDenormaliseUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned;
 
-    /**
-     * Activate the events for when an afk overlay is clicked 
+    /** 
+     * Triggers an afk state with a overlay that will eventually time out the stream after a timer. 
      */
-    onAfkClick(): void;
+    onAfkTriggered() : void;
+
+    /**
+     * Set whether we should timeout when afk.
+     * @param afkEnabled If true we timeout when idle for some given amount of time.
+     */
+    setAfkEnabled(afkEnabled : boolean) : void;
 
     /**
      * Activate the streams video source 

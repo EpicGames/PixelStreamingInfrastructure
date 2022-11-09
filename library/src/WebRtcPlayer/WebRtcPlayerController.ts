@@ -96,7 +96,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		}
 
 		// set up the afk logic class and connect up its method for closing the signaling server 
-		this.afkLogic = new AfkLogic(this.config.controlScheme, this.config.afkTimeout);
+		this.afkLogic = new AfkLogic(this.config);
 		this.afkLogic.setDisconnectMessageOverride = (message: string) => this.setDisconnectMessageOverride(message);
 		this.afkLogic.closeWebSocket = () => this.closeSignalingServer();
 
@@ -310,15 +310,25 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.delegate.onInputControlOwnership(inputControlOwnership);
 	}
 
-	/**
-	 * connect up the onAfkClick action with a method so it can be exposed to the delegate
-	 */
-	onAfkClick(): void {
+	onAfkTriggered() : void {
 		this.afkLogic.onAfkClick();
 
 		// if the stream is paused play it
 		if (this.videoPlayer.videoElement.paused === true) {
 			this.playStream();
+		}
+	}
+
+	/**
+	* Set whether we should timeout when afk.
+	* @param afkEnabled If true we timeout when idle for some given amount of time.
+	*/
+	setAfkEnabled(afkEnabled : boolean) : void {
+		this.config.afkDetectionEnabled = afkEnabled;
+		if(afkEnabled){
+			this.onAfkTriggered();
+		} else {
+			this.afkLogic.stopAfkWarningTimer();
 		}
 	}
 
@@ -623,7 +633,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.peerConnectionController.handleAnswer(sdpAnswer);
 
-		// start the afk warning timer as the container is now running
+		// start the afk warning timer as PS is now running
 		this.afkLogic.startAfkWarningTimer();
 
 		// show the overlay that we have an answer
