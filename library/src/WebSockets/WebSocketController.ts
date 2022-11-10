@@ -83,7 +83,7 @@ export class WebSocketController {
             return;
         }
 
-        let message: MessageReceive.MessageRecv = JSON.parse(event.data);
+        const message: MessageReceive.MessageRecv = JSON.parse(event.data);
         Logger.Log(Logger.GetStackTrace(), "received => \n" + JSON.stringify(JSON.parse(event.data), undefined, 4), 6);
 
         switch (message.type) {
@@ -98,20 +98,17 @@ export class WebSocketController {
             }
             case MessageReceive.MessageRecvTypes.AUTHENTICATION_REQUIRED: {
                 Logger.Log(Logger.GetStackTrace(), "AUTHENTICATION_REQUIRED", 6);
-                let authenticationRequired: MessageReceive.MessageAuthRequired = JSON.parse(event.data);
-
-                let url_string = window.location.href;
-                let url = new URL(url_string);
-
-                let authRequest = new MessageSend.MessageAuthRequest(url.searchParams.get("code"), url.searchParams.get("provider"));
-
+                //const authenticationRequired: MessageReceive.MessageAuthRequired = JSON.parse(event.data);
+                const url_string = window.location.href;
+                const url = new URL(url_string);
+                const authRequest = new MessageSend.MessageAuthRequest(url.searchParams.get("code"), url.searchParams.get("provider"));
                 this.webSocket.send(authRequest.payload());
 
                 break;
             }
             case MessageReceive.MessageRecvTypes.AUTHENTICATION_RESPONSE: {
                 Logger.Log(Logger.GetStackTrace(), "AUTHENTICATION_RESPONSE", 6);
-                let authenticationResponse: MessageReceive.MessageAuthResponse = JSON.parse(event.data);
+                const authenticationResponse: MessageReceive.MessageAuthResponse = JSON.parse(event.data);
 
                 this.onAuthenticationResponse(authenticationResponse);
 
@@ -143,32 +140,38 @@ export class WebSocketController {
             }
             case MessageReceive.MessageRecvTypes.INSTANCE_STATE: {
                 Logger.Log(Logger.GetStackTrace(), "INSTANCE_STATE", 6);
-                let instanceState: MessageReceive.MessageInstanceState = JSON.parse(event.data);
+                const instanceState: MessageReceive.MessageInstanceState = JSON.parse(event.data);
                 this.onInstanceStateChange(instanceState);
                 break;
             }
             case MessageReceive.MessageRecvTypes.CONFIG: {
                 Logger.Log(Logger.GetStackTrace(), "CONFIG", 6);
-                let config: MessageReceive.MessageConfig = JSON.parse(event.data);
+                const config: MessageReceive.MessageConfig = JSON.parse(event.data);
                 this.onConfig(config);
                 break;
             }
             case MessageReceive.MessageRecvTypes.PLAYER_COUNT: {
                 Logger.Log(Logger.GetStackTrace(), "PLAYER_COUNT", 6);
-                let playerCount: MessageReceive.MessagePlayerCount = JSON.parse(event.data);
+                const playerCount: MessageReceive.MessagePlayerCount = JSON.parse(event.data);
                 Logger.Log(Logger.GetStackTrace(), "Player Count: " + (playerCount.count - 1), 6);
 
                 break;
             }
             case MessageReceive.MessageRecvTypes.ANSWER: {
                 Logger.Log(Logger.GetStackTrace(), "ANSWER", 6);
-                let answer: MessageReceive.MessageAnswer = JSON.parse(event.data);
+                const answer: MessageReceive.MessageAnswer = JSON.parse(event.data);
                 this.onWebRtcAnswer(answer);
+                break;
+            }
+            case MessageReceive.MessageRecvTypes.OFFER: {
+                Logger.Log(Logger.GetStackTrace(), "OFFER", 6);
+                const offer: MessageReceive.MessageOffer = JSON.parse(event.data);
+                this.onWebRtcOffer(offer);
                 break;
             }
             case MessageReceive.MessageRecvTypes.ICE_CANDIDATE: {
                 Logger.Log(Logger.GetStackTrace(), "ICE_CANDIDATE", 6);
-                let iceCandidate: MessageReceive.MessageIceCandidate = JSON.parse(event.data);
+                const iceCandidate: MessageReceive.MessageIceCandidate = JSON.parse(event.data);
                 this.onIceCandidate(iceCandidate.candidate);
                 break;
             }
@@ -265,6 +268,12 @@ export class WebSocketController {
      * @param messageAnswer - The RTC Answer payload from the signaling server
      */
     onWebRtcAnswer(messageAnswer: MessageReceive.MessageAnswer) { }
+
+    /**
+     * Event is fired when the websocket receives the offer for the RTC peer Connection
+     * @param messageOffer - The sdp offer
+     */
+    onWebRtcOffer(messageOffer: MessageReceive.MessageOffer) { }
 
     /**
      * Event fired with the websocket receives a instance state

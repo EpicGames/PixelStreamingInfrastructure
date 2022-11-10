@@ -78,228 +78,170 @@
                     <div id="settingsHeading">Settings</div>
                     <div id="settingsClose"></div>
                     <div id="settingsContent">
-                        <!-- <div id="streamToolsSettings" class="container">
-                            <div id="ControlsSettings" class="row"> -->
-                                <section id="preStreamOptions" class="settingsContainer">
+                        <section id="preStreamOptions" class="settingsContainer">
 
-                                    <div id="preStreamOptionsHeader" class="settingsHeader settings-text">
-                                        <div>Pixel Streaming</div>
-                                    </div>
+                            <div id="preStreamOptionsHeader" class="settingsHeader settings-text">
+                                <div>Pixel Streaming</div>
+                            </div>
 
-                                    <div id="qualityControlOwnership" class="setting">
-                                        <div title="If enabled this browser's network dictates video quality." class="settings-text">Is quality controller?</div>
+                            <div id="qualityControlOwnership" class="setting">
+                                <div title="If enabled this browser's network dictates video quality." class="settings-text">Is quality controller?</div>
+                                <label class="tgl-switch">
+                                    <input type="checkbox" id="quality-control-ownership-tgl" class="tgl tgl-flat">
+                                    <div class="tgl-slider"></div>
+                                </label>
+                            </div>
+
+                            <div id="offerToReceive" class="setting">
+                                <div title="This peer will send the SDP offer." class="settings-text">Peer send offer</div>
+                                <label class="tgl-switch">
+                                    <input type="checkbox" id="offer-receive-tgl" class="tgl tgl-flat">
+                                    <div class="tgl-slider"></div>
+                                </label>
+                            </div>
+
+                            <div id="preferSFU" class="setting">
+                                <div title="Try to connect to the SFU instead of P2P." class="settings-text">Prefer SFU</div>
+                                <label class="tgl-switch">
+                                    <input type="checkbox" id="prefer-sfu-tgl" class="tgl tgl-flat">
+                                    <div class="tgl-slider"></div>
+                                </label>
+                            </div>
+
+                            <div id="useMic" class="setting">
+                                <div class="settings-text">Use microphone</div>
+                                <label class="tgl-switch">
+                                    <input type="checkbox" id="use-microphone-tgl" class="tgl tgl-flat">
+                                    <div class="tgl-slider"></div>
+                                </label>
+                            </div>
+
+                            <div id="forceMonoAudio" class="setting">
+                                <div class="settings-text">Force mono audio</div>
+                                <label class="tgl-switch">
+                                    <input type="checkbox" id="force-mono-tgl" class="tgl tgl-flat">
+                                    <div class="tgl-slider"></div>
+                                </label>
+                            </div>
+
+                            <div id="forceTURN" class="setting">
+                                <div title="Only generate TURN/Relayed ICE candidates." class="settings-text">Force TURN</div>
+                                <label class="tgl-switch">
+                                    <input type="checkbox" id="force-turn-tgl" class="tgl tgl-flat">
+                                    <div class="tgl-slider"></div>
+                                </label>
+                            </div>
+
+                            <div id="afkIfIdle" class="setting">
+                                <div class="settings-text">Disconnect if idle</div>
+                                <label class="tgl-switch">
+                                    <input type="checkbox" id="afk-toggle" class="tgl tgl-flat">
+                                    <div class="tgl-slider"></div>
+                                </label>
+                            </div>
+
+                        </section>
+
+                        <section id="viewSettings" class="settingsContainer">
+                            <div id="viewSettingsHeader" class="settingsHeader settings-text">
+                                <div>UI</div>
+                            </div>
+                            <div id="viewSettingsContainer" class="d-none">
+
+                                <div id="fillWindow" class="setting">
+                                    <div class="settings-text">Video fill window</div>
+                                    <label class="tgl-switch">
+                                        <input type="checkbox" id="enlarge-display-to-fill-window-tgl" class="tgl tgl-flat" checked>
+                                        <div class="tgl-slider"></div>
+                                    </label>
+                                </div>
+
+                                <div id="matchViewportResolution" class="setting">
+                                    <div class="settings-text">Match viewport resolution</div>
+                                    <label class="tgl-switch">
+                                        <input type="checkbox" id="match-viewport-res-tgl" class="tgl tgl-flat">
+                                        <div class="tgl-slider"></div>
+                                    </label>
+                                </div>
+
+                                <div id="toggleControl" class="setting">
+                                    <div class="settings-text" id="control-scheme-title">Control Scheme</div>
+                                    <label class="btn-overlay">
                                         <label class="tgl-switch">
-                                            <input type="checkbox" id="quality-control-ownership-tgl" class="tgl tgl-flat">
+                                            <input type="checkbox" id="control-scheme-tgl" class="tgl tgl-flat">
                                             <div class="tgl-slider"></div>
                                         </label>
-                                    </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </section>
 
-                                    <div id="offerToReceive" class="setting">
-                                        <div title="This peer will send the SDP offer." class="settings-text">Peer send offer</div>
-                                        <label class="tgl-switch">
-                                            <input type="checkbox" id="offer-receive-tgl" class="tgl tgl-flat">
-                                            <div class="tgl-slider"></div>
-                                        </label>
-                                    </div>
+                        <section id="commands" class="settingsContainer">
+                            <div id="commandsHeader" class="settingsHeader settings-text">
+                                <div>Commands</div>
+                            </div>
+                            <div id="commandsContainer" class="d-none">
+                                <div id="showFPS" class="setting">
+                                    <div class="settings-text">Show FPS</div>
+                                    <label class="btn-overlay">
+                                        <input type="button" id="show-fps-button" class="overlay-button btn-flat" value="Toggle">
+                                    </label>
+                                </div>
+                                <div class="setting">
+                                    <div class="settings-text">Restart Stream</div>
+                                    <label class="btn-overlay">
+                                        <input type="button" id="restart-stream-button" class="overlay-button btn-flat" value="Restart">
+                                    </label>
+                                </div>	
+                                <div id="keyframeRequest" class="setting">
+                                    <div class="settings-text">Request KeyFrame</div>
+                                    <label class="btn-overlay">
+                                        <input type="button" id="request-keyframe-button" class="overlay-button btn-flat" value="Request">
+                                    </label>
+                                </div>
+                            </div>
+                        </section>
 
-                                    <div id="preferSFU" class="setting">
-                                        <div title="Try to connect to the SFU instead of P2P." class="settings-text">Prefer SFU</div>
-                                        <label class="tgl-switch">
-                                            <input type="checkbox" id="prefer-sfu-tgl" class="tgl tgl-flat">
-                                            <div class="tgl-slider"></div>
-                                        </label>
-                                    </div>
+                        <section id="encoderSettings">
+                            <div id="encoderSettingsHeader" class="settingsHeader settings-text">
+                                <div>Encoder Settings</div>
+                            </div>
+                            <div id="encoderParamsContainer" class="collapse">
+                                <div class="form-group">
+                                    <label for="encoder-min-qp-text">Min QP</label>
+                                    <input type="number" class="form-control" id="encoder-min-qp-text" value="0" min="0"
+                                        max="51" />
+                                    <label for="encoder-max-qp-text">Max QP</label>
+                                    <input type="number" class="form-control" id="encoder-max-qp-text" value="51" min="0"
+                                        max="51" />
+                                    <br>
+                                    <input id="encoder-params-submit" class="overlay-button btn-flat" type="button"
+                                        value="Apply">
+                                </div>
+                            </div>
+                        </section>
 
-                                    <div id="useMic" class="setting">
-                                        <div class="settings-text">Use microphone</div>
-                                        <label class="tgl-switch">
-                                            <input type="checkbox" id="use-microphone-tgl" class="tgl tgl-flat">
-                                            <div class="tgl-slider"></div>
-                                        </label>
-                                    </div>
-
-                                    <div id="forceMonoAudio" class="setting">
-                                        <div class="settings-text">Force mono audio</div>
-                                        <label class="tgl-switch">
-                                            <input type="checkbox" id="force-mono-tgl" class="tgl tgl-flat">
-                                            <div class="tgl-slider"></div>
-                                        </label>
-                                    </div>
-
-                                    <div id="forceTURN" class="setting">
-                                        <div title="Only generate TURN/Relayed ICE candidates." class="settings-text">Force TURN</div>
-                                        <label class="tgl-switch">
-                                            <input type="checkbox" id="force-turn-tgl" class="tgl tgl-flat">
-                                            <div class="tgl-slider"></div>
-                                        </label>
-                                    </div>
-
-                                    <div id="afkIfIdle" class="setting">
-                                        <div class="settings-text">Disconnect if idle</div>
-                                        <label class="tgl-switch">
-                                            <input type="checkbox" id="afk-toggle" class="tgl tgl-flat">
-                                            <div class="tgl-slider"></div>
-                                        </label>
-                                    </div>
-
-                                </section>
-
-                                <section id="viewSettings" class="settingsContainer">
-                                    <div id="viewSettingsHeader" class="settingsHeader settings-text">
-                                        <div>UI</div>
-                                    </div>
-                                    <div id="viewSettingsContainer" class="d-none">
-
-                                        <div id="fillWindow" class="setting">
-                                            <div class="settings-text">Video fill window</div>
-                                            <label class="tgl-switch">
-                                                <input type="checkbox" id="enlarge-display-to-fill-window-tgl" class="tgl tgl-flat" checked>
-                                                <div class="tgl-slider"></div>
-                                            </label>
-                                        </div>
-
-                                        <div id="matchViewportResolution" class="setting">
-                                            <div class="settings-text">Match viewport resolution</div>
-                                            <label class="tgl-switch">
-                                                <input type="checkbox" id="match-viewport-res-tgl" class="tgl tgl-flat">
-                                                <div class="tgl-slider"></div>
-                                            </label>
-                                        </div>
-
-                                        <div id="toggleControl" class="setting">
-                                            <div class="settings-text" id="control-scheme-title">Control Scheme</div>
-                                            <label class="btn-overlay">
-                                                <label class="tgl-switch">
-                                                    <input type="checkbox" id="control-scheme-tgl" class="tgl tgl-flat">
-                                                    <div class="tgl-slider"></div>
-                                                </label>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <section id="commands" class="settingsContainer">
-                                    <div id="commandsHeader" class="settingsHeader settings-text">
-                                        <div>Commands</div>
-                                    </div>
-                                    <div id="commandsContainer" class="d-none">
-                                        <div id="showFPS" class="setting">
-                                            <div class="settings-text">Show FPS</div>
-                                            <label class="btn-overlay">
-                                                <input type="button" id="show-fps-button" class="overlay-button btn-flat" value="Toggle">
-                                            </label>
-                                        </div>
-                                        <div class="setting">
-                                            <div class="settings-text">Restart Stream</div>
-                                            <label class="btn-overlay">
-                                                <input type="button" id="restart-stream-button" class="overlay-button btn-flat" value="Restart">
-                                            </label>
-                                        </div>	
-                                        <div id="keyframeRequest" class="setting">
-                                            <div class="settings-text">Request KeyFrame</div>
-                                            <label class="btn-overlay">
-                                                <input type="button" id="request-keyframe-button" class="overlay-button btn-flat" value="Request">
-                                            </label>
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <section id="encoderSettings">
-                                    <div id="encoderSettingsHeader" class="settingsHeader settings-text">
-                                        <div>Encoder Settings</div>
-                                    </div>
-                                    <div id="encoderParamsContainer" class="collapse">
-                                        <div class="form-group">
-                                            <label for="encoder-min-qp-text">Min QP</label>
-                                            <input type="number" class="form-control" id="encoder-min-qp-text" value="0" min="0"
-                                                max="51" />
-                                            <label for="encoder-max-qp-text">Max QP</label>
-                                            <input type="number" class="form-control" id="encoder-max-qp-text" value="51" min="0"
-                                                max="51" />
-                                            <br>
-                                            <input id="encoder-params-submit" class="overlay-button btn-flat" type="button"
-                                                value="Apply">
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <section id="webRTCSettings">
-                                    <div id="webRTCSettingsHeader" class="settingsHeader settings-text">
-                                        <div>WebRTC Settings</div>
-                                    </div>
-                                    <div id="webrtcParamsContainer" class="collapse">
-                                        <div class="form-group">
-                                            <label for="webrtc-fps-text">FPS</label>
-                                            <input type="number" class="form-control" id="webrtc-fps-text" value="60" min="1"
-                                                max="999" />
-                                            <label for="webrtc-min-bitrate-text">Min bitrate (kbps)</label>
-                                            <input type="number" class="form-control" id="webrtc-min-bitrate-text" value="0" min="0"
-                                                max="100000" />
-                                            <label for="webrtc-max-bitrate-text">Max bitrate (kbps)</label>
-                                            <input type="number" class="form-control" id="webrtc-max-bitrate-text" value="0" min="0"
-                                                max="100000" />
-                                            <br>
-                                            <input id="webrtc-params-submit" class="overlay-button btn-flat" type="button"
-                                                value="Apply">
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <!-- <section id="streamingSettings" class="settingsContainer">
-                                    <div id="streamingSettingsHeader" class="settings-text">
-                                        <div>Settings</div>
-                                    </div>
-                                    <div id="streamingSettingsContainer" class="d-none">
-                                        <div class="form-group row">
-                                            <div class="col-sm">
-                                                <div>Encoder Settings</div>
-                                                <div id="encoderSettings" class="col">
-                                                    <div class="form-group row">
-                                                        <label for="encoder-min-qp-text">Min QP</label>
-                                                        <input type="number" class="form-control form-control-sm"
-                                                            id="encoder-min-qp-text" value="0" min="0" max="51" />
-                                                    </div>
-
-                                                    <div class="form-group row">
-                                                        <label for="encoder-max-qp-text">Max QP</label>
-                                                        <input type="number" class="form-control form-control-sm"
-                                                            id="encoder-max-qp-text" value="51" min="0" max="51" />
-                                                    </div>
-                                                    <input id="btn-encoder-settings" class="streamTools-button btn-flat"
-                                                        type="button" value="Apply">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <div class="col-sm">
-                                                <div>WebRTC Settings</div>
-                                                <div id="webrtcSettings">
-                                                    <div class="form-group row">
-                                                        <label for="webrtc-fps-text">FPS</label>
-                                                        <input type="number" class="form-control form-control-sm"
-                                                            id="webrtc-fps-text" value="0" min="1" max="999" />
-                                                    </div>
-                                                    <div class="form-group row">
-                                                        <label for="webrtc-min-bitrate-text">Min bitrate (kbps)</label>
-                                                        <input type="number" class="form-control form-control-sm"
-                                                            id="webrtc-min-bitrate-text" value="0" min="0"
-                                                            max="100000" />
-                                                    </div>
-                                                    <div class="form-group row">
-                                                        <label for="webrtc-max-bitrate-text">Max bitrate (kbps)</label>
-                                                        <input type="number" class="form-control form-control-sm"
-                                                            id="webrtc-max-bitrate-text" value="0" min="0"
-                                                            max="100000" />
-                                                    </div>
-                                                    <input id="btn-webrtc-settings" class="streamTools-button btn-flat"
-                                                        type="button" value="Apply">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </section> -->
-                            <!-- </div>
-                        </div> -->
+                        <section id="webRTCSettings">
+                            <div id="webRTCSettingsHeader" class="settingsHeader settings-text">
+                                <div>WebRTC Settings</div>
+                            </div>
+                            <div id="webrtcParamsContainer" class="collapse">
+                                <div class="form-group">
+                                    <label for="webrtc-fps-text">FPS</label>
+                                    <input type="number" class="form-control" id="webrtc-fps-text" value="60" min="1"
+                                        max="999" />
+                                    <label for="webrtc-min-bitrate-text">Min bitrate (kbps)</label>
+                                    <input type="number" class="form-control" id="webrtc-min-bitrate-text" value="0" min="0"
+                                        max="100000" />
+                                    <label for="webrtc-max-bitrate-text">Max bitrate (kbps)</label>
+                                    <input type="number" class="form-control" id="webrtc-max-bitrate-text" value="0" min="0"
+                                        max="100000" />
+                                    <br>
+                                    <input id="webrtc-params-submit" class="overlay-button btn-flat" type="button"
+                                        value="Apply">
+                                </div>
+                            </div>
+                        </section>
                     </div>
                 </div>
             </div>

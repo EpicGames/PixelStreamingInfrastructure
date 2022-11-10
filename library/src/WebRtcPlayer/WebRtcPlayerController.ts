@@ -1,6 +1,6 @@
 import { WebSocketController } from "../WebSockets/WebSocketController";
 import { StreamController } from "../VideoPlayer/StreamController";
-import { MessageInstanceState, MessageAnswer, MessageAuthResponse, MessageConfig } from "../WebSockets/MessageReceive";
+import { MessageInstanceState, MessageAnswer, MessageOffer, MessageAuthResponse, MessageConfig } from "../WebSockets/MessageReceive";
 import { UiController } from "../Ui/UiController";
 import { FreezeFrameController } from "../FreezeFrame/FreezeFrameController";
 import { AfkLogic } from "../Afk/AfkLogic";
@@ -614,30 +614,54 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		// When the signaling server sends a WebRTC Answer over the websocket connection have the WebRtcController handle the message
 		this.webSocketController.onWebRtcAnswer = (messageAnswer: MessageReceive.MessageAnswer) => this.handleWebRtcAnswer(messageAnswer);
+		this.webSocketController.onWebRtcOffer = (messageOffer: MessageReceive.MessageOffer) => this.handleWebRtcOffer(messageOffer);
 
 		// When the signaling server sends a IceCandidate over the websocket connection have the WebRtcController handle the message
 		this.webSocketController.onIceCandidate = (iceCandidate: RTCIceCandidateInit) => this.handleIceCandidate(iceCandidate);
 	}
 
 	/**
-	 * Handle the RTC Answer from the signaling server
-	 * @param Answer - Answer Message from the Signaling server
+	 * Process SDP passed through the signalling server from our remote peer.
+	 * @param sdp The remote peer sdp (might be offer or answer).
 	 */
-	handleWebRtcAnswer(Answer: MessageAnswer) {
-		Logger.Log(Logger.GetStackTrace(), "There is an answer", 6);
-
-		let sdpAnswer: RTCSessionDescriptionInit = {
-			sdp: Answer.sdp,
-			type: "answer"
-		}
-
-		this.peerConnectionController.handleAnswer(sdpAnswer);
+	handleWebRtcRemoteSdp(sdp : RTCSessionDescriptionInit){
+		this.peerConnectionController.setRemoteSdp(sdp);
 
 		// start the afk warning timer as PS is now running
 		this.afkLogic.startAfkWarningTimer();
 
 		// show the overlay that we have an answer
-		this.delegate.onWebRtcAnswer();
+		this.delegate.onWebRtcSdp();
+	}
+
+	/**
+	 * Handle the RTC Answer from the signaling server
+	 * @param Answer - Answer sdp from the peer.
+	 */
+	handleWebRtcAnswer(Answer: MessageAnswer) {
+		Logger.Log(Logger.GetStackTrace(), `Got answer sdp ${Answer.sdp}`, 6);
+
+		const sdpAnswer: RTCSessionDescriptionInit = {
+			sdp: Answer.sdp,
+			type: "answer"
+		}
+
+		this.handleWebRtcRemoteSdp(sdpAnswer);
+	}
+
+	/**
+	 * Handle the RTC offer from a WebRTC peer (received through the signalling server).
+	 * @param Offer - Offer SDP from the peer.
+	 */
+	handleWebRtcOffer(Offer: MessageOffer) {
+		Logger.Log(Logger.GetStackTrace(), `Got offer sdp ${Offer.sdp}`, 6);
+
+		const sdpAnswer: RTCSessionDescriptionInit = {
+			sdp: Offer.sdp,
+			type: "offer"
+		}
+
+		//this.handleWebRtcRemoteSdp(sdpAnswer);
 	}
 
 	/**
@@ -647,7 +671,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	handleIceCandidate(iceCandidate: RTCIceCandidateInit) {
 		Logger.Log(Logger.GetStackTrace(), "Web RTC Controller: onWebRtcIce", 6);
 
-		let candidate = new RTCIceCandidate(iceCandidate);
+		const candidate = new RTCIceCandidate(iceCandidate);
 		this.peerConnectionController.handleOnIce(candidate);
 	}
 

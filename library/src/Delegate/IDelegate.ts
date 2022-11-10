@@ -175,9 +175,9 @@ export interface IDelegate {
 	onAuthenticationResponse(authResponse: MessageAuthResponse): void;
 
 	/**
-	 * Set up functionality to happen when receiving a webRTC answer
+	 * Set up functionality to happen when receiving a webRTC sdp
 	 */
-	onWebRtcAnswer(): void;
+	onWebRtcSdp(): void;
 
 	/**
 	 * Event fired when the video is disconnected

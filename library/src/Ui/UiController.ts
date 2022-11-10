@@ -68,7 +68,7 @@ export class UiController {
         let videoElement = this.videoPlayerProvider.getVideoElement() as any;
         let videoElementParent = this.videoPlayerProvider.getVideoParentElement() as any;
 
-        if (videoElement.length > 0) {
+        if (videoElement) {
             // Display image in its actual size
             this.playerStyleAttributes.styleWidth = videoElement.videoWidth;
             this.playerStyleAttributes.styleHeight = videoElement.videoHeight;

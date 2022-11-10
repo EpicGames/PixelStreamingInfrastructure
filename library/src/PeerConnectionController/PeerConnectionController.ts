@@ -110,10 +110,10 @@ export class PeerConnectionController {
 
     /**
      * Set the Remote Descriptor from the signaling server to the RTC Peer Connection 
-     * @param sdpAnswer - RTC Session Descriptor from the Signaling Server
+     * @param sdp - RTC Session Descriptor from the Signaling Server
      */
-    handleAnswer(sdpAnswer: RTCSessionDescriptionInit) {
-        this.peerConnection.setRemoteDescription(sdpAnswer);
+    setRemoteSdp(sdp: RTCSessionDescriptionInit) {
+        this.peerConnection.setRemoteDescription(sdp);
     }
 
     /**

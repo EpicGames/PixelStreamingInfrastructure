@@ -234,8 +234,8 @@ export class DelegateBase implements IDelegate {
 	/**
 	 * Set up functionality to happen when receiving a webRTC answer 
 	 */
-	onWebRtcAnswer() {
-		this.showTextOverlay("RTC Answer");
+	onWebRtcSdp() {
+		this.showTextOverlay("Remote SDP received.");
 	}
 
 	/**

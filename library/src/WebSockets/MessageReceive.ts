@@ -86,6 +86,13 @@ export class MessageAnswer extends MessageRecv {
 }
 
 /**
+ * WebRTC sdp offer message wrapper.
+ */
+export class MessageOffer extends MessageRecv {
+    sdp: string;
+}
+
+/**
  * Ice Candidate Message wrapper
  */
 export class MessageIceCandidate extends MessageRecv {
