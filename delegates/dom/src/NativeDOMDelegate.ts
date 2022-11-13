@@ -4,6 +4,8 @@ import { VideoQpIndicator } from './VideoQpIndicator';
 import { ActionOverlayBase, AfkOverlayBase, TextOverlayBase } from './Overlays';
 import { FullScreenLogic } from './Fullscreen';
 import { OnScreenKeyboard } from './OnScreenKeyboard';
+import { SettingFlag } from "@tensorworks/libspsfrontend"
+
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	config: libspsfrontend.Config;
 	latencyStartTime: number;
@@ -26,8 +28,19 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	settingsPanel = document.getElementById('settings-panel') as HTMLDivElement;
 	statsPanel = document.getElementById('stats-panel') as HTMLDivElement;
 
+	qualityControlSetting = new SettingFlag(
+		"ControlsQuality", 
+		"Is quality controller?", 
+		"True if this peer controls stream quality", 
+		true,
+		(isQualityController)=>{ 
+			if (!isQualityController === false) {
+				this.iWebRtcController.sendRequestQualityControlOwnership();
+			}
+		}
+	);
+
 	// Pre Stream options
-	offerToReceiveToggle = document.getElementById("offer-receive-tgl") as HTMLInputElement;
 	preferSfuToggle = document.getElementById("prefer-sfu-tgl") as HTMLInputElement;
 	useMicrophoneToggle = document.getElementById("use-microphone-tgl") as HTMLInputElement;
 	forceMonoAudioToggle = document.getElementById("force-mono-tgl") as HTMLInputElement;
@@ -36,13 +49,9 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 	// Viewing
 	enlargeDisplayToFillWindow = document.getElementById("enlarge-display-to-fill-window-tgl") as HTMLInputElement;
-	qualityControlOwnershipCheckBox = document.getElementById("quality-control-ownership-tgl") as HTMLInputElement;
 	toggleMatchViewPortRes = document.getElementById("match-viewport-res-tgl") as HTMLInputElement;
 	controlSchemeToggle = document.getElementById("control-scheme-tgl") as HTMLInputElement;
 	controlSchemeToggleTitle = document.getElementById("control-scheme-title") as HTMLDivElement;
-
-	// Commands
-	uiDescriptorText = document.getElementById("ui-descriptor-text") as HTMLInputElement;
 
 	// Settings
 	encoderMinQpText = document.getElementById("encoder-min-qp-text") as HTMLInputElement;
@@ -54,6 +63,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 	// Statistics
 	sendStatsToServer = document.getElementById("send-stats-tgl") as HTMLInputElement;
+
 
 	// Containers Headers
 	// preStreamContainer = document.getElementById("preStreamOptionsHeader") as HTMLDivElement;
@@ -437,8 +447,19 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		document.getElementById('statsBtn').onclick = () => this.statsClicked();
 		document.getElementById('statsClose').onclick = () => this.statsClicked();
 
-		// setup the url toggles
-		this.setUpToggleWithUrlParams(this.offerToReceiveToggle, "offerToReceive");
+		const settingsContainer = document.getElementById("preStreamOptions");
+		settingsContainer.appendChild(this.qualityControlSetting.rootElement);
+
+		// Setup the toggable settings that can be set in UI by clicking the toggle or via a URL query string parameter.
+
+		const sendSDPAnswerSetting = new SettingFlag(
+			"offerToReceive", 
+			"Browser send answer", 
+			"Browser will hint it would like to send the sdp answer.", 
+			false, 
+			()=>{});
+
+		settingsContainer.appendChild(sendSDPAnswerSetting.rootElement);
 
 		this.setUpToggleWithUrlParams(this.preferSfuToggle, "preferSFU");
 
@@ -498,13 +519,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.toggleMatchViewPortRes.onchange = () => {
 			this.iWebRtcController.matchViewportResolution = this.toggleMatchViewPortRes.checked;
 			this.iWebRtcController.updateVideoStreamSize();
-		};
-
-		// quality control ownership checkbox 
-		this.qualityControlOwnershipCheckBox.onchange = () => {
-			if (this.qualityControlOwnershipCheckBox.checked === false) {
-				this.iWebRtcController.sendRequestQualityControlOwnership();
-			}
 		};
 
 		this.afkToggle.onchange = () => {
@@ -782,7 +796,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 * @param hasQualityOwnership - flag if the user has quality ownership
 	 */
 	onQualityControlOwnership(hasQualityOwnership: boolean): void {
-		this.qualityControlOwnershipCheckBox.checked = hasQualityOwnership;
+		this.qualityControlSetting.value = hasQualityOwnership;
 	}
 
 	/**

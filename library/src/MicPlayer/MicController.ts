@@ -13,7 +13,7 @@ export class MicController {
         this.useMic = urlParams.has('useMic');
 
         if (this.useMic) {
-            Logger.Info(Logger.GetStackTrace(), "Microphone access is enabled IT IS EXPERIMENTAL AND IS NOT PROPERLY SUPPORTED ACROSS UE. IF IT DOES NOT WORK ITS YOUR OWN FAULT! YOU HAVE BEEN TOLD.");
+            Logger.Info(Logger.GetStackTrace(), "Microphone access is enabled... IT IS EXPERIMENTAL SO BEWARE.");
         }
 
         // if (!this.useMic) {
