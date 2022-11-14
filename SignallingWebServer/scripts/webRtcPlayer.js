@@ -201,7 +201,7 @@ function webRtcPlayer(parOptions) {
             handleOnAudioTrack(e.streams[0]);
             return;
         }
-        else(e.track.kind == "video")
+        else if(e.track.kind == "video")
         {
             for (const s of e.streams) {
                 if (!self.availableVideoStreams.has(s.id)) {
