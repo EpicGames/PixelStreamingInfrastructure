@@ -8,8 +8,8 @@ export class SettingFlag extends SettingBase {
     /* This element contains a text node that reflects the setting's text label. */
     _settingsTextElem : HTMLElement;
 
-    constructor(id: string, label: string, description: string, defaultFlagValue: boolean, onChange: (newFlag: boolean) => void) {
-        super(id, label, description, defaultFlagValue, onChange);
+    constructor(id: string, label: string, description: string, defaultFlagValue: boolean) {
+        super(id, label, description, defaultFlagValue);
 
         // parse flag from url parameters
         const urlParamFlag = this.getUrlParamFlag();
@@ -70,6 +70,7 @@ export class SettingFlag extends SettingBase {
             this._rootElement.appendChild(wrapperLabel);
 
             // create input type=checkbox
+            this.checkbox.title = this.description;
             this.checkbox.classList.add("tgl");
             this.checkbox.classList.add("tgl-flat");
             const slider = document.createElement("div");

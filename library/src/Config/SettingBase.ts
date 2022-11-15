@@ -9,12 +9,12 @@ export class SettingBase {
     _rootElement: HTMLElement;
     onChange: (changedValue: unknown) => void;
 
-    constructor(id: string, label: string, description: string, defaultSettingValue: unknown, onChange: (changedValue: unknown) => void) {
+    constructor(id: string, label: string, description: string, defaultSettingValue: unknown) {
         this.id = id;
         this.description = description;
         this.label = label;
         this.value = defaultSettingValue;
-        this.onChange = onChange;
+        this.onChange = ()=>{ /* Do nothing, to be overridden. */ };
     }
 
     /**

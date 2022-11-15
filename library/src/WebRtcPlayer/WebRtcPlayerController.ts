@@ -10,13 +10,12 @@ import { KeyboardController } from "../Inputs/KeyboardController";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { IWebRtcPlayerController } from "./IWebRtcPlayerController";
 import { IDelegate } from "../Delegate/IDelegate";
-import { Config } from "../Config/Config";
+import { Config, Flags } from "../Config/Config";
 import { Encoder, InitialSettings, WebRTC } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
 import { Logger } from "../Logger/Logger";
 import { FileLogic } from "../FileManager/FileLogic";
 import { InputClassesFactory } from "../Inputs/InputClassesFactory";
-import { MicController } from "../MicPlayer/MicController";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 import { StreamMessageController, MessageDirection } from "../UeInstanceMessage/StreamMessageController";
 import { ResponseController } from "../UeInstanceMessage/ResponseController";
@@ -51,7 +50,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	uiController: UiController;
 	inputClassesFactory: InputClassesFactory;
 	freezeFrameController: FreezeFrameController;
-	shouldShowPlayOverlay: boolean = true;
+	shouldShowPlayOverlay = true;
 	afkLogic: AfkLogic;
 	videoElementParentClientRect: DOMRect;
 	lastTimeResized = new Date().getTime();
@@ -74,10 +73,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
 	// it will use this property to store the override message string
 	disconnectMessageOverride: string;
-
-	// for mic support 
-	urlParams: URLSearchParams;
-	micController: MicController;
 
 	/**
 	 * 
@@ -156,11 +151,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param event - Message Event
 	 */
 	handelOnMessage(event: MessageEvent) {
-		let message = new Uint8Array(event.data);
+		const message = new Uint8Array(event.data);
 		Logger.Log(Logger.GetStackTrace(), "Message incoming:" + message, 6);
 
 		//try {
-		let messageType = this.streamMessageController.fromStreamerMessages.getFromValue(message[0]);
+		const messageType = this.streamMessageController.fromStreamerMessages.getFromValue(message[0]);
 		this.streamMessageController.fromStreamerHandlers.get(messageType)(event.data);
 		//} catch (e) {
 		//Logger.Error(Logger.GetStackTrace(), `Custom data channel message with message type that is unknown to the Pixel Streaming protocol. Does your PixelStreamingProtocol need updating? The message type was: ${message[0]}`);
@@ -223,10 +218,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	onCommand(message: Uint16Array) {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.Command", 6);
-		let commandAsString = new TextDecoder("utf-16").decode(message.slice(1));
+		const commandAsString = new TextDecoder("utf-16").decode(message.slice(1));
 
 		Logger.Log(Logger.GetStackTrace(), "Data Channel Command: " + commandAsString, 6);
-		let command = JSON.parse(commandAsString);
+		const command = JSON.parse(commandAsString);
 		if (command.command === "onScreenKeyboard") {
 			this.delegate.activateOnScreenKeyboard(command);
 		}
@@ -238,16 +233,16 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	onProtocolMessage(message: Uint8Array) {
 		try {
-			let protocolString = new TextDecoder("utf-16").decode(message.slice(1));
-			let protocolJSON = JSON.parse(protocolString);
+			const protocolString = new TextDecoder("utf-16").decode(message.slice(1));
+			const protocolJSON = JSON.parse(protocolString);
 			if (!protocolJSON.hasOwnProperty("Direction")) {
 				Logger.Error(Logger.GetStackTrace(), 'Malformed protocol received. Ensure the protocol message contains a direction');
 			}
-			let direction = protocolJSON.Direction;
+			const direction = protocolJSON.Direction;
 			delete protocolJSON.Direction;
 			Logger.Log(Logger.GetStackTrace(), `Received new ${direction == MessageDirection.FromStreamer ? "FromStreamer" : "ToStreamer"} protocol. Updating existing protocol...`);
 			Object.keys(protocolJSON).forEach((messageType) => {
-				let message = protocolJSON[messageType];
+				const message = protocolJSON[messageType];
 				switch (direction) {
 					case MessageDirection.ToStreamer:
 						// Check that the message contains all the relevant params
@@ -305,7 +300,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	onInputControlOwnership(message: Uint8Array) {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.InputControlOwnership", 6);
-		let inputControlOwnership = new Boolean(message[1]).valueOf();
+		const inputControlOwnership = new Boolean(message[1]).valueOf();
 		Logger.Log(Logger.GetStackTrace(), `Received input controller message - will your input control the stream: ${inputControlOwnership}`);
 		this.delegate.onInputControlOwnership(inputControlOwnership);
 	}
@@ -313,8 +308,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	onAfkTriggered() : void {
 		this.afkLogic.onAfkClick();
 
-		// if the stream is paused play it
-		if (this.videoPlayer.videoElement.paused === true) {
+		// if the stream is paused play it, if we can
+		if (this.videoPlayer.videoElement.paused === true && this.videoPlayer.videoElement.srcObject) {
 			this.playStream();
 		}
 	}
@@ -324,7 +319,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	* @param afkEnabled If true we timeout when idle for some given amount of time.
 	*/
 	setAfkEnabled(afkEnabled : boolean) : void {
-		this.config.afkDetectionEnabled = afkEnabled;
 		if(afkEnabled){
 			this.onAfkTriggered();
 		} else {
@@ -359,7 +353,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.closeSignalingServer();
 
 			// wait for the connection to close and restart the connection
-			let autoConnectTimeout = setTimeout(() => {
+			const autoConnectTimeout = setTimeout(() => {
 				this.delegate.onWebRtcAutoConnect();
 				this.connectToSignallingSever();
 				clearTimeout(autoConnectTimeout);
@@ -406,7 +400,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	onFreezeFrameMessage(message: Uint8Array) {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.FreezeFrame", 6);
-		let view = new Uint8Array(message);
+		const view = new Uint8Array(message);
 		this.freezeFrameController.processFreezeFrameMessage(view, () => this.loadFreezeFrameOrShowPlayOverlay());
 	}
 
@@ -428,7 +422,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param data the file extension data  
 	 */
 	onFileExtension(data: any) {
-		let view = new Uint8Array(data);
+		const view = new Uint8Array(data);
 		this.fileLogic.processFileExtension(view);
 	}
 
@@ -437,7 +431,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param data the file mime type data  
 	 */
 	onFileMimeType(data: any) {
-		let view = new Uint8Array(data);
+		const view = new Uint8Array(data);
 		this.fileLogic.processFileMimeType(view);
 	}
 
@@ -446,7 +440,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param data the file contents data  
 	 */
 	onFileContents(data: any) {
-		let view = new Uint8Array(data);
+		const view = new Uint8Array(data);
 		this.fileLogic.processFileContents(view);
 	}
 
@@ -454,6 +448,12 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Plays the stream audio and video source and sets up other pieces while the stream starts
 	 */
 	playStream() {
+
+		if(!this.videoPlayer.videoElement.srcObject){
+			console.warn("Cannot play stream, the video element has no srcObject to play.");
+			return;
+		}
+
 		if (!this.videoPlayer.videoElement) {
 			this.delegate.showErrorOverlay("Could not player video stream because the video player was not initialised correctly.");
 			Logger.Error(Logger.GetStackTrace(), "Could not player video stream because the video player was not initialised correctly.");
@@ -527,14 +527,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @remark RTC Peer Connection on Ice Candidate event have it handled by handle Send Ice Candidate
 	 */
 	startSession(peerConfig: RTCConfiguration) {
-		// set up url params for STUN, Mic and SFU
-		this.urlParams = new URLSearchParams(window.location.search);
-
-		const hasForceTURN = this.urlParams.has('ForceTURN');
-		const hasForceMonoAudio = this.urlParams.has('ForceMonoAudio');
 
 		// check for forcing turn
-		if (hasForceTURN) {
+		if (this.config.isFlagEnabled(Flags.ForceTURN)) {
 			// check for a turn server
 			const hasTurnServer = this.checkTurnServerAvailability(peerConfig);
 
@@ -548,10 +543,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		}
 
 		// set up the peer connection controller
-		this.peerConnectionController = new PeerConnectionController(peerConfig, hasForceTURN, hasForceMonoAudio);
-
-		//set up mic controller
-		this.micController = new MicController(this.urlParams)
+		this.peerConnectionController = new PeerConnectionController(peerConfig, this.config);
 
 		// set up peer connection controller video stats
 		this.peerConnectionController.onVideoStats = (event: AggregatedStats) => this.handleVideoStats(event);
@@ -573,7 +565,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.peerConnectionController.onTrack = (trackEvent: RTCTrackEvent) => this.streamController.handleOnTrack(trackEvent);
 
 		/* Start the Hand shake process by creating an Offer */
-		this.peerConnectionController.createOffer(this.sdpConstraints, this.micController.useMic);
+		this.peerConnectionController.createOffer(this.sdpConstraints, this.config);
 	}
 
 	/**
@@ -740,14 +732,14 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			return;
 		}
 
-		let now = new Date().getTime();
+		const now = new Date().getTime();
 		if (now - this.lastTimeResized > 1000) {
-			let videoElementParent = this.config.videoElementParent;
+			const videoElementParent = this.config.videoElementParent;
 			if (!videoElementParent) {
 				return;
 			}
 
-			let descriptor = {
+			const descriptor = {
 				"Resolution.Width": videoElementParent.clientWidth,
 				"Resolution.Height": videoElementParent.clientHeight
 			};
@@ -876,9 +868,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	handleLatencyTestResult(message: Uint8Array) {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.latencyTest", 6);
-		let latencyAsString = new TextDecoder("utf-16").decode(message.slice(1));
-		let iLatencyTestResults: ILatencyTestResults = JSON.parse(latencyAsString);
-		let latencyTestResults: LatencyTestResults = new LatencyTestResults();
+		const latencyAsString = new TextDecoder("utf-16").decode(message.slice(1));
+		const iLatencyTestResults: ILatencyTestResults = JSON.parse(latencyAsString);
+		const latencyTestResults: LatencyTestResults = new LatencyTestResults();
 		Object.assign(latencyTestResults, iLatencyTestResults);
 		latencyTestResults.processFields();
 
@@ -901,9 +893,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	handleInitialSettings(message: Uint8Array) {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.InitialSettings", 6);
-		let payloadAsString = new TextDecoder("utf-16").decode(message.slice(1));
-		let iInitialSettings: IInitialSettings = JSON.parse(payloadAsString);
-		let initialSettings: InitialSettings = new InitialSettings();
+		const payloadAsString = new TextDecoder("utf-16").decode(message.slice(1));
+		const iInitialSettings: IInitialSettings = JSON.parse(payloadAsString);
+		const initialSettings: InitialSettings = new InitialSettings();
 		Object.assign(initialSettings, iInitialSettings);
 		initialSettings.ueCompatible()
 		Logger.Log(Logger.GetStackTrace(), payloadAsString, 6);
@@ -917,7 +909,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	handleVideoEncoderAvgQP(message: Uint8Array) {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.VideoEncoderAvgQP", 6);
-		let AvgQP = Number(new TextDecoder("utf-16").decode(message.slice(1)));
+		const AvgQP = Number(new TextDecoder("utf-16").decode(message.slice(1)));
 		this.delegate.onVideoEncoderAvgQP(AvgQP);
 	}
 
@@ -927,7 +919,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	onQualityControlOwnership(message: Uint8Array) {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.QualityControlOwnership", 6);
-		let QualityOwnership = new Boolean(message[1]).valueOf();
+		const QualityOwnership = new Boolean(message[1]).valueOf();
 		Logger.Log(Logger.GetStackTrace(), `Received quality controller message, will control quality: ${QualityOwnership}`);
 		this.delegate.onQualityControlOwnership(QualityOwnership);
 	}

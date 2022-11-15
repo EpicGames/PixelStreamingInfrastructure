@@ -1,4 +1,4 @@
-import { Config, ControlSchemeType } from "../Config/Config";
+import { Config, ControlSchemeType, Flags } from "../Config/Config";
 import { Logger } from "../Logger/Logger";
 export class AfkLogic {
     // time out logic details 
@@ -17,7 +17,6 @@ export class AfkLogic {
      * The methods that occur when an afk event listener is clicked
      */
     onAfkClick() {
-        this.hideCurrentOverlay();
         clearInterval(this.countDownTimer);
         this.startAfkWarningTimer();
     }
@@ -26,7 +25,7 @@ export class AfkLogic {
      * Start the warning timer if a timeout is set greater that 0 seconds   
      */
     startAfkWarningTimer() {
-        if (this.config.afkTimeout > 0 && this.config.afkDetectionEnabled) {
+        if (this.config.afkTimeout > 0 && this.config.isFlagEnabled(Flags.AFKDetection)) {
             this.active = true;
         } else {
             this.active = false;
@@ -54,7 +53,7 @@ export class AfkLogic {
      * If the user interacts then reset the warning timer.  
      */
     resetAfkWarningTimer() {
-        if (this.active && this.config.afkDetectionEnabled) {
+        if (this.active && this.config.isFlagEnabled(Flags.AFKDetection)) {
             clearTimeout(this.warnTimer);
             this.warnTimer = setTimeout(() => this.activateAfkEvent(), this.config.afkTimeout * 1000);
         }

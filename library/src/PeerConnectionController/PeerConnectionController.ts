@@ -1,4 +1,5 @@
 import { Logger } from "../Logger/Logger";
+import { Config, Flags } from "../Config/Config";
 import { AggregatedStats } from "./AggregatedStats";
 
 /**
@@ -7,21 +8,19 @@ import { AggregatedStats } from "./AggregatedStats";
 export class PeerConnectionController {
     peerConnection: RTCPeerConnection;
     aggregatedStats: AggregatedStats;
-    forceTurn: boolean;
-    forceMonoAudio: boolean;
+    config: Config;
 
     /**
      * Create a new RTC Peer Connection client
      * @param options - Peer connection Options
-     * @param forceTurn - if turn is being enforced
+     * @param config - The config for our PS experience.
      */
-    constructor(options: RTCConfiguration, forceTurn: boolean, forceMonoAudio: boolean) {
+    constructor(options: RTCConfiguration, config: Config) {
 
-        // Set the turn state to true or false for rtc options
-        this.forceTurn = forceTurn;
-        this.forceMonoAudio = forceMonoAudio;
+        this.config = config;
 
-        if (this.forceTurn === true) {
+        // Set the ICE transport to relay if TURN enabled
+        if (config.isFlagEnabled(Flags.ForceTURN)) {
             options.iceTransportPolicy = "relay";
             Logger.Log(Logger.GetStackTrace(), "Forcing TURN usage by setting ICE Transport Policy in peer connection config.");
         }
@@ -40,10 +39,19 @@ export class PeerConnectionController {
      * Create an offer for the Web RTC handshake and send the offer to the signaling server via websocket
      * @param offerOptions - RTC Offer Options
      */
-    createOffer(offerOptions: RTCOfferOptions, useMic: boolean) {
+    createOffer(offerOptions: RTCOfferOptions, config: Config) {
         Logger.Log(Logger.GetStackTrace(), "Create Offer", 6);
 
-        this.setupTracksToSendAsync(useMic).finally(() => { });
+        const isLocalhostConnection = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+        const isHttpsConnection = location.protocol === 'https:';
+        let useMic = config.isFlagEnabled(Flags.UseMic);
+        if (useMic && isLocalhostConnection && !isHttpsConnection) {
+            useMic = false;
+            Logger.Error(Logger.GetStackTrace(), "Microphone access in the browser will not work if you are not on HTTPS or localhost. Disabling mic access.");
+            Logger.Error(Logger.GetStackTrace(), "For testing you can enable HTTP microphone access Chrome by visiting chrome://flags/ and enabling 'unsafely-treat-insecure-origin-as-secure'");
+        }
+
+        this.setupTracksToSendAsync(useMic).finally(() => { /* TODO: Handling when tracks are finally done setting up/failing to setup. */ });
 
         this.peerConnection.createOffer(offerOptions).then((offer: RTCSessionDescriptionInit) => {
             this.showTextOverlayConnecting();
@@ -97,7 +105,7 @@ export class PeerConnectionController {
         }
 
         // Force mono or stereo based on whether ?forceMono was passed or not
-        audioSDP += this.forceMonoAudio ? 'sprop-stereo=0;stereo=0;' : 'sprop-stereo=1;stereo=1;';
+        audioSDP += this.config.isFlagEnabled(Flags.ForceMonoAudio) ? 'sprop-stereo=0;stereo=0;' : 'sprop-stereo=1;stereo=1;';
 
         // enable in-band forward error correction for opus audio
         audioSDP += 'useinbandfec=1';
@@ -124,7 +132,7 @@ export class PeerConnectionController {
         Logger.Log(Logger.GetStackTrace(), "peerconnection handleOnIce", 6);
 
         // // if forcing TURN, reject any candidates not relay
-        if (this.forceTurn) {
+        if (this.config.isFlagEnabled(Flags.ForceTURN)) {
             // check if no relay address is found, if so, we are assuming it means no TURN server
             if (iceCandidate.candidate.indexOf("relay") < 0) {
                 Logger.Info(Logger.GetStackTrace(), `Dropping candidate because it was not TURN relay. | Type= ${iceCandidate.type} | Protocol= ${iceCandidate.protocol} | Address=${iceCandidate.address} | Port=${iceCandidate.port} |`, 6);
@@ -194,7 +202,7 @@ export class PeerConnectionController {
      */
     async setupTracksToSendAsync(useMic: boolean) {
 
-        let hasTransceivers = this.peerConnection.getTransceivers().length > 0;
+        const hasTransceivers = this.peerConnection.getTransceivers().length > 0;
 
         // Setup a transceiver for getting UE video
         this.peerConnection.addTransceiver("video", { direction: "recvonly" });
@@ -206,7 +214,7 @@ export class PeerConnectionController {
         else {
 
             // set the audio options based on mic usage
-            let audioOptions = useMic ?
+            const audioOptions = useMic ?
                 {
                     autoGainControl: false,
                     channelCount: 1,
@@ -219,7 +227,7 @@ export class PeerConnectionController {
                 } : false;
 
             // set the media send options 
-            let mediaSendOptions: MediaStreamConstraints = {
+            const mediaSendOptions: MediaStreamConstraints = {
                 video: false,
                 audio: audioOptions,
             }
@@ -228,7 +236,7 @@ export class PeerConnectionController {
             const stream = await navigator.mediaDevices.getUserMedia(mediaSendOptions);
             if (stream) {
                 if (hasTransceivers) {
-                    for (let transceiver of this.peerConnection.getTransceivers()) {
+                    for (const transceiver of this.peerConnection.getTransceivers()) {
                         if (transceiver && transceiver.receiver && transceiver.receiver.track && transceiver.receiver.track.kind === "audio") {
                             for (const track of stream.getTracks()) {
                                 if (track.kind && track.kind == "audio") {
