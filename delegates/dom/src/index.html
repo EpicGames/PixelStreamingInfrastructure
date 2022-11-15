@@ -15,18 +15,6 @@
     <link id="favSvg" rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <link id="favPng" rel="icon" type="image/png" href="./assets/images/favicon.png">
 
-    <script type="text/javascript">
-        var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-        if (isFirefox) {
-            window.navigator.mozGetUserMedia = function () { };
-            if (window.navigator.mediaDevices === undefined) {
-                navigator.mediaDevices = {};
-                navigator.mediaDevices.getSupportedConstraints = function () { return {}; };
-                navigator.mediaDevices.getUserMedia = function () { return {}; };
-            }
-        }
-    </script>
-
     <title>Scalable Pixel Streaming</title>
 </head>
 
@@ -78,54 +66,6 @@
                     <div id="settingsHeading">Settings</div>
                     <div id="settingsClose"></div>
                     <div id="settingsContent">
-                        <section id="preStreamOptions" class="settingsContainer">
-
-                            <div id="preStreamOptionsHeader" class="settingsHeader settings-text">
-                                <div>Pixel Streaming</div>
-                            </div>
-
-                            <div id="preferSFU" class="setting">
-                                <div title="Try to connect to the SFU instead of P2P." class="settings-text">Prefer SFU</div>
-                                <label class="tgl-switch">
-                                    <input type="checkbox" id="prefer-sfu-tgl" class="tgl tgl-flat">
-                                    <div class="tgl-slider"></div>
-                                </label>
-                            </div>
-
-                            <div id="useMic" class="setting">
-                                <div class="settings-text">Use microphone</div>
-                                <label class="tgl-switch">
-                                    <input type="checkbox" id="use-microphone-tgl" class="tgl tgl-flat">
-                                    <div class="tgl-slider"></div>
-                                </label>
-                            </div>
-
-                            <div id="forceMonoAudio" class="setting">
-                                <div class="settings-text">Force mono audio</div>
-                                <label class="tgl-switch">
-                                    <input type="checkbox" id="force-mono-tgl" class="tgl tgl-flat">
-                                    <div class="tgl-slider"></div>
-                                </label>
-                            </div>
-
-                            <div id="forceTURN" class="setting">
-                                <div title="Only generate TURN/Relayed ICE candidates." class="settings-text">Force TURN</div>
-                                <label class="tgl-switch">
-                                    <input type="checkbox" id="force-turn-tgl" class="tgl tgl-flat">
-                                    <div class="tgl-slider"></div>
-                                </label>
-                            </div>
-
-                            <div id="afkIfIdle" class="setting">
-                                <div class="settings-text">Disconnect if idle</div>
-                                <label class="tgl-switch">
-                                    <input type="checkbox" id="afk-toggle" class="tgl tgl-flat">
-                                    <div class="tgl-slider"></div>
-                                </label>
-                            </div>
-
-                        </section>
-
                         <section id="viewSettings" class="settingsContainer">
                             <div id="viewSettingsHeader" class="settingsHeader settings-text">
                                 <div>UI</div>

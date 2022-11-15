@@ -4,7 +4,7 @@ import { VideoQpIndicator } from './VideoQpIndicator';
 import { ActionOverlayBase, AfkOverlayBase, TextOverlayBase } from './Overlays';
 import { FullScreenLogic } from './Fullscreen';
 import { OnScreenKeyboard } from './OnScreenKeyboard';
-import { SettingFlag } from "@tensorworks/libspsfrontend"
+import { Flags } from "@tensorworks/libspsfrontend"
 
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	config: libspsfrontend.Config;
@@ -28,25 +28,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	settingsPanel = document.getElementById('settings-panel') as HTMLDivElement;
 	statsPanel = document.getElementById('stats-panel') as HTMLDivElement;
 
-	qualityControlSetting = new SettingFlag(
-		"ControlsQuality", 
-		"Is quality controller?", 
-		"True if this peer controls stream quality", 
-		true,
-		(isQualityController)=>{ 
-			if (!isQualityController === false) {
-				this.iWebRtcController.sendRequestQualityControlOwnership();
-			}
-		}
-	);
-
-	// Pre Stream options
-	preferSfuToggle = document.getElementById("prefer-sfu-tgl") as HTMLInputElement;
-	useMicrophoneToggle = document.getElementById("use-microphone-tgl") as HTMLInputElement;
-	forceMonoAudioToggle = document.getElementById("force-mono-tgl") as HTMLInputElement;
-	forceTurnToggle = document.getElementById("force-turn-tgl") as HTMLInputElement;
-	afkToggle = document.getElementById("afk-toggle") as HTMLInputElement;
-
 	// Viewing
 	enlargeDisplayToFillWindow = document.getElementById("enlarge-display-to-fill-window-tgl") as HTMLInputElement;
 	toggleMatchViewPortRes = document.getElementById("match-viewport-res-tgl") as HTMLInputElement;
@@ -64,27 +45,13 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	// Statistics
 	sendStatsToServer = document.getElementById("send-stats-tgl") as HTMLInputElement;
 
-
-	// Containers Headers
-	// preStreamContainer = document.getElementById("preStreamOptionsHeader") as HTMLDivElement;
-	// viewSettingsHeader = document.getElementById("viewSettingsHeader") as HTMLDivElement;
-	// commandsHeader = document.getElementById("commandsHeader") as HTMLDivElement;
-	// streamingSettingsHeader = document.getElementById("streamingSettingsHeader") as HTMLDivElement;
-	// statsHeader = document.getElementById("statisticsHeader") as HTMLDivElement;
-	// latencyHeader = document.getElementById("latencyTestHeader") as HTMLDivElement;
-
-	// // Containers
-	// viewSettingsContainer = document.getElementById("viewSettingsContainer") as HTMLDivElement;
-	// commandsContainer = document.getElementById("commandsContainer") as HTMLDivElement;
-	// streamingSettingsContainer = document.getElementById("streamingSettingsContainer") as HTMLDivElement;
-	// statsContainer = document.getElementById("statisticsContainer") as HTMLDivElement;
-	// latencyContainer = document.getElementById("latencyTestContainer") as HTMLDivElement;
-
 	constructor(config: libspsfrontend.Config) {
 		super(config);
 		this.showStats = true;
 		this.videoQpIndicator = new VideoQpIndicator("connectionStrength", "qualityText", "outer", "middle", "inner", "dot");
 		this.fullScreenLogic = new FullScreenLogic();
+
+		this.configureSettings();
 
 		// build all of the overlays 
 		this.buildDisconnectOverlay();
@@ -96,6 +63,25 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		// configure all buttons 
 		this.ConfigureButtons();
+	}
+
+	/**
+	 * Configure the settings with on change listeners and any additonal per experience settings.
+	 */
+	configureSettings() : void {
+
+		// This builds all the settings sections and flags under this `settingsContent` element.
+		this.config.setupFlags(document.getElementById("settingsContent"));
+
+		this.config.addOnSettingChangedListener(Flags.IsQualityController, (isQualityController: boolean)=>{ 
+			if (!isQualityController === false) {
+				this.iWebRtcController.sendRequestQualityControlOwnership();
+			}
+		});
+
+		this.config.addOnSettingChangedListener(Flags.AFKDetection, (isAFKEnabled: boolean) => {
+			this.iWebRtcController.setAfkEnabled(isAFKEnabled);
+		});
 	}
 
 	/**
@@ -234,10 +220,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 */
 	buildAfkOverlay() {
 
-		// Determine if afk timeout is enabled by checking the /?TimeoutIfIdle=true
-		const urlParams = new URLSearchParams(window.location.search);
-		this.config.afkDetectionEnabled = urlParams.has('TimeoutIfIdle') ? true : this.config.afkDetectionEnabled;
-
 		// build the overlay base div 
 		let afkOverlayHtml = document.createElement('div');
 		afkOverlayHtml.id = "afkOverlay";
@@ -287,7 +269,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		// build the inner html
 		let errorOverlayHtmlInner = document.createElement('div');
 		errorOverlayHtmlInner.id = 'errorOverlayInner';
-		errorOverlayHtmlInner.classList.add(".text-danger");
 
 		// instantiate the overlay
 		this.errorOverlay = new TextOverlayBase(this.config.videoElementParent, errorOverlayHtml, errorOverlayHtmlInner);
@@ -447,30 +428,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		document.getElementById('statsBtn').onclick = () => this.statsClicked();
 		document.getElementById('statsClose').onclick = () => this.statsClicked();
 
-		const settingsContainer = document.getElementById("preStreamOptions");
-		settingsContainer.appendChild(this.qualityControlSetting.rootElement);
-
-		// Setup the toggable settings that can be set in UI by clicking the toggle or via a URL query string parameter.
-
-		const sendSDPAnswerSetting = new SettingFlag(
-			"offerToReceive", 
-			"Browser send answer", 
-			"Browser will hint it would like to send the sdp answer.", 
-			false, 
-			()=>{});
-
-		settingsContainer.appendChild(sendSDPAnswerSetting.rootElement);
-
-		this.setUpToggleWithUrlParams(this.preferSfuToggle, "preferSFU");
-
-		this.setUpToggleWithUrlParams(this.useMicrophoneToggle, "useMic");
-
-		this.setUpToggleWithUrlParams(this.forceMonoAudioToggle, "ForceMonoAudio");
-
-		this.setUpToggleWithUrlParams(this.forceTurnToggle, "ForceTURN");
-
-		this.setUpToggleWithUrlParams(this.afkToggle, "TimeoutIfIdle");
-
 		this.setUpControlSchemeTypeToggle(this.controlSchemeToggle);
 		this.setUpToggleWithUrlParams(this.controlSchemeToggle, "hoveringMouse");
 
@@ -520,10 +477,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.iWebRtcController.matchViewportResolution = this.toggleMatchViewPortRes.checked;
 			this.iWebRtcController.updateVideoStreamSize();
 		};
-
-		this.afkToggle.onchange = () => {
-			this.iWebRtcController.setAfkEnabled(this.afkToggle.checked);
-		}
 	}
 
 	/**
@@ -627,25 +580,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.iWebRtcController.sendLatencyTest();
 		}
 
-		// // Set up stream tools header functionality
-		// this.viewSettingsHeader.onclick = () => {
-		// 	this.viewSettingsContainer.classList.contains("d-none") ? this.viewSettingsContainer.classList.remove("d-none") : this.viewSettingsContainer.classList.add("d-none")
-		// }
-
-		// this.commandsHeader.onclick = () => {
-		// 	this.commandsContainer.classList.contains("d-none") ? this.commandsContainer.classList.remove("d-none") : this.commandsContainer.classList.add("d-none")
-		// }
-
-		// this.streamingSettingsHeader.onclick = () => {
-		// 	this.streamingSettingsContainer.classList.contains("d-none") ? this.streamingSettingsContainer.classList.remove("d-none") : this.streamingSettingsContainer.classList.add("d-none")
-		// }
-		// this.statsHeader.onclick = () => {
-		// 	this.statsContainer.classList.contains("d-none") ? this.statsContainer.classList.remove("d-none") : this.statsContainer.classList.add("d-none")
-		// }
-		// this.latencyHeader.onclick = () => {
-		// 	this.latencyContainer.classList.contains("d-none") ? this.latencyContainer.classList.remove("d-none") : this.latencyContainer.classList.add("d-none")
-		// }
-
 		// Reveal all the container
 		// this.viewSettingsContainer.classList.remove("d-none");
 		// this.commandsContainer.classList.remove("d-none");
@@ -668,19 +602,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		// starting a latency check
 		this.latencyTestButton.onclick = () => { }
-
-		// Set up stream tools header functionality
-		// this.viewSettingsHeader.onclick = () => { }
-		// this.commandsHeader.onclick = () => { }
-		// this.streamingSettingsHeader.onclick = () => { }
-		// this.statsHeader.onclick = () => { }
-		// this.latencyHeader.onclick = () => { }
-
-		// Hide all the containers
-		// this.viewSettingsContainer.classList.add("d-none");
-		// this.commandsContainer.classList.add("d-none");
-		// this.streamingSettingsContainer.classList.add("d-none");
-		// this.statsContainer.classList.add("d-none");
 	}
 
 	/**
@@ -796,7 +717,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 * @param hasQualityOwnership - flag if the user has quality ownership
 	 */
 	onQualityControlOwnership(hasQualityOwnership: boolean): void {
-		this.qualityControlSetting.value = hasQualityOwnership;
+		this.config.setFlagEnabled(Flags.IsQualityController, hasQualityOwnership);
 	}
 
 	/**
