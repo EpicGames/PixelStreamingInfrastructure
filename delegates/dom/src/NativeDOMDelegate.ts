@@ -6,6 +6,7 @@ import { FullScreenLogic } from './Fullscreen';
 import { OnScreenKeyboard } from './OnScreenKeyboard';
 import { Flags } from "@tensorworks/libspsfrontend"
 import { LabelledButton} from "@tensorworks/libspsfrontend"
+import { NumericParameters } from '@tensorworks/libspsfrontend';
 
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	config: libspsfrontend.Config;
@@ -98,6 +99,27 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 				this.config.controlScheme = libspsfrontend.ControlSchemeType.LockedMouse;
 				this.iWebRtcController.activateRegisterMouse();
 			}
+		});
+
+		// encoder settings
+		this.config.addOnNumericSettingChangedListener(NumericParameters.MinQP, (newValue: number) => {
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending encoder settings  --------", 7);
+			let encode: libspsfrontend.Encoder = {
+				MinQP: newValue,
+				MaxQP: this.config.getNumericSettingValue(NumericParameters.MaxQP)
+			};
+			this.iWebRtcController.sendEncoderSettings(encode);
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
+		});
+
+		this.config.addOnNumericSettingChangedListener(NumericParameters.MaxQP, (newValue: number) => {
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending encoder settings  --------", 7);
+			let encode: libspsfrontend.Encoder = {
+				MinQP: this.config.getNumericSettingValue(NumericParameters.MinQP),
+				MaxQP: newValue
+			};
+			this.iWebRtcController.sendEncoderSettings(encode);
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
 		});
 
 	}
@@ -468,19 +490,19 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		});
 
 		commandsSectionElem.appendChild(showFPSButton.rootElement);
-		commandsSectionElem.appendChild(restartStreamButton.rootElement);
 		commandsSectionElem.appendChild(requestKeyframeButton.rootElement);
+		commandsSectionElem.appendChild(restartStreamButton.rootElement);
 
 
-		document.getElementById("encoder-params-submit").onclick = () => {
-			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending encoder settings  --------", 7);
-			let encode: libspsfrontend.Encoder = {
-				MinQP: Number(this.encoderMinQpText.value),
-				MaxQP: Number(this.encoderMaxQpText.value),
-			}
-			this.iWebRtcController.sendEncoderSettings(encode);
-			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
-		}
+		// document.getElementById("encoder-params-submit").onclick = () => {
+		// 	libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending encoder settings  --------", 7);
+		// 	let encode: libspsfrontend.Encoder = {
+		// 		MinQP: Number(this.encoderMinQpText.value),
+		// 		MaxQP: Number(this.encoderMaxQpText.value),
+		// 	}
+		// 	this.iWebRtcController.sendEncoderSettings(encode);
+		// 	libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
+		// }
 
 		document.getElementById("webrtc-params-submit").onclick = () => {
 			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending web rtc settings  --------", 7);

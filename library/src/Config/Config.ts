@@ -1,4 +1,5 @@
 import { SettingFlag } from "./SettingFlag";
+import { SettingNumber } from "./SettingNumber";
 
 /**
  * A collection of toggable flags that are core to all Pixel Streaming experiences.
@@ -16,6 +17,15 @@ export class Flags {
 	static VideoFillWindow = "FillWindow";
 	static MatchViewportResolution = "MatchViewportRes";
 	static ControlScheme = "ControlScheme"
+}
+
+/**
+ * A collection of numeric parameters that are core to all Pixel Streaming experiences.
+ * 
+ */
+export class NumericParameters {
+	static MinQP = "MinQP";
+	static MaxQP = "MaxQP";
 }
 
 export class Config {
@@ -49,6 +59,9 @@ export class Config {
 
 	/* A map of toggable flags - options that can be set in the application - e.g. Use Mic? */
 	flags = new Map<string, SettingFlag>();
+
+	/* A map of numerical settings - options that can be in the application - e.g. MinBitrate */
+	numericParameters = new Map<string, SettingNumber>();
 
 	/**
 	 * @param signallingServerAddress - the address of the signaling server 
@@ -171,6 +184,52 @@ export class Config {
 		this.addSettingFlag(viewSettingsSection, matchViewportResSetting);
 		this.addSettingFlag(viewSettingsSection, controlSchemeSetting);
 
+		/* Setup all encoder related settings under this section */
+		const encoderSettingsSection = this.buildSectionWithHeading(settingsElem, "Encoder");
+
+		const minQPSetting = new SettingNumber(
+			NumericParameters.MinQP,
+			"Min QP", 
+			"The lower bound for the quantization parameter (QP) of the encoder. 0 = Best quality, 51 = worst quality.",
+			0, /*min*/
+			51, /*max*/
+			0 /*value*/);
+
+		const maxQPSetting = new SettingNumber(
+			NumericParameters.MaxQP,
+			"Max QP", 
+			"The upper bound for the quantization parameter (QP) of the encoder. 0 = Best quality, 51 = worst quality.",
+			0, /*min*/
+			51, /*max*/
+			51 /*value*/);
+
+		this.addSettingNumeric(encoderSettingsSection, minQPSetting);
+		this.addSettingNumeric(encoderSettingsSection, maxQPSetting);
+
+	}
+
+	/**
+	 * Add a callback to fire when the numeric setting is toggled.
+	 * @param id The id of the flag.
+	 * @param onChangedListener The callback to fire when the numeric value changes.
+	 */
+	addOnNumericSettingChangedListener(id: string, onChangedListener: (newValue: number) => void) : void {
+		if(this.numericParameters.has(id)){
+			this.numericParameters.get(id).addOnChangedListener(onChangedListener);
+		}
+	}
+
+	/**
+	 * @param id The id of the numeric setting we are interested in getting a value for.
+	 * @returns The numeric value stored in the parameter with the passed id.
+	 */
+	getNumericSettingValue(id: string) : number {
+		if(this.numericParameters.has(id)){
+			return this.numericParameters.get(id).number;
+		}
+		else {
+			throw new Error(`There is no numeric setting with the id of ${id}`);
+		}
 	}
 
 	/**
@@ -192,6 +251,16 @@ export class Config {
 	addSettingFlag(settingsSection: HTMLElement, settingFlag: SettingFlag) : void {
 		settingsSection.appendChild(settingFlag.rootElement);
 		this.flags.set(settingFlag.id, settingFlag);
+	}
+
+	/**
+	 * Add a SettingFlag element to a particular settings section in the DOM and registers that flag in the Config.flag map.
+	 * @param settingsSection The settings section HTML element.
+	 * @param settingFlag The settings flag object.
+	 */
+	addSettingNumeric(settingsSection: HTMLElement, setting: SettingNumber) : void {
+		settingsSection.appendChild(setting.rootElement);
+		this.numericParameters.set(setting.id, setting);
 	}
 
 	/**
