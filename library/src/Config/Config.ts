@@ -14,6 +14,8 @@ export class Flags {
 	static ForceTURN = "ForceTURN";
 	static AFKDetection = "TimeoutIfIdle";
 	static VideoFillWindow = "FillWindow";
+	static MatchViewportResolution = "MatchViewportRes";
+	static ControlScheme = "ControlScheme"
 }
 
 export class Config {
@@ -153,7 +155,21 @@ export class Config {
 			"Video will try to fill the available space.", 
 			true);
 
+		const matchViewportResSetting = new SettingFlag(
+			Flags.MatchViewportResolution, 
+			"Match viewport resolution", 
+			"Pixel Streaming will be instructed to dynamically resize the video stream to match the size of the video element.", 
+			false);
+
+		const controlSchemeSetting = new SettingFlag(
+			Flags.ControlScheme, 
+			"Control Scheme: Locked Mouse", 
+			"Either locked mouse, where the pointer is consumed by the video and locked to it, or hovering mouse, where the mouse is not consumed.", 
+			false);
+
 		this.addSettingFlag(viewSettingsSection, fillWindowSetting);
+		this.addSettingFlag(viewSettingsSection, matchViewportResSetting);
+		this.addSettingFlag(viewSettingsSection, controlSchemeSetting);
 
 	}
 
@@ -197,6 +213,19 @@ export class Config {
 			console.warn(`Cannot toggle flag called ${id} - it does not exist in the Config.flags map.`);
 		} else {
 			this.flags.get(id).value = flagEnabled;
+		}
+	}
+
+	/**
+	 * Set the label for the flag.
+	 * @param id The id of the flag.
+	 * @param label The new label to use for the flag.
+	 */
+	setFlagLabel(id: string, label: string) {
+		if(!this.flags.has(id)) {
+			console.warn(`Cannot set label for flag called ${id} - it does not exist in the Config.flags map.`);
+		} else {
+			this.flags.get(id).label = label;
 		}
 	}
 

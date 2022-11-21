@@ -29,10 +29,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	statsPanel = document.getElementById('stats-panel') as HTMLDivElement;
 
 	// Viewing
-	//enlargeDisplayToFillWindow = document.getElementById("enlarge-display-to-fill-window-tgl") as HTMLInputElement;
-	toggleMatchViewPortRes = document.getElementById("match-viewport-res-tgl") as HTMLInputElement;
-	controlSchemeToggle = document.getElementById("control-scheme-tgl") as HTMLInputElement;
-	controlSchemeToggleTitle = document.getElementById("control-scheme-title") as HTMLDivElement;
+	//controlSchemeToggle = document.getElementById("control-scheme-tgl") as HTMLInputElement;
+	//controlSchemeToggleTitle = document.getElementById("control-scheme-title") as HTMLDivElement;
 
 	// Settings
 	encoderMinQpText = document.getElementById("encoder-min-qp-text") as HTMLInputElement;
@@ -86,6 +84,23 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.config.addOnSettingChangedListener(Flags.VideoFillWindow, (shouldFillWindow : boolean) => {
 			this.iWebRtcController.setEnlargeToFillDisplay(shouldFillWindow);
 			this.iWebRtcController.resizePlayerStyle();
+		});
+
+		this.config.addOnSettingChangedListener(Flags.MatchViewportResolution, (shouldMatch : boolean) => {
+			this.iWebRtcController.matchViewportResolution = shouldMatch;
+			this.iWebRtcController.updateVideoStreamSize();
+		});
+
+		this.config.addOnSettingChangedListener(Flags.ControlScheme, (isHoveringMouse : boolean) => {
+			if (isHoveringMouse) {
+				this.config.setFlagLabel(Flags.ControlScheme, "Control Scheme: Hovering Mouse");
+				this.config.controlScheme = libspsfrontend.ControlSchemeType.HoveringMouse;
+				this.iWebRtcController.activateRegisterMouse();
+			} else {
+				this.config.setFlagLabel(Flags.ControlScheme, "Control Scheme: Locked Mouse");
+				this.config.controlScheme = libspsfrontend.ControlSchemeType.LockedMouse;
+				this.iWebRtcController.activateRegisterMouse();
+			}
 		});
 
 	}
@@ -434,8 +449,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		document.getElementById('statsBtn').onclick = () => this.statsClicked();
 		document.getElementById('statsClose').onclick = () => this.statsClicked();
 
-		this.setUpControlSchemeTypeToggle(this.controlSchemeToggle);
-		this.setUpToggleWithUrlParams(this.controlSchemeToggle, "hoveringMouse");
+		//this.setUpControlSchemeTypeToggle(this.controlSchemeToggle);
+		//this.setUpToggleWithUrlParams(this.controlSchemeToggle, "hoveringMouse");
 
 		// set up the restart stream button
 		document.getElementById("restart-stream-button").onclick = () => {
@@ -471,12 +486,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		document.getElementById("show-fps-button").onclick = () => {
 			this.iWebRtcController.sendShowFps();
 		};
-
-		// make the player match the view port resolution 
-		this.toggleMatchViewPortRes.onchange = () => {
-			this.iWebRtcController.matchViewportResolution = this.toggleMatchViewPortRes.checked;
-			this.iWebRtcController.updateVideoStreamSize();
-		};
 	}
 
 	/**
@@ -505,40 +514,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		}
 
 		this.statsPanel.classList.toggle("panel-wrap-visible");
-	}
-
-	/**
-	 * Set up toggle element for controlling hovering mouse or locked mouse  
-	 * @param toggleElement the toggle html element to be set up
-	 */
-	setUpControlSchemeTypeToggle(toggleElement: HTMLInputElement) {
-		if (toggleElement) {
-
-			const urlParams = new URLSearchParams(window.location.search);
-			this.config.controlScheme = (urlParams.has('hoveringMouse') ?  libspsfrontend.ControlSchemeType.HoveringMouse : libspsfrontend.ControlSchemeType.LockedMouse);
-
-			// set the state for the toggle based on the config
-			if (this.config.controlScheme === libspsfrontend.ControlSchemeType.LockedMouse) {
-				this.controlSchemeToggleTitle.innerHTML = "Control Scheme: Locked Mouse"
-				this.controlSchemeToggle.checked = false;
-			} else {
-				this.controlSchemeToggleTitle.innerHTML = "Control Scheme: Hovering Mouse"
-				this.controlSchemeToggle.checked = true;
-			}
-
-			// set the onChange event 
-			toggleElement.addEventListener("change", () => {
-				if (toggleElement.checked === true) {
-					this.controlSchemeToggleTitle.innerHTML = "Control Scheme: Hovering Mouse"
-					this.config.controlScheme = libspsfrontend.ControlSchemeType.HoveringMouse;
-					this.iWebRtcController.activateRegisterMouse();
-				} else {
-					this.controlSchemeToggleTitle.innerHTML = "Control Scheme: Locked Mouse"
-					this.config.controlScheme = libspsfrontend.ControlSchemeType.LockedMouse;
-					this.iWebRtcController.activateRegisterMouse();
-				}
-			});
-		}
 	}
 
 	/**
