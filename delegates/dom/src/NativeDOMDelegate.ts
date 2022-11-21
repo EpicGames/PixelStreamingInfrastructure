@@ -5,6 +5,7 @@ import { ActionOverlayBase, AfkOverlayBase, TextOverlayBase } from './Overlays';
 import { FullScreenLogic } from './Fullscreen';
 import { OnScreenKeyboard } from './OnScreenKeyboard';
 import { Flags } from "@tensorworks/libspsfrontend"
+import { LabelledButton} from "@tensorworks/libspsfrontend"
 
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	config: libspsfrontend.Config;
@@ -27,10 +28,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	// settings and stats panels
 	settingsPanel = document.getElementById('settings-panel') as HTMLDivElement;
 	statsPanel = document.getElementById('stats-panel') as HTMLDivElement;
-
-	// Viewing
-	//controlSchemeToggle = document.getElementById("control-scheme-tgl") as HTMLInputElement;
-	//controlSchemeToggleTitle = document.getElementById("control-scheme-title") as HTMLDivElement;
 
 	// Settings
 	encoderMinQpText = document.getElementById("encoder-min-qp-text") as HTMLInputElement;
@@ -449,17 +446,31 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		document.getElementById('statsBtn').onclick = () => this.statsClicked();
 		document.getElementById('statsClose').onclick = () => this.statsClicked();
 
-		//this.setUpControlSchemeTypeToggle(this.controlSchemeToggle);
-		//this.setUpToggleWithUrlParams(this.controlSchemeToggle, "hoveringMouse");
+		const settingsElem = document.getElementById("settingsContent");
+		const commandsSectionElem = this.config.buildSectionWithHeading(settingsElem, "Commands");
+		
+		// Add button for toggle fps
+		const showFPSButton = new LabelledButton("Show FPS", "Toggle");
+		showFPSButton.addOnClickListener(()=>{
+			this.iWebRtcController.sendShowFps();
+		});
 
-		// set up the restart stream button
-		document.getElementById("restart-stream-button").onclick = () => {
+		// Add button for restart stream
+		const restartStreamButton = new LabelledButton("Restart Stream", "Restart");
+		restartStreamButton.addOnClickListener(()=>{
 			this.iWebRtcController.restartStreamAutomaticity();
-		}
+		});
 
-		document.getElementById("request-keyframe-button").onclick = () => {
+		// Add button for request keyframe
+		const requestKeyframeButton = new LabelledButton("Request keyframe", "Request");
+		requestKeyframeButton.addOnClickListener(()=>{
 			this.iWebRtcController.requestKeyFrame();
-		}
+		});
+
+		commandsSectionElem.appendChild(showFPSButton.rootElement);
+		commandsSectionElem.appendChild(restartStreamButton.rootElement);
+		commandsSectionElem.appendChild(requestKeyframeButton.rootElement);
+
 
 		document.getElementById("encoder-params-submit").onclick = () => {
 			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending encoder settings  --------", 7);
@@ -482,10 +493,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
 		}
 
-		// show the current fps on screen 
-		document.getElementById("show-fps-button").onclick = () => {
-			this.iWebRtcController.sendShowFps();
-		};
 	}
 
 	/**
