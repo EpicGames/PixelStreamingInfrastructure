@@ -29,7 +29,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	statsPanel = document.getElementById('stats-panel') as HTMLDivElement;
 
 	// Viewing
-	enlargeDisplayToFillWindow = document.getElementById("enlarge-display-to-fill-window-tgl") as HTMLInputElement;
+	//enlargeDisplayToFillWindow = document.getElementById("enlarge-display-to-fill-window-tgl") as HTMLInputElement;
 	toggleMatchViewPortRes = document.getElementById("match-viewport-res-tgl") as HTMLInputElement;
 	controlSchemeToggle = document.getElementById("control-scheme-tgl") as HTMLInputElement;
 	controlSchemeToggleTitle = document.getElementById("control-scheme-title") as HTMLDivElement;
@@ -82,6 +82,12 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.config.addOnSettingChangedListener(Flags.AFKDetection, (isAFKEnabled: boolean) => {
 			this.iWebRtcController.setAfkEnabled(isAFKEnabled);
 		});
+
+		this.config.addOnSettingChangedListener(Flags.VideoFillWindow, (shouldFillWindow : boolean) => {
+			this.iWebRtcController.setEnlargeToFillDisplay(shouldFillWindow);
+			this.iWebRtcController.resizePlayerStyle();
+		});
+
 	}
 
 	/**
@@ -464,12 +470,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		// show the current fps on screen 
 		document.getElementById("show-fps-button").onclick = () => {
 			this.iWebRtcController.sendShowFps();
-		};
-
-		// make the player fill the window
-		this.enlargeDisplayToFillWindow.onchange = () => {
-			this.iWebRtcController.setEnlargeToFillDisplay(this.enlargeDisplayToFillWindow.checked);
-			this.iWebRtcController.resizePlayerStyle();
 		};
 
 		// make the player match the view port resolution 

@@ -11,10 +11,16 @@ export class SettingFlag extends SettingBase {
     constructor(id: string, label: string, description: string, defaultFlagValue: boolean) {
         super(id, label, description, defaultFlagValue);
 
-        // parse flag from url parameters
-        const urlParamFlag = this.getUrlParamFlag();
-        if(urlParamFlag !== defaultFlagValue) {
-            this.value = urlParamFlag;
+        const urlParams = new URLSearchParams(window.location.search);
+        if(!urlParams.has(this.id)){
+            this.value = defaultFlagValue;
+        }
+        else {
+            // parse flag from url parameters
+            const urlParamFlag = this.getUrlParamFlag();
+            if(urlParamFlag !== defaultFlagValue) {
+                this.value = urlParamFlag;
+            } 
         }
     }
 
@@ -79,7 +85,7 @@ export class SettingFlag extends SettingBase {
             wrapperLabel.appendChild(slider);
 
             // setup on change from checkbox
-            this.checkbox.addEventListener("change", (e) => {
+            this.checkbox.addEventListener("change", () => {
                 this.value = this.checkbox.checked;
                 this.onChange(this.checkbox.checked);
 

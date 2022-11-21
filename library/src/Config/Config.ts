@@ -13,6 +13,7 @@ export class Flags {
 	static ForceMonoAudio = "ForceMonoAudio";
 	static ForceTURN = "ForceTURN";
 	static AFKDetection = "TimeoutIfIdle";
+	static VideoFillWindow = "FillWindow";
 }
 
 export class Config {
@@ -117,21 +118,21 @@ export class Config {
 			Flags.ForceMonoAudio, 
 			"Force mono audio",
 			"Force browser to request mono audio in the SDP", 
-			true
+			false
 		);
 
 		const forceTURNSetting = new SettingFlag(
 			Flags.ForceTURN, 
 			"Force TURN",
 			"Only generate TURN/Relayed ICE candidates.", 
-			true
+			false
 		);
 
 		const afkIfIdleSetting = new SettingFlag(
 			Flags.AFKDetection, 
 			"AFK if idle",
 			"Timeout the experience if user is AFK for a period.", 
-			true
+			false
 		);
 		
 		// make settings show up in DOM
@@ -142,6 +143,18 @@ export class Config {
 		this.addSettingFlag(psSettingsSection, forceMonoAudioSetting);
 		this.addSettingFlag(psSettingsSection, forceTURNSetting);
 		this.addSettingFlag(psSettingsSection, afkIfIdleSetting);
+
+		/* Setup all view/ui related settings under this section */
+		const viewSettingsSection = this.buildSectionWithHeading(settingsElem, "UI");
+
+		const fillWindowSetting = new SettingFlag(
+			Flags.VideoFillWindow, 
+			"Video fill window", 
+			"Video will try to fill the available space.", 
+			true);
+
+		this.addSettingFlag(viewSettingsSection, fillWindowSetting);
+
 	}
 
 	/**
