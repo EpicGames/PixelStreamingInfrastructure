@@ -18,6 +18,16 @@
 		this._min = min;
 		this._max = max;
 		this._number = defaultNumber;
+
+		// attempt to read the number from the url params
+		const urlParams = new URLSearchParams(window.location.search);
+		if(urlParams.has(this.id)){
+			const parsedValue = Number.parseInt(urlParams.get(this.id));
+			if(!Number.isNaN(parsedValue)) {
+				this._number = parsedValue;
+			}
+		}
+
 	}
 
 	/**
@@ -31,8 +41,17 @@
 	 * Set the number in the spinner (will be clamped within range).
 	 */
 	public set number(newNumber: number){
-		this._number = Math.max(Math.min(this._max, newNumber), this._min);
+		this._number = this.clamp(newNumber);
 		this.spinner.value = this._number.toString();
+	}
+
+	/**
+	 * Clamps a number between the min and max values (inclusive).
+	 * @param inNumber The number to clamp.
+	 * @returns The clamped number.
+	 */
+	public clamp(inNumber: number) : number {
+		return Math.max(Math.min(this._max, inNumber), this._min);
 	}
 
 	/**
@@ -48,13 +67,21 @@
 				console.warn(`Could not parse value change into a valid number - value was ${inputElem.value}, resetting value to ${this._min}`);
 				this.number = this._min;
 			} else {
-				const clampedValue = Math.max(Math.min(this._max, parsedValue), this._min);
+				const clampedValue = this.clamp(parsedValue);
 				this._number = clampedValue;
 				this._spinner.value = clampedValue.toString();
+				this.updateURLParams();
 			}
 
 			onChangedFunc(this._number);
 		};
+	}
+
+	public updateURLParams() : void {
+		// set url params like ?id=number
+		const urlParams = new URLSearchParams(window.location.search);
+		urlParams.set(this.id, this._number.toString());
+		window.history.replaceState({}, '', urlParams.toString() !== "" ? `${location.pathname}?${urlParams}` : `${location.pathname}`);
 	}
 
 	/**
