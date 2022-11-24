@@ -206,6 +206,11 @@ export class Config {
 		this.addSettingNumeric(encoderSettingsSection, minQPSetting);
 		this.addSettingNumeric(encoderSettingsSection, maxQPSetting);
 
+		/* Setup all webrtc related settings under this section */
+		
+		//const webrtcSettingsSection = this.buildSectionWithHeading(settingsElem, "WebRTC");
+		//this.addSettingNumeric(webrtcSettingsSection, //todo);
+
 	}
 
 	/**

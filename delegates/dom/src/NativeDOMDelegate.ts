@@ -493,27 +493,16 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		commandsSectionElem.appendChild(requestKeyframeButton.rootElement);
 		commandsSectionElem.appendChild(restartStreamButton.rootElement);
 
-
-		// document.getElementById("encoder-params-submit").onclick = () => {
-		// 	libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending encoder settings  --------", 7);
-		// 	let encode: libspsfrontend.Encoder = {
-		// 		MinQP: Number(this.encoderMinQpText.value),
-		// 		MaxQP: Number(this.encoderMaxQpText.value),
+		// document.getElementById("webrtc-params-submit").onclick = () => {
+		// 	libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending web rtc settings  --------", 7);
+		// 	let webRtcSettings: libspsfrontend.WebRTC = {
+		// 		FPS: Number(this.webRtcFpsText.value),
+		// 		MinBitrate: Number(this.webRtcMinBitrateText.value) * 1000,
+		// 		MaxBitrate: Number(this.webRtcMaxBitrateText.value) * 1000,
 		// 	}
-		// 	this.iWebRtcController.sendEncoderSettings(encode);
+		// 	this.iWebRtcController.sendWebRtcSettings(webRtcSettings);
 		// 	libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
 		// }
-
-		document.getElementById("webrtc-params-submit").onclick = () => {
-			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending web rtc settings  --------", 7);
-			let webRtcSettings: libspsfrontend.WebRTC = {
-				FPS: Number(this.webRtcFpsText.value),
-				MinBitrate: Number(this.webRtcMinBitrateText.value) * 1000,
-				MaxBitrate: Number(this.webRtcMaxBitrateText.value) * 1000,
-			}
-			this.iWebRtcController.sendWebRtcSettings(webRtcSettings);
-			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
-		}
 
 	}
 
@@ -543,28 +532,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		}
 
 		this.statsPanel.classList.toggle("panel-wrap-visible");
-	}
-
-	/**
-	 * Set up url toggle buttons
-	 * @param toggleElement the toggle element being activated  
-	 * @param urlParameterKey the url key that is being made use of
-	 */
-	setUpToggleWithUrlParams(toggleElement: HTMLInputElement, urlParameterKey: string) {
-		if (toggleElement) {
-			//Check if the element has been set from the URL Params 
-			toggleElement.checked = new URLSearchParams(window.location.search).has(urlParameterKey);
-
-			toggleElement.addEventListener("change", () => {
-				const urlParams = new URLSearchParams(window.location.search);
-				if (toggleElement.checked === true) {
-					urlParams.set(urlParameterKey, "true");
-				} else {
-					urlParams.delete(urlParameterKey);
-				}
-				window.history.replaceState({}, '', urlParams.toString() !== "" ? `${location.pathname}?${urlParams}` : `${location.pathname}`);
-			});
-		}
 	}
 
 	/**
