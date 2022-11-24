@@ -7,6 +7,7 @@ import { OnScreenKeyboard } from './OnScreenKeyboard';
 import { Flags } from "@tensorworks/libspsfrontend"
 import { LabelledButton} from "@tensorworks/libspsfrontend"
 import { NumericParameters } from '@tensorworks/libspsfrontend';
+import { SettingPanel } from '@tensorworks/libspsfrontend'
 
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	config: libspsfrontend.Config;
@@ -26,19 +27,12 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	videoQpIndicator: VideoQpIndicator;
 	fullScreenLogic: FullScreenLogic;
 
-	// settings and stats panels
-	settingsPanel = document.getElementById('settings-panel') as HTMLDivElement;
-	statsPanel = document.getElementById('stats-panel') as HTMLDivElement;
-
 	// Settings
-	encoderMinQpText = document.getElementById("encoder-min-qp-text") as HTMLInputElement;
-	encoderMaxQpText = document.getElementById("encoder-max-qp-text") as HTMLInputElement;
-	webRtcFpsText = document.getElementById("webrtc-fps-text") as HTMLInputElement;
-	webRtcMinBitrateText = document.getElementById("webrtc-min-bitrate-text") as HTMLInputElement;
-	webRtcMaxBitrateText = document.getElementById("webrtc-max-bitrate-text") as HTMLInputElement;
-	latencyTestButton = document.getElementById("btn-start-latency-test") as HTMLButtonElement;
+	settingsPanel: SettingPanel;
 
-	// Statistics
+	// Stats
+	statsPanel = document.getElementById('stats-panel') as HTMLDivElement;
+	latencyTestButton = document.getElementById("btn-start-latency-test") as HTMLButtonElement;
 	sendStatsToServer = document.getElementById("send-stats-tgl") as HTMLInputElement;
 
 	constructor(config: libspsfrontend.Config) {
@@ -47,6 +41,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.videoQpIndicator = new VideoQpIndicator("connectionStrength", "qualityText", "outer", "middle", "inner", "dot");
 		this.fullScreenLogic = new FullScreenLogic();
 
+		this.settingsPanel = new SettingPanel();
+		document.getElementById("uiFeatures").appendChild(this.settingsPanel.rootElement);
 		this.configureSettings();
 
 		// build all of the overlays 
@@ -540,7 +536,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.statsPanel.classList.toggle("panel-wrap-visible");
 		}
 
-		this.settingsPanel.classList.toggle("panel-wrap-visible");
+		this.settingsPanel.toggleVisibility();
 	}
 
 	/**
@@ -550,10 +546,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		/**
 		 * Toggle stats panel. If settings panel is already open, close it and then open stats
 		 */
-		if (this.settingsPanel.classList.contains("panel-wrap-visible")) {
-			this.settingsPanel.classList.toggle("panel-wrap-visible");
-		}
-
+		this.settingsPanel.hide();
 		this.statsPanel.classList.toggle("panel-wrap-visible");
 	}
 
@@ -616,13 +609,13 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			}
 		}
 		if (settings.Encoder) {
-			this.encoderMinQpText.value = settings.Encoder.MinQP.toString();
-			this.encoderMaxQpText.value = settings.Encoder.MaxQP.toString();
+			this.config.setNumericSetting(NumericParameters.MinQP, settings.Encoder.MinQP);
+			this.config.setNumericSetting(NumericParameters.MaxQP, settings.Encoder.MaxQP);
 		}
 		if (settings.WebRTC) {
-			this.webRtcMinBitrateText.value = settings.WebRTC.MinBitrate.toString();
-			this.webRtcMaxBitrateText.value = settings.WebRTC.MaxBitrate.toString();
-			this.webRtcFpsText.value = settings.WebRTC.FPS.toString();
+			this.config.setNumericSetting(NumericParameters.WebRTCMinBitrate, settings.WebRTC.MinBitrate);
+			this.config.setNumericSetting(NumericParameters.WebRTCMinBitrate, settings.WebRTC.MaxBitrate);
+			this.config.setNumericSetting(NumericParameters.WebRTCFPS, settings.WebRTC.FPS);
 		}
 	}
 

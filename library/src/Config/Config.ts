@@ -267,6 +267,20 @@ export class Config {
 	}
 
 	/**
+	 * Set number in the setting.
+	 * @param id The id of the numeric setting we are interested in.
+	 * @param value The numeric value to set.
+	 */
+	setNumericSetting(id: string, value: number) : void {
+		if(this.numericParameters.has(id)){
+			this.numericParameters.get(id).number = value;
+		}
+		else {
+			throw new Error(`There is no numeric setting with the id of ${id}`);
+		}
+	}
+
+	/**
 	 * Add a callback to fire when the flag is toggled.
 	 * @param id The id of the flag.
 	 * @param onChangeListener The callback to fire when the value changes.
