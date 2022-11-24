@@ -2538,7 +2538,6 @@ const CodeToKeyCode = {
     "NumLock": 144,
     "ControlRight": 254,
     "AltRight": 255,
-    "Pause": 19,
     "Home": 36,
     "End": 35,
     "ArrowUp": 38,
@@ -2557,7 +2556,7 @@ function getKeyCode(e) {
 
     // If we don't have keyCode property because browser API is deprecated then use KeyboardEvent.code instead.
     // See: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode#constants_for_keycode_value
-    if(!"keyCode" in e) {
+    if(!("keyCode" in e)) {
         // Convert KeyboardEvent.code string into integer-based key code for backwards compatibility reasons.
         if(e.code in CodeToKeyCode) {
             return CodeToKeyCode[e.code];
@@ -2620,7 +2619,7 @@ function registerKeyboardEvents() {
     };
 
     document.onkeypress = function(e){
-        if(!"charCode" in e){
+        if(!("charCode" in e)){
             console.warn("KeyboardEvent.charCode is deprecated in this browser, cannot send key press.");
             return;
         }
