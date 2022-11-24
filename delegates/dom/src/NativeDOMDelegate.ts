@@ -122,6 +122,40 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
 		});
 
+		// WebRTC settings
+		this.config.addOnNumericSettingChangedListener(NumericParameters.WebRTCMinBitrate, (newValue: number) => {
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending web rtc settings  --------", 7);
+			let webRtcSettings: libspsfrontend.WebRTC = {
+				FPS: this.config.getNumericSettingValue(NumericParameters.WebRTCFPS),
+				MinBitrate: newValue * 1000,
+				MaxBitrate: this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate) * 1000,
+			}
+			this.iWebRtcController.sendWebRtcSettings(webRtcSettings);
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
+		});
+
+		this.config.addOnNumericSettingChangedListener(NumericParameters.WebRTCMaxBitrate, (newValue: number) => {
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending web rtc settings  --------", 7);
+			let webRtcSettings: libspsfrontend.WebRTC = {
+				FPS: this.config.getNumericSettingValue(NumericParameters.WebRTCFPS),
+				MinBitrate: this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate) * 1000,
+				MaxBitrate: newValue * 1000,
+			}
+			this.iWebRtcController.sendWebRtcSettings(webRtcSettings);
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
+		});
+
+		this.config.addOnNumericSettingChangedListener(NumericParameters.WebRTCFPS, (newValue: number) => {
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending web rtc settings  --------", 7);
+			let webRtcSettings: libspsfrontend.WebRTC = {
+				FPS: newValue,
+				MinBitrate: this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate) * 1000,
+				MaxBitrate: this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate) * 1000,
+			}
+			this.iWebRtcController.sendWebRtcSettings(webRtcSettings);
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
+		});
+
 	}
 
 	/**
@@ -492,17 +526,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		commandsSectionElem.appendChild(showFPSButton.rootElement);
 		commandsSectionElem.appendChild(requestKeyframeButton.rootElement);
 		commandsSectionElem.appendChild(restartStreamButton.rootElement);
-
-		// document.getElementById("webrtc-params-submit").onclick = () => {
-		// 	libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "--------  Sending web rtc settings  --------", 7);
-		// 	let webRtcSettings: libspsfrontend.WebRTC = {
-		// 		FPS: Number(this.webRtcFpsText.value),
-		// 		MinBitrate: Number(this.webRtcMinBitrateText.value) * 1000,
-		// 		MaxBitrate: Number(this.webRtcMaxBitrateText.value) * 1000,
-		// 	}
-		// 	this.iWebRtcController.sendWebRtcSettings(webRtcSettings);
-		// 	libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "-------------------------------------------", 7);
-		// }
 
 	}
 

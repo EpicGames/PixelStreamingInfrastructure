@@ -10,6 +10,7 @@
 	_max: number;
 	_rootElement: HTMLElement;
 	_spinner: HTMLInputElement;
+	_onChange: (newNumber: number) => void;
 
 	constructor(id: string, label: string, description: string, min: number, max: number, defaultNumber: number) {
 		this._id = id;
@@ -27,6 +28,28 @@
 				this._number = parsedValue;
 			}
 		}
+
+		// setup onchange
+		this.spinner.onchange = (event : Event) => {
+			const inputElem = event.target as HTMLInputElement;
+
+			const parsedValue = Number.parseInt(inputElem.value);
+
+			if(Number.isNaN(parsedValue)) {
+				console.warn(`Could not parse value change into a valid number - value was ${inputElem.value}, resetting value to ${this._min}`);
+				this.number = this._min;
+			} else {
+				const clampedValue = this.clamp(parsedValue);
+				this._number = clampedValue;
+				this._spinner.value = clampedValue.toString();
+				this.updateURLParams();
+			}
+
+			// call onchange if we have set it
+			if(this._onChange) {
+				this._onChange(this._number);
+			}
+		};
 
 	}
 
@@ -46,6 +69,13 @@
 	}
 
 	/**
+	 * @returns The number stored in the spinner.
+	 */
+	public get number() : number {
+		return this._number;
+	}
+
+	/**
 	 * Clamps a number between the min and max values (inclusive).
 	 * @param inNumber The number to clamp.
 	 * @returns The clamped number.
@@ -58,23 +88,7 @@
 	 * Add a change listener to the spinner element.
 	 */
 	public addOnChangedListener(onChangedFunc: (newNumber: number) => void) {
-		this.spinner.onchange = (event : Event) => {
-			const inputElem = event.target as HTMLInputElement;
-
-			const parsedValue = Number.parseInt(inputElem.value);
-
-			if(Number.isNaN(parsedValue)) {
-				console.warn(`Could not parse value change into a valid number - value was ${inputElem.value}, resetting value to ${this._min}`);
-				this.number = this._min;
-			} else {
-				const clampedValue = this.clamp(parsedValue);
-				this._number = clampedValue;
-				this._spinner.value = clampedValue.toString();
-				this.updateURLParams();
-			}
-
-			onChangedFunc(this._number);
-		};
+		this._onChange = onChangedFunc;
 	}
 
 	public updateURLParams() : void {

@@ -26,6 +26,9 @@ export class Flags {
 export class NumericParameters {
 	static MinQP = "MinQP";
 	static MaxQP = "MaxQP";
+	static WebRTCFPS = "WebRTCFPS";
+	static WebRTCMinBitrate = "WebRTCMinBitrate";
+	static WebRTCMaxBitrate = "WebRTCMaxBitrate";
 }
 
 export class Config {
@@ -207,9 +210,35 @@ export class Config {
 		this.addSettingNumeric(encoderSettingsSection, maxQPSetting);
 
 		/* Setup all webrtc related settings under this section */
-		
-		//const webrtcSettingsSection = this.buildSectionWithHeading(settingsElem, "WebRTC");
-		//this.addSettingNumeric(webrtcSettingsSection, //todo);
+		const webrtcSettingsSection = this.buildSectionWithHeading(settingsElem, "WebRTC");
+
+		const webrtcFPSSetting = new SettingNumber(
+			NumericParameters.WebRTCFPS,
+			"Max FPS", 
+			"The maximum FPS that WebRTC will try to transmit frames at.",
+			1, /*min*/
+			999, /*max*/
+			60 /*value*/);
+
+		const webrtcMinBitrateSetting = new SettingNumber(
+			NumericParameters.WebRTCMinBitrate,
+			"Min Bitrate (kbps)", 
+			"The minimum bitrate that WebRTC should use.",
+			0, /*min*/
+			100000, /*max*/
+			0 /*value*/);
+
+		const webrtcMaxBitrateSetting = new SettingNumber(
+			NumericParameters.WebRTCMaxBitrate,
+			"Max Bitrate (kbps)", 
+			"The maximum bitrate that WebRTC should use.",
+			0, /*min*/
+			100000, /*max*/
+			0 /*value*/);
+
+		this.addSettingNumeric(webrtcSettingsSection, webrtcFPSSetting);
+		this.addSettingNumeric(webrtcSettingsSection, webrtcMinBitrateSetting);
+		this.addSettingNumeric(webrtcSettingsSection, webrtcMaxBitrateSetting);
 
 	}
 
