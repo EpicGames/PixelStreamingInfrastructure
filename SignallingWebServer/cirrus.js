@@ -40,7 +40,7 @@ console.log(`configFile ${configFile}`);
 const config = require('./modules/config.js').init(configFile, defaultConfig);
 
 if (config.LogToFile) {
-	logging.RegisterFileLogger('./logs');
+	logging.RegisterFileLogger('./logs/');
 }
 
 console.log("Config: " + JSON.stringify(config, null, '\t'));
