@@ -61,6 +61,8 @@ let responseEventListeners = new Map();
 let freezeFrameOverlay = null;
 let shouldShowPlayOverlay = true;
 
+let defaultToHover = false;
+
 let isFullscreen = false;
 let isMuted = false;
 // A freeze frame is a still JPEG image shown instead of the video.
@@ -697,7 +699,7 @@ function onFullscreenChange() {
 
 function parseURLParams() {
     let urlParams = new URLSearchParams(window.location.search);
-    inputOptions.controlScheme = (urlParams.has('hoveringMouse') ?  ControlSchemeType.HoveringMouse : ControlSchemeType.LockedMouse);
+    inputOptions.controlScheme = (!!urlParams.get('hoveringMouse') ?  ControlSchemeType.HoveringMouse : ControlSchemeType.LockedMouse);
     let schemeToggle = document.getElementById("control-scheme-text");
     switch (inputOptions.controlScheme) {
         case ControlSchemeType.HoveringMouse:
@@ -707,8 +709,15 @@ function parseURLParams() {
             schemeToggle.innerHTML = "Control Scheme: Locked Mouse";
             break;
         default:
-            schemeToggle.innerHTML = "Control Scheme: Locked Mouse";
-            console.log(`ERROR: Unknown control scheme ${inputOptions.controlScheme}, defaulting to Locked Mouse`);
+            if (defaultToHover) {
+                schemeToggle.innerHTML = "Control Scheme: Hovering Mouse";
+                console.log(`ERROR: Unknown control scheme ${inputOptions.controlScheme}, defaulting to Hovering Mouse`);
+                inputOptions.controlScheme = ControlSchemeType.HoveringMouse;
+            } else {
+                schemeToggle.innerHTML = "Control Scheme: Locked Mouse";
+                console.log(`ERROR: Unknown control scheme ${inputOptions.controlScheme}, defaulting to Locked Mouse`);
+                inputOptions.controlScheme = ControlSchemeType.LockedMouse;
+            }
             break;
     }
 
@@ -2733,6 +2742,11 @@ function connect() {
             if (!UrlParamsCheck('offerToReceive')) {
                 onWebRtcOffer(msg);
             }
+            defaultToHover = !!msg.defaultToHover;
+            if (defaultToHover) {
+                inputOptions.controlScheme = ControlSchemeType.LockedMouse;
+                toggleControlScheme();
+            }
         } else if (msg.type === 'answer') {
             console.log("%c[Inbound SS (answer)]", "background: lightblue; color: black", msg);
             onWebRtcAnswer(msg);
@@ -2826,9 +2840,15 @@ function toggleControlScheme() {
             schemeToggle.innerHTML = "Control Scheme: Hovering Mouse";
             break;
         default:
-            inputOptions.controlScheme = ControlSchemeType.LockedMouse;
-            schemeToggle.innerHTML = "Control Scheme: Locked Mouse";
-            console.log(`ERROR: Unknown control scheme ${inputOptions.controlScheme}, defaulting to Locked Mouse`);
+            if (defaultToHover) {
+                inputOptions.controlScheme = ControlSchemeType.HoveringMouse;
+                schemeToggle.innerHTML = "Control Scheme: Hovering Mouse";
+                console.log(`ERROR: Unknown control scheme ${inputOptions.controlScheme}, defaulting to Hovering Mouse`);
+            } else {
+                inputOptions.controlScheme = ControlSchemeType.LockedMouse;
+                schemeToggle.innerHTML = "Control Scheme: Locked Mouse";
+                console.log(`ERROR: Unknown control scheme ${inputOptions.controlScheme}, defaulting to Locked Mouse`);
+            }
             break;
     }
 
