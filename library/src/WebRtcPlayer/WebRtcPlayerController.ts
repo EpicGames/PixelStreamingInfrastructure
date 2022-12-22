@@ -486,7 +486,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Plays the video stream
 	 */
 	private playVideo() {
-		// // handle play() with .then as it is an asynchronous call  
+		// // handle play() with promise as it is an asynchronous call  
 		this.videoPlayer.videoElement.play().catch((onRejectedReason: string) => {
 			if (this.streamController.audioElement.srcObject) {
 				this.streamController.audioElement.pause();

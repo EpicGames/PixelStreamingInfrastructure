@@ -1,7 +1,6 @@
-import playButton from './assets/images/Play.png';
 import * as libspsfrontend from '@tensorworks/libspsfrontend'
 import { VideoQpIndicator } from './VideoQpIndicator';
-import { ActionOverlayBase, AfkOverlayBase, TextOverlayBase } from './Overlays';
+import { AfkOverlay, ConnectOverlay, DisconnectOverlay, PlayOverlay, InfoOverlay, ErrorOverlay } from './Overlays';
 import { FullScreenLogic } from './Fullscreen';
 import { OnScreenKeyboard } from './OnScreenKeyboard';
 import { Flags } from "@tensorworks/libspsfrontend"
@@ -46,12 +45,12 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.configureSettings();
 
 		// build all of the overlays 
-		this.buildDisconnectOverlay();
-		this.buildConnectOverlay();
-		this.buildPlayOverlay();
-		this.buildAfkOverlay();
-		this.buildInfoOverlay();
-		this.buildErrorOverlay();
+		this.disconnectOverlay = new DisconnectOverlay(this.config.videoElementParent);
+		this.connectOverlay = new ConnectOverlay(this.config.videoElementParent);
+		this.playOverlay = new PlayOverlay(this.config.videoElementParent);
+		this.afkOverlay = new AfkOverlay(this.config.videoElementParent);
+		this.infoOverlay = new InfoOverlay(this.config.videoElementParent);
+		this.errorOverlay = new ErrorOverlay(this.config.videoElementParent);
 
 		// configure all buttons 
 		this.ConfigureButtons();
@@ -174,174 +173,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.onScreenKeyboardHelper = new OnScreenKeyboard(this.config.videoElementParent);
 		this.onScreenKeyboardHelper.unquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.iWebRtcController.requestUnquantisedAndDenormaliseUnsigned(x, y);
 		this.activateOnScreenKeyboard = (command: any) => this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
-	}
-
-	/**
-	 * Builds the disconnect overlay 
-	 */
-	buildDisconnectOverlay() {
-		// build the overlay base div 
-		let disconnectOverlayHtml = document.createElement('div');
-		disconnectOverlayHtml.id = "disconnectOverlay";
-		disconnectOverlayHtml.className = "clickableState";
-
-		// set the event Listener
-		let disconnectOverlayEvent: EventListener = () => this.onDisconnectionAction();
-
-		// add the new event listener 
-		disconnectOverlayHtml.addEventListener('click', function onOverlayClick(event: Event) {
-			disconnectOverlayEvent(event);
-		});
-
-		// build the inner html container 
-		let disconnectOverlayHtmlInnerContainer = document.createElement('div');
-		disconnectOverlayHtmlInnerContainer.id = 'disconnectButton';
-
-		// build the span that holds error text
-		let disconnectOverlayInnerSpan = document.createElement('span');
-		disconnectOverlayInnerSpan.id = 'disconnectText';
-		disconnectOverlayInnerSpan.innerHTML = 'Click To Restart';
-
-		// build the image element that holds the reconnect element
-		let restartSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-		restartSvg.setAttribute('width', "40");
-		restartSvg.setAttribute('height', "40");
-		restartSvg.setAttribute('fill', "currentColor");
-		restartSvg.setAttribute('class', "bi bi-arrow-counterclockwise m-2");
-		restartSvg.setAttribute('viewBox', "0 0 16 16");
-
-		// build the arrow path 
-		let restartSvgPathArrow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-		restartSvgPathArrow.setAttribute('fill-rule', "evenodd");
-		restartSvgPathArrow.setAttribute('d', "M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z");
-
-		// build the circle path
-		let restartSvgPathCircle = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-		restartSvgPathCircle.setAttribute('d', "M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z");
-
-		// bring it all together
-		restartSvg.appendChild(restartSvgPathArrow);
-		restartSvg.appendChild(restartSvgPathCircle);
-
-		// append the span and images to the content container 
-		disconnectOverlayHtmlInnerContainer.appendChild(disconnectOverlayInnerSpan);
-		disconnectOverlayHtmlInnerContainer.appendChild(restartSvg);
-
-		// instantiate the overlay
-		this.disconnectOverlay = new ActionOverlayBase(this.config.videoElementParent, disconnectOverlayHtml, disconnectOverlayHtmlInnerContainer, "disconnectText");
-	}
-
-	/**
-	 * Builds the connect overlay 
-	 */
-	buildConnectOverlay() {
-		// build the overlay base div 
-		let connectOverlayHtml = document.createElement('div');
-		connectOverlayHtml.id = "connectOverlay";
-		connectOverlayHtml.className = "clickableState";
-
-		// set the event Listener
-		let connectOverlayEvent: EventListener = () => this.onConnectAction();
-
-		// add the new event listener 
-		connectOverlayHtml.addEventListener('click', function onOverlayClick(event: Event) {
-			connectOverlayEvent(event);
-		});
-
-		// build the inner html 
-		let connectOverlayHtmlInner = document.createElement('div');
-		connectOverlayHtmlInner.id = 'connectButton';
-		connectOverlayHtmlInner.innerHTML = 'Click to start';
-
-		// instantiate the overlay
-		this.connectOverlay = new ActionOverlayBase(this.config.videoElementParent, connectOverlayHtml, connectOverlayHtmlInner);
-	}
-
-	/**
-	 * Builds the play overlay 
-	 */
-	buildPlayOverlay() {
-		// build the overlay base div 
-		let playOverlayHtml = document.createElement('div');
-		playOverlayHtml.id = "playOverlay";
-		playOverlayHtml.className = "clickableState";
-
-		// set the event Listener
-		let playOverlayEvent: EventListener = () => this.onPlayAction();
-
-		// add the new event listener 
-		playOverlayHtml.addEventListener('click', function onOverlayClick(event: Event) {
-			playOverlayEvent(event);
-		});
-
-		// build the inner html 
-		let playOverlayHtmlInner = document.createElement('img');
-		playOverlayHtmlInner.id = 'playButton';
-		playOverlayHtmlInner.src = playButton;
-		//playOverlayHtmlInner.src = "images/Play.png";
-		playOverlayHtmlInner.alt = 'Start Streaming';
-
-		// instantiate the overlay
-		this.playOverlay = new ActionOverlayBase(this.config.videoElementParent, playOverlayHtml, playOverlayHtmlInner);
-	}
-
-	/**
-	 * Builds the Afk overlay 
-	 */
-	buildAfkOverlay() {
-
-		// build the overlay base div 
-		let afkOverlayHtml = document.createElement('div');
-		afkOverlayHtml.id = "afkOverlay";
-		afkOverlayHtml.className = "clickableState";
-
-		let afkOverlayEvent: EventListener = () => this.onAfkAction();
-
-		afkOverlayHtml.addEventListener('click', function onOverlayClick(event: Event) {
-			afkOverlayEvent(event);
-		});
-
-		// build the inner html
-		let afkOverlayHtmlInner = document.createElement('div');
-		afkOverlayHtmlInner.id = 'afkOverlayInner';
-		afkOverlayHtmlInner.innerHTML = '<center>No activity detected<br>Disconnecting in <span id="afkCountDownNumber"></span> seconds<br>Click to continue<br></center>'
-
-		// instantiate the overlay
-		this.afkOverlay = new AfkOverlayBase(this.config.videoElementParent, afkOverlayHtml, afkOverlayHtmlInner, "afkCountDownNumber");
-	}
-
-	/**
-	 * Builds the info overlay 
-	 */
-	buildInfoOverlay() {
-		// build the overlay base div 
-		let infoOverlayHtml = document.createElement('div');
-		infoOverlayHtml.id = "infoOverlay";
-		infoOverlayHtml.className = "textDisplayState";
-
-		// build the inner html
-		let infoOverlayHtmlInner = document.createElement('div');
-		infoOverlayHtmlInner.id = 'messageOverlayInner';
-
-		// instantiate the overlay
-		this.infoOverlay = new TextOverlayBase(this.config.videoElementParent, infoOverlayHtml, infoOverlayHtmlInner);
-	}
-
-	/**
-	 * Builds the error overlay 
-	 */
-	buildErrorOverlay() {
-		// build the overlay base div 
-		let errorOverlayHtml = document.createElement('div');
-		errorOverlayHtml.id = "errorOverlay";
-		errorOverlayHtml.className = "textDisplayState";
-
-		// build the inner html
-		let errorOverlayHtmlInner = document.createElement('div');
-		errorOverlayHtmlInner.id = 'errorOverlayInner';
-
-		// instantiate the overlay
-		this.errorOverlay = new TextOverlayBase(this.config.videoElementParent, errorOverlayHtml, errorOverlayHtmlInner);
 	}
 
 	/**
@@ -587,7 +418,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		// update all of the tools upon disconnect 
 		this.onVideoEncoderAvgQP(0);
 
-		// starting a latency check
+		// disable starting a latency check
 		this.latencyTestButton.onclick = () => { }
 	}
 
