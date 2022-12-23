@@ -34,9 +34,14 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 	constructor(config: libspsfrontend.Config) {
 		super(config);
-		this.videoQpIndicator = new VideoQpIndicator("connectionStrength", "qualityText", "outer", "middle", "inner", "dot");
+
+		// Add the video stream QP indicator
+		this.videoQpIndicator = new VideoQpIndicator();
+		document.getElementById("uiFeatures").appendChild(this.videoQpIndicator.rootElement);
+
 		this.fullScreenLogic = new FullScreenLogic();
 
+		// Add the settings panel
 		this.settingsPanel = new SettingPanel();
 		document.getElementById("uiFeatures").appendChild(this.settingsPanel.rootElement);
 		this.configureSettings();
