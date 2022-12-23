@@ -18,8 +18,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	// instantiate the WebRtcPlayerControllers interface var 
 	iWebRtcController: libspsfrontend.IWebRtcPlayerController;
 
-	showStats: boolean;
-
 	// HTML Elements that are used multiple times
 
 	// Global
@@ -36,7 +34,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 	constructor(config: libspsfrontend.Config) {
 		super(config);
-		this.showStats = true;
 		this.videoQpIndicator = new VideoQpIndicator("connectionStrength", "qualityText", "outer", "middle", "inner", "dot");
 		this.fullScreenLogic = new FullScreenLogic();
 
