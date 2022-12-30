@@ -8,6 +8,7 @@ import { LabelledButton} from "@tensorworks/libspsfrontend"
 import { NumericParameters } from '@tensorworks/libspsfrontend';
 import { SettingPanel } from '@tensorworks/libspsfrontend'
 import { SettingsIcon } from './SettingsIcon';
+import { StatsIcon } from './StatsIcon';
 
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	config: libspsfrontend.Config;
@@ -332,7 +333,11 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.settingsPanel.settingsCloseButton.onclick = () => this.settingsClicked();
 
 		// setup the stats/info button
-		document.getElementById('statsBtn').onclick = () => this.statsClicked();
+		const statsIcon = new StatsIcon();
+		document.getElementById("controls").appendChild(statsIcon.rootElement);
+		statsIcon.rootElement.onclick = () => this.statsClicked();
+		
+		// todo get rid of element by id once stats becomes a component
 		document.getElementById('statsClose').onclick = () => this.statsClicked();
 
 		// Add button for toggle fps
