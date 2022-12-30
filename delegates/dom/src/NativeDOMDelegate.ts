@@ -1,7 +1,7 @@
 import * as libspsfrontend from '@tensorworks/libspsfrontend'
 import { VideoQpIndicator } from './VideoQpIndicator';
 import { AfkOverlay, ConnectOverlay, DisconnectOverlay, PlayOverlay, InfoOverlay, ErrorOverlay } from './Overlays';
-import { FullScreenLogic } from './Fullscreen';
+import { FullScreenIcon } from './FullscreenIcon';
 import { OnScreenKeyboard } from './OnScreenKeyboard';
 import { Flags } from "@tensorworks/libspsfrontend"
 import { LabelledButton} from "@tensorworks/libspsfrontend"
@@ -22,7 +22,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 	// Global
 	videoQpIndicator: VideoQpIndicator;
-	fullScreenLogic: FullScreenLogic;
 
 	// Settings
 	settingsPanel: SettingPanel;
@@ -39,12 +38,14 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.videoQpIndicator = new VideoQpIndicator();
 		document.getElementById("uiFeatures").appendChild(this.videoQpIndicator.rootElement);
 
-		this.fullScreenLogic = new FullScreenLogic();
-
 		// Add the settings panel
 		this.settingsPanel = new SettingPanel();
 		document.getElementById("uiFeatures").appendChild(this.settingsPanel.rootElement);
 		this.configureSettings();
+
+		// Add fullscreen button to controls
+		const fullScreenIcon = new FullScreenIcon(document.getElementById("playerUI"));
+		document.getElementById("controls").appendChild(fullScreenIcon.rootElement);
 
 		// build all of the overlays 
 		this.disconnectOverlay = new DisconnectOverlay(this.config.videoElementParent);
@@ -400,12 +401,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.iWebRtcController.sendLatencyTest();
 		}
 
-		// Reveal all the container
-		// this.viewSettingsContainer.classList.remove("d-none");
-		// this.commandsContainer.classList.remove("d-none");
-		// this.streamingSettingsContainer.classList.remove("d-none");
-		// this.statsContainer.classList.remove("d-none");
-
 		this.videoStartTime = Date.now();
 	}
 
@@ -546,28 +541,5 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	  */
 	onVideoEncoderAvgQP(QP: number): void {
 		this.videoQpIndicator.updateQpTooltip(QP);
-	}
-}
-
-/**
- * Declare additions to base types 
- */
-declare global {
-	interface Document {
-		webkitIsFullScreen?: boolean;
-		mozFullScreen?: boolean;
-		webkitFullscreenEnabled?: boolean;
-		mozCancelFullScreen?: () => Promise<void>;
-		msExitFullscreen?: () => Promise<void>;
-		webkitExitFullscreen?: () => Promise<void>;
-		mozFullScreenElement?: Element;
-		msFullscreenElement?: Element;
-		webkitFullscreenElement?: Element;
-	}
-
-	interface HTMLElement {
-		msRequestFullscreen?: () => Promise<void>;
-		mozRequestFullscreen?: () => Promise<void>;
-		webkitRequestFullscreen?: () => Promise<void>;
 	}
 }
