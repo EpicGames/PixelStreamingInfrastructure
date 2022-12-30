@@ -4,6 +4,8 @@
 export class SettingPanel {
 
 	_rootElement: HTMLElement;
+	_settingsCloseButton : HTMLElement;
+	_settingsContentElement : HTMLElement;
 
 	constructor() {
 		this._rootElement = null;
@@ -27,16 +29,27 @@ export class SettingPanel {
 			settingsHeading.textContent = "Settings";
 			panelElem.appendChild(settingsHeading);
 
-			const settingsClose = document.createElement("div");
-			settingsClose.id = "settingsClose";
-			panelElem.appendChild(settingsClose);
-
-			const settingsContent = document.createElement("div");
-			settingsContent.id = "settingsContent";
-			panelElem.appendChild(settingsContent);
+			panelElem.appendChild(this.settingsCloseButton);
+			panelElem.appendChild(this.settingsContentElement);
 
 		}
 		return this._rootElement;
+	}
+
+	public get settingsContentElement() : HTMLElement {
+		if(!this._settingsContentElement) {
+			this._settingsContentElement = document.createElement("div");
+			this._settingsContentElement.id = "settingsContent";
+		}
+		return this._settingsContentElement;
+	}
+
+	public get settingsCloseButton() : HTMLElement {
+		if(!this._settingsCloseButton) {
+			this._settingsCloseButton = document.createElement("div");
+			this._settingsCloseButton.id = "settingsClose";
+		}
+		return this._settingsCloseButton;
 	}
 
 	/**

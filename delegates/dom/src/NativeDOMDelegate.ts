@@ -7,6 +7,7 @@ import { Flags } from "@tensorworks/libspsfrontend"
 import { LabelledButton} from "@tensorworks/libspsfrontend"
 import { NumericParameters } from '@tensorworks/libspsfrontend';
 import { SettingPanel } from '@tensorworks/libspsfrontend'
+import { SettingsIcon } from './SettingsIcon';
 
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	config: libspsfrontend.Config;
@@ -42,10 +43,6 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.settingsPanel = new SettingPanel();
 		document.getElementById("uiFeatures").appendChild(this.settingsPanel.rootElement);
 		this.configureSettings();
-
-		// Add fullscreen button to controls
-		const fullScreenIcon = new FullScreenIcon(document.getElementById("playerUI"));
-		document.getElementById("controls").appendChild(fullScreenIcon.rootElement);
 
 		// build all of the overlays 
 		this.disconnectOverlay = new DisconnectOverlay(this.config.videoElementParent);
@@ -324,17 +321,20 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 */
 	ConfigureButtons() {
 
-		// set up the settings 
-		document.getElementById('settingsBtn').onclick = () => this.settingsClicked();
-		document.getElementById('settingsClose').onclick = () => this.settingsClicked();
+		// Add fullscreen button to controls
+		const fullScreenIcon = new FullScreenIcon(document.getElementById("playerUI"));
+		document.getElementById("controls").appendChild(fullScreenIcon.rootElement);
 
-		// setup the info button
+		// Add settings button to controls
+		const settingsIcon = new SettingsIcon();
+		document.getElementById("controls").appendChild(settingsIcon.rootElement);
+		settingsIcon.rootElement.onclick = () => this.settingsClicked();
+		this.settingsPanel.settingsCloseButton.onclick = () => this.settingsClicked();
+
+		// setup the stats/info button
 		document.getElementById('statsBtn').onclick = () => this.statsClicked();
 		document.getElementById('statsClose').onclick = () => this.statsClicked();
 
-		const settingsElem = document.getElementById("settingsContent");
-		const commandsSectionElem = this.config.buildSectionWithHeading(settingsElem, "Commands");
-		
 		// Add button for toggle fps
 		const showFPSButton = new LabelledButton("Show FPS", "Toggle");
 		showFPSButton.addOnClickListener(()=>{
@@ -353,6 +353,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			this.iWebRtcController.requestKeyFrame();
 		});
 
+		const commandsSectionElem = this.config.buildSectionWithHeading(this.settingsPanel.settingsContentElement, "Commands");
 		commandsSectionElem.appendChild(showFPSButton.rootElement);
 		commandsSectionElem.appendChild(requestKeyframeButton.rootElement);
 		commandsSectionElem.appendChild(restartStreamButton.rootElement);
