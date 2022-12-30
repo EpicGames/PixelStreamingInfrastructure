@@ -37,9 +37,8 @@ declare global {
 	/**
 	 * Construct a FullScreenIcon
 	 */
-	constructor(fullscreenElement : HTMLElement) {
+	constructor() {
 
-		this.fullscreenElement = fullscreenElement;
 		this.rootElement.onclick = () => this.toggleFullscreen();
 
 		// set up the full screen events

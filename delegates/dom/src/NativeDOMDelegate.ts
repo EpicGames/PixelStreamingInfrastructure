@@ -1,14 +1,12 @@
 import * as libspsfrontend from '@tensorworks/libspsfrontend'
 import { VideoQpIndicator } from './VideoQpIndicator';
 import { AfkOverlay, ConnectOverlay, DisconnectOverlay, PlayOverlay, InfoOverlay, ErrorOverlay } from './Overlays';
-import { FullScreenIcon } from './FullscreenIcon';
 import { OnScreenKeyboard } from './OnScreenKeyboard';
 import { Flags } from "@tensorworks/libspsfrontend"
 import { LabelledButton} from "@tensorworks/libspsfrontend"
 import { NumericParameters } from '@tensorworks/libspsfrontend';
 import { SettingPanel } from '@tensorworks/libspsfrontend'
-import { SettingsIcon } from './SettingsIcon';
-import { StatsIcon } from './StatsIcon';
+import { Controls } from './Controls';
 
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	config: libspsfrontend.Config;
@@ -322,20 +320,19 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 */
 	ConfigureButtons() {
 
-		// Add fullscreen button to controls
-		const fullScreenIcon = new FullScreenIcon(document.getElementById("playerUI"));
-		document.getElementById("controls").appendChild(fullScreenIcon.rootElement);
+		// Setup controls
+		const controls = new Controls();
+
+		// When we fullscreen we want this element to be the root
+		controls.fullscreenIcon.fullscreenElement = document.getElementById("playerUI");
+		document.getElementById("uiFeatures").appendChild(controls.rootElement);
 
 		// Add settings button to controls
-		const settingsIcon = new SettingsIcon();
-		document.getElementById("controls").appendChild(settingsIcon.rootElement);
-		settingsIcon.rootElement.onclick = () => this.settingsClicked();
+		controls.settingsIcon.rootElement.onclick = () => this.settingsClicked();
 		this.settingsPanel.settingsCloseButton.onclick = () => this.settingsClicked();
 
 		// setup the stats/info button
-		const statsIcon = new StatsIcon();
-		document.getElementById("controls").appendChild(statsIcon.rootElement);
-		statsIcon.rootElement.onclick = () => this.statsClicked();
+		controls.statsIcon.rootElement.onclick = () => this.statsClicked();
 		
 		// todo get rid of element by id once stats becomes a component
 		document.getElementById('statsClose').onclick = () => this.statsClicked();
