@@ -7,6 +7,7 @@ import { LabelledButton} from "@tensorworks/libspsfrontend"
 import { NumericParameters } from '@tensorworks/libspsfrontend';
 import { SettingPanel } from '@tensorworks/libspsfrontend'
 import { Controls } from './Controls';
+import { LatencyTest } from './LatencyTest';
 
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	config: libspsfrontend.Config;
@@ -28,7 +29,9 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 	// Stats
 	statsPanel = document.getElementById('stats-panel') as HTMLDivElement;
-	latencyTestButton = document.getElementById("btn-start-latency-test") as HTMLButtonElement;
+
+	latencyTest: LatencyTest;
+
 	sendStatsToServer = document.getElementById("send-stats-tgl") as HTMLInputElement;
 
 	constructor(config: libspsfrontend.Config) {
@@ -42,6 +45,11 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.settingsPanel = new SettingPanel();
 		document.getElementById("uiFeatures").appendChild(this.settingsPanel.rootElement);
 		this.configureSettings();
+
+		// Add stats/info panel
+		// todo
+		this.latencyTest = new LatencyTest();
+		document.getElementById("ControlsStats").appendChild(this.latencyTest.rootElement);
 
 		// build all of the overlays 
 		this.disconnectOverlay = new DisconnectOverlay(this.config.videoElementParent);
@@ -400,7 +408,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 */
 	onVideoInitialised() {
 		// starting a latency check
-		this.latencyTestButton.onclick = () => {
+		this.latencyTest.latencyTestButton.onclick = () => {
 			this.iWebRtcController.sendLatencyTest();
 		}
 
@@ -419,7 +427,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.onVideoEncoderAvgQP(0);
 
 		// disable starting a latency check
-		this.latencyTestButton.onclick = () => { }
+		this.latencyTest.latencyTestButton.onclick = () => { }
 	}
 
 	/**
@@ -434,8 +442,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			}
 			let disableLatencyTest = settings.PixelStreaming.DisableLatencyTest;
 			if (disableLatencyTest) {
-				this.latencyTestButton.disabled = true;
-				this.latencyTestButton.title = "Disabled by -PixelStreamingDisableLatencyTester=true";
+				this.latencyTest.latencyTestButton.disabled = true;
+				this.latencyTest.latencyTestButton.title = "Disabled by -PixelStreamingDisableLatencyTester=true";
 				libspsfrontend.Logger.Info(libspsfrontend.Logger.GetStackTrace(), "-PixelStreamingDisableLatencyTester=true, requesting latency report from the the browser to UE is disabled.");
 			}
 		}
@@ -517,17 +525,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	* @param latencyTimings - Latency Test Timings sent from the UE Instance 
 	*/
 	onLatencyTestResult(latencyTimings: libspsfrontend.LatencyTestResults): void {
-		libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), latencyTimings.toString(), 6);
-		let latencyStatsInnerHTML = '';
-		latencyStatsInnerHTML += "<div>Net latency RTT (ms): " + latencyTimings.networkLatency + "</div>";
-		latencyStatsInnerHTML += "<div>UE Encode (ms): " + latencyTimings.EncodeMs + "</div>";
-		latencyStatsInnerHTML += "<div>UE Capture (ms): " + latencyTimings.CaptureToSendMs + "</div>";
-		latencyStatsInnerHTML += "<div>Browser send latency (ms): " + latencyTimings.browserSendLatency + "</div>";
-		latencyStatsInnerHTML += latencyTimings.frameDisplayDeltaTimeMs && latencyTimings.browserReceiptTimeMs ? "<div>Browser receive latency (ms): " + latencyTimings.frameDisplayDeltaTimeMs + "</div>" : "";
-		latencyStatsInnerHTML += "<div>Total latency (excluding browser) (ms): " + latencyTimings.latencyExcludingDecode + "</div>";
-		latencyStatsInnerHTML += latencyTimings.endToEndLatency ? "<div>Total latency (ms): " + latencyTimings.endToEndLatency + "</div>" : "";
-
-		document.getElementById("latencyStatsResults").innerHTML = latencyStatsInnerHTML;
+		this.latencyTest.handleTestResult(latencyTimings);
 	}
 
 	/**
