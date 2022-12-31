@@ -1,27 +1,26 @@
-import { IEncoder, IInitialSettings, IPixelStreaming, IWebRTC } from "../DataChannel/IInitialSettings"
 
 /**
  * Latency Test Results Data
  */
-export class InitialSettings implements IInitialSettings {
+export class InitialSettings {
 
-    PixelStreaming?: IPixelStreaming;
-    Encoder?: IEncoder;
-    WebRTC?: IWebRTC;
+    PixelStreamingSettings: PixelStreamingSettings;
+    EncoderSettings: EncoderSettings;
+    WebRTCSettings: WebRTCSettings;
 
 
     constructor() {
-        this.PixelStreaming = new PixelStreaming()
-        this.Encoder = new Encoder()
-        this.WebRTC = new WebRTC()
+        this.PixelStreamingSettings = new PixelStreamingSettings()
+        this.EncoderSettings = new EncoderSettings()
+        this.WebRTCSettings = new WebRTCSettings()
     }
 
     /**
      * Checks for compatibility with the FPS and MaxFPS stats between 4.27 and 5
      */
     ueCompatible() {
-        if (this.WebRTC.MaxFPS != null) {
-            this.WebRTC.FPS = this.WebRTC.MaxFPS
+        if (this.WebRTCSettings.MaxFPS != null) {
+            this.WebRTCSettings.FPS = this.WebRTCSettings.MaxFPS
         }
     }
 
@@ -30,7 +29,7 @@ export class InitialSettings implements IInitialSettings {
 /**
  * A class for handling pixel streaming details 
  */
-export class PixelStreaming implements IPixelStreaming {
+export class PixelStreamingSettings {
     AllowPixelStreamingCommands?: boolean;
     DisableLatencyTest?: boolean;
 }
@@ -38,7 +37,7 @@ export class PixelStreaming implements IPixelStreaming {
 /**
  * A class for handling enoder stats 
  */
-export class Encoder implements IEncoder {
+export class EncoderSettings {
     TargetBitrate?: number;
     MaxBitrate?: number;
     MinQP?: number;
@@ -53,7 +52,7 @@ export class Encoder implements IEncoder {
 /**
  * A class for handling web rtc stats 
  */
-export class WebRTC implements IWebRTC {
+export class WebRTCSettings {
     DegradationPref?: "BALANCED" | "MAINTAIN_FRAMERATE" | "MAINTAIN_RESOLUTION";
     MinBitrate?: number;
     MaxBitrate?: number;

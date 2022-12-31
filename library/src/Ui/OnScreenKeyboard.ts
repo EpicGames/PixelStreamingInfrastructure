@@ -1,4 +1,6 @@
-import * as libspsfrontend from '@tensorworks/libspsfrontend'
+
+import { UnquantisedAndDenormaliseUnsigned } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+
 /**
  * Class for handling on screen keyboard usage
  */
@@ -28,7 +30,7 @@ export class OnScreenKeyboard {
      * @param y the y axis point 
      * @returns unquantizeAndDenormalizeUnsigned object 
      */
-    unquantizeAndDenormalizeUnsigned(x: number, y: number): libspsfrontend.UnquantisedAndDenormaliseUnsigned {
+    unquantizeAndDenormalizeUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned {
         return null;
     };
 
@@ -69,7 +71,7 @@ export class OnScreenKeyboard {
             // Show the 'edit text' button.
             this.editTextButton.classList.remove('hiddenState');
             // Place the 'edit text' button near the UE input widget.
-            let pos = this.unquantizeAndDenormalizeUnsigned(command.x, command.y);
+            const pos = this.unquantizeAndDenormalizeUnsigned(command.x, command.y);
             this.editTextButton.style.top = pos.y.toString() + 'px';
             this.editTextButton.style.left = (pos.x - 40).toString() + 'px';
         } else {

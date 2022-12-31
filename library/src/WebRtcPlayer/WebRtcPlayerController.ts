@@ -9,9 +9,8 @@ import { PeerConnectionController } from "../PeerConnectionController/PeerConnec
 import { KeyboardController } from "../Inputs/KeyboardController";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { IWebRtcPlayerController } from "./IWebRtcPlayerController";
-import { IDelegate } from "../Delegate/IDelegate";
 import { Config, Flags } from "../Config/Config";
-import { Encoder, InitialSettings, WebRTC } from "../DataChannel/InitialSettings";
+import { EncoderSettings, InitialSettings, WebRTCSettings } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
 import { Logger } from "../Logger/Logger";
 import { FileLogic } from "../FileManager/FileLogic";
@@ -20,7 +19,6 @@ import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 import { StreamMessageController, MessageDirection } from "../UeInstanceMessage/StreamMessageController";
 import { ResponseController } from "../UeInstanceMessage/ResponseController";
 import * as MessageReceive from "../WebSockets/MessageReceive";
-import { IInitialSettings } from "../DataChannel/IInitialSettings";
 import { ILatencyTestResults } from "../DataChannel/ILatencyTestResults";
 import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
 import { SendDescriptorController } from "../UeInstanceMessage/SendDescriptorController";
@@ -799,7 +797,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Send the Encoder Settings to the UE Instance as a UE UI Descriptor.
 	 * @param encoder - Encoder Settings
 	 */
-	sendEncoderSettings(encoder: Encoder) {
+	sendEncoderSettings(encoder: EncoderSettings) {
 		Logger.Log(Logger.GetStackTrace(), "----   Encoder Settings    ----\n" + JSON.stringify(encoder, undefined, 4) + "\n-------------------------------", 6);
 
 		if (encoder.MinQP != null) {
@@ -814,7 +812,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Send the WebRTC Settings to the UE Instance as a UE UI Descriptor.
 	 * @param webRTC - Web RTC Settings 
 	 */
-	sendWebRtcSettings(webRTC: WebRTC) {
+	sendWebRtcSettings(webRTC: WebRTCSettings) {
 		Logger.Log(Logger.GetStackTrace(), "----   WebRTC Settings    ----\n" + JSON.stringify(webRTC, undefined, 4) + "\n-------------------------------", 6);
 
 		// 4.27 and 5 compatibility
@@ -895,9 +893,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	handleInitialSettings(message: Uint8Array) {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.InitialSettings", 6);
 		const payloadAsString = new TextDecoder("utf-16").decode(message.slice(1));
-		const iInitialSettings: IInitialSettings = JSON.parse(payloadAsString);
+		const parsedInitialSettings: InitialSettings = JSON.parse(payloadAsString);
 		const initialSettings: InitialSettings = new InitialSettings();
-		Object.assign(initialSettings, iInitialSettings);
+		Object.assign(initialSettings, parsedInitialSettings);
 		initialSettings.ueCompatible()
 		Logger.Log(Logger.GetStackTrace(), payloadAsString, 6);
 

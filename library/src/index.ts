@@ -17,7 +17,7 @@ export { IAfkOverlay } from './Overlay/IAfkOverlay';
 export { AfkLogic } from './Afk/AfkLogic';
 
 export { LatencyTestResults } from "./DataChannel/LatencyTestResults";
-export { Encoder, InitialSettings, WebRTC } from './DataChannel/InitialSettings';
+export { EncoderSettings, InitialSettings, WebRTCSettings } from './DataChannel/InitialSettings';
 export { AggregatedStats } from './PeerConnectionController/AggregatedStats';
 export { MessageInstanceState, InstanceState, MessageAuthResponse, MessageAuthResponseOutcomeType } from './WebSockets/MessageReceive';
 export { Logger } from './Logger/Logger';

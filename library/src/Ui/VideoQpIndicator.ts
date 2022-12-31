@@ -6,11 +6,11 @@
  */
  export class VideoQpIndicator {
 
-	videoEncoderAvgQP: number = -1;
+	videoEncoderAvgQP = -1;
 
 	// non html elements 
-	statsText: string = "";
-	color: string = "";
+	statsText = "";
+	color = "";
 
 	// qp colours 
 	readonly orangeQP = 26;
@@ -23,12 +23,6 @@
 	_outer: SVGElement;
 	_middle: SVGElement;
 	_inner: SVGElement;
-
-	/**
-	 * Construct a VideoQpIndicator
-	 */
-	constructor() {
-	}
 
 	/**
 	 * Get the root element of the QP indicator.
@@ -142,7 +136,7 @@
 	blinkVideoQualityStatus(speed: number) {
 		let iteration = speed;
 		let opacity = 1;
-		let tickID = setInterval(() => {
+		const tickID = setInterval(() => {
 			opacity -= 0.1;
 			this.qualityText.style.opacity = String(Math.abs((opacity - 0.5) * 2));
 			if (opacity <= 0.1) {

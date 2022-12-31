@@ -11,5 +11,5 @@
     "declaration": false
   },
   "lib": ["es2015"],
-  "include": ["./src/*.ts", "index.d.ts", "../../library/src/Ui/LatencyTest.ts"],
+  "include": ["./src/*.ts", "index.d.ts", "../../library/src/Ui/LatencyTest.ts", "../../library/src/Ui/VideoQpIndicator.ts", "../../library/src/Ui/OnScreenKeyboard.ts", "../../library/src/Overlay/Overlays.ts", "../../library/src/Ui/Controls.ts"],
 }

@@ -1,9 +1,5 @@
 import { InitialSettings } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults"
-import { IActionOverlay } from "../Overlay/IActionOverlay";
-import { IAfkOverlay } from "../Overlay/IAfkOverlay";
-import { IOverlay } from "../Overlay/IOverlay";
-import { ITextOverlay } from "../Overlay/ITextOverlay";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { IWebRtcPlayerController } from "../WebRtcPlayer/IWebRtcPlayerController";
 import { MessageInstanceState, MessageAuthResponse } from "../WebSockets/MessageReceive";
@@ -13,15 +9,6 @@ import { MessageInstanceState, MessageAuthResponse } from "../WebSockets/Message
 */
 export interface IDelegate {
 
-	// placeholders for overlays 
-	currentOverlay: IOverlay;
-	connectOverlay: IActionOverlay;
-	playOverlay: IActionOverlay;
-	disconnectOverlay: IActionOverlay;
-	afkOverlay: IAfkOverlay;
-	infoOverlay: ITextOverlay;
-	errorOverlay: ITextOverlay;
-	showActionOrErrorOnDisconnect: boolean;
 
 	/**
 	 * Activate the on screen keyboard when receiving the command from the streamer
