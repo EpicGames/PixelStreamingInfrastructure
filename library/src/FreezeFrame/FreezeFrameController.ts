@@ -16,7 +16,7 @@ export class FreezeFrameController {
      * Construct a freeze frame controller 
      * @param rootDiv - the div that a freeze frame element will be injected into
      */
-    constructor(rootDiv: HTMLDivElement) {
+    constructor(rootDiv: HTMLElement) {
         this.freezeFrame = new FreezeFrame(rootDiv);
     }
 

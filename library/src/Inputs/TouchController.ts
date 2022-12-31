@@ -13,7 +13,7 @@ export class TouchController implements ITouchController {
     videoElementParent: HTMLVideoElement;
     fingers = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
     fingerIds = new Map();
-    maxByteValue: number = 255;
+    maxByteValue = 255;
 
     /**
      * @param toStreamerMessagesProvider - Stream message instance  
@@ -29,6 +29,12 @@ export class TouchController implements ITouchController {
         this.videoElementParent.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
         this.videoElementParent.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
         Logger.Log(Logger.GetStackTrace(), "Touch Events Registered", 6);
+
+        // is this strictly necessary?
+        document.ontouchmove = (event: TouchEvent) => {
+            event.preventDefault();
+        }
+
     }
 
     /**
@@ -36,7 +42,7 @@ export class TouchController implements ITouchController {
      * @param touch - the touch command 
      */
     rememberTouch(touch: Touch) {
-        let finger = this.fingers.pop();
+        const finger = this.fingers.pop();
         if (finger === undefined) {
             Logger.Log(Logger.GetStackTrace(), 'exhausted touch identifiers', 6);
         }
@@ -97,17 +103,17 @@ export class TouchController implements ITouchController {
 
     emitTouchData(type: string, touches: TouchList) {
         if(!this.videoElementProvider.isVideoReady()){ return; }
-        let videoElementParent = this.videoElementProvider.getVideoParentElement();
-        let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+        const videoElementParent = this.videoElementProvider.getVideoParentElement();
+        const toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 
         for (let t = 0; t < touches.length; t++) {
-            let numTouches = 1; // the number of touches to be sent this message
-            let touch = touches[t];
-            let x = touch.clientX - videoElementParent.offsetLeft;
-            let y = touch.clientY - videoElementParent.offsetTop;
+            const numTouches = 1; // the number of touches to be sent this message
+            const touch = touches[t];
+            const x = touch.clientX - videoElementParent.offsetLeft;
+            const y = touch.clientY - videoElementParent.offsetTop;
             Logger.Log(Logger.GetStackTrace(), `F${this.fingerIds.get(touch.identifier)}=(${x}, ${y})`, 6);
 
-            let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(x, y);
+            const coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(x, y);
             switch (type) {
                 case "TouchStart":
                     toStreamerHandlers.get("TouchStart")("TouchStart", [numTouches, coord.x, coord.y, this.fingerIds.get(touch.identifier), this.maxByteValue * touch.force, coord.inRange ? 1 : 0]);

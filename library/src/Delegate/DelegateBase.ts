@@ -16,7 +16,12 @@ import { MessageInstanceState, MessageAuthResponse } from '../WebSockets/Message
 export class DelegateBase implements IDelegate {
 	public iWebRtcController: IWebRtcPlayerController;
 	public config: Config;
-	showActionOrErrorOnDisconnect: boolean = true;
+
+	_rootElement: HTMLElement;
+	_uiFeatureElement: HTMLElement;
+	_videoElementParent: HTMLElement;
+
+	showActionOrErrorOnDisconnect = true;
 
 	// set the overlay placeholders 
 	currentOverlay: IOverlay;
@@ -33,6 +38,42 @@ export class DelegateBase implements IDelegate {
 	 */
 	constructor(config: Config) {
 		this.config = config;
+	}
+
+	/**
+	 * Gets the rootElement of the application, video stream and all UI are children of this element.
+	 */
+	public get rootElement() : HTMLElement {
+		if(!this._rootElement) {
+			this._rootElement = document.createElement("div");
+			this._rootElement.id = "playerUI";
+			this._rootElement.classList.add("noselect");
+			this._rootElement.appendChild(this.videoElementParent);
+			this._rootElement.appendChild(this.uiFeaturesElement);
+		}
+		return this._rootElement;
+	}
+
+	/**
+	 * Gets the element that contains the video stream element.
+	 */
+	public get videoElementParent() : HTMLElement {
+		if(!this._videoElementParent) {
+			this._videoElementParent = document.createElement("div");
+			this._videoElementParent.id = "videoElementParent";
+		}
+		return this._videoElementParent;
+	}
+
+	/**
+	 * Gets the element that contains all the UI features, like the stats and settings panels.
+	 */
+	public get uiFeaturesElement() : HTMLElement {
+		if(!this._uiFeatureElement) {
+			this._uiFeatureElement = document.createElement("div");
+			this._uiFeatureElement.id = "uiFeatures";
+		}
+		return this._uiFeatureElement;
 	}
 
 	/**

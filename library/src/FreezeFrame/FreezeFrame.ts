@@ -2,7 +2,7 @@
  * A class for managing the freeze frame object
  */
 export class FreezeFrame {
-    protected rootDiv: HTMLDivElement;
+    protected rootDiv: HTMLElement;
     protected rootElement: HTMLDivElement;
     imageElement: HTMLImageElement;
     freezeFrameHeight = 0;
@@ -13,7 +13,7 @@ export class FreezeFrame {
      * Construct a freeze frame
      * @param rootDiv the div that a freeze frame element will be injected into
      */
-    constructor(rootDiv: HTMLDivElement) {
+    constructor(rootDiv: HTMLElement) {
         this.rootDiv = rootDiv;
 
         // create the overlay
@@ -52,7 +52,7 @@ export class FreezeFrame {
      * @param jpeg - the freeze frame image as a byte array data  
      */
     updateImageElementSource(jpeg: Uint8Array) {
-        let base64 = btoa(jpeg.reduce((data, byte) => data + String.fromCharCode(byte), ''));
+        const base64 = btoa(jpeg.reduce((data, byte) => data + String.fromCharCode(byte), ''));
         this.imageElement.src = 'data:image/jpeg;base64,' + base64;
     }
 
@@ -75,8 +75,8 @@ export class FreezeFrame {
             let displayTop = 0;
             let displayLeft = 0;
             if (this.enlargeDisplayToFillWindow === null || this.enlargeDisplayToFillWindow === true) {
-                let windowAspectRatio = window.innerWidth / window.innerHeight;
-                let videoAspectRatio = this.freezeFrameWidth / this.freezeFrameHeight;
+                const windowAspectRatio = window.innerWidth / window.innerHeight;
+                const videoAspectRatio = this.freezeFrameWidth / this.freezeFrameHeight;
                 if (windowAspectRatio < videoAspectRatio) {
                     displayWidth = window.innerWidth;
                     displayHeight = Math.floor(window.innerWidth / videoAspectRatio);
@@ -90,8 +90,8 @@ export class FreezeFrame {
                 }
             } else {
                 // Video is coming in at native resolution, we care more about the player size
-                let playerAspectRatio = this.rootDiv.offsetWidth / this.rootDiv.offsetHeight;
-                let videoAspectRatio = this.freezeFrameWidth / this.freezeFrameHeight;
+                const playerAspectRatio = this.rootDiv.offsetWidth / this.rootDiv.offsetHeight;
+                const videoAspectRatio = this.freezeFrameWidth / this.freezeFrameHeight;
                 if (playerAspectRatio < videoAspectRatio) {
                     displayWidth = this.rootDiv.offsetWidth;
                     displayHeight = Math.floor(this.rootDiv.offsetWidth / videoAspectRatio);

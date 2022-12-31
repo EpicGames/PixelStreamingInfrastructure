@@ -1,10 +1,10 @@
 import { IVideoPlayer } from "./IVideoPlayer";
 
 /**
- * Extra types for the HTMLDivElement 
+ * Extra types for the HTMLElement 
  */
 declare global {
-    interface HTMLDivElement {
+    interface HTMLElement {
         pressMouseButtons?(mouseEvent: MouseEvent): void;
         releaseMouseButtons?(mouseEvent: MouseEvent): void;
         mozRequestPointerLock?(): void;
@@ -12,7 +12,7 @@ declare global {
 }
 
 /**
- * Class for the video player html element 
+ * The video player html element 
  */
 export class VideoPlayer implements IVideoPlayer {
     videoElement: HTMLVideoElement;
@@ -21,7 +21,7 @@ export class VideoPlayer implements IVideoPlayer {
      * @param videoElementParent the html div the the video player will be injected into 
      * @param startVideoMuted will the video be started muted 
      */
-    constructor(videoElementParent: HTMLDivElement, startVideoMuted: boolean) {
+    constructor(videoElementParent: HTMLElement, startVideoMuted: boolean) {
         this.videoElement = document.createElement("video");
         this.videoElement.id = "streamingVideo";
         this.videoElement.muted = startVideoMuted;
@@ -70,7 +70,7 @@ export class VideoPlayer implements IVideoPlayer {
     */
     setVideoEnabled(enabled: boolean) {
         // this is a temporary hack until type scripts video element is updated to reflect the need for tracks on a html video element 
-        let videoElement = this.videoElement as any;
+        const videoElement = this.videoElement as any;
         videoElement.srcObject.getTracks().forEach((track: MediaStreamTrack) => track.enabled = enabled);
     }
 }

@@ -36,31 +36,12 @@ if (signallingServerAddress == '') {
     }
 }
 
-// prep the video element parent div element 
-let videoElementParent = document.getElementById("videoElementParent") as HTMLDivElement;
-
 // Create a config object
-let config = CreateConfig(signallingServerAddress, videoElementParent);
+let config = new libspsfrontend.Config(signallingServerAddress);
 config.enableSpsAutoConnect = false;
 config.enableSpsAutoplay = false;
 
 // Create a Native DOM delegate instance that implements the Delegate interface class
 let delegate = new NativeDOMDelegate(config);
+document.body.appendChild(delegate.rootElement);
 
-// Create and return a new webRtcPlayerController instance 
-let RTCPlayer = create(config, delegate);
-
-// create takes in a delage interface type which our NativeDomDelegate class implements
-function create(config: libspsfrontend.Config, delegate: libspsfrontend.IDelegate) {
-    return new libspsfrontend.webRtcPlayerController(config, delegate);
-}
-
-document.ontouchmove = (event: TouchEvent) => {
-    event.preventDefault();
-}
-
-// Create a config object instance 
-function CreateConfig(signalingAddress: string, videoElementParent: HTMLDivElement) {
-    let config = new libspsfrontend.Config(signalingAddress, videoElementParent);
-    return config;
-}

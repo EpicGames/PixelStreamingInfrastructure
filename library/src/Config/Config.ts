@@ -49,7 +49,7 @@ export class Config {
 	// The control scheme controls the behaviour of the mouse when it interacts with the WebRTC player.
 	controlScheme = ControlSchemeType.LockedMouse;
 
-	// Browser keys are those which are typically used by the browser UI. We usually want to suppress these to allow, for example, UE4 to show shader complexity with the F5 key without the web page refreshing.
+	// Browser keys are those which are typically used by the browser UI. We usually want to suppress these to allow, for example, UE to show shader complexity with the F5 key without the web page refreshing.
 	suppressBrowserKeys = true;
 
 	// UE has a fake touches option which fakes a single finger touch when the user drags with their mouse. 
@@ -58,7 +58,6 @@ export class Config {
 
 	//compulsory options and DOMs 
 	signallingServerAddress: string;
-	videoElementParent: HTMLDivElement;
 
 	/* A map of toggable flags - options that can be set in the application - e.g. Use Mic? */
 	flags = new Map<string, SettingFlag>();
@@ -68,11 +67,9 @@ export class Config {
 
 	/**
 	 * @param signallingServerAddress - the address of the signaling server 
-	 * @param videoElementParent - the player element ID 
 	 */
-	constructor(signallingServerAddress: string, videoElementParent: HTMLDivElement) {
+	constructor(signallingServerAddress: string) {
 		this.signallingServerAddress = signallingServerAddress;
-		this.videoElementParent = videoElementParent;
 	}
 
 	/**

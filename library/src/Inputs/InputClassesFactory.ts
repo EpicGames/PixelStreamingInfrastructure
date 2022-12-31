@@ -40,7 +40,7 @@ export class InputClassesFactory {
      */
     registerKeyBoard(suppressBrowserKeys: boolean) {
         Logger.Log(Logger.GetStackTrace(), "Register Keyboard Events", 7);
-        let keyboardController = new KeyboardController(this.toStreamerMessagesProvider, suppressBrowserKeys, this.activeKeys);
+        const keyboardController = new KeyboardController(this.toStreamerMessagesProvider, suppressBrowserKeys, this.activeKeys);
         keyboardController.registerKeyBoardEvents();
         return keyboardController;
     }
@@ -51,7 +51,7 @@ export class InputClassesFactory {
      */
     registerMouse(controlScheme: ControlSchemeType, playerStyleAttributesProvider: IPlayerStyleAttributes) {
         Logger.Log(Logger.GetStackTrace(), "Register Mouse Events", 7);
-        let mouseController = new MouseController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
+        const mouseController = new MouseController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
         mouseController.clearMouseEvents();
 
         switch (controlScheme) {
@@ -76,8 +76,8 @@ export class InputClassesFactory {
      * @param playerStyleAttributesProvider - a player style attributes instance
      */
     registerLockedMouseEvents(mouseController: MouseController, playerStyleAttributesProvider: IPlayerStyleAttributes) {
-        let videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
-        let lockedMouseEvents: IMouseEvents = new LockedMouseEvents(this.videoElementProvider, mouseController, this.activeKeys, playerStyleAttributesProvider);
+        const videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
+        const lockedMouseEvents: IMouseEvents = new LockedMouseEvents(this.videoElementProvider, mouseController, this.activeKeys, playerStyleAttributesProvider);
 
         videoElementParent.requestPointerLock = videoElementParent.requestPointerLock || videoElementParent.mozRequestPointerLock;
         document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
@@ -107,8 +107,8 @@ export class InputClassesFactory {
      * @param mouseController - A mouse controller object 
      */
     registerHoveringMouseEvents(mouseController: MouseController) {
-        let videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
-        let hoveringMouseEvents = new HoveringMouseEvents(mouseController);
+        const videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
+        const hoveringMouseEvents = new HoveringMouseEvents(mouseController);
 
         videoElementParent.onmousemove = (mouseEvent: MouseEvent) => hoveringMouseEvents.updateMouseMovePosition(mouseEvent);
         videoElementParent.onmousedown = (mouseEvent: MouseEvent) => hoveringMouseEvents.handleMouseDown(mouseEvent);
@@ -127,7 +127,7 @@ export class InputClassesFactory {
     registerTouch(fakeMouseTouch: boolean, videoElementParentClientRect: DOMRect) {
         Logger.Log(Logger.GetStackTrace(), "Registering Touch", 6);
         if (fakeMouseTouch) {
-            let fakeTouchController = new FakeTouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
+            const fakeTouchController = new FakeTouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
             fakeTouchController.setVideoElementParentClientRect(videoElementParentClientRect);
             return fakeTouchController;
         } else {
@@ -140,7 +140,7 @@ export class InputClassesFactory {
      */
     registerGamePad() {
         Logger.Log(Logger.GetStackTrace(), "Register Game Pad", 7);
-        let gamePadController = new GamePadController(this.toStreamerMessagesProvider);
+        const gamePadController = new GamePadController(this.toStreamerMessagesProvider);
         return gamePadController;
     }
 }

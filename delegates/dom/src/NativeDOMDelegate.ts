@@ -35,27 +35,30 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 		// Add the video stream QP indicator
 		this.videoQpIndicator = new VideoQpIndicator();
-		document.getElementById("uiFeatures").appendChild(this.videoQpIndicator.rootElement);
+		this.uiFeaturesElement.appendChild(this.videoQpIndicator.rootElement);
 
 		// Add the settings panel
 		this.settingsPanel = new SettingPanel();
-		document.getElementById("uiFeatures").appendChild(this.settingsPanel.rootElement);
+		this.uiFeaturesElement.appendChild(this.settingsPanel.rootElement);
 		this.configureSettings();
 
 		// Add stats/info panel
 		this.statsPanel = new StatsPanel();
-		document.getElementById("uiFeatures").appendChild(this.statsPanel.rootElement);
+		this.uiFeaturesElement.appendChild(this.statsPanel.rootElement);
 
 		// build all of the overlays 
-		this.disconnectOverlay = new DisconnectOverlay(this.config.videoElementParent);
-		this.connectOverlay = new ConnectOverlay(this.config.videoElementParent);
-		this.playOverlay = new PlayOverlay(this.config.videoElementParent);
-		this.afkOverlay = new AfkOverlay(this.config.videoElementParent);
-		this.infoOverlay = new InfoOverlay(this.config.videoElementParent);
-		this.errorOverlay = new ErrorOverlay(this.config.videoElementParent);
+		this.disconnectOverlay = new DisconnectOverlay(this.videoElementParent);
+		this.connectOverlay = new ConnectOverlay(this.videoElementParent);
+		this.playOverlay = new PlayOverlay(this.videoElementParent);
+		this.afkOverlay = new AfkOverlay(this.videoElementParent);
+		this.infoOverlay = new InfoOverlay(this.videoElementParent);
+		this.errorOverlay = new ErrorOverlay(this.videoElementParent);
 
 		// configure all buttons 
 		this.ConfigureButtons();
+
+		// setup webrtc
+		this.setIWebRtcPlayerController(new libspsfrontend.webRtcPlayerController(this.config, this));
 	}
 
 	/**
@@ -64,7 +67,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	configureSettings() : void {
 
 		// This builds all the settings sections and flags under this `settingsContent` element.
-		this.config.setupFlags(document.getElementById("settingsContent"));
+		this.config.setupFlags(this.settingsPanel.settingsContentElement);
 
 		this.config.addOnSettingChangedListener(Flags.IsQualityController, (isQualityController: boolean)=>{ 
 			if (!isQualityController === false) {
@@ -172,7 +175,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		super.setIWebRtcPlayerController(iWebRtcPlayerController);
 
 		// set up the on screen keyboard
-		this.onScreenKeyboardHelper = new OnScreenKeyboard(this.config.videoElementParent);
+		this.onScreenKeyboardHelper = new OnScreenKeyboard(this.videoElementParent);
 		this.onScreenKeyboardHelper.unquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.iWebRtcController.requestUnquantisedAndDenormaliseUnsigned(x, y);
 		this.activateOnScreenKeyboard = (command: any) => this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
 	}
@@ -327,8 +330,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		const controls = new Controls();
 
 		// When we fullscreen we want this element to be the root
-		controls.fullscreenIcon.fullscreenElement = document.getElementById("playerUI");
-		document.getElementById("uiFeatures").appendChild(controls.rootElement);
+		controls.fullscreenIcon.fullscreenElement = this.rootElement;
+		this.uiFeaturesElement.appendChild(controls.rootElement);
 
 		// Add settings button to controls
 		controls.settingsIcon.rootElement.onclick = () => this.settingsClicked();

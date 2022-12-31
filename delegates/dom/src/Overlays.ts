@@ -4,16 +4,16 @@ import { EventEmitter } from "events";
  * Class for the base overlay structure 
  */
 export class OverlayBase implements libspsfrontend.IOverlay {
-    protected rootElement: HTMLDivElement;
-    protected rootDiv: HTMLDivElement;
-    public textElement: HTMLDivElement;
+    protected rootElement: HTMLElement;
+    protected rootDiv: HTMLElement;
+    public textElement: HTMLElement;
 
     /**
      * Construct an overlay 
      * @param rootDiv the root element this overlay will be inserted into 
      * @param rootElement the root element that is the overlay
      */
-    protected constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement, textElement: HTMLDivElement) {
+    protected constructor(rootDiv: HTMLElement, rootElement: HTMLElement, textElement: HTMLElement) {
         this.rootDiv = rootDiv;
         this.rootElement = rootElement;
         this.textElement = textElement;
@@ -50,7 +50,7 @@ export class ActionOverlayBase extends OverlayBase implements libspsfrontend.IAc
      * @param rootElement the root element that is the overlay
      * @param contentElement an element that contains text for the action overlay 
      */
-    public constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement, contentElement: HTMLDivElement, contentElementSpanId?: string) {
+    public constructor(rootDiv: HTMLElement, rootElement: HTMLElement, contentElement: HTMLElement, contentElementSpanId?: string) {
         super(rootDiv, rootElement, contentElement);
         this.eventEmitter = new EventEmitter();
         this.contentElementSpanId = contentElementSpanId;
@@ -91,7 +91,7 @@ export class AfkOverlay extends ActionOverlayBase implements libspsfrontend.IAfk
     /**
     * @returns The created root element of this overlay.
     */
-    public static createRootElement() : HTMLDivElement {
+    public static createRootElement() : HTMLElement {
         let afkOverlayHtml = document.createElement('div');
 		afkOverlayHtml.id = "afkOverlay";
 		afkOverlayHtml.className = "clickableState";
@@ -101,7 +101,7 @@ export class AfkOverlay extends ActionOverlayBase implements libspsfrontend.IAfk
     /**
      * @returns The created content element of this overlay, which contain some text for an afk count down.
      */
-    public static createContentElement() : HTMLDivElement {
+    public static createContentElement() : HTMLElement {
         let afkOverlayHtmlInner = document.createElement('div');
 		afkOverlayHtmlInner.id = 'afkOverlayInner';
 		afkOverlayHtmlInner.innerHTML = '<center>No activity detected<br>Disconnecting in <span id="afkCountDownNumber"></span> seconds<br>Click to continue<br></center>';
@@ -112,7 +112,7 @@ export class AfkOverlay extends ActionOverlayBase implements libspsfrontend.IAfk
      * Construct an Afk overlay 
      * @param parentElement the element this overlay will be inserted into 
      */
-    public constructor(rootDiv: HTMLDivElement) {
+    public constructor(rootDiv: HTMLElement) {
         super(rootDiv, AfkOverlay.createRootElement(), AfkOverlay.createContentElement());
 
         this.rootElement.addEventListener('click', () => {
@@ -138,7 +138,7 @@ export class DisconnectOverlay extends ActionOverlayBase {
     /**
      * @returns The created root element of this overlay.
      */
-    public static createRootElement() : HTMLDivElement {
+    public static createRootElement() : HTMLElement {
         let disconnectOverlayHtml = document.createElement('div');
 		disconnectOverlayHtml.id = "disconnectOverlay";
 		disconnectOverlayHtml.className = "clickableState";
@@ -148,7 +148,7 @@ export class DisconnectOverlay extends ActionOverlayBase {
     /**
      * @returns The created content element of this overlay, which contain whatever content this element contains, like text or a button.
      */
-    public static createContentElement() : HTMLDivElement {
+    public static createContentElement() : HTMLElement {
         // build the inner html container 
 		let disconnectOverlayHtmlInnerContainer = document.createElement('div');
 		disconnectOverlayHtmlInnerContainer.id = 'disconnectButton';
@@ -189,7 +189,7 @@ export class DisconnectOverlay extends ActionOverlayBase {
      * Construct a disconnect overlay with a retry connection icon.
      * @param parentElem the parent element this overlay will be inserted into. 
      */
-     public constructor(parentElem: HTMLDivElement) {
+     public constructor(parentElem: HTMLElement) {
         super(parentElem, DisconnectOverlay.createRootElement(), DisconnectOverlay.createContentElement(), "disconnectText");
 
 		// add the new event listener 
@@ -208,7 +208,7 @@ export class ConnectOverlay extends ActionOverlayBase {
     /**
     * @returns The created root element of this overlay.
     */
-    public static createRootElement() : HTMLDivElement {
+    public static createRootElement() : HTMLElement {
         let connectElem = document.createElement('div');
         connectElem.id = "connectOverlay";
         connectElem.className = "clickableState";
@@ -218,7 +218,7 @@ export class ConnectOverlay extends ActionOverlayBase {
     /**
      * @returns The created content element of this overlay, which contain whatever content this element contains, like text or a button.
      */
-    public static createContentElement() : HTMLDivElement {
+    public static createContentElement() : HTMLElement {
         let connectContentElem = document.createElement('div');
 		connectContentElem.id = 'connectButton';
 		connectContentElem.innerHTML = 'Click to start';
@@ -229,7 +229,7 @@ export class ConnectOverlay extends ActionOverlayBase {
      * Construct a connect overlay with a connection button.
      * @param parentElem the parent element this overlay will be inserted into. 
      */
-        public constructor(parentElem: HTMLDivElement) {
+        public constructor(parentElem: HTMLElement) {
         super(parentElem, ConnectOverlay.createRootElement(), ConnectOverlay.createContentElement());
 
         // add the new event listener 
@@ -250,7 +250,7 @@ import playButton from './assets/images/Play.png';
     /**
     * @returns The created root element of this overlay.
     */
-    public static createRootElement() : HTMLDivElement {
+    public static createRootElement() : HTMLElement {
         let playElem = document.createElement('div');
         playElem.id = "playOverlay";
         playElem.className = "clickableState";
@@ -260,7 +260,7 @@ import playButton from './assets/images/Play.png';
     /**
      * @returns The created content element of this overlay, which contain whatever content this element contains, like text or a button.
      */
-    public static createContentElement() : HTMLDivElement {
+    public static createContentElement() : HTMLElement {
         let playOverlayHtmlInner = document.createElement('img');
 		playOverlayHtmlInner.id = 'playButton';
 		playOverlayHtmlInner.src = playButton;
@@ -272,7 +272,7 @@ import playButton from './assets/images/Play.png';
      * Construct a connect overlay with a connection button.
      * @param parentElem the parent element this overlay will be inserted into. 
      */
-        public constructor(parentElem: HTMLDivElement) {
+        public constructor(parentElem: HTMLElement) {
         super(parentElem, PlayOverlay.createRootElement(), PlayOverlay.createContentElement());
 
         // add the new event listener 
@@ -294,7 +294,7 @@ export class TextOverlayBase extends OverlayBase implements libspsfrontend.IText
      * @param rootElement the root element that is the overlay
      * @param textElement an element that contains text for the action overlay  
      */
-    public constructor(rootDiv: HTMLDivElement, rootElement: HTMLDivElement, textElement: HTMLDivElement) {
+    public constructor(rootDiv: HTMLElement, rootElement: HTMLElement, textElement: HTMLElement) {
         super(rootDiv, rootElement, textElement);
     }
 
@@ -317,7 +317,7 @@ export class TextOverlayBase extends OverlayBase implements libspsfrontend.IText
     /**
     * @returns The created root element of this overlay.
     */
-    public static createRootElement() : HTMLDivElement {
+    public static createRootElement() : HTMLElement {
         let infoOverlayHtml = document.createElement('div');
 		infoOverlayHtml.id = "infoOverlay";
 		infoOverlayHtml.className = "textDisplayState";
@@ -327,7 +327,7 @@ export class TextOverlayBase extends OverlayBase implements libspsfrontend.IText
     /**
      * @returns The created content element of this overlay, which contain whatever content this element contains, like text or a button.
      */
-    public static createContentElement() : HTMLDivElement {
+    public static createContentElement() : HTMLElement {
         let infoOverlayHtmlInner = document.createElement('div');
 		infoOverlayHtmlInner.id = 'messageOverlayInner';
         return infoOverlayHtmlInner;
@@ -337,7 +337,7 @@ export class TextOverlayBase extends OverlayBase implements libspsfrontend.IText
      * Construct a connect overlay with a connection button.
      * @param parentElem the parent element this overlay will be inserted into. 
      */
-        public constructor(parentElem: HTMLDivElement) {
+        public constructor(parentElem: HTMLElement) {
         super(parentElem, InfoOverlay.createRootElement(), InfoOverlay.createContentElement());
     }
 }
@@ -350,7 +350,7 @@ export class TextOverlayBase extends OverlayBase implements libspsfrontend.IText
     /**
     * @returns The created root element of this overlay.
     */
-    public static createRootElement() : HTMLDivElement {
+    public static createRootElement() : HTMLElement {
         let errorOverlayHtml = document.createElement('div');
 		errorOverlayHtml.id = "errorOverlay";
 		errorOverlayHtml.className = "textDisplayState";
@@ -360,7 +360,7 @@ export class TextOverlayBase extends OverlayBase implements libspsfrontend.IText
     /**
      * @returns The created content element of this overlay, which contain whatever content this element contains, like text or a button.
      */
-    public static createContentElement() : HTMLDivElement {
+    public static createContentElement() : HTMLElement {
         let errorOverlayHtmlInner = document.createElement('div');
 		errorOverlayHtmlInner.id = 'errorOverlayInner';
         return errorOverlayHtmlInner;
@@ -370,7 +370,7 @@ export class TextOverlayBase extends OverlayBase implements libspsfrontend.IText
      * Construct a connect overlay with a connection button.
      * @param parentElem the parent element this overlay will be inserted into. 
      */
-    public constructor(parentElem: HTMLDivElement) {
+    public constructor(parentElem: HTMLElement) {
         super(parentElem, ErrorOverlay.createRootElement(), ErrorOverlay.createContentElement());
     }
 }

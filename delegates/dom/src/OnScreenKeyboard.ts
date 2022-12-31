@@ -16,7 +16,7 @@ export class OnScreenKeyboard {
      * 
      * @param videoElementParent The div element the video player is injected into 
      */
-    constructor(videoElementParent: HTMLDivElement) {
+    constructor(videoElementParent: HTMLElement) {
         if ('ontouchstart' in document.documentElement) {
             this.createOnScreenKeyboardHelpers(videoElementParent);
         }
@@ -36,7 +36,7 @@ export class OnScreenKeyboard {
      * Creates on screen keyboard helpers 
      * @param videoElementParent The div element the video player i injected into
      */
-    createOnScreenKeyboardHelpers(videoElementParent: HTMLDivElement) {
+    createOnScreenKeyboardHelpers(videoElementParent: HTMLElement) {
         if (document.getElementById('hiddenInput') === null) {
             this.hiddenInput = document.createElement('input');
             this.hiddenInput.id = 'hiddenInput';

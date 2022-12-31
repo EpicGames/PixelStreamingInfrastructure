@@ -33,6 +33,7 @@ import { NormalizeAndQuantize, UnquantisedAndDenormaliseUnsigned } from "../Norm
 import { ITouchController } from "../Inputs/ITouchController";
 import { IPlayerStyleAttributes } from "../Ui/IPlayerStyleAttributes";
 import { PlayerStyleAttributes } from "../Ui/PlayerStyleAttributes";
+import { DelegateBase } from "../Delegate/DelegateBase";
 /**
  * Entry point for the Web RTC Player
  */
@@ -57,7 +58,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	matchViewportResolution: boolean;
 	resizeTimeout: ReturnType<typeof setTimeout>;
 	latencyStartTime: number;
-	delegate: IDelegate;
+	delegate: DelegateBase;
 	fileLogic: FileLogic;
 	streamMessageController: IStreamMessageController;
 	sendDescriptorController: SendDescriptorController;
@@ -79,7 +80,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param config - the frontend config object 
 	 * @param delegate - the delegate interface object 
 	 */
-	constructor(config: Config, delegate: IDelegate) {
+	constructor(config: Config, delegate: DelegateBase) {
 		this.config = config;
 		this.delegate = delegate;
 		this.responseController = new ResponseController();
@@ -95,9 +96,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.afkLogic.setDisconnectMessageOverride = (message: string) => this.setDisconnectMessageOverride(message);
 		this.afkLogic.closeWebSocket = () => this.closeSignalingServer();
 
-		this.freezeFrameController = new FreezeFrameController(this.config.videoElementParent);
+		this.freezeFrameController = new FreezeFrameController(this.delegate.videoElementParent);
 
-		this.videoPlayer = new VideoPlayer(this.config.videoElementParent, this.config.startVideoMuted);
+		this.videoPlayer = new VideoPlayer(this.delegate.videoElementParent, this.config.startVideoMuted);
 		this.streamController = new StreamController(this.videoPlayer);
 
 		this.normalizeAndQuantize = new NormalizeAndQuantize(this.videoPlayer);
@@ -734,7 +735,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		const now = new Date().getTime();
 		if (now - this.lastTimeResized > 1000) {
-			const videoElementParent = this.config.videoElementParent;
+			const videoElementParent = this.delegate.videoElementParent;
 			if (!videoElementParent) {
 				return;
 			}
