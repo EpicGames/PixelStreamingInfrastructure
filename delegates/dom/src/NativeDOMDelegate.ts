@@ -6,8 +6,8 @@ import { Flags } from "@tensorworks/libspsfrontend"
 import { LabelledButton} from "@tensorworks/libspsfrontend"
 import { NumericParameters } from '@tensorworks/libspsfrontend';
 import { SettingPanel } from '@tensorworks/libspsfrontend'
+import { StatsPanel } from '@tensorworks/libspsfrontend'
 import { Controls } from './Controls';
-import { LatencyTest } from './LatencyTest';
 
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	config: libspsfrontend.Config;
@@ -28,11 +28,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	settingsPanel: SettingPanel;
 
 	// Stats
-	statsPanel = document.getElementById('stats-panel') as HTMLDivElement;
-
-	latencyTest: LatencyTest;
-
-	sendStatsToServer = document.getElementById("send-stats-tgl") as HTMLInputElement;
+	statsPanel: StatsPanel;
 
 	constructor(config: libspsfrontend.Config) {
 		super(config);
@@ -47,9 +43,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.configureSettings();
 
 		// Add stats/info panel
-		// todo
-		this.latencyTest = new LatencyTest();
-		document.getElementById("ControlsStats").appendChild(this.latencyTest.rootElement);
+		this.statsPanel = new StatsPanel();
+		document.getElementById("uiFeatures").appendChild(this.statsPanel.rootElement);
 
 		// build all of the overlays 
 		this.disconnectOverlay = new DisconnectOverlay(this.config.videoElementParent);
@@ -342,8 +337,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		// setup the stats/info button
 		controls.statsIcon.rootElement.onclick = () => this.statsClicked();
 		
-		// todo get rid of element by id once stats becomes a component
-		document.getElementById('statsClose').onclick = () => this.statsClicked();
+		this.statsPanel.statsCloseButton.onclick = () => this.statsClicked();
 
 		// Add button for toggle fps
 		const showFPSButton = new LabelledButton("Show FPS", "Toggle");
@@ -374,13 +368,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 * Shows or hides the settings panel if clicked
 	 */
 	settingsClicked() {
-		/**
-		 * Toggle settings panel. If stats panel is already open, close it and then open settings
-		 */
-		if (this.statsPanel.classList.contains("panel-wrap-visible")) {
-			this.statsPanel.classList.toggle("panel-wrap-visible");
-		}
-
+		this.statsPanel.hide();
 		this.settingsPanel.toggleVisibility();
 	}
 
@@ -388,11 +376,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 * Shows or hides the stats panel if clicked
 	 */
 	statsClicked() {
-		/**
-		 * Toggle stats panel. If settings panel is already open, close it and then open stats
-		 */
 		this.settingsPanel.hide();
-		this.statsPanel.classList.toggle("panel-wrap-visible");
+		this.statsPanel.toggleVisibility();
 	}
 
 	/**
@@ -408,7 +393,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 */
 	onVideoInitialised() {
 		// starting a latency check
-		this.latencyTest.latencyTestButton.onclick = () => {
+		this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
 			this.iWebRtcController.sendLatencyTest();
 		}
 
@@ -427,7 +412,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.onVideoEncoderAvgQP(0);
 
 		// disable starting a latency check
-		this.latencyTest.latencyTestButton.onclick = () => { }
+		this.statsPanel.latencyTest.latencyTestButton.onclick = () => { }
 	}
 
 	/**
@@ -442,8 +427,8 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 			}
 			let disableLatencyTest = settings.PixelStreaming.DisableLatencyTest;
 			if (disableLatencyTest) {
-				this.latencyTest.latencyTestButton.disabled = true;
-				this.latencyTest.latencyTestButton.title = "Disabled by -PixelStreamingDisableLatencyTester=true";
+				this.statsPanel.latencyTest.latencyTestButton.disabled = true;
+				this.statsPanel.latencyTest.latencyTestButton.title = "Disabled by -PixelStreamingDisableLatencyTester=true";
 				libspsfrontend.Logger.Info(libspsfrontend.Logger.GetStackTrace(), "-PixelStreamingDisableLatencyTester=true, requesting latency report from the the browser to UE is disabled.");
 			}
 		}
@@ -463,61 +448,24 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	* @param stats - Stats generate from the Peer Connection Client
 	*/
 	onVideoStats(stats: libspsfrontend.AggregatedStats): void {
-		let runTime = new Date(Date.now() - this.videoStartTime).toISOString().substr(11, 8);
-		let statsText = "";
-		let inboundData = this.formatBytes(stats.inboundVideoStats.bytesReceived, 2);
+		
+		// Duration
+		const runTime = new Date(Date.now() - this.videoStartTime).toISOString().substr(11, 8).toString();
+		this.statsPanel.addOrUpdateStat("DurationStat", "Duration", runTime);
 
-		// format numbering based on the browser language
-		let numberFormat = new Intl.NumberFormat(window.navigator.language, {
-			maximumFractionDigits: 0
-		});
+		// Input control?
+		const controlsStreamInput = this.inputController === null ? "Not sent yet" : (this.inputController ? "true" : "false");
+		this.statsPanel.addOrUpdateStat("ControlsInputStat", "Controls stream input", controlsStreamInput);
 
-		// ensure that we have a currentRoundTripTime coming in from stats and format it if it's a number
-		let netRTT = stats.candidatePair.hasOwnProperty('currentRoundTripTime') && stats.isNumber(stats.candidatePair.currentRoundTripTime) ? numberFormat.format(stats.candidatePair.currentRoundTripTime * 1000) : 'Can\'t calculate';
+		// QP
+		this.statsPanel.addOrUpdateStat("QPStat", "Video quantization parameter", this.videoQpIndicator.videoEncoderAvgQP.toString());
+		
+		// Grab all stats we can off the aggregated stats
+		this.statsPanel.handleStats(stats);
 
-		statsText += `<div>Duration: ${runTime}</div>`;
-		statsText += `<div>Controls stream input: ${this.inputController === null ? "Not sent yet" : (this.inputController ? "true" : "false")}</div>`;
-		statsText += `<div>Received: ${inboundData}</div>`;
-		statsText += `<div>Packets Lost: ${stats.inboundVideoStats.packetsLost}</div>`;
-		statsText += `<div>Bitrate (kbps): ${stats.inboundVideoStats.bitrate}</div>`;
-		statsText += `<div>Video Resolution: ${stats.inboundVideoStats.hasOwnProperty('frameWidth') && stats.inboundVideoStats.frameWidth && stats.inboundVideoStats.hasOwnProperty('frameHeight') && stats.inboundVideoStats.frameHeight ?
-			stats.inboundVideoStats.frameWidth + 'x' + stats.inboundVideoStats.frameHeight : 'Chrome only'
-			}</div>`;
-		statsText += `<div>Frames Decoded: ${stats.inboundVideoStats.hasOwnProperty('framesDecoded') ? numberFormat.format(stats.inboundVideoStats.framesDecoded) : 'Chrome only'}</div>`;
-		statsText += `<div>Packets Lost: ${stats.inboundVideoStats.hasOwnProperty('packetsLost') ? numberFormat.format(stats.inboundVideoStats.packetsLost) : 'Chrome only'}</div>`;
-		statsText += `<div>Framerate: ${stats.inboundVideoStats.framerate}</div>`;
-		statsText += `<div>Frames dropped: ${stats.inboundVideoStats.framesDropped}</div>`;
-		statsText += `<div>Net RTT (ms): ${netRTT}</div>`;
-		//statsText += `<div>Browser receive to composite (ms): ${stats.inboundVideoStats.receiveToCompositeMs}</div>`;
-		statsText += `<div>Video Quantization Parameter: ${this.videoQpIndicator.videoEncoderAvgQP}</div>`;
-
-		let statsDiv = document.getElementById("statisticsResult");
-		statsDiv.innerHTML = statsText;
-
-		libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), `--------- Stats ---------\n ${stats}\n------------------------`, 6);
-
-		if (this.sendStatsToServer.checked === true) {
+		if (this.statsPanel.sendToServerCheckbox.checked === true) {
 			this.iWebRtcController.sendStatsToSignallingServer(stats);
 		}
-	}
-
-	/**
-	* formats Bytes coming in for video stats
-	* @param bytes number to convert
-	* @param decimals number of decimal places
-	*/
-	formatBytes(bytes: number, decimals: number): string {
-		if (bytes === 0) {
-			return "0";
-		}
-
-		const factor: number = 1024;
-		const dm = decimals < 0 ? 0 : decimals;
-		const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
-
-		const i = Math.floor(Math.log(bytes) / Math.log(factor));
-
-		return parseFloat((bytes / Math.pow(factor, i)).toFixed(dm)) + ' ' + sizes[i];
 	}
 
 	/**
@@ -525,7 +473,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	* @param latencyTimings - Latency Test Timings sent from the UE Instance 
 	*/
 	onLatencyTestResult(latencyTimings: libspsfrontend.LatencyTestResults): void {
-		this.latencyTest.handleTestResult(latencyTimings);
+		this.statsPanel.latencyTest.handleTestResult(latencyTimings);
 	}
 
 	/**

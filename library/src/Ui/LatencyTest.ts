@@ -1,4 +1,5 @@
-import * as libspsfrontend from '@tensorworks/libspsfrontend'
+import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
+import { Logger } from "../Logger/Logger";
 
 /**
  * Latency test UI elements and results handling.
@@ -8,25 +9,6 @@ import * as libspsfrontend from '@tensorworks/libspsfrontend'
 	_rootElement: HTMLElement;
 	_latencyTestButton: HTMLInputElement;
 	_latencyTestResultsElement: HTMLElement;
-
-	/**
-	 * Construct a StatsIcon
-	 */
-	constructor() {
-
-	}
-
-
-	// <section id="latencyTest" class="settingsContainer">
-	// 	<div id="latencyTestHeader" class="settings-text">
-	// 		<div>Latency Test</div>
-	// 		<input id="btn-start-latency-test" class="streamTools-button btn-flat"
-	// 			type="button" value="Run Test">
-	// 	</div>
-	// 	<div id="latencyTestContainer" class="d-none">
-	// 		<div id="latencyStatsResults" class="StatsResult"></div>
-	// 	</div>
-	// </section>
 
 	/**
 	 * Get the the button containing the stats icon.
@@ -84,8 +66,8 @@ import * as libspsfrontend from '@tensorworks/libspsfrontend'
 	 * Populate the UI based on the latency test's results.
 	 * @param latencyTimings The latency test results.
 	 */
-	public handleTestResult(latencyTimings: libspsfrontend.LatencyTestResults) {
-		libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), latencyTimings.toString(), 6);
+	public handleTestResult(latencyTimings: LatencyTestResults) {
+		Logger.Log(Logger.GetStackTrace(), latencyTimings.toString(), 6);
 		let latencyStatsInnerHTML = '';
 		latencyStatsInnerHTML += "<div>Net latency RTT (ms): " + latencyTimings.networkLatency + "</div>";
 		latencyStatsInnerHTML += "<div>UE Encode (ms): " + latencyTimings.EncodeMs + "</div>";

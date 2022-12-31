@@ -3,6 +3,7 @@ export { Config, ControlSchemeType, Flags, NumericParameters } from "./Config/Co
 export { SettingBase } from "./Config/SettingBase"
 export { SettingFlag } from "./Config/SettingFlag"
 export { SettingPanel } from "./Config/SettingPanel"
+export { StatsPanel } from "./Ui/StatsPanel"
 export { SettingNumber } from "./Config/SettingNumber"
 export { LabelledButton } from "./Ui/LabelledButton"
 export { IDelegate } from "./Delegate/IDelegate"
