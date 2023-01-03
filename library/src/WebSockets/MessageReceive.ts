@@ -2,7 +2,7 @@
  * The Types of Messages that will be received
  */
 export enum MessageRecvTypes {
-    AUTHENTICATION_REQUIRED = "authenticationRequired",
+    
     AUTHENTICATION_RESPONSE = "authenticationResponse",
     INSTANCE_STATE = "instanceState",
     CONFIG = "config",

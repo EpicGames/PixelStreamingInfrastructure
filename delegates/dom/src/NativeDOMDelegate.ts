@@ -1,10 +1,48 @@
 import * as libspsfrontend from '@tensorworks/libspsfrontend'
 
+/**
+ * Auth Request Message Wrapper
+ */
+ export class MessageAuthRequest extends libspsfrontend.MessageSend {
+    token: string;
+    provider: string;
+
+    /**
+     * @param token - Token Provided by the Auth Provider
+     * @param provider - Name of the provider that is registered in the auth plugin
+     */
+    constructor(token: string, provider: string) {
+        super();
+        this.type = "authenticationRequest";
+        this.token = token;
+        this.provider = provider;
+    }
+}
+
+
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	
 	constructor(config: libspsfrontend.Config) {
 		super(config);
 		
+	}
+
+	/**
+	 * Extend the signalling protocol with SPS specific messages.
+	 */
+	extendSignallingProtocol() {
+
+		// AUTHENTICATION_REQUIRED = "authenticationRequired",
+
+		this.iWebRtcController.webSocketController.signallingProtocol.addMessageHandler("authenticationRequired", (authReqPayload : string) => {
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "AUTHENTICATION_REQUIRED", 6);
+			//const authenticationRequired: MessageReceive.MessageAuthRequired = JSON.parse(event.data);
+			const url_string = window.location.href;
+			const url = new URL(url_string);
+			const authRequest = new MessageAuthRequest(url.searchParams.get("code"), url.searchParams.get("provider"));
+			this.iWebRtcController.webSocketController.webSocket.send(authRequest.payload());
+		});
+
 	}
 
 	/**

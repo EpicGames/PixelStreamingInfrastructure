@@ -7,7 +7,6 @@ import { IAfkOverlay } from "../Overlay/IAfkOverlay";
 import { IOverlay } from "../Overlay/IOverlay";
 import { ITextOverlay } from "../Overlay/ITextOverlay";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
-import { IWebRtcPlayerController } from "../WebRtcPlayer/IWebRtcPlayerController";
 import { MessageInstanceState, MessageAuthResponse } from '../WebSockets/MessageReceive';
 import { VideoQpIndicator } from '../Ui/VideoQpIndicator'
 import { SettingPanel } from "../Config/SettingPanel";
@@ -24,7 +23,7 @@ import { LabelledButton } from "../Ui/LabelledButton";
  * Provides common base functionality for delegates that implement the IDelegate interface
 */
 export class DelegateBase implements IDelegate {
-	public iWebRtcController: IWebRtcPlayerController;
+	public iWebRtcController: webRtcPlayerController;
 	public config: Config;
 
 	_rootElement: HTMLElement;
@@ -425,7 +424,7 @@ export class DelegateBase implements IDelegate {
 	 * Instantiate the WebRTCPlayerController interface to provide WebRTCPlayerController functionality within this class and set up anything that requires it 
 	 * @param iWebRtcPlayerController - a WebRtcPlayerController controller instance 
 	 */
-	setIWebRtcPlayerController(iWebRtcPlayerController: IWebRtcPlayerController) {
+	setIWebRtcPlayerController(iWebRtcPlayerController: webRtcPlayerController) {
 		this.iWebRtcController = iWebRtcPlayerController;
 
 		this.iWebRtcController.resizePlayerStyle();

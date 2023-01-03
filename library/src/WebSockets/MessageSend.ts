@@ -13,7 +13,7 @@ import { OutBoundVideoStats } from "../PeerConnectionController/OutBoundVideoSta
 export enum MessageSendTypes {
     ICE_CANDIDATE = "iceCandidate",
     STATS = "stats",
-    AUTHENTICATION_REQUEST = "authenticationRequest",
+    
     REQUEST_INSTANCE = "requestInstance",
     OFFER = "offer",
     PONG = "pong"
@@ -23,7 +23,7 @@ export enum MessageSendTypes {
  * A Wrapper for the message to send to the signaling server
  */
 export class MessageSend implements Send {
-    type: MessageSendTypes;
+    type: string;
     peerConnectionOptions: Object;
 
     /**
@@ -42,25 +42,6 @@ export interface Send {
      * @returns - JSON String of the Message to send
      */
     payload: () => string;
-}
-
-/**
- * Auth Request Message Wrapper
- */
-export class MessageAuthRequest extends MessageSend {
-    token: string;
-    provider: string;
-
-    /**
-     * @param token - Token Provided by the Auth Provider
-     * @param provider - Name of the provider that is registered in the auth plugin
-     */
-    constructor(token: string, provider: string) {
-        super();
-        this.type = MessageSendTypes.AUTHENTICATION_REQUEST;
-        this.token = token;
-        this.provider = provider;
-    }
 }
 
 /**

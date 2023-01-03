@@ -2,6 +2,8 @@ import { Logger } from "../Logger/Logger";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import * as MessageReceive from "./MessageReceive";
 import * as MessageSend from "./MessageSend";
+import { MessageAuthResponse } from "./MessageReceive";
+import { SignallingProtocol } from "./SignallingProtocol"
 
 // declare the new method for the websocket interface
 declare global {
@@ -18,6 +20,7 @@ export class WebSocketController {
     address: string;
     webSocket: WebSocket;
     onCloseCallback : () => void;
+    signallingProtocol: SignallingProtocol;
 
     /**
      * @param Address - The Address of the signaling server
@@ -87,29 +90,15 @@ export class WebSocketController {
         const message: MessageReceive.MessageRecv = JSON.parse(event.data);
         Logger.Log(Logger.GetStackTrace(), "received => \n" + JSON.stringify(JSON.parse(event.data), undefined, 4), 6);
 
+        // Send to our signalling protocol to handle the incoming message
+        this.signallingProtocol.handleMessage(message.type, event.data);
+
         switch (message.type) {
-            case MessageReceive.MessageRecvTypes.PING: {
-
-                // send our pong payload back to the signalling server
-                const payload = new MessageSend.MessagePong(new Date().getTime()).payload()
-                Logger.Log(Logger.GetStackTrace(), MessageReceive.MessageRecvTypes.PING + ": " + payload, 6);
-                this.webSocket.send(payload)
-
-                break;
-            }
-            case MessageReceive.MessageRecvTypes.AUTHENTICATION_REQUIRED: {
-                Logger.Log(Logger.GetStackTrace(), "AUTHENTICATION_REQUIRED", 6);
-                //const authenticationRequired: MessageReceive.MessageAuthRequired = JSON.parse(event.data);
-                const url_string = window.location.href;
-                const url = new URL(url_string);
-                const authRequest = new MessageSend.MessageAuthRequest(url.searchParams.get("code"), url.searchParams.get("provider"));
-                this.webSocket.send(authRequest.payload());
-
-                break;
-            }
+            
+            
             case MessageReceive.MessageRecvTypes.AUTHENTICATION_RESPONSE: {
                 Logger.Log(Logger.GetStackTrace(), "AUTHENTICATION_RESPONSE", 6);
-                const authenticationResponse: MessageReceive.MessageAuthResponse = JSON.parse(event.data);
+                const authenticationResponse: MessageAuthResponse = JSON.parse(event.data);
 
                 this.onAuthenticationResponse(authenticationResponse);
 
@@ -145,39 +134,13 @@ export class WebSocketController {
                 this.onInstanceStateChange(instanceState);
                 break;
             }
-            case MessageReceive.MessageRecvTypes.CONFIG: {
-                Logger.Log(Logger.GetStackTrace(), "CONFIG", 6);
-                const config: MessageReceive.MessageConfig = JSON.parse(event.data);
-                this.onConfig(config);
-                break;
-            }
-            case MessageReceive.MessageRecvTypes.PLAYER_COUNT: {
-                Logger.Log(Logger.GetStackTrace(), "PLAYER_COUNT", 6);
-                const playerCount: MessageReceive.MessagePlayerCount = JSON.parse(event.data);
-                Logger.Log(Logger.GetStackTrace(), "Player Count: " + (playerCount.count - 1), 6);
-
-                break;
-            }
-            case MessageReceive.MessageRecvTypes.ANSWER: {
-                Logger.Log(Logger.GetStackTrace(), "ANSWER", 6);
-                const answer: MessageReceive.MessageAnswer = JSON.parse(event.data);
-                this.onWebRtcAnswer(answer);
-                break;
-            }
-            case MessageReceive.MessageRecvTypes.OFFER: {
-                Logger.Log(Logger.GetStackTrace(), "OFFER", 6);
-                const offer: MessageReceive.MessageOffer = JSON.parse(event.data);
-                this.onWebRtcOffer(offer);
-                break;
-            }
-            case MessageReceive.MessageRecvTypes.ICE_CANDIDATE: {
-                Logger.Log(Logger.GetStackTrace(), "ICE_CANDIDATE", 6);
-                const iceCandidate: MessageReceive.MessageIceCandidate = JSON.parse(event.data);
-                this.onIceCandidate(iceCandidate.candidate);
-                break;
-            }
+            
+            
+            
+            
+            
             default: {
-                Logger.Error(Logger.GetStackTrace(), `Error Message type of ${message.type} not defined.`);
+                
                 break;
             }
         }
