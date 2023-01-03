@@ -893,9 +893,22 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	handleInitialSettings(message: Uint8Array) {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.InitialSettings", 6);
 		const payloadAsString = new TextDecoder("utf-16").decode(message.slice(1));
-		const parsedInitialSettings: InitialSettings = JSON.parse(payloadAsString);
+		const parsedInitialSettings = JSON.parse(payloadAsString);
+
 		const initialSettings: InitialSettings = new InitialSettings();
-		Object.assign(initialSettings, parsedInitialSettings);
+
+		if(parsedInitialSettings.Encoder) {
+			initialSettings.EncoderSettings = parsedInitialSettings.Encoder;
+		}
+
+		if(parsedInitialSettings.WebRTC) {
+			initialSettings.WebRTCSettings = parsedInitialSettings.WebRTC;
+		}
+
+		if(parsedInitialSettings.PixelStreaming) {
+			initialSettings.PixelStreamingSettings = parsedInitialSettings.PixelStreaming;
+		}
+
 		initialSettings.ueCompatible()
 		Logger.Log(Logger.GetStackTrace(), payloadAsString, 6);
 
