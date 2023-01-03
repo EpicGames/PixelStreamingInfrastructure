@@ -131,7 +131,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.afkLogic.showAfkOverlay = () => this.delegate.showAfkOverlay(this.afkLogic.countDown);
 		this.afkLogic.updateAfkCountdown = () => this.delegate.updateAfkOverlay(this.afkLogic.countDown);
 		this.afkLogic.hideCurrentOverlay = () => this.delegate.hideCurrentOverlay();
-		this.webSocketController.stopAfkWarningTimer = () => this.afkLogic.stopAfkWarningTimer();
+		this.webSocketController.onCloseCallback = () => this.afkLogic.stopAfkWarningTimer();
 
 		this.inputClassesFactory = new InputClassesFactory(this.streamMessageController, this.videoPlayer, this.normalizeAndQuantize);
 	}

@@ -17,6 +17,7 @@ export class WebSocketController {
     WS_OPEN_STATE = 1;
     address: string;
     webSocket: WebSocket;
+    onCloseCallback : () => void;
 
     /**
      * @param Address - The Address of the signaling server
@@ -64,7 +65,7 @@ export class WebSocketController {
             });
 
             // send the new stringified event back into `onmessage`
-            this.handleOnMessageBinary(constructedMessage);
+            this.handleOnMessage(constructedMessage);
 
         }).catch((error: Error) => {
             Logger.Error(Logger.GetStackTrace(), `Failed to parse binary blob from websocket, reason: ${error}`);
@@ -206,13 +207,10 @@ export class WebSocketController {
     handleOnClose(event: CloseEvent) {
         this.onWebSocketOncloseOverlayMessage(event);
         Logger.Log(Logger.GetStackTrace(), "Disconnected to the signalling server via WebSocket: " + JSON.stringify(event.code) + " - " + event.reason);
-        this.stopAfkWarningTimer();
+        if(this.onCloseCallback) {
+            this.onCloseCallback();
+        }
     }
-
-    /**
-     * An override for stopping the afk warning timer
-     */
-    stopAfkWarningTimer() { }
 
     sendWebRtcOffer(offer: RTCSessionDescriptionInit) {
         const payload = new MessageSend.MessageWebRTCOffer(offer);
