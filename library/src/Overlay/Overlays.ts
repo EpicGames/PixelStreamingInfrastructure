@@ -3,7 +3,6 @@ import { IOverlay } from "./IOverlay";
 import { IActionOverlay } from "./IActionOverlay";
 import { IAfkOverlay } from "./IAfkOverlay";
 import { ITextOverlay } from "./ITextOverlay";
-import { EventEmitter } from "events";
 /**
  * Class for the base overlay structure 
  */
@@ -45,8 +44,8 @@ export class OverlayBase implements IOverlay {
  * Class for the base action overlay structure 
  */
 export class ActionOverlayBase extends OverlayBase implements IActionOverlay {
-    eventEmitter: EventEmitter;
     contentElementSpanId: string;
+    onActionCallback: (...args: any[]) => void;
 
     /**
      * Construct an action overlay 
@@ -56,8 +55,8 @@ export class ActionOverlayBase extends OverlayBase implements IActionOverlay {
      */
     public constructor(rootDiv: HTMLElement, rootElement: HTMLElement, contentElement: HTMLElement, contentElementSpanId?: string) {
         super(rootDiv, rootElement, contentElement);
-        this.eventEmitter = new EventEmitter();
         this.contentElementSpanId = contentElementSpanId;
+        this.onActionCallback = () => { /* do nothing */ console.log("Did you forget to set the onAction callback in your overlay?") };
     }
 
     /**
@@ -75,14 +74,14 @@ export class ActionOverlayBase extends OverlayBase implements IActionOverlay {
      * @param callBack the method that is to be called when the event is emitted 
      */
     onAction(callBack: (...args: any[]) => void) {
-        this.eventEmitter.on("action", callBack);
+        this.onActionCallback = callBack;
     }
 
     /**
      * Activate an event that is attached to the event emitter 
      */
     activate() {
-        this.eventEmitter.emit("action");
+        this.onActionCallback();
     }
 
 }
@@ -91,7 +90,7 @@ export class ActionOverlayBase extends OverlayBase implements IActionOverlay {
  * Show an overlay for when the session is unattended, it begins a countdown timer, which when elapsed will disconnect the stream.
  */
 export class AfkOverlay extends ActionOverlayBase implements IAfkOverlay {
-    
+
     /**
     * @returns The created root element of this overlay.
     */
@@ -101,7 +100,7 @@ export class AfkOverlay extends ActionOverlayBase implements IAfkOverlay {
 		afkOverlayHtml.className = "clickableState";
         return afkOverlayHtml;
     }
-    
+
     /**
      * @returns The created content element of this overlay, which contain some text for an afk count down.
      */

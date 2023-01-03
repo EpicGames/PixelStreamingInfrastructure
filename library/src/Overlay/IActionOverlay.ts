@@ -1,14 +1,9 @@
 import { IOverlay } from "./IOverlay";
-import { EventEmitter } from "events";
-import { ITextOverlay } from "./ITextOverlay";
 
 /**
  * The abstract class for action overlays 
  */
 export interface IActionOverlay extends IOverlay {
-
-    // the event emitter object 
-    eventEmitter: EventEmitter;
 
     /**
      * Update the text content of an action overlay

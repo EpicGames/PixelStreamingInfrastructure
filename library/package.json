@@ -23,8 +23,5 @@
     "webpack": "^5.61.0",
     "webpack-cli": "^4.8.0",
     "webpack-dev-server": "^4.7.4"
-  },
-  "dependencies": {
-    "events": "^3.3.0"
   }
 }
