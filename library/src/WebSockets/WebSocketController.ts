@@ -37,7 +37,7 @@ export class WebSocketController {
             this.webSocket.onerror = (event) => this.handleOnError(event);
             this.webSocket.onclose = (event) => this.handleOnClose(event);
             this.webSocket.onmessage = (event) => this.handleOnMessage(event);
-            this.webSocket.onmessagebinary = (event) => this.handelOnMessageBinary(event);
+            this.webSocket.onmessagebinary = (event) => this.handleOnMessageBinary(event);
             return true;
         } catch (error) {
             Logger.Error(error, error);
@@ -49,22 +49,22 @@ export class WebSocketController {
      * Handles what happens when a message is received in binary form
      * @param event - Message Received
      */
-    handelOnMessageBinary(event: MessageEvent) {
+    handleOnMessageBinary(event: MessageEvent) {
         // if the event is empty return
         if (!event || !event.data) {
             return;
         }
 
-        // handel the binary and then handel the message
+        // handle the binary and then handle the message
         event.data.text().then((messageString: any) => {
 
             // build a new message
-            let constructedMessage = new MessageEvent('messageFromBinary', {
+            const constructedMessage = new MessageEvent('messageFromBinary', {
                 data: messageString
             });
 
             // send the new stringified event back into `onmessage`
-            this.handelOnMessageBinary(constructedMessage);
+            this.handleOnMessageBinary(constructedMessage);
 
         }).catch((error: Error) => {
             Logger.Error(Logger.GetStackTrace(), `Failed to parse binary blob from websocket, reason: ${error}`);
@@ -79,7 +79,7 @@ export class WebSocketController {
 
         // Check if websocket message is binary, if so, stringify it.
         if (event.data && event.data instanceof Blob) {
-            this.handelOnMessageBinary(event);
+            this.handleOnMessageBinary(event);
             return;
         }
 
@@ -215,7 +215,7 @@ export class WebSocketController {
     stopAfkWarningTimer() { }
 
     sendWebRtcOffer(offer: RTCSessionDescriptionInit) {
-        let payload = new MessageSend.MessageWebRTCOffer(offer);
+        const payload = new MessageSend.MessageWebRTCOffer(offer);
         this.webSocket.send(payload.payload());
     }
 
@@ -227,7 +227,7 @@ export class WebSocketController {
         Logger.Log(Logger.GetStackTrace(), "Sending Ice Candidate");
         if (this.webSocket && this.webSocket.readyState === this.WS_OPEN_STATE) {
             //ws.send(JSON.stringify({ type: 'iceCandidate', candidate: candidate }));
-            let IceCandidate = new MessageSend.MessageIceCandidate(candidate);
+            const IceCandidate = new MessageSend.MessageIceCandidate(candidate);
 
             this.webSocket.send(IceCandidate.payload());
         }
@@ -245,7 +245,7 @@ export class WebSocketController {
      * @param stats - Stats Payload
      */
     sendStats(stats: AggregatedStats) {
-        let data = new MessageSend.MessageStats(stats);
+        const data = new MessageSend.MessageStats(stats);
         this.webSocket.send(data.payload());
     }
 
@@ -287,6 +287,3 @@ export class WebSocketController {
      */
     onAuthenticationResponse(authResponse: MessageReceive.MessageAuthResponse) { }
 }
-
-
-/* 524f4d4d */

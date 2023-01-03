@@ -106,7 +106,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.dataChannelController = new DataChannelController();
 		this.dataChannelController.handleOnOpen = () => this.handleDataChannelConnected();
-		this.dataChannelController.handleOnMessage = (ev: MessageEvent<any>) => this.handelOnMessage(ev);
+		this.dataChannelController.handleOnMessage = (ev: MessageEvent<any>) => this.handleOnMessage(ev);
 		this.dataChannelSender = new DataChannelSender(this.dataChannelController);
 		this.dataChannelSender.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
 
@@ -149,7 +149,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Handles when a message is received 
 	 * @param event - Message Event
 	 */
-	handelOnMessage(event: MessageEvent) {
+	handleOnMessage(event: MessageEvent) {
 		const message = new Uint8Array(event.data);
 		Logger.Log(Logger.GetStackTrace(), "Message incoming:" + message, 6);
 
@@ -557,7 +557,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.peerConnectionController.showTextOverlayConnecting = () => this.delegate.onWebRtcConnecting();
 		this.peerConnectionController.showTextOverlaySetupFailure = () => this.delegate.onWebRtcFailed();
 
-		// handel mic connections with promise
+		// handle mic connections with promise
 		this.dataChannelController.createDataChannel(this.peerConnectionController.peerConnection, "cirrus", this.datachannelOptions);
 
 		/* RTC Peer Connection on Track event -> handle on track */

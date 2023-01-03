@@ -31,7 +31,7 @@ export class PeerConnectionController {
         this.peerConnection.oniceconnectionstatechange = (ev: Event) => this.handleIceConnectionStateChange(ev);
         this.peerConnection.onicegatheringstatechange = (ev: Event) => this.handleIceGatheringStateChange(ev);
         this.peerConnection.ontrack = (ev: RTCTrackEvent) => this.handleOnTrack(ev);
-        this.peerConnection.onicecandidate = (ev: RTCPeerConnectionIceEvent) => this.handelIceCandidate(ev);
+        this.peerConnection.onicecandidate = (ev: RTCPeerConnectionIceEvent) => this.handleIceCandidate(ev);
         this.aggregatedStats = new AggregatedStats();
     }
 
@@ -179,7 +179,7 @@ export class PeerConnectionController {
      * Activates the onPeerIceCandidate 
      * @param event - The peer ice candidate
      */
-    handelIceCandidate(event: RTCPeerConnectionIceEvent) {
+    handleIceCandidate(event: RTCPeerConnectionIceEvent) {
         this.onPeerIceCandidate(event);
     }
 

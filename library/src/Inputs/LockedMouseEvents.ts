@@ -146,7 +146,7 @@ export class LockedMouseEvents implements IMouseEvents {
      * Handle the press mouse buttons event, sends the mouse data to the UE Instance
      * @param mouseEvent - Mouse Event
      */
-    handelPressMouseButtons(mouseEvent: MouseEvent) {
+    handlePressMouseButtons(mouseEvent: MouseEvent) {
         if(!this.videoElementProvider.isVideoReady()){ return; }
         this.mouseController.pressMouseButtons(mouseEvent.buttons, this.x, this.y);
     }
@@ -155,7 +155,7 @@ export class LockedMouseEvents implements IMouseEvents {
      * Handle the release mouse buttons event, sends the mouse data to the UE Instance
      * @param mouseEvent - Mouse Event
      */
-    handelReleaseMouseButtons(mouseEvent: MouseEvent) {
+    handleReleaseMouseButtons(mouseEvent: MouseEvent) {
         if(!this.videoElementProvider.isVideoReady()){ return; }
         this.mouseController.releaseMouseButtons(mouseEvent.buttons, this.x, this.y);
     }

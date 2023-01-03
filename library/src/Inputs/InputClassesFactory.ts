@@ -97,8 +97,8 @@ export class InputClassesFactory {
         videoElementParent.onmouseup = (mouseEvent: MouseEvent) => lockedMouseEvents.handleMouseUp(mouseEvent);
         videoElementParent.onwheel = (wheelEvent: WheelEvent) => lockedMouseEvents.handleMouseWheel(wheelEvent);
         videoElementParent.ondblclick = (mouseEvent: MouseEvent) => lockedMouseEvents.handleMouseDouble(mouseEvent);
-        videoElementParent.pressMouseButtons = (mouseEvent: MouseEvent) => lockedMouseEvents.handelPressMouseButtons(mouseEvent);
-        videoElementParent.releaseMouseButtons = (mouseEvent: MouseEvent) => lockedMouseEvents.handelReleaseMouseButtons(mouseEvent);
+        videoElementParent.pressMouseButtons = (mouseEvent: MouseEvent) => lockedMouseEvents.handlePressMouseButtons(mouseEvent);
+        videoElementParent.releaseMouseButtons = (mouseEvent: MouseEvent) => lockedMouseEvents.handleReleaseMouseButtons(mouseEvent);
 
     }
 
@@ -116,8 +116,8 @@ export class InputClassesFactory {
         videoElementParent.oncontextmenu = (mouseEvent: MouseEvent) => hoveringMouseEvents.handleContextMenu(mouseEvent);
         videoElementParent.onwheel = (wheelEvent: WheelEvent) => hoveringMouseEvents.handleMouseWheel(wheelEvent);
         videoElementParent.ondblclick = (mouseEvent: MouseEvent) => hoveringMouseEvents.handleMouseDouble(mouseEvent);
-        videoElementParent.pressMouseButtons = (mouseEvent: MouseEvent) => hoveringMouseEvents.handelPressMouseButtons(mouseEvent);
-        videoElementParent.releaseMouseButtons = (mouseEvent: MouseEvent) => hoveringMouseEvents.handelReleaseMouseButtons(mouseEvent);
+        videoElementParent.pressMouseButtons = (mouseEvent: MouseEvent) => hoveringMouseEvents.handlePressMouseButtons(mouseEvent);
+        videoElementParent.releaseMouseButtons = (mouseEvent: MouseEvent) => hoveringMouseEvents.handleReleaseMouseButtons(mouseEvent);
     }
 
     /**

@@ -42,13 +42,13 @@ export interface IMouseEvents {
     * Handle the press mouse buttons event, sends the mouse data to the UE Instance
     * @param mouseEvent - Mouse Event
     */
-    handelPressMouseButtons(mouseEvent: MouseEvent): void;
+    handlePressMouseButtons(mouseEvent: MouseEvent): void;
 
     /**
      * Handle the release mouse buttons event, sends the mouse data to the UE Instance
      * @param mouseEvent - Mouse Event
      */
-    handelReleaseMouseButtons(mouseEvent: MouseEvent): void;
+    handleReleaseMouseButtons(mouseEvent: MouseEvent): void;
 
     /**
     * Handle the mouse context menu
