@@ -22,6 +22,7 @@ import { Logger } from "../Logger/Logger";
 			const heading = document.createElement("div");
 			heading.id = "latencyTestHeader";
 			heading.classList.add("settings-text");
+			heading.classList.add("settingsHeader");
 			this._rootElement.appendChild(heading);
 
 			const headingText = document.createElement("div");

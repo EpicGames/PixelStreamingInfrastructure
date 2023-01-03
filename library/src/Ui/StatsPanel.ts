@@ -81,6 +81,7 @@ export class StatsPanel {
 			const statisticsHeader = document.createElement("div");
 			statisticsHeader.id = "statisticsHeader";
 			statisticsHeader.classList.add("settings-text");
+			statisticsHeader.classList.add("settingsHeader");
 
 			const sessionStats = document.createElement("div");
 			sessionStats.innerHTML = "Session Stats";
@@ -99,7 +100,7 @@ export class StatsPanel {
 		return this._statsContentElement;
 	}
 
-	// todo: extract
+	// Todo: This should not be in the library, but in the implementation
 	public get sendToServerRow() : HTMLElement {
 		if(!this._sendToServerRow) {
 			this._sendToServerRow = document.createElement("div");
@@ -257,6 +258,7 @@ export class StatsPanel {
 			newStat.element.innerHTML = statHTML;
 			// add the stat to the dom
 			this.statsResult.appendChild(newStat.element);
+			this.statsMap.set(id, newStat);
 		}
 		// update the existing stat
 		else {

@@ -8,13 +8,6 @@
 	_tooltipText : HTMLElement;
 
 	/**
-	 * Construct a StatsIcon
-	 */
-	constructor() {
-
-	}
-
-	/**
 	 * Get the the button containing the stats icon.
 	 */
 	public get rootElement() : HTMLButtonElement {
@@ -33,7 +26,7 @@
 		if(!this._tooltipText) {
 			this._tooltipText = document.createElement("span");
 			this._tooltipText.classList.add("tooltiptext");
-			this._tooltipText.innerHTML = "Settings";
+			this._tooltipText.innerHTML = "Information";
 		}
 		return this._tooltipText;
 	}
