@@ -75,18 +75,18 @@ export class FreezeFrame {
             let displayTop = 0;
             let displayLeft = 0;
             if (this.enlargeDisplayToFillWindow === null || this.enlargeDisplayToFillWindow === true) {
-                const windowAspectRatio = window.innerWidth / window.innerHeight;
+				const parentAspectRatio = this.rootDiv.clientWidth / this.rootDiv.clientHeight;
                 const videoAspectRatio = this.freezeFrameWidth / this.freezeFrameHeight;
-                if (windowAspectRatio < videoAspectRatio) {
-                    displayWidth = window.innerWidth;
-                    displayHeight = Math.floor(window.innerWidth / videoAspectRatio);
-                    displayTop = Math.floor((window.innerHeight - displayHeight) * 0.5);
+				if (parentAspectRatio < videoAspectRatio) {
+					displayWidth = this.rootDiv.clientWidth;
+					displayHeight = Math.floor(this.rootDiv.clientWidth / videoAspectRatio);
+					displayTop = Math.floor((this.rootDiv.clientHeight - displayHeight) * 0.5);
                     displayLeft = 0;
                 } else {
-                    displayWidth = Math.floor(window.innerHeight * videoAspectRatio);
-                    displayHeight = window.innerHeight;
+					displayWidth = Math.floor(this.rootDiv.clientHeight * videoAspectRatio);
+					displayHeight = this.rootDiv.clientHeight;
                     displayTop = 0;
-                    displayLeft = Math.floor((window.innerWidth - displayWidth) * 0.5);
+					displayLeft = Math.floor((this.rootDiv.clientWidth - displayWidth) * 0.5);
                 }
             } else {
                 // Video is coming in at native resolution, we care more about the player size
