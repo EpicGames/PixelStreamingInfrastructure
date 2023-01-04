@@ -573,11 +573,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		const BrowserSendsOffer = this.config.isFlagEnabled(Flags.BrowserSendOffer);
 		if (BrowserSendsOffer) {
 			// If browser is sending the offer, create an offer and send it to the streamer
-			this.peerConnectionController.createOffer(this.sdpConstraints, this.config).finally(() => {
-				// Once the offer has been sent, create our p2p data channel
-				this.sendrecvDataChannelController.createDataChannel(this.peerConnectionController.peerConnection, 'cirrus', this.datachannelOptions);
-				this.sendrecvDataChannelController.handleOnMessage = (ev: MessageEvent<any>) => this.handleOnMessage(ev);
-			});
+			this.sendrecvDataChannelController.createDataChannel(this.peerConnectionController.peerConnection, 'cirrus', this.datachannelOptions);
+			this.sendrecvDataChannelController.handleOnMessage = (ev: MessageEvent<any>) => this.handleOnMessage(ev);
+			this.peerConnectionController.createOffer(this.sdpConstraints, this.config);
 		}
 	}
 
