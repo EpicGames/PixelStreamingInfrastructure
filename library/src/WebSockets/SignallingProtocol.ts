@@ -11,6 +11,10 @@ export class SignallingProtocol {
 
 	private FromUEMessageHandlers : Map<string, (payload: string) => void>;
 
+	constructor() {
+		this.FromUEMessageHandlers = new Map<string, (payload: string) => void>();
+	}
+
 	addMessageHandler(messageId : string, messageHandler : (payload: string) => void ){
 		this.FromUEMessageHandlers.set(messageId, messageHandler);
 	}

@@ -27,6 +27,8 @@ export class WebSocketController {
      */
     constructor(Address: string) {
         this.address = Address;
+        this.signallingProtocol = new SignallingProtocol();
+        SignallingProtocol.setupDefaultHandlers(this);
     }
 
     /**

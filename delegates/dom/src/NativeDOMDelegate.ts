@@ -43,7 +43,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	
 	constructor(config: libspsfrontend.Config) {
 		super(config);
-		
+		this.extendSignallingProtocol();
 	}
 
 	/**
