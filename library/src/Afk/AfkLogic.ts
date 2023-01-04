@@ -103,25 +103,35 @@ export class AfkLogic {
     /**
      * An override method for updating the afk countdown number in the overlay 
      */
-    updateAfkCountdown() { }
+    updateAfkCountdown() { 
+		// Base Functionality: Do Nothing
+	}
 
     /**
      * An override method for showing the afk overlay 
      */
-    showAfkOverlay() { }
+    showAfkOverlay() { 
+		// Base Functionality: Do Nothing
+	}
 
     /**
      * An override method for hiding the afk overlay 
      */
-    hideCurrentOverlay() { }
+    hideCurrentOverlay() { 
+		// Base Functionality: Do Nothing
+	}
 
     /**
      * An  override method for setting the override for the disconnect message
      */
-    setDisconnectMessageOverride(message: string) { }
+    setDisconnectMessageOverride(message: string) { 
+		// Base Functionality: Do Nothing
+	}
 
     /**
      * An override method for closing the websocket connection from the clients side
      */
-    closeWebSocket() { }
+    closeWebSocket() { 
+		// Base Functionality: Do Nothing
+	}
 }

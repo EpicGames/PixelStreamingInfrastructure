@@ -239,7 +239,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		try {
 			const protocolString = new TextDecoder("utf-16").decode(message.slice(1));
 			const protocolJSON = JSON.parse(protocolString);
-			if (!protocolJSON.hasOwnProperty("Direction")) {
+			if (!Object.prototype.hasOwnProperty.call(protocolJSON, "Direction")) {
 				Logger.Error(Logger.GetStackTrace(), 'Malformed protocol received. Ensure the protocol message contains a direction');
 			}
 			const direction = protocolJSON.Direction;
@@ -250,13 +250,13 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 				switch (direction) {
 					case MessageDirection.ToStreamer:
 						// Check that the message contains all the relevant params
-						if (!message.hasOwnProperty("id") || !message.hasOwnProperty("byteLength")) {
+						if (!Object.prototype.hasOwnProperty.call(message, "id") || !Object.prototype.hasOwnProperty.call(message, "byteLength")) {
 							Logger.Error(Logger.GetStackTrace(), `ToStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id and a byteLength\n
 										   Definition was: ${JSON.stringify(message, null, 2)}`);
 							// return in a forEach is equivalent to a continue in a normal for loop
 							return;
 						}
-						if (message.byteLength > 0 && !message.hasOwnProperty("structure")) {
+						if (message.byteLength > 0 && !Object.prototype.hasOwnProperty.call(message, "structure")) {
 							// If we specify a bytelength, will must have a corresponding structure
 							Logger.Error(Logger.GetStackTrace(), `ToStreamer->${messageType} protocol definition was malformed as it specified a byteLength but no accompanying structure`);
 							// return in a forEach is equivalent to a continue in a normal for loop
@@ -272,7 +272,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 						break;
 					case MessageDirection.FromStreamer:
 						// Check that the message contains all the relevant params
-						if (!message.hasOwnProperty("id")) {
+						if (!Object.prototype.hasOwnProperty.call(message, "id")) {
 							Logger.Error(Logger.GetStackTrace(), `FromStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id\n
 							Definition was: ${JSON.stringify(message, null, 2)}`);
 							// return in a forEach is equivalent to a continue in a normal for loop
@@ -688,10 +688,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.recvDataChannelController.createDataChannel(this.peerConnectionController.peerConnection, "recv-datachannel", RecvOptions);
 			this.recvDataChannelController.handleOnOpen = () => this.webSocketController.sendSFURecvDataChannelReady();
 			// If we're uni-directional, only the recv data channel should handle incoming messages
-			this.recvDataChannelController.handleOnMessage = (ev: MessageEvent<any>) => this.handleOnMessage(ev);
+			this.recvDataChannelController.handleOnMessage = (ev: MessageEvent) => this.handleOnMessage(ev);
 		} else {
 			// else our primary datachannel is send/recv so it can handle incoming messages
-			this.sendrecvDataChannelController.handleOnMessage = (ev: MessageEvent<any>) => this.handleOnMessage(ev);
+			this.sendrecvDataChannelController.handleOnMessage = (ev: MessageEvent) => this.handleOnMessage(ev);
 		}
 	}
 
@@ -841,7 +841,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	sendLatencyTest() {
 		this.latencyStartTime = Date.now();
-		this.sendDescriptorController.sendLatencyTest(this.latencyStartTime);
+		this.sendDescriptorController.sendLatencyTest({ "StartTime": this.latencyStartTime });
 	}
 
 	/**
@@ -893,7 +893,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	sendShowFps(): void {
 		Logger.Log(Logger.GetStackTrace(), "----   Sending show stat to UE   ----", 6);
-		this.sendDescriptorController.emitCommand("stat fps");
+		this.sendDescriptorController.emitCommand({ "stat.fps": "" });
 	}
 
 	/**

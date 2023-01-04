@@ -43,8 +43,8 @@ export class DataChannelController implements IDataChannelController {
 		this.dataChannel.binaryType = "arraybuffer";
 		this.dataChannel.onopen = () => this.handleOnOpen();
 		this.dataChannel.onclose = () => this.handleOnClose();
-		this.dataChannel.onmessage = (ev: MessageEvent<any>) => this.handleOnMessage(ev);
-		this.dataChannel.onerror = (ev: MessageEvent<any>) => this.handleOnError(ev);
+		this.dataChannel.onmessage = (ev: MessageEvent) => this.handleOnMessage(ev);
+		this.dataChannel.onerror = (ev: MessageEvent) => this.handleOnError(ev);
 	}
 
     /**

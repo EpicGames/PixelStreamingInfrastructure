@@ -46,7 +46,7 @@ export class OverlayBase implements IOverlay {
  */
 export class ActionOverlayBase extends OverlayBase implements IActionOverlay {
     contentElementSpanId: string;
-    onActionCallback: (...args: any[]) => void;
+    onActionCallback: (...args: []) => void;
 
     /**
      * Construct an action overlay 
@@ -74,7 +74,7 @@ export class ActionOverlayBase extends OverlayBase implements IActionOverlay {
      * Set a method as an event emitter callback 
      * @param callBack the method that is to be called when the event is emitted 
      */
-    onAction(callBack: (...args: any[]) => void) {
+    onAction(callBack: (...args: []) => void) {
         this.onActionCallback = callBack;
     }
 

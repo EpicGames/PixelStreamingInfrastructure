@@ -24,7 +24,7 @@ export class StreamController {
      */
     handleOnTrack(rtcTrackEvent: RTCTrackEvent) {
         Logger.Log(Logger.GetStackTrace(), "handleOnTrack " + JSON.stringify(rtcTrackEvent.streams), 6);
-        let videoElement = this.videoElementProvider.getVideoElement();
+        const videoElement = this.videoElementProvider.getVideoElement();
 
         if (rtcTrackEvent.track) {
             Logger.Log(Logger.GetStackTrace(), 'Got track - ' + rtcTrackEvent.track.kind + ' id=' + rtcTrackEvent.track.id + ' readyState=' + rtcTrackEvent.track.readyState, 6);
@@ -45,7 +45,7 @@ export class StreamController {
     * @param audioMediaStream - Audio Media stream track
     */
     CreateAudioTrack(audioMediaStream: MediaStream) {
-        let videoElement = this.videoElementProvider.getVideoElement();
+        const videoElement = this.videoElementProvider.getVideoElement();
 
         // do nothing the video has the same media stream as the audio track we have here (they are linked)
         if (videoElement.srcObject == audioMediaStream) {

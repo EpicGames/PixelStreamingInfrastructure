@@ -476,7 +476,9 @@ export class DelegateBase implements IDelegate {
 	 * Set up functionality to happen when receiving an auth response 
 	 * @param authResponse - the auth response message type
 	 */
-	onAuthenticationResponse(authResponse: MessageAuthResponse) { }
+	onAuthenticationResponse(authResponse: MessageAuthResponse) { 
+		// Base Functionality: Do Nothing
+	}
 
 	/**
 	 * Set up functionality to happen when receiving a webRTC answer 

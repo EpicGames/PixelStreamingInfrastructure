@@ -228,19 +228,25 @@ export class PeerConnectionController {
      * An override method for onTrack for use outside of the PeerConnectionController
      * @param trackEvent - The webRtc track event
      */
-    onTrack(trackEvent: RTCTrackEvent) { }
+    onTrack(trackEvent: RTCTrackEvent) {
+		// Default Functionality: Do Nothing
+	}
 
     /**
      * An override method for onPeerIceCandidate for use outside of the PeerConnectionController
      * @param peerConnectionIceEvent - The peer ice candidate
      */
-    onPeerIceCandidate(peerConnectionIceEvent: RTCPeerConnectionIceEvent) { }
+    onPeerIceCandidate(peerConnectionIceEvent: RTCPeerConnectionIceEvent) { 
+		// Default Functionality: Do Nothing
+	}
 
 	/**
 	 * An override method for onDataChannel for use outside of the PeerConnectionController
 	 * @param datachannelEvent - The peer's data channel
 	 */
-	onDataChannel(datachannelEvent: RTCDataChannelEvent) { }
+	onDataChannel(datachannelEvent: RTCDataChannelEvent) {
+		// Default Functionality: Do Nothing
+	}
 
     /**
      * Setup tracks on the RTC Peer Connection 
@@ -309,27 +315,37 @@ export class PeerConnectionController {
      * And override event for when the video stats are fired
      * @param event - Aggregated Stats
      */
-    onVideoStats(event: AggregatedStats) { }
+    onVideoStats(event: AggregatedStats) { 
+		// Default Functionality: Do Nothing
+	}
 
     /**
      * Event to send the RTC offer to the Signaling server
      * @param offer - RTC Offer
      */
-    onSendWebRTCOffer(offer: RTCSessionDescriptionInit) { }
+    onSendWebRTCOffer(offer: RTCSessionDescriptionInit) { 
+		// Default Functionality: Do Nothing
+	}
 
 	/**
 	 * Event to send the RTC Answer to the Signaling server
 	 * @param answer - RTC Answer
 	 */
-	onSendWebRTCAnswer(answer: RTCSessionDescriptionInit) { }
+	onSendWebRTCAnswer(answer: RTCSessionDescriptionInit) { 
+		// Default Functionality: Do Nothing
+	}
 
     /**
      * An override for showing the Peer connection connecting Overlay
      */
-    showTextOverlayConnecting() { }
+    showTextOverlayConnecting() {
+		// Default Functionality: Do Nothing
+	}
 
     /**
      * An override for showing the Peer connection Failed overlay
      */
-    showTextOverlaySetupFailure() { }
+    showTextOverlaySetupFailure() {
+		// Default Functionality: Do Nothing
+	}
 }

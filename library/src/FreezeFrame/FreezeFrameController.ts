@@ -42,7 +42,7 @@ export class FreezeFrameController {
      * @param jpeg - the freeze frame image as a byte array data
      * @param onLoadCallBack - a call back for managing if the play overlay needs to be shown or not
      */
-    updateFreezeFrameAndShow(jpeg: Uint8Array, onLoadCallBack: Function) {
+    updateFreezeFrameAndShow(jpeg: Uint8Array, onLoadCallBack: () => void) {
         this.freezeFrame.updateImageElementSource(jpeg);
         this.freezeFrame.imageElement.onload = () => {
             this.freezeFrame.setDimensionsFromElementAndResize();
@@ -55,7 +55,7 @@ export class FreezeFrameController {
      * @param view - the freeze frame image as a byte array data
      * @param onLoadCallBack - a call back for managing if the play overlay needs to be shown or not
      */
-    processFreezeFrameMessage(view: Uint8Array, onLoadCallBack: Function) {
+    processFreezeFrameMessage(view: Uint8Array, onLoadCallBack: () => void) {
         // Reset freeze frame if we got a freeze frame message and we are not "receiving" yet.
         if (!this.receiving) {
             this.receiving = true;
@@ -68,11 +68,11 @@ export class FreezeFrameController {
         this.size = (new DataView(view.slice(1, 5).buffer)).getInt32(0, true);
 
         // Get the jpeg part of the payload
-        let jpegBytes = view.slice(1 + 4);
+        const jpegBytes = view.slice(1 + 4);
 
         // Append to existing jpeg that holds the freeze frame
         if (this.jpeg) {
-            let jpeg = new Uint8Array(this.jpeg.length + jpegBytes.length);
+            const jpeg = new Uint8Array(this.jpeg.length + jpegBytes.length);
             jpeg.set(this.jpeg, 0);
             jpeg.set(jpegBytes, this.jpeg.length);
             this.jpeg = jpeg;

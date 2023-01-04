@@ -81,5 +81,7 @@ export class VideoPlayer implements IVideoPlayer {
 	/**
 	 * An override for when the video has been initialised with a srcObject
 	 */
-	onVideoInitialised() {}
+	onVideoInitialised() {
+		// Default Functionality: Do Nothing
+	}
 }

@@ -20,19 +20,19 @@ export class LatencyTestResults implements ILatencyTestResults {
 
 
     //Fields Set when processed
-    testStartTimeMs: number = 0;
-    browserReceiptTimeMs: number = 0;
+    testStartTimeMs = 0;
+    browserReceiptTimeMs = 0;
 
     //Fields set from calculations
-    latencyExcludingDecode: number = 0;
-    testDuration: number = 0;
+    latencyExcludingDecode = 0;
+    testDuration = 0;
     //ueLatency: number = 0;
-    networkLatency: number = 0;
-    browserSendLatency: number = 0;
-    frameDisplayDeltaTimeMs: number = 0;
-    endToEndLatency: number = 0;
+    networkLatency = 0;
+    browserSendLatency = 0;
+    frameDisplayDeltaTimeMs = 0;
+    endToEndLatency = 0;
     //uePixelStreamLatency: number = 0;
-    encodeLatency: number = 0;
+    encodeLatency = 0;
 
     /**
      * Sets the Delta Time Milliseconds
