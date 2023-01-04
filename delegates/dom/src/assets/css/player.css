@@ -44,6 +44,7 @@ body {
 #playerUI {
 	width: 100%;
 	height: 100%;
+	position: relative;
 }
 
 canvas {
@@ -63,7 +64,7 @@ canvas {
 	width: 100%;
 	height: 100%;
 	z-index: 30;
-	position: absolute;
+	position: relative;
 	color: var(--colour2);
 	pointer-events: none;
 	overflow: hidden;
@@ -229,7 +230,7 @@ object {
 }
 
 .panel-wrap {
-	position: fixed;
+	position: absolute;
 	top: 0;
 	bottom: 0;
 	right: 0;

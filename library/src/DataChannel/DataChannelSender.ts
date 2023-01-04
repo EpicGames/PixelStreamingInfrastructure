@@ -39,5 +39,7 @@ export class DataChannelSender {
     /**
      * An override method for resetting the Afk warning timer when data is sent over the data channel 
      */
-    resetAfkWarningTimerOnDataSend() { }
+	resetAfkWarningTimerOnDataSend() {
+		// Base Functionality: Do Nothing 
+	}
 }

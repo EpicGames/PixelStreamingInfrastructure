@@ -192,8 +192,8 @@ export class DelegateBase implements IDelegate {
 			this.iWebRtcController.setAfkEnabled(isAFKEnabled);
 		});
 
-		this.config.addOnSettingChangedListener(Flags.VideoFillWindow, (shouldFillWindow : boolean) => {
-			this.iWebRtcController.setEnlargeToFillDisplay(shouldFillWindow);
+		this.config.addOnSettingChangedListener(Flags.VideoFillParent, (shouldFillParent : boolean) => {
+			this.iWebRtcController.setEnlargeToFillParent(shouldFillParent);
 			this.iWebRtcController.resizePlayerStyle();
 		});
 
@@ -205,11 +205,11 @@ export class DelegateBase implements IDelegate {
 		this.config.addOnSettingChangedListener(Flags.ControlScheme, (isHoveringMouse : boolean) => {
 			if (isHoveringMouse) {
 				this.config.setFlagLabel(Flags.ControlScheme, "Control Scheme: Hovering Mouse");
-				this.config.controlScheme = ControlSchemeType.HoveringMouse;
+				this.config.setFlagEnabled(Flags.ControlScheme, true);
 				this.iWebRtcController.activateRegisterMouse();
 			} else {
 				this.config.setFlagLabel(Flags.ControlScheme, "Control Scheme: Locked Mouse");
-				this.config.controlScheme = ControlSchemeType.LockedMouse;
+				this.config.setFlagEnabled(Flags.ControlScheme, false);
 				this.iWebRtcController.activateRegisterMouse();
 			}
 		});
@@ -475,7 +475,7 @@ export class DelegateBase implements IDelegate {
 	 * Set up functionality to happen when receiving a webRTC answer 
 	 */
 	onWebRtcSdp() {
-		this.showTextOverlay("Remote SDP received.");
+		this.showTextOverlay("WebRTC Connection Negotiated");
 	}
 
 	/**

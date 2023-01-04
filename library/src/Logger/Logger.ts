@@ -1,12 +1,12 @@
 export class Logger {
-    static verboseLogLevel: number = 5;
+    static verboseLogLevel = 5;
 
     /**
      * Captures the stack and returns it
      * @returns the current stack
      */
     static GetStackTrace() {
-        let error = new Error();
+		const error = new Error();
         let formattedStack = "No Stack Available for this browser";
 
         // format the error
@@ -15,7 +15,7 @@ export class Logger {
         }
 
         return formattedStack;
-    };
+    }
 
     /**
      * Set the log verbosity level
@@ -37,7 +37,7 @@ export class Logger {
             return;
         }
 
-        let returnString = `Level: Log, Caller: ${stack}, Msg: ${message}`;
+		const returnString = `Level: Log\nMsg: ${message}\nCaller: ${stack}`;
         console.log(returnString);
     }
 
@@ -52,7 +52,7 @@ export class Logger {
             return;
         }
 
-        let returnString = `Level: Info, Msg: ${message}`;
+		const returnString = `Level: Info\nMsg: ${message}`;
         console.info(returnString);
     }
 
@@ -62,7 +62,18 @@ export class Logger {
      * @param message - the message to be logged
      */
     static Error(stack: string, message: string) {
-        let returnString = `Level: Error, Caller: ${stack}, Msg: ${message}`;
+		const returnString = `Level: Error\nMsg: ${message}\nCaller: ${stack}`;
         console.error(returnString);
     }
+
+
+	/**
+	 * The standard logging output 
+	 * @param stack - the stack trace
+	 * @param message - the message to be logged
+	 */
+	static Warning(stack: string, message: string) {
+		const returnString = `Level: Warning\nCaller: ${stack}\nMsg: ${message}`;
+		console.warn(returnString);
+	}
 }

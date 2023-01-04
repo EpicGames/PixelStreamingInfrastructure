@@ -27,19 +27,19 @@ export class SendMessageController {
             messageData = [];
         }
 
-        let toStreamerMessages = this.toStreamerMessagesMapProvider.getToStreamerMessageMap();
-        let messageFormat = toStreamerMessages.getFromKey(messageType);
+        const toStreamerMessages = this.toStreamerMessagesMapProvider.getToStreamerMessageMap();
+        const messageFormat = toStreamerMessages.getFromKey(messageType);
         if (messageFormat === undefined) {
             Logger.Error(Logger.GetStackTrace(), `Attempted to send a message to the streamer with message type: ${messageType}, but the frontend hasn't been configured to send such a message. Check you've added the message type in your cpp`);
             return;
         }
 
-        let data = new DataView(new ArrayBuffer(messageFormat.byteLength + 1));
+        const data = new DataView(new ArrayBuffer(messageFormat.byteLength + 1));
         data.setUint8(0, messageFormat.id);
         let byteOffset = 1;
 
         messageData.forEach((element: any, idx: any) => {
-            let type = messageFormat.structure[idx];
+            const type = messageFormat.structure[idx];
             switch (type) {
                 case "uint8":
                     data.setUint8(byteOffset, element);
@@ -64,7 +64,7 @@ export class SendMessageController {
         });
 
         if(!this.dataChannelSender.canSend()){
-            console.log(`Data channel cannot send yet, skipping sending message: ${messageType} - ${new Uint8Array(data.buffer)}`);
+            Logger.Info(Logger.GetStackTrace(), `Data channel cannot send yet, skipping sending message: ${messageType} - ${new Uint8Array(data.buffer)}`);
             return;
         }
         else{

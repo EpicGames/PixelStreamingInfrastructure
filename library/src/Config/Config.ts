@@ -1,3 +1,4 @@
+import { Logger } from "../Logger/Logger";
 import { SettingFlag } from "./SettingFlag";
 import { SettingNumber } from "./SettingNumber";
 
@@ -8,15 +9,15 @@ import { SettingNumber } from "./SettingNumber";
  */
 export class Flags {
 	static UseMic = "UseMic";
-	static BrowserSendAnswer = "offerToReceive";
+	static BrowserSendOffer = "offerToReceive";
 	static PreferSFU = "preferSFU";
 	static IsQualityController = "ControlsQuality";
 	static ForceMonoAudio = "ForceMonoAudio";
 	static ForceTURN = "ForceTURN";
 	static AFKDetection = "TimeoutIfIdle";
-	static VideoFillWindow = "FillWindow";
+	static VideoFillParent = "FillParent";
 	static MatchViewportResolution = "MatchViewportRes";
-	static ControlScheme = "ControlScheme"
+	static ControlScheme = "HoveringMouse"
 }
 
 /**
@@ -45,9 +46,6 @@ export class Config {
 
 	// set the amount of wait time in seconds while there is inactivity for afk to occur 
 	afkTimeout = 120;
-
-	// The control scheme controls the behaviour of the mouse when it interacts with the WebRTC player.
-	controlScheme = ControlSchemeType.LockedMouse;
 
 	// Browser keys are those which are typically used by the browser UI. We usually want to suppress these to allow, for example, UE to show shader complexity with the F5 key without the web page refreshing.
 	suppressBrowserKeys = true;
@@ -105,9 +103,9 @@ export class Config {
 		const psSettingsSection = this.buildSectionWithHeading(settingsElem, "Pixel Streaming");
 
 		const sendSDPAnswerSetting = new SettingFlag(
-			Flags.BrowserSendAnswer, 
-			"Browser send answer", 
-			"Browser will hint it would like to send the sdp answer.", 
+			Flags.BrowserSendOffer, 
+			"Browser send offer", 
+			"Browser will initiate the WebRTC handshake by sending the offer to the streamer", 
 			false);
 
 		const useMicSetting = new SettingFlag(
@@ -163,9 +161,9 @@ export class Config {
 		const viewSettingsSection = this.buildSectionWithHeading(settingsElem, "UI");
 
 		const fillWindowSetting = new SettingFlag(
-			Flags.VideoFillWindow, 
-			"Video fill window", 
-			"Video will try to fill the available space.", 
+			Flags.VideoFillParent, 
+			"Video fill parent element", 
+			"True: Video will be resized by the browser to fit inside its parent element\nFalse: The video element will resize to the size of the incoming stream", 
 			true);
 
 		const matchViewportResSetting = new SettingFlag(
@@ -183,6 +181,8 @@ export class Config {
 		this.addSettingFlag(viewSettingsSection, fillWindowSetting);
 		this.addSettingFlag(viewSettingsSection, matchViewportResSetting);
 		this.addSettingFlag(viewSettingsSection, controlSchemeSetting);
+		controlSchemeSetting.label = `Control Scheme: ${(controlSchemeSetting.value) ? "Hovering" : "Locked"} Mouse`;
+		
 
 		/* Setup all encoder related settings under this section */
 		const encoderSettingsSection = this.buildSectionWithHeading(settingsElem, "Encoder");
@@ -324,7 +324,7 @@ export class Config {
 	 */
 	setFlagEnabled(id: string, flagEnabled: boolean) {
 		if(!this.flags.has(id)) {
-			console.warn(`Cannot toggle flag called ${id} - it does not exist in the Config.flags map.`);
+			Logger.Warning(Logger.GetStackTrace(), `Cannot toggle flag called ${id} - it does not exist in the Config.flags map.`);
 		} else {
 			this.flags.get(id).value = flagEnabled;
 		}
@@ -337,7 +337,7 @@ export class Config {
 	 */
 	setFlagLabel(id: string, label: string) {
 		if(!this.flags.has(id)) {
-			console.warn(`Cannot set label for flag called ${id} - it does not exist in the Config.flags map.`);
+			Logger.Warning(Logger.GetStackTrace(), `Cannot set label for flag called ${id} - it does not exist in the Config.flags map.`);
 		} else {
 			this.flags.get(id).label = label;
 		}

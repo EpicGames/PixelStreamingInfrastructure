@@ -1,7 +1,7 @@
 
 import { Logger } from "../Logger/Logger";
 import { WebSocketController } from "./WebSocketController"
-import { MessageRecvTypes, MessageConfig, MessagePlayerCount, MessageAnswer, MessageOffer, MessageIceCandidate } from "./MessageReceive";
+import { MessageRecvTypes, MessageConfig, MessagePlayerCount, MessageAnswer, MessageOffer, MessageIceCandidate, MessagePeerDataChannels } from "./MessageReceive";
 import { MessagePong } from "./MessageSend";
 
 /**
@@ -82,6 +82,17 @@ export class SignallingProtocol {
 			websocketController.onIceCandidate(iceCandidate.candidate);
 		});
 
+		// WARNING
+		websocketController.signallingProtocol.addMessageHandler(MessageRecvTypes.WARNING, (warningPayload: string) => {
+			Logger.Warning(Logger.GetStackTrace(), `Warning received: ${warningPayload}`);
+		});
+
+		// PEER DATA CHANNELS
+		websocketController.signallingProtocol.addMessageHandler(MessageRecvTypes.PEER_DATA_CHANNELS, (peerDataChannelsPayload: string) => {
+			Logger.Log(Logger.GetStackTrace(), MessageRecvTypes.PEER_DATA_CHANNELS, 6);
+			const peerDataChannels: MessagePeerDataChannels = JSON.parse(peerDataChannelsPayload);
+			websocketController.onWebRtcPeerDataChannels(peerDataChannels);
+		});
 	}
 
 }

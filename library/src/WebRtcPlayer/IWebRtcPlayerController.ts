@@ -98,7 +98,7 @@ export interface IWebRtcPlayerController {
      * Sets if we are enlarging the display to fill the window for freeze frames and ui 
      * @param isFilling is the display filling or not
      */
-    setEnlargeToFillDisplay(isFilling: boolean): void;
+	setEnlargeToFillParent(isFilling: boolean): void;
 
     /**
      * Handles when the stream size changes

@@ -16,7 +16,7 @@ export class SendDescriptorController {
      * Send a Latency Test to the UE Instance
      * @param descriptor - the descriptor for a latency test 
      */
-    sendLatencyTest(descriptor: Object) {
+    sendLatencyTest(descriptor: object) {
         this.sendDescriptor("LatencyTest", descriptor);
     }
 
@@ -24,7 +24,7 @@ export class SendDescriptorController {
      * Send a Latency Test to the UE Instance
      * @param descriptor - the descriptor for a command 
      */
-    emitCommand(descriptor: Object) {
+    emitCommand(descriptor: object) {
         this.sendDescriptor("Command", descriptor);
     }
 
@@ -32,7 +32,7 @@ export class SendDescriptorController {
      * Send a Latency Test to the UE Instance
      * @param descriptor - the descriptor for a UI Interaction 
      */
-    emitUIInteraction(descriptor: Object) {
+    emitUIInteraction(descriptor: object) {
         this.sendDescriptor("UIInteraction", descriptor);
     }
 
@@ -41,11 +41,11 @@ export class SendDescriptorController {
      * @param messageType - UE Message Type
      * @param descriptor - Descriptor Message as JSON
      */
-    sendDescriptor(messageType: string, descriptor: Object) {
+    sendDescriptor(messageType: string, descriptor: object) {
         // Convert the descriptor object into a JSON string.
-        let descriptorAsString = JSON.stringify(descriptor);
-        let toStreamerMessages = this.toStreamerMessagesMapProvider.getToStreamerMessageMap();
-        let messageFormat = toStreamerMessages.getFromKey(messageType);
+        const descriptorAsString = JSON.stringify(descriptor);
+        const toStreamerMessages = this.toStreamerMessagesMapProvider.getToStreamerMessageMap();
+        const messageFormat = toStreamerMessages.getFromKey(messageType);
         if (messageFormat === undefined) {
             Logger.Error(Logger.GetStackTrace(), `Attempted to emit descriptor with message type: ${messageType}, but the frontend hasn't been configured to send such a message. Check you've added the message type in your cpp`);
         }
@@ -53,7 +53,7 @@ export class SendDescriptorController {
         Logger.Log(Logger.GetStackTrace(), "Sending: " + descriptor, 6);
         // Add the UTF-16 JSON string to the array byte buffer, going two bytes at
         // a time.
-        let data = new DataView(new ArrayBuffer(1 + 2 + 2 * descriptorAsString.length));
+        const data = new DataView(new ArrayBuffer(1 + 2 + 2 * descriptorAsString.length));
         let byteIdx = 0;
         data.setUint8(byteIdx, messageFormat.id);
         byteIdx++;
@@ -65,7 +65,7 @@ export class SendDescriptorController {
         }
 
         if(!this.dataChannelSender.canSend()){
-            console.log(`Data channel cannot send yet, skipping sending descriptor message: ${messageType} - ${descriptorAsString}`);
+            Logger.Info(Logger.GetStackTrace(), `Data channel cannot send yet, skipping sending descriptor message: ${messageType} - ${descriptorAsString}`);
             return;
         }
 

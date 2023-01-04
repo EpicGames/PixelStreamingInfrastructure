@@ -9,7 +9,7 @@ import { PeerConnectionController } from "../PeerConnectionController/PeerConnec
 import { KeyboardController } from "../Inputs/KeyboardController";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { IWebRtcPlayerController } from "./IWebRtcPlayerController";
-import { Config, Flags } from "../Config/Config";
+import { Config, Flags, ControlSchemeType } from "../Config/Config";
 import { EncoderSettings, InitialSettings, WebRTCSettings } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
 import { Logger } from "../Logger/Logger";
@@ -40,7 +40,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	responseController: ResponseController;
 	sdpConstraints: RTCOfferOptions;
 	webSocketController: WebSocketController;
-	dataChannelController: DataChannelController;
+	// The primary data channel. This is bidirectional when p2p and send only when using an SFU
+	sendrecvDataChannelController: DataChannelController;
+	// A recv only data channel required when using an SFU
+	recvDataChannelController: DataChannelController;
 	dataChannelSender: DataChannelSender;
 	datachannelOptions: RTCDataChannelInit;
 	videoPlayer: VideoPlayer;
@@ -68,6 +71,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	gamePadController: GamePadController;
 	normalizeAndQuantize: NormalizeAndQuantize;
 	playerStyleAttributes: IPlayerStyleAttributes = new PlayerStyleAttributes();
+	isUsingSFU: boolean;
 
 	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
 	// it will use this property to store the override message string
@@ -97,6 +101,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.freezeFrameController = new FreezeFrameController(this.delegate.videoElementParent);
 
 		this.videoPlayer = new VideoPlayer(this.delegate.videoElementParent, this.config.startVideoMuted);
+		this.videoPlayer.onVideoInitialised = () => this.handleVideoInitialised();
 		this.streamController = new StreamController(this.videoPlayer);
 
 		this.normalizeAndQuantize = new NormalizeAndQuantize(this.videoPlayer);
@@ -104,10 +109,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.uiController = new UiController(this.videoPlayer, this.playerStyleAttributes);
 		this.uiController.setUpMouseAndFreezeFrame = () => this.setUpMouseAndFreezeFrame();
 
-		this.dataChannelController = new DataChannelController();
-		this.dataChannelController.handleOnOpen = () => this.handleDataChannelConnected();
-		this.dataChannelController.handleOnMessage = (ev: MessageEvent<any>) => this.handleOnMessage(ev);
-		this.dataChannelSender = new DataChannelSender(this.dataChannelController);
+		this.sendrecvDataChannelController = new DataChannelController();
+		this.recvDataChannelController = new DataChannelController();
+		this.dataChannelSender = new DataChannelSender(this.sendrecvDataChannelController);
 		this.dataChannelSender.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
 
 		this.streamMessageController = new StreamMessageController();
@@ -132,6 +136,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.webSocketController.onCloseCallback = () => this.afkLogic.stopAfkWarningTimer();
 
 		this.inputClassesFactory = new InputClassesFactory(this.streamMessageController, this.videoPlayer, this.normalizeAndQuantize);
+
+		this.isUsingSFU = false;
 	}
 
 	/**
@@ -232,7 +238,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		try {
 			const protocolString = new TextDecoder("utf-16").decode(message.slice(1));
 			const protocolJSON = JSON.parse(protocolString);
-			if (!protocolJSON.hasOwnProperty("Direction")) {
+			if (!Object.prototype.hasOwnProperty.call(protocolJSON, "Direction")) {
 				Logger.Error(Logger.GetStackTrace(), 'Malformed protocol received. Ensure the protocol message contains a direction');
 			}
 			const direction = protocolJSON.Direction;
@@ -243,13 +249,13 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 				switch (direction) {
 					case MessageDirection.ToStreamer:
 						// Check that the message contains all the relevant params
-						if (!message.hasOwnProperty("id") || !message.hasOwnProperty("byteLength")) {
+						if (!Object.prototype.hasOwnProperty.call(message, "id") || !Object.prototype.hasOwnProperty.call(message, "byteLength")) {
 							Logger.Error(Logger.GetStackTrace(), `ToStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id and a byteLength\n
 										   Definition was: ${JSON.stringify(message, null, 2)}`);
 							// return in a forEach is equivalent to a continue in a normal for loop
 							return;
 						}
-						if (message.byteLength > 0 && !message.hasOwnProperty("structure")) {
+						if (message.byteLength > 0 && !Object.prototype.hasOwnProperty.call(message, "structure")) {
 							// If we specify a bytelength, will must have a corresponding structure
 							Logger.Error(Logger.GetStackTrace(), `ToStreamer->${messageType} protocol definition was malformed as it specified a byteLength but no accompanying structure`);
 							// return in a forEach is equivalent to a continue in a normal for loop
@@ -265,7 +271,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 						break;
 					case MessageDirection.FromStreamer:
 						// Check that the message contains all the relevant params
-						if (!message.hasOwnProperty("id")) {
+						if (!Object.prototype.hasOwnProperty.call(message, "id")) {
 							Logger.Error(Logger.GetStackTrace(), `FromStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id\n
 							Definition was: ${JSON.stringify(message, null, 2)}`);
 							// return in a forEach is equivalent to a continue in a normal for loop
@@ -369,7 +375,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Sets if we are enlarging the display to fill the window for freeze frames and ui controller
 	 * @param isFilling is the display filling or not
 	 */
-	setEnlargeToFillDisplay(isFilling: boolean) {
+	setEnlargeToFillParent(isFilling: boolean) {
 		this.freezeFrameController.freezeFrame.enlargeDisplayToFillWindow = isFilling;
 		this.uiController.enlargeDisplayToFillWindow = isFilling;
 	}
@@ -445,9 +451,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Plays the stream audio and video source and sets up other pieces while the stream starts
 	 */
 	playStream() {
-
 		if(!this.videoPlayer.videoElement.srcObject){
-			console.warn("Cannot play stream, the video element has no srcObject to play.");
+			Logger.Warning(Logger.GetStackTrace(), "Cannot play stream, the video element has no srcObject to play.");
 			return;
 		}
 
@@ -462,7 +467,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.closeSignalingServer();
 		} else {
 			this.touchController = this.inputClassesFactory.registerTouch(this.config.fakeMouseWithTouches, this.videoElementParentClientRect);
-			if (this.streamController.audioElement) {
+			this.delegate.hideCurrentOverlay();
+			if (this.streamController.audioElement.srcObject) {
 				this.streamController.audioElement.play().then(() => {
 					this.playVideo();
 				}).catch((onRejectedReason) => {
@@ -475,7 +481,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			}
 			this.shouldShowPlayOverlay = false;
 			this.freezeFrameController.showFreezeFrame();
-			this.delegate.hideCurrentOverlay();
 		}
 	}
 
@@ -551,23 +556,28 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		/* When the Peer Connection wants to send an answer have it handled */
 		this.peerConnectionController.onSendWebRTCAnswer = (offer: RTCSessionDescriptionInit) => this.handleSendWebRTCAnswer(offer);
 
-		/* When the Peer connection ice candidate is added have it handled */
+		/* When the Peer Connection ice candidate is added have it handled */
 		this.peerConnectionController.onPeerIceCandidate = (peerConnectionIceEvent: RTCPeerConnectionIceEvent) => this.handleSendIceCandidate(peerConnectionIceEvent);
+
+		/* When the Peer Connection has a data channel created for it by the browser, handle it */
+		this.peerConnectionController.onDataChannel = (datachannelEvent: RTCDataChannelEvent) => this.handleDataChannel(datachannelEvent);
 
 		// set up webRtc text overlays 
 		this.peerConnectionController.showTextOverlayConnecting = () => this.delegate.onWebRtcConnecting();
 		this.peerConnectionController.showTextOverlaySetupFailure = () => this.delegate.onWebRtcFailed();
 
-		// handle mic connections with promise
-		this.dataChannelController.createDataChannel(this.peerConnectionController.peerConnection, "cirrus", this.datachannelOptions);
-
 		/* RTC Peer Connection on Track event -> handle on track */
 		this.peerConnectionController.onTrack = (trackEvent: RTCTrackEvent) => this.streamController.handleOnTrack(trackEvent);
 
 		/* Start the Hand shake process by creating an Offer */
-		const BrowserSendAnswer = this.config.isFlagEnabled(Flags.BrowserSendAnswer);
-		if (!BrowserSendAnswer) {
-			this.peerConnectionController.createOffer(this.sdpConstraints, this.config);
+		const BrowserSendsOffer = this.config.isFlagEnabled(Flags.BrowserSendOffer);
+		if (BrowserSendsOffer) {
+			// If browser is sending the offer, create an offer and send it to the streamer
+			this.peerConnectionController.createOffer(this.sdpConstraints, this.config).finally(() => {
+				// Once the offer has been sent, create our p2p data channel
+				this.sendrecvDataChannelController.createDataChannel(this.peerConnectionController.peerConnection, 'cirrus', this.datachannelOptions);
+				this.sendrecvDataChannelController.handleOnMessage = (ev: MessageEvent<any>) => this.handleOnMessage(ev);
+			});
 		}
 	}
 
@@ -601,7 +611,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param messageConfig - Config Message received from the signaling server
 	 */
 	handleOnConfigMessage(messageConfig: MessageConfig) {
-		this.setEnlargeToFillDisplay(true);
+		this.setEnlargeToFillParent(true);
 		this.resizePlayerStyle();
 
 		// Tell the WebRtcController to start a session with the peer options sent from the signaling server
@@ -610,28 +620,15 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// When the signaling server sends a WebRTC Answer over the websocket connection have the WebRtcController handle the message
 		this.webSocketController.onWebRtcAnswer = (messageAnswer: MessageReceive.MessageAnswer) => this.handleWebRtcAnswer(messageAnswer);
 		this.webSocketController.onWebRtcOffer = (messageOffer: MessageReceive.MessageOffer) => this.handleWebRtcOffer(messageOffer);
+		this.webSocketController.onWebRtcPeerDataChannels = (messageDataChannels: MessageReceive.MessagePeerDataChannels) => this.handleWebRtcSFUPeerDatachannels(messageDataChannels);
 
 		// When the signaling server sends a IceCandidate over the websocket connection have the WebRtcController handle the message
 		this.webSocketController.onIceCandidate = (iceCandidate: RTCIceCandidateInit) => this.handleIceCandidate(iceCandidate);
 	}
 
 	/**
-	 * Process SDP passed through the signalling server from our remote peer.
-	 * @param sdp The remote peer sdp (might be offer or answer).
-	 */
-	handleWebRtcRemoteSdp(sdp : RTCSessionDescriptionInit){
-		this.peerConnectionController.setRemoteSdp(sdp);
-
-		// start the afk warning timer as PS is now running
-		this.afkLogic.startAfkWarningTimer();
-
-		// show the overlay that we have an answer
-		this.delegate.onWebRtcSdp();
-	}
-
-	/**
 	 * Handle the RTC Answer from the signaling server
-	 * @param Answer - Answer sdp from the peer.
+	 * @param Answer - Answer SDP from the peer.
 	 */
 	handleWebRtcAnswer(Answer: MessageAnswer) {
 		Logger.Log(Logger.GetStackTrace(), `Got answer sdp ${Answer.sdp}`, 6);
@@ -641,7 +638,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			type: "answer"
 		}
 
-		this.handleWebRtcRemoteSdp(sdpAnswer);
+		this.peerConnectionController.receiveAnswer(sdpAnswer);
+		this.handlePostWebrtcNegotiation();
 	}
 
 	/**
@@ -651,14 +649,64 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	handleWebRtcOffer(Offer: MessageOffer) {
 		Logger.Log(Logger.GetStackTrace(), `Got offer sdp ${Offer.sdp}`, 6);
 
+		if (Offer.sfu) {
+			this.isUsingSFU = true;
+		}
+
 		const sdpOffer: RTCSessionDescriptionInit = {
 			sdp: Offer.sdp,
 			type: "offer"
 		}
 
-		// TODO (william.belcher): SFU support
-
 		this.peerConnectionController.receiveOffer(sdpOffer, this.config);
+		this.handlePostWebrtcNegotiation();
+	}
+
+	/**
+	 * TODO (william.belcher): Fill this out
+	 * @param DataChannels - 
+	 */
+	handleWebRtcSFUPeerDatachannels(DataChannels: MessageReceive.MessagePeerDataChannels) {
+		const SendOptions: RTCDataChannelInit = {
+			ordered: true,
+			negotiated: true,
+			id: DataChannels.sendStreamId
+		};
+
+		const unidirectional = DataChannels.sendStreamId != DataChannels.recvStreamId;
+
+		this.sendrecvDataChannelController.createDataChannel(this.peerConnectionController.peerConnection, unidirectional ? "send-datachannel" : "datachannel", SendOptions);
+
+		if(unidirectional) {
+			const RecvOptions: RTCDataChannelInit = {
+				ordered: true,
+				negotiated: true,
+				id: DataChannels.recvStreamId
+			}
+
+			this.recvDataChannelController.createDataChannel(this.peerConnectionController.peerConnection, "recv-datachannel", RecvOptions);
+			this.recvDataChannelController.handleOnOpen = () => this.webSocketController.sendSFURecvDataChannelReady();
+			// If we're uni-directional, only the recv data channel should handle incoming messages
+			this.recvDataChannelController.handleOnMessage = (ev: MessageEvent) => this.handleOnMessage(ev);
+		} else {
+			// else our primary datachannel is send/recv so it can handle incoming messages
+			this.sendrecvDataChannelController.handleOnMessage = (ev: MessageEvent) => this.handleOnMessage(ev);
+		}
+	}
+
+	handlePostWebrtcNegotiation() {
+		// start the afk warning timer as PS is now running
+		this.afkLogic.startAfkWarningTimer();
+		// show the overlay that we have negotiated a connection
+		this.delegate.onWebRtcSdp();
+
+		setInterval(() => this.getStats(), 1000);
+		this.delegate.onVideoInitialised();
+
+		/*  */
+		this.activateRegisterMouse()
+		this.keyboardController = this.inputClassesFactory.registerKeyBoard(this.config.suppressBrowserKeys);
+		this.gamePadController = this.inputClassesFactory.registerGamePad();
 	}
 
 	/**
@@ -684,6 +732,18 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
+	 * Send the ice Candidate to the signaling server via websocket
+	 * @param iceEvent - RTC Peer ConnectionIceEvent) {
+	 */
+	handleDataChannel(datachannelEvent: RTCDataChannelEvent) {
+		Logger.Log(Logger.GetStackTrace(), "Data channel created for us by browser as we are a receiving peer.", 6);
+		this.sendrecvDataChannelController.dataChannel = datachannelEvent.channel;
+		// Data channel was created for us, so we just need to setup its callbacks and array type
+		this.sendrecvDataChannelController.setupDataChannel();
+		this.sendrecvDataChannelController.handleOnMessage = (ev: MessageEvent<any>) => this.handleOnMessage(ev);
+	}
+
+	/**
 	 * Send the RTC Offer Session to the Signaling server via websocket
 	 * @param offer - RTC Session Description
 	 */
@@ -699,34 +759,17 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	handleSendWebRTCAnswer(answer: RTCSessionDescriptionInit) {
 		Logger.Log(Logger.GetStackTrace(), "Sending the answer to the Server", 6);
 		this.webSocketController.sendWebRtcAnswer(answer);
+
+		if(this.isUsingSFU) {
+			this.webSocketController.sendWebRtcDatachannelRequest();
+		}
 	}
 
 	/**
 	 * registers the mouse for use in IWebRtcPlayerController
 	 */
 	activateRegisterMouse() {
-		this.mouseController = this.inputClassesFactory.registerMouse(this.config.controlScheme, this.playerStyleAttributes);
-	}
-
-	/**
-	 * Sets up the Data channel Keyboard, Mouse, UE Control Message, UE Descriptor
-	 */
-	handleDataChannelConnected() {
-		Logger.Log(Logger.GetStackTrace(), "Data Channel is open", 6);
-
-		// show the connected overlay 
-		this.delegate.onWebRtcConnected();
-		this.activateRegisterMouse()
-		this.keyboardController = this.inputClassesFactory.registerKeyBoard(this.config.suppressBrowserKeys);
-		this.gamePadController = this.inputClassesFactory.registerGamePad();
-		setInterval(() => this.getStats(), 1000);
-
-		// either autoplay the video or set up the play overlay
-		this.autoPlayVideoOrSetUpPlayOverlay();
-		this.setEnlargeToFillDisplay(true);
-		this.resizePlayerStyle();
-		this.delegate.onVideoInitialised();
-		this.uiController.updateVideoStreamSize = () => this.updateVideoStreamSize();
+		this.mouseController = this.inputClassesFactory.registerMouse((this.config.isFlagEnabled(Flags.ControlScheme)) ? ControlSchemeType.HoveringMouse : ControlSchemeType.LockedMouse, this.playerStyleAttributes);
 	}
 
 	/**
@@ -789,7 +832,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	sendLatencyTest() {
 		this.latencyStartTime = Date.now();
-		this.sendDescriptorController.sendLatencyTest(this.latencyStartTime);
+		this.sendDescriptorController.sendLatencyTest({ "StartTime": this.latencyStartTime });
 	}
 
 	/**
@@ -841,7 +884,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	sendShowFps(): void {
 		Logger.Log(Logger.GetStackTrace(), "----   Sending show stat to UE   ----", 6);
-		this.sendDescriptorController.emitCommand("stat fps");
+		this.sendDescriptorController.emitCommand({ "stat.fps": "" });
 	}
 
 	/**
@@ -922,6 +965,17 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.VideoEncoderAvgQP", 6);
 		const AvgQP = Number(new TextDecoder("utf-16").decode(message.slice(1)));
 		this.delegate.onVideoEncoderAvgQP(AvgQP);
+	}
+
+	/**
+	 * Handles when the video element has been loaded with a srcObject
+	 */
+	handleVideoInitialised() {
+		// either autoplay the video or set up the play overlay
+		this.autoPlayVideoOrSetUpPlayOverlay();
+		this.setEnlargeToFillParent(true);
+		this.resizePlayerStyle();
+		this.uiController.updateVideoStreamSize = () => this.updateVideoStreamSize();
 	}
 
 	/**

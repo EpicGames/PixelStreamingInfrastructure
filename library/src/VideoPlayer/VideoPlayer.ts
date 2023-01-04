@@ -39,6 +39,10 @@ export class VideoPlayer implements IVideoPlayer {
                 this.videoElement.play();
             }
         }
+
+		this.videoElement.onloadedmetadata = () => {
+			this.onVideoInitialised();
+		}
     }
 
     /**
@@ -73,4 +77,11 @@ export class VideoPlayer implements IVideoPlayer {
         const videoElement = this.videoElement as any;
         videoElement.srcObject.getTracks().forEach((track: MediaStreamTrack) => track.enabled = enabled);
     }
+
+	/**
+	 * An override for when the video has been initialised with a srcObject
+	 */
+	onVideoInitialised() {
+		// Default Functionality: Do Nothing
+	}
 }

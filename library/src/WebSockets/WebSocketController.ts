@@ -35,9 +35,16 @@ export class WebSocketController {
      * @returns - If there is a connection
      */
     connect(): boolean {
+		let connectionURL = this.address;
+		// ensure we add the sfu preference to the url
+		const urlParams = new URLSearchParams(window.location.search);
+		if (urlParams.has('preferSFU')) {
+			connectionURL = connectionURL.split("/ws").join("?preferSFU=true" + "/ws");
+		}
+
         Logger.Log(Logger.GetStackTrace(), this.address, 6);
         try {
-            this.webSocket = new WebSocket(this.address);
+			this.webSocket = new WebSocket(connectionURL);
             this.webSocket.onopen = (event) => this.handleOnOpen(event);
             this.webSocket.onerror = (event) => this.handleOnError(event);
             this.webSocket.onclose = (event) => this.handleOnClose(event);
@@ -130,7 +137,17 @@ export class WebSocketController {
     }
 	
 	sendWebRtcAnswer(answer: RTCSessionDescriptionInit) {
-		let payload = new MessageSend.MessageWebRTCAnswer(answer);
+		const payload = new MessageSend.MessageWebRTCAnswer(answer);
+		this.webSocket.send(payload.payload());
+	}
+
+	sendWebRtcDatachannelRequest() {
+		const payload = new MessageSend.MessageWebRTCDatachannelRequest();
+		this.webSocket.send(payload.payload());
+	}
+
+	sendSFURecvDataChannelReady() {
+		const payload = new MessageSend.MessageSFURecvDataChannelReady();
 		this.webSocket.send(payload.payload());
 	}
 
@@ -189,4 +206,10 @@ export class WebSocketController {
      * @param messageOffer - The sdp offer
      */
     onWebRtcOffer(messageOffer: MessageReceive.MessageOffer) { }
+
+    /**
+	 * Event is fired when the websocket receives the data channels for the RTC peer Connection from the SFU
+	 * @param messageDataChannels - The data channels details
+	 */
+	onWebRtcPeerDataChannels(messageDataChannels: MessageReceive.MessagePeerDataChannels) { }
 }

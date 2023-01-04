@@ -39,9 +39,9 @@ if (signallingServerAddress == '') {
 // Create a config object
 let config = new libspsfrontend.Config(signallingServerAddress);
 config.enableSpsAutoConnect = false;
-config.enableSpsAutoplay = false;
+config.enableSpsAutoplay = true;
 
 // Create a Native DOM delegate instance that implements the Delegate interface class
 let delegate = new NativeDOMDelegate(config);
-document.body.appendChild(delegate.rootElement);
+document.getElementById("centrebox").appendChild(delegate.rootElement);
 

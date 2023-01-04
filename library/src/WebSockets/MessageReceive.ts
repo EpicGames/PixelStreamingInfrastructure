@@ -9,7 +9,9 @@ export enum MessageRecvTypes {
     OFFER = "offer",
     ANSWER = "answer",
     ICE_CANDIDATE = "iceCandidate",
-    PING = "ping"
+	PEER_DATA_CHANNELS = "peerDataChannels",
+    PING = "ping",
+	WARNING = "warning"
 }
 
 /**
@@ -49,10 +51,11 @@ export class MessageAnswer extends MessageRecv {
 }
 
 /**
- * WebRTC sdp offer message wrapper.
+ * WebRTC sdp offer Message wrapper.
  */
 export class MessageOffer extends MessageRecv {
     sdp: string;
+	sfu?: string;
 }
 
 /**
@@ -60,4 +63,13 @@ export class MessageOffer extends MessageRecv {
  */
 export class MessageIceCandidate extends MessageRecv {
     candidate: RTCIceCandidateInit;
+}
+
+/**
+ * Peer Data Channels Message wrapper
+ */
+export class MessagePeerDataChannels extends MessageRecv {
+	recvStreamId: number;
+	sendStreamId: number;
+	type: string;
 }

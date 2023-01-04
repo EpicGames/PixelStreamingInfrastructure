@@ -10,7 +10,7 @@ export class UiController {
     orientationChangeTimeout: ReturnType<typeof setTimeout>;
     lastTimeResized = new Date().getTime();
     resizeTimeout: number;
-    enlargeDisplayToFillWindow: boolean = true;
+    enlargeDisplayToFillWindow = true;
 
     /**
      * @param videoPlayerProvider Video Player instance  
@@ -26,36 +26,36 @@ export class UiController {
     }
 
     /**
-     * Resizes the player element to fill the window 
+     * Resizes the player element to fill the parent element 
      */
-    resizePlayerStyleToFillWindow() {
-        let videoElement = this.videoPlayerProvider.getVideoElement();
-        let videoElementParent = this.videoPlayerProvider.getVideoParentElement() as any;
+    resizePlayerStyleToFillParentElement() {
+        const videoElement = this.videoPlayerProvider.getVideoElement();
+        const videoElementParent = this.videoPlayerProvider.getVideoParentElement() as any;
 
         // Fill the player display in window, keeping picture's aspect ratio.
-        let windowAspectRatio = window.innerHeight / window.innerWidth;
-        let playerAspectRatio = videoElementParent.clientHeight / videoElementParent.clientWidth;
+		const elementAspectRatio = videoElementParent.innerHeight / videoElementParent.innerWidth;
+        const playerAspectRatio = videoElementParent.clientHeight / videoElementParent.clientWidth;
         // We want to keep the video ratio correct for the video stream
-        let videoAspectRatio = videoElement.videoHeight / videoElement.videoWidth;
+        const videoAspectRatio = videoElement.videoHeight / videoElement.videoWidth;
         if (isNaN(videoAspectRatio)) {
-            //Video is not initialised yet so set videoElementParent to size of window
-            this.playerStyleAttributes.styleWidth = window.innerWidth;
-            this.playerStyleAttributes.styleHeight = window.innerHeight;
-            this.playerStyleAttributes.styleTop = 0;
-            this.playerStyleAttributes.styleLeft = 0;
+            //Video is not initialised yet so set videoElementParent to size of parent element
+			this.playerStyleAttributes.styleWidth = videoElementParent.innerWidth;
+			this.playerStyleAttributes.styleHeight = videoElementParent.innerHeight;
+			this.playerStyleAttributes.styleTop = 0;
+			this.playerStyleAttributes.styleLeft = 0;
             videoElementParent.style = "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional;
-        } else if (windowAspectRatio < playerAspectRatio) {
-            // Window height is the constraining factor so to keep aspect ratio change width appropriately
-            this.playerStyleAttributes.styleWidth = Math.floor(window.innerHeight / videoAspectRatio);
-            this.playerStyleAttributes.styleHeight = window.innerHeight;
+		} else if (elementAspectRatio < playerAspectRatio) {
+            // Parent element height is the constraining factor so to keep aspect ratio change width appropriately
+			this.playerStyleAttributes.styleWidth = Math.floor(videoElementParent.innerHeight / videoAspectRatio);
+			this.playerStyleAttributes.styleHeight = videoElementParent.innerHeight;
             this.playerStyleAttributes.styleTop = 0;
-            this.playerStyleAttributes.styleLeft = Math.floor((window.innerWidth - this.playerStyleAttributes.styleWidth) * 0.5);
+			this.playerStyleAttributes.styleLeft = Math.floor((videoElementParent.innerWidth - this.playerStyleAttributes.styleWidth) * 0.5);
             videoElementParent.style = "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional;
         } else {
-            // Window width is the constraining factor so to keep aspect ratio change height appropriately
-            this.playerStyleAttributes.styleWidth = window.innerWidth;
-            this.playerStyleAttributes.styleHeight = Math.floor(window.innerWidth * videoAspectRatio);
-            this.playerStyleAttributes.styleTop = Math.floor((window.innerHeight - this.playerStyleAttributes.styleHeight) * 0.5);
+            // Parent element width is the constraining factor so to keep aspect ratio change height appropriately
+			this.playerStyleAttributes.styleWidth = videoElementParent.innerWidth;
+			this.playerStyleAttributes.styleHeight = Math.floor(videoElementParent.innerWidth * videoAspectRatio);
+			this.playerStyleAttributes.styleTop = Math.floor((videoElementParent.innerHeight - this.playerStyleAttributes.styleHeight) * 0.5);
             this.playerStyleAttributes.styleLeft = 0;
             videoElementParent.style = "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional;
         }
@@ -65,15 +65,15 @@ export class UiController {
      * Resizes the player element to fit the actual size of the stream
      */
     resizePlayerStyleToActualSize() {
-        let videoElement = this.videoPlayerProvider.getVideoElement() as any;
-        let videoElementParent = this.videoPlayerProvider.getVideoParentElement() as any;
+        const videoElement = this.videoPlayerProvider.getVideoElement() as any;
+        const videoElementParent = this.videoPlayerProvider.getVideoParentElement() as any;
 
         if (videoElement) {
             // Display image in its actual size
             this.playerStyleAttributes.styleWidth = videoElement.videoWidth;
             this.playerStyleAttributes.styleHeight = videoElement.videoHeight;
-            let Top = Math.floor((window.innerHeight - this.playerStyleAttributes.styleHeight) * 0.5);
-            let Left = Math.floor((window.innerWidth - this.playerStyleAttributes.styleWidth) * 0.5);
+            const Top = Math.floor((window.innerHeight - this.playerStyleAttributes.styleHeight) * 0.5);
+            const Left = Math.floor((window.innerWidth - this.playerStyleAttributes.styleWidth) * 0.5);
             this.playerStyleAttributes.styleTop = (Top > 0) ? Top : 0;
             this.playerStyleAttributes.styleLeft = (Left > 0) ? Left : 0;
             videoElementParent.style = "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional;
@@ -84,7 +84,7 @@ export class UiController {
      * Resizes the player element to fit an arbitrary size 
      */
     resizePlayerStyleToArbitrarySize() {
-        let videoElementParent = this.videoPlayerProvider.getVideoParentElement() as any;
+        const videoElementParent = this.videoPlayerProvider.getVideoParentElement() as any;
         videoElementParent.style = "top: 0px; left: 0px; width: " + this.playerStyleAttributes.styleWidth + "px; height: " + this.playerStyleAttributes.styleHeight + "px; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional;
     }
 
@@ -103,7 +103,7 @@ export class UiController {
      * @returns - nil if requirements are satisfied 
      */
     resizePlayerStyle() {
-        let videoElementParent = this.videoPlayerProvider.getVideoParentElement() as any;
+        const videoElementParent = this.videoPlayerProvider.getVideoParentElement() as any;
 
         if (!videoElementParent) {
             return;
@@ -117,10 +117,10 @@ export class UiController {
         }
 
         // controls for resizing the player 
-        let windowSmallerThanPlayer = window.innerWidth < videoElementParent.videoWidth || window.innerHeight < videoElementParent.videoHeight;
+        const windowSmallerThanPlayer = window.innerWidth < videoElementParent.videoWidth || window.innerHeight < videoElementParent.videoHeight;
         if (this.enlargeDisplayToFillWindow !== null) {
             if (this.enlargeDisplayToFillWindow === true || windowSmallerThanPlayer) {
-                this.resizePlayerStyleToFillWindow();
+                this.resizePlayerStyleToFillParentElement();
             } else {
                 this.resizePlayerStyleToActualSize();
             }
