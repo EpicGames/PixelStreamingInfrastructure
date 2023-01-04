@@ -16,6 +16,7 @@ export enum MessageSendTypes {
     
     REQUEST_INSTANCE = "requestInstance",
     OFFER = "offer",
+    ANSWER = "answer",
     PONG = "pong"
 }
 
@@ -114,6 +115,26 @@ export class MessageWebRTCOffer extends MessageSend {
             this.sdp = offer.sdp;
         }
     }
+}
+
+/**
+ *  Web RTC Answer message wrapper
+ */
+export class MessageWebRTCAnswer extends MessageSend {
+	sdp: string;
+
+	/**
+	 * @param answer - Generated Web RTC Offer
+	 */
+	constructor(answer?: RTCSessionDescriptionInit) {
+		super();
+		this.type = MessageSendTypes.ANSWER;
+
+		if (answer) {
+			this.type = answer.type as MessageSendTypes;
+			this.sdp = answer.sdp;
+		}
+	}
 }
 
 /**
