@@ -193,8 +193,8 @@ export class DelegateBase implements IDelegate {
 			this.iWebRtcController.setAfkEnabled(isAFKEnabled);
 		});
 
-		this.config.addOnSettingChangedListener(Flags.VideoFillWindow, (shouldFillWindow : boolean) => {
-			this.iWebRtcController.setEnlargeToFillDisplay(shouldFillWindow);
+		this.config.addOnSettingChangedListener(Flags.VideoFillParent, (shouldFillParent : boolean) => {
+			this.iWebRtcController.setEnlargeToFillParent(shouldFillParent);
 			this.iWebRtcController.resizePlayerStyle();
 		});
 

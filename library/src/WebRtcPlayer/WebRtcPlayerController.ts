@@ -376,7 +376,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Sets if we are enlarging the display to fill the window for freeze frames and ui controller
 	 * @param isFilling is the display filling or not
 	 */
-	setEnlargeToFillDisplay(isFilling: boolean) {
+	setEnlargeToFillParent(isFilling: boolean) {
 		this.freezeFrameController.freezeFrame.enlargeDisplayToFillWindow = isFilling;
 		this.uiController.enlargeDisplayToFillWindow = isFilling;
 	}
@@ -612,7 +612,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * @param messageConfig - Config Message received from the signaling server
 	 */
 	handleOnConfigMessage(messageConfig: MessageConfig) {
-		this.setEnlargeToFillDisplay(true);
+		this.setEnlargeToFillParent(true);
 		this.resizePlayerStyle();
 
 		// Tell the WebRtcController to start a session with the peer options sent from the signaling server
@@ -982,7 +982,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	handleVideoInitialised() {
 		// either autoplay the video or set up the play overlay
 		this.autoPlayVideoOrSetUpPlayOverlay();
-		this.setEnlargeToFillDisplay(true);
+		this.setEnlargeToFillParent(true);
 		this.resizePlayerStyle();
 		this.uiController.updateVideoStreamSize = () => this.updateVideoStreamSize();
 	}

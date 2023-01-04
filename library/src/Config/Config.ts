@@ -15,7 +15,7 @@ export class Flags {
 	static ForceMonoAudio = "ForceMonoAudio";
 	static ForceTURN = "ForceTURN";
 	static AFKDetection = "TimeoutIfIdle";
-	static VideoFillWindow = "FillWindow";
+	static VideoFillParent = "FillParent";
 	static MatchViewportResolution = "MatchViewportRes";
 	static ControlScheme = "HoveringMouse"
 }
@@ -161,9 +161,9 @@ export class Config {
 		const viewSettingsSection = this.buildSectionWithHeading(settingsElem, "UI");
 
 		const fillWindowSetting = new SettingFlag(
-			Flags.VideoFillWindow, 
-			"Video fill window", 
-			"Video will try to fill the available space.", 
+			Flags.VideoFillParent, 
+			"Video fill parent element", 
+			"True: Video will be resized by the browser to fit inside its parent element\nFalse: The video element will resize to the size of the incoming stream", 
 			true);
 
 		const matchViewportResSetting = new SettingFlag(
