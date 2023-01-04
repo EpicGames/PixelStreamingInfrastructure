@@ -546,8 +546,11 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// set up peer connection controller video stats
 		this.peerConnectionController.onVideoStats = (event: AggregatedStats) => this.handleVideoStats(event);
 
-		/* When the Peer Connection Wants to send an offer have it handled */
+		/* When the Peer Connection wants to send an offer have it handled */
 		this.peerConnectionController.onSendWebRTCOffer = (offer: RTCSessionDescriptionInit) => this.handleSendWebRTCOffer(offer);
+
+		/* When the Peer Connection wants to send an answer have it handled */
+		this.peerConnectionController.onSendWebRTCAnswer = (offer: RTCSessionDescriptionInit) => this.handleSendWebRTCAnswer(offer);
 
 		/* When the Peer connection ice candidate is added have it handled */
 		this.peerConnectionController.onPeerIceCandidate = (peerConnectionIceEvent: RTCPeerConnectionIceEvent) => this.handleSendIceCandidate(peerConnectionIceEvent);
@@ -563,7 +566,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.peerConnectionController.onTrack = (trackEvent: RTCTrackEvent) => this.streamController.handleOnTrack(trackEvent);
 
 		/* Start the Hand shake process by creating an Offer */
-		this.peerConnectionController.createOffer(this.sdpConstraints, this.config);
+		const BrowserSendAnswer = this.config.isFlagEnabled(Flags.BrowserSendAnswer);
+		if (!BrowserSendAnswer) {
+			this.peerConnectionController.createOffer(this.sdpConstraints, this.config);
+		}
 	}
 
 	/**
@@ -646,12 +652,14 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	handleWebRtcOffer(Offer: MessageOffer) {
 		Logger.Log(Logger.GetStackTrace(), `Got offer sdp ${Offer.sdp}`, 6);
 
-		const sdpAnswer: RTCSessionDescriptionInit = {
+		const sdpOffer: RTCSessionDescriptionInit = {
 			sdp: Offer.sdp,
 			type: "offer"
 		}
 
-		//this.handleWebRtcRemoteSdp(sdpAnswer);
+		// TODO (william.belcher): SFU support
+
+		this.peerConnectionController.receiveOffer(sdpOffer, this.config);
 	}
 
 	/**
@@ -683,6 +691,15 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	handleSendWebRTCOffer(offer: RTCSessionDescriptionInit) {
 		Logger.Log(Logger.GetStackTrace(), "Sending the offer to the Server", 6);
 		this.webSocketController.sendWebRtcOffer(offer);
+	}
+
+	/**
+	 * Send the RTC Offer Session to the Signaling server via websocket
+	 * @param answer - RTC Session Description
+	 */
+	handleSendWebRTCAnswer(answer: RTCSessionDescriptionInit) {
+		Logger.Log(Logger.GetStackTrace(), "Sending the answer to the Server", 6);
+		this.webSocketController.sendWebRtcAnswer(answer);
 	}
 
 	/**

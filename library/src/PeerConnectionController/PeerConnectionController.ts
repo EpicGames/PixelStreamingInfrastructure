@@ -1,6 +1,7 @@
 import { Logger } from "../Logger/Logger";
 import { Config, Flags } from "../Config/Config";
 import { AggregatedStats } from "./AggregatedStats";
+import { MessageOffer } from "../WebSockets/MessageReceive";
 
 /**
  * Handles the Peer Connection 
@@ -55,13 +56,45 @@ export class PeerConnectionController {
 
         this.peerConnection.createOffer(offerOptions).then((offer: RTCSessionDescriptionInit) => {
             this.showTextOverlayConnecting();
-            offer.sdp = this.mungeOffer(offer.sdp, useMic);
+            offer.sdp = this.mungeSDP(offer.sdp, useMic);
             this.peerConnection.setLocalDescription(offer);
             this.onSendWebRTCOffer(offer);
         }).catch((onRejectedReason: string) => {
             this.showTextOverlaySetupFailure();
         });
     }
+
+	/**
+	 * 
+	 */
+	async receiveOffer(Offer: RTCSessionDescriptionInit, config: Config) {
+		Logger.Log(Logger.GetStackTrace(), "Receive Offer", 6);
+
+		this.peerConnection.setRemoteDescription(Offer).then(() => {
+			const isLocalhostConnection = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+			const isHttpsConnection = location.protocol === 'https:';
+			let useMic = config.isFlagEnabled(Flags.UseMic);
+			if (useMic && isLocalhostConnection && !isHttpsConnection) {
+				useMic = false;
+				Logger.Error(Logger.GetStackTrace(), "Microphone access in the browser will not work if you are not on HTTPS or localhost. Disabling mic access.");
+				Logger.Error(Logger.GetStackTrace(), "For testing you can enable HTTP microphone access Chrome by visiting chrome://flags/ and enabling 'unsafely-treat-insecure-origin-as-secure'");
+			}
+
+			this.setupTracksToSendAsync(useMic).finally(() => {
+				this.peerConnection.createAnswer()
+					.then((Answer: RTCSessionDescriptionInit) => {
+						Answer.sdp = this.mungeSDP(Answer.sdp, useMic);
+						return this.peerConnection.setLocalDescription(Answer);
+					})
+					.then(() => {
+						this.onSendWebRTCAnswer(this.peerConnection.currentLocalDescription);
+					})
+					.catch(() => {
+						Logger.Error(Logger.GetStackTrace(), "createAnswer() failed");
+					});
+			});
+		});
+	}
 
     /**
      * Generate Aggregated Stats and then fire a onVideo Stats event
@@ -89,7 +122,7 @@ export class PeerConnectionController {
      * @param useMic - Is the microphone in use
      * @returns A modified Session Descriptor
      */
-    mungeOffer(sdp: string, useMic: boolean) {
+    mungeSDP(sdp: string, useMic: boolean) {
         const mungedSDP = sdp;
         mungedSDP.replace(/(a=fmtp:\d+ .*level-asymmetry-allowed=.*)\r\n/gm, "$1;x-google-start-bitrate=10000;x-google-max-bitrate=100000\r\n");
         mungedSDP.replace('useinbandfec=1', 'useinbandfec=1;stereo=1;sprop-maxcapturerate=48000');
@@ -272,6 +305,12 @@ export class PeerConnectionController {
      * @param offer - RTC Offer
      */
     onSendWebRTCOffer(offer: RTCSessionDescriptionInit) { }
+
+	/**
+	 * Event to send the RTC Answer to the Signaling server
+	 * @param answer - RTC Answer
+	 */
+	onSendWebRTCAnswer(answer: RTCSessionDescriptionInit) { }
 
     /**
      * An override for showing the Peer connection connecting Overlay

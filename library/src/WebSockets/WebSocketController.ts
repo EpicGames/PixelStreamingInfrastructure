@@ -174,6 +174,11 @@ export class WebSocketController {
         const payload = new MessageSend.MessageWebRTCOffer(offer);
         this.webSocket.send(payload.payload());
     }
+	
+	sendWebRtcAnswer(answer: RTCSessionDescriptionInit) {
+		let payload = new MessageSend.MessageWebRTCAnswer(answer);
+		this.webSocket.send(payload.payload());
+	}
 
     /**
      * Sends an RTC Ice Candidate to the Server
