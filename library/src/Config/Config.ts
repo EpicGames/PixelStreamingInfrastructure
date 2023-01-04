@@ -17,7 +17,7 @@ export class Flags {
 	static AFKDetection = "TimeoutIfIdle";
 	static VideoFillWindow = "FillWindow";
 	static MatchViewportResolution = "MatchViewportRes";
-	static ControlScheme = "ControlScheme"
+	static ControlScheme = "HoveringMouse"
 }
 
 /**
@@ -184,6 +184,9 @@ export class Config {
 		this.addSettingFlag(viewSettingsSection, fillWindowSetting);
 		this.addSettingFlag(viewSettingsSection, matchViewportResSetting);
 		this.addSettingFlag(viewSettingsSection, controlSchemeSetting);
+		// Update the configs control scheme based on the settings value
+		this.controlScheme = (controlSchemeSetting.value) ? 1 : 0;
+		controlSchemeSetting.label = `Control Scheme: ${(controlSchemeSetting.value) ? "Hovering" : "Locked"} Mouse`;
 
 		/* Setup all encoder related settings under this section */
 		const encoderSettingsSection = this.buildSectionWithHeading(settingsElem, "Encoder");
