@@ -21,7 +21,7 @@ export class SignallingProtocol {
 
 	handleMessage(messageId : string, messageData : string) {
 		if(this.FromUEMessageHandlers.has(messageId)) {
-			this.FromUEMessageHandlers.get(messageId).call(messageData);
+			this.FromUEMessageHandlers.get(messageId)(messageData);
 		}
 		else {
 			Logger.Error(Logger.GetStackTrace(), `Message type of ${messageId} does not have a message handler registered on the frontend - ignoring message.`);

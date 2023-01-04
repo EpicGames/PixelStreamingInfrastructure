@@ -566,8 +566,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.peerConnectionController.onTrack = (trackEvent: RTCTrackEvent) => this.streamController.handleOnTrack(trackEvent);
 
 		/* Start the Hand shake process by creating an Offer */
-		const BrowserSendAnswer = this.config.isFlagEnabled(Flags.BrowserSendAnswer);
-		if (!BrowserSendAnswer) {
+		const BrowserSendOffer = this.config.isFlagEnabled(Flags.BrowserSendOffer);
+		if (BrowserSendOffer) {
 			this.peerConnectionController.createOffer(this.sdpConstraints, this.config);
 		}
 	}

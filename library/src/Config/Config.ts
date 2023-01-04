@@ -8,7 +8,7 @@ import { SettingNumber } from "./SettingNumber";
  */
 export class Flags {
 	static UseMic = "UseMic";
-	static BrowserSendAnswer = "offerToReceive";
+	static BrowserSendOffer = "offerToReceive";
 	static PreferSFU = "preferSFU";
 	static IsQualityController = "ControlsQuality";
 	static ForceMonoAudio = "ForceMonoAudio";
@@ -105,9 +105,9 @@ export class Config {
 		const psSettingsSection = this.buildSectionWithHeading(settingsElem, "Pixel Streaming");
 
 		const sendSDPAnswerSetting = new SettingFlag(
-			Flags.BrowserSendAnswer, 
-			"Browser send answer", 
-			"Browser will hint it would like to send the sdp answer.", 
+			Flags.BrowserSendOffer, 
+			"Browser send offer", 
+			"Browser will initiate the WebRTC handshake by sending the offer to the streamer", 
 			false);
 
 		const useMicSetting = new SettingFlag(
