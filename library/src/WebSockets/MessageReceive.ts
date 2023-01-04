@@ -3,23 +3,13 @@
  */
 export enum MessageRecvTypes {
     
-    AUTHENTICATION_RESPONSE = "authenticationResponse",
+    
     CONFIG = "config",
     PLAYER_COUNT = "playerCount",
     OFFER = "offer",
     ANSWER = "answer",
     ICE_CANDIDATE = "iceCandidate",
     PING = "ping"
-}
-
-/**
- * Types of Authentication reposes 
- */
-export enum MessageAuthResponseOutcomeType {
-    REDIRECT = "REDIRECT",
-    INVALID_TOKEN = "INVALID_TOKEN",
-    AUTHENTICATED = "AUTHENTICATED",
-    ERROR = "ERROR"
 }
 
 /**
@@ -35,14 +25,7 @@ export class MessageRecv {
  */
 export class MessageAuthRequired extends MessageRecv { }
 
-/**
- * Authentication Response Message wrapper
- */
-export class MessageAuthResponse extends MessageRecv {
-    outcome: MessageAuthResponseOutcomeType;
-    redirect: string;
-    error: string;
-}
+
 
 /**
  * Config Message Wrapper

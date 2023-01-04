@@ -13,8 +13,6 @@ import { OutBoundVideoStats } from "../PeerConnectionController/OutBoundVideoSta
 export enum MessageSendTypes {
     ICE_CANDIDATE = "iceCandidate",
     STATS = "stats",
-    
-    REQUEST_INSTANCE = "requestInstance",
     OFFER = "offer",
     ANSWER = "answer",
     PONG = "pong"
@@ -56,16 +54,6 @@ export class MessagePong extends MessageSend {
         super();
         this.type = MessageSendTypes.PONG;
         this.time = time
-    }
-}
-
-/**
- * Instance Request Message Wrapper
- */
-export class MessageRequestInstance extends MessageSend {
-    constructor() {
-        super();
-        this.type = MessageSendTypes.REQUEST_INSTANCE;
     }
 }
 

@@ -7,7 +7,6 @@ import { IAfkOverlay } from "../Overlay/IAfkOverlay";
 import { IOverlay } from "../Overlay/IOverlay";
 import { ITextOverlay } from "../Overlay/ITextOverlay";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
-import { MessageAuthResponse } from '../WebSockets/MessageReceive';
 import { VideoQpIndicator } from '../Ui/VideoQpIndicator'
 import { SettingPanel } from "../Config/SettingPanel";
 import { webRtcPlayerController } from "../WebRtcPlayer/WebRtcPlayerController";
@@ -471,12 +470,6 @@ export class DelegateBase implements IDelegate {
 		this.showTextOverlay("Auto Connecting Now");
 		this.showActionOrErrorOnDisconnect = true;
 	}
-
-	/**
-	 * Set up functionality to happen when receiving an auth response 
-	 * @param authResponse - the auth response message type
-	 */
-	onAuthenticationResponse(authResponse: MessageAuthResponse) { }
 
 	/**
 	 * Set up functionality to happen when receiving a webRTC answer 

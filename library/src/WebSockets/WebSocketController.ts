@@ -2,7 +2,6 @@ import { Logger } from "../Logger/Logger";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import * as MessageReceive from "./MessageReceive";
 import * as MessageSend from "./MessageSend";
-import { MessageAuthResponse } from "./MessageReceive";
 import { SignallingProtocol } from "./SignallingProtocol"
 
 // declare the new method for the websocket interface
@@ -94,53 +93,6 @@ export class WebSocketController {
 
         // Send to our signalling protocol to handle the incoming message
         this.signallingProtocol.handleMessage(message.type, event.data);
-
-        switch (message.type) {
-            
-            
-            case MessageReceive.MessageRecvTypes.AUTHENTICATION_RESPONSE: {
-                Logger.Log(Logger.GetStackTrace(), "AUTHENTICATION_RESPONSE", 6);
-                const authenticationResponse: MessageAuthResponse = JSON.parse(event.data);
-
-                this.onAuthenticationResponse(authenticationResponse);
-
-                switch (authenticationResponse.outcome) {
-                    case MessageReceive.MessageAuthResponseOutcomeType.REDIRECT: {
-                        window.location.href = authenticationResponse.redirect;
-                        break;
-                    }
-                    case MessageReceive.MessageAuthResponseOutcomeType.AUTHENTICATED: {
-                        Logger.Log(Logger.GetStackTrace(), "User is authenticated and now requesting an instance", 6);
-
-                        this.webSocket.send(new MessageSend.MessageRequestInstance().payload());
-                        break;
-                    }
-                    case MessageReceive.MessageAuthResponseOutcomeType.INVALID_TOKEN: {
-                        Logger.Info(Logger.GetStackTrace(), "Authentication error : Invalid Token");
-                        break;
-                    }
-                    case MessageReceive.MessageAuthResponseOutcomeType.ERROR: {
-                        Logger.Info(Logger.GetStackTrace(), "Authentication Error from server Check what you are sending");
-                        break;
-                    }
-                    default: {
-                        Logger.Error(Logger.GetStackTrace(), "The Outcome Message has not been handled : this is really bad");
-                        break;
-                    }
-                }
-                break;
-            }
-            
-            
-            
-            
-            
-            
-            default: {
-                
-                break;
-            }
-        }
     }
 
     /**
@@ -237,10 +189,4 @@ export class WebSocketController {
      * @param messageOffer - The sdp offer
      */
     onWebRtcOffer(messageOffer: MessageReceive.MessageOffer) { }
-
-    /**
-     * Event fired with the websocket receives a Authentication Response
-     * @param authResponse - Authentication Response
-     */
-    onAuthenticationResponse(authResponse: MessageReceive.MessageAuthResponse) { }
 }

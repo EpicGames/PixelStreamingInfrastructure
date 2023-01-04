@@ -1,6 +1,6 @@
 import { WebSocketController } from "../WebSockets/WebSocketController";
 import { StreamController } from "../VideoPlayer/StreamController";
-import { MessageAnswer, MessageOffer, MessageAuthResponse, MessageConfig } from "../WebSockets/MessageReceive";
+import { MessageAnswer, MessageOffer, MessageConfig } from "../WebSockets/MessageReceive";
 import { UiController } from "../Ui/UiController";
 import { FreezeFrameController } from "../FreezeFrame/FreezeFrameController";
 import { AfkLogic } from "../Afk/AfkLogic";
@@ -115,7 +115,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// set up websocket methods
 		this.webSocketController = new WebSocketController(this.config.signallingServerAddress);
 		this.webSocketController.onConfig = (messageConfig: MessageReceive.MessageConfig) => this.handleOnConfigMessage(messageConfig);
-		this.webSocketController.onAuthenticationResponse = (authResponse: MessageReceive.MessageAuthResponse) => this.handleAuthenticationResponse(authResponse);
 		this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => this.delegate.onDisconnect(`${event.code} - ${event.reason}`);
 
 		// set up the final webRtc player controller methods from within our delegate so a connection can be activated
@@ -728,14 +727,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.resizePlayerStyle();
 		this.delegate.onVideoInitialised();
 		this.uiController.updateVideoStreamSize = () => this.updateVideoStreamSize();
-	}
-
-	/**
-	 * Handles when the web socket receives an authentication response
-	 * @param authResponse - Authentication Response
-	 */
-	handleAuthenticationResponse(authResponse: MessageAuthResponse) {
-		this.delegate.onAuthenticationResponse(authResponse);
 	}
 
 	/**
