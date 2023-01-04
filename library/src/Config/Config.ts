@@ -47,9 +47,6 @@ export class Config {
 	// set the amount of wait time in seconds while there is inactivity for afk to occur 
 	afkTimeout = 120;
 
-	// The control scheme controls the behaviour of the mouse when it interacts with the WebRTC player.
-	controlScheme = ControlSchemeType.LockedMouse;
-
 	// Browser keys are those which are typically used by the browser UI. We usually want to suppress these to allow, for example, UE to show shader complexity with the F5 key without the web page refreshing.
 	suppressBrowserKeys = true;
 
@@ -184,9 +181,8 @@ export class Config {
 		this.addSettingFlag(viewSettingsSection, fillWindowSetting);
 		this.addSettingFlag(viewSettingsSection, matchViewportResSetting);
 		this.addSettingFlag(viewSettingsSection, controlSchemeSetting);
-		// Update the configs control scheme based on the settings value
-		this.controlScheme = (controlSchemeSetting.value) ? 1 : 0;
 		controlSchemeSetting.label = `Control Scheme: ${(controlSchemeSetting.value) ? "Hovering" : "Locked"} Mouse`;
+		
 
 		/* Setup all encoder related settings under this section */
 		const encoderSettingsSection = this.buildSectionWithHeading(settingsElem, "Encoder");

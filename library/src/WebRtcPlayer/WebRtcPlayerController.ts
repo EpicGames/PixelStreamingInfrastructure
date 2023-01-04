@@ -9,7 +9,7 @@ import { PeerConnectionController } from "../PeerConnectionController/PeerConnec
 import { KeyboardController } from "../Inputs/KeyboardController";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { IWebRtcPlayerController } from "./IWebRtcPlayerController";
-import { Config, Flags } from "../Config/Config";
+import { Config, Flags, ControlSchemeType } from "../Config/Config";
 import { EncoderSettings, InitialSettings, WebRTCSettings } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
 import { Logger } from "../Logger/Logger";
@@ -770,7 +770,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * registers the mouse for use in IWebRtcPlayerController
 	 */
 	activateRegisterMouse() {
-		this.mouseController = this.inputClassesFactory.registerMouse(this.config.controlScheme, this.playerStyleAttributes);
+		this.mouseController = this.inputClassesFactory.registerMouse((this.config.isFlagEnabled(Flags.ControlScheme)) ? ControlSchemeType.HoveringMouse : ControlSchemeType.LockedMouse, this.playerStyleAttributes);
 	}
 
 	/**

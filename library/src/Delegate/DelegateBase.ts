@@ -206,11 +206,11 @@ export class DelegateBase implements IDelegate {
 		this.config.addOnSettingChangedListener(Flags.ControlScheme, (isHoveringMouse : boolean) => {
 			if (isHoveringMouse) {
 				this.config.setFlagLabel(Flags.ControlScheme, "Control Scheme: Hovering Mouse");
-				this.config.controlScheme = ControlSchemeType.HoveringMouse;
+				this.config.setFlagEnabled(Flags.ControlScheme, true);
 				this.iWebRtcController.activateRegisterMouse();
 			} else {
 				this.config.setFlagLabel(Flags.ControlScheme, "Control Scheme: Locked Mouse");
-				this.config.controlScheme = ControlSchemeType.LockedMouse;
+				this.config.setFlagEnabled(Flags.ControlScheme, false);
 				this.iWebRtcController.activateRegisterMouse();
 			}
 		});
