@@ -1,6 +1,7 @@
 import { Logger } from "../Logger/Logger";
 import { SettingFlag } from "./SettingFlag";
 import { SettingNumber } from "./SettingNumber";
+import { SettingText } from "./SettingText";
 
 /**
  * A collection of toggable flags that are core to all Pixel Streaming experiences.
@@ -30,6 +31,14 @@ export class NumericParameters {
 	static WebRTCFPS = "WebRTCFPS";
 	static WebRTCMinBitrate = "WebRTCMinBitrate";
 	static WebRTCMaxBitrate = "WebRTCMaxBitrate";
+}
+
+/**
+ * A collection of textual parameters that are core to all Pixel Streaming experiences.
+ * 
+ */
+ export class TextParameters {
+	static SignallingServerUrl = "ss";
 }
 
 export class Config {
@@ -62,6 +71,9 @@ export class Config {
 
 	/* A map of numerical settings - options that can be in the application - e.g. MinBitrate */
 	numericParameters = new Map<string, SettingNumber>();
+
+	/* A map of text settings - e.g. signalling server url */
+	textParameters = new Map<string, SettingText>();
 
 	/**
 	 * @param signallingServerAddress - the address of the signaling server 
@@ -101,6 +113,12 @@ export class Config {
 
 		/* Setup all Pixel Streaming specific settings */
 		const psSettingsSection = this.buildSectionWithHeading(settingsElem, "Pixel Streaming");
+
+		const signallingUrlSetting = new SettingText(
+			TextParameters.SignallingServerUrl, 
+			"Signalling url", 
+			"Url of the signalling server",
+			(location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.hostname);
 
 		const sendSDPAnswerSetting = new SettingFlag(
 			Flags.BrowserSendOffer, 
@@ -149,6 +167,7 @@ export class Config {
 		);
 		
 		// make settings show up in DOM
+		this.addSettingText(psSettingsSection, signallingUrlSetting);
 		this.addSettingFlag(psSettingsSection, sendSDPAnswerSetting);
 		this.addSettingFlag(psSettingsSection, useMicSetting);
 		this.addSettingFlag(psSettingsSection, preferSFUSetting);
@@ -264,6 +283,19 @@ export class Config {
 	}
 
 	/**
+	 * @param id The id of the text setting we are interested in getting a value for.
+	 * @returns The text value stored in the parameter with the passed id.
+	 */
+	getTextSettingValue(id: string) : string {
+		if(this.textParameters.has(id)){
+			return this.textParameters.get(id).value as string;
+		}
+		else {
+			throw new Error(`There is no numeric setting with the id of ${id}`);
+		}
+	}
+
+	/**
 	 * Set number in the setting.
 	 * @param id The id of the numeric setting we are interested in.
 	 * @param value The numeric value to set.
@@ -286,6 +318,16 @@ export class Config {
 		if(this.flags.has(id)){
 			this.flags.get(id).onChange = onChangeListener;
 		}
+	}
+
+	/**
+	 * Add a SettingText element to a particular settings section in the DOM and registers that text in the text settings map.
+	 * @param settingsSection The settings section HTML element.
+	 * @param settingText The textual settings object.
+	 */
+	addSettingText(settingsSection: HTMLElement, settingText: SettingText) : void {
+		settingsSection.appendChild(settingText.rootElement);
+		this.textParameters.set(settingText.id, settingText);
 	}
 
 	/**

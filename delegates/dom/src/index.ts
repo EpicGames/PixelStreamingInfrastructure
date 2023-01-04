@@ -43,5 +43,6 @@ config.enableSpsAutoplay = true;
 
 // Create a Native DOM delegate instance that implements the Delegate interface class
 let delegate = new NativeDOMDelegate(config);
-document.getElementById("centrebox").appendChild(delegate.rootElement);
+//document.getElementById("centrebox").appendChild(delegate.rootElement);
+document.body.appendChild(delegate.rootElement);
 
