@@ -1,3 +1,4 @@
+import { Logger } from "../Logger/Logger";
 import { SettingFlag } from "./SettingFlag";
 import { SettingNumber } from "./SettingNumber";
 
@@ -324,7 +325,7 @@ export class Config {
 	 */
 	setFlagEnabled(id: string, flagEnabled: boolean) {
 		if(!this.flags.has(id)) {
-			console.warn(`Cannot toggle flag called ${id} - it does not exist in the Config.flags map.`);
+			Logger.Warning(Logger.GetStackTrace(), `Cannot toggle flag called ${id} - it does not exist in the Config.flags map.`);
 		} else {
 			this.flags.get(id).value = flagEnabled;
 		}
@@ -337,7 +338,7 @@ export class Config {
 	 */
 	setFlagLabel(id: string, label: string) {
 		if(!this.flags.has(id)) {
-			console.warn(`Cannot set label for flag called ${id} - it does not exist in the Config.flags map.`);
+			Logger.Warning(Logger.GetStackTrace(), `Cannot set label for flag called ${id} - it does not exist in the Config.flags map.`);
 		} else {
 			this.flags.get(id).label = label;
 		}

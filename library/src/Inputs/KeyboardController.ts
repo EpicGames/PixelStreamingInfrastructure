@@ -196,7 +196,7 @@ export class KeyboardController {
     handleOnKeyPress(keyboard: KeyboardEvent) {
 
         if(!("charCode" in keyboard)){
-            console.warn("KeyboardEvent.charCode is deprecated in this browser, cannot send key press.");
+            Logger.Warning(Logger.GetStackTrace(), "KeyboardEvent.charCode is deprecated in this browser, cannot send key press.");
             return;
         }
 
@@ -221,7 +221,7 @@ export class KeyboardController {
             if(keyboardEvent.code in this.CodeToKeyCode) {
                 return this.CodeToKeyCode[keyboardEvent.code];
             } else {
-                console.warn(`Keyboard code of ${keyboardEvent.code} is not supported in our mapping, ignoring this key.`);
+                Logger.Warning(Logger.GetStackTrace(), `Keyboard code of ${keyboardEvent.code} is not supported in our mapping, ignoring this key.`);
                 return null;
             }
         }

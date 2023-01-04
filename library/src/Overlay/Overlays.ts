@@ -3,6 +3,7 @@ import { IOverlay } from "./IOverlay";
 import { IActionOverlay } from "./IActionOverlay";
 import { IAfkOverlay } from "./IAfkOverlay";
 import { ITextOverlay } from "./ITextOverlay";
+import { Logger } from "../Logger/Logger";
 /**
  * Class for the base overlay structure 
  */
@@ -56,7 +57,7 @@ export class ActionOverlayBase extends OverlayBase implements IActionOverlay {
     public constructor(rootDiv: HTMLElement, rootElement: HTMLElement, contentElement: HTMLElement, contentElementSpanId?: string) {
         super(rootDiv, rootElement, contentElement);
         this.contentElementSpanId = contentElementSpanId;
-        this.onActionCallback = () => { /* do nothing */ console.log("Did you forget to set the onAction callback in your overlay?") };
+        this.onActionCallback = () => { /* do nothing */ Logger.Info(Logger.GetStackTrace(), "Did you forget to set the onAction callback in your overlay?") };
     }
 
     /**

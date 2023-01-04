@@ -1,7 +1,6 @@
 import { Logger } from "../Logger/Logger";
 import { Config, Flags } from "../Config/Config";
 import { AggregatedStats } from "./AggregatedStats";
-import { MessageOffer } from "../WebSockets/MessageReceive";
 
 /**
  * Handles the Peer Connection 
@@ -33,6 +32,7 @@ export class PeerConnectionController {
         this.peerConnection.onicegatheringstatechange = (ev: Event) => this.handleIceGatheringStateChange(ev);
         this.peerConnection.ontrack = (ev: RTCTrackEvent) => this.handleOnTrack(ev);
         this.peerConnection.onicecandidate = (ev: RTCPeerConnectionIceEvent) => this.handleIceCandidate(ev);
+		this.peerConnection.ondatachannel = (ev: RTCDataChannelEvent) => this.handleDataChannel(ev);
         this.aggregatedStats = new AggregatedStats();
     }
 
@@ -40,7 +40,7 @@ export class PeerConnectionController {
      * Create an offer for the Web RTC handshake and send the offer to the signaling server via websocket
      * @param offerOptions - RTC Offer Options
      */
-    createOffer(offerOptions: RTCOfferOptions, config: Config) {
+    async createOffer(offerOptions: RTCOfferOptions, config: Config) {
         Logger.Log(Logger.GetStackTrace(), "Create Offer", 6);
 
         const isLocalhostConnection = location.hostname === "localhost" || location.hostname === "127.0.0.1";
@@ -52,16 +52,16 @@ export class PeerConnectionController {
             Logger.Error(Logger.GetStackTrace(), "For testing you can enable HTTP microphone access Chrome by visiting chrome://flags/ and enabling 'unsafely-treat-insecure-origin-as-secure'");
         }
 
-        this.setupTracksToSendAsync(useMic).finally(() => { /* TODO: Handling when tracks are finally done setting up/failing to setup. */ });
-
-        this.peerConnection.createOffer(offerOptions).then((offer: RTCSessionDescriptionInit) => {
-            this.showTextOverlayConnecting();
-            offer.sdp = this.mungeSDP(offer.sdp, useMic);
-            this.peerConnection.setLocalDescription(offer);
-            this.onSendWebRTCOffer(offer);
-        }).catch((onRejectedReason: string) => {
-            this.showTextOverlaySetupFailure();
-        });
+        this.setupTransceiversAsync(useMic).finally(() => { 
+			this.peerConnection.createOffer(offerOptions).then((offer: RTCSessionDescriptionInit) => {
+				this.showTextOverlayConnecting();
+				offer.sdp = this.mungeSDP(offer.sdp, useMic);
+				this.peerConnection.setLocalDescription(offer);
+				this.onSendWebRTCOffer(offer);
+			}).catch((onRejectedReason: string) => {
+				this.showTextOverlaySetupFailure();
+			});
+		});
     }
 
 	/**
@@ -80,7 +80,7 @@ export class PeerConnectionController {
 				Logger.Error(Logger.GetStackTrace(), "For testing you can enable HTTP microphone access Chrome by visiting chrome://flags/ and enabling 'unsafely-treat-insecure-origin-as-secure'");
 			}
 
-			this.setupTracksToSendAsync(useMic).finally(() => {
+			this.setupTransceiversAsync(useMic).finally(() => {
 				this.peerConnection.createAnswer()
 					.then((Answer: RTCSessionDescriptionInit) => {
 						Answer.sdp = this.mungeSDP(Answer.sdp, useMic);
@@ -94,6 +94,14 @@ export class PeerConnectionController {
 					});
 			});
 		});
+	}
+
+	/**
+	 * Set the Remote Descriptor from the signaling server to the RTC Peer Connection 
+	 * @param sdp - RTC Session Descriptor from the Signaling Server
+	 */
+	receiveAnswer(sdp: RTCSessionDescriptionInit) {
+		this.peerConnection.setRemoteDescription(sdp);
 	}
 
     /**
@@ -147,14 +155,6 @@ export class PeerConnectionController {
         mungedSDP.replace('useinbandfec=1', audioSDP);
 
         return mungedSDP;
-    }
-
-    /**
-     * Set the Remote Descriptor from the signaling server to the RTC Peer Connection 
-     * @param sdp - RTC Session Descriptor from the Signaling Server
-     */
-    setRemoteSdp(sdp: RTCSessionDescriptionInit) {
-        this.peerConnection.setRemoteDescription(sdp);
     }
 
     /**
@@ -216,6 +216,14 @@ export class PeerConnectionController {
         this.onPeerIceCandidate(event);
     }
 
+	/**
+	 * Activates the onDataChannel 
+	 * @param event - The peer's data channel
+	 */
+	handleDataChannel(event: RTCDataChannelEvent) {
+		this.onDataChannel(event);
+	}
+
     /**
      * An override method for onTrack for use outside of the PeerConnectionController
      * @param trackEvent - The webRtc track event
@@ -228,12 +236,17 @@ export class PeerConnectionController {
      */
     onPeerIceCandidate(peerConnectionIceEvent: RTCPeerConnectionIceEvent) { }
 
+	/**
+	 * An override method for onDataChannel for use outside of the PeerConnectionController
+	 * @param datachannelEvent - The peer's data channel
+	 */
+	onDataChannel(datachannelEvent: RTCDataChannelEvent) { }
 
     /**
      * Setup tracks on the RTC Peer Connection 
      * @param useMic - is mic in use
      */
-    async setupTracksToSendAsync(useMic: boolean) {
+	async setupTransceiversAsync(useMic: boolean) {
 
         const hasTransceivers = this.peerConnection.getTransceivers().length > 0;
 
@@ -243,9 +256,7 @@ export class PeerConnectionController {
         // Setup a transceiver for sending mic audio to UE and receiving audio from UE
         if (!useMic) {
             this.peerConnection.addTransceiver("audio", { direction: "recvonly" });
-        }
-        else {
-
+        } else {
             // set the audio options based on mic usage
             const audioOptions = useMic ?
                 {

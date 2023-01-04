@@ -35,18 +35,23 @@ export class DataChannelController implements IDataChannelController {
         }
 
         this.dataChannel = this.peerConnection.createDataChannel(this.label, this.datachannelOptions);
-        //We Want an Array Buffer not a blob
-        this.dataChannel.binaryType = "arraybuffer";
-        this.dataChannel.onopen = () => this.handleOnOpen();
-        this.dataChannel.onclose = () => this.handleOnClose();
-        this.dataChannel.onmessage = (ev: MessageEvent<any>) => this.handleOnMessage(ev);
+		this.setupDataChannel();
     }
+
+	setupDataChannel() {
+		//We Want an Array Buffer not a blob
+		this.dataChannel.binaryType = "arraybuffer";
+		this.dataChannel.onopen = () => this.handleOnOpen();
+		this.dataChannel.onclose = () => this.handleOnClose();
+		this.dataChannel.onmessage = (ev: MessageEvent<any>) => this.handleOnMessage(ev);
+		this.dataChannel.onerror = (ev: MessageEvent<any>) => this.handleOnError(ev);
+	}
 
     /**
      * Handles when the Data Channel is opened
      */
     handleOnOpen() {
-        Logger.Log(Logger.GetStackTrace(), `Data Channel: ${this.label} is opened.`, 7);
+		Logger.Log(Logger.GetStackTrace(), `Data Channel (${this.label}) opened.`, 7);
     }
 
 
@@ -54,7 +59,7 @@ export class DataChannelController implements IDataChannelController {
      * Handles when the Data Channel is closed
      */
     handleOnClose() {
-        Logger.Log(Logger.GetStackTrace(), `Data Channel: ${this.label} is closed.`, 7);
+        Logger.Log(Logger.GetStackTrace(), `Data Channel (${this.label}) closed.`, 7);
     }
 
     /**
@@ -62,6 +67,15 @@ export class DataChannelController implements IDataChannelController {
      * @param event - Message Event
      */
     handleOnMessage(event: MessageEvent) {
-        Logger.Log(Logger.GetStackTrace(), `Data Channel event message has been received: ${event}`, 7);
+		// Higher log level to prevent log spam with messages received
+		Logger.Log(Logger.GetStackTrace(), `Data Channel (${this.label}) message: ${event}`, 8);
     }
+
+	/**
+	 * Handles when an error is thrown
+	 * @param event - Error Event
+	 */
+	handleOnError(event: MessageEvent) {
+		Logger.Log(Logger.GetStackTrace(), `Data Channel (${this.label}) error: ${event}`, 7);
+	}
 }

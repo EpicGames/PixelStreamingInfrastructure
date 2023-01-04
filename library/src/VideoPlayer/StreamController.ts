@@ -35,7 +35,7 @@ export class StreamController {
             return;
         } else if (rtcTrackEvent.track.kind == "video" && videoElement.srcObject !== rtcTrackEvent.streams[0]) {
             videoElement.srcObject = rtcTrackEvent.streams[0];
-            Logger.Log(Logger.GetStackTrace(), 'Set video source from video track ontrack.',);
+            Logger.Log(Logger.GetStackTrace(), 'Set video source from video track ontrack.');
             return;
         }
     }

@@ -65,7 +65,7 @@ export class SendDescriptorController {
         }
 
         if(!this.dataChannelSender.canSend()){
-            console.log(`Data channel cannot send yet, skipping sending descriptor message: ${messageType} - ${descriptorAsString}`);
+            Logger.Info(Logger.GetStackTrace(), `Data channel cannot send yet, skipping sending descriptor message: ${messageType} - ${descriptorAsString}`);
             return;
         }
 

@@ -1,3 +1,5 @@
+import { Logger } from "../Logger/Logger";
+
 /**
  * A number spinner with a text label beside it.
  */
@@ -36,7 +38,7 @@
 			const parsedValue = Number.parseInt(inputElem.value);
 
 			if(Number.isNaN(parsedValue)) {
-				console.warn(`Could not parse value change into a valid number - value was ${inputElem.value}, resetting value to ${this._min}`);
+				Logger.Warning(Logger.GetStackTrace(), `Could not parse value change into a valid number - value was ${inputElem.value}, resetting value to ${this._min}`)
 				this.number = this._min;
 			} else {
 				const clampedValue = this.clamp(parsedValue);

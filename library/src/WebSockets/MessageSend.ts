@@ -17,6 +17,8 @@ export enum MessageSendTypes {
     REQUEST_INSTANCE = "requestInstance",
     OFFER = "offer",
     ANSWER = "answer",
+	DATACHANNELREQUEST = "dataChannelRequest",
+	SFURECVDATACHANNELREADY = "peerDataChannelsReady",
     PONG = "pong"
 }
 
@@ -136,6 +138,30 @@ export class MessageWebRTCAnswer extends MessageSend {
 		}
 	}
 }
+
+/**
+ *  Web RTC Data channel request message wrapper
+ */
+export class MessageWebRTCDatachannelRequest extends MessageSend {
+	constructor() {
+		super();
+		this.type = MessageSendTypes.DATACHANNELREQUEST;
+	}
+}
+
+/**
+ *  // TODO (william.belcher)
+ */
+export class MessageSFURecvDataChannelReady extends MessageSend {
+	constructor() {
+		super();
+		this.type = MessageSendTypes.SFURECVDATACHANNELREADY;
+	}
+}
+
+
+
+
 
 /**
  * RTC Ice Candidate Wrapper

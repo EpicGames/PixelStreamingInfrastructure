@@ -64,7 +64,7 @@ export class SendMessageController {
         });
 
         if(!this.dataChannelSender.canSend()){
-            console.log(`Data channel cannot send yet, skipping sending message: ${messageType} - ${new Uint8Array(data.buffer)}`);
+            Logger.Info(Logger.GetStackTrace(), `Data channel cannot send yet, skipping sending message: ${messageType} - ${new Uint8Array(data.buffer)}`);
             return;
         }
         else{
