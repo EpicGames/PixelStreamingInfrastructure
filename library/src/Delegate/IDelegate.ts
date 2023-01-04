@@ -2,7 +2,7 @@ import { InitialSettings } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults"
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { IWebRtcPlayerController } from "../WebRtcPlayer/IWebRtcPlayerController";
-import { MessageInstanceState, MessageAuthResponse } from "../WebSockets/MessageReceive";
+import { MessageAuthResponse } from "../WebSockets/MessageReceive";
 
 /**
  * Delegate is an interface connecting methods from within the libspsfrontend to the user's functions for methods in their frontend implementation
@@ -148,12 +148,6 @@ export interface IDelegate {
 	 * @param hasQualityOwnership - does this user have quality ownership of the stream true / false
 	 */
 	onQualityControlOwnership(hasQualityOwnership: boolean): void;
-
-	/**
-	 * Set up functionality to happen when an instance state change occurs
-	 * @param instanceState - the message instance state
-	 */
-	onInstanceStateChange(instanceState: MessageInstanceState): void;
 
 	/**
 	 * Set up functionality to happen when receiving an auth response

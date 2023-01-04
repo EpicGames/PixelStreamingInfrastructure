@@ -7,7 +7,7 @@ import { IAfkOverlay } from "../Overlay/IAfkOverlay";
 import { IOverlay } from "../Overlay/IOverlay";
 import { ITextOverlay } from "../Overlay/ITextOverlay";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
-import { MessageInstanceState, MessageAuthResponse } from '../WebSockets/MessageReceive';
+import { MessageAuthResponse } from '../WebSockets/MessageReceive';
 import { VideoQpIndicator } from '../Ui/VideoQpIndicator'
 import { SettingPanel } from "../Config/SettingPanel";
 import { webRtcPlayerController } from "../WebRtcPlayer/WebRtcPlayerController";
@@ -471,12 +471,6 @@ export class DelegateBase implements IDelegate {
 		this.showTextOverlay("Auto Connecting Now");
 		this.showActionOrErrorOnDisconnect = true;
 	}
-
-	/**
-	 * Set up functionality to happen when an instance state change occurs
-	 * @param instanceState - the message instance state 
-	 */
-	onInstanceStateChange(instanceState: MessageInstanceState) { }
 
 	/**
 	 * Set up functionality to happen when receiving an auth response 

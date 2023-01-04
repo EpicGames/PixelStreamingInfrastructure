@@ -4,7 +4,6 @@
 export enum MessageRecvTypes {
     
     AUTHENTICATION_RESPONSE = "authenticationResponse",
-    INSTANCE_STATE = "instanceState",
     CONFIG = "config",
     PLAYER_COUNT = "playerCount",
     OFFER = "offer",
@@ -21,16 +20,6 @@ export enum MessageAuthResponseOutcomeType {
     INVALID_TOKEN = "INVALID_TOKEN",
     AUTHENTICATED = "AUTHENTICATED",
     ERROR = "ERROR"
-}
-
-/**
- * States of the UE Instance
- */
-export enum InstanceState {
-    UNALLOCATED = "UNALLOCATED",
-    PENDING = "PENDING",
-    FAILED = "FAILED",
-    READY = "READY"
 }
 
 /**
@@ -53,15 +42,6 @@ export class MessageAuthResponse extends MessageRecv {
     outcome: MessageAuthResponseOutcomeType;
     redirect: string;
     error: string;
-}
-
-/**
- * Instance State Message wrapper
- */
-export class MessageInstanceState extends MessageRecv {
-    state: InstanceState;
-    details: string;
-    progress: number;
 }
 
 /**

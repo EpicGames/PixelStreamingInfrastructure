@@ -1,6 +1,6 @@
 import { WebSocketController } from "../WebSockets/WebSocketController";
 import { StreamController } from "../VideoPlayer/StreamController";
-import { MessageInstanceState, MessageAnswer, MessageOffer, MessageAuthResponse, MessageConfig } from "../WebSockets/MessageReceive";
+import { MessageAnswer, MessageOffer, MessageAuthResponse, MessageConfig } from "../WebSockets/MessageReceive";
 import { UiController } from "../Ui/UiController";
 import { FreezeFrameController } from "../FreezeFrame/FreezeFrameController";
 import { AfkLogic } from "../Afk/AfkLogic";
@@ -115,7 +115,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		// set up websocket methods
 		this.webSocketController = new WebSocketController(this.config.signallingServerAddress);
 		this.webSocketController.onConfig = (messageConfig: MessageReceive.MessageConfig) => this.handleOnConfigMessage(messageConfig);
-		this.webSocketController.onInstanceStateChange = (instanceState: MessageReceive.MessageInstanceState) => this.handleInstanceStateChange(instanceState);
 		this.webSocketController.onAuthenticationResponse = (authResponse: MessageReceive.MessageAuthResponse) => this.handleAuthenticationResponse(authResponse);
 		this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => this.delegate.onDisconnect(`${event.code} - ${event.reason}`);
 
@@ -751,14 +750,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			clearTimeout(this.resizeTimeout);
 			this.resizeTimeout = setTimeout(this.updateVideoStreamSize, 1000);
 		}
-	}
-
-	/**
-	 * Handles when the Instance State Changes
-	 * @param instanceState  - Instance State 
-	 */
-	handleInstanceStateChange(instanceState: MessageInstanceState) {
-		this.delegate.onInstanceStateChange(instanceState)
 	}
 
 	/**

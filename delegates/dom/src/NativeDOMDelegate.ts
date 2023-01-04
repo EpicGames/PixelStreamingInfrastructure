@@ -19,6 +19,25 @@ import * as libspsfrontend from '@tensorworks/libspsfrontend'
     }
 }
 
+/**
+ * States of the UE Instance
+ */
+ export enum InstanceState {
+    UNALLOCATED = "UNALLOCATED",
+    PENDING = "PENDING",
+    FAILED = "FAILED",
+    READY = "READY"
+}
+
+/**
+ * Instance State Message wrapper
+ */
+ export class MessageInstanceState extends libspsfrontend.MessageRecv {
+    state: InstanceState;
+    details: string;
+    progress: number;
+}
+
 
 export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	
@@ -32,15 +51,21 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	 */
 	extendSignallingProtocol() {
 
-		// AUTHENTICATION_REQUIRED = "authenticationRequired",
 
+		// authenticationRequired
 		this.iWebRtcController.webSocketController.signallingProtocol.addMessageHandler("authenticationRequired", (authReqPayload : string) => {
 			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "AUTHENTICATION_REQUIRED", 6);
-			//const authenticationRequired: MessageReceive.MessageAuthRequired = JSON.parse(event.data);
 			const url_string = window.location.href;
 			const url = new URL(url_string);
 			const authRequest = new MessageAuthRequest(url.searchParams.get("code"), url.searchParams.get("provider"));
 			this.iWebRtcController.webSocketController.webSocket.send(authRequest.payload());
+		});
+
+		// instanceState
+		this.iWebRtcController.webSocketController.signallingProtocol.addMessageHandler("instanceState", (instanceStatePayload : string) => {
+			libspsfrontend.Logger.Log(libspsfrontend.Logger.GetStackTrace(), "INSTANCE_STATE", 6);
+			const instanceState: MessageInstanceState = JSON.parse(instanceStatePayload);
+			this.onInstanceStateChange(instanceState);
 		});
 
 	}
@@ -49,21 +74,21 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	* Set up functionality to happen when an instance state change occurs and updates the info overlay with the response
 	* @param instanceState - the message instance state 
 	*/
-	onInstanceStateChange(instanceState: libspsfrontend.MessageInstanceState) {
+	onInstanceStateChange(instanceState: MessageInstanceState) {
 		let instanceStateMessage = "";
 		let isInstancePending = false;
 		let isError = false;
 
 		// get the response type
 		switch (instanceState.state) {
-			case libspsfrontend.InstanceState.UNALLOCATED:
+			case InstanceState.UNALLOCATED:
 				instanceStateMessage = "Instance Unallocated: " + instanceState.details;
 				break;
-			case libspsfrontend.InstanceState.FAILED:
+			case InstanceState.FAILED:
 				instanceStateMessage = "UE Instance Failed: " + instanceState.details;
 				isError = true;
 				break;
-			case libspsfrontend.InstanceState.PENDING:
+			case InstanceState.PENDING:
 				isInstancePending = true;
 				if (instanceState.details == undefined || instanceState.details == null) {
 					instanceStateMessage = "Your application is pending";
@@ -71,7 +96,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 					instanceStateMessage = instanceState.details;
 				}
 				break;
-			case libspsfrontend.InstanceState.READY:
+			case InstanceState.READY:
 				if (instanceState.details == undefined || instanceState.details == null) {
 					instanceStateMessage = "Instance is Ready";
 

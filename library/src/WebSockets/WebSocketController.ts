@@ -128,12 +128,7 @@ export class WebSocketController {
                 }
                 break;
             }
-            case MessageReceive.MessageRecvTypes.INSTANCE_STATE: {
-                Logger.Log(Logger.GetStackTrace(), "INSTANCE_STATE", 6);
-                const instanceState: MessageReceive.MessageInstanceState = JSON.parse(event.data);
-                this.onInstanceStateChange(instanceState);
-                break;
-            }
+            
             
             
             
@@ -235,12 +230,6 @@ export class WebSocketController {
      * @param messageOffer - The sdp offer
      */
     onWebRtcOffer(messageOffer: MessageReceive.MessageOffer) { }
-
-    /**
-     * Event fired with the websocket receives a instance state
-     * @param instanceState - UE Instance State
-     */
-    onInstanceStateChange(instanceState: MessageReceive.MessageInstanceState) { }
 
     /**
      * Event fired with the websocket receives a Authentication Response
