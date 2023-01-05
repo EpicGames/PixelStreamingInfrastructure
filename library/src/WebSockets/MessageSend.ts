@@ -138,7 +138,7 @@ export class MessageWebRTCDatachannelRequest extends MessageSend {
 }
 
 /**
- *  // TODO (william.belcher)
+ *  Web RTC SFU Data channel ready message wrapper
  */
 export class MessageSFURecvDataChannelReady extends MessageSend {
 	constructor() {
@@ -146,10 +146,6 @@ export class MessageSFURecvDataChannelReady extends MessageSend {
 		this.type = MessageSendTypes.SFURECVDATACHANNELREADY;
 	}
 }
-
-
-
-
 
 /**
  * RTC Ice Candidate Wrapper

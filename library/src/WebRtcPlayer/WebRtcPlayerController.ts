@@ -661,8 +661,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
-	 * TODO (william.belcher): Fill this out
-	 * @param DataChannels - 
+	 * Handle when the SFU provides the peer with its data channels
+	 * @param DataChannels - The message from the SFU containing the data channels ids
 	 */
 	handleWebRtcSFUPeerDatachannels(DataChannels: MessageReceive.MessagePeerDataChannels) {
 		const SendOptions: RTCDataChannelInit = {
@@ -699,7 +699,6 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.delegate.onWebRtcSdp();
 
 		setInterval(() => this.getStats(), 1000);
-		this.delegate.onVideoInitialised();
 
 		/*  */
 		this.activateRegisterMouse()
@@ -969,6 +968,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Handles when the video element has been loaded with a srcObject
 	 */
 	handleVideoInitialised() {
+		this.delegate.onVideoInitialised();
+
 		// either autoplay the video or set up the play overlay
 		this.autoPlayVideoOrSetUpPlayOverlay();
 		this.setEnlargeToFillParent(true);

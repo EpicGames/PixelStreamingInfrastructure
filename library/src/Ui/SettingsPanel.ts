@@ -1,7 +1,7 @@
 /**
  * A UI component containing all the settings for the application.
  */
-export class SettingPanel {
+export class SettingsPanel {
 
 	_rootElement: HTMLElement;
 	_settingsCloseButton : HTMLElement;

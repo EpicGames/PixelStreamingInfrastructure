@@ -8,9 +8,9 @@ import { IOverlay } from "../Overlay/IOverlay";
 import { ITextOverlay } from "../Overlay/ITextOverlay";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { VideoQpIndicator } from '../Ui/VideoQpIndicator'
-import { SettingPanel } from "../Config/SettingPanel";
+import { SettingsPanel } from "../Ui/SettingsPanel";
 import { webRtcPlayerController } from "../WebRtcPlayer/WebRtcPlayerController";
-import { Flags, ControlSchemeType, NumericParameters } from "../Config/Config";
+import { Flags, NumericParameters } from "../Config/Config";
 import { Logger } from "../Logger/Logger";
 import { InitialSettings, EncoderSettings, WebRTCSettings } from "../DataChannel/InitialSettings"
 import { OnScreenKeyboard } from "../Ui/OnScreenKeyboard"
@@ -31,7 +31,7 @@ export class DelegateBase implements IDelegate {
 
 	showActionOrErrorOnDisconnect = true;
 
-	settingsPanel: SettingPanel;
+	settingsPanel: SettingsPanel;
 	statsPanel: StatsPanel;
 	videoQpIndicator: VideoQpIndicator;
 	onScreenKeyboardHelper: OnScreenKeyboard;
@@ -62,7 +62,7 @@ export class DelegateBase implements IDelegate {
 		this.uiFeaturesElement.appendChild(this.videoQpIndicator.rootElement);
 
 		// Add settings panel
-		this.settingsPanel = new SettingPanel();
+		this.settingsPanel = new SettingsPanel();
 		this.uiFeaturesElement.appendChild(this.settingsPanel.rootElement);
 		this.configureSettings();
 
@@ -268,7 +268,6 @@ export class DelegateBase implements IDelegate {
 			this.iWebRtcController.sendWebRtcSettings(webRtcSettings);
 			Logger.Log(Logger.GetStackTrace(), "-------------------------------------------", 7);
 		});
-
 	}
 
 	/**
@@ -585,10 +584,6 @@ export class DelegateBase implements IDelegate {
 		
 		// Grab all stats we can off the aggregated stats
 		this.statsPanel.handleStats(videoStats);
-
-		if (this.statsPanel.sendToServerCheckbox.checked === true) {
-			this.iWebRtcController.sendStatsToSignallingServer(videoStats);
-		}
 	}
 
 	/**
