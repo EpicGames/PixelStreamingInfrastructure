@@ -552,7 +552,7 @@ section> :first-child {
 }
 
 .settingsContainer {
-	border-bottom: 1px solid var(--colour2);
+	border-bottom: 1px solid var(--colour7);
 	padding-top: 10px;
 	padding-bottom: 10px;
 }
