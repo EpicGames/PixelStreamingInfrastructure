@@ -1,22 +1,22 @@
 import { MouseController } from "./MouseController";
 import { Logger } from "../Logger/Logger";
-import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
 import { IMouseEvents } from "./IMouseEvents";
 import { NormaliseAndQuantiseUnsigned } from "../NormalizeAndQuantize/NormalizeAndQuantize";
-import { IActiveKeys } from "./InputClassesFactory";
-import { IPlayerStyleAttributes } from "../Ui/IPlayerStyleAttributes";
+import { ActiveKeys } from "./InputClassesFactory";
+import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
+import { PlayerStyleAttributes } from "../Ui/PlayerStyleAttributes";
 
 /**
  * Handle the mouse locked events
  */
 export class LockedMouseEvents implements IMouseEvents {
-    x: number = 0;
-    y: number = 0;
+    x = 0;
+    y = 0;
     coord: NormaliseAndQuantiseUnsigned;
-    videoElementProvider: IVideoPlayer;
+    videoElementProvider: VideoPlayer;
     mouseController: MouseController;
-    activeKeysProvider: IActiveKeys;
-    playerStyleAttributesProvider: IPlayerStyleAttributes;
+    activeKeysProvider: ActiveKeys;
+    playerStyleAttributesProvider: PlayerStyleAttributes;
     updateMouseMovePositionEvent = (mouseEvent: MouseEvent) => { this.updateMouseMovePosition(mouseEvent) };
 
     /**
@@ -25,12 +25,12 @@ export class LockedMouseEvents implements IMouseEvents {
      * @param activeKeysProvider - Active keys provider instance 
      * @param playerStyleAttributesProvider - Player style attributes instance
      */
-    constructor(videoElementProvider: IVideoPlayer, mouseController: MouseController, activeKeysProvider: IActiveKeys, playerStyleAttributesProvider: IPlayerStyleAttributes) {
+    constructor(videoElementProvider: VideoPlayer, mouseController: MouseController, activeKeysProvider: ActiveKeys, playerStyleAttributesProvider: PlayerStyleAttributes) {
         this.videoElementProvider = videoElementProvider;
         this.mouseController = mouseController;
         this.activeKeysProvider = activeKeysProvider;
         this.playerStyleAttributesProvider = playerStyleAttributesProvider;
-        let videoElementParent = this.videoElementProvider.getVideoParentElement() as any;
+        const videoElementParent = this.videoElementProvider.getVideoParentElement() as any;
         this.x = videoElementParent.getBoundingClientRect().width / 2;
         this.y = videoElementParent.getBoundingClientRect().height / 2;
         this.coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.x, this.y);
@@ -40,8 +40,8 @@ export class LockedMouseEvents implements IMouseEvents {
      * Handle when the locked state Changed
      */
     lockStateChange() {
-        let videoElementParent = this.videoElementProvider.getVideoParentElement();
-        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        const videoElementParent = this.videoElementProvider.getVideoParentElement();
+        const toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
 
         if (document.pointerLockElement === videoElementParent || document.mozPointerLockElement === videoElementParent) {
             Logger.Log(Logger.GetStackTrace(), 'Pointer locked', 6);
@@ -55,8 +55,8 @@ export class LockedMouseEvents implements IMouseEvents {
             // This is necessary as when the mouse loses focus, the windows stops listening for events and as such
             // the keyup listener won't get fired
             let activeKeys = this.activeKeysProvider.getActiveKeys();
-            let setKeys = new Set(activeKeys);
-            let newKeysIterable: Array<any> = [];
+            const setKeys = new Set(activeKeys);
+            const newKeysIterable: Array<any> = [];
 
             setKeys.forEach((setKey: any) => {
                 newKeysIterable[setKey];
@@ -76,9 +76,9 @@ export class LockedMouseEvents implements IMouseEvents {
      */
     updateMouseMovePosition(mouseEvent: MouseEvent) {
         if(!this.videoElementProvider.isVideoReady()){ return; }
-        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        let styleWidth = this.playerStyleAttributesProvider.getStyleWidth();
-        let styleHeight = this.playerStyleAttributesProvider.getStyleHeight();
+        const toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        const styleWidth = this.playerStyleAttributesProvider.getStyleWidth();
+        const styleHeight = this.playerStyleAttributesProvider.getStyleHeight();
 
         this.x += mouseEvent.movementX;
         this.y += mouseEvent.movementY;
@@ -96,8 +96,8 @@ export class LockedMouseEvents implements IMouseEvents {
             this.y = styleHeight - this.y;
         }
 
-        let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.x, this.y);
-        let delta = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeSigned(mouseEvent.movementX, mouseEvent.movementY);
+        const coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.x, this.y);
+        const delta = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeSigned(mouseEvent.movementX, mouseEvent.movementY);
         toStreamerHandlers.get("MouseMove")("MouseMove", [coord.x, coord.y, delta.x, delta.y]);
     }
 
@@ -107,7 +107,7 @@ export class LockedMouseEvents implements IMouseEvents {
      */
     handleMouseDown(mouseEvent: MouseEvent) {
         if(!this.videoElementProvider.isVideoReady()){ return; }
-        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        const toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("MouseDown")("MouseDown", [mouseEvent.button, this.coord.x, this.coord.y]);
     }
 
@@ -118,7 +118,7 @@ export class LockedMouseEvents implements IMouseEvents {
      */
     handleMouseUp(mouseEvent: MouseEvent) {
         if(!this.videoElementProvider.isVideoReady()){ return; }
-        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        const toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("MouseUp")("MouseUp", [mouseEvent.button, this.coord.x, this.coord.y]);
     }
 
@@ -128,7 +128,7 @@ export class LockedMouseEvents implements IMouseEvents {
      */
     handleMouseWheel(wheelEvent: WheelEvent) {
         if(!this.videoElementProvider.isVideoReady()){ return; }
-        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        const toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("MouseWheel")("MouseWheel", [wheelEvent.wheelDelta, this.coord.x, this.coord.y]);
     }
 
@@ -138,7 +138,7 @@ export class LockedMouseEvents implements IMouseEvents {
     */
     handleMouseDouble(mouseEvent: MouseEvent) {
         if(!this.videoElementProvider.isVideoReady()){ return; }
-        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        const toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("MouseDouble")("MouseDouble", [mouseEvent.button, this.coord.x, this.coord.y]);
     }
 

@@ -252,12 +252,6 @@ export class SPSSignalling {
 				break;
 		}
 
-		// if the response is an error show the error instead of the info 
-		if (isError) {
-			this.onAuthenticationResponse(instanceStateMessage, true);
-		} else {
-			this.onAuthenticationResponse(instanceStateMessage, false);
-		}
+		this.onAuthenticationResponse(instanceStateMessage, isError);
 	}
-
 }

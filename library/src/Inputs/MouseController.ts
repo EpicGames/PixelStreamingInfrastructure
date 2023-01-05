@@ -1,23 +1,23 @@
 import { MouseButtonsMask, MouseButton } from "./MouseButtons";
 import { Logger } from "../Logger/Logger";
-import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
-import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
-import { INormalizeAndQuantize } from "../NormalizeAndQuantize/INormalizeAndQuantize";
+import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";
+import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 
 /**
  * Handles the Mouse Inputs for the document
  */
 export class MouseController {
-	videoElementProvider: IVideoPlayer;
-	toStreamerMessagesProvider: IStreamMessageController;
-	normalizeAndQuantize: INormalizeAndQuantize;
+	videoElementProvider: VideoPlayer;
+	toStreamerMessagesProvider: StreamMessageController;
+	normalizeAndQuantize: NormalizeAndQuantize;
 
 	/**
      * @param toStreamerMessagesProvider - Stream message instance  
      * @param videoElementProvider - Video Player instance
      * @param normalizeAndQuantize - A normalize and quantize instance 
      */
-	constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer, normalizeAndQuantize: INormalizeAndQuantize) {
+	constructor(toStreamerMessagesProvider: StreamMessageController, videoElementProvider: VideoPlayer, normalizeAndQuantize: NormalizeAndQuantize) {
 		this.toStreamerMessagesProvider = toStreamerMessagesProvider;
 		this.normalizeAndQuantize = normalizeAndQuantize;
 		this.videoElementProvider = videoElementProvider;
@@ -28,7 +28,7 @@ export class MouseController {
 	 * Clears all the click events on the current video element parent div
 	 */
 	clearMouseEvents() {
-		let videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
+		const videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
 		videoElementParent.onclick = null;
 		videoElementParent.onmousedown = null;
 		videoElementParent.onmouseup = null;
@@ -41,7 +41,7 @@ export class MouseController {
 	* Set the mouse enter and mouse leave events 
 	*/
 	registerMouseEnterAndLeaveEvents() {
-		let videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
+		const videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
 
 		// Handle when the Mouse has entered the element
 		videoElementParent.onmouseenter = (event: MouseEvent) => {
@@ -67,7 +67,7 @@ export class MouseController {
 	 * @param Y - Mouse pointer Y coordinate
 	 */
 	releaseMouseButtons(buttons: number, X: number, Y: number) {
-		let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
+		const coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
 		if (buttons & MouseButtonsMask.primaryButton) {
 			this.sendMouseUp(MouseButton.mainButton, coord.x, coord.y);
 		}
@@ -93,7 +93,7 @@ export class MouseController {
 	 */
 	pressMouseButtons(buttons: number, X: number, Y: number) {
 		if(!this.videoElementProvider.isVideoReady()){ return; }
-		let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
+		const coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
 		if (buttons & MouseButtonsMask.primaryButton) {
 			this.sendMouseDown(MouseButton.mainButton, coord.x, coord.y);
 		}
@@ -116,7 +116,7 @@ export class MouseController {
 	 */
 	sendMouseEnter() {
 		if(!this.videoElementProvider.isVideoReady()){ return; }
-		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+		const toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 		toStreamerHandlers.get("MouseEnter")("MouseEnter");
 	}
 
@@ -125,7 +125,7 @@ export class MouseController {
 	 */
 	sendMouseLeave() {
 		if(!this.videoElementProvider.isVideoReady()){ return; }
-		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+		const toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 		toStreamerHandlers.get("MouseLeave")("MouseLeave");
 	}
 
@@ -138,7 +138,7 @@ export class MouseController {
 	sendMouseDown(button: number, X: number, Y: number) {
 		if(!this.videoElementProvider.isVideoReady()){ return; }
 		Logger.Log(Logger.GetStackTrace(), `mouse button ${button} down at (${X}, ${Y})`, 6);
-		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+		const toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 		toStreamerHandlers.get("MouseDown")("MouseDown", [button, X, Y]);
 	}
 
@@ -151,8 +151,8 @@ export class MouseController {
 	sendMouseUp(button: number, X: number, Y: number) {
 		if(!this.videoElementProvider.isVideoReady()){ return; }
 		Logger.Log(Logger.GetStackTrace(), `mouse button ${button} up at (${X}, ${Y})`, 6);
-		let coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
-		let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+		const coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
+		const toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 		toStreamerHandlers.get("MouseUp")("MouseUp", [button, coord.x, coord.y]);
 	}
 }

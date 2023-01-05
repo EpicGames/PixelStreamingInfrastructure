@@ -12,7 +12,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 	constructor(config: libspsfrontend.Config) {
 		super(config);
-		this.signallingExtension = new SPSSignalling(this.iWebRtcController.webSocketController);
+		this.signallingExtension = new SPSSignalling(this.webRtcController.webSocketController);
 		this.signallingExtension.onAuthenticationResponse = this.handleSignallingResponse.bind(this);
 		this.signallingExtension.onInstanceStateChanged = this.handleSignallingResponse.bind(this);
 
@@ -34,7 +34,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		super.onVideoStats(videoStats);
 
 		if (this.config.isFlagEnabled(NativeDOMDelegate.SPSFlags.sendToServer)) {
-			this.iWebRtcController.sendStatsToSignallingServer(videoStats);
+			this.webRtcController.sendStatsToSignallingServer(videoStats);
 		}
 	}
 
@@ -48,7 +48,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 
 	enforceSpecialSignallingServerUrl() {
 		// SPS needs a special /ws added to the signalling server url so K8s can distinguish it
-		this.iWebRtcController.buildSignallingServerUrl = function() {
+		this.webRtcController.buildSignallingServerUrl = function() {
 			let signallingUrl = this.config.getTextSettingValue(libspsfrontend.TextParameters.SignallingServerUrl);
 
 			if(signallingUrl && signallingUrl !== undefined && !signallingUrl.endsWith("/ws")) {

@@ -1,9 +1,8 @@
-import { ILatencyTestResults } from "../DataChannel/ILatencyTestResults"
 import { Logger } from "../Logger/Logger";
 /**
  * Latency Test Results Data
  */
-export class LatencyTestResults implements ILatencyTestResults {
+export class LatencyTestResults {
     //Fields Set from the latency payload regardless of version
     ReceiptTimeMs: number = null;
     TransmissionTimeMs: number = null;

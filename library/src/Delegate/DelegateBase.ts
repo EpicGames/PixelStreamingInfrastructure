@@ -1,11 +1,6 @@
 import { Config } from "../Config/Config";
 import { StatsPanel } from "../Ui/StatsPanel";
-import { IDelegate } from "./IDelegate";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults"
-import { IActionOverlay } from "../Overlay/IActionOverlay";
-import { IAfkOverlay } from "../Overlay/IAfkOverlay";
-import { IOverlay } from "../Overlay/IOverlay";
-import { ITextOverlay } from "../Overlay/ITextOverlay";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { VideoQpIndicator } from '../Ui/VideoQpIndicator'
 import { SettingsPanel } from "../Ui/SettingsPanel";
@@ -14,15 +9,23 @@ import { Flags, NumericParameters } from "../Config/Config";
 import { Logger } from "../Logger/Logger";
 import { InitialSettings, EncoderSettings, WebRTCSettings } from "../DataChannel/InitialSettings"
 import { OnScreenKeyboard } from "../Ui/OnScreenKeyboard"
-import { DisconnectOverlay, ConnectOverlay, PlayOverlay, AfkOverlay, InfoOverlay, ErrorOverlay } from "../Overlay/Overlays"
 import { Controls } from "../Ui/Controls"
 import { LabelledButton } from "../Ui/LabelledButton";
+import { OverlayBase } from "../Overlay/BaseOverlay";
+import { ActionOverlay } from "../Overlay/ActionOverlay"
+import { AfkOverlay } from "../Overlay/AfkOverlay";
+import { TextOverlay } from "../Overlay/TextOverlay";
+import { ConnectOverlay } from "../Overlay/ConnectOverlay";
+import { DisconnectOverlay } from "../Overlay/DisconnectOverlay";
+import { PlayOverlay } from "../Overlay/PlayOverlay";
+import { InfoOverlay } from "../Overlay/InfoOverlay";
+import { ErrorOverlay } from "../Overlay/ErrorOverlay";
 
 /**
  * Provides common base functionality for delegates that implement the IDelegate interface
 */
-export class DelegateBase implements IDelegate {
-	public iWebRtcController: webRtcPlayerController;
+export class DelegateBase {
+	public webRtcController: webRtcPlayerController;
 	public config: Config;
 
 	_rootElement: HTMLElement;
@@ -37,13 +40,13 @@ export class DelegateBase implements IDelegate {
 	onScreenKeyboardHelper: OnScreenKeyboard;
 
 	// set the overlay placeholders 
-	currentOverlay: IOverlay;
-	disconnectOverlay: IActionOverlay;
-	connectOverlay: IActionOverlay;
-	playOverlay: IActionOverlay;
-	afkOverlay: IAfkOverlay;
-	infoOverlay: ITextOverlay;
-	errorOverlay: ITextOverlay;
+	currentOverlay: OverlayBase;
+	disconnectOverlay: ActionOverlay;
+	connectOverlay: ActionOverlay;
+	playOverlay: ActionOverlay;
+	afkOverlay: AfkOverlay;
+	infoOverlay: TextOverlay;
+	errorOverlay: TextOverlay;
 
 	videoStartTime: number;
 	inputController: boolean;
@@ -73,11 +76,11 @@ export class DelegateBase implements IDelegate {
 		this.createButtons();
 
 		// setup webrtc
-		this.setIWebRtcPlayerController(new webRtcPlayerController(this.config, this));
+		this.setWebRtcPlayerController(new webRtcPlayerController(this.config, this));
 
 		// Onscreen keyboard
 		this.onScreenKeyboardHelper = new OnScreenKeyboard(this.videoElementParent);
-		this.onScreenKeyboardHelper.unquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.iWebRtcController.requestUnquantisedAndDenormaliseUnsigned(x, y);
+		this.onScreenKeyboardHelper.unquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.webRtcController.requestUnquantisedAndDenormaliseUnsigned(x, y);
 		this.activateOnScreenKeyboard = (command: any) => this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
 
 	}
@@ -116,19 +119,19 @@ export class DelegateBase implements IDelegate {
 		// Add button for toggle fps
 		const showFPSButton = new LabelledButton("Show FPS", "Toggle");
 		showFPSButton.addOnClickListener(()=>{
-			this.iWebRtcController.sendShowFps();
+			this.webRtcController.sendShowFps();
 		});
 
 		// Add button for restart stream
 		const restartStreamButton = new LabelledButton("Restart Stream", "Restart");
 		restartStreamButton.addOnClickListener(()=>{
-			this.iWebRtcController.restartStreamAutomaticity();
+			this.webRtcController.restartStreamAutomaticity();
 		});
 
 		// Add button for request keyframe
 		const requestKeyframeButton = new LabelledButton("Request keyframe", "Request");
 		requestKeyframeButton.addOnClickListener(()=>{
-			this.iWebRtcController.requestKeyFrame();
+			this.webRtcController.requestKeyFrame();
 		});
 
 		const commandsSectionElem = this.config.buildSectionWithHeading(this.settingsPanel.settingsContentElement, "Commands");
@@ -184,33 +187,33 @@ export class DelegateBase implements IDelegate {
 
 		this.config.addOnSettingChangedListener(Flags.IsQualityController, (isQualityController: boolean)=>{ 
 			if (!isQualityController === false) {
-				this.iWebRtcController.sendRequestQualityControlOwnership();
+				this.webRtcController.sendRequestQualityControlOwnership();
 			}
 		});
 
 		this.config.addOnSettingChangedListener(Flags.AFKDetection, (isAFKEnabled: boolean) => {
-			this.iWebRtcController.setAfkEnabled(isAFKEnabled);
+			this.webRtcController.setAfkEnabled(isAFKEnabled);
 		});
 
 		this.config.addOnSettingChangedListener(Flags.VideoFillParent, (shouldFillParent : boolean) => {
-			this.iWebRtcController.setEnlargeToFillParent(shouldFillParent);
-			this.iWebRtcController.resizePlayerStyle();
+			this.webRtcController.setEnlargeToFillParent(shouldFillParent);
+			this.webRtcController.resizePlayerStyle();
 		});
 
 		this.config.addOnSettingChangedListener(Flags.MatchViewportResolution, (shouldMatch : boolean) => {
-			this.iWebRtcController.matchViewportResolution = shouldMatch;
-			this.iWebRtcController.updateVideoStreamSize();
+			this.webRtcController.matchViewportResolution = shouldMatch;
+			this.webRtcController.updateVideoStreamSize();
 		});
 
 		this.config.addOnSettingChangedListener(Flags.ControlScheme, (isHoveringMouse : boolean) => {
 			if (isHoveringMouse) {
 				this.config.setFlagLabel(Flags.ControlScheme, "Control Scheme: Hovering Mouse");
 				this.config.setFlagEnabled(Flags.ControlScheme, true);
-				this.iWebRtcController.activateRegisterMouse();
+				this.webRtcController.activateRegisterMouse();
 			} else {
 				this.config.setFlagLabel(Flags.ControlScheme, "Control Scheme: Locked Mouse");
 				this.config.setFlagEnabled(Flags.ControlScheme, false);
-				this.iWebRtcController.activateRegisterMouse();
+				this.webRtcController.activateRegisterMouse();
 			}
 		});
 
@@ -221,7 +224,7 @@ export class DelegateBase implements IDelegate {
 				MinQP: newValue,
 				MaxQP: this.config.getNumericSettingValue(NumericParameters.MaxQP)
 			};
-			this.iWebRtcController.sendEncoderSettings(encode);
+			this.webRtcController.sendEncoderSettings(encode);
 			Logger.Log(Logger.GetStackTrace(), "-------------------------------------------", 7);
 		});
 
@@ -231,7 +234,7 @@ export class DelegateBase implements IDelegate {
 				MinQP: this.config.getNumericSettingValue(NumericParameters.MinQP),
 				MaxQP: newValue
 			};
-			this.iWebRtcController.sendEncoderSettings(encode);
+			this.webRtcController.sendEncoderSettings(encode);
 			Logger.Log(Logger.GetStackTrace(), "-------------------------------------------", 7);
 		});
 
@@ -243,7 +246,7 @@ export class DelegateBase implements IDelegate {
 				MinBitrate: newValue * 1000,
 				MaxBitrate: this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate) * 1000,
 			}
-			this.iWebRtcController.sendWebRtcSettings(webRtcSettings);
+			this.webRtcController.sendWebRtcSettings(webRtcSettings);
 			Logger.Log(Logger.GetStackTrace(), "-------------------------------------------", 7);
 		});
 
@@ -254,7 +257,7 @@ export class DelegateBase implements IDelegate {
 				MinBitrate: this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate) * 1000,
 				MaxBitrate: newValue * 1000,
 			}
-			this.iWebRtcController.sendWebRtcSettings(webRtcSettings);
+			this.webRtcController.sendWebRtcSettings(webRtcSettings);
 			Logger.Log(Logger.GetStackTrace(), "-------------------------------------------", 7);
 		});
 
@@ -265,7 +268,7 @@ export class DelegateBase implements IDelegate {
 				MinBitrate: this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate) * 1000,
 				MaxBitrate: this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate) * 1000,
 			}
-			this.iWebRtcController.sendWebRtcSettings(webRtcSettings);
+			this.webRtcController.sendWebRtcSettings(webRtcSettings);
 			Logger.Log(Logger.GetStackTrace(), "-------------------------------------------", 7);
 		});
 	}
@@ -422,26 +425,26 @@ export class DelegateBase implements IDelegate {
 	 * Instantiate the WebRTCPlayerController interface to provide WebRTCPlayerController functionality within this class and set up anything that requires it 
 	 * @param iWebRtcPlayerController - a WebRtcPlayerController controller instance 
 	 */
-	setIWebRtcPlayerController(iWebRtcPlayerController: webRtcPlayerController) {
-		this.iWebRtcController = iWebRtcPlayerController;
+	setWebRtcPlayerController(iWebRtcPlayerController: webRtcPlayerController) {
+		this.webRtcController = iWebRtcPlayerController;
 
-		this.iWebRtcController.resizePlayerStyle();
+		this.webRtcController.resizePlayerStyle();
 
 		this.disconnectOverlay.onAction(() => {
 			this.onWebRtcAutoConnect();
-			this.iWebRtcController.connectToSignallingServer();
+			this.webRtcController.connectToSignallingServer();
 		});
 
 		// Build the webRtc connect overlay Event Listener and show the connect overlay
-		this.connectOverlay.onAction(() => this.iWebRtcController.connectToSignallingServer());
+		this.connectOverlay.onAction(() => this.webRtcController.connectToSignallingServer());
 
 		// set up the afk overlays action 
-		this.afkOverlay.onAction(() => this.iWebRtcController.onAfkTriggered());
+		this.afkOverlay.onAction(() => this.webRtcController.onAfkTriggered());
 
 		// set up the play overlays action 
 		this.playOverlay.onAction(() => {
 			this.onStreamLoading();
-			this.iWebRtcController.playStream();
+			this.webRtcController.playStream();
 		});
 
 		// set up the connect overlays action
@@ -458,7 +461,7 @@ export class DelegateBase implements IDelegate {
 		} else {
 			// if autoplaying show an info overlay while while waiting for the connection to begin 
 			this.onWebRtcAutoConnect();
-			this.iWebRtcController.connectToSignallingServer();
+			this.webRtcController.connectToSignallingServer();
 		}
 	}
 
@@ -504,9 +507,9 @@ export class DelegateBase implements IDelegate {
 	 */
 	onDisconnect(eventString: string) {
 		// if we have overridden the default disconnection message, assign the new value here
-		if (this.iWebRtcController.getDisconnectMessageOverride() != "" && this.iWebRtcController.getDisconnectMessageOverride() !== undefined && this.iWebRtcController.getDisconnectMessageOverride() != null) {
-			eventString = this.iWebRtcController.getDisconnectMessageOverride();
-			this.iWebRtcController.setDisconnectMessageOverride('');
+		if (this.webRtcController.getDisconnectMessageOverride() != "" && this.webRtcController.getDisconnectMessageOverride() !== undefined && this.webRtcController.getDisconnectMessageOverride() != null) {
+			eventString = this.webRtcController.getDisconnectMessageOverride();
+			this.webRtcController.setDisconnectMessageOverride('');
 		}
 
 		if (this.showActionOrErrorOnDisconnect == false) {
@@ -552,7 +555,7 @@ export class DelegateBase implements IDelegate {
 	onVideoInitialised() {
 		// starting a latency check
 		this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
-			this.iWebRtcController.sendLatencyTest();
+			this.webRtcController.sendLatencyTest();
 		}
 
 		this.videoStartTime = Date.now();

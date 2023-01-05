@@ -6,29 +6,29 @@ import { GamePadController } from "./GamepadController";
 import { ControlSchemeType } from "../Config/Config";
 import { LockedMouseEvents } from "./LockedMouseEvents";
 import { HoveringMouseEvents } from "./HoveringMouseEvents";
-import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
 import { IMouseEvents } from "./IMouseEvents";
 import { Logger } from "../Logger/Logger";
-import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
 import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuantize";
-import { IPlayerStyleAttributes } from "../Ui/IPlayerStyleAttributes";
+import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";
+import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
+import { PlayerStyleAttributes } from "../Ui/PlayerStyleAttributes";
 
 /**
  * Class for making and setting up input class types 
  */
 export class InputClassesFactory {
 
-    toStreamerMessagesProvider: IStreamMessageController;
-    videoElementProvider: IVideoPlayer;
+    toStreamerMessagesProvider: StreamMessageController;
+    videoElementProvider: VideoPlayer;
     normalizeAndQuantize: NormalizeAndQuantize;
-    activeKeys: IActiveKeys = new ActiveKeys();
+    activeKeys: ActiveKeys = new ActiveKeys();
 
     /**
      * @param toStreamerMessagesProvider - Stream message instance  
      * @param videoElementProvider - Video Player instance
      * @param normalizeAndQuantize - A normalize and quantize instance 
      */
-    constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer, normalizeAndQuantize: NormalizeAndQuantize) {
+    constructor(toStreamerMessagesProvider: StreamMessageController, videoElementProvider: VideoPlayer, normalizeAndQuantize: NormalizeAndQuantize) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.videoElementProvider = videoElementProvider;
         this.normalizeAndQuantize = normalizeAndQuantize;
@@ -49,7 +49,7 @@ export class InputClassesFactory {
      * register mouse events based on a control type 
      * @param controlScheme - if the mouse is either hovering or locked 
      */
-    registerMouse(controlScheme: ControlSchemeType, playerStyleAttributesProvider: IPlayerStyleAttributes) {
+    registerMouse(controlScheme: ControlSchemeType, playerStyleAttributesProvider: PlayerStyleAttributes) {
         Logger.Log(Logger.GetStackTrace(), "Register Mouse Events", 7);
         const mouseController = new MouseController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
         mouseController.clearMouseEvents();
@@ -75,7 +75,7 @@ export class InputClassesFactory {
      * @param mouseController - a mouse controller instance 
      * @param playerStyleAttributesProvider - a player style attributes instance
      */
-    registerLockedMouseEvents(mouseController: MouseController, playerStyleAttributesProvider: IPlayerStyleAttributes) {
+    registerLockedMouseEvents(mouseController: MouseController, playerStyleAttributesProvider: PlayerStyleAttributes) {
         const videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
         const lockedMouseEvents: IMouseEvents = new LockedMouseEvents(this.videoElementProvider, mouseController, this.activeKeys, playerStyleAttributesProvider);
 
@@ -146,16 +146,9 @@ export class InputClassesFactory {
 }
 
 /**
- * An interface for the active keys class
- */
-export interface IActiveKeys {
-    getActiveKeys(): Array<any>;
-}
-
-/**
  * A class that keeps track of current active keys
  */
-export class ActiveKeys implements IActiveKeys {
+export class ActiveKeys {
     activeKeys: Array<any> = [];
     constructor() {
         this.activeKeys = [];

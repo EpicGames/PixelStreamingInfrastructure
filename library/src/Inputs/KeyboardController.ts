@@ -1,7 +1,7 @@
 import { SpecialKeyCodes } from "./SpecialKeyCodes";
 import { Logger } from "../Logger/Logger";
-import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
-import { IActiveKeys } from "./InputClassesFactory";
+import { ActiveKeys } from "./InputClassesFactory";
+import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";
 
 interface ICodeToKeyCode {
     [key: string]: number;
@@ -11,9 +11,9 @@ interface ICodeToKeyCode {
  * Handles the Keyboard Inputs for the document
  */
 export class KeyboardController {
-    toStreamerMessagesProvider: IStreamMessageController;
+    toStreamerMessagesProvider: StreamMessageController;
     suppressBrowserKeys: boolean;
-    activeKeysProvider: IActiveKeys;
+    activeKeysProvider: ActiveKeys;
 
     /* 
     * New browser APIs have moved away from KeyboarddEvent.keyCode to KeyboardEvent.Code. 
@@ -129,7 +129,7 @@ export class KeyboardController {
      * @param suppressBrowserKeys Suppress Browser Keys
      * @param activeKeysProvider Active keys provider class object
      */
-    constructor(toStreamerMessagesProvider: IStreamMessageController, suppressBrowserKeys: boolean, activeKeysProvider: IActiveKeys) {
+    constructor(toStreamerMessagesProvider: StreamMessageController, suppressBrowserKeys: boolean, activeKeysProvider: ActiveKeys) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.suppressBrowserKeys = suppressBrowserKeys;
         this.activeKeysProvider = activeKeysProvider;

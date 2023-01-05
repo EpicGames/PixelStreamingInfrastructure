@@ -23,9 +23,9 @@ export class HoveringMouseEvents implements IMouseEvents {
     updateMouseMovePosition(mouseEvent: MouseEvent) {
         if(!this.mouseController.videoElementProvider.isVideoReady()) { return; }
         Logger.Log(Logger.GetStackTrace(), "MouseMove", 6);
-        let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
-        let delta = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeSigned(mouseEvent.movementX, mouseEvent.movementY);
-        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        const coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
+        const delta = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeSigned(mouseEvent.movementX, mouseEvent.movementY);
+        const toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("MouseMove")("MouseMove", [coord.x, coord.y, delta.x, delta.y]);
         mouseEvent.preventDefault();
     }
@@ -37,8 +37,8 @@ export class HoveringMouseEvents implements IMouseEvents {
     handleMouseDown(mouseEvent: MouseEvent) {
         if(!this.mouseController.videoElementProvider.isVideoReady()) { return; }
         Logger.Log(Logger.GetStackTrace(), "onMouse Down", 6);
-        let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
-        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        const coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
+        const toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("MouseDown")("MouseDown", [mouseEvent.button, coord.x, coord.y]);
         mouseEvent.preventDefault();
     }
@@ -49,8 +49,8 @@ export class HoveringMouseEvents implements IMouseEvents {
      */
     handleMouseUp(mouseEvent: MouseEvent) {
         if(!this.mouseController.videoElementProvider.isVideoReady()) { return; }
-        let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
-        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        const coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
+        const toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("MouseUp")("MouseUp", [mouseEvent.button, coord.x, coord.y]);
         mouseEvent.preventDefault();
     }
@@ -61,8 +61,8 @@ export class HoveringMouseEvents implements IMouseEvents {
     */
     handleContextMenu(mouseEvent: MouseEvent) {
         if(!this.mouseController.videoElementProvider.isVideoReady()) { return; }
-        let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
-        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        const coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
+        const toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("MouseUp")("MouseUp", [mouseEvent.button, coord.x, coord.y]);
         mouseEvent.preventDefault();
     }
@@ -73,8 +73,8 @@ export class HoveringMouseEvents implements IMouseEvents {
      */
     handleMouseWheel(wheelEvent: WheelEvent) {
         if(!this.mouseController.videoElementProvider.isVideoReady()) { return; }
-        let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(wheelEvent.offsetX, wheelEvent.offsetY);
-        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        const coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(wheelEvent.offsetX, wheelEvent.offsetY);
+        const toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("MouseWheel")("MouseWheel", [wheelEvent.wheelDelta, coord.x, coord.y]);
         wheelEvent.preventDefault();
     }
@@ -85,8 +85,8 @@ export class HoveringMouseEvents implements IMouseEvents {
      */
     handleMouseDouble(mouseEvent: MouseEvent) {
         if(!this.mouseController.videoElementProvider.isVideoReady()) { return; }
-        let coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
-        let toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
+        const coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(mouseEvent.offsetX, mouseEvent.offsetY);
+        const toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("MouseDouble")("MouseDouble", [mouseEvent.button, coord.x, coord.y]);
     }
 

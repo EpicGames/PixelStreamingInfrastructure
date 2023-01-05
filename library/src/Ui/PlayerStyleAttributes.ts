@@ -1,8 +1,7 @@
-import { IPlayerStyleAttributes } from "./IPlayerStyleAttributes";
 /**
  * A class for managing the current player windows attributes
  */
-export class PlayerStyleAttributes implements IPlayerStyleAttributes {
+export class PlayerStyleAttributes {
     styleWidth: number;
     styleHeight: number;
     styleTop: number;

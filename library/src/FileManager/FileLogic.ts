@@ -27,7 +27,7 @@ export class FileLogic {
             Logger.Log(Logger.GetStackTrace(), 'Received first chunk of file', 6);
         }
 
-        let extensionAsString = new TextDecoder("utf-16").decode(view.slice(1));
+        const extensionAsString = new TextDecoder("utf-16").decode(view.slice(1));
         Logger.Log(Logger.GetStackTrace(), extensionAsString, 6);
         this.file.extension = extensionAsString;
     }
@@ -49,7 +49,7 @@ export class FileLogic {
             Logger.Log(Logger.GetStackTrace(), 'Received first chunk of file', 6);
         }
 
-        let mimeAsString = new TextDecoder("utf-16").decode(view.slice(1));
+        const mimeAsString = new TextDecoder("utf-16").decode(view.slice(1));
         Logger.Log(Logger.GetStackTrace(), mimeAsString, 6);
         this.file.mimetype = mimeAsString;
     }
@@ -66,7 +66,7 @@ export class FileLogic {
         this.file.size = Math.ceil((new DataView(view.slice(1, 5).buffer)).getInt32(0, true) / 16379 /* The maximum number of payload bits per message*/);
 
         // Get the file part of the payload
-        let fileBytes = view.slice(1 + 4);
+        const fileBytes = view.slice(1 + 4);
 
         // Append to existing data that holds the file
         this.file.data.push(fileBytes);
@@ -88,8 +88,8 @@ export class FileLogic {
              * 
              * This code reconstructs the received data into the original file based on the mime type and extension provided and then downloads the reconstructed file
              */
-            var received = new Blob(this.file.data, { type: this.file.mimetype });
-            var a = document.createElement('a');
+            const received = new Blob(this.file.data, { type: this.file.mimetype });
+            const a = document.createElement('a');
             a.setAttribute('href', URL.createObjectURL(received));
             a.setAttribute('download', `transfer.${this.file.extension}`);
             document.body.append(a);
@@ -107,11 +107,11 @@ export class FileLogic {
  * A class that represents a template for a downloaded file
  */
 export class FileTemplate {
-    mimetype: string = "";
-    extension: string = "";
-    receiving: boolean = false;
-    size: number = 0;
+    mimetype = "";
+    extension = "";
+    receiving = false;
+    size = 0;
     data: Array<any> = [];
-    valid: boolean = false;
+    valid = false;
     timestampStart: any = undefined;
 }

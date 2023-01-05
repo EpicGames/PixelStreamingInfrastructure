@@ -1,9 +1,8 @@
 import { Logger } from "../Logger/Logger";
-import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
-import { INormalizeAndQuantize } from "./INormalizeAndQuantize";
+import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 
-export class NormalizeAndQuantize implements INormalizeAndQuantize {
-    videoElementProvider: IVideoPlayer;
+export class NormalizeAndQuantize {
+    videoElementProvider: VideoPlayer;
     videoElementParent: HTMLElement;
     videoElement: HTMLVideoElement;
     ratio: number;
@@ -11,7 +10,7 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
     /**
      * @param videoElementProvider - the div element that the video player will be injected into 
      */
-    constructor(videoElementProvider: IVideoPlayer) {
+    constructor(videoElementProvider: VideoPlayer) {
         this.videoElementProvider = videoElementProvider;
     }
 
@@ -50,8 +49,8 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
         this.videoElement = this.videoElementProvider.getVideoElement() as any;
 
         if (this.videoElementParent && this.videoElement) {
-            let playerAspectRatio = this.videoElementParent.clientHeight / this.videoElementParent.clientWidth;
-            let videoAspectRatio = this.videoElement.videoHeight / this.videoElement.videoWidth;
+            const playerAspectRatio = this.videoElementParent.clientHeight / this.videoElementParent.clientWidth;
+            const videoAspectRatio = this.videoElement.videoHeight / this.videoElement.videoWidth;
             if (playerAspectRatio > videoAspectRatio) {
                 Logger.Log(Logger.GetStackTrace(), 'Setup Normalize and Quantize for playerAspectRatio > videoAspectRatio', 6);
                 this.ratio = playerAspectRatio / videoAspectRatio;
@@ -102,8 +101,8 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
     * @param y - y axis point 
     */
     overRideNormalizeAndQuantizeUnsigned(x: number, y: number): NormaliseAndQuantiseUnsigned {
-        let normalizedX = x / this.videoElementParent.clientWidth;
-        let normalizedY = this.ratio * (y / this.videoElementParent.clientHeight - 0.5) + 0.5;
+        const normalizedX = x / this.videoElementParent.clientWidth;
+        const normalizedY = this.ratio * (y / this.videoElementParent.clientHeight - 0.5) + 0.5;
         if (normalizedX < 0.0 || normalizedX > 1.0 || normalizedY < 0.0 || normalizedY > 1.0) {
             return new NormaliseAndQuantiseUnsigned(false, 65535, 65535);
         } else {
@@ -117,8 +116,8 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
     * @param y - y axis point 
     */
     overRideUnquantizeAndDenormalizeUnsigned(x: number, y: number) {
-        let normalizedX = x / 65536;
-        let normalizedY = (y / 65536 - 0.5) / this.ratio + 0.5;
+        const normalizedX = x / 65536;
+        const normalizedY = (y / 65536 - 0.5) / this.ratio + 0.5;
         return new UnquantisedAndDenormaliseUnsigned(normalizedX * this.videoElementParent.clientWidth, normalizedY * this.videoElementParent.clientHeight);
     }
 
@@ -128,8 +127,8 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
     * @param y - y axis point 
     */
     overRideNormalizeAndQuantizeSigned(x: number, y: number) {
-        let normalizedX = x / (0.5 * this.videoElementParent.clientWidth);
-        let normalizedY = (this.ratio * y) / (0.5 * this.videoElementParent.clientHeight);
+        const normalizedX = x / (0.5 * this.videoElementParent.clientWidth);
+        const normalizedY = (this.ratio * y) / (0.5 * this.videoElementParent.clientHeight);
         return new NormaliseAndQuantiseSigned(normalizedX * 32767, normalizedY * 32767);
     }
 
@@ -139,8 +138,8 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
     * @param y - y axis point 
     */
     overRideNormalizeAndQuantizeUnsignedAlt(x: number, y: number) {
-        let normalizedX = this.ratio * (x / this.videoElementParent.clientWidth - 0.5) + 0.5;
-        let normalizedY = y / this.videoElementParent.clientHeight;
+        const normalizedX = this.ratio * (x / this.videoElementParent.clientWidth - 0.5) + 0.5;
+        const normalizedY = y / this.videoElementParent.clientHeight;
         if (normalizedX < 0.0 || normalizedX > 1.0 || normalizedY < 0.0 || normalizedY > 1.0) {
             return new NormaliseAndQuantiseUnsigned(false, 65535, 65535);
         } else {
@@ -154,8 +153,8 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
     * @param y - y axis point 
     */
     overRideUnquantizeAndDenormalizeUnsignedAlt(x: number, y: number) {
-        let normalizedX = (x / 65536 - 0.5) / this.ratio + 0.5;
-        let normalizedY = y / 65536;
+        const normalizedX = (x / 65536 - 0.5) / this.ratio + 0.5;
+        const normalizedY = y / 65536;
         return new UnquantisedAndDenormaliseUnsigned(normalizedX * this.videoElementParent.clientWidth, normalizedY * this.videoElementParent.clientHeight);
     }
 
@@ -165,8 +164,8 @@ export class NormalizeAndQuantize implements INormalizeAndQuantize {
     * @param y - y axis point 
     */
     overRideNormalizeAndQuantizeSignedAlt(x: number, y: number) {
-        let normalizedX = (this.ratio * x) / (0.5 * this.videoElementParent.clientWidth);
-        let normalizedY = y / (0.5 * this.videoElementParent.clientHeight);
+        const normalizedX = (this.ratio * x) / (0.5 * this.videoElementParent.clientWidth);
+        const normalizedY = y / (0.5 * this.videoElementParent.clientHeight);
         return new NormaliseAndQuantiseSigned(normalizedX * 32767, normalizedY * 32767);
     }
 }

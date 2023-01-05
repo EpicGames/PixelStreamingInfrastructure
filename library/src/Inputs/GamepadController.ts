@@ -1,5 +1,5 @@
 import { Logger } from "../Logger/Logger";
-import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
+import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";
 
 /**
  * The class that handles the functionality of gamepads and controllers 
@@ -7,12 +7,12 @@ import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageCon
 export class GamePadController {
     controllers: Controller[];
     requestAnimationFrame: any;
-    toStreamerMessagesProvider: IStreamMessageController;
+    toStreamerMessagesProvider: StreamMessageController;
 
     /**
      * @param toStreamerMessagesProvider - Stream message instance   
      */
-    constructor(toStreamerMessagesProvider: IStreamMessageController) {
+    constructor(toStreamerMessagesProvider: StreamMessageController) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
 
         this.requestAnimationFrame = window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.requestAnimationFrame;
@@ -32,9 +32,9 @@ export class GamePadController {
      */
     gamePadConnectHandler(gamePadEvent: GamepadEvent) {
         Logger.Log(Logger.GetStackTrace(), "Gamepad connect handler", 6);
-        let gamepad = gamePadEvent.gamepad;
+        const gamepad = gamePadEvent.gamepad;
 
-        let temp: Controller = {
+        const temp: Controller = {
             currentState: gamepad,
             prevState: gamepad
         };
@@ -61,8 +61,8 @@ export class GamePadController {
      * Scan for connected gamepads 
      */
     scanGamePads() {
-        var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
-        for (var i = 0; i < gamepads.length; i++) {
+        const gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+        for (let i = 0; i < gamepads.length; i++) {
             if (gamepads[i] && (gamepads[i].index in this.controllers)) {
                 this.controllers[gamepads[i].index].currentState = gamepads[i];
             }
@@ -74,15 +74,15 @@ export class GamePadController {
      */
     updateStatus() {
         this.scanGamePads();
-        let toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
+        const toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 
         // Iterate over multiple controllers in the case the multiple gamepads are connected
-        for (let controller of this.controllers) {
-            let controllerIndex = this.controllers.indexOf(controller);
-            let currentState = controller.currentState;
+        for (const controller of this.controllers) {
+            const controllerIndex = this.controllers.indexOf(controller);
+            const currentState = controller.currentState;
             for (let i = 0; i < controller.currentState.buttons.length; i++) {
-                let currentButton = controller.currentState.buttons[i];
-                let previousButton = controller.prevState.buttons[i];
+                const currentButton = controller.currentState.buttons[i];
+                const previousButton = controller.prevState.buttons[i];
                 if (currentButton.pressed) {
                     // press
                     if (i == gamepadLayout.LeftTrigger) {
@@ -110,11 +110,11 @@ export class GamePadController {
             // Iterate over gamepad axes (we will increment in lots of 2 as there is 2 axes per stick)
             for (let i = 0; i < currentState.axes.length; i += 2) {
                 // Horizontal axes are even numbered
-                let x = parseFloat(currentState.axes[i].toFixed(4));
+                const x = parseFloat(currentState.axes[i].toFixed(4));
 
                 // Vertical axes are odd numbered
                 // https://w3c.github.io/gamepad/#remapping Gamepad browser side standard mapping has positive down, negative up. This is downright disgusting. So we fix it.
-                let y = -parseFloat(currentState.axes[i + 1].toFixed(4));
+                const y = -parseFloat(currentState.axes[i + 1].toFixed(4));
 
                 // UE's analog axes follow the same order as the browsers, but start at index 1 so we will offset as such
                 toStreamerHandlers.get("GamepadAnalog")([controllerIndex, i + 1, x]); // Horizontal axes, only offset by 1

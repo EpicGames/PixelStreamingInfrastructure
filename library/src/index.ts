@@ -6,14 +6,8 @@ export { SettingsPanel } from "./Ui/SettingsPanel"
 export { StatsPanel } from "./Ui/StatsPanel"
 export { SettingNumber } from "./Config/SettingNumber"
 export { LabelledButton } from "./Ui/LabelledButton"
-export { IDelegate } from "./Delegate/IDelegate"
 export { DelegateBase } from "./Delegate/DelegateBase"
-export { IWebRtcPlayerController } from "./WebRtcPlayer/IWebRtcPlayerController"
 
-export { IOverlay } from './Overlay/IOverlay';
-export { ITextOverlay } from './Overlay/ITextOverlay';
-export { IActionOverlay } from "./Overlay/IActionOverlay"
-export { IAfkOverlay } from './Overlay/IAfkOverlay';
 export { AfkLogic } from './Afk/AfkLogic';
 
 export { LatencyTestResults } from "./DataChannel/LatencyTestResults";
@@ -26,5 +20,5 @@ export { MessageRecv } from "./WebSockets/MessageReceive"
 export { WebSocketController } from "./WebSockets/WebSocketController"
 export { SignallingProtocol } from "./WebSockets/SignallingProtocol"
 
-declare var LIBRARY_VERSION: string;
+declare let LIBRARY_VERSION: string;
 export const version = LIBRARY_VERSION;

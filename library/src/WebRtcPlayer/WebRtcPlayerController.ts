@@ -8,7 +8,6 @@ import { DataChannelController } from "../DataChannel/DataChannelController";
 import { PeerConnectionController } from "../PeerConnectionController/PeerConnectionController"
 import { KeyboardController } from "../Inputs/KeyboardController";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
-import { IWebRtcPlayerController } from "./IWebRtcPlayerController";
 import { Config, Flags, ControlSchemeType, TextParameters } from "../Config/Config";
 import { EncoderSettings, InitialSettings, WebRTCSettings } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
@@ -19,8 +18,6 @@ import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 import { StreamMessageController, MessageDirection } from "../UeInstanceMessage/StreamMessageController";
 import { ResponseController } from "../UeInstanceMessage/ResponseController";
 import * as MessageReceive from "../WebSockets/MessageReceive";
-import { ILatencyTestResults } from "../DataChannel/ILatencyTestResults";
-import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
 import { SendDescriptorController } from "../UeInstanceMessage/SendDescriptorController";
 import { SendMessageController } from "../UeInstanceMessage/SendMessageController";
 import { ToStreamerMessagesController } from "../UeInstanceMessage/ToStreamerMessagesController";
@@ -28,14 +25,13 @@ import { MouseController } from "../Inputs/MouseController";
 import { GamePadController } from "../Inputs/GamepadController";
 import { DataChannelSender } from "../DataChannel/DataChannelSender";
 import { NormalizeAndQuantize, UnquantisedAndDenormaliseUnsigned } from "../NormalizeAndQuantize/NormalizeAndQuantize";
-import { ITouchController } from "../Inputs/ITouchController";
-import { IPlayerStyleAttributes } from "../Ui/IPlayerStyleAttributes";
 import { PlayerStyleAttributes } from "../Ui/PlayerStyleAttributes";
 import { DelegateBase } from "../Delegate/DelegateBase";
+import { ITouchController } from "../Inputs/ITouchController";
 /**
  * Entry point for the Web RTC Player
  */
-export class webRtcPlayerController implements IWebRtcPlayerController {
+export class webRtcPlayerController {
 	config: Config;
 	responseController: ResponseController;
 	sdpConstraints: RTCOfferOptions;
@@ -61,7 +57,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	latencyStartTime: number;
 	delegate: DelegateBase;
 	fileLogic: FileLogic;
-	streamMessageController: IStreamMessageController;
+	streamMessageController: StreamMessageController;
 	sendDescriptorController: SendDescriptorController;
 	sendMessageController: SendMessageController;
 	toStreamerMessagesController: ToStreamerMessagesController;
@@ -70,7 +66,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	touchController: ITouchController;
 	gamePadController: GamePadController;
 	normalizeAndQuantize: NormalizeAndQuantize;
-	playerStyleAttributes: IPlayerStyleAttributes = new PlayerStyleAttributes();
+	playerStyleAttributes: PlayerStyleAttributes = new PlayerStyleAttributes();
 	isUsingSFU: boolean;
 
 	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
@@ -125,7 +121,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.sendDescriptorController = new SendDescriptorController(this.dataChannelSender, this.streamMessageController);
 		this.sendMessageController = new SendMessageController(this.dataChannelSender, this.streamMessageController);
 		this.toStreamerMessagesController = new ToStreamerMessagesController(this.sendMessageController);
-		this.delegate.setIWebRtcPlayerController(this);
+		this.delegate.setWebRtcPlayerController(this);
 		this.registerMessageHandlers();
 		this.streamMessageController.populateDefaultProtocol();
 
@@ -919,9 +915,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	handleLatencyTestResult(message: Uint8Array) {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.latencyTest", 6);
 		const latencyAsString = new TextDecoder("utf-16").decode(message.slice(1));
-		const iLatencyTestResults: ILatencyTestResults = JSON.parse(latencyAsString);
 		const latencyTestResults: LatencyTestResults = new LatencyTestResults();
-		Object.assign(latencyTestResults, iLatencyTestResults);
+		Object.assign(latencyTestResults, JSON.parse(latencyAsString));
 		latencyTestResults.processFields();
 
 		latencyTestResults.testStartTimeMs = this.latencyStartTime;

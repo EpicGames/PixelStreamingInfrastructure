@@ -1,5 +1,3 @@
-import { IVideoPlayer } from "./IVideoPlayer";
-
 /**
  * Extra types for the HTMLElement 
  */
@@ -14,7 +12,7 @@ declare global {
 /**
  * The video player html element 
  */
-export class VideoPlayer implements IVideoPlayer {
+export class VideoPlayer {
     videoElement: HTMLVideoElement;
 
     /**

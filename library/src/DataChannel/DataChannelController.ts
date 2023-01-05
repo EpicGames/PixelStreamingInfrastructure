@@ -1,10 +1,9 @@
 import { Logger } from "../Logger/Logger";
-import { IDataChannelController } from "./IDataChannelController";
 
 /**
  * Handles the Sending and Receiving of messages to the UE Instance via the Data Channel
  */
-export class DataChannelController implements IDataChannelController {
+export class DataChannelController {
     dataChannel: RTCDataChannel;
     peerConnection: RTCPeerConnection;
     datachannelOptions: RTCDataChannelInit;
