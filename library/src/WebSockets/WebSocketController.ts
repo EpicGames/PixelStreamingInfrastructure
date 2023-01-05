@@ -16,33 +16,23 @@ declare global {
  */
 export class WebSocketController {
     WS_OPEN_STATE = 1;
-    address: string;
     webSocket: WebSocket;
     onCloseCallback : () => void;
     signallingProtocol: SignallingProtocol;
 
-    /**
-     * @param Address - The Address of the signaling server
-     */
-    constructor(Address: string) {
-        this.address = Address;
+    constructor() {
         this.signallingProtocol = new SignallingProtocol();
         SignallingProtocol.setupDefaultHandlers(this);
     }
 
     /**
      * Connect to the signaling server
+     * @param connectionURL - The Address of the signaling server
      * @returns - If there is a connection
      */
-    connect(): boolean {
-		let connectionURL = this.address;
-		// ensure we add the sfu preference to the url
-		const urlParams = new URLSearchParams(window.location.search);
-		if (urlParams.has('preferSFU')) {
-			connectionURL = connectionURL.split("/ws").join("?preferSFU=true" + "/ws");
-		}
+    connect(connectionURL: string): boolean {
 
-        Logger.Log(Logger.GetStackTrace(), this.address, 6);
+        Logger.Log(Logger.GetStackTrace(), connectionURL, 6);
         try {
 			this.webSocket = new WebSocket(connectionURL);
             this.webSocket.onopen = (event) => this.handleOnOpen(event);

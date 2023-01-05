@@ -1,5 +1,5 @@
 export { webRtcPlayerController } from "./WebRtcPlayer/WebRtcPlayerController"
-export { Config, ControlSchemeType, Flags, NumericParameters } from "./Config/Config"
+export { Config, ControlSchemeType, Flags, NumericParameters, TextParameters } from "./Config/Config"
 export { SettingBase } from "./Config/SettingBase"
 export { SettingFlag } from "./Config/SettingFlag"
 export { SettingPanel } from "./Config/SettingPanel"

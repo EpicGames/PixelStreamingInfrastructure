@@ -9,7 +9,7 @@ import { PeerConnectionController } from "../PeerConnectionController/PeerConnec
 import { KeyboardController } from "../Inputs/KeyboardController";
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { IWebRtcPlayerController } from "./IWebRtcPlayerController";
-import { Config, Flags, ControlSchemeType } from "../Config/Config";
+import { Config, Flags, ControlSchemeType, TextParameters } from "../Config/Config";
 import { EncoderSettings, InitialSettings, WebRTCSettings } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
 import { Logger } from "../Logger/Logger";
@@ -117,7 +117,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.streamMessageController = new StreamMessageController();
 
 		// set up websocket methods
-		this.webSocketController = new WebSocketController(this.config.signallingServerAddress);
+		this.webSocketController = new WebSocketController();
 		this.webSocketController.onConfig = (messageConfig: MessageReceive.MessageConfig) => this.handleOnConfigMessage(messageConfig);
 		this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => this.delegate.onDisconnect(`${event.code} - ${event.reason}`);
 
@@ -343,7 +343,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		if (!this.webSocketController.webSocket) {
 			Logger.Log(Logger.GetStackTrace(), "A websocket connection has not been made yet so we will start the stream");
 			this.delegate.onWebRtcAutoConnect();
-			this.connectToSignallingSever();
+			this.connectToSignallingServer();
 
 		} else {
 			// set the replay status so we get a text overlay over an action overlay
@@ -358,7 +358,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			// wait for the connection to close and restart the connection
 			const autoConnectTimeout = setTimeout(() => {
 				this.delegate.onWebRtcAutoConnect();
-				this.connectToSignallingSever();
+				this.connectToSignallingServer();
 				clearTimeout(autoConnectTimeout);
 			}, 3000);
 		}
@@ -516,11 +516,23 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.resizePlayerStyle();
 	}
 
+	buildSignallingServerUrl() {
+		let signallingServerUrl = this.config.getTextSettingValue(TextParameters.SignallingServerUrl);
+
+		// If we are connecting to the SFU add a special url parameter to the url
+		if(this.config.isFlagEnabled(Flags.PreferSFU)) {
+			signallingServerUrl += "?" + Flags.PreferSFU + "=true";
+		}
+
+		return signallingServerUrl;
+	}
+
 	/**
 	 * Connect to the Signaling server
 	 */
-	connectToSignallingSever() {
-		this.webSocketController.connect();
+	connectToSignallingServer() {
+		const signallingUrl = this.buildSignallingServerUrl();
+		this.webSocketController.connect(signallingUrl);
 	}
 
 	/**

@@ -11,6 +11,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		this.signallingExtension = new SPSSignalling(this.iWebRtcController.webSocketController);
 		this.signallingExtension.onAuthenticationResponse = this.handleSignallingResponse.bind(this);
 		this.signallingExtension.onInstanceStateChanged = this.handleSignallingResponse.bind(this);
+		this.enforceSpecialSignallingServerUrl();
 	}
 
 	handleSignallingResponse(signallingResp: string, isError: boolean) {
@@ -19,6 +20,19 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		} else { 
 			this.showTextOverlay(signallingResp);
 		}
+	}
+
+	enforceSpecialSignallingServerUrl() {
+		// SPS needs a special /ws added to the signalling server url so K8s can distinguish it
+		this.iWebRtcController.buildSignallingServerUrl = function() {
+			let signallingUrl = this.config.getTextSettingValue(libspsfrontend.TextParameters.SignallingServerUrl);
+
+			if(signallingUrl && signallingUrl !== undefined && !signallingUrl.endsWith("/ws")) {
+				signallingUrl = signallingUrl.endsWith("/") ? signallingUrl + "ws" : signallingUrl + "/ws";
+			}
+
+			return signallingUrl
+		};
 	}
 
 }

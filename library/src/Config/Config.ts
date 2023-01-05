@@ -63,23 +63,19 @@ export class Config {
 	// We may perform the reverse; a single finger touch may be converted into a mouse drag UE side. This allows a non-touch application to be controlled partially via a touch device.
 	fakeMouseWithTouches = false;
 
-	//compulsory options and DOMs 
-	signallingServerAddress: string;
-
 	/* A map of toggable flags - options that can be set in the application - e.g. Use Mic? */
-	flags = new Map<string, SettingFlag>();
+	private flags = new Map<string, SettingFlag>();
 
 	/* A map of numerical settings - options that can be in the application - e.g. MinBitrate */
-	numericParameters = new Map<string, SettingNumber>();
+	private numericParameters = new Map<string, SettingNumber>();
 
 	/* A map of text settings - e.g. signalling server url */
-	textParameters = new Map<string, SettingText>();
+	private textParameters = new Map<string, SettingText>();
 
-	/**
-	 * @param signallingServerAddress - the address of the signaling server 
-	 */
-	constructor(signallingServerAddress: string) {
-		this.signallingServerAddress = signallingServerAddress;
+	// ------------ Settings -----------------
+
+	constructor() {
+		this.populateDefaultSettings();
 	}
 
 	/**
@@ -106,155 +102,182 @@ export class Config {
 	}
 
 	/**
-	 * Setup flags with their default values and add them to the `Config.flags` map.
-	 * @param settingsElem - The element that contains all the individual settings sections, flags, and so on.
+	 * Populate the default settings for a Pixel Streaming application
 	 */
-	setupFlags(settingsElem : HTMLElement) : void {
+	populateDefaultSettings() : void {
 
-		/* Setup all Pixel Streaming specific settings */
-		const psSettingsSection = this.buildSectionWithHeading(settingsElem, "Pixel Streaming");
+		/** 
+		 * Text Parameters 
+		 */
 
-		const signallingUrlSetting = new SettingText(
+		this.textParameters.set(TextParameters.SignallingServerUrl, new SettingText(
 			TextParameters.SignallingServerUrl, 
 			"Signalling url", 
 			"Url of the signalling server",
-			(location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.hostname);
+			(location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.hostname));
+	
+		/**
+		 * Boolean parameters
+		 */
 
-		const sendSDPAnswerSetting = new SettingFlag(
+		this.flags.set(Flags.BrowserSendOffer, new SettingFlag(
 			Flags.BrowserSendOffer, 
 			"Browser send offer", 
 			"Browser will initiate the WebRTC handshake by sending the offer to the streamer", 
-			false);
+			false));
 
-		const useMicSetting = new SettingFlag(
+		this.flags.set(Flags.UseMic, new SettingFlag(
 			Flags.UseMic, 
 			"Use microphone", 
 			"Make browser request microphone access and open an input audio track.", 
-			false);
+			false));
 
-		const preferSFUSetting = new SettingFlag(
+		this.flags.set(Flags.PreferSFU, new SettingFlag(
 			Flags.PreferSFU, 
 			"Prefer SFU", 
 			"Try to connect to the SFU instead of P2P.", 
-			false);
-
-		const qualityControlSetting = new SettingFlag(
+			false));
+	
+		this.flags.set(Flags.IsQualityController, new SettingFlag(
 			Flags.IsQualityController, 
 			"Is quality controller?", 
 			"True if this peer controls stream quality", 
-			true
-		);
+			true));
 
-		const forceMonoAudioSetting = new SettingFlag(
+		this.flags.set(Flags.ForceMonoAudio, new SettingFlag(
 			Flags.ForceMonoAudio, 
 			"Force mono audio",
 			"Force browser to request mono audio in the SDP", 
 			false
-		);
-
-		const forceTURNSetting = new SettingFlag(
+		));
+	
+		this.flags.set(Flags.ForceTURN, new SettingFlag(
 			Flags.ForceTURN, 
 			"Force TURN",
 			"Only generate TURN/Relayed ICE candidates.", 
 			false
-		);
+		));
 
-		const afkIfIdleSetting = new SettingFlag(
+		this.flags.set(Flags.AFKDetection, new SettingFlag(
 			Flags.AFKDetection, 
 			"AFK if idle",
 			"Timeout the experience if user is AFK for a period.", 
 			false
-		);
-		
-		// make settings show up in DOM
-		this.addSettingText(psSettingsSection, signallingUrlSetting);
-		this.addSettingFlag(psSettingsSection, sendSDPAnswerSetting);
-		this.addSettingFlag(psSettingsSection, useMicSetting);
-		this.addSettingFlag(psSettingsSection, preferSFUSetting);
-		this.addSettingFlag(psSettingsSection, qualityControlSetting);
-		this.addSettingFlag(psSettingsSection, forceMonoAudioSetting);
-		this.addSettingFlag(psSettingsSection, forceTURNSetting);
-		this.addSettingFlag(psSettingsSection, afkIfIdleSetting);
+		));
 
-		/* Setup all view/ui related settings under this section */
-		const viewSettingsSection = this.buildSectionWithHeading(settingsElem, "UI");
-
-		const fillWindowSetting = new SettingFlag(
+		this.flags.set(Flags.VideoFillParent, new SettingFlag(
 			Flags.VideoFillParent, 
 			"Video fill parent element", 
 			"True: Video will be resized by the browser to fit inside its parent element\nFalse: The video element will resize to the size of the incoming stream", 
-			true);
+			true
+		));
 
-		const matchViewportResSetting = new SettingFlag(
+		this.flags.set(Flags.MatchViewportResolution, new SettingFlag(
 			Flags.MatchViewportResolution, 
 			"Match viewport resolution", 
 			"Pixel Streaming will be instructed to dynamically resize the video stream to match the size of the video element.", 
-			false);
+			false
+		));
 
-		const controlSchemeSetting = new SettingFlag(
+		this.flags.set(Flags.ControlScheme, new SettingFlag(
 			Flags.ControlScheme, 
 			"Control Scheme: Locked Mouse", 
 			"Either locked mouse, where the pointer is consumed by the video and locked to it, or hovering mouse, where the mouse is not consumed.", 
-			false);
+			false
+		));
 
-		this.addSettingFlag(viewSettingsSection, fillWindowSetting);
-		this.addSettingFlag(viewSettingsSection, matchViewportResSetting);
-		this.addSettingFlag(viewSettingsSection, controlSchemeSetting);
-		controlSchemeSetting.label = `Control Scheme: ${(controlSchemeSetting.value) ? "Hovering" : "Locked"} Mouse`;
-		
+		/**
+		 * Numeric parameters
+		 */
 
-		/* Setup all encoder related settings under this section */
-		const encoderSettingsSection = this.buildSectionWithHeading(settingsElem, "Encoder");
-
-		const minQPSetting = new SettingNumber(
+		this.numericParameters.set(NumericParameters.MinQP, new SettingNumber(
 			NumericParameters.MinQP,
 			"Min QP", 
 			"The lower bound for the quantization parameter (QP) of the encoder. 0 = Best quality, 51 = worst quality.",
 			0, /*min*/
 			51, /*max*/
-			0 /*value*/);
+			0 /*value*/
+		));
 
-		const maxQPSetting = new SettingNumber(
+		this.numericParameters.set(NumericParameters.MaxQP, new SettingNumber(
 			NumericParameters.MaxQP,
 			"Max QP", 
 			"The upper bound for the quantization parameter (QP) of the encoder. 0 = Best quality, 51 = worst quality.",
 			0, /*min*/
 			51, /*max*/
-			51 /*value*/);
+			51 /*value*/
+		));
 
-		this.addSettingNumeric(encoderSettingsSection, minQPSetting);
-		this.addSettingNumeric(encoderSettingsSection, maxQPSetting);
-
-		/* Setup all webrtc related settings under this section */
-		const webrtcSettingsSection = this.buildSectionWithHeading(settingsElem, "WebRTC");
-
-		const webrtcFPSSetting = new SettingNumber(
+		this.numericParameters.set(NumericParameters.WebRTCFPS, new SettingNumber(
 			NumericParameters.WebRTCFPS,
 			"Max FPS", 
 			"The maximum FPS that WebRTC will try to transmit frames at.",
 			1, /*min*/
 			999, /*max*/
-			60 /*value*/);
+			60 /*value*/
+		));
 
-		const webrtcMinBitrateSetting = new SettingNumber(
+		this.numericParameters.set(NumericParameters.WebRTCMinBitrate, new SettingNumber(
 			NumericParameters.WebRTCMinBitrate,
 			"Min Bitrate (kbps)", 
 			"The minimum bitrate that WebRTC should use.",
 			0, /*min*/
 			100000, /*max*/
-			0 /*value*/);
+			0 /*value*/
+		));
 
-		const webrtcMaxBitrateSetting = new SettingNumber(
+		this.numericParameters.set(NumericParameters.WebRTCMaxBitrate, new SettingNumber(
 			NumericParameters.WebRTCMaxBitrate,
 			"Max Bitrate (kbps)", 
 			"The maximum bitrate that WebRTC should use.",
 			0, /*min*/
 			100000, /*max*/
-			0 /*value*/);
+			0 /*value*/
+		));
+	}
 
-		this.addSettingNumeric(webrtcSettingsSection, webrtcFPSSetting);
-		this.addSettingNumeric(webrtcSettingsSection, webrtcMinBitrateSetting);
-		this.addSettingNumeric(webrtcSettingsSection, webrtcMaxBitrateSetting);
+	/**
+	 * Setup flags with their default values and add them to the `Config.flags` map.
+	 * @param settingsElem - The element that contains all the individual settings sections, flags, and so on.
+	 */
+	populateSettingsElement(settingsElem : HTMLElement) : void {
+
+		/* Setup all Pixel Streaming specific settings */
+		const psSettingsSection = this.buildSectionWithHeading(settingsElem, "Pixel Streaming");
+		
+		// make settings show up in DOM
+		this.addSettingText(psSettingsSection, this.textParameters.get(TextParameters.SignallingServerUrl));
+		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.BrowserSendOffer));
+		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.UseMic));
+		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.PreferSFU));
+		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.IsQualityController));
+		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.ForceMonoAudio));
+		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.ForceTURN));
+		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.AFKDetection));
+
+		/* Setup all view/ui related settings under this section */
+		const viewSettingsSection = this.buildSectionWithHeading(settingsElem, "UI");
+
+		this.addSettingFlag(viewSettingsSection, this.flags.get(Flags.VideoFillParent));
+		this.addSettingFlag(viewSettingsSection, this.flags.get(Flags.MatchViewportResolution));
+
+		const ControlSchemeFlag = this.flags.get(Flags.ControlScheme);
+		this.addSettingFlag(viewSettingsSection, ControlSchemeFlag);
+		ControlSchemeFlag.label = `Control Scheme: ${(ControlSchemeFlag.value) ? "Hovering" : "Locked"} Mouse`;
+		
+
+		/* Setup all encoder related settings under this section */
+		const encoderSettingsSection = this.buildSectionWithHeading(settingsElem, "Encoder");
+
+		this.addSettingNumeric(encoderSettingsSection, this.numericParameters.get(NumericParameters.MinQP));
+		this.addSettingNumeric(encoderSettingsSection, this.numericParameters.get(NumericParameters.MaxQP));
+
+		/* Setup all webrtc related settings under this section */
+		const webrtcSettingsSection = this.buildSectionWithHeading(settingsElem, "WebRTC");
+
+		this.addSettingNumeric(webrtcSettingsSection, this.numericParameters.get(NumericParameters.WebRTCFPS));
+		this.addSettingNumeric(webrtcSettingsSection, this.numericParameters.get(NumericParameters.WebRTCMinBitrate));
+		this.addSettingNumeric(webrtcSettingsSection, this.numericParameters.get(NumericParameters.WebRTCMaxBitrate));
 
 	}
 
@@ -321,6 +344,17 @@ export class Config {
 	}
 
 	/**
+	 * Add a callback to fire when the text is changed.
+	 * @param id The id of the flag.
+	 * @param onChangeListener The callback to fire when the value changes.
+	 */
+	addOnTextSettingChangedListener(id: string, onChangeListener: (newTextValue: string) => void) : void {
+		if(this.textParameters.has(id)){
+			this.textParameters.get(id).onChange = onChangeListener;
+		}
+	}
+
+	/**
 	 * Add a SettingText element to a particular settings section in the DOM and registers that text in the text settings map.
 	 * @param settingsSection The settings section HTML element.
 	 * @param settingText The textual settings object.
@@ -369,6 +403,19 @@ export class Config {
 			Logger.Warning(Logger.GetStackTrace(), `Cannot toggle flag called ${id} - it does not exist in the Config.flags map.`);
 		} else {
 			this.flags.get(id).value = flagEnabled;
+		}
+	}
+
+	/**
+	 * Set the text setting.
+	 * @param id The id of the setting
+	 * @param settingValue The value to set in the setting.
+	 */
+	setTextSetting(id: string, settingValue: string) {
+		if(!this.textParameters.has(id)) {
+			Logger.Warning(Logger.GetStackTrace(), `Cannot set text setting called ${id} - it does not exist in the Config.textParameters map.`);
+		} else {
+			this.textParameters.get(id).value = settingValue;
 		}
 	}
 

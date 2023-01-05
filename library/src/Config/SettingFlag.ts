@@ -105,6 +105,13 @@ export class SettingFlag extends SettingBase {
     }
 
     /**
+     * Enables this flag.
+     */
+    public enable() : void {
+        this.value = true;
+    }
+
+    /**
      * @return The setting's value.
      */
     public get value() : unknown{
@@ -117,11 +124,11 @@ export class SettingFlag extends SettingBase {
      */
      public set value(inValue : unknown) {
         this._value = inValue;
-        
+
         if(typeof inValue === "boolean") {
             this.checkbox.checked = inValue;
         }
-        
+
     }
 
     /**

@@ -10,7 +10,7 @@ import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { VideoQpIndicator } from '../Ui/VideoQpIndicator'
 import { SettingPanel } from "../Config/SettingPanel";
 import { webRtcPlayerController } from "../WebRtcPlayer/WebRtcPlayerController";
-import { Flags, ControlSchemeType, NumericParameters } from "../Config/Config";
+import { Flags, NumericParameters } from "../Config/Config";
 import { Logger } from "../Logger/Logger";
 import { InitialSettings, EncoderSettings, WebRTCSettings } from "../DataChannel/InitialSettings"
 import { OnScreenKeyboard } from "../Ui/OnScreenKeyboard"
@@ -180,7 +180,7 @@ export class DelegateBase implements IDelegate {
 	configureSettings() : void {
 
 		// This builds all the settings sections and flags under this `settingsContent` element.
-		this.config.setupFlags(this.settingsPanel.settingsContentElement);
+		this.config.populateSettingsElement(this.settingsPanel.settingsContentElement);
 
 		this.config.addOnSettingChangedListener(Flags.IsQualityController, (isQualityController: boolean)=>{ 
 			if (!isQualityController === false) {
@@ -430,11 +430,11 @@ export class DelegateBase implements IDelegate {
 
 		this.disconnectOverlay.onAction(() => {
 			this.onWebRtcAutoConnect();
-			this.iWebRtcController.connectToSignallingSever();
+			this.iWebRtcController.connectToSignallingServer();
 		});
 
 		// Build the webRtc connect overlay Event Listener and show the connect overlay
-		this.connectOverlay.onAction(() => this.iWebRtcController.connectToSignallingSever());
+		this.connectOverlay.onAction(() => this.iWebRtcController.connectToSignallingServer());
 
 		// set up the afk overlays action 
 		this.afkOverlay.onAction(() => this.iWebRtcController.onAfkTriggered());
@@ -459,7 +459,7 @@ export class DelegateBase implements IDelegate {
 		} else {
 			// if autoplaying show an info overlay while while waiting for the connection to begin 
 			this.onWebRtcAutoConnect();
-			this.iWebRtcController.connectToSignallingSever();
+			this.iWebRtcController.connectToSignallingServer();
 		}
 	}
 

@@ -34,7 +34,7 @@ export interface IWebRtcPlayerController {
     /**
      * Connect to the Signaling server
      */
-    connectToSignallingSever(): void;
+    connectToSignallingServer(): void;
 
     /**
      * Close the Connection to the signaling server
