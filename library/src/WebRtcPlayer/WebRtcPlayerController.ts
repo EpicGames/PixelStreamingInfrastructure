@@ -100,7 +100,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		this.freezeFrameController = new FreezeFrameController(this.delegate.videoElementParent);
 
-		this.videoPlayer = new VideoPlayer(this.delegate.videoElementParent, this.config.startVideoMuted);
+		this.videoPlayer = new VideoPlayer(this.delegate.videoElementParent, this.config);
 		this.videoPlayer.onVideoInitialised = () => this.handleVideoInitialised();
 		this.streamController = new StreamController(this.videoPlayer);
 
@@ -312,7 +312,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		this.afkLogic.onAfkClick();
 
 		// if the stream is paused play it, if we can
-		if (this.videoPlayer.videoElement.paused === true && this.videoPlayer.videoElement.srcObject) {
+		if (this.videoPlayer.isPaused() && this.videoPlayer.hasVideoSource()) {
 			this.playStream();
 		}
 	}
@@ -330,9 +330,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
-	 * Restart the stream automaticity without refreshing the page
+	 * Restart the stream automatically without refreshing the page
 	 */
-	restartStreamAutomaticity() {
+	restartStreamAutomatically() {
 		// if there is no webSocketController return immediately or this will not work
 		if (!this.webSocketController) {
 			Logger.Log(Logger.GetStackTrace(), "The Web Socket Controller does not exist so this will not work right now.");
@@ -350,7 +350,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 			this.delegate.showActionOrErrorOnDisconnect = false;
 
 			// set the disconnect message
-			this.setDisconnectMessageOverride("Restarting stream manually");
+			this.setDisconnectMessageOverride("Restarting stream...");
 
 			// close the connection 
 			this.closeSignalingServer();
@@ -415,7 +415,8 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 		setTimeout(() => {
 			this.freezeFrameController.hideFreezeFrame();
 		}, this.freezeFrameController.freezeFrameDelay);
-		if (this.videoPlayer.videoElement) {
+		
+		if (this.videoPlayer.getVideoElement()) {
 			this.videoPlayer.setVideoEnabled(true);
 		}
 	}
@@ -451,13 +452,9 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 * Plays the stream audio and video source and sets up other pieces while the stream starts
 	 */
 	playStream() {
-		if(!this.videoPlayer.videoElement.srcObject){
-			Logger.Warning(Logger.GetStackTrace(), "Cannot play stream, the video element has no srcObject to play.");
-			return;
-		}
 
-		if (!this.videoPlayer.videoElement) {
-			this.delegate.showErrorOverlay("Could not player video stream because the video player was not initialised correctly.");
+		if (!this.videoPlayer.getVideoElement()) {
+			this.delegate.showErrorOverlay("Could not play video stream because the video player was not initialised correctly.");
 			Logger.Error(Logger.GetStackTrace(), "Could not player video stream because the video player was not initialised correctly.");
 
 			// set the disconnect message
@@ -465,23 +462,34 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 			// close the connection 
 			this.closeSignalingServer();
-		} else {
-			this.touchController = this.inputClassesFactory.registerTouch(this.config.fakeMouseWithTouches, this.videoElementParentClientRect);
-			this.delegate.hideCurrentOverlay();
-			if (this.streamController.audioElement.srcObject) {
-				this.streamController.audioElement.play().then(() => {
-					this.playVideo();
-				}).catch((onRejectedReason) => {
-					Logger.Log(Logger.GetStackTrace(), onRejectedReason);
-					Logger.Log(Logger.GetStackTrace(), "Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.");
-					this.delegate.showPlayOverlay();
-				});
-			} else {
-				this.playVideo();
-			}
-			this.shouldShowPlayOverlay = false;
-			this.freezeFrameController.showFreezeFrame();
+			return;
+		} 
+
+		if(!this.videoPlayer.hasVideoSource()){
+			Logger.Warning(Logger.GetStackTrace(), "Cannot play stream, the video element has no srcObject to play.");
+			return;
 		}
+		
+		this.touchController = this.inputClassesFactory.registerTouch(this.config.isFlagEnabled(Flags.FakeMouseWithTouches), this.videoElementParentClientRect);
+		this.delegate.hideCurrentOverlay();
+
+		if (this.streamController.audioElement.srcObject) {
+
+			this.streamController.audioElement.muted = this.config.isFlagEnabled(Flags.StartVideoMuted);
+
+			this.streamController.audioElement.play().then(() => {
+				this.playVideo();
+			}).catch((onRejectedReason) => {
+				Logger.Log(Logger.GetStackTrace(), onRejectedReason);
+				Logger.Log(Logger.GetStackTrace(), "Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.");
+				this.delegate.showPlayOverlay();
+			});
+		} else {
+			this.playVideo();
+		}
+
+		this.shouldShowPlayOverlay = false;
+		this.freezeFrameController.showFreezeFrame();
 	}
 
 	/**
@@ -489,7 +497,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	 */
 	private playVideo() {
 		// // handle play() with promise as it is an asynchronous call  
-		this.videoPlayer.videoElement.play().catch((onRejectedReason: string) => {
+		this.videoPlayer.play().catch((onRejectedReason: string) => {
 			if (this.streamController.audioElement.srcObject) {
 				this.streamController.audioElement.pause();
 			}
@@ -500,13 +508,10 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 	}
 
 	/**
-	 * Enable the video to play automaticity if enableSpsAutoplay is true
+	 * Enable the video to play automatically if AutoPlayVideo is true.
 	 */
 	autoPlayVideoOrSetUpPlayOverlay() {
-		if (this.config.enableSpsAutoplay === true) {
-
-			// set up the auto play on the video element  
-			this.videoPlayer.videoElement.autoplay = true;
+		if (this.config.isFlagEnabled(Flags.AutoPlayVideo)) {
 
 			// attempt to play the video
 			this.playStream();
@@ -714,7 +719,7 @@ export class webRtcPlayerController implements IWebRtcPlayerController {
 
 		/*  */
 		this.activateRegisterMouse()
-		this.keyboardController = this.inputClassesFactory.registerKeyBoard(this.config.suppressBrowserKeys);
+		this.keyboardController = this.inputClassesFactory.registerKeyBoard(this.config);
 		this.gamePadController = this.inputClassesFactory.registerGamePad();
 	}
 

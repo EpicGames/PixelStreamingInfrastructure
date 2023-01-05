@@ -1,4 +1,4 @@
-import { Config, ControlSchemeType, Flags } from "../Config/Config";
+import { Config, ControlSchemeType, Flags, NumericParameters } from "../Config/Config";
 import { Logger } from "../Logger/Logger";
 export class AfkLogic {
     // time out logic details 
@@ -25,7 +25,7 @@ export class AfkLogic {
      * Start the warning timer if a timeout is set greater that 0 seconds   
      */
     startAfkWarningTimer() {
-        if (this.config.afkTimeout > 0 && this.config.isFlagEnabled(Flags.AFKDetection)) {
+        if (this.config.getNumericSettingValue(NumericParameters.AFKTimeoutSecs) > 0 && this.config.isFlagEnabled(Flags.AFKDetection)) {
             this.active = true;
         } else {
             this.active = false;
@@ -55,7 +55,7 @@ export class AfkLogic {
     resetAfkWarningTimer() {
         if (this.active && this.config.isFlagEnabled(Flags.AFKDetection)) {
             clearTimeout(this.warnTimer);
-            this.warnTimer = setTimeout(() => this.activateAfkEvent(), this.config.afkTimeout * 1000);
+            this.warnTimer = setTimeout(() => this.activateAfkEvent(), this.config.getNumericSettingValue(NumericParameters.AFKTimeoutSecs) * 1000);
         }
     }
 

@@ -9,16 +9,21 @@ import { SettingText } from "./SettingText";
  * these flags are provided for convenience to avoid hardcoded strings across the library.
  */
 export class Flags {
-	static UseMic = "UseMic";
+	static AutoConnect = "AutoConnect";
+	static AutoPlayVideo = "AutoPlayVideo";
+	static AFKDetection = "TimeoutIfIdle";
 	static BrowserSendOffer = "offerToReceive";
-	static PreferSFU = "preferSFU";
-	static IsQualityController = "ControlsQuality";
+	static ControlScheme = "HoveringMouse"
 	static ForceMonoAudio = "ForceMonoAudio";
 	static ForceTURN = "ForceTURN";
-	static AFKDetection = "TimeoutIfIdle";
-	static VideoFillParent = "FillParent";
+	static FakeMouseWithTouches = "FakeMouseWithTouches";
+	static IsQualityController = "ControlsQuality";
 	static MatchViewportResolution = "MatchViewportRes";
-	static ControlScheme = "HoveringMouse"
+	static PreferSFU = "preferSFU";
+	static StartVideoMuted = "StartVideoMuted";
+	static SuppressBrowserKeys = "SuppressBrowserKeys";
+	static UseMic = "UseMic";
+	static VideoFillParent = "FillParent";
 }
 
 /**
@@ -26,6 +31,7 @@ export class Flags {
  * 
  */
 export class NumericParameters {
+	static AFKTimeoutSecs = "AFKTimeout";
 	static MinQP = "MinQP";
 	static MaxQP = "MaxQP";
 	static WebRTCFPS = "WebRTCFPS";
@@ -42,26 +48,6 @@ export class NumericParameters {
 }
 
 export class Config {
-
-	// PRESET OPTIONS
-	// enable the auto connect of the websocket 
-	enableSpsAutoConnect = false;
-
-	// enable the autoplay of the video if enabled by browser
-	enableSpsAutoplay = true;
-
-	// start the video muted
-	startVideoMuted = false;
-
-	// set the amount of wait time in seconds while there is inactivity for afk to occur 
-	afkTimeout = 120;
-
-	// Browser keys are those which are typically used by the browser UI. We usually want to suppress these to allow, for example, UE to show shader complexity with the F5 key without the web page refreshing.
-	suppressBrowserKeys = true;
-
-	// UE has a fake touches option which fakes a single finger touch when the user drags with their mouse. 
-	// We may perform the reverse; a single finger touch may be converted into a mouse drag UE side. This allows a non-touch application to be controlled partially via a touch device.
-	fakeMouseWithTouches = false;
 
 	/* A map of toggable flags - options that can be set in the application - e.g. Use Mic? */
 	private flags = new Map<string, SettingFlag>();
@@ -120,6 +106,18 @@ export class Config {
 		 * Boolean parameters
 		 */
 
+		this.flags.set(Flags.AutoConnect, new SettingFlag(
+			Flags.AutoConnect, 
+			"Auto connect to stream", 
+			"Whether we should attempt to auto connect to the signalling server or show a click to start prompt.", 
+			false));
+
+		this.flags.set(Flags.AutoPlayVideo, new SettingFlag(
+			Flags.AutoPlayVideo, 
+			"Auto play video", 
+			"When video is ready automatically start playing it as opposed to showing a play button.", 
+			true));
+
 		this.flags.set(Flags.BrowserSendOffer, new SettingFlag(
 			Flags.BrowserSendOffer, 
 			"Browser send offer", 
@@ -131,6 +129,20 @@ export class Config {
 			"Use microphone", 
 			"Make browser request microphone access and open an input audio track.", 
 			false));
+
+		this.flags.set(Flags.StartVideoMuted, new SettingFlag(
+			Flags.StartVideoMuted, 
+			"Start video muted", 
+			"Video will start muted if true.", 
+			false
+		));
+
+		this.flags.set(Flags.SuppressBrowserKeys, new SettingFlag(
+			Flags.SuppressBrowserKeys, 
+			"Suppress browser keys", 
+			"Suppress certain browser keys that we use in UE, for example F5 to show shader complexity instead of refresh the page.", 
+			true
+		));
 
 		this.flags.set(Flags.PreferSFU, new SettingFlag(
 			Flags.PreferSFU, 
@@ -186,9 +198,25 @@ export class Config {
 			false
 		));
 
+		this.flags.set(Flags.FakeMouseWithTouches, new SettingFlag(
+			Flags.FakeMouseWithTouches, 
+			"Fake mouse with touches", 
+			"A single finger touch is converted into a mouse event. This allows a non-touch application to be controlled partially via a touch device.", 
+			false
+		));
+
 		/**
 		 * Numeric parameters
 		 */
+
+		this.numericParameters.set(NumericParameters.AFKTimeoutSecs, new SettingNumber(
+			NumericParameters.AFKTimeoutSecs,
+			"AFK timeout", 
+			"The time (in seconds) it takes for the application to time out if AFK timeout is enabled.",
+			0, /*min*/
+			600, /*max*/
+			120 /*value*/
+		));
 
 		this.numericParameters.set(NumericParameters.MinQP, new SettingNumber(
 			NumericParameters.MinQP,
@@ -247,13 +275,18 @@ export class Config {
 		
 		// make settings show up in DOM
 		this.addSettingText(psSettingsSection, this.textParameters.get(TextParameters.SignallingServerUrl));
+		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.AutoConnect));
+		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.AutoPlayVideo));
 		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.BrowserSendOffer));
 		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.UseMic));
+		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.StartVideoMuted));
 		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.PreferSFU));
 		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.IsQualityController));
 		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.ForceMonoAudio));
 		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.ForceTURN));
+		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.SuppressBrowserKeys));
 		this.addSettingFlag(psSettingsSection, this.flags.get(Flags.AFKDetection));
+		this.addSettingNumeric(psSettingsSection, this.numericParameters.get(NumericParameters.AFKTimeoutSecs));
 
 		/* Setup all view/ui related settings under this section */
 		const viewSettingsSection = this.buildSectionWithHeading(settingsElem, "UI");

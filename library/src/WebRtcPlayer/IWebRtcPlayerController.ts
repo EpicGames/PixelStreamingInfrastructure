@@ -42,9 +42,9 @@ export interface IWebRtcPlayerController {
     closeSignalingServer(): void;
 
     /**
-     * Restart the stream automaticity without refreshing the page
+     * Restart the stream automatically without refreshing the page
      */
-    restartStreamAutomaticity(): void;
+    restartStreamAutomatically(): void;
 
     /**
      * Send an Iframe request to the streamer

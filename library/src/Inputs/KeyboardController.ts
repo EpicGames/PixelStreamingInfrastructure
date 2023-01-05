@@ -2,6 +2,7 @@ import { SpecialKeyCodes } from "./SpecialKeyCodes";
 import { Logger } from "../Logger/Logger";
 import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
 import { IActiveKeys } from "./InputClassesFactory";
+import { Config, Flags } from "../Config/Config";
 
 interface ICodeToKeyCode {
     [key: string]: number;
@@ -11,8 +12,8 @@ interface ICodeToKeyCode {
  * Handles the Keyboard Inputs for the document
  */
 export class KeyboardController {
+    config: Config;
     toStreamerMessagesProvider: IStreamMessageController;
-    suppressBrowserKeys: boolean;
     activeKeysProvider: IActiveKeys;
 
     /* 
@@ -126,13 +127,12 @@ export class KeyboardController {
 
     /**
      * @param toStreamerMessagesProvider Stream message provider class object
-     * @param suppressBrowserKeys Suppress Browser Keys
      * @param activeKeysProvider Active keys provider class object
      */
-    constructor(toStreamerMessagesProvider: IStreamMessageController, suppressBrowserKeys: boolean, activeKeysProvider: IActiveKeys) {
+    constructor(toStreamerMessagesProvider: IStreamMessageController, activeKeysProvider: IActiveKeys, config : Config) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
-        this.suppressBrowserKeys = suppressBrowserKeys;
         this.activeKeysProvider = activeKeysProvider;
+        this.config = config;
     }
 
     /**
@@ -166,7 +166,7 @@ export class KeyboardController {
             document.onkeypress.apply("charCode", SpecialKeyCodes.backSpace);
         }
 
-        if (this.suppressBrowserKeys && this.isKeyCodeBrowserKey(keyCode)) {
+        if (this.config.isFlagEnabled(Flags.SuppressBrowserKeys) && this.isKeyCodeBrowserKey(keyCode)) {
             keyboardEvent.preventDefault();
         }
     }
@@ -184,7 +184,7 @@ export class KeyboardController {
         const toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("KeyUp")("KeyUp", [keyCode, keyboardEvent.repeat]);
 
-        if (this.suppressBrowserKeys && this.isKeyCodeBrowserKey(keyCode)) {
+        if (this.config.isFlagEnabled(Flags.SuppressBrowserKeys) && this.isKeyCodeBrowserKey(keyCode)) {
             keyboardEvent.preventDefault();
         }
     }

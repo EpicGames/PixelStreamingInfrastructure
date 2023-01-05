@@ -122,7 +122,7 @@ export class DelegateBase implements IDelegate {
 		// Add button for restart stream
 		const restartStreamButton = new LabelledButton("Restart Stream", "Restart");
 		restartStreamButton.addOnClickListener(()=>{
-			this.iWebRtcController.restartStreamAutomaticity();
+			this.iWebRtcController.restartStreamAutomatically();
 		});
 
 		// Add button for request keyframe
@@ -452,11 +452,11 @@ export class DelegateBase implements IDelegate {
 	 * Show the Connect Overlay or auto connect 
 	 */
 	showConnectOrAutoConnectOverlays() {
-		// set up if the auto play will be used or regular click to start
-		if (!this.config.enableSpsAutoConnect) {
+		// set up if the auto connect will be used or a whether the user will be shown a "click to start" prompt
+		if (!this.config.isFlagEnabled(Flags.AutoConnect)) {
 			this.showConnectOverlay();
 		} else {
-			// if autoplaying show an info overlay while while waiting for the connection to begin 
+			// if we want to auto connect show an info overlay while while waiting for the connection to begin 
 			this.onWebRtcAutoConnect();
 			this.iWebRtcController.connectToSignallingServer();
 		}
@@ -466,7 +466,7 @@ export class DelegateBase implements IDelegate {
 	 * Show the webRtcAutoConnect Overlay and connect
 	 */
 	onWebRtcAutoConnect() {
-		this.showTextOverlay("Auto Connecting Now");
+		this.showTextOverlay("Connecting Now");
 		this.showActionOrErrorOnDisconnect = true;
 	}
 

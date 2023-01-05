@@ -6,8 +6,6 @@ import * as libspsfrontend from '@tensorworks/libspsfrontend';
 
 // Create a config object
 let config = new libspsfrontend.Config();
-config.enableSpsAutoConnect = false;
-config.enableSpsAutoplay = true;
 
 // Extremely important, SPS only support browser sending the offer.
 config.setFlagEnabled(libspsfrontend.Flags.BrowserSendOffer, true);
