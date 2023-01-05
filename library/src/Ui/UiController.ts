@@ -1,11 +1,11 @@
-import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
+import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 import { PlayerStyleAttributes } from "./PlayerStyleAttributes";
 
 /**
  * The Ui Controller class handles all methods that interact with the UI
  */
 export class UiController {
-    videoPlayerProvider: IVideoPlayer;
+    videoPlayerProvider: VideoPlayer;
     playerStyleAttributes: PlayerStyleAttributes;
     orientationChangeTimeout: ReturnType<typeof setTimeout>;
     lastTimeResized = new Date().getTime();
@@ -16,7 +16,7 @@ export class UiController {
      * @param videoPlayerProvider Video Player instance  
      * @param playerStyleAttributes Player style attributes instance 
      */
-    constructor(videoPlayerProvider: IVideoPlayer, playerStyleAttributes: PlayerStyleAttributes) {
+    constructor(videoPlayerProvider: VideoPlayer, playerStyleAttributes: PlayerStyleAttributes) {
         this.videoPlayerProvider = videoPlayerProvider;
         this.playerStyleAttributes = playerStyleAttributes;
 

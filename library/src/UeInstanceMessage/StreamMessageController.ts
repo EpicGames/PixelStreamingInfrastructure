@@ -1,8 +1,7 @@
 import { TwoWayMap } from "./TwoWayMap";
-import { IStreamMessageController } from "./IStreamMessageController";
 import { Logger } from "../Logger/Logger";
 
-export class StreamMessageController implements IStreamMessageController {
+export class StreamMessageController {
     toStreamerHandlers: Map<string, (messageType: any, messageData?: any[] | undefined) => void>;
     fromStreamerHandlers: Map<string, (messageType: any, messageData?: any[] | undefined) => void>;
     toStreamerMessages: TwoWayMap;

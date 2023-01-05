@@ -64,7 +64,7 @@ canvas {
 	overflow: hidden;
 }
 
-.spsUiTool .tooltiptext {
+.UiTool .tooltiptext {
 	visibility: hidden;
 	width: auto;
 	color: var(--colour2);
@@ -82,7 +82,7 @@ canvas {
 	z-index: 20;
 }
 
-.spsUiTool:hover .tooltiptext {
+.UiTool:hover .tooltiptext {
 	visibility: visible;
 	background-color: var(--colour7);
 }

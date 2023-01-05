@@ -1,15 +1,15 @@
-import { ITouchController } from "./ITouchController";
-import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
 import { Logger } from "../Logger/Logger";
-import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
-import { INormalizeAndQuantize } from "../NormalizeAndQuantize/INormalizeAndQuantize";
+import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";
+import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
+import { ITouchController } from "./ITouchController";
 /** 
  * Handles the Touch input Events
  */
 export class TouchController implements ITouchController {
-    toStreamerMessagesProvider: IStreamMessageController;
-    videoElementProvider: IVideoPlayer;
-    normalizeAndQuantize: INormalizeAndQuantize;
+    toStreamerMessagesProvider: StreamMessageController;
+    videoElementProvider: VideoPlayer;
+    normalizeAndQuantize: NormalizeAndQuantize
     videoElementParent: HTMLVideoElement;
     fingers = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
     fingerIds = new Map();
@@ -20,7 +20,7 @@ export class TouchController implements ITouchController {
      * @param videoElementProvider - Video Player instance
      * @param normalizeAndQuantize - A normalize and quantize instance 
      */
-    constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer, normalizeAndQuantize: INormalizeAndQuantize) {
+	constructor(toStreamerMessagesProvider: StreamMessageController, videoElementProvider: VideoPlayer, normalizeAndQuantize: NormalizeAndQuantize) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.videoElementProvider = videoElementProvider;
         this.normalizeAndQuantize = normalizeAndQuantize;

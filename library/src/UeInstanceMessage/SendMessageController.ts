@@ -1,17 +1,17 @@
 import { DataChannelSender } from "../DataChannel/DataChannelSender";
-import { IStreamMessageController } from "./IStreamMessageController";
 import { Logger } from "../Logger/Logger";
+import { StreamMessageController } from "./StreamMessageController";
 
 export class SendMessageController {
 
-    toStreamerMessagesMapProvider: IStreamMessageController;
+    toStreamerMessagesMapProvider: StreamMessageController;
     dataChannelSender: DataChannelSender;
 
     /**
      * @param dataChannelSender - Data channel instance  
      * @param toStreamerMessagesMapProvider - Stream Messages instance 
      */
-    constructor(dataChannelSender: DataChannelSender, toStreamerMessagesMapProvider: IStreamMessageController) {
+    constructor(dataChannelSender: DataChannelSender, toStreamerMessagesMapProvider: StreamMessageController) {
         this.dataChannelSender = dataChannelSender;
         this.toStreamerMessagesMapProvider = toStreamerMessagesMapProvider;
     }

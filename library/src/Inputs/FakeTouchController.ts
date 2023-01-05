@@ -1,8 +1,8 @@
+import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";
+import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 import { ITouchController } from "./ITouchController";
 import { MouseButton } from "./MouseButtons";
-import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
-import { IVideoPlayer } from "../VideoPlayer/IVideoPlayer";
-import { INormalizeAndQuantize } from "../NormalizeAndQuantize/INormalizeAndQuantize";
 
 
 /**
@@ -12,9 +12,9 @@ import { INormalizeAndQuantize } from "../NormalizeAndQuantize/INormalizeAndQuan
  */
 export class FakeTouchController implements ITouchController {
     fakeTouchFinger: FakeTouchFinger;
-    toStreamerMessagesProvider: IStreamMessageController;
-    videoElementProvider: IVideoPlayer;
-    normalizeAndQuantize: INormalizeAndQuantize;
+    toStreamerMessagesProvider: StreamMessageController;
+    videoElementProvider: VideoPlayer;
+    normalizeAndQuantize: NormalizeAndQuantize;
     videoElementParentClientRect: DOMRect;
 
     /**
@@ -22,7 +22,7 @@ export class FakeTouchController implements ITouchController {
      * @param videoElementProvider - Video element instance
      * @param normalizeAndQuantize - Normalise and Quantize instance
      */
-    constructor(toStreamerMessagesProvider: IStreamMessageController, videoElementProvider: IVideoPlayer, normalizeAndQuantize: INormalizeAndQuantize) {
+    constructor(toStreamerMessagesProvider: StreamMessageController, videoElementProvider: VideoPlayer, normalizeAndQuantize: NormalizeAndQuantize) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.videoElementProvider = videoElementProvider;
         this.normalizeAndQuantize = normalizeAndQuantize;

@@ -1,19 +1,19 @@
 import { MouseController } from "../Inputs/MouseController"
 import { Logger } from "../Logger/Logger";
-import { IVideoPlayer } from "./IVideoPlayer";
+import { VideoPlayer } from "./VideoPlayer";
 
 /**
  * Video Player Controller handles the creation of the video HTML element and all handlers
  */
 export class StreamController {
-    videoElementProvider: IVideoPlayer;
+    videoElementProvider: VideoPlayer;
     audioElement: HTMLAudioElement;
     mouseController: MouseController;
 
     /**
      * @param videoElementProvider Video Player instance  
      */
-    constructor(videoElementProvider: IVideoPlayer) {
+    constructor(videoElementProvider: VideoPlayer) {
         this.videoElementProvider = videoElementProvider;
         this.audioElement = document.createElement("Audio") as HTMLAudioElement;
     }

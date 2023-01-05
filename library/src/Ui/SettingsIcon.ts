@@ -8,20 +8,13 @@
 	_tooltipText : HTMLElement;
 
 	/**
-	 * Construct a SettingsIcon
-	 */
-	constructor() {
-
-	}
-
-	/**
 	 * Get the the button containing the settings icon.
 	 */
 	public get rootElement() : HTMLButtonElement {
 		if(!this._rootElement) {
 			this._rootElement = document.createElement("button");
 			this._rootElement.type = "button";
-            this._rootElement.classList.add("spsUiTool");
+            this._rootElement.classList.add("UiTool");
 			this._rootElement.id = "settingsBtn";
 			this._rootElement.appendChild(this.settingsIcon);
 			this._rootElement.appendChild(this.tooltipText);

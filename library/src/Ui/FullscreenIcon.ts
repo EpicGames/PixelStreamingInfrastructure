@@ -26,7 +26,7 @@ declare global {
  * Minimize and maximize icon that when clicked will toggle fullscreen of the given element.
  */
  export class FullScreenIcon {
-	isFullscreen: boolean = false;
+	isFullscreen = false;
 	fullscreenElement : HTMLElement;
 
 	_rootElement: HTMLButtonElement;
@@ -55,7 +55,7 @@ declare global {
 		if(!this._rootElement) {
 			this._rootElement = document.createElement("button");
 			this._rootElement.type = "button";
-            this._rootElement.classList.add("spsUiTool");
+            this._rootElement.classList.add("UiTool");
 			this._rootElement.id = "fullscreen-btn";
 			this._rootElement.appendChild(this.maximizeIcon);
 			this._rootElement.appendChild(this.minimizeIcon);
@@ -163,7 +163,7 @@ declare global {
 				document.msExitFullscreen();
 			}
 		} else {
-			let element = this.fullscreenElement;
+			const element = this.fullscreenElement;
 			
 			if (!element) {
 				return;
@@ -192,8 +192,8 @@ declare global {
 			|| (document.msFullscreenElement && document.msFullscreenElement !== null)
 			|| (document.fullscreenElement && document.fullscreenElement !== null));
 
-		let minimize = document.getElementById('minimizeIcon');
-		let maximize = this.maximizeIcon;
+		const minimize = document.getElementById('minimizeIcon');
+		const maximize = this.maximizeIcon;
 		
 		if (this.isFullscreen) {
 			minimize.style.display = 'inline';

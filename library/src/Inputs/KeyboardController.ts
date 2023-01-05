@@ -1,7 +1,7 @@
 import { SpecialKeyCodes } from "./SpecialKeyCodes";
 import { Logger } from "../Logger/Logger";
-import { IStreamMessageController } from "../UeInstanceMessage/IStreamMessageController";
-import { IActiveKeys } from "./InputClassesFactory";
+import { ActiveKeys } from "./InputClassesFactory";
+import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";
 import { Config, Flags } from "../Config/Config";
 
 interface ICodeToKeyCode {
@@ -13,8 +13,8 @@ interface ICodeToKeyCode {
  */
 export class KeyboardController {
     config: Config;
-    toStreamerMessagesProvider: IStreamMessageController;
-    activeKeysProvider: IActiveKeys;
+    toStreamerMessagesProvider: StreamMessageController;
+    activeKeysProvider: ActiveKeys;
 
     /* 
     * New browser APIs have moved away from KeyboarddEvent.keyCode to KeyboardEvent.Code. 
@@ -129,7 +129,7 @@ export class KeyboardController {
      * @param toStreamerMessagesProvider Stream message provider class object
      * @param activeKeysProvider Active keys provider class object
      */
-    constructor(toStreamerMessagesProvider: IStreamMessageController, activeKeysProvider: IActiveKeys, config : Config) {
+    constructor(toStreamerMessagesProvider: StreamMessageController, activeKeysProvider: ActiveKeys, config : Config) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.activeKeysProvider = activeKeysProvider;
         this.config = config;

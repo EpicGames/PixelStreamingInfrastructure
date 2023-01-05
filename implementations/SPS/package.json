@@ -1,20 +1,19 @@
 {
-  "name": "sps-delegate-dom",
+  "name": "sps-application",
   "version": "0.1.0",
-  "description": "The reference delegate implementation for consuming the Scalable Pixel Streaming frontend library",
+  "description": "The reference implementation for consuming the Scalable Pixel Streaming frontend library",
   "main": "index.ts",
   "scripts": {
     "build": "npx webpack",
     "watch": "npx webpack --watch",
     "start": "npx webpack && open-cli ./dist/index.html",
     "serve": "webpack serve",
-    "symlink": "cd ../../library && npm link && cd ../delegates/dom && npm link @tensorworks/libspsfrontend",
-    "build-all": "cd ../../library && npm run build && cd ../delegates/dom && npm run symlink && npm run build"
+    "build-all": "cd ../../library && npm run build && cd ../implementations/SPS && npm link ../../library && npm run build"
   },
   "author": "TensorWorks Pty Ltd",
   "license": "MIT",
   "devDependencies": {
-    "@tensorworks/libspsfrontend": "0.1.4",
+    "@epicgames/libfrontend": "0.0.1",
     "bootstrap": "^5.0.2",
     "css-loader": "^6.2.0",
     "html-loader": "^4.1.0",

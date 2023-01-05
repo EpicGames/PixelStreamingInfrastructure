@@ -10,11 +10,11 @@ export class SettingBase {
     onChange: (changedValue: unknown) => void;
 
     constructor(id: string, label: string, description: string, defaultSettingValue: unknown) {
+		this.onChange = () => { /* Do nothing, to be overridden. */ };
         this.id = id;
         this.description = description;
         this.label = label;
         this.value = defaultSettingValue;
-        this.onChange = ()=>{ /* Do nothing, to be overridden. */ };
     }
 
     /**
