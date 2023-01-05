@@ -9,7 +9,6 @@ import { SettingBase } from "./SettingBase";
 	_max: number;
 	_rootElement: HTMLElement;
 	_spinner: HTMLInputElement;
-	_onChange: (newNumber: number) => void;
 
 	constructor(id: string, label: string, description: string, min: number, max: number, defaultNumber: number) {
 		super(id, label, description, defaultNumber)
@@ -43,8 +42,8 @@ import { SettingBase } from "./SettingBase";
 			}
 
 			// call onchange if we have set it
-			if(this._onChange) {
-				this._onChange(this.value as number);
+			if(this.onChange) {
+				this.onChange(this.value);
 			}
 		};
 
@@ -79,7 +78,7 @@ import { SettingBase } from "./SettingBase";
 	 * Add a change listener to the spinner element.
 	 */
 	public addOnChangedListener(onChangedFunc: (newNumber: number) => void) {
-		this._onChange = onChangedFunc;
+		this.onChange = onChangedFunc;
 	}
 
 	public updateURLParams() : void {

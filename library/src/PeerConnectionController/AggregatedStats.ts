@@ -11,7 +11,7 @@ import { Logger } from "../Logger/Logger";
  * The Aggregated Stats that is generated from the RTC Stats Report
  */
 
-type RTCStatsTypeSPS = RTCStatsType | "stream"
+type RTCStatsTypePS = RTCStatsType | "stream"
 export class AggregatedStats {
     inboundVideoStats: inboundVideoStats;
     inboundAudioStats: inboundAudioStats;
@@ -41,7 +41,7 @@ export class AggregatedStats {
         this.remoteCandidates = new Array<CandidateStat>();
 
         rtcStatsReport.forEach((stat) => {
-            let type: RTCStatsTypeSPS = stat.type;
+            const type: RTCStatsTypePS = stat.type;
 
             switch (type) {
                 case "candidate-pair":
@@ -50,8 +50,6 @@ export class AggregatedStats {
                 case "certificate":
                     break;
                 case "codec":
-                    break;
-                case "csrc":
                     break;
                 case "data-channel":
                     this.handleDataChannel(stat);
@@ -142,7 +140,7 @@ export class AggregatedStats {
      * @param stat - local stats
      */
     handleLocalCandidate(stat: any) {
-        let localCandidate = new CandidateStat();
+        const localCandidate = new CandidateStat();
         localCandidate.label = "local-candidate"
         localCandidate.address = stat.address;
         localCandidate.port = stat.port
@@ -157,7 +155,7 @@ export class AggregatedStats {
      * @param stat - ice candidate stats 
      */
     handleRemoteCandidate(stat: any) {
-        let RemoteCandidate = new CandidateStat();
+        const RemoteCandidate = new CandidateStat();
         RemoteCandidate.label = "local-candidate"
         RemoteCandidate.address = stat.address;
         RemoteCandidate.port = stat.port

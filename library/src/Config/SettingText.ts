@@ -118,12 +118,4 @@ export class SettingText extends SettingBase {
         this._label = inLabel;
         this.settingsTextElem.innerText = this._label;
     }
-
-    /**
-     * @returns The label text for the setting.
-    */
-    public get label(): string {
-        return this._label;
-    }
-
 }

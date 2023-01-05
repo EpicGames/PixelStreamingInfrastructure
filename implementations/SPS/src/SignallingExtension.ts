@@ -1,7 +1,7 @@
 
-import { MessageSend, WebSocketController } from "@tensorworks/libspsfrontend";
-import { MessageRecv } from "@tensorworks/libspsfrontend";
-import { Logger } from "@tensorworks/libspsfrontend";
+import { MessageSend, WebSocketController } from "@epicgames/libfrontend";
+import { MessageRecv } from "@epicgames/libfrontend";
+import { Logger } from "@epicgames/libfrontend";
 
 /**
  * Auth Request Message Wrapper

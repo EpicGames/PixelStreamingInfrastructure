@@ -14,7 +14,7 @@
 		if(!this._rootElement) {
 			this._rootElement = document.createElement("button");
 			this._rootElement.type = "button";
-            this._rootElement.classList.add("spsUiTool");
+            this._rootElement.classList.add("UiTool");
 			this._rootElement.id = "statsBtn";
 			this._rootElement.appendChild(this.statsIcon);
 			this._rootElement.appendChild(this.tooltipText);

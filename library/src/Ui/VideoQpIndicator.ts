@@ -32,7 +32,7 @@
 			// make the root element that contains the svg for the connection
 			this._rootElement = document.createElement("div");
 			this._rootElement.id = "connection";
-			this._rootElement.classList.add("spsUiTool");
+			this._rootElement.classList.add("UiTool");
 
 			// add svg icon for the connection strength
 			this._rootElement.appendChild(this.qualityStatus);

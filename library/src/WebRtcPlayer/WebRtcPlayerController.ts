@@ -26,12 +26,12 @@ import { GamePadController } from "../Inputs/GamepadController";
 import { DataChannelSender } from "../DataChannel/DataChannelSender";
 import { NormalizeAndQuantize, UnquantisedAndDenormaliseUnsigned } from "../NormalizeAndQuantize/NormalizeAndQuantize";
 import { PlayerStyleAttributes } from "../Ui/PlayerStyleAttributes";
-import { DelegateBase } from "../Delegate/DelegateBase";
+import { Application } from "../Application/Application";
 import { ITouchController } from "../Inputs/ITouchController";
 /**
  * Entry point for the Web RTC Player
  */
-export class webRtcPlayerController {
+export class WebRtcPlayerController {
 	config: Config;
 	responseController: ResponseController;
 	sdpConstraints: RTCOfferOptions;
@@ -55,7 +55,7 @@ export class webRtcPlayerController {
 	matchViewportResolution: boolean;
 	resizeTimeout: ReturnType<typeof setTimeout>;
 	latencyStartTime: number;
-	delegate: DelegateBase;
+	application: Application;
 	fileLogic: FileLogic;
 	streamMessageController: StreamMessageController;
 	sendDescriptorController: SendDescriptorController;
@@ -76,11 +76,11 @@ export class webRtcPlayerController {
 	/**
 	 * 
 	 * @param config - the frontend config object 
-	 * @param delegate - the delegate interface object 
+	 * @param application - the application object 
 	 */
-	constructor(config: Config, delegate: DelegateBase) {
+	constructor(config: Config, application: Application) {
 		this.config = config;
-		this.delegate = delegate;
+		this.application = application;
 		this.responseController = new ResponseController();
 		this.fileLogic = new FileLogic();
 
@@ -94,9 +94,9 @@ export class webRtcPlayerController {
 		this.afkLogic.setDisconnectMessageOverride = (message: string) => this.setDisconnectMessageOverride(message);
 		this.afkLogic.closeWebSocket = () => this.closeSignalingServer();
 
-		this.freezeFrameController = new FreezeFrameController(this.delegate.videoElementParent);
+		this.freezeFrameController = new FreezeFrameController(this.application.videoElementParent);
 
-		this.videoPlayer = new VideoPlayer(this.delegate.videoElementParent, this.config.startVideoMuted);
+		this.videoPlayer = new VideoPlayer(this.application.videoElementParent, this.config.startVideoMuted);
 		this.videoPlayer.onVideoInitialised = () => this.handleVideoInitialised();
 		this.streamController = new StreamController(this.videoPlayer);
 
@@ -115,20 +115,20 @@ export class webRtcPlayerController {
 		// set up websocket methods
 		this.webSocketController = new WebSocketController();
 		this.webSocketController.onConfig = (messageConfig: MessageReceive.MessageConfig) => this.handleOnConfigMessage(messageConfig);
-		this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => this.delegate.onDisconnect(`${event.code} - ${event.reason}`);
+		this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => this.application.onDisconnect(`${event.code} - ${event.reason}`);
 
-		// set up the final webRtc player controller methods from within our delegate so a connection can be activated
+		// set up the final webRtc player controller methods from within our application so a connection can be activated
 		this.sendDescriptorController = new SendDescriptorController(this.dataChannelSender, this.streamMessageController);
 		this.sendMessageController = new SendMessageController(this.dataChannelSender, this.streamMessageController);
 		this.toStreamerMessagesController = new ToStreamerMessagesController(this.sendMessageController);
-		this.delegate.setWebRtcPlayerController(this);
+		this.application.setWebRtcPlayerController(this);
 		this.registerMessageHandlers();
 		this.streamMessageController.populateDefaultProtocol();
 
-		// now that the delegate has finished instantiating connect the rest of the afk methods to the afk logic class
-		this.afkLogic.showAfkOverlay = () => this.delegate.showAfkOverlay(this.afkLogic.countDown);
-		this.afkLogic.updateAfkCountdown = () => this.delegate.updateAfkOverlay(this.afkLogic.countDown);
-		this.afkLogic.hideCurrentOverlay = () => this.delegate.hideCurrentOverlay();
+		// now that the application has finished instantiating connect the rest of the afk methods to the afk logic class
+		this.afkLogic.showAfkOverlay = () => this.application.showAfkOverlay(this.afkLogic.countDown);
+		this.afkLogic.updateAfkCountdown = () => this.application.updateAfkOverlay(this.afkLogic.countDown);
+		this.afkLogic.hideCurrentOverlay = () => this.application.hideCurrentOverlay();
 		this.webSocketController.onCloseCallback = () => this.afkLogic.stopAfkWarningTimer();
 
 		this.inputClassesFactory = new InputClassesFactory(this.streamMessageController, this.videoPlayer, this.normalizeAndQuantize);
@@ -222,7 +222,7 @@ export class webRtcPlayerController {
 		Logger.Log(Logger.GetStackTrace(), "Data Channel Command: " + commandAsString, 6);
 		const command = JSON.parse(commandAsString);
 		if (command.command === "onScreenKeyboard") {
-			this.delegate.activateOnScreenKeyboard(command);
+			this.application.activateOnScreenKeyboard(command);
 		}
 	}
 
@@ -301,7 +301,7 @@ export class webRtcPlayerController {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.InputControlOwnership", 6);
 		const inputControlOwnership = new Boolean(message[1]).valueOf();
 		Logger.Log(Logger.GetStackTrace(), `Received input controller message - will your input control the stream: ${inputControlOwnership}`);
-		this.delegate.onInputControlOwnership(inputControlOwnership);
+		this.application.onInputControlOwnership(inputControlOwnership);
 	}
 
 	onAfkTriggered() : void {
@@ -338,12 +338,12 @@ export class webRtcPlayerController {
 		// if a websocket object has not been created connect normally without closing 
 		if (!this.webSocketController.webSocket) {
 			Logger.Log(Logger.GetStackTrace(), "A websocket connection has not been made yet so we will start the stream");
-			this.delegate.onWebRtcAutoConnect();
+			this.application.onWebRtcAutoConnect();
 			this.connectToSignallingServer();
 
 		} else {
 			// set the replay status so we get a text overlay over an action overlay
-			this.delegate.showActionOrErrorOnDisconnect = false;
+			this.application.showActionOrErrorOnDisconnect = false;
 
 			// set the disconnect message
 			this.setDisconnectMessageOverride("Restarting stream manually");
@@ -353,7 +353,7 @@ export class webRtcPlayerController {
 
 			// wait for the connection to close and restart the connection
 			const autoConnectTimeout = setTimeout(() => {
-				this.delegate.onWebRtcAutoConnect();
+				this.application.onWebRtcAutoConnect();
 				this.connectToSignallingServer();
 				clearTimeout(autoConnectTimeout);
 			}, 3000);
@@ -382,7 +382,7 @@ export class webRtcPlayerController {
 	loadFreezeFrameOrShowPlayOverlay() {
 		if (this.shouldShowPlayOverlay === true) {
 			Logger.Log(Logger.GetStackTrace(), "showing play overlay");
-			this.delegate.showPlayOverlay();
+			this.application.showPlayOverlay();
 			this.resizePlayerStyle();
 		} else {
 			Logger.Log(Logger.GetStackTrace(), "showing freeze frame");
@@ -453,7 +453,7 @@ export class webRtcPlayerController {
 		}
 
 		if (!this.videoPlayer.videoElement) {
-			this.delegate.showErrorOverlay("Could not player video stream because the video player was not initialised correctly.");
+			this.application.showErrorOverlay("Could not player video stream because the video player was not initialised correctly.");
 			Logger.Error(Logger.GetStackTrace(), "Could not player video stream because the video player was not initialised correctly.");
 
 			// set the disconnect message
@@ -463,14 +463,14 @@ export class webRtcPlayerController {
 			this.closeSignalingServer();
 		} else {
 			this.touchController = this.inputClassesFactory.registerTouch(this.config.fakeMouseWithTouches, this.videoElementParentClientRect);
-			this.delegate.hideCurrentOverlay();
+			this.application.hideCurrentOverlay();
 			if (this.streamController.audioElement.srcObject) {
 				this.streamController.audioElement.play().then(() => {
 					this.playVideo();
 				}).catch((onRejectedReason) => {
 					Logger.Log(Logger.GetStackTrace(), onRejectedReason);
 					Logger.Log(Logger.GetStackTrace(), "Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.");
-					this.delegate.showPlayOverlay();
+					this.application.showPlayOverlay();
 				});
 			} else {
 				this.playVideo();
@@ -491,15 +491,15 @@ export class webRtcPlayerController {
 			}
 			Logger.Log(Logger.GetStackTrace(), onRejectedReason);
 			Logger.Log(Logger.GetStackTrace(), "Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.");
-			this.delegate.showPlayOverlay();
+			this.application.showPlayOverlay();
 		});
 	}
 
 	/**
-	 * Enable the video to play automaticity if enableSpsAutoplay is true
+	 * Enable the video to play automaticity if enableAutoplay is true
 	 */
 	autoPlayVideoOrSetUpPlayOverlay() {
-		if (this.config.enableSpsAutoplay === true) {
+		if (this.config.enableAutoplay === true) {
 
 			// set up the auto play on the video element  
 			this.videoPlayer.videoElement.autoplay = true;
@@ -507,7 +507,7 @@ export class webRtcPlayerController {
 			// attempt to play the video
 			this.playStream();
 		} else {
-			this.delegate.showPlayOverlay();
+			this.application.showPlayOverlay();
 		}
 		this.resizePlayerStyle();
 	}
@@ -571,8 +571,8 @@ export class webRtcPlayerController {
 		this.peerConnectionController.onDataChannel = (datachannelEvent: RTCDataChannelEvent) => this.handleDataChannel(datachannelEvent);
 
 		// set up webRtc text overlays 
-		this.peerConnectionController.showTextOverlayConnecting = () => this.delegate.onWebRtcConnecting();
-		this.peerConnectionController.showTextOverlaySetupFailure = () => this.delegate.onWebRtcFailed();
+		this.peerConnectionController.showTextOverlayConnecting = () => this.application.onWebRtcConnecting();
+		this.peerConnectionController.showTextOverlaySetupFailure = () => this.application.onWebRtcFailed();
 
 		/* RTC Peer Connection on Track event -> handle on track */
 		this.peerConnectionController.onTrack = (trackEvent: RTCTrackEvent) => this.streamController.handleOnTrack(trackEvent);
@@ -704,7 +704,7 @@ export class webRtcPlayerController {
 		// start the afk warning timer as PS is now running
 		this.afkLogic.startAfkWarningTimer();
 		// show the overlay that we have negotiated a connection
-		this.delegate.onWebRtcSdp();
+		this.application.onWebRtcSdp();
 
 		setInterval(() => this.getStats(), 1000);
 
@@ -771,7 +771,7 @@ export class webRtcPlayerController {
 	}
 
 	/**
-	 * registers the mouse for use in IWebRtcPlayerController
+	 * registers the mouse for use in WebRtcPlayerController
 	 */
 	activateRegisterMouse() {
 		this.mouseController = this.inputClassesFactory.registerMouse((this.config.isFlagEnabled(Flags.ControlScheme)) ? ControlSchemeType.HoveringMouse : ControlSchemeType.LockedMouse, this.playerStyleAttributes);
@@ -788,7 +788,7 @@ export class webRtcPlayerController {
 
 		const now = new Date().getTime();
 		if (now - this.lastTimeResized > 1000) {
-			const videoElementParent = this.delegate.videoElementParent;
+			const videoElementParent = this.application.videoElementParent;
 			if (!videoElementParent) {
 				return;
 			}
@@ -929,7 +929,7 @@ export class webRtcPlayerController {
 		if (latencyTestResults.frameDisplayDeltaTimeMs && latencyTestResults.browserReceiptTimeMs) {
 			latencyTestResults.endToEndLatency = ~~(latencyTestResults.frameDisplayDeltaTimeMs + latencyTestResults.networkLatency, + latencyTestResults.CaptureToSendMs);
 		}
-		this.delegate.onLatencyTestResult(latencyTestResults);
+		this.application.onLatencyTestResult(latencyTestResults);
 	}
 
 	/**
@@ -958,7 +958,7 @@ export class webRtcPlayerController {
 		initialSettings.ueCompatible()
 		Logger.Log(Logger.GetStackTrace(), payloadAsString, 6);
 
-		this.delegate.onInitialSettings(initialSettings);
+		this.application.onInitialSettings(initialSettings);
 	}
 
 	/**
@@ -968,14 +968,14 @@ export class webRtcPlayerController {
 	handleVideoEncoderAvgQP(message: Uint8Array) {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.VideoEncoderAvgQP", 6);
 		const AvgQP = Number(new TextDecoder("utf-16").decode(message.slice(1)));
-		this.delegate.onVideoEncoderAvgQP(AvgQP);
+		this.application.onVideoEncoderAvgQP(AvgQP);
 	}
 
 	/**
 	 * Handles when the video element has been loaded with a srcObject
 	 */
 	handleVideoInitialised() {
-		this.delegate.onVideoInitialised();
+		this.application.onVideoInitialised();
 
 		// either autoplay the video or set up the play overlay
 		this.autoPlayVideoOrSetUpPlayOverlay();
@@ -992,7 +992,7 @@ export class webRtcPlayerController {
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.QualityControlOwnership", 6);
 		const QualityOwnership = new Boolean(message[1]).valueOf();
 		Logger.Log(Logger.GetStackTrace(), `Received quality controller message, will control quality: ${QualityOwnership}`);
-		this.delegate.onQualityControlOwnership(QualityOwnership);
+		this.application.onQualityControlOwnership(QualityOwnership);
 	}
 
 	/**
@@ -1000,7 +1000,7 @@ export class webRtcPlayerController {
 	 * @param stats - Aggregated Stats
 	 */
 	handleVideoStats(stats: AggregatedStats) {
-		this.delegate.onVideoStats(stats);
+		this.application.onVideoStats(stats);
 	}
 
 	/**

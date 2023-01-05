@@ -28,8 +28,8 @@ module.exports = {
     })
   ],
   output: {
-    filename: 'libspsfrontend.min.js',
-    library: 'libspsfrontend', // exposed variable that will provide access to the library classes
+    filename: 'libfrontend.min.js',
+    library: 'libfrontend', // exposed variable that will provide access to the library classes
     libraryTarget: 'umd',
     path: path.resolve(__dirname, 'dist'),
     clean: false,
