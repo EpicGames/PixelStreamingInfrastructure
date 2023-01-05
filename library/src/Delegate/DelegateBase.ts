@@ -571,8 +571,14 @@ export class DelegateBase implements IDelegate {
 	 * @param videoStats - video statistics as a aggregate stats object 
 	 */
 	onVideoStats(videoStats: AggregatedStats) {
+		
 		// Duration
-		const runTime = new Date(Date.now() - this.videoStartTime).toISOString().substr(11, 8).toString();
+		if(!this.videoStartTime || this.videoStartTime === undefined) {
+			this.videoStartTime = Date.now();
+		}
+
+		const deltaTime = Date.now() - this.videoStartTime;
+		const runTime = new Date(deltaTime).toISOString().substr(11, 8).toString();
 		this.statsPanel.addOrUpdateStat("DurationStat", "Duration", runTime);
 
 		// Input control?

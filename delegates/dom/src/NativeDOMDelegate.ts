@@ -21,7 +21,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 		// Add 'Send Stats to Server' checkbox
 		const spsSettingsSection = this.config.buildSectionWithHeading(this.settingsPanel.settingsContentElement, "Scalable Pixel Streaming");
 		const sendStatsToServerSettings = new libspsfrontend.SettingFlag(
-			NativeDomDelegate.SPSFlags.sendToServer,
+			NativeDOMDelegate.SPSFlags.sendToServer,
 			"Send stats to server",
 			"Send session stats to the server",
 			true
@@ -33,7 +33,7 @@ export class NativeDOMDelegate extends libspsfrontend.DelegateBase {
 	onVideoStats(videoStats: libspsfrontend.AggregatedStats): void {
 		super.onVideoStats(videoStats);
 
-		if (this.config.isFlagEnabled(NativeDomDelegate.SPSFlags.sendToServer)) {
+		if (this.config.isFlagEnabled(NativeDOMDelegate.SPSFlags.sendToServer)) {
 			this.iWebRtcController.sendStatsToSignallingServer(videoStats);
 		}
 	}
