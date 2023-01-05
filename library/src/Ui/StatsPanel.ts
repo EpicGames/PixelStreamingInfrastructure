@@ -23,8 +23,6 @@ export class StatsPanel {
 	_statsCloseButton : HTMLElement;
 	_statsContentElement : HTMLElement;
 	_statisticsContainer : HTMLElement;
-	_sendToServerRow : HTMLElement;
-	_sendToServerCheckbox : HTMLInputElement;
 	_statsResult : HTMLElement;
 
 	latencyTest : LatencyTest;
@@ -33,6 +31,7 @@ export class StatsPanel {
 	statsMap = new Map<string, Stat>();
 
 	constructor() {
+		this._rootElement = null;
 		this.latencyTest = new LatencyTest();
 	}
 
@@ -86,7 +85,6 @@ export class StatsPanel {
 			const sessionStats = document.createElement("div");
 			sessionStats.innerHTML = "Session Stats";
 
-
 			this._statsContentElement.appendChild(streamToolStats);
 			streamToolStats.appendChild(controlStats);
 			controlStats.appendChild(statistics);
@@ -100,49 +98,12 @@ export class StatsPanel {
 		return this._statsContentElement;
 	}
 
-	// Todo: This should not be in the library, but in the implementation
-	public get sendToServerRow() : HTMLElement {
-		if(!this._sendToServerRow) {
-			this._sendToServerRow = document.createElement("div");
-			this._sendToServerRow.classList.add("row");
-
-			const labelContainer = document.createElement("div");
-
-			const sendToServerLabel = document.createElement("label");
-			sendToServerLabel.classList.add("form-check-label");
-			sendToServerLabel.setAttribute("for", "send-stats-tgl");
-			sendToServerLabel.id = "control-scheme-title";
-			sendToServerLabel.innerHTML = "Send To Server";
-
-			const checkboxContainer = document.createElement("div");
-			checkboxContainer.classList.add("form-check");
-			checkboxContainer.classList.add("form-switch");
-
-			this._sendToServerRow.appendChild(labelContainer);
-			labelContainer.appendChild(sendToServerLabel);
-			this.sendToServerRow.appendChild(checkboxContainer);
-			checkboxContainer.appendChild(this.sendToServerCheckbox);
-		}
-		return this._sendToServerRow;
-	}
-
-	public get sendToServerCheckbox() : HTMLInputElement {
-		if(!this._sendToServerCheckbox) {
-			this._sendToServerCheckbox = document.createElement("input");
-			this._sendToServerCheckbox.type = "checkbox";
-			this._sendToServerCheckbox.setAttribute("role", "switch");
-			this._sendToServerCheckbox.classList.add("form-check-input");
-			this._sendToServerCheckbox.id = "send-stats-tgl";
-		}
-		return this._sendToServerCheckbox;
-	}
 
 	public get statisticsContainer() : HTMLElement {
 		if(!this._statisticsContainer) {
 			this._statisticsContainer = document.createElement("div");
 			this._statisticsContainer.id = "statisticsContainer";
 			this._statisticsContainer.classList.add("d-none");
-			this._statisticsContainer.appendChild(this.sendToServerRow);
 			this._statisticsContainer.appendChild(this.statsResult);
 		}
 		return this._statisticsContainer;
