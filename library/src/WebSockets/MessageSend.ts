@@ -25,7 +25,7 @@ export enum MessageSendTypes {
  */
 export class MessageSend implements Send {
     type: string;
-    peerConnectionOptions: Object;
+    peerConnectionOptions: object;
 
     /**
      * Turns the wrapper into a JSON String
