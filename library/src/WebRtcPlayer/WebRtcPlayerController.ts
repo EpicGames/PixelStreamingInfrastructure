@@ -68,6 +68,7 @@ export class WebRtcPlayerController {
 	normalizeAndQuantize: NormalizeAndQuantize;
 	playerStyleAttributes: PlayerStyleAttributes = new PlayerStyleAttributes();
 	isUsingSFU: boolean;
+	statsTimerHandle: number;
 
 	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
 	// it will use this property to store the override message string
@@ -711,7 +712,11 @@ export class WebRtcPlayerController {
 		// show the overlay that we have negotiated a connection
 		this.application.onWebRtcSdp();
 
-		setInterval(() => this.getStats(), 1000);
+		if(this.statsTimerHandle && this.statsTimerHandle !== undefined) {
+			window.clearInterval(this.statsTimerHandle);
+		}
+
+		this.statsTimerHandle = window.setInterval(() => this.getStats(), 1000);
 
 		/*  */
 		this.activateRegisterMouse()
@@ -827,6 +832,12 @@ export class WebRtcPlayerController {
 	 * Close the Connection to the signaling server
 	 */
 	closeSignalingServer() {
+
+		// stop sending stats on interval if we have closed our connection
+		if(this.statsTimerHandle && this.statsTimerHandle !== undefined) {
+			window.clearInterval(this.statsTimerHandle);
+		}
+
 		this.webSocketController.close();
 	}
 
