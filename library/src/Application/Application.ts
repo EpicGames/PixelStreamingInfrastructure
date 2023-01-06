@@ -192,9 +192,8 @@ export class Application {
 			this.webRtcController.setAfkEnabled(isAFKEnabled);
 		});
 
-		this.config.addOnSettingChangedListener(Flags.MatchViewportResolution, (shouldMatch : boolean) => {
-			this.webRtcController.matchViewportResolution = shouldMatch;
-			this.webRtcController.updateVideoStreamSize();
+		this.config.addOnSettingChangedListener(Flags.MatchViewportResolution, () => {
+			this.webRtcController.videoPlayer.updateVideoStreamSize();
 		});
 
 		this.config.addOnSettingChangedListener(Flags.HoveringMouseMode, (isHoveringMouse : boolean) => {

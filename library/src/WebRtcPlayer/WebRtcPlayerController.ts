@@ -1,7 +1,6 @@
 import { WebSocketController } from "../WebSockets/WebSocketController";
 import { StreamController } from "../VideoPlayer/StreamController";
 import { MessageAnswer, MessageOffer, MessageConfig } from "../WebSockets/MessageReceive";
-import { UiController } from "../UI/UiController";
 import { FreezeFrameController } from "../FreezeFrame/FreezeFrameController";
 import { AFKController } from "../AFK/AFKController";
 import { DataChannelController } from "../DataChannel/DataChannelController";
@@ -47,15 +46,11 @@ export class WebRtcPlayerController {
 	videoPlayer: VideoPlayer;
 	streamController: StreamController;
 	peerConnectionController: PeerConnectionController;
-	uiController: UiController;
 	inputClassesFactory: InputClassesFactory;
 	freezeFrameController: FreezeFrameController;
 	shouldShowPlayOverlay = true;
 	afkController: AFKController;
 	videoElementParentClientRect: DOMRect;
-	lastTimeResized = new Date().getTime();
-	matchViewportResolution: boolean;
-	resizeTimeout: ReturnType<typeof setTimeout>;
 	latencyStartTime: number;
 	application: Application;
 	streamMessageController: StreamMessageController;
@@ -103,14 +98,25 @@ export class WebRtcPlayerController {
 
 		this.freezeFrameController = new FreezeFrameController(this.application.videoElementParent);
 
-		this.videoPlayer = new VideoPlayer(this.application.videoElementParent, this.config);
+		this.videoPlayer = new VideoPlayer(this.application.videoElementParent, this.config, this.playerStyleAttributes);
 		this.videoPlayer.onVideoInitialised = () => this.handleVideoInitialised();
+		
+		// When in match viewport resolution mode, when the browser viewport is resized we send a resize command back to UE.
+		this.videoPlayer.onMatchViewportResolutionCallback = (width: number, height: number) => {
+			const descriptor = {
+				"Resolution.Width": width,
+				"Resolution.Height": height
+			};
+
+			this.sendDescriptorController.emitCommand(descriptor);
+		}
+
+		// Everytime video player is resized in browser we need to reinitialize the mouse coordinate conversion and freeze frame sizing logic.
+		this.videoPlayer.onResizePlayerCallback = () => { this.setUpMouseAndFreezeFrame(); }
+
 		this.streamController = new StreamController(this.videoPlayer);
 
 		this.coordinateConverter = new CoordinateConverter(this.videoPlayer);
-
-		this.uiController = new UiController(this.videoPlayer, this.playerStyleAttributes);
-		this.uiController.setUpMouseAndFreezeFrame = () => this.setUpMouseAndFreezeFrame();
 
 		this.sendrecvDataChannelController = new DataChannelController();
 		this.recvDataChannelController = new DataChannelController();
@@ -790,37 +796,6 @@ export class WebRtcPlayerController {
 	}
 
 	/**
-	 * Handles when the stream size changes
-	 */
-	updateVideoStreamSize() {
-		// Call the setter before calling this function
-		if (!this.matchViewportResolution) {
-			return;
-		}
-
-		const now = new Date().getTime();
-		if (now - this.lastTimeResized > 1000) {
-			const videoElementParent = this.application.videoElementParent;
-			if (!videoElementParent) {
-				return;
-			}
-
-			const descriptor = {
-				"Resolution.Width": videoElementParent.clientWidth,
-				"Resolution.Height": videoElementParent.clientHeight
-			};
-
-			this.sendDescriptorController.emitCommand(descriptor);
-			this.lastTimeResized = new Date().getTime();
-		}
-		else {
-			Logger.Log(Logger.GetStackTrace(), 'Resizing too often - skipping', 6);
-			clearTimeout(this.resizeTimeout);
-			this.resizeTimeout = setTimeout(this.updateVideoStreamSize, 1000);
-		}
-	}
-
-	/**
 	 * Set the freeze frame overlay to the player div
 	 */
 	setUpMouseAndFreezeFrame() {
@@ -992,7 +967,7 @@ export class WebRtcPlayerController {
 		// either autoplay the video or set up the play overlay
 		this.autoPlayVideoOrSetUpPlayOverlay();
 		this.resizePlayerStyle();
-		this.uiController.updateVideoStreamSize = () => this.updateVideoStreamSize();
+		this.videoPlayer.updateVideoStreamSize();
 	}
 
 	/**
@@ -1019,7 +994,7 @@ export class WebRtcPlayerController {
 	* To Resize the Video Player element
 	*/
 	resizePlayerStyle(): void {
-		this.uiController.resizePlayerStyle();
+		this.videoPlayer.resizePlayerStyle();
 	}
 
 	/**
