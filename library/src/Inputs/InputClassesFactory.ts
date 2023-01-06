@@ -3,7 +3,7 @@ import { KeyboardController } from "./KeyboardController";
 import { MouseController } from "./MouseController";
 import { TouchController } from "./TouchController";
 import { GamePadController } from "./GamepadController";
-import { ControlSchemeType } from "../Config/Config";
+import { Config, ControlSchemeType } from "../Config/Config";
 import { LockedMouseEvents } from "./LockedMouseEvents";
 import { HoveringMouseEvents } from "./HoveringMouseEvents";
 import { IMouseEvents } from "./IMouseEvents";
@@ -34,12 +34,11 @@ export class InputClassesFactory {
     }
 
     /**
-     * registers browser key events  
-     * @param suppressBrowserKeys - option to suppress browser keys 
+     * Registers browser key events.
      */
-    registerKeyBoard(suppressBrowserKeys: boolean) {
+    registerKeyBoard(config: Config) {
         Logger.Log(Logger.GetStackTrace(), "Register Keyboard Events", 7);
-        const keyboardController = new KeyboardController(this.toStreamerMessagesProvider, suppressBrowserKeys, this.activeKeys);
+        const keyboardController = new KeyboardController(this.toStreamerMessagesProvider, this.activeKeys, config);
         keyboardController.registerKeyBoardEvents();
         return keyboardController;
     }

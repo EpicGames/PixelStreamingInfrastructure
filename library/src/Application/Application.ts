@@ -125,7 +125,7 @@ export class Application {
 		// Add button for restart stream
 		const restartStreamButton = new LabelledButton("Restart Stream", "Restart");
 		restartStreamButton.addOnClickListener(()=>{
-			this.webRtcController.restartStreamAutomaticity();
+			this.webRtcController.restartStreamAutomatically();
 		});
 
 		// Add button for request keyframe
@@ -202,12 +202,12 @@ export class Application {
 
 		this.config.addOnSettingChangedListener(Flags.ControlScheme, (isHoveringMouse : boolean) => {
 			if (isHoveringMouse) {
-				this.config.setFlagLabel(Flags.ControlScheme, "Control Scheme: Hovering Mouse");
-				this.config.setFlagEnabled(Flags.ControlScheme, true);
+				this.config.setFlagLabel(Flags.HoveringMouseMode, "Control Scheme: Hovering Mouse");
+				this.config.setFlagEnabled(Flags.HoveringMouseMode, true);
 				this.webRtcController.activateRegisterMouse();
 			} else {
-				this.config.setFlagLabel(Flags.ControlScheme, "Control Scheme: Locked Mouse");
-				this.config.setFlagEnabled(Flags.ControlScheme, false);
+				this.config.setFlagLabel(Flags.HoveringMouseMode, "Control Scheme: Locked Mouse");
+				this.config.setFlagEnabled(Flags.HoveringMouseMode, false);
 				this.webRtcController.activateRegisterMouse();
 			}
 		});
@@ -452,7 +452,7 @@ export class Application {
 	 */
 	showConnectOrAutoConnectOverlays() {
 		// set up if the auto play will be used or regular click to start
-		if (!this.config.enableAutoConnect) {
+		if (!this.config.isFlagEnabled(Flags.AutoConnect)) {
 			this.showConnectOverlay();
 		} else {
 			// if autoplaying show an info overlay while while waiting for the connection to begin 

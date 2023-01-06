@@ -68,6 +68,7 @@ export class WebRtcPlayerController {
 	normalizeAndQuantize: NormalizeAndQuantize;
 	playerStyleAttributes: PlayerStyleAttributes = new PlayerStyleAttributes();
 	isUsingSFU: boolean;
+	statsTimerHandle: number;
 
 	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
 	// it will use this property to store the override message string
@@ -96,7 +97,7 @@ export class WebRtcPlayerController {
 
 		this.freezeFrameController = new FreezeFrameController(this.application.videoElementParent);
 
-		this.videoPlayer = new VideoPlayer(this.application.videoElementParent, this.config.startVideoMuted);
+		this.videoPlayer = new VideoPlayer(this.application.videoElementParent, this.config);
 		this.videoPlayer.onVideoInitialised = () => this.handleVideoInitialised();
 		this.streamController = new StreamController(this.videoPlayer);
 
@@ -116,6 +117,14 @@ export class WebRtcPlayerController {
 		this.webSocketController = new WebSocketController();
 		this.webSocketController.onConfig = (messageConfig: MessageReceive.MessageConfig) => this.handleOnConfigMessage(messageConfig);
 		this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => this.application.onDisconnect(`${event.code} - ${event.reason}`);
+		this.webSocketController.onClose.addEventListener("close", () => {
+			this.afkLogic.stopAfkWarningTimer();
+
+			// stop sending stats on interval if we have closed our connection
+			if (this.statsTimerHandle && this.statsTimerHandle !== undefined) {
+				window.clearInterval(this.statsTimerHandle);
+			}
+		})
 
 		// set up the final webRtc player controller methods from within our application so a connection can be activated
 		this.sendDescriptorController = new SendDescriptorController(this.dataChannelSender, this.streamMessageController);
@@ -129,7 +138,6 @@ export class WebRtcPlayerController {
 		this.afkLogic.showAfkOverlay = () => this.application.showAfkOverlay(this.afkLogic.countDown);
 		this.afkLogic.updateAfkCountdown = () => this.application.updateAfkOverlay(this.afkLogic.countDown);
 		this.afkLogic.hideCurrentOverlay = () => this.application.hideCurrentOverlay();
-		this.webSocketController.onCloseCallback = () => this.afkLogic.stopAfkWarningTimer();
 
 		this.inputClassesFactory = new InputClassesFactory(this.streamMessageController, this.videoPlayer, this.normalizeAndQuantize);
 
@@ -310,7 +318,7 @@ export class WebRtcPlayerController {
 		this.afkLogic.onAfkClick();
 
 		// if the stream is paused play it, if we can
-		if (this.videoPlayer.videoElement.paused === true && this.videoPlayer.videoElement.srcObject) {
+		if (this.videoPlayer.isPaused() && this.videoPlayer.hasVideoSource()) {
 			this.playStream();
 		}
 	}
@@ -328,9 +336,9 @@ export class WebRtcPlayerController {
 	}
 
 	/**
-	 * Restart the stream automaticity without refreshing the page
+	 * Restart the stream automatically without refreshing the page
 	 */
-	restartStreamAutomaticity() {
+	restartStreamAutomatically() {
 		// if there is no webSocketController return immediately or this will not work
 		if (!this.webSocketController) {
 			Logger.Log(Logger.GetStackTrace(), "The Web Socket Controller does not exist so this will not work right now.");
@@ -348,7 +356,7 @@ export class WebRtcPlayerController {
 			this.application.showActionOrErrorOnDisconnect = false;
 
 			// set the disconnect message
-			this.setDisconnectMessageOverride("Restarting stream manually");
+			this.setDisconnectMessageOverride("Restarting stream...");
 
 			// close the connection 
 			this.closeSignalingServer();
@@ -404,7 +412,7 @@ export class WebRtcPlayerController {
 		setTimeout(() => {
 			this.freezeFrameController.hideFreezeFrame();
 		}, this.freezeFrameController.freezeFrameDelay);
-		if (this.videoPlayer.videoElement) {
+		if (this.videoPlayer.getVideoElement()) {
 			this.videoPlayer.setVideoEnabled(true);
 		}
 	}
@@ -440,13 +448,8 @@ export class WebRtcPlayerController {
 	 * Plays the stream audio and video source and sets up other pieces while the stream starts
 	 */
 	playStream() {
-		if(!this.videoPlayer.videoElement.srcObject){
-			Logger.Warning(Logger.GetStackTrace(), "Cannot play stream, the video element has no srcObject to play.");
-			return;
-		}
-
-		if (!this.videoPlayer.videoElement) {
-			this.application.showErrorOverlay("Could not player video stream because the video player was not initialised correctly.");
+		if (!this.videoPlayer.getVideoElement()) {
+			this.application.showErrorOverlay("Could not play video stream because the video player was not initialised correctly.");
 			Logger.Error(Logger.GetStackTrace(), "Could not player video stream because the video player was not initialised correctly.");
 
 			// set the disconnect message
@@ -454,31 +457,42 @@ export class WebRtcPlayerController {
 
 			// close the connection 
 			this.closeSignalingServer();
-		} else {
-			this.touchController = this.inputClassesFactory.registerTouch(this.config.fakeMouseWithTouches, this.videoElementParentClientRect);
-			this.application.hideCurrentOverlay();
-			if (this.streamController.audioElement.srcObject) {
-				this.streamController.audioElement.play().then(() => {
-					this.playVideo();
-				}).catch((onRejectedReason) => {
-					Logger.Log(Logger.GetStackTrace(), onRejectedReason);
-					Logger.Log(Logger.GetStackTrace(), "Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.");
-					this.application.showPlayOverlay();
-				});
-			} else {
-				this.playVideo();
-			}
-			this.shouldShowPlayOverlay = false;
-			this.freezeFrameController.showFreezeFrame();
+			return;
 		}
+
+		if (!this.videoPlayer.hasVideoSource()) {
+			Logger.Warning(Logger.GetStackTrace(), "Cannot play stream, the video element has no srcObject to play.");
+			return;
+		}
+
+		this.touchController = this.inputClassesFactory.registerTouch(this.config.isFlagEnabled(Flags.FakeMouseWithTouches), this.videoElementParentClientRect);
+		this.application.hideCurrentOverlay();
+
+		if (this.streamController.audioElement.srcObject) {
+
+			this.streamController.audioElement.muted = this.config.isFlagEnabled(Flags.StartVideoMuted);
+
+			this.streamController.audioElement.play().then(() => {
+				this.playVideo();
+			}).catch((onRejectedReason) => {
+				Logger.Log(Logger.GetStackTrace(), onRejectedReason);
+				Logger.Log(Logger.GetStackTrace(), "Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.");
+				this.application.showPlayOverlay();
+			});
+		} else {
+			this.playVideo();
+		}
+
+		this.shouldShowPlayOverlay = false;
+		this.freezeFrameController.showFreezeFrame();
 	}
 
 	/**
 	 * Plays the video stream
 	 */
 	private playVideo() {
-		// // handle play() with promise as it is an asynchronous call  
-		this.videoPlayer.videoElement.play().catch((onRejectedReason: string) => {
+		// handle play() with promise as it is an asynchronous call  
+		this.videoPlayer.play().catch((onRejectedReason: string) => {
 			if (this.streamController.audioElement.srcObject) {
 				this.streamController.audioElement.pause();
 			}
@@ -492,11 +506,7 @@ export class WebRtcPlayerController {
 	 * Enable the video to play automaticity if enableAutoplay is true
 	 */
 	autoPlayVideoOrSetUpPlayOverlay() {
-		if (this.config.enableAutoplay === true) {
-
-			// set up the auto play on the video element  
-			this.videoPlayer.videoElement.autoplay = true;
-
+		if (this.config.isFlagEnabled(Flags.AutoPlayVideo)) {
 			// attempt to play the video
 			this.playStream();
 		} else {
@@ -698,11 +708,15 @@ export class WebRtcPlayerController {
 		// show the overlay that we have negotiated a connection
 		this.application.onWebRtcSdp();
 
-		setInterval(() => this.getStats(), 1000);
+		if (this.statsTimerHandle && this.statsTimerHandle !== undefined) {
+			window.clearInterval(this.statsTimerHandle);
+		}
+
+		this.statsTimerHandle = window.setInterval(() => this.getStats(), 1000);
 
 		/*  */
 		this.activateRegisterMouse()
-		this.keyboardController = this.inputClassesFactory.registerKeyBoard(this.config.suppressBrowserKeys);
+		this.keyboardController = this.inputClassesFactory.registerKeyBoard(this.config);
 		this.gamePadController = this.inputClassesFactory.registerGamePad();
 	}
 
@@ -766,7 +780,7 @@ export class WebRtcPlayerController {
 	 * registers the mouse for use in WebRtcPlayerController
 	 */
 	activateRegisterMouse() {
-		this.mouseController = this.inputClassesFactory.registerMouse((this.config.isFlagEnabled(Flags.ControlScheme)) ? ControlSchemeType.HoveringMouse : ControlSchemeType.LockedMouse);
+		this.mouseController = this.inputClassesFactory.registerMouse((this.config.isFlagEnabled(Flags.HoveringMouseMode)) ? ControlSchemeType.HoveringMouse : ControlSchemeType.LockedMouse);
 	}
 
 	/**

@@ -2,6 +2,7 @@ import { SpecialKeyCodes } from "./SpecialKeyCodes";
 import { Logger } from "../Logger/Logger";
 import { ActiveKeys } from "./InputClassesFactory";
 import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";
+import { Config, Flags } from "../Config/Config";
 
 interface ICodeToKeyCode {
     [key: string]: number;
@@ -12,8 +13,8 @@ interface ICodeToKeyCode {
  */
 export class KeyboardController {
     toStreamerMessagesProvider: StreamMessageController;
-    suppressBrowserKeys: boolean;
     activeKeysProvider: ActiveKeys;
+	config: Config;
 
     /* 
     * New browser APIs have moved away from KeyboarddEvent.keyCode to KeyboardEvent.Code. 
@@ -126,12 +127,12 @@ export class KeyboardController {
 
     /**
      * @param toStreamerMessagesProvider Stream message provider class object
-     * @param suppressBrowserKeys Suppress Browser Keys
+     * @param config The applications configuration. We're interested in the suppress browser keys option
      * @param activeKeysProvider Active keys provider class object
      */
-    constructor(toStreamerMessagesProvider: StreamMessageController, suppressBrowserKeys: boolean, activeKeysProvider: ActiveKeys) {
+    constructor(toStreamerMessagesProvider: StreamMessageController, config: Config, activeKeysProvider: ActiveKeys) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
-        this.suppressBrowserKeys = suppressBrowserKeys;
+		this.config = config;
         this.activeKeysProvider = activeKeysProvider;
     }
 
@@ -166,7 +167,7 @@ export class KeyboardController {
             document.onkeypress.apply("charCode", SpecialKeyCodes.backSpace);
         }
 
-        if (this.suppressBrowserKeys && this.isKeyCodeBrowserKey(keyCode)) {
+		if (this.config.isFlagEnabled(Flags.SuppressBrowserKeys) && this.isKeyCodeBrowserKey(keyCode)) {
             keyboardEvent.preventDefault();
         }
     }
@@ -184,7 +185,7 @@ export class KeyboardController {
         const toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
         toStreamerHandlers.get("KeyUp")("KeyUp", [keyCode, keyboardEvent.repeat ? 1 : 0]);
 
-        if (this.suppressBrowserKeys && this.isKeyCodeBrowserKey(keyCode)) {
+		if (this.config.isFlagEnabled(Flags.SuppressBrowserKeys) && this.isKeyCodeBrowserKey(keyCode)) {
             keyboardEvent.preventDefault();
         }
     }

@@ -1,3 +1,5 @@
+import { Config, Flags } from "../Config/Config";
+
 /**
  * Extra types for the HTMLElement 
  */
@@ -13,16 +15,17 @@ declare global {
  * The video player html element 
  */
 export class VideoPlayer {
-    videoElement: HTMLVideoElement;
+	private config: Config;
+    private videoElement: HTMLVideoElement;
 
     /**
      * @param videoElementParent the html div the the video player will be injected into 
-     * @param startVideoMuted will the video be started muted 
+     * @param config the applications configuration. We're interested in the startVideoMuted flag
      */
-    constructor(videoElementParent: HTMLElement, startVideoMuted: boolean) {
+    constructor(videoElementParent: HTMLElement, config: Config) {
         this.videoElement = document.createElement("video");
+		this.config = config;
         this.videoElement.id = "streamingVideo";
-        this.videoElement.muted = startVideoMuted;
         this.videoElement.disablePictureInPicture = true;
         this.videoElement.playsInline = true;
         this.videoElement.style.width = "100%";
@@ -43,12 +46,36 @@ export class VideoPlayer {
 		}
     }
 
+	/**
+	 * Sets up the video element with any application config and plays the video element.
+	 * @returns A promise for if playing the video was successful or not.
+	 */
+	play(): Promise<void> {
+		this.videoElement.muted = this.config.isFlagEnabled(Flags.StartVideoMuted);
+		this.videoElement.autoplay = this.config.isFlagEnabled(Flags.AutoPlayVideo);
+		return this.videoElement.play();
+	}
+
+	/**
+	 * @returns True if the video element is paused.
+	 */
+	isPaused(): boolean {
+		return this.videoElement.paused;
+	}
+
     /**
      * @returns - whether the video element is playing.
      */
     isVideoReady(): boolean {
         return this.videoElement.readyState !== undefined && this.videoElement.readyState > 0;
     }
+
+	/** 
+	 * @returns True if the video element has a valid video source (srcObject).
+	 */
+	hasVideoSource(): boolean {
+		return this.videoElement.srcObject !== undefined && this.videoElement.srcObject !== null;
+	}
 
     /**
      * Get the current context of the html video element

@@ -1,9 +1,10 @@
-import { Config, Flags } from "../Config/Config";
+import { Config, Flags, NumericParameters } from "../Config/Config";
 import { Logger } from "../Logger/Logger";
 export class AfkLogic {
     // time out logic details 
     closeTimeout = 10;
     active = false;
+    countdownActive = false;
     warnTimer: ReturnType<typeof setTimeout> = undefined;
     countDown = 0;
     countDownTimer: ReturnType<typeof setInterval> = undefined;
@@ -18,14 +19,18 @@ export class AfkLogic {
      */
     onAfkClick() {
         clearInterval(this.countDownTimer);
-        this.startAfkWarningTimer();
+
+        if(this.active || this.countdownActive) {
+            this.startAfkWarningTimer();
+            this.hideCurrentOverlay();
+        }
     }
 
     /**
      * Start the warning timer if a timeout is set greater that 0 seconds   
      */
     startAfkWarningTimer() {
-        if (this.config.afkTimeout > 0 && this.config.isFlagEnabled(Flags.AFKDetection)) {
+        if (this.config.getNumericSettingValue(NumericParameters.AFKTimeoutSecs) > 0 && this.config.isFlagEnabled(Flags.AFKDetection)) {
             this.active = true;
         } else {
             this.active = false;
@@ -38,6 +43,7 @@ export class AfkLogic {
      */
     stopAfkWarningTimer() {
         this.active = false;
+        this.countdownActive = false;
         clearInterval(this.warnTimer);
         clearInterval(this.countDownTimer);
     }
@@ -55,7 +61,7 @@ export class AfkLogic {
     resetAfkWarningTimer() {
         if (this.active && this.config.isFlagEnabled(Flags.AFKDetection)) {
             clearTimeout(this.warnTimer);
-            this.warnTimer = setTimeout(() => this.activateAfkEvent(), this.config.afkTimeout * 1000);
+            this.warnTimer = setTimeout(() => this.activateAfkEvent(), this.config.getNumericSettingValue(NumericParameters.AFKTimeoutSecs) * 1000);
         }
     }
 
@@ -71,10 +77,11 @@ export class AfkLogic {
 
         // update our countDown timer and overlay contents
         this.countDown = this.closeTimeout;
+        this.countdownActive = true;
         this.updateAfkCountdown();
 
         // if we are in locked mouse exit pointerlock
-		if (!this.config.isFlagEnabled(Flags.ControlScheme)) {
+		if (!this.config.isFlagEnabled(Flags.HoveringMouseMode)) {
             // minor hack to alleviate ios not supporting pointerlock
             if (document.exitPointerLock) {
                 document.exitPointerLock();

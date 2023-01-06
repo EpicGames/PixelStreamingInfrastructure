@@ -17,10 +17,11 @@ declare global {
 export class WebSocketController {
     WS_OPEN_STATE = 1;
     webSocket: WebSocket;
-    onCloseCallback : () => void;
+    onClose : EventTarget;
     signallingProtocol: SignallingProtocol;
 
     constructor() {
+        this.onClose = new EventTarget();
         this.signallingProtocol = new SignallingProtocol();
         SignallingProtocol.setupDefaultHandlers(this);
     }
@@ -117,9 +118,7 @@ export class WebSocketController {
     handleOnClose(event: CloseEvent) {
         this.onWebSocketOncloseOverlayMessage(event);
         Logger.Log(Logger.GetStackTrace(), "Disconnected to the signalling server via WebSocket: " + JSON.stringify(event.code) + " - " + event.reason);
-        if(this.onCloseCallback) {
-            this.onCloseCallback();
-        }
+        this.onClose.dispatchEvent(new Event("close"));
     }
 
     sendWebRtcOffer(offer: RTCSessionDescriptionInit) {

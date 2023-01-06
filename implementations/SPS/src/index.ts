@@ -6,8 +6,6 @@ import * as libfrontend from '@epicgames/libfrontend';
 
 // Create a config object
 let config = new libfrontend.Config();
-config.enableAutoConnect = false;
-config.enableAutoplay = true;
 
 // Extremely important, SPS only support browser sending the offer.
 config.setFlagEnabled(libfrontend.Flags.BrowserSendOffer, true);

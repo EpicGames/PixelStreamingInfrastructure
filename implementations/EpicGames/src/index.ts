@@ -5,8 +5,6 @@ import * as libfrontend from '@epicgames/libfrontend';
 
 // Create a config object
 let config = new libfrontend.Config();
-config.enableAutoConnect = false;
-config.enableAutoplay = true;
 
 // Create a Native DOM delegate instance that implements the Delegate interface class
 let application = new libfrontend.Application(config);
