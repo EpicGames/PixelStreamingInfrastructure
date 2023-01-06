@@ -4,8 +4,6 @@ import { TextOverlay } from "./TextOverlay";
  * Generic overlay used to show textual info to the user.
  */
 export class InfoOverlay extends TextOverlay {
-	private speed = 5;
-
 	/**
 	* @returns The created root element of this overlay.
 	*/

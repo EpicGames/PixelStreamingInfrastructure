@@ -7,6 +7,10 @@
 	--colour5:#ffab00;
 	--colour6:#1e1d22;
 	--colour7:#3c3b40;
+	--colour8: #41008c;
+	--colour9: #3e0070;
+	--colour10: #2e0052;
+	--colour11: rgba(65,0,139,1);
 }
 
 .noselect {
@@ -335,7 +339,6 @@ object {
 	align-items: center;
 	justify-content: center;
 	text-transform: uppercase;
-
 }
 
 /* State for element to be clickable */
@@ -353,7 +356,7 @@ object {
 
 /* State to hide overlay, WebRTC communication is in progress and or is playing */
 .hiddenState {
-	display: none;
+	display: none !important;
 }
 
 #playButton,
@@ -641,4 +644,106 @@ g {
 	fill: var(--colour2);
 }
 
-/* STREAM TOOLS */
+
+/* CUSTOM SPS STYLING */
+/* Loading overlay */
+#loadingOverlay {
+	z-index: 30;
+	position: absolute;
+	color: var(--colour2);
+	font-size: 1.8em;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	justify-content: center;
+	text-transform: uppercase;
+	display: flex;
+	overflow: hidden;
+}
+
+#loadingOverlayText {
+	align-self: flex-end;
+	padding-bottom: 1%;
+	display: inline-block;
+	text-align: center;
+}
+
+#loadingOverlayAnimation {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+}
+
+#dropContainer {
+	width: 100%;
+	height: 100%;
+	animation: rain 5s linear infinite;
+	position: absolute;
+}
+
+/* Rain drops */
+drop {
+	position: absolute;
+	height: 20%;
+	background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.5) 50%, var(--colour11) 100%);
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	overflow: hidden;
+}
+
+/* drop:nth-child(3n + 1) {
+	background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.5) 50%, var(--colour9) 100%);
+}
+
+drop:nth-child(3n + 2) {
+	background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.5) 50%, var(--colour10)  100%);
+} */
+
+@keyframes rain {
+	0% {
+		transform: translateY(-20%);
+	}
+
+	100% {
+		transform: translateY(calc(100% + 20%));
+	}
+}
+
+/* Loading spinner */
+.loading-spinner {
+  display: inline-block;
+  position: relative;
+}
+.loading-spinner div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  margin: 12.5%;
+  border: 1px solid var(--colour2);
+  border-radius: 50%;
+  animation: loading-spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: var(--colour2) transparent transparent transparent;
+}
+.loading-spinner div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+.loading-spinner div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.loading-spinner div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+@keyframes loading-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#drophead {
+	background-color: var(--colour11);
+	position: absolute;
+	top: 100%;
+}

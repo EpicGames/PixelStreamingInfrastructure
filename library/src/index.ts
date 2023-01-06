@@ -20,5 +20,15 @@ export { MessageRecv } from "./WebSockets/MessageReceive"
 export { WebSocketController } from "./WebSockets/WebSocketController"
 export { SignallingProtocol } from "./WebSockets/SignallingProtocol"
 
+export { ActionOverlay } from "./Overlay/ActionOverlay";
+export { AfkOverlay } from "./Overlay/AfkOverlay";
+export { OverlayBase } from "./Overlay/BaseOverlay";
+export { ConnectOverlay } from "./Overlay/ConnectOverlay";
+export { DisconnectOverlay } from "./Overlay/DisconnectOverlay";
+export { ErrorOverlay } from "./Overlay/ErrorOverlay";
+export { InfoOverlay } from "./Overlay/InfoOverlay";
+export { PlayOverlay } from "./Overlay/PlayOverlay";
+export { TextOverlay } from "./Overlay/TextOverlay";
+
 declare let LIBRARY_VERSION: string;
 export const version = LIBRARY_VERSION;

@@ -1,9 +1,10 @@
 import * as libfrontend from '@epicgames/libfrontend'
+import { LoadingOverlay } from './LoadingOverlay';
 import { SPSSignalling } from './SignallingExtension';
 
 
 export class SPSApplication extends libfrontend.Application {
-	
+	private loadingOverlay : LoadingOverlay;
 	private signallingExtension : SPSSignalling;
 
 	static Flags = class {
@@ -28,6 +29,7 @@ export class SPSApplication extends libfrontend.Application {
 		);
 
 		this.config.addSettingFlag(spsSettingsSection, sendStatsToServerSettings);
+		this.loadingOverlay = new LoadingOverlay(this.videoElementParent);
 	}
 
 	onVideoStats(videoStats: libfrontend.AggregatedStats): void {
@@ -42,7 +44,7 @@ export class SPSApplication extends libfrontend.Application {
 		if(isError) { 
 			this.showErrorOverlay(signallingResp);
 		} else { 
-			this.showTextOverlay(signallingResp);
+			this.showLoadingOverlay(signallingResp);
 		}
 	}
 
@@ -59,4 +61,11 @@ export class SPSApplication extends libfrontend.Application {
 		};
 	}
 
+	showLoadingOverlay(signallingResp: string) {
+		this.hideCurrentOverlay();
+		this.loadingOverlay.show();
+		this.loadingOverlay.update(signallingResp);
+		this.loadingOverlay.animate();
+		this.currentOverlay = this.loadingOverlay;
+	}
 }
