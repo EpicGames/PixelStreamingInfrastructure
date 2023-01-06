@@ -8,7 +8,7 @@ export { SettingNumber } from "./Config/SettingNumber"
 export { LabelledButton } from "./Ui/LabelledButton"
 export { Application } from "./Application/Application"
 
-export { AfkLogic } from './Afk/AfkLogic';
+export { AFKController as AfkLogic } from './AFK/AFKController';
 
 export { LatencyTestResults } from "./DataChannel/LatencyTestResults";
 export { EncoderSettings, InitialSettings, WebRTCSettings } from './DataChannel/InitialSettings';

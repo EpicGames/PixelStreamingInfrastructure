@@ -13,7 +13,6 @@ import { Controls } from "../Ui/Controls"
 import { LabelledButton } from "../Ui/LabelledButton";
 import { OverlayBase } from "../Overlay/BaseOverlay";
 import { ActionOverlay } from "../Overlay/ActionOverlay"
-import { AfkOverlay } from "../Overlay/AfkOverlay";
 import { TextOverlay } from "../Overlay/TextOverlay";
 import { ConnectOverlay } from "../Overlay/ConnectOverlay";
 import { DisconnectOverlay } from "../Overlay/DisconnectOverlay";
@@ -45,7 +44,6 @@ export class Application {
 	disconnectOverlay: ActionOverlay;
 	connectOverlay: ActionOverlay;
 	playOverlay: ActionOverlay;
-	afkOverlay: AfkOverlay;
 	infoOverlay: TextOverlay;
 	errorOverlay: TextOverlay;
 
@@ -90,7 +88,6 @@ export class Application {
 		this.disconnectOverlay = new DisconnectOverlay(this.videoElementParent);
 		this.connectOverlay = new ConnectOverlay(this.videoElementParent);
 		this.playOverlay = new PlayOverlay(this.videoElementParent);
-		this.afkOverlay = new AfkOverlay(this.videoElementParent);
 		this.infoOverlay = new InfoOverlay(this.videoElementParent);
 		this.errorOverlay = new ErrorOverlay(this.videoElementParent);
 	}
@@ -397,24 +394,9 @@ export class Application {
 	 */
 	showAfkOverlay(countDown: number) {
 		this.hideCurrentOverlay();
-		this.updateAfkOverlay(countDown);
-		this.afkOverlay.show();
-		this.currentOverlay = this.afkOverlay;
-	}
-
-	/**
-	 * Update the afk overlays countdown number 
-	 * @param countDown - the new countdown number 
-	 */
-	updateAfkOverlay(countDown: number) {
-		this.afkOverlay.updateCountdown(countDown);
-	}
-
-	/**
-	 * Activates the afk overlays action 
-	 */
-	onAfkAction() {
-		this.afkOverlay.activate();
+		this.webRtcController.afkController.afkOverlay.updateCountdown(countDown);
+		this.webRtcController.afkController.afkOverlay.show();
+		this.currentOverlay = this.webRtcController.afkController.afkOverlay;
 	}
 
 	/**
@@ -433,9 +415,6 @@ export class Application {
 
 		// Build the webRtc connect overlay Event Listener and show the connect overlay
 		this.connectOverlay.onAction(() => this.webRtcController.connectToSignallingServer());
-
-		// set up the afk overlays action 
-		this.afkOverlay.onAction(() => this.webRtcController.onAfkTriggered());
 
 		// set up the play overlays action 
 		this.playOverlay.onAction(() => {

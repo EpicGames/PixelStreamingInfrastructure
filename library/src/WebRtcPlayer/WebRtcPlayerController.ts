@@ -3,7 +3,7 @@ import { StreamController } from "../VideoPlayer/StreamController";
 import { MessageAnswer, MessageOffer, MessageConfig } from "../WebSockets/MessageReceive";
 import { UiController } from "../Ui/UiController";
 import { FreezeFrameController } from "../FreezeFrame/FreezeFrameController";
-import { AfkLogic } from "../Afk/AfkLogic";
+import { AFKController } from "../AFK/AFKController";
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { PeerConnectionController } from "../PeerConnectionController/PeerConnectionController"
 import { KeyboardController } from "../Inputs/KeyboardController";
@@ -29,8 +29,9 @@ import { CoordinateConverter, UnquantizedDenormalizedUnsignedCoord } from "../Ut
 import { PlayerStyleAttributes } from "../Ui/PlayerStyleAttributes";
 import { Application } from "../Application/Application";
 import { ITouchController } from "../Inputs/ITouchController";
+import { AFKOverlay } from "../AFK/AFKOverlay";
 /**
- * Entry point for the Web RTC Player
+ * Entry point for the WebRTC Player
  */
 export class WebRtcPlayerController {
 	config: Config;
@@ -50,7 +51,7 @@ export class WebRtcPlayerController {
 	inputClassesFactory: InputClassesFactory;
 	freezeFrameController: FreezeFrameController;
 	shouldShowPlayOverlay = true;
-	afkLogic: AfkLogic;
+	afkController: AFKController;
 	videoElementParentClientRect: DOMRect;
 	lastTimeResized = new Date().getTime();
 	matchViewportResolution: boolean;
@@ -92,9 +93,13 @@ export class WebRtcPlayerController {
 		}
 
 		// set up the afk logic class and connect up its method for closing the signaling server 
-		this.afkLogic = new AfkLogic(this.config);
-		this.afkLogic.setDisconnectMessageOverride = (message: string) => this.setDisconnectMessageOverride(message);
-		this.afkLogic.closeWebSocket = () => this.closeSignalingServer();
+		const afkOverlay = new AFKOverlay(this.application.videoElementParent);
+		afkOverlay.onAction(() => this.onAfkTriggered());
+		this.afkController = new AFKController(this.config, afkOverlay);
+		this.afkController.onAFKTimedOutCallback = () => {
+			this.setDisconnectMessageOverride("You have been disconnected due to inactivity");
+			this.closeSignalingServer();
+		} 
 
 		this.freezeFrameController = new FreezeFrameController(this.application.videoElementParent);
 
@@ -110,7 +115,7 @@ export class WebRtcPlayerController {
 		this.sendrecvDataChannelController = new DataChannelController();
 		this.recvDataChannelController = new DataChannelController();
 		this.dataChannelSender = new DataChannelSender(this.sendrecvDataChannelController);
-		this.dataChannelSender.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
+		this.dataChannelSender.resetAfkWarningTimerOnDataSend = () => this.afkController.resetAfkWarningTimer();
 
 		this.streamMessageController = new StreamMessageController();
 
@@ -119,7 +124,7 @@ export class WebRtcPlayerController {
 		this.webSocketController.onConfig = (messageConfig: MessageReceive.MessageConfig) => this.handleOnConfigMessage(messageConfig);
 		this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => this.application.onDisconnect(`${event.code} - ${event.reason}`);
 		this.webSocketController.onClose.addEventListener("close", () => {
-			this.afkLogic.stopAfkWarningTimer();
+			this.afkController.stopAfkWarningTimer();
 
 			// stop sending stats on interval if we have closed our connection
 			if (this.statsTimerHandle && this.statsTimerHandle !== undefined) {
@@ -136,9 +141,8 @@ export class WebRtcPlayerController {
 		this.streamMessageController.populateDefaultProtocol();
 
 		// now that the application has finished instantiating connect the rest of the afk methods to the afk logic class
-		this.afkLogic.showAfkOverlay = () => this.application.showAfkOverlay(this.afkLogic.countDown);
-		this.afkLogic.updateAfkCountdown = () => this.application.updateAfkOverlay(this.afkLogic.countDown);
-		this.afkLogic.hideCurrentOverlay = () => this.application.hideCurrentOverlay();
+		this.afkController.showAfkOverlay = () => this.application.showAfkOverlay(this.afkController.countDown);
+		this.afkController.hideCurrentOverlay = () => this.application.hideCurrentOverlay();
 
 		this.inputClassesFactory = new InputClassesFactory(this.streamMessageController, this.videoPlayer, this.coordinateConverter);
 
@@ -316,7 +320,7 @@ export class WebRtcPlayerController {
 	}
 
 	onAfkTriggered() : void {
-		this.afkLogic.onAfkClick();
+		this.afkController.onAfkClick();
 
 		// if the stream is paused play it, if we can
 		if (this.videoPlayer.isPaused() && this.videoPlayer.hasVideoSource()) {
@@ -332,7 +336,7 @@ export class WebRtcPlayerController {
 		if(afkEnabled){
 			this.onAfkTriggered();
 		} else {
-			this.afkLogic.stopAfkWarningTimer();
+			this.afkController.stopAfkWarningTimer();
 		}
 	}
 
@@ -705,7 +709,7 @@ export class WebRtcPlayerController {
 
 	handlePostWebrtcNegotiation() {
 		// start the afk warning timer as PS is now running
-		this.afkLogic.startAfkWarningTimer();
+		this.afkController.startAfkWarningTimer();
 		// show the overlay that we have negotiated a connection
 		this.application.onWebRtcSdp();
 

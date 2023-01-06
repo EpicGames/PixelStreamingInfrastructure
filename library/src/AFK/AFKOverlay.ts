@@ -1,9 +1,9 @@
-import { ActionOverlay } from "./ActionOverlay";
+import { ActionOverlay } from "../Overlay/ActionOverlay";
 
 /**
  * Show an overlay for when the session is unattended, it begins a countdown timer, which when elapsed will disconnect the stream.
  */
-export class AfkOverlay extends ActionOverlay {
+export class AFKOverlay extends ActionOverlay {
 
 	/**
 	* @returns The created root element of this overlay.
@@ -30,7 +30,7 @@ export class AfkOverlay extends ActionOverlay {
 	 * @param parentElement the element this overlay will be inserted into 
 	 */
 	public constructor(rootDiv: HTMLElement) {
-		super(rootDiv, AfkOverlay.createRootElement(), AfkOverlay.createContentElement());
+		super(rootDiv, AFKOverlay.createRootElement(), AFKOverlay.createContentElement());
 
 		this.rootElement.addEventListener('click', () => {
 			this.activate();
