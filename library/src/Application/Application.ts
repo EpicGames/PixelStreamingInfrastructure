@@ -205,14 +205,14 @@ export class Application {
 			this.webRtcController.updateVideoStreamSize();
 		});
 
-		this.config.addOnSettingChangedListener(Flags.ControlScheme, (isHoveringMouse : boolean) => {
+		this.config.addOnSettingChangedListener(Flags.HoveringMouseMode, (isHoveringMouse : boolean) => {
 			if (isHoveringMouse) {
-				this.config.setFlagLabel(Flags.ControlScheme, "Control Scheme: Hovering Mouse");
-				this.config.setFlagEnabled(Flags.ControlScheme, true);
+				this.config.setFlagLabel(Flags.HoveringMouseMode, "Control Scheme: Hovering Mouse");
+				this.config.setFlagEnabled(Flags.HoveringMouseMode, true);
 				this.webRtcController.activateRegisterMouse();
 			} else {
-				this.config.setFlagLabel(Flags.ControlScheme, "Control Scheme: Locked Mouse");
-				this.config.setFlagEnabled(Flags.ControlScheme, false);
+				this.config.setFlagLabel(Flags.HoveringMouseMode, "Control Scheme: Locked Mouse");
+				this.config.setFlagEnabled(Flags.HoveringMouseMode, false);
 				this.webRtcController.activateRegisterMouse();
 			}
 		});

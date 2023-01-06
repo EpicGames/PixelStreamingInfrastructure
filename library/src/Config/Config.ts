@@ -13,7 +13,7 @@ export class Flags {
 	static AutoPlayVideo = "AutoPlayVideo";
 	static AFKDetection = "TimeoutIfIdle";
 	static BrowserSendOffer = "offerToReceive";
-	static ControlScheme = "HoveringMouse"
+	static HoveringMouseMode = "HoveringMouse"
 	static ForceMonoAudio = "ForceMonoAudio";
 	static ForceTURN = "ForceTURN";
 	static FakeMouseWithTouches = "FakeMouseWithTouches";
@@ -191,8 +191,8 @@ export class Config {
 			false
 		));
 
-		this.flags.set(Flags.ControlScheme, new SettingFlag(
-			Flags.ControlScheme, 
+		this.flags.set(Flags.HoveringMouseMode, new SettingFlag(
+			Flags.HoveringMouseMode, 
 			"Control Scheme: Locked Mouse", 
 			"Either locked mouse, where the pointer is consumed by the video and locked to it, or hovering mouse, where the mouse is not consumed.", 
 			false
@@ -294,7 +294,7 @@ export class Config {
 		this.addSettingFlag(viewSettingsSection, this.flags.get(Flags.VideoFillParent));
 		this.addSettingFlag(viewSettingsSection, this.flags.get(Flags.MatchViewportResolution));
 
-		const ControlSchemeFlag = this.flags.get(Flags.ControlScheme);
+		const ControlSchemeFlag = this.flags.get(Flags.HoveringMouseMode);
 		this.addSettingFlag(viewSettingsSection, ControlSchemeFlag);
 		ControlSchemeFlag.label = `Control Scheme: ${(ControlSchemeFlag.value) ? "Hovering" : "Locked"} Mouse`;
 		

@@ -1,9 +1,10 @@
-import { Config, ControlSchemeType, Flags, NumericParameters } from "../Config/Config";
+import { Config, Flags, NumericParameters } from "../Config/Config";
 import { Logger } from "../Logger/Logger";
 export class AfkLogic {
     // time out logic details 
     closeTimeout = 10;
     active = false;
+    countdownActive = false;
     warnTimer: ReturnType<typeof setTimeout> = undefined;
     countDown = 0;
     countDownTimer: ReturnType<typeof setInterval> = undefined;
@@ -18,7 +19,11 @@ export class AfkLogic {
      */
     onAfkClick() {
         clearInterval(this.countDownTimer);
-        this.startAfkWarningTimer();
+
+        if(this.active || this.countdownActive) {
+            this.startAfkWarningTimer();
+            this.hideCurrentOverlay();
+        }
     }
 
     /**
@@ -38,6 +43,7 @@ export class AfkLogic {
      */
     stopAfkWarningTimer() {
         this.active = false;
+        this.countdownActive = false;
         clearInterval(this.warnTimer);
         clearInterval(this.countDownTimer);
     }
@@ -71,10 +77,11 @@ export class AfkLogic {
 
         // update our countDown timer and overlay contents
         this.countDown = this.closeTimeout;
+        this.countdownActive = true;
         this.updateAfkCountdown();
 
         // if we are in locked mouse exit pointerlock
-		if (!this.config.isFlagEnabled(Flags.ControlScheme)) {
+		if (!this.config.isFlagEnabled(Flags.HoveringMouseMode)) {
             // minor hack to alleviate ios not supporting pointerlock
             if (document.exitPointerLock) {
                 document.exitPointerLock();

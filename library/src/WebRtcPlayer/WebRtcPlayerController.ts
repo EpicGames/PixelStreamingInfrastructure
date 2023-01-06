@@ -117,6 +117,14 @@ export class WebRtcPlayerController {
 		this.webSocketController = new WebSocketController();
 		this.webSocketController.onConfig = (messageConfig: MessageReceive.MessageConfig) => this.handleOnConfigMessage(messageConfig);
 		this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => this.application.onDisconnect(`${event.code} - ${event.reason}`);
+		this.webSocketController.onClose.addEventListener("close", () => { 
+			this.afkLogic.stopAfkWarningTimer();
+		
+			// stop sending stats on interval if we have closed our connection
+			if(this.statsTimerHandle && this.statsTimerHandle !== undefined) {
+				window.clearInterval(this.statsTimerHandle);
+			}
+		})
 
 		// set up the final webRtc player controller methods from within our application so a connection can be activated
 		this.sendDescriptorController = new SendDescriptorController(this.dataChannelSender, this.streamMessageController);
@@ -130,7 +138,6 @@ export class WebRtcPlayerController {
 		this.afkLogic.showAfkOverlay = () => this.application.showAfkOverlay(this.afkLogic.countDown);
 		this.afkLogic.updateAfkCountdown = () => this.application.updateAfkOverlay(this.afkLogic.countDown);
 		this.afkLogic.hideCurrentOverlay = () => this.application.hideCurrentOverlay();
-		this.webSocketController.onCloseCallback = () => this.afkLogic.stopAfkWarningTimer();
 
 		this.inputClassesFactory = new InputClassesFactory(this.streamMessageController, this.videoPlayer, this.normalizeAndQuantize);
 
@@ -784,7 +791,7 @@ export class WebRtcPlayerController {
 	 * registers the mouse for use in WebRtcPlayerController
 	 */
 	activateRegisterMouse() {
-		this.mouseController = this.inputClassesFactory.registerMouse((this.config.isFlagEnabled(Flags.ControlScheme)) ? ControlSchemeType.HoveringMouse : ControlSchemeType.LockedMouse, this.playerStyleAttributes);
+		this.mouseController = this.inputClassesFactory.registerMouse((this.config.isFlagEnabled(Flags.HoveringMouseMode)) ? ControlSchemeType.HoveringMouse : ControlSchemeType.LockedMouse, this.playerStyleAttributes);
 	}
 
 	/**
@@ -832,12 +839,6 @@ export class WebRtcPlayerController {
 	 * Close the Connection to the signaling server
 	 */
 	closeSignalingServer() {
-
-		// stop sending stats on interval if we have closed our connection
-		if(this.statsTimerHandle && this.statsTimerHandle !== undefined) {
-			window.clearInterval(this.statsTimerHandle);
-		}
-
 		this.webSocketController.close();
 	}
 
