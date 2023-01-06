@@ -1,4 +1,4 @@
-import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+import { CoordinateConverter } from "../Util/CoordinateConverter";
 import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 import { ITouchController } from "./ITouchController";
@@ -14,18 +14,18 @@ export class FakeTouchController implements ITouchController {
     fakeTouchFinger: FakeTouchFinger;
     toStreamerMessagesProvider: StreamMessageController;
     videoElementProvider: VideoPlayer;
-    normalizeAndQuantize: NormalizeAndQuantize;
+    coordinateConverter: CoordinateConverter;
     videoElementParentClientRect: DOMRect;
 
     /**
      * @param toStreamerMessagesProvider - Stream message instance
      * @param videoElementProvider - Video element instance
-     * @param normalizeAndQuantize - Normalise and Quantize instance
+     * @param coordinateConverter - A coordinate converter instance
      */
-    constructor(toStreamerMessagesProvider: StreamMessageController, videoElementProvider: VideoPlayer, normalizeAndQuantize: NormalizeAndQuantize) {
+    constructor(toStreamerMessagesProvider: StreamMessageController, videoElementProvider: VideoPlayer, coordinateConverter: CoordinateConverter) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.videoElementProvider = videoElementProvider;
-        this.normalizeAndQuantize = normalizeAndQuantize;
+        this.coordinateConverter = coordinateConverter;
         document.ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
         document.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
         document.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
@@ -53,7 +53,7 @@ export class FakeTouchController implements ITouchController {
             const mouseEvent = new MouseEvent(touch.type, first_touch);
             videoElementParent.onmouseenter(mouseEvent);
 
-            const coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.fakeTouchFinger.x, this.fakeTouchFinger.y);
+            const coord = this.coordinateConverter.normalizeAndQuantizeUnsigned(this.fakeTouchFinger.x, this.fakeTouchFinger.y);
             const toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
             toStreamerHandlers.get("MouseDown")("MouseDown", [MouseButton.mainButton, coord.x, coord.y]);
         }
@@ -74,7 +74,7 @@ export class FakeTouchController implements ITouchController {
             if (touch.identifier === this.fakeTouchFinger.id) {
                 const x = touch.clientX - this.videoElementParentClientRect.left;
                 const y = touch.clientY - this.videoElementParentClientRect.top;
-                const coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(x, y);
+                const coord = this.coordinateConverter.normalizeAndQuantizeUnsigned(x, y);
                 toStreamerHandlers.get("MouseUp")("MouseUp", [MouseButton.mainButton, coord.x, coord.y]);
 
                 const mouseEvent = new MouseEvent(touchEvent.type, touch);
@@ -99,8 +99,8 @@ export class FakeTouchController implements ITouchController {
             if (touch.identifier === this.fakeTouchFinger.id) {
                 const x = touch.clientX - this.videoElementParentClientRect.left;
                 const y = touch.clientY - this.videoElementParentClientRect.top;
-                const coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(x, y);
-                const delta = this.normalizeAndQuantize.normalizeAndQuantizeSigned(x - this.fakeTouchFinger.x, y - this.fakeTouchFinger.y);
+                const coord = this.coordinateConverter.normalizeAndQuantizeUnsigned(x, y);
+                const delta = this.coordinateConverter.normalizeAndQuantizeSigned(x - this.fakeTouchFinger.x, y - this.fakeTouchFinger.y);
                 toStreamerHandlers.get("MoveMouse")("MouseMove", [coord.x, coord.y, delta.x, delta.y]);
                 this.fakeTouchFinger.x = x;
                 this.fakeTouchFinger.y = y;

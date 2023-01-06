@@ -25,7 +25,7 @@ import { ToStreamerMessagesController } from "../UeInstanceMessage/ToStreamerMes
 import { MouseController } from "../Inputs/MouseController";
 import { GamePadController } from "../Inputs/GamepadController";
 import { DataChannelSender } from "../DataChannel/DataChannelSender";
-import { NormalizeAndQuantize, UnquantisedAndDenormaliseUnsigned } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+import { CoordinateConverter, UnquantizedDenormalizedUnsignedCoord } from "../Util/CoordinateConverter";
 import { PlayerStyleAttributes } from "../Ui/PlayerStyleAttributes";
 import { Application } from "../Application/Application";
 import { ITouchController } from "../Inputs/ITouchController";
@@ -65,7 +65,7 @@ export class WebRtcPlayerController {
 	mouseController: MouseController;
 	touchController: ITouchController;
 	gamePadController: GamePadController;
-	normalizeAndQuantize: NormalizeAndQuantize;
+	coordinateConverter: CoordinateConverter;
 	playerStyleAttributes: PlayerStyleAttributes = new PlayerStyleAttributes();
 	isUsingSFU: boolean;
 	statsTimerHandle: number;
@@ -102,7 +102,7 @@ export class WebRtcPlayerController {
 		this.videoPlayer.onVideoInitialised = () => this.handleVideoInitialised();
 		this.streamController = new StreamController(this.videoPlayer);
 
-		this.normalizeAndQuantize = new NormalizeAndQuantize(this.videoPlayer);
+		this.coordinateConverter = new CoordinateConverter(this.videoPlayer);
 
 		this.uiController = new UiController(this.videoPlayer, this.playerStyleAttributes);
 		this.uiController.setUpMouseAndFreezeFrame = () => this.setUpMouseAndFreezeFrame();
@@ -140,7 +140,7 @@ export class WebRtcPlayerController {
 		this.afkLogic.updateAfkCountdown = () => this.application.updateAfkOverlay(this.afkLogic.countDown);
 		this.afkLogic.hideCurrentOverlay = () => this.application.hideCurrentOverlay();
 
-		this.inputClassesFactory = new InputClassesFactory(this.streamMessageController, this.videoPlayer, this.normalizeAndQuantize);
+		this.inputClassesFactory = new InputClassesFactory(this.streamMessageController, this.videoPlayer, this.coordinateConverter);
 
 		this.isUsingSFU = false;
 	}
@@ -150,8 +150,8 @@ export class WebRtcPlayerController {
 	 * @param x x axis coordinate 
 	 * @param y y axis coordinate
 	 */
-	requestUnquantisedAndDenormaliseUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned {
-		return this.normalizeAndQuantize.unquantizeAndDenormalizeUnsigned(x, y);
+	requestUnquantisedAndDenormaliseUnsigned(x: number, y: number): UnquantizedDenormalizedUnsignedCoord {
+		return this.coordinateConverter.unquantizeAndDenormalizeUnsigned(x, y);
 	}
 
 	/**
@@ -822,7 +822,7 @@ export class WebRtcPlayerController {
 	setUpMouseAndFreezeFrame() {
 		// Calculating and normalizing positions depends on the width and height of the player.
 		this.videoElementParentClientRect = this.videoPlayer.getVideoParentElement().getBoundingClientRect();
-		this.normalizeAndQuantize.setupNormalizeAndQuantize();
+		this.coordinateConverter.setupNormalizeAndQuantize();
 		this.freezeFrameController.freezeFrame.resize();
 	}
 

@@ -1,7 +1,7 @@
 import { MouseButtonsMask, MouseButton } from "./MouseButtons";
 import { Logger } from "../Logger/Logger";
 import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";
-import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+import { CoordinateConverter } from "../Util/CoordinateConverter";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 
 /**
@@ -10,16 +10,16 @@ import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 export class MouseController {
 	videoElementProvider: VideoPlayer;
 	toStreamerMessagesProvider: StreamMessageController;
-	normalizeAndQuantize: NormalizeAndQuantize;
+	coordinateConverter: CoordinateConverter;
 
 	/**
      * @param toStreamerMessagesProvider - Stream message instance  
      * @param videoElementProvider - Video Player instance
      * @param normalizeAndQuantize - A normalize and quantize instance 
      */
-	constructor(toStreamerMessagesProvider: StreamMessageController, videoElementProvider: VideoPlayer, normalizeAndQuantize: NormalizeAndQuantize) {
+	constructor(toStreamerMessagesProvider: StreamMessageController, videoElementProvider: VideoPlayer, coordinateConverter: CoordinateConverter) {
 		this.toStreamerMessagesProvider = toStreamerMessagesProvider;
-		this.normalizeAndQuantize = normalizeAndQuantize;
+		this.coordinateConverter = coordinateConverter;
 		this.videoElementProvider = videoElementProvider;
 		this.registerMouseEnterAndLeaveEvents();
 	}
@@ -67,7 +67,7 @@ export class MouseController {
 	 * @param Y - Mouse pointer Y coordinate
 	 */
 	releaseMouseButtons(buttons: number, X: number, Y: number) {
-		const coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
+		const coord = this.coordinateConverter.normalizeAndQuantizeUnsigned(X, Y);
 		if (buttons & MouseButtonsMask.primaryButton) {
 			this.sendMouseUp(MouseButton.mainButton, coord.x, coord.y);
 		}
@@ -93,7 +93,7 @@ export class MouseController {
 	 */
 	pressMouseButtons(buttons: number, X: number, Y: number) {
 		if(!this.videoElementProvider.isVideoReady()){ return; }
-		const coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
+		const coord = this.coordinateConverter.normalizeAndQuantizeUnsigned(X, Y);
 		if (buttons & MouseButtonsMask.primaryButton) {
 			this.sendMouseDown(MouseButton.mainButton, coord.x, coord.y);
 		}
@@ -151,7 +151,7 @@ export class MouseController {
 	sendMouseUp(button: number, X: number, Y: number) {
 		if(!this.videoElementProvider.isVideoReady()){ return; }
 		Logger.Log(Logger.GetStackTrace(), `mouse button ${button} up at (${X}, ${Y})`, 6);
-		const coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(X, Y);
+		const coord = this.coordinateConverter.normalizeAndQuantizeUnsigned(X, Y);
 		const toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
 		toStreamerHandlers.get("MouseUp")("MouseUp", [button, coord.x, coord.y]);
 	}

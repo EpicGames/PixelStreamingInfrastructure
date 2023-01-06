@@ -1,7 +1,7 @@
 import { MouseController } from "./MouseController";
 import { Logger } from "../Logger/Logger";
 import { IMouseEvents } from "./IMouseEvents";
-import { NormaliseAndQuantiseUnsigned } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+import { NormalizedQuantizedUnsignedCoord } from "../Util/CoordinateConverter";
 import { ActiveKeys } from "./InputClassesFactory";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 
@@ -11,7 +11,7 @@ import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 export class LockedMouseEvents implements IMouseEvents {
     x = 0;
     y = 0;
-    coord: NormaliseAndQuantiseUnsigned;
+    coord: NormalizedQuantizedUnsignedCoord;
     videoElementProvider: VideoPlayer;
     mouseController: MouseController;
     activeKeysProvider: ActiveKeys;
@@ -30,7 +30,7 @@ export class LockedMouseEvents implements IMouseEvents {
         const videoElementParent = this.videoElementProvider.getVideoParentElement();
         this.x = videoElementParent.getBoundingClientRect().width / 2;
         this.y = videoElementParent.getBoundingClientRect().height / 2;
-        this.coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.x, this.y);
+        this.coord = this.mouseController.coordinateConverter.normalizeAndQuantizeUnsigned(this.x, this.y);
     }
 
     /**
@@ -93,8 +93,8 @@ export class LockedMouseEvents implements IMouseEvents {
             this.y = styleHeight - this.y;
         }
 
-        const coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.x, this.y);
-        const delta = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeSigned(mouseEvent.movementX, mouseEvent.movementY);
+        const coord = this.mouseController.coordinateConverter.normalizeAndQuantizeUnsigned(this.x, this.y);
+        const delta = this.mouseController.coordinateConverter.normalizeAndQuantizeSigned(mouseEvent.movementX, mouseEvent.movementY);
         toStreamerHandlers.get("MouseMove")("MouseMove", [coord.x, coord.y, delta.x, delta.y]);
     }
 

@@ -8,7 +8,7 @@ import { LockedMouseEvents } from "./LockedMouseEvents";
 import { HoveringMouseEvents } from "./HoveringMouseEvents";
 import { IMouseEvents } from "./IMouseEvents";
 import { Logger } from "../Logger/Logger";
-import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+import { CoordinateConverter } from "../Util/CoordinateConverter";
 import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 
@@ -19,18 +19,18 @@ export class InputClassesFactory {
 
     toStreamerMessagesProvider: StreamMessageController;
     videoElementProvider: VideoPlayer;
-    normalizeAndQuantize: NormalizeAndQuantize;
+    coordinateConverter: CoordinateConverter;
     activeKeys: ActiveKeys = new ActiveKeys();
 
     /**
      * @param toStreamerMessagesProvider - Stream message instance  
      * @param videoElementProvider - Video Player instance
-     * @param normalizeAndQuantize - A normalize and quantize instance 
+     * @param coordinateConverter - A coordinateConverter instance 
      */
-    constructor(toStreamerMessagesProvider: StreamMessageController, videoElementProvider: VideoPlayer, normalizeAndQuantize: NormalizeAndQuantize) {
+    constructor(toStreamerMessagesProvider: StreamMessageController, videoElementProvider: VideoPlayer, coordinateConverter: CoordinateConverter) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.videoElementProvider = videoElementProvider;
-        this.normalizeAndQuantize = normalizeAndQuantize;
+        this.coordinateConverter = coordinateConverter;
     }
 
     /**
@@ -49,7 +49,7 @@ export class InputClassesFactory {
      */
     registerMouse(controlScheme: ControlSchemeType) {
         Logger.Log(Logger.GetStackTrace(), "Register Mouse Events", 7);
-        const mouseController = new MouseController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
+        const mouseController = new MouseController(this.toStreamerMessagesProvider, this.videoElementProvider, this.coordinateConverter);
         mouseController.clearMouseEvents();
 
         switch (controlScheme) {
@@ -125,11 +125,11 @@ export class InputClassesFactory {
     registerTouch(fakeMouseTouch: boolean, videoElementParentClientRect: DOMRect) {
         Logger.Log(Logger.GetStackTrace(), "Registering Touch", 6);
         if (fakeMouseTouch) {
-            const fakeTouchController = new FakeTouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
+            const fakeTouchController = new FakeTouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.coordinateConverter);
             fakeTouchController.setVideoElementParentClientRect(videoElementParentClientRect);
             return fakeTouchController;
         } else {
-            return new TouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
+            return new TouchController(this.toStreamerMessagesProvider, this.videoElementProvider, this.coordinateConverter);
         }
     }
 

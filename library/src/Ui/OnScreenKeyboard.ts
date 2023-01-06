@@ -1,5 +1,5 @@
 
-import { UnquantisedAndDenormaliseUnsigned } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+import { UnquantizedDenormalizedUnsignedCoord } from "../Util/CoordinateConverter";
 import { MessageOnScreenKeyboard } from "../WebSockets/MessageReceive";
 
 /**
@@ -32,7 +32,7 @@ export class OnScreenKeyboard {
      * @returns unquantizeAndDenormalizeUnsigned object 
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    unquantizeAndDenormalizeUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned {
+    unquantizeAndDenormalizeUnsigned(x: number, y: number): UnquantizedDenormalizedUnsignedCoord {
         return null;
     }
 
