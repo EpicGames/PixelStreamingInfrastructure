@@ -20,6 +20,7 @@ import { DisconnectOverlay } from "../Overlay/DisconnectOverlay";
 import { PlayOverlay } from "../Overlay/PlayOverlay";
 import { InfoOverlay } from "../Overlay/InfoOverlay";
 import { ErrorOverlay } from "../Overlay/ErrorOverlay";
+import { MessageOnScreenKeyboard } from "../WebSockets/MessageReceive";
 
 /**
  * Provides common base functionality for applications that extend this application
@@ -81,8 +82,7 @@ export class Application {
 		// Onscreen keyboard
 		this.onScreenKeyboardHelper = new OnScreenKeyboard(this.videoElementParent);
 		this.onScreenKeyboardHelper.unquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.webRtcController.requestUnquantisedAndDenormaliseUnsigned(x, y);
-		this.activateOnScreenKeyboard = (command: any) => this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
-
+		this.activateOnScreenKeyboard = (command: MessageOnScreenKeyboard) => this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
 	}
 
 	public createOverlays() : void {
@@ -195,11 +195,6 @@ export class Application {
 			this.webRtcController.setAfkEnabled(isAFKEnabled);
 		});
 
-		this.config.addOnSettingChangedListener(Flags.VideoFillParent, (shouldFillParent : boolean) => {
-			this.webRtcController.setEnlargeToFillParent(shouldFillParent);
-			this.webRtcController.resizePlayerStyle();
-		});
-
 		this.config.addOnSettingChangedListener(Flags.MatchViewportResolution, (shouldMatch : boolean) => {
 			this.webRtcController.matchViewportResolution = shouldMatch;
 			this.webRtcController.updateVideoStreamSize();
@@ -293,7 +288,8 @@ export class Application {
 	 * Activate the on screen keyboard when receiving the command from the streamer
 	 * @param command - the keyboard command
 	 */
-	activateOnScreenKeyboard(command: any): void {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	activateOnScreenKeyboard(command: MessageOnScreenKeyboard): void {
 		throw new Error("Method not implemented.");
 	}
 

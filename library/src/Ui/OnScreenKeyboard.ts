@@ -1,5 +1,6 @@
 
 import { UnquantisedAndDenormaliseUnsigned } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+import { MessageOnScreenKeyboard } from "../WebSockets/MessageReceive";
 
 /**
  * Class for handling on screen keyboard usage
@@ -30,9 +31,10 @@ export class OnScreenKeyboard {
      * @param y the y axis point 
      * @returns unquantizeAndDenormalizeUnsigned object 
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     unquantizeAndDenormalizeUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned {
         return null;
-    };
+    }
 
     /**
      * Creates on screen keyboard helpers 
@@ -66,7 +68,7 @@ export class OnScreenKeyboard {
      * Shows the on screen keyboard 
      * @param command the command received via the data channel containing keyboard positions
      */
-    showOnScreenKeyboard(command: any) {
+	showOnScreenKeyboard(command: MessageOnScreenKeyboard) {
         if (command.showOnScreenKeyboard) {
             // Show the 'edit text' button.
             this.editTextButton.classList.remove('hiddenState');

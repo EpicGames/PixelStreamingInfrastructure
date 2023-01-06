@@ -58,7 +58,7 @@ export class WebSocketController {
         }
 
         // handle the binary and then handle the message
-        event.data.text().then((messageString: any) => {
+        event.data.text().then((messageString: unknown) => {
 
             // build a new message
             const constructedMessage = new MessageEvent('messageFromBinary', {
@@ -96,6 +96,7 @@ export class WebSocketController {
      * Handles when the Websocket is opened 
      * @param event - Not Used
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     handleOnOpen(event: Event) {
         Logger.Log(Logger.GetStackTrace(), "Connected to the signalling server via WebSocket", 6);
     }
@@ -172,34 +173,40 @@ export class WebSocketController {
     }
 
     /** Event used for Displaying websocket closed messages */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
     onWebSocketOncloseOverlayMessage(event: CloseEvent) { }
 
     /**
      * The Message Contains the payload of the peer connection options used for the RTC Peer hand shake
      * @param messageConfig - Config Message received from he signaling server
      */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
     onConfig(messageConfig: MessageReceive.MessageConfig) { }
 
     /**
      * @param iceCandidate - Ice Candidate sent from the Signaling server server's RTC hand shake
      */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
     onIceCandidate(iceCandidate: RTCIceCandidateInit) { }
 
     /**
      * Event is fired when the websocket receives the answer for the RTC peer Connection
      * @param messageAnswer - The RTC Answer payload from the signaling server
      */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
     onWebRtcAnswer(messageAnswer: MessageReceive.MessageAnswer) { }
 
     /**
      * Event is fired when the websocket receives the offer for the RTC peer Connection
      * @param messageOffer - The sdp offer
      */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
     onWebRtcOffer(messageOffer: MessageReceive.MessageOffer) { }
 
     /**
 	 * Event is fired when the websocket receives the data channels for the RTC peer Connection from the SFU
 	 * @param messageDataChannels - The data channels details
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
 	onWebRtcPeerDataChannels(messageDataChannels: MessageReceive.MessagePeerDataChannels) { }
 }

@@ -27,7 +27,7 @@ export class InitialSettings {
 }
 
 /**
- * A class for handling pixel streaming details 
+ * A class for handling Pixel Streaming details 
  */
 export class PixelStreamingSettings {
     AllowPixelStreamingCommands?: boolean;
@@ -35,7 +35,7 @@ export class PixelStreamingSettings {
 }
 
 /**
- * A class for handling enoder stats 
+ * A class for handling encoder stats 
  */
 export class EncoderSettings {
     TargetBitrate?: number;

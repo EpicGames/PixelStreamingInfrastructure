@@ -1,4 +1,4 @@
-import { Config, ControlSchemeType, Flags } from "../Config/Config";
+import { Config, Flags } from "../Config/Config";
 import { Logger } from "../Logger/Logger";
 export class AfkLogic {
     // time out logic details 
@@ -124,6 +124,7 @@ export class AfkLogic {
     /**
      * An  override method for setting the override for the disconnect message
      */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
     setDisconnectMessageOverride(message: string) { 
 		// Base Functionality: Do Nothing
 	}

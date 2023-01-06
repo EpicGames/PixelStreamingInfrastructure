@@ -46,7 +46,7 @@ export class NormalizeAndQuantize {
      */
     setupNormalizeAndQuantize() {
         this.videoElementParent = this.videoElementProvider.getVideoParentElement();
-        this.videoElement = this.videoElementProvider.getVideoElement() as any;
+        this.videoElement = this.videoElementProvider.getVideoElement();
 
         if (this.videoElementParent && this.videoElement) {
             const playerAspectRatio = this.videoElementParent.clientHeight / this.videoElementParent.clientWidth;
@@ -73,6 +73,7 @@ export class NormalizeAndQuantize {
     * @param x - x axis point
     * @param y - y axis point 
     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setterNormalizeAndQuantizeUnsigned(x: number, y: number): NormaliseAndQuantiseUnsigned {
         throw new Error("Method not implemented.");
     }
@@ -82,6 +83,7 @@ export class NormalizeAndQuantize {
      * @param x - x axis point
      * @param y - y axis point 
      */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
     setterUnquantizeAndDenormalizeUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned {
         throw new Error("Method not implemented.");
     }
@@ -91,6 +93,7 @@ export class NormalizeAndQuantize {
      * @param x - x axis point
      * @param y - y axis point 
      */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
     setterNormalizeAndQuantizeSigned(x: number, y: number): NormaliseAndQuantiseSigned {
         throw new Error("Method not implemented.");
     }

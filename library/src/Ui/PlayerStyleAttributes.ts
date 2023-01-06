@@ -2,12 +2,12 @@
  * A class for managing the current player windows attributes
  */
 export class PlayerStyleAttributes {
-    styleWidth: number;
-    styleHeight: number;
+    styleWidth: string;
+    styleHeight: string;
     styleTop: number;
     styleLeft: number;
     styleCursor = 'default';
-    styleAdditional: number;
+    styleAdditional = "";
 
     /**
      * Get the width of the current player window

@@ -6,7 +6,7 @@ import { StreamMessageController } from "../UeInstanceMessage/StreamMessageContr
  */
 export class GamePadController {
     controllers: Controller[];
-    requestAnimationFrame: any;
+	requestAnimationFrame: (callback: FrameRequestCallback) => number;
     toStreamerMessagesProvider: StreamMessageController;
 
     /**
@@ -16,10 +16,11 @@ export class GamePadController {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
 
         this.requestAnimationFrame = window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.requestAnimationFrame;
-        if ("GamepadEvent" in window) {
+		const browserWindow = window as Window;
+		if ("GamepadEvent" in browserWindow) {
             window.addEventListener("gamepadconnected", (ev: GamepadEvent) => this.gamePadConnectHandler(ev));
             window.addEventListener("gamepaddisconnected", (ev: GamepadEvent) => this.gamePadDisconnectHandler(ev));
-        } else if ("WebKitGamepadEvent" in window) {
+		} else if ("WebKitGamepadEvent" in browserWindow) {
             window.addEventListener("webkitgamepadconnected", (ev: GamepadEvent) => this.gamePadConnectHandler(ev));
             window.addEventListener("webkitgamepaddisconnected", (ev: GamepadEvent) => this.gamePadDisconnectHandler(ev));
         }
@@ -87,23 +88,23 @@ export class GamePadController {
                     // press
                     if (i == gamepadLayout.LeftTrigger) {
                         //                       UEs left analog has a button index of 5
-                        toStreamerHandlers.get("GamepadAnalog")([controllerIndex, 5, currentButton.value]);
+						toStreamerHandlers.get("GamepadAnalog")("GamepadAnalog", [controllerIndex, 5, currentButton.value]);
                     } else if (i == gamepadLayout.RightTrigger) {
                         //                       UEs right analog has a button index of 6
-                        toStreamerHandlers.get("GamepadAnalog")([controllerIndex, 6, currentButton.value]);
+						toStreamerHandlers.get("GamepadAnalog")("GamepadAnalog", [controllerIndex, 6, currentButton.value]);
                     } else {
-                        toStreamerHandlers.get("GamepadButtonPressed")([controllerIndex, i, previousButton.pressed]);
+						toStreamerHandlers.get("GamepadButtonPressed")("GamepadButtonPressed", [controllerIndex, i, previousButton.pressed ? 1 : 0]);
                     }
                 } else if (!currentButton.pressed && previousButton.pressed) {
                     // release
                     if (i == gamepadLayout.LeftTrigger) {
                         //                       UEs left analog has a button index of 5
-                        toStreamerHandlers.get("GamepadAnalog")([controllerIndex, 5, 0]);
+						toStreamerHandlers.get("GamepadAnalog")("GamepadAnalog", [controllerIndex, 5, 0]);
                     } else if (i == gamepadLayout.RightTrigger) {
                         //                       UEs right analog has a button index of 6
-                        toStreamerHandlers.get("GamepadAnalog")([controllerIndex, 6, 0]);
+						toStreamerHandlers.get("GamepadAnalog")("GamepadAnalog", [controllerIndex, 6, 0]);
                     } else {
-                        toStreamerHandlers.get("GamepadButtonReleased")([controllerIndex, i]);
+						toStreamerHandlers.get("GamepadButtonReleased")("GamepadButtonReleased", [controllerIndex, i]);
                     }
                 }
             }
@@ -117,8 +118,8 @@ export class GamePadController {
                 const y = -parseFloat(currentState.axes[i + 1].toFixed(4));
 
                 // UE's analog axes follow the same order as the browsers, but start at index 1 so we will offset as such
-                toStreamerHandlers.get("GamepadAnalog")([controllerIndex, i + 1, x]); // Horizontal axes, only offset by 1
-                toStreamerHandlers.get("GamepadAnalog")([controllerIndex, i + 2, y]); // Vertical axes, offset by two (1 to match UEs axes convention and then another 1 for the vertical axes)
+				toStreamerHandlers.get("GamepadAnalog")("GamepadAnalog", [controllerIndex, i + 1, x]); // Horizontal axes, only offset by 1
+				toStreamerHandlers.get("GamepadAnalog")("GamepadAnalog", [controllerIndex, i + 2, y]); // Vertical axes, offset by two (1 to match UEs axes convention and then another 1 for the vertical axes)
             }
             this.controllers[controllerIndex].prevState = currentState;
         }

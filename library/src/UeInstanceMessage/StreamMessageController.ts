@@ -1,11 +1,19 @@
 import { TwoWayMap } from "./TwoWayMap";
 import { Logger } from "../Logger/Logger";
 
+export class ToStreamerMessage {
+	id: number;
+	byteLength: number;
+	structure?: Array<string>;
+}
+
 export class StreamMessageController {
-    toStreamerHandlers: Map<string, (messageType: any, messageData?: any[] | undefined) => void>;
-    fromStreamerHandlers: Map<string, (messageType: any, messageData?: any[] | undefined) => void>;
-    toStreamerMessages: TwoWayMap;
-    fromStreamerMessages: TwoWayMap;
+	toStreamerHandlers: Map<string, (messageType: string, messageData?: Array<number> | undefined) => void>;
+	fromStreamerHandlers: Map<string, (messageType: string, messageData?: ArrayBuffer | undefined) => void>;
+	//                              Type      Format
+	toStreamerMessages: TwoWayMap<string, ToStreamerMessage>;
+	//                              Type     ID
+    fromStreamerMessages: TwoWayMap<string, number>;
 
     constructor() {
         this.toStreamerHandlers = new Map();
@@ -17,14 +25,14 @@ export class StreamMessageController {
     /**
      * Get the current map for to streamer handlers
      */
-    getToStreamHandlersMap(): Map<string, (messageType: any, messageData?: any[] | undefined) => void> {
+	getToStreamHandlersMap(): Map<string, (messageType: string, messageData?: Array<number> | undefined) => void> {
         return this.toStreamerHandlers;
     }
 
     /**
      * Get the current twoWayMap for to streamer messages
      */
-    getToStreamerMessageMap(): TwoWayMap {
+	getToStreamerMessageMap(): TwoWayMap<string, ToStreamerMessage> {
         return this.toStreamerMessages;
     }
 
@@ -215,7 +223,7 @@ export class StreamMessageController {
      * @param messageType - the type of the message 
      * @param messageHandler - the function or method to be executed when this handler is called
      */
-    registerMessageHandler(messageDirection: MessageDirection, messageType: string, messageHandler: (messageType: any, messageData?: any[] | undefined) => void) {
+	registerMessageHandler(messageDirection: MessageDirection, messageType: string, messageHandler: (messageType: string, messageData?: unknown | undefined) => void) {
         switch (messageDirection) {
             case MessageDirection.ToStreamer:
                 this.toStreamerHandlers.set(messageType, messageHandler);

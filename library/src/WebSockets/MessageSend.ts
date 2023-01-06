@@ -3,9 +3,8 @@ import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { CandidatePairStats } from "../PeerConnectionController/CandidatePairStats";
 import { CandidateStat } from "../PeerConnectionController/CandidateStat";
 import { dataChannelStats } from "../PeerConnectionController/DataChannelStats";
-import { inboundAudioStats } from "../PeerConnectionController/InboundAudioStats";
-import { inboundVideoStats } from "../PeerConnectionController/InboundVideoStats";
-import { OutBoundVideoStats } from "../PeerConnectionController/OutBoundVideoStats";
+import { InboundAudioStats, InboundVideoStats } from "../PeerConnectionController/InboundRTPStats";
+import { OutBoundVideoStats } from "../PeerConnectionController/OutBoundRTPStats";
 
 /**
  * The Send Types that are pushed from the signaling server
@@ -63,8 +62,8 @@ export class MessagePong extends MessageSend {
  * Aggregated Stats Message Wrapper
  */
 export class MessageStats extends MessageSend {
-    inboundVideoStats: inboundVideoStats;
-    inboundAudioStats: inboundAudioStats;
+    inboundVideoStats: InboundVideoStats;
+    inboundAudioStats: InboundAudioStats;
     candidatePair: CandidatePairStats
     dataChannelStats: dataChannelStats;
     localCandidates: Array<CandidateStat>;

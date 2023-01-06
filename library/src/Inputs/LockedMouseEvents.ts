@@ -4,7 +4,6 @@ import { IMouseEvents } from "./IMouseEvents";
 import { NormaliseAndQuantiseUnsigned } from "../NormalizeAndQuantize/NormalizeAndQuantize";
 import { ActiveKeys } from "./InputClassesFactory";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
-import { PlayerStyleAttributes } from "../Ui/PlayerStyleAttributes";
 
 /**
  * Handle the mouse locked events
@@ -16,7 +15,6 @@ export class LockedMouseEvents implements IMouseEvents {
     videoElementProvider: VideoPlayer;
     mouseController: MouseController;
     activeKeysProvider: ActiveKeys;
-    playerStyleAttributesProvider: PlayerStyleAttributes;
     updateMouseMovePositionEvent = (mouseEvent: MouseEvent) => { this.updateMouseMovePosition(mouseEvent) };
 
     /**
@@ -25,12 +23,11 @@ export class LockedMouseEvents implements IMouseEvents {
      * @param activeKeysProvider - Active keys provider instance 
      * @param playerStyleAttributesProvider - Player style attributes instance
      */
-    constructor(videoElementProvider: VideoPlayer, mouseController: MouseController, activeKeysProvider: ActiveKeys, playerStyleAttributesProvider: PlayerStyleAttributes) {
+    constructor(videoElementProvider: VideoPlayer, mouseController: MouseController, activeKeysProvider: ActiveKeys) {
         this.videoElementProvider = videoElementProvider;
         this.mouseController = mouseController;
         this.activeKeysProvider = activeKeysProvider;
-        this.playerStyleAttributesProvider = playerStyleAttributesProvider;
-        const videoElementParent = this.videoElementProvider.getVideoParentElement() as any;
+        const videoElementParent = this.videoElementProvider.getVideoParentElement();
         this.x = videoElementParent.getBoundingClientRect().width / 2;
         this.y = videoElementParent.getBoundingClientRect().height / 2;
         this.coord = this.mouseController.normalizeAndQuantize.normalizeAndQuantizeUnsigned(this.x, this.y);
@@ -56,9 +53,9 @@ export class LockedMouseEvents implements IMouseEvents {
             // the keyup listener won't get fired
             let activeKeys = this.activeKeysProvider.getActiveKeys();
             const setKeys = new Set(activeKeys);
-            const newKeysIterable: Array<any> = [];
+            const newKeysIterable: Array<number> = [];
 
-            setKeys.forEach((setKey: any) => {
+			setKeys.forEach((setKey: number) => {
                 newKeysIterable[setKey];
             });
 
@@ -77,8 +74,8 @@ export class LockedMouseEvents implements IMouseEvents {
     updateMouseMovePosition(mouseEvent: MouseEvent) {
         if(!this.videoElementProvider.isVideoReady()){ return; }
         const toStreamerHandlers = this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        const styleWidth = this.playerStyleAttributesProvider.getStyleWidth();
-        const styleHeight = this.playerStyleAttributesProvider.getStyleHeight();
+		const styleWidth = this.videoElementProvider.getVideoParentElement().clientWidth;
+		const styleHeight = this.videoElementProvider.getVideoParentElement().clientHeight;
 
         this.x += mouseEvent.movementX;
         this.y += mouseEvent.movementY;
@@ -166,11 +163,11 @@ export class LockedMouseEvents implements IMouseEvents {
  */
 declare global {
     interface Document {
-        mozPointerLockElement: any;
+		mozPointerLockElement: unknown;
         mozExitPointerLock?(): void;
     }
 
     interface WheelEvent {
-        wheelDelta: any;
+        wheelDelta: number;
     }
 }

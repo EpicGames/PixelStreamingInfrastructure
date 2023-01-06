@@ -14,7 +14,7 @@ export class FileLogic {
      * Processes a files extension when received over data channel 
      * @param view - the file extension data
      */
-    processFileExtension(view: any) {
+	processFileExtension(view: Uint8Array) {
         // Reset file if we got a file message and we are not "receiving" it yet
         if (!this.file.receiving) {
             this.file.mimetype = "";
@@ -36,7 +36,7 @@ export class FileLogic {
      * Processes a files mime type when received over data channel 
      * @param view - the file mime type data
      */
-    processFileMimeType(view: any) {
+	processFileMimeType(view: Uint8Array) {
         // Reset file if we got a file message and we are not "receiving" it yet
         if (!this.file.receiving) {
             this.file.mimetype = "";
@@ -58,7 +58,7 @@ export class FileLogic {
      * Processes a files contents when received over data channel 
      * @param view - the file contents data
      */
-    processFileContents(view: any) {
+    processFileContents(view: Uint8Array) {
         // If we haven't received the initial setup instructions, return
         if (!this.file.receiving) return;
 
@@ -111,7 +111,7 @@ export class FileTemplate {
     extension = "";
     receiving = false;
     size = 0;
-    data: Array<any> = [];
+	data: Array<Uint8Array> = [];
     valid = false;
-    timestampStart: any = undefined;
+    timestampStart: number;
 }

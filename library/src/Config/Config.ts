@@ -16,7 +16,6 @@ export class Flags {
 	static ForceMonoAudio = "ForceMonoAudio";
 	static ForceTURN = "ForceTURN";
 	static AFKDetection = "TimeoutIfIdle";
-	static VideoFillParent = "FillParent";
 	static MatchViewportResolution = "MatchViewportRes";
 	static ControlScheme = "HoveringMouse"
 }
@@ -165,13 +164,6 @@ export class Config {
 			false
 		));
 
-		this.flags.set(Flags.VideoFillParent, new SettingFlag(
-			Flags.VideoFillParent, 
-			"Video fill parent element", 
-			"True: Video will be resized by the browser to fit inside its parent element\nFalse: The video element will resize to the size of the incoming stream", 
-			true
-		));
-
 		this.flags.set(Flags.MatchViewportResolution, new SettingFlag(
 			Flags.MatchViewportResolution, 
 			"Match viewport resolution", 
@@ -257,8 +249,6 @@ export class Config {
 
 		/* Setup all view/ui related settings under this section */
 		const viewSettingsSection = this.buildSectionWithHeading(settingsElem, "UI");
-
-		this.addSettingFlag(viewSettingsSection, this.flags.get(Flags.VideoFillParent));
 		this.addSettingFlag(viewSettingsSection, this.flags.get(Flags.MatchViewportResolution));
 
 		const ControlSchemeFlag = this.flags.get(Flags.ControlScheme);

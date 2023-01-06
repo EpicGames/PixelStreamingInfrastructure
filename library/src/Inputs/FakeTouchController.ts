@@ -35,7 +35,7 @@ export class FakeTouchController implements ITouchController {
      * Sets the video Element Parent Client Rect numbers for this class 
      * @param videoElementParentClientRect - a html ElementParentClientRect object
      */
-    setVideoElementParentClientRect(videoElementParentClientRect: any) {
+	setVideoElementParentClientRect(videoElementParentClientRect: DOMRect) {
         this.videoElementParentClientRect = videoElementParentClientRect;
     }
 

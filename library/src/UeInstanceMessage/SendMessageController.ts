@@ -22,7 +22,7 @@ export class SendMessageController {
      * @param messageData - the message data we are sending over the data channel 
      * @returns - nil
      */
-    sendMessageToStreamer(messageType: string, messageData?: Array<any>) {
+    sendMessageToStreamer(messageType: string, messageData?: Array<number>) {
         if (messageData === undefined) {
             messageData = [];
         }
@@ -38,7 +38,7 @@ export class SendMessageController {
         data.setUint8(0, messageFormat.id);
         let byteOffset = 1;
 
-        messageData.forEach((element: any, idx: any) => {
+        messageData.forEach((element: number, idx: number) => {
             const type = messageFormat.structure[idx];
             switch (type) {
                 case "uint8":

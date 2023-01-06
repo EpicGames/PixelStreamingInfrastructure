@@ -58,7 +58,7 @@ export class PeerConnectionController {
 				offer.sdp = this.mungeSDP(offer.sdp, useMic);
 				this.peerConnection.setLocalDescription(offer);
 				this.onSendWebRTCOffer(offer);
-			}).catch((onRejectedReason: string) => {
+			}).catch(() => {
 				this.showTextOverlaySetupFailure();
 			});
 		});
@@ -228,6 +228,7 @@ export class PeerConnectionController {
      * An override method for onTrack for use outside of the PeerConnectionController
      * @param trackEvent - The webRtc track event
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onTrack(trackEvent: RTCTrackEvent) {
 		// Default Functionality: Do Nothing
 	}
@@ -236,6 +237,7 @@ export class PeerConnectionController {
      * An override method for onPeerIceCandidate for use outside of the PeerConnectionController
      * @param peerConnectionIceEvent - The peer ice candidate
      */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
     onPeerIceCandidate(peerConnectionIceEvent: RTCPeerConnectionIceEvent) { 
 		// Default Functionality: Do Nothing
 	}
@@ -244,6 +246,7 @@ export class PeerConnectionController {
 	 * An override method for onDataChannel for use outside of the PeerConnectionController
 	 * @param datachannelEvent - The peer's data channel
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	onDataChannel(datachannelEvent: RTCDataChannelEvent) {
 		// Default Functionality: Do Nothing
 	}
@@ -315,6 +318,7 @@ export class PeerConnectionController {
      * And override event for when the video stats are fired
      * @param event - Aggregated Stats
      */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
     onVideoStats(event: AggregatedStats) { 
 		// Default Functionality: Do Nothing
 	}
@@ -323,6 +327,7 @@ export class PeerConnectionController {
      * Event to send the RTC offer to the Signaling server
      * @param offer - RTC Offer
      */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
     onSendWebRTCOffer(offer: RTCSessionDescriptionInit) { 
 		// Default Functionality: Do Nothing
 	}
@@ -331,6 +336,7 @@ export class PeerConnectionController {
 	 * Event to send the RTC Answer to the Signaling server
 	 * @param answer - RTC Answer
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	onSendWebRTCAnswer(answer: RTCSessionDescriptionInit) { 
 		// Default Functionality: Do Nothing
 	}

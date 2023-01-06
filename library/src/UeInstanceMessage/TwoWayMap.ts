@@ -1,22 +1,13 @@
-export class TwoWayMap {
-    map: Map<string, any>;
-    reverseMap: Map<any, string>;
+export class TwoWayMap<KeyType, ValueType> {
+	map: Map<KeyType, ValueType>;
+	reverseMap: Map<ValueType, KeyType>;
 
     /**
      * @param map - an optional map of parameters  
      */
-    constructor(map?: Map<string, any>) {
-        if (map === undefined) {
-            this.map = new Map();
-        } else {
-            this.map = map;
-        }
-
+    constructor() {
+		this.map = new Map();
         this.reverseMap = new Map();
-        for (const key in map) {
-            const value = map.get(key);
-            this.reverseMap.set(value, key);
-        }
     }
 
     /**
@@ -24,7 +15,7 @@ export class TwoWayMap {
      * @param key - the key we are searching by 
      * @returns - the value associated with the key
      */
-    getFromKey(key: string) {
+	getFromKey(key: KeyType) {
         return this.map.get(key);
     }
 
@@ -33,7 +24,7 @@ export class TwoWayMap {
      * @param value - the key we are searching by 
      * @returns - they key associated with the value 
      */
-    getFromValue(value: any) {
+    getFromValue(value: ValueType) {
         return this.reverseMap.get(value);
     }
 
@@ -42,7 +33,7 @@ export class TwoWayMap {
      * @param key - the indexing key 
      * @param value - the value associated with the key 
      */
-    add(key: string, value: any) {
+    add(key: KeyType, value: ValueType) {
         this.map.set(key, value);
         this.reverseMap.set(value, key);
     }
@@ -52,9 +43,8 @@ export class TwoWayMap {
      * @param key - the indexing key 
      * @param value - the value associated with the key 
      */
-    remove(key: string, value: any) {
+    remove(key: KeyType, value: ValueType) {
         this.map.delete(key);
         this.reverseMap.delete(value);
     }
-
 }

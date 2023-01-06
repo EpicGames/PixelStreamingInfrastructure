@@ -1,9 +1,9 @@
-import { inboundAudioStats } from "./InboundAudioStats";
-import { inboundVideoStats } from "./InboundVideoStats";
+import { InboundRTPStats, InboundVideoStats, InboundAudioStats } from './InboundRTPStats';
+import { InboundTrackStats } from './InboundTrackStats'
 import { dataChannelStats } from "./DataChannelStats";
 import { CandidateStat } from "./CandidateStat";
 import { CandidatePairStats } from "./CandidatePairStats";
-import { OutBoundVideoStats } from "./OutBoundVideoStats";
+import { OutBoundRTPStats, OutBoundVideoStats } from "./OutBoundRTPStats";
 import { StreamStats } from "./StreamStats";
 import { Logger } from "../Logger/Logger";
 
@@ -13,9 +13,9 @@ import { Logger } from "../Logger/Logger";
 
 type RTCStatsTypePS = RTCStatsType | "stream"
 export class AggregatedStats {
-    inboundVideoStats: inboundVideoStats;
-    inboundAudioStats: inboundAudioStats;
-    lastVideoStats: inboundVideoStats;
+	inboundVideoStats: InboundVideoStats;
+	inboundAudioStats: InboundAudioStats;
+    lastVideoStats: InboundVideoStats;
     candidatePair: CandidatePairStats
     dataChannelStats: dataChannelStats;
     localCandidates: Array<CandidateStat>;
@@ -24,8 +24,8 @@ export class AggregatedStats {
     streamStats: StreamStats
 
     constructor() {
-        this.inboundVideoStats = new inboundVideoStats();
-        this.inboundAudioStats = new inboundAudioStats();
+		this.inboundVideoStats = new InboundVideoStats();
+		this.inboundAudioStats = new InboundAudioStats();
         this.candidatePair = new CandidatePairStats();
         this.dataChannelStats = new dataChannelStats();
         this.outBoundVideoStats = new OutBoundVideoStats();
@@ -97,7 +97,7 @@ export class AggregatedStats {
      * 
      * @param stat - the stats coming in from webrtc
      */
-    handleStream(stat: any) {
+    handleStream(stat: StreamStats) {
         this.streamStats = stat
     }
 
@@ -105,7 +105,7 @@ export class AggregatedStats {
      * Process the Ice Candidate Pair Data 
      * @param stat - the stats coming in from ice candidates
      */
-    handleCandidatePair(stat: any) {
+	handleCandidatePair(stat: CandidatePairStats) {
         this.candidatePair.bytesReceived = stat.bytesReceived;
         this.candidatePair.bytesSent = stat.bytesSent;
         this.candidatePair.localCandidateId = stat.localCandidateId
@@ -122,8 +122,8 @@ export class AggregatedStats {
      * Process the Data Channel Data 
      * @param stat - the stats coming in from the data channel
      */
-    handleDataChannel(stat: any) {
-        this.dataChannelStats.bytesReceived = stat.dataytesReceived;
+    handleDataChannel(stat: dataChannelStats) {
+		this.dataChannelStats.bytesReceived = stat.bytesReceived;
         this.dataChannelStats.bytesSent = stat.bytesSent
         this.dataChannelStats.dataChannelIdentifier = stat.dataChannelIdentifier
         this.dataChannelStats.id = stat.id
@@ -139,7 +139,7 @@ export class AggregatedStats {
      * Process the Local Ice Candidate Data 
      * @param stat - local stats
      */
-    handleLocalCandidate(stat: any) {
+    handleLocalCandidate(stat: CandidateStat) {
         const localCandidate = new CandidateStat();
         localCandidate.label = "local-candidate"
         localCandidate.address = stat.address;
@@ -154,7 +154,7 @@ export class AggregatedStats {
      * Process the Remote Ice Candidate Data 
      * @param stat - ice candidate stats 
      */
-    handleRemoteCandidate(stat: any) {
+    handleRemoteCandidate(stat: CandidateStat) {
         const RemoteCandidate = new CandidateStat();
         RemoteCandidate.label = "local-candidate"
         RemoteCandidate.address = stat.address;
@@ -169,7 +169,7 @@ export class AggregatedStats {
      * Process the Inbound RTP Audio and Video Data 
      * @param stat - inbound rtp stats 
      */
-    handleInBoundRTP(stat: any) {
+    handleInBoundRTP(stat: InboundRTPStats) {
         switch (stat.kind) {
             case "video":
                 this.inboundVideoStats.timestamp = stat.timestamp;
@@ -214,7 +214,7 @@ export class AggregatedStats {
             case "audio":
                 this.inboundAudioStats.bytesReceived = stat.bytesReceived
                 this.inboundAudioStats.jitter = stat.jitter;
-                this.inboundAudioStats.packetsLost = stat.packetslost;
+                this.inboundAudioStats.packetsLost = stat.packetsLost;
                 this.inboundAudioStats.timestamp = stat.timestamp;
                 break;
             default:
@@ -229,7 +229,7 @@ export class AggregatedStats {
      * Process the outbound RTP Audio and Video Data  
      * @param stat - remote outbound stats
      */
-    handleRemoteOutBound(stat: any) {
+    handleRemoteOutBound(stat: OutBoundRTPStats) {
         switch (stat.kind) {
             case "video":
                 this.outBoundVideoStats.bytesSent = stat.bytesSent;
@@ -251,7 +251,7 @@ export class AggregatedStats {
      * Process the Inbound Video Track Data  
      * @param stat - video track stats
      */
-    handleTrack(stat: any) {
+	handleTrack(stat: InboundTrackStats) {
 
         // we only want to extract stats from the video track
         if (stat.type === 'track' && (stat.trackIdentifier === 'video_label' || stat.kind === 'video')) {
@@ -269,7 +269,7 @@ export class AggregatedStats {
      * Check if a value coming in from our stats is actually a number
      * @param value - the number to be checked  
      */
-    isNumber(value: any): boolean {
+    isNumber(value: unknown): boolean {
         return typeof value === 'number' && isFinite(value);
     }
 }

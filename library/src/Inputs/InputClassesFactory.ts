@@ -11,7 +11,6 @@ import { Logger } from "../Logger/Logger";
 import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuantize";
 import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
-import { PlayerStyleAttributes } from "../Ui/PlayerStyleAttributes";
 
 /**
  * Class for making and setting up input class types 
@@ -49,21 +48,21 @@ export class InputClassesFactory {
      * register mouse events based on a control type 
      * @param controlScheme - if the mouse is either hovering or locked 
      */
-    registerMouse(controlScheme: ControlSchemeType, playerStyleAttributesProvider: PlayerStyleAttributes) {
+    registerMouse(controlScheme: ControlSchemeType) {
         Logger.Log(Logger.GetStackTrace(), "Register Mouse Events", 7);
         const mouseController = new MouseController(this.toStreamerMessagesProvider, this.videoElementProvider, this.normalizeAndQuantize);
         mouseController.clearMouseEvents();
 
         switch (controlScheme) {
             case ControlSchemeType.LockedMouse:
-                this.registerLockedMouseEvents(mouseController, playerStyleAttributesProvider);
+                this.registerLockedMouseEvents(mouseController);
                 break
             case ControlSchemeType.HoveringMouse:
                 this.registerHoveringMouseEvents(mouseController);
                 break
             default:
                 Logger.Info(Logger.GetStackTrace(), "unknown Control Scheme Type Defaulting to Locked Mouse Events");
-                this.registerLockedMouseEvents(mouseController, playerStyleAttributesProvider);
+                this.registerLockedMouseEvents(mouseController);
                 break
         }
 
@@ -75,9 +74,9 @@ export class InputClassesFactory {
      * @param mouseController - a mouse controller instance 
      * @param playerStyleAttributesProvider - a player style attributes instance
      */
-    registerLockedMouseEvents(mouseController: MouseController, playerStyleAttributesProvider: PlayerStyleAttributes) {
+    registerLockedMouseEvents(mouseController: MouseController) {
         const videoElementParent = this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
-        const lockedMouseEvents: IMouseEvents = new LockedMouseEvents(this.videoElementProvider, mouseController, this.activeKeys, playerStyleAttributesProvider);
+        const lockedMouseEvents: IMouseEvents = new LockedMouseEvents(this.videoElementProvider, mouseController, this.activeKeys);
 
         videoElementParent.requestPointerLock = videoElementParent.requestPointerLock || videoElementParent.mozRequestPointerLock;
         document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
@@ -149,7 +148,7 @@ export class InputClassesFactory {
  * A class that keeps track of current active keys
  */
 export class ActiveKeys {
-    activeKeys: Array<any> = [];
+    activeKeys: Array<number> = [];
     constructor() {
         this.activeKeys = [];
     }
@@ -158,7 +157,7 @@ export class ActiveKeys {
      * Get the current array of active keys 
      * @returns - an array of active keys 
      */
-    getActiveKeys(): any[] {
+	getActiveKeys(): number[] {
         return this.activeKeys;
     }
 }

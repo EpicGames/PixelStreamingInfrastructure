@@ -9,3 +9,16 @@ export class OutBoundVideoStats {
     remoteTimestamp: number;
     timestamp: number;
 }
+
+/** 
+ * Outbound Stats collected from the RTC Stats Report
+ */
+export class OutBoundRTPStats {
+	kind: string;
+	bytesSent: number;
+	id: string;
+	localId: string;
+	packetsSent: number;
+	remoteTimestamp: number;
+	timestamp: number;
+}

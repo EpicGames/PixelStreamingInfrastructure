@@ -10,5 +10,6 @@ config.enableAutoplay = true;
 
 // Create a Native DOM delegate instance that implements the Delegate interface class
 let application = new libfrontend.Application(config);
+// document.getElementById("centrebox").appendChild(application.rootElement);
 document.body.appendChild(application.rootElement);
 

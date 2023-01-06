@@ -2,8 +2,6 @@
  * The Types of Messages that will be received
  */
 export enum MessageRecvTypes {
-    
-    
     CONFIG = "config",
     PLAYER_COUNT = "playerCount",
     OFFER = "offer",
@@ -72,4 +70,11 @@ export class MessagePeerDataChannels extends MessageRecv {
 	recvStreamId: number;
 	sendStreamId: number;
 	type: string;
+}
+
+export class MessageOnScreenKeyboard {
+	command: string;
+	showOnScreenKeyboard: boolean;
+	x: number;
+	y: number;
 }

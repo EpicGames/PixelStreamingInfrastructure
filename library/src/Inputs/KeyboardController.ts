@@ -157,7 +157,7 @@ export class KeyboardController {
 
         Logger.Log(Logger.GetStackTrace(), `key down ${keyCode}, repeat = ${keyboardEvent.repeat}`, 6);
         const toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get("KeyDown")("KeyDown", [this.getKeycode(keyboardEvent), keyboardEvent.repeat]);
+        toStreamerHandlers.get("KeyDown")("KeyDown", [this.getKeycode(keyboardEvent), keyboardEvent.repeat ? 1 : 0]);
         const activeKeys = this.activeKeysProvider.getActiveKeys();
         activeKeys.push(keyCode);
         // Backspace is not considered a keypress in JavaScript but we need it
@@ -182,7 +182,7 @@ export class KeyboardController {
 
         Logger.Log(Logger.GetStackTrace(), `key up ${keyCode}`, 6);
         const toStreamerHandlers = this.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get("KeyUp")("KeyUp", [keyCode, keyboardEvent.repeat]);
+        toStreamerHandlers.get("KeyUp")("KeyUp", [keyCode, keyboardEvent.repeat ? 1 : 0]);
 
         if (this.suppressBrowserKeys && this.isKeyCodeBrowserKey(keyCode)) {
             keyboardEvent.preventDefault();
