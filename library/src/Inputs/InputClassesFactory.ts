@@ -38,7 +38,7 @@ export class InputClassesFactory {
      */
     registerKeyBoard(config: Config) {
         Logger.Log(Logger.GetStackTrace(), "Register Keyboard Events", 7);
-        const keyboardController = new KeyboardController(this.toStreamerMessagesProvider, this.activeKeys, config);
+		const keyboardController = new KeyboardController(this.toStreamerMessagesProvider, config, this.activeKeys);
         keyboardController.registerKeyBoardEvents();
         return keyboardController;
     }

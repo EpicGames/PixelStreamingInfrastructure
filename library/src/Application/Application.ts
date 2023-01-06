@@ -200,7 +200,7 @@ export class Application {
 			this.webRtcController.updateVideoStreamSize();
 		});
 
-		this.config.addOnSettingChangedListener(Flags.ControlScheme, (isHoveringMouse : boolean) => {
+		this.config.addOnSettingChangedListener(Flags.HoveringMouseMode, (isHoveringMouse : boolean) => {
 			if (isHoveringMouse) {
 				this.config.setFlagLabel(Flags.HoveringMouseMode, "Control Scheme: Hovering Mouse");
 				this.config.setFlagEnabled(Flags.HoveringMouseMode, true);
