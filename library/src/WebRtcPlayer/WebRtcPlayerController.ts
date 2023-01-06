@@ -12,12 +12,13 @@ import { Config, Flags, ControlSchemeType, TextParameters } from "../Config/Conf
 import { EncoderSettings, InitialSettings, WebRTCSettings } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
 import { Logger } from "../Logger/Logger";
-import { FileLogic } from "../FileManager/FileLogic";
+import { FileTemplate, FileUtil } from "../Util/FileUtil";
 import { InputClassesFactory } from "../Inputs/InputClassesFactory";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 import { StreamMessageController, MessageDirection } from "../UeInstanceMessage/StreamMessageController";
 import { ResponseController } from "../UeInstanceMessage/ResponseController";
 import * as MessageReceive from "../WebSockets/MessageReceive";
+import { MessageOnScreenKeyboard } from "../WebSockets/MessageReceive"
 import { SendDescriptorController } from "../UeInstanceMessage/SendDescriptorController";
 import { SendMessageController } from "../UeInstanceMessage/SendMessageController";
 import { ToStreamerMessagesController } from "../UeInstanceMessage/ToStreamerMessagesController";
@@ -56,7 +57,6 @@ export class WebRtcPlayerController {
 	resizeTimeout: ReturnType<typeof setTimeout>;
 	latencyStartTime: number;
 	application: Application;
-	fileLogic: FileLogic;
 	streamMessageController: StreamMessageController;
 	sendDescriptorController: SendDescriptorController;
 	sendMessageController: SendMessageController;
@@ -69,6 +69,7 @@ export class WebRtcPlayerController {
 	playerStyleAttributes: PlayerStyleAttributes = new PlayerStyleAttributes();
 	isUsingSFU: boolean;
 	statsTimerHandle: number;
+	file: FileTemplate;
 
 	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
 	// it will use this property to store the override message string
@@ -83,7 +84,7 @@ export class WebRtcPlayerController {
 		this.config = config;
 		this.application = application;
 		this.responseController = new ResponseController();
-		this.fileLogic = new FileLogic();
+		this.file = new FileTemplate();
 
 		this.sdpConstraints = {
 			offerToReceiveAudio: true,
@@ -229,7 +230,7 @@ export class WebRtcPlayerController {
 		const commandAsString = new TextDecoder("utf-16").decode(message.slice(1));
 
 		Logger.Log(Logger.GetStackTrace(), "Data Channel Command: " + commandAsString, 6);
-		const command: MessageReceive.MessageOnScreenKeyboard = JSON.parse(commandAsString);
+		const command: MessageOnScreenKeyboard = JSON.parse(commandAsString);
 		if (command.command === "onScreenKeyboard") {
 			this.application.activateOnScreenKeyboard(command);
 		}
@@ -423,7 +424,7 @@ export class WebRtcPlayerController {
 	 */
 	onFileExtension(data: ArrayBuffer) {
 		const view = new Uint8Array(data);
-		this.fileLogic.processFileExtension(view);
+		FileUtil.setExtensionFromBytes(view, this.file);
 	}
 
 	/**
@@ -432,7 +433,7 @@ export class WebRtcPlayerController {
 	 */
 	onFileMimeType(data: ArrayBuffer) {
 		const view = new Uint8Array(data);
-		this.fileLogic.processFileMimeType(view);
+		FileUtil.setMimeTypeFromBytes(view, this.file);
 	}
 
 	/**
@@ -441,7 +442,7 @@ export class WebRtcPlayerController {
 	 */
 	onFileContents(data: ArrayBuffer) {
 		const view = new Uint8Array(data);
-		this.fileLogic.processFileContents(view);
+		FileUtil.setContentsFromBytes(view, this.file);
 	}
 
 	/**
@@ -780,7 +781,8 @@ export class WebRtcPlayerController {
 	 * registers the mouse for use in WebRtcPlayerController
 	 */
 	activateRegisterMouse() {
-		this.mouseController = this.inputClassesFactory.registerMouse((this.config.isFlagEnabled(Flags.HoveringMouseMode)) ? ControlSchemeType.HoveringMouse : ControlSchemeType.LockedMouse);
+		const mouseMode = (this.config.isFlagEnabled(Flags.HoveringMouseMode)) ? ControlSchemeType.HoveringMouse : ControlSchemeType.LockedMouse;
+		this.mouseController = this.inputClassesFactory.registerMouse(mouseMode);
 	}
 
 	/**
