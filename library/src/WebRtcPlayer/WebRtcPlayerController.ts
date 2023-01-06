@@ -1,7 +1,7 @@
 import { WebSocketController } from "../WebSockets/WebSocketController";
 import { StreamController } from "../VideoPlayer/StreamController";
 import { MessageAnswer, MessageOffer, MessageConfig } from "../WebSockets/MessageReceive";
-import { UiController } from "../Ui/UiController";
+import { UiController } from "../UI/UiController";
 import { FreezeFrameController } from "../FreezeFrame/FreezeFrameController";
 import { AFKController } from "../AFK/AFKController";
 import { DataChannelController } from "../DataChannel/DataChannelController";
@@ -26,7 +26,7 @@ import { MouseController } from "../Inputs/MouseController";
 import { GamePadController } from "../Inputs/GamepadController";
 import { DataChannelSender } from "../DataChannel/DataChannelSender";
 import { CoordinateConverter, UnquantizedDenormalizedUnsignedCoord } from "../Util/CoordinateConverter";
-import { PlayerStyleAttributes } from "../Ui/PlayerStyleAttributes";
+import { PlayerStyleAttributes } from "../UI/PlayerStyleAttributes";
 import { Application } from "../Application/Application";
 import { ITouchController } from "../Inputs/ITouchController";
 import { AFKOverlay } from "../AFK/AFKOverlay";

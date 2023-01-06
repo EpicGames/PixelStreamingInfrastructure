@@ -2,10 +2,10 @@ export { WebRtcPlayerController } from "./WebRtcPlayer/WebRtcPlayerController"
 export { Config, ControlSchemeType, Flags, NumericParameters, TextParameters } from "./Config/Config"
 export { SettingBase } from "./Config/SettingBase"
 export { SettingFlag } from "./Config/SettingFlag"
-export { SettingsPanel } from "./Ui/SettingsPanel"
-export { StatsPanel } from "./Ui/StatsPanel"
+export { SettingsPanel } from "./UI/SettingsPanel"
+export { StatsPanel } from "./UI/StatsPanel"
 export { SettingNumber } from "./Config/SettingNumber"
-export { LabelledButton } from "./Ui/LabelledButton"
+export { LabelledButton } from "./UI/LabelledButton"
 export { Application } from "./Application/Application"
 
 export { AFKController as AfkLogic } from './AFK/AFKController';

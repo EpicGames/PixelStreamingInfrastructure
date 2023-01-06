@@ -1,16 +1,16 @@
 import { Config } from "../Config/Config";
-import { StatsPanel } from "../Ui/StatsPanel";
+import { StatsPanel } from "../UI/StatsPanel";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults"
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
-import { VideoQpIndicator } from '../Ui/VideoQpIndicator'
-import { SettingsPanel } from "../Ui/SettingsPanel";
+import { VideoQpIndicator } from '../UI/VideoQpIndicator'
+import { SettingsPanel } from "../UI/SettingsPanel";
 import { WebRtcPlayerController } from "../WebRtcPlayer/WebRtcPlayerController";
 import { Flags, NumericParameters } from "../Config/Config";
 import { Logger } from "../Logger/Logger";
 import { InitialSettings, EncoderSettings, WebRTCSettings } from "../DataChannel/InitialSettings"
-import { OnScreenKeyboard } from "../Ui/OnScreenKeyboard"
-import { Controls } from "../Ui/Controls"
-import { LabelledButton } from "../Ui/LabelledButton";
+import { OnScreenKeyboard } from "../UI/OnScreenKeyboard"
+import { Controls } from "../UI/Controls"
+import { LabelledButton } from "../UI/LabelledButton";
 import { OverlayBase } from "../Overlay/BaseOverlay";
 import { ActionOverlay } from "../Overlay/ActionOverlay"
 import { TextOverlay } from "../Overlay/TextOverlay";
