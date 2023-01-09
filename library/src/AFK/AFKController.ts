@@ -1,6 +1,8 @@
 import { Config, Flags, NumericParameters } from "../Config/Config";
 import { Logger } from "../Logger/Logger";
-export class AfkLogic {
+import { AFKOverlay } from "./AFKOverlay";
+
+export class AFKController {
     // time out logic details 
     closeTimeout = 10;
     active = false;
@@ -9,9 +11,14 @@ export class AfkLogic {
     countDown = 0;
     countDownTimer: ReturnType<typeof setInterval> = undefined;
     config: Config;
+    afkOverlay: AFKOverlay;
 
-    constructor(config: Config) {
+    onAFKTimedOutCallback: () => void;
+
+    constructor(config: Config, afkOverlay: AFKOverlay) {
         this.config = config;
+        this.afkOverlay = afkOverlay;
+        this.onAFKTimedOutCallback = () => { console.log("AFK timed out, did you want to override this callback?") };
     }
 
     /**
@@ -78,7 +85,7 @@ export class AfkLogic {
         // update our countDown timer and overlay contents
         this.countDown = this.closeTimeout;
         this.countdownActive = true;
-        this.updateAfkCountdown();
+        this.afkOverlay.updateCountdown(this.countDown)
 
         // if we are in locked mouse exit pointerlock
 		if (!this.config.isFlagEnabled(Flags.HoveringMouseMode)) {
@@ -94,25 +101,16 @@ export class AfkLogic {
             if (this.countDown == 0) {
                 // The user failed to click so hide the overlay and disconnect them.
                 this.hideCurrentOverlay();
-                this.setDisconnectMessageOverride("You have been disconnected due to inactivity");
-                this.closeWebSocket();
+                this.onAFKTimedOutCallback();
                 Logger.Log(Logger.GetStackTrace(), "You have been disconnected due to inactivity");
 
                 // switch off the afk feature as stream has closed 
                 this.stopAfkWarningTimer();
             } else {
-                // Update the countDown message.
-                this.updateAfkCountdown();
+                this.afkOverlay.updateCountdown(this.countDown)
             }
         }, 1000);
     }
-
-    /**
-     * An override method for updating the afk countdown number in the overlay 
-     */
-    updateAfkCountdown() { 
-		// Base Functionality: Do Nothing
-	}
 
     /**
      * An override method for showing the afk overlay 
@@ -125,21 +123,6 @@ export class AfkLogic {
      * An override method for hiding the afk overlay 
      */
     hideCurrentOverlay() { 
-		// Base Functionality: Do Nothing
-	}
-
-    /**
-     * An  override method for setting the override for the disconnect message
-     */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-    setDisconnectMessageOverride(message: string) { 
-		// Base Functionality: Do Nothing
-	}
-
-    /**
-     * An override method for closing the websocket connection from the clients side
-     */
-    closeWebSocket() { 
 		// Base Functionality: Do Nothing
 	}
 }

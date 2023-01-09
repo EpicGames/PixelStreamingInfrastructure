@@ -1,4 +1,6 @@
 import { Config, Flags } from "../Config/Config";
+import { Logger } from "../Logger/Logger";
+import { PlayerStyleAttributes } from "../UI/PlayerStyleAttributes"
 
 /**
  * Extra types for the HTMLElement 
@@ -17,12 +19,20 @@ declare global {
 export class VideoPlayer {
 	private config: Config;
     private videoElement: HTMLVideoElement;
+    private orientationChangeTimeout: number;
+    private playerStyleAttributes: PlayerStyleAttributes;
+    private lastTimeResized = new Date().getTime();
+
+    onMatchViewportResolutionCallback: (width: number, height: number) => void;
+    onResizePlayerCallback: () => void;
+    resizeTimeoutHandle: number;
 
     /**
      * @param videoElementParent the html div the the video player will be injected into 
      * @param config the applications configuration. We're interested in the startVideoMuted flag
      */
-    constructor(videoElementParent: HTMLElement, config: Config) {
+    constructor(videoElementParent: HTMLElement, config: Config, playerStyleAttributes: PlayerStyleAttributes) {
+        this.playerStyleAttributes = playerStyleAttributes;
         this.videoElement = document.createElement("video");
 		this.config = config;
         this.videoElement.id = "streamingVideo";
@@ -34,6 +44,9 @@ export class VideoPlayer {
         this.videoElement.style.pointerEvents = "all";
         videoElementParent.appendChild(this.videoElement);
 
+        this.onResizePlayerCallback = () => { console.log("Resolution changed, restyling player, did you forget to override this function?"); }
+        this.onMatchViewportResolutionCallback = () => { console.log("Resolution changed and match viewport resolution is turned on, did you forget to override this function?"); }
+
         // set play for video
         this.videoElement.onclick = () => {
             if (this.videoElement.paused) {
@@ -44,6 +57,10 @@ export class VideoPlayer {
 		this.videoElement.onloadedmetadata = () => {
 			this.onVideoInitialised();
 		}
+
+        // set resize events to the windows if it is resized or its orientation is changed
+        window.addEventListener('resize', () => this.resizePlayerStyle(), true);
+        window.addEventListener('orientationchange', () => this.onOrientationChange());
     }
 
 	/**
@@ -109,4 +126,74 @@ export class VideoPlayer {
 	onVideoInitialised() {
 		// Default Functionality: Do Nothing
 	}
+
+    /**
+     * On the orientation change of a window clear the timeout 
+     */
+     onOrientationChange() {
+        clearTimeout(this.orientationChangeTimeout);
+        this.orientationChangeTimeout = window.setTimeout(() => { this.resizePlayerStyle() }, 500);
+    }
+
+    /**
+     * Resizes the player style based on the window height and width 
+     * @returns - nil if requirements are satisfied 
+     */
+    resizePlayerStyle() {
+        const videoElementParent = this.getVideoParentElement();
+
+        if (!videoElementParent) {
+            return;
+        }
+
+        this.updateVideoStreamSize();
+
+        if (videoElementParent.classList.contains('fixed-size')) {
+            this.onResizePlayerCallback();
+            return;
+        }
+
+        // controls for resizing the player 
+        this.resizePlayerStyleToFillParentElement();
+        this.onResizePlayerCallback();
+    }
+
+    /**
+    * Resizes the player element to fill the parent element 
+    */
+    resizePlayerStyleToFillParentElement() {
+        const videoElementParent = this.getVideoParentElement();
+
+        //Video is not initialised yet so set videoElementParent to size of parent element
+        this.playerStyleAttributes.styleWidth = "100%";
+        this.playerStyleAttributes.styleHeight = "100%";
+        this.playerStyleAttributes.styleTop = 0;
+        this.playerStyleAttributes.styleLeft = 0;
+        videoElementParent.setAttribute("style", "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "; height: " + this.playerStyleAttributes.styleHeight + "; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
+    }
+
+    updateVideoStreamSize() {
+
+		if (!this.config.isFlagEnabled(Flags.MatchViewportResolution)) {
+			return;
+		}
+
+		const now = new Date().getTime();
+		if (now - this.lastTimeResized > 1000) {
+			const videoElementParent = this.getVideoParentElement();
+			if (!videoElementParent) {
+				return;
+			}
+
+            this.onMatchViewportResolutionCallback(videoElementParent.clientWidth, videoElementParent.clientHeight);
+
+			this.lastTimeResized = new Date().getTime();
+		}
+		else {
+			Logger.Log(Logger.GetStackTrace(), 'Resizing too often - skipping', 6);
+			clearTimeout(this.resizeTimeoutHandle);
+			this.resizeTimeoutHandle = window.setTimeout(() => this.updateVideoStreamSize, 1000);
+		}
+	}
+
 }

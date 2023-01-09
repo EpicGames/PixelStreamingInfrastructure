@@ -1,9 +1,8 @@
 import { WebSocketController } from "../WebSockets/WebSocketController";
 import { StreamController } from "../VideoPlayer/StreamController";
 import { MessageAnswer, MessageOffer, MessageConfig } from "../WebSockets/MessageReceive";
-import { UiController } from "../Ui/UiController";
 import { FreezeFrameController } from "../FreezeFrame/FreezeFrameController";
-import { AfkLogic } from "../Afk/AfkLogic";
+import { AFKController } from "../AFK/AFKController";
 import { DataChannelController } from "../DataChannel/DataChannelController";
 import { PeerConnectionController } from "../PeerConnectionController/PeerConnectionController"
 import { KeyboardController } from "../Inputs/KeyboardController";
@@ -12,24 +11,26 @@ import { Config, Flags, ControlSchemeType, TextParameters } from "../Config/Conf
 import { EncoderSettings, InitialSettings, WebRTCSettings } from "../DataChannel/InitialSettings";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults";
 import { Logger } from "../Logger/Logger";
-import { FileLogic } from "../FileManager/FileLogic";
+import { FileTemplate, FileUtil } from "../Util/FileUtil";
 import { InputClassesFactory } from "../Inputs/InputClassesFactory";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 import { StreamMessageController, MessageDirection } from "../UeInstanceMessage/StreamMessageController";
 import { ResponseController } from "../UeInstanceMessage/ResponseController";
 import * as MessageReceive from "../WebSockets/MessageReceive";
+import { MessageOnScreenKeyboard } from "../WebSockets/MessageReceive"
 import { SendDescriptorController } from "../UeInstanceMessage/SendDescriptorController";
 import { SendMessageController } from "../UeInstanceMessage/SendMessageController";
 import { ToStreamerMessagesController } from "../UeInstanceMessage/ToStreamerMessagesController";
 import { MouseController } from "../Inputs/MouseController";
 import { GamePadController } from "../Inputs/GamepadController";
 import { DataChannelSender } from "../DataChannel/DataChannelSender";
-import { NormalizeAndQuantize, UnquantisedAndDenormaliseUnsigned } from "../NormalizeAndQuantize/NormalizeAndQuantize";
-import { PlayerStyleAttributes } from "../Ui/PlayerStyleAttributes";
+import { CoordinateConverter, UnquantizedDenormalizedUnsignedCoord } from "../Util/CoordinateConverter";
+import { PlayerStyleAttributes } from "../UI/PlayerStyleAttributes";
 import { Application } from "../Application/Application";
 import { ITouchController } from "../Inputs/ITouchController";
+import { AFKOverlay } from "../AFK/AFKOverlay";
 /**
- * Entry point for the Web RTC Player
+ * Entry point for the WebRTC Player
  */
 export class WebRtcPlayerController {
 	config: Config;
@@ -45,18 +46,13 @@ export class WebRtcPlayerController {
 	videoPlayer: VideoPlayer;
 	streamController: StreamController;
 	peerConnectionController: PeerConnectionController;
-	uiController: UiController;
 	inputClassesFactory: InputClassesFactory;
 	freezeFrameController: FreezeFrameController;
 	shouldShowPlayOverlay = true;
-	afkLogic: AfkLogic;
+	afkController: AFKController;
 	videoElementParentClientRect: DOMRect;
-	lastTimeResized = new Date().getTime();
-	matchViewportResolution: boolean;
-	resizeTimeout: ReturnType<typeof setTimeout>;
 	latencyStartTime: number;
 	application: Application;
-	fileLogic: FileLogic;
 	streamMessageController: StreamMessageController;
 	sendDescriptorController: SendDescriptorController;
 	sendMessageController: SendMessageController;
@@ -65,10 +61,11 @@ export class WebRtcPlayerController {
 	mouseController: MouseController;
 	touchController: ITouchController;
 	gamePadController: GamePadController;
-	normalizeAndQuantize: NormalizeAndQuantize;
+	coordinateConverter: CoordinateConverter;
 	playerStyleAttributes: PlayerStyleAttributes = new PlayerStyleAttributes();
 	isUsingSFU: boolean;
 	statsTimerHandle: number;
+	file: FileTemplate;
 
 	// if you override the disconnection message by calling the interface method setDisconnectMessageOverride
 	// it will use this property to store the override message string
@@ -83,7 +80,7 @@ export class WebRtcPlayerController {
 		this.config = config;
 		this.application = application;
 		this.responseController = new ResponseController();
-		this.fileLogic = new FileLogic();
+		this.file = new FileTemplate();
 
 		this.sdpConstraints = {
 			offerToReceiveAudio: true,
@@ -91,25 +88,40 @@ export class WebRtcPlayerController {
 		}
 
 		// set up the afk logic class and connect up its method for closing the signaling server 
-		this.afkLogic = new AfkLogic(this.config);
-		this.afkLogic.setDisconnectMessageOverride = (message: string) => this.setDisconnectMessageOverride(message);
-		this.afkLogic.closeWebSocket = () => this.closeSignalingServer();
+		const afkOverlay = new AFKOverlay(this.application.videoElementParent);
+		afkOverlay.onAction(() => this.onAfkTriggered());
+		this.afkController = new AFKController(this.config, afkOverlay);
+		this.afkController.onAFKTimedOutCallback = () => {
+			this.setDisconnectMessageOverride("You have been disconnected due to inactivity");
+			this.closeSignalingServer();
+		} 
 
 		this.freezeFrameController = new FreezeFrameController(this.application.videoElementParent);
 
-		this.videoPlayer = new VideoPlayer(this.application.videoElementParent, this.config);
+		this.videoPlayer = new VideoPlayer(this.application.videoElementParent, this.config, this.playerStyleAttributes);
 		this.videoPlayer.onVideoInitialised = () => this.handleVideoInitialised();
+		
+		// When in match viewport resolution mode, when the browser viewport is resized we send a resize command back to UE.
+		this.videoPlayer.onMatchViewportResolutionCallback = (width: number, height: number) => {
+			const descriptor = {
+				"Resolution.Width": width,
+				"Resolution.Height": height
+			};
+
+			this.sendDescriptorController.emitCommand(descriptor);
+		}
+
+		// Everytime video player is resized in browser we need to reinitialize the mouse coordinate conversion and freeze frame sizing logic.
+		this.videoPlayer.onResizePlayerCallback = () => { this.setUpMouseAndFreezeFrame(); }
+
 		this.streamController = new StreamController(this.videoPlayer);
 
-		this.normalizeAndQuantize = new NormalizeAndQuantize(this.videoPlayer);
-
-		this.uiController = new UiController(this.videoPlayer, this.playerStyleAttributes);
-		this.uiController.setUpMouseAndFreezeFrame = () => this.setUpMouseAndFreezeFrame();
+		this.coordinateConverter = new CoordinateConverter(this.videoPlayer);
 
 		this.sendrecvDataChannelController = new DataChannelController();
 		this.recvDataChannelController = new DataChannelController();
 		this.dataChannelSender = new DataChannelSender(this.sendrecvDataChannelController);
-		this.dataChannelSender.resetAfkWarningTimerOnDataSend = () => this.afkLogic.resetAfkWarningTimer();
+		this.dataChannelSender.resetAfkWarningTimerOnDataSend = () => this.afkController.resetAfkWarningTimer();
 
 		this.streamMessageController = new StreamMessageController();
 
@@ -118,7 +130,7 @@ export class WebRtcPlayerController {
 		this.webSocketController.onConfig = (messageConfig: MessageReceive.MessageConfig) => this.handleOnConfigMessage(messageConfig);
 		this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => this.application.onDisconnect(`${event.code} - ${event.reason}`);
 		this.webSocketController.onClose.addEventListener("close", () => {
-			this.afkLogic.stopAfkWarningTimer();
+			this.afkController.stopAfkWarningTimer();
 
 			// stop sending stats on interval if we have closed our connection
 			if (this.statsTimerHandle && this.statsTimerHandle !== undefined) {
@@ -135,11 +147,10 @@ export class WebRtcPlayerController {
 		this.streamMessageController.populateDefaultProtocol();
 
 		// now that the application has finished instantiating connect the rest of the afk methods to the afk logic class
-		this.afkLogic.showAfkOverlay = () => this.application.showAfkOverlay(this.afkLogic.countDown);
-		this.afkLogic.updateAfkCountdown = () => this.application.updateAfkOverlay(this.afkLogic.countDown);
-		this.afkLogic.hideCurrentOverlay = () => this.application.hideCurrentOverlay();
+		this.afkController.showAfkOverlay = () => this.application.showAfkOverlay(this.afkController.countDown);
+		this.afkController.hideCurrentOverlay = () => this.application.hideCurrentOverlay();
 
-		this.inputClassesFactory = new InputClassesFactory(this.streamMessageController, this.videoPlayer, this.normalizeAndQuantize);
+		this.inputClassesFactory = new InputClassesFactory(this.streamMessageController, this.videoPlayer, this.coordinateConverter);
 
 		this.isUsingSFU = false;
 	}
@@ -149,8 +160,8 @@ export class WebRtcPlayerController {
 	 * @param x x axis coordinate 
 	 * @param y y axis coordinate
 	 */
-	requestUnquantisedAndDenormaliseUnsigned(x: number, y: number): UnquantisedAndDenormaliseUnsigned {
-		return this.normalizeAndQuantize.unquantizeAndDenormalizeUnsigned(x, y);
+	requestUnquantisedAndDenormaliseUnsigned(x: number, y: number): UnquantizedDenormalizedUnsignedCoord {
+		return this.coordinateConverter.unquantizeAndDenormalizeUnsigned(x, y);
 	}
 
 	/**
@@ -229,7 +240,7 @@ export class WebRtcPlayerController {
 		const commandAsString = new TextDecoder("utf-16").decode(message.slice(1));
 
 		Logger.Log(Logger.GetStackTrace(), "Data Channel Command: " + commandAsString, 6);
-		const command: MessageReceive.MessageOnScreenKeyboard = JSON.parse(commandAsString);
+		const command: MessageOnScreenKeyboard = JSON.parse(commandAsString);
 		if (command.command === "onScreenKeyboard") {
 			this.application.activateOnScreenKeyboard(command);
 		}
@@ -315,7 +326,7 @@ export class WebRtcPlayerController {
 	}
 
 	onAfkTriggered() : void {
-		this.afkLogic.onAfkClick();
+		this.afkController.onAfkClick();
 
 		// if the stream is paused play it, if we can
 		if (this.videoPlayer.isPaused() && this.videoPlayer.hasVideoSource()) {
@@ -331,7 +342,7 @@ export class WebRtcPlayerController {
 		if(afkEnabled){
 			this.onAfkTriggered();
 		} else {
-			this.afkLogic.stopAfkWarningTimer();
+			this.afkController.stopAfkWarningTimer();
 		}
 	}
 
@@ -423,7 +434,7 @@ export class WebRtcPlayerController {
 	 */
 	onFileExtension(data: ArrayBuffer) {
 		const view = new Uint8Array(data);
-		this.fileLogic.processFileExtension(view);
+		FileUtil.setExtensionFromBytes(view, this.file);
 	}
 
 	/**
@@ -432,7 +443,7 @@ export class WebRtcPlayerController {
 	 */
 	onFileMimeType(data: ArrayBuffer) {
 		const view = new Uint8Array(data);
-		this.fileLogic.processFileMimeType(view);
+		FileUtil.setMimeTypeFromBytes(view, this.file);
 	}
 
 	/**
@@ -441,7 +452,7 @@ export class WebRtcPlayerController {
 	 */
 	onFileContents(data: ArrayBuffer) {
 		const view = new Uint8Array(data);
-		this.fileLogic.processFileContents(view);
+		FileUtil.setContentsFromBytes(view, this.file);
 	}
 
 	/**
@@ -704,7 +715,7 @@ export class WebRtcPlayerController {
 
 	handlePostWebrtcNegotiation() {
 		// start the afk warning timer as PS is now running
-		this.afkLogic.startAfkWarningTimer();
+		this.afkController.startAfkWarningTimer();
 		// show the overlay that we have negotiated a connection
 		this.application.onWebRtcSdp();
 
@@ -780,38 +791,8 @@ export class WebRtcPlayerController {
 	 * registers the mouse for use in WebRtcPlayerController
 	 */
 	activateRegisterMouse() {
-		this.mouseController = this.inputClassesFactory.registerMouse((this.config.isFlagEnabled(Flags.HoveringMouseMode)) ? ControlSchemeType.HoveringMouse : ControlSchemeType.LockedMouse);
-	}
-
-	/**
-	 * Handles when the stream size changes
-	 */
-	updateVideoStreamSize() {
-		// Call the setter before calling this function
-		if (!this.matchViewportResolution) {
-			return;
-		}
-
-		const now = new Date().getTime();
-		if (now - this.lastTimeResized > 1000) {
-			const videoElementParent = this.application.videoElementParent;
-			if (!videoElementParent) {
-				return;
-			}
-
-			const descriptor = {
-				"Resolution.Width": videoElementParent.clientWidth,
-				"Resolution.Height": videoElementParent.clientHeight
-			};
-
-			this.sendDescriptorController.emitCommand(descriptor);
-			this.lastTimeResized = new Date().getTime();
-		}
-		else {
-			Logger.Log(Logger.GetStackTrace(), 'Resizing too often - skipping', 6);
-			clearTimeout(this.resizeTimeout);
-			this.resizeTimeout = setTimeout(this.updateVideoStreamSize, 1000);
-		}
+		const mouseMode = (this.config.isFlagEnabled(Flags.HoveringMouseMode)) ? ControlSchemeType.HoveringMouse : ControlSchemeType.LockedMouse;
+		this.mouseController = this.inputClassesFactory.registerMouse(mouseMode);
 	}
 
 	/**
@@ -820,7 +801,7 @@ export class WebRtcPlayerController {
 	setUpMouseAndFreezeFrame() {
 		// Calculating and normalizing positions depends on the width and height of the player.
 		this.videoElementParentClientRect = this.videoPlayer.getVideoParentElement().getBoundingClientRect();
-		this.normalizeAndQuantize.setupNormalizeAndQuantize();
+		this.coordinateConverter.setupNormalizeAndQuantize();
 		this.freezeFrameController.freezeFrame.resize();
 	}
 
@@ -986,7 +967,7 @@ export class WebRtcPlayerController {
 		// either autoplay the video or set up the play overlay
 		this.autoPlayVideoOrSetUpPlayOverlay();
 		this.resizePlayerStyle();
-		this.uiController.updateVideoStreamSize = () => this.updateVideoStreamSize();
+		this.videoPlayer.updateVideoStreamSize();
 	}
 
 	/**
@@ -1013,7 +994,7 @@ export class WebRtcPlayerController {
 	* To Resize the Video Player element
 	*/
 	resizePlayerStyle(): void {
-		this.uiController.resizePlayerStyle();
+		this.videoPlayer.resizePlayerStyle();
 	}
 
 	/**

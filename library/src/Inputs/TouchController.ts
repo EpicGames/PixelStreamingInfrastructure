@@ -1,5 +1,5 @@
 import { Logger } from "../Logger/Logger";
-import { NormalizeAndQuantize } from "../NormalizeAndQuantize/NormalizeAndQuantize";
+import { CoordinateConverter } from "../Util/CoordinateConverter";
 import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 import { ITouchController } from "./ITouchController";
@@ -9,7 +9,7 @@ import { ITouchController } from "./ITouchController";
 export class TouchController implements ITouchController {
     toStreamerMessagesProvider: StreamMessageController;
     videoElementProvider: VideoPlayer;
-    normalizeAndQuantize: NormalizeAndQuantize
+    coordinateConverter: CoordinateConverter
     videoElementParent: HTMLVideoElement;
     fingers = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
     fingerIds = new Map();
@@ -18,12 +18,12 @@ export class TouchController implements ITouchController {
     /**
      * @param toStreamerMessagesProvider - Stream message instance  
      * @param videoElementProvider - Video Player instance
-     * @param normalizeAndQuantize - A normalize and quantize instance 
+     * @param coordinateConverter - A coordinate converter instance 
      */
-	constructor(toStreamerMessagesProvider: StreamMessageController, videoElementProvider: VideoPlayer, normalizeAndQuantize: NormalizeAndQuantize) {
+	constructor(toStreamerMessagesProvider: StreamMessageController, videoElementProvider: VideoPlayer, coordinateConverter: CoordinateConverter) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.videoElementProvider = videoElementProvider;
-        this.normalizeAndQuantize = normalizeAndQuantize;
+        this.coordinateConverter = coordinateConverter;
         this.videoElementParent = videoElementProvider.getVideoElement();
         this.videoElementParent.ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
         this.videoElementParent.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
@@ -113,7 +113,7 @@ export class TouchController implements ITouchController {
             const y = touch.clientY - videoElementParent.offsetTop;
             Logger.Log(Logger.GetStackTrace(), `F${this.fingerIds.get(touch.identifier)}=(${x}, ${y})`, 6);
 
-            const coord = this.normalizeAndQuantize.normalizeAndQuantizeUnsigned(x, y);
+            const coord = this.coordinateConverter.normalizeAndQuantizeUnsigned(x, y);
             switch (type) {
                 case "TouchStart":
                     toStreamerHandlers.get("TouchStart")("TouchStart", [numTouches, coord.x, coord.y, this.fingerIds.get(touch.identifier), this.maxByteValue * touch.force, coord.inRange ? 1 : 0]);
