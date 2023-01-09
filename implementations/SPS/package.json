@@ -6,26 +6,20 @@
   "scripts": {
     "build": "npx webpack",
     "watch": "npx webpack --watch",
-    "start": "npx webpack && open-cli ./dist/index.html",
     "serve": "webpack serve",
-    "build-all": "cd ../../library && npm run build && cd ../implementations/SPS && npm link ../../library && npm run build"
+    "build-all": "cd ../../library && npm run build && cd ../implementations/SPS && npm run build"
   },
   "author": "TensorWorks Pty Ltd",
   "license": "MIT",
   "devDependencies": {
-    "@epicgames/libfrontend": "0.0.1",
-    "bootstrap": "^5.0.2",
-    "css-loader": "^6.2.0",
-    "html-loader": "^4.1.0",
-    "html-webpack-plugin": "^5.3.2",
-    "image-webpack-loader": "^8.1.0",
-    "mini-css-extract-plugin": "^2.1.0",
-    "open-cli": "^7.0.0",
-    "style-loader": "^3.2.1",
-    "ts-loader": "^9.2.4",
-    "typescript": "^4.3.5",
-    "webpack": "^5.46.0",
-    "webpack-cli": "^4.8.0",
-    "webpack-dev-server": "^4.7.4"
+    "@epicgames/libfrontend": "file:../../library",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.11.1",
+	"css-loader": "^6.7.3",
+    "html-loader": "^4.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "path": "^0.12.7",
+    "ts-loader": "^9.4.2",
+    "webpack": "^5.75.0"
   }
 }
