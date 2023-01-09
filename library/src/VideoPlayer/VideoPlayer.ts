@@ -1,6 +1,5 @@
 import { Config, Flags } from "../Config/Config";
 import { Logger } from "../Logger/Logger";
-import { PlayerStyleAttributes } from "../UI/PlayerStyleAttributes"
 
 /**
  * Extra types for the HTMLElement 
@@ -20,7 +19,6 @@ export class VideoPlayer {
 	private config: Config;
     private videoElement: HTMLVideoElement;
     private orientationChangeTimeout: number;
-    private playerStyleAttributes: PlayerStyleAttributes;
     private lastTimeResized = new Date().getTime();
 
     onMatchViewportResolutionCallback: (width: number, height: number) => void;
@@ -31,8 +29,7 @@ export class VideoPlayer {
      * @param videoElementParent the html div the the video player will be injected into 
      * @param config the applications configuration. We're interested in the startVideoMuted flag
      */
-    constructor(videoElementParent: HTMLElement, config: Config, playerStyleAttributes: PlayerStyleAttributes) {
-        this.playerStyleAttributes = playerStyleAttributes;
+    constructor(videoElementParent: HTMLElement, config: Config) {
         this.videoElement = document.createElement("video");
 		this.config = config;
         this.videoElement.id = "streamingVideo";
@@ -165,11 +162,11 @@ export class VideoPlayer {
         const videoElementParent = this.getVideoParentElement();
 
         //Video is not initialised yet so set videoElementParent to size of parent element
-        this.playerStyleAttributes.styleWidth = "100%";
-        this.playerStyleAttributes.styleHeight = "100%";
-        this.playerStyleAttributes.styleTop = 0;
-        this.playerStyleAttributes.styleLeft = 0;
-        videoElementParent.setAttribute("style", "top: " + this.playerStyleAttributes.styleTop + "px; left: " + this.playerStyleAttributes.styleLeft + "px; width: " + this.playerStyleAttributes.styleWidth + "; height: " + this.playerStyleAttributes.styleHeight + "; cursor: " + this.playerStyleAttributes.styleCursor + "; " + this.playerStyleAttributes.styleAdditional);
+        const styleWidth = "100%";
+        const styleHeight = "100%";
+        const styleTop = 0;
+        const styleLeft = 0;
+		videoElementParent.setAttribute("style", "top: " + styleTop + "px; left: " + styleLeft + "px; width: " + styleWidth + "; height: " + styleHeight + "; cursor: default;");
     }
 
     updateVideoStreamSize() {

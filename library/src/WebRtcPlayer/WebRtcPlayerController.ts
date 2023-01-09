@@ -25,7 +25,6 @@ import { MouseController } from "../Inputs/MouseController";
 import { GamePadController } from "../Inputs/GamepadController";
 import { DataChannelSender } from "../DataChannel/DataChannelSender";
 import { CoordinateConverter, UnquantizedDenormalizedUnsignedCoord } from "../Util/CoordinateConverter";
-import { PlayerStyleAttributes } from "../UI/PlayerStyleAttributes";
 import { Application } from "../Application/Application";
 import { ITouchController } from "../Inputs/ITouchController";
 import { AFKOverlay } from "../AFK/AFKOverlay";
@@ -62,7 +61,6 @@ export class WebRtcPlayerController {
 	touchController: ITouchController;
 	gamePadController: GamePadController;
 	coordinateConverter: CoordinateConverter;
-	playerStyleAttributes: PlayerStyleAttributes = new PlayerStyleAttributes();
 	isUsingSFU: boolean;
 	statsTimerHandle: number;
 	file: FileTemplate;
@@ -98,7 +96,7 @@ export class WebRtcPlayerController {
 
 		this.freezeFrameController = new FreezeFrameController(this.application.videoElementParent);
 
-		this.videoPlayer = new VideoPlayer(this.application.videoElementParent, this.config, this.playerStyleAttributes);
+		this.videoPlayer = new VideoPlayer(this.application.videoElementParent, this.config);
 		this.videoPlayer.onVideoInitialised = () => this.handleVideoInitialised();
 		
 		// When in match viewport resolution mode, when the browser viewport is resized we send a resize command back to UE.

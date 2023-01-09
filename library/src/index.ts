@@ -20,8 +20,8 @@ export { MessageRecv } from "./WebSockets/MessageReceive"
 export { WebSocketController } from "./WebSockets/WebSocketController"
 export { SignallingProtocol } from "./WebSockets/SignallingProtocol"
 
+export { AFKOverlay } from "./AFK/AFKOverlay";
 export { ActionOverlay } from "./Overlay/ActionOverlay";
-export { AfkOverlay } from "./Overlay/AfkOverlay";
 export { OverlayBase } from "./Overlay/BaseOverlay";
 export { ConnectOverlay } from "./Overlay/ConnectOverlay";
 export { DisconnectOverlay } from "./Overlay/DisconnectOverlay";
