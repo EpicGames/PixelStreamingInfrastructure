@@ -1,7 +1,7 @@
 
-import { LatencyTest } from "./LatencyTest"
+import { LatencyTest } from "./LatencyTest";
 import { Logger } from "../Logger/Logger";
-import { AggregatedStats } from "../PeerConnectionController/AggregatedStats"
+import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import { MathUtils } from "../Util/MathUtils";
 
 /**

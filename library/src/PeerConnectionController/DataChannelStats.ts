@@ -1,7 +1,7 @@
 /** 
  * Data Channel Stats collected from the RTC Stats Report
  */
-export class dataChannelStats {
+export class DataChannelStats {
     bytesReceived: number;
     bytesSent: number;
     dataChannelIdentifier: number;

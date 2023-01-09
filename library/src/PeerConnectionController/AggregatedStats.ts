@@ -1,6 +1,6 @@
 import { InboundRTPStats, InboundVideoStats, InboundAudioStats } from './InboundRTPStats';
 import { InboundTrackStats } from './InboundTrackStats'
-import { dataChannelStats } from "./DataChannelStats";
+import { DataChannelStats } from "./DataChannelStats";
 import { CandidateStat } from "./CandidateStat";
 import { CandidatePairStats } from "./CandidatePairStats";
 import { OutBoundRTPStats, OutBoundVideoStats } from "./OutBoundRTPStats";
@@ -15,21 +15,21 @@ type RTCStatsTypePS = RTCStatsType | "stream"
 export class AggregatedStats {
 	inboundVideoStats: InboundVideoStats;
 	inboundAudioStats: InboundAudioStats;
-    lastVideoStats: InboundVideoStats;
-    candidatePair: CandidatePairStats
-    dataChannelStats: dataChannelStats;
-    localCandidates: Array<CandidateStat>;
-    remoteCandidates: Array<CandidateStat>;
-    outBoundVideoStats: OutBoundVideoStats;
-    streamStats: StreamStats
+	lastVideoStats: InboundVideoStats;
+	candidatePair: CandidatePairStats
+	DataChannelStats: DataChannelStats;
+	localCandidates: Array<CandidateStat>;
+	remoteCandidates: Array<CandidateStat>;
+	outBoundVideoStats: OutBoundVideoStats;
+	streamStats: StreamStats
 
     constructor() {
 		this.inboundVideoStats = new InboundVideoStats();
 		this.inboundAudioStats = new InboundAudioStats();
-        this.candidatePair = new CandidatePairStats();
-        this.dataChannelStats = new dataChannelStats();
-        this.outBoundVideoStats = new OutBoundVideoStats();
-        this.streamStats = new StreamStats();
+		this.candidatePair = new CandidatePairStats();
+		this.DataChannelStats = new DataChannelStats();
+		this.outBoundVideoStats = new OutBoundVideoStats();
+		this.streamStats = new StreamStats();
     }
 
     /**
@@ -37,8 +37,8 @@ export class AggregatedStats {
      * @param rtcStatsReport - RTC Stats Report
      */
     processStats(rtcStatsReport: RTCStatsReport) {
-        this.localCandidates = new Array<CandidateStat>();
-        this.remoteCandidates = new Array<CandidateStat>();
+		this.localCandidates = new Array<CandidateStat>();
+		this.remoteCandidates = new Array<CandidateStat>();
 
         rtcStatsReport.forEach((stat) => {
             const type: RTCStatsTypePS = stat.type;
@@ -83,8 +83,8 @@ export class AggregatedStats {
                     this.handleStream(stat);
                     break;
                 default:
-                    Logger.Error(Logger.GetStackTrace(), "unhandled Stat Type");
-                    Logger.Log(Logger.GetStackTrace(), stat);
+					Logger.Error(Logger.GetStackTrace(), "unhandled Stat Type");
+					Logger.Log(Logger.GetStackTrace(), stat);
                     break;
             }
 
@@ -97,7 +97,7 @@ export class AggregatedStats {
      * 
      * @param stat - the stats coming in from webrtc
      */
-    handleStream(stat: StreamStats) {
+	handleStream(stat: StreamStats) {
         this.streamStats = stat
     }
 
@@ -122,25 +122,25 @@ export class AggregatedStats {
      * Process the Data Channel Data 
      * @param stat - the stats coming in from the data channel
      */
-    handleDataChannel(stat: dataChannelStats) {
-		this.dataChannelStats.bytesReceived = stat.bytesReceived;
-        this.dataChannelStats.bytesSent = stat.bytesSent
-        this.dataChannelStats.dataChannelIdentifier = stat.dataChannelIdentifier
-        this.dataChannelStats.id = stat.id
-        this.dataChannelStats.label = stat.label
-        this.dataChannelStats.messagesReceived = stat.messagesReceived
-        this.dataChannelStats.messagesSent = stat.messagesSent
-        this.dataChannelStats.protocol = stat.protocol
-        this.dataChannelStats.state = stat.state
-        this.dataChannelStats.timestamp = stat.timestamp
+	handleDataChannel(stat: DataChannelStats) {
+		this.DataChannelStats.bytesReceived = stat.bytesReceived;
+        this.DataChannelStats.bytesSent = stat.bytesSent
+        this.DataChannelStats.dataChannelIdentifier = stat.dataChannelIdentifier
+        this.DataChannelStats.id = stat.id
+        this.DataChannelStats.label = stat.label
+        this.DataChannelStats.messagesReceived = stat.messagesReceived
+        this.DataChannelStats.messagesSent = stat.messagesSent
+        this.DataChannelStats.protocol = stat.protocol
+        this.DataChannelStats.state = stat.state
+        this.DataChannelStats.timestamp = stat.timestamp
     }
 
     /** 
      * Process the Local Ice Candidate Data 
      * @param stat - local stats
      */
-    handleLocalCandidate(stat: CandidateStat) {
-        const localCandidate = new CandidateStat();
+	handleLocalCandidate(stat: CandidateStat) {
+		const localCandidate = new CandidateStat();
         localCandidate.label = "local-candidate"
         localCandidate.address = stat.address;
         localCandidate.port = stat.port
@@ -154,8 +154,8 @@ export class AggregatedStats {
      * Process the Remote Ice Candidate Data 
      * @param stat - ice candidate stats 
      */
-    handleRemoteCandidate(stat: CandidateStat) {
-        const RemoteCandidate = new CandidateStat();
+	handleRemoteCandidate(stat: CandidateStat) {
+		const RemoteCandidate = new CandidateStat();
         RemoteCandidate.label = "local-candidate"
         RemoteCandidate.address = stat.address;
         RemoteCandidate.port = stat.port
@@ -169,7 +169,7 @@ export class AggregatedStats {
      * Process the Inbound RTP Audio and Video Data 
      * @param stat - inbound rtp stats 
      */
-    handleInBoundRTP(stat: InboundRTPStats) {
+	handleInBoundRTP(stat: InboundRTPStats) {
         switch (stat.kind) {
             case "video":
                 this.inboundVideoStats.timestamp = stat.timestamp;
@@ -218,7 +218,7 @@ export class AggregatedStats {
                 this.inboundAudioStats.timestamp = stat.timestamp;
                 break;
             default:
-                Logger.Log(Logger.GetStackTrace(), "Kind is not handled");
+				Logger.Log(Logger.GetStackTrace(), "Kind is not handled");
                 break;
 
         }
@@ -229,7 +229,7 @@ export class AggregatedStats {
      * Process the outbound RTP Audio and Video Data  
      * @param stat - remote outbound stats
      */
-    handleRemoteOutBound(stat: OutBoundRTPStats) {
+	handleRemoteOutBound(stat: OutBoundRTPStats) {
         switch (stat.kind) {
             case "video":
                 this.outBoundVideoStats.bytesSent = stat.bytesSent;
@@ -273,16 +273,3 @@ export class AggregatedStats {
         return typeof value === 'number' && isFinite(value);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

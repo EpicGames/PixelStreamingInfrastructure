@@ -1,6 +1,7 @@
 import * as libfrontend from '@epicgames/libfrontend'
 import { LoadingOverlay } from './LoadingOverlay';
 import { SPSSignalling } from './SignallingExtension';
+import { MessageStats } from './Messages';
 
 
 export class SPSApplication extends libfrontend.Application {
@@ -36,7 +37,7 @@ export class SPSApplication extends libfrontend.Application {
 		super.onVideoStats(videoStats);
 
 		if (this.config.isFlagEnabled(SPSApplication.Flags.sendToServer)) {
-			this.webRtcController.sendStatsToSignallingServer(videoStats);
+			this.sendStatsToSignallingServer(videoStats);
 		}
 	}
 
@@ -67,5 +68,14 @@ export class SPSApplication extends libfrontend.Application {
 		this.loadingOverlay.update(signallingResp);
 		this.loadingOverlay.animate();
 		this.currentOverlay = this.loadingOverlay;
+	}
+
+	/**
+	 * Send Aggregated Stats to the Signaling Server
+	 * @param stats - Aggregated Stats
+	 */
+	sendStatsToSignallingServer(stats: libfrontend.AggregatedStats) {
+		const data = new MessageStats(stats);
+		this.webRtcController.webSocketController.webSocket.send(data.payload());
 	}
 }

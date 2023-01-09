@@ -1,5 +1,4 @@
 import { Logger } from "../Logger/Logger";
-import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 import * as MessageReceive from "./MessageReceive";
 import * as MessageSend from "./MessageSend";
 import { SignallingProtocol } from "./SignallingProtocol"
@@ -160,15 +159,6 @@ export class WebSocketController {
      */
     close() {
         this.webSocket.close();
-    }
-
-    /**
-     * Sends the Aggregated Stats to the signaling server
-     * @param stats - Stats Payload
-     */
-    sendStats(stats: AggregatedStats) {
-        const data = new MessageSend.MessageStats(stats);
-        this.webSocket.send(data.payload());
     }
 
     /** Event used for Displaying websocket closed messages */

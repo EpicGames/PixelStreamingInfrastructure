@@ -1,17 +1,10 @@
 import { Logger } from "../Logger/Logger";
-import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
-import { CandidatePairStats } from "../PeerConnectionController/CandidatePairStats";
-import { CandidateStat } from "../PeerConnectionController/CandidateStat";
-import { dataChannelStats } from "../PeerConnectionController/DataChannelStats";
-import { InboundAudioStats, InboundVideoStats } from "../PeerConnectionController/InboundRTPStats";
-import { OutBoundVideoStats } from "../PeerConnectionController/OutBoundRTPStats";
 
 /**
  * The Send Types that are pushed from the signaling server
  */
 export enum MessageSendTypes {
     ICE_CANDIDATE = "iceCandidate",
-    STATS = "stats",
     OFFER = "offer",
     ANSWER = "answer",
 	DATACHANNELREQUEST = "dataChannelRequest",
@@ -55,34 +48,6 @@ export class MessagePong extends MessageSend {
         super();
         this.type = MessageSendTypes.PONG;
         this.time = time
-    }
-}
-
-/**
- * Aggregated Stats Message Wrapper
- */
-export class MessageStats extends MessageSend {
-    inboundVideoStats: InboundVideoStats;
-    inboundAudioStats: InboundAudioStats;
-    candidatePair: CandidatePairStats
-    dataChannelStats: dataChannelStats;
-    localCandidates: Array<CandidateStat>;
-    remoteCandidates: Array<CandidateStat>;
-    outboundVideoStats: OutBoundVideoStats;
-
-    /**
-     * @param aggregatedStats - Aggregated Stats 
-     */
-    constructor(aggregatedStats: AggregatedStats) {
-        super();
-        this.type = MessageSendTypes.STATS
-        this.inboundVideoStats = aggregatedStats.inboundVideoStats;
-        this.inboundAudioStats = aggregatedStats.inboundAudioStats;
-        this.candidatePair = aggregatedStats.candidatePair;
-        this.dataChannelStats = aggregatedStats.dataChannelStats
-        this.localCandidates = aggregatedStats.localCandidates;
-        this.remoteCandidates = aggregatedStats.remoteCandidates;
-        this.outboundVideoStats = aggregatedStats.outBoundVideoStats;
     }
 }
 

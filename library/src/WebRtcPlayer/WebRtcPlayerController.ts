@@ -861,15 +861,6 @@ export class WebRtcPlayerController {
 	}
 
 	/**
-	 * Send Aggregated Stats to the Signaling Server
-	 * @param stats - Aggregated Stats
-	 */
-	sendStatsToSignallingServer(stats: AggregatedStats) {
-		Logger.Log(Logger.GetStackTrace(), "----   Sending Aggregated Stats to Signaling Server   ----\n" + JSON.stringify(stats, undefined, 4) + "\n-----------------------------------------------------------", 6);
-		this.webSocketController.sendStats(stats);
-	}
-
-	/**
 	 * Sends the UI Descriptor `stat fps` to the UE Instance 
 	 */
 	sendShowFps(): void {
