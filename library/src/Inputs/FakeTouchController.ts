@@ -8,7 +8,7 @@ import { MouseButton } from "./MouseButtons";
 /**
  * Allows for the usage of fake touch events and implements ITouchController
  * @param dataChannelController - The controller for the Data channel 
- * @param videovideoElementParent - The video player DOM element 
+ * @param videoElementParent - The video player DOM element 
  */
 export class FakeTouchController implements ITouchController {
     fakeTouchFinger: FakeTouchFinger;

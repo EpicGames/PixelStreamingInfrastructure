@@ -52,7 +52,7 @@ export class VideoPlayer {
         }
 
 		this.videoElement.onloadedmetadata = () => {
-			this.onVideoInitialised();
+			this.onVideoInitialized();
 		}
 
         // set resize events to the windows if it is resized or its orientation is changed
@@ -118,9 +118,9 @@ export class VideoPlayer {
     }
 
 	/**
-	 * An override for when the video has been initialised with a srcObject
+	 * An override for when the video has been initialized with a srcObject
 	 */
-	onVideoInitialised() {
+	onVideoInitialized() {
 		// Default Functionality: Do Nothing
 	}
 
@@ -161,7 +161,7 @@ export class VideoPlayer {
     resizePlayerStyleToFillParentElement() {
         const videoElementParent = this.getVideoParentElement();
 
-        //Video is not initialised yet so set videoElementParent to size of parent element
+        //Video is not initialized yet so set videoElementParent to size of parent element
         const styleWidth = "100%";
         const styleHeight = "100%";
         const styleTop = 0;

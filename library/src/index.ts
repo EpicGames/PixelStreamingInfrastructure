@@ -14,7 +14,7 @@ export { LatencyTestResults } from "./DataChannel/LatencyTestResults";
 export { EncoderSettings, InitialSettings, WebRTCSettings } from './DataChannel/InitialSettings';
 export { AggregatedStats } from './PeerConnectionController/AggregatedStats';
 export { Logger } from './Logger/Logger';
-export { UnquantizedDenormalizedUnsignedCoord as UnquantisedAndDenormaliseUnsigned } from './Util/CoordinateConverter';
+export { UnquantizedDenormalizedUnsignedCoord as UnquantizedAndDenormalizeUnsigned } from './Util/CoordinateConverter';
 export { MessageSend } from "./WebSockets/MessageSend"
 export { MessageRecv } from "./WebSockets/MessageReceive"
 export { WebSocketController } from "./WebSockets/WebSocketController"

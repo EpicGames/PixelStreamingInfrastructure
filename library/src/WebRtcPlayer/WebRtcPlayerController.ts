@@ -97,7 +97,7 @@ export class WebRtcPlayerController {
 		this.freezeFrameController = new FreezeFrameController(this.application.videoElementParent);
 
 		this.videoPlayer = new VideoPlayer(this.application.videoElementParent, this.config);
-		this.videoPlayer.onVideoInitialised = () => this.handleVideoInitialised();
+		this.videoPlayer.onVideoInitialized = () => this.handleVideoInitialized();
 		
 		// When in match viewport resolution mode, when the browser viewport is resized we send a resize command back to UE.
 		this.videoPlayer.onMatchViewportResolutionCallback = (width: number, height: number) => {
@@ -109,7 +109,7 @@ export class WebRtcPlayerController {
 			this.sendDescriptorController.emitCommand(descriptor);
 		}
 
-		// Everytime video player is resized in browser we need to reinitialize the mouse coordinate conversion and freeze frame sizing logic.
+		// Every time video player is resized in browser we need to reinitialize the mouse coordinate conversion and freeze frame sizing logic.
 		this.videoPlayer.onResizePlayerCallback = () => { this.setUpMouseAndFreezeFrame(); }
 
 		this.streamController = new StreamController(this.videoPlayer);
@@ -154,11 +154,11 @@ export class WebRtcPlayerController {
 	}
 
 	/**
-	 * Make a request to UnquantisedAndDenormaliseUnsigned coordinates 
+	 * Make a request to UnquantizedAndDenormalizeUnsigned coordinates 
 	 * @param x x axis coordinate 
 	 * @param y y axis coordinate
 	 */
-	requestUnquantisedAndDenormaliseUnsigned(x: number, y: number): UnquantizedDenormalizedUnsignedCoord {
+	requestUnquantizedAndDenormalizeUnsigned(x: number, y: number): UnquantizedDenormalizedUnsignedCoord {
 		return this.coordinateConverter.unquantizeAndDenormalizeUnsigned(x, y);
 	}
 
@@ -458,11 +458,11 @@ export class WebRtcPlayerController {
 	 */
 	playStream() {
 		if (!this.videoPlayer.getVideoElement()) {
-			this.application.showErrorOverlay("Could not play video stream because the video player was not initialised correctly.");
-			Logger.Error(Logger.GetStackTrace(), "Could not player video stream because the video player was not initialised correctly.");
+			this.application.showErrorOverlay("Could not play video stream because the video player was not initialized correctly.");
+			Logger.Error(Logger.GetStackTrace(), "Could not player video stream because the video player was not initialized correctly.");
 
 			// set the disconnect message
-			this.setDisconnectMessageOverride("Stream not initialised correctly");
+			this.setDisconnectMessageOverride("Stream not initialized correctly");
 
 			// close the connection 
 			this.closeSignalingServer();
@@ -512,7 +512,7 @@ export class WebRtcPlayerController {
 	}
 
 	/**
-	 * Enable the video to play automaticity if enableAutoplay is true
+	 * Enable the video to play automatically if enableAutoplay is true
 	 */
 	autoPlayVideoOrSetUpPlayOverlay() {
 		if (this.config.isFlagEnabled(Flags.AutoPlayVideo)) {
@@ -950,8 +950,8 @@ export class WebRtcPlayerController {
 	/**
 	 * Handles when the video element has been loaded with a srcObject
 	 */
-	handleVideoInitialised() {
-		this.application.onVideoInitialised();
+	handleVideoInitialized() {
+		this.application.onVideoInitialized();
 
 		// either autoplay the video or set up the play overlay
 		this.autoPlayVideoOrSetUpPlayOverlay();

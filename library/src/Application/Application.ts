@@ -74,12 +74,12 @@ export class Application {
 
 		this.createButtons();
 
-		// setup webrtc
+		// setup WebRTC
 		this.setWebRtcPlayerController(new WebRtcPlayerController(this.config, this));
 
 		// Onscreen keyboard
 		this.onScreenKeyboardHelper = new OnScreenKeyboard(this.videoElementParent);
-		this.onScreenKeyboardHelper.unquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.webRtcController.requestUnquantisedAndDenormaliseUnsigned(x, y);
+		this.onScreenKeyboardHelper.unquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.webRtcController.requestUnquantizedAndDenormalizeUnsigned(x, y);
 		this.activateOnScreenKeyboard = (command: MessageOnScreenKeyboard) => this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
 	}
 
@@ -175,7 +175,7 @@ export class Application {
 	}
 
 	/**
-	 * Configure the settings with on change listeners and any additonal per experience settings.
+	 * Configure the settings with on change listeners and any additional per experience settings.
 	 */
 	configureSettings() : void {
 
@@ -524,9 +524,9 @@ export class Application {
 	}
 
 	/**
-	 * Handle when the Video has been Initialised
+	 * Handle when the Video has been Initialized
 	 */
-	onVideoInitialised() {
+	onVideoInitialized() {
 		// starting a latency check
 		this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
 			this.webRtcController.sendLatencyTest();

@@ -17,10 +17,10 @@ export class KeyboardController {
 	config: Config;
 
     /* 
-    * New browser APIs have moved away from KeyboarddEvent.keyCode to KeyboardEvent.Code. 
+    * New browser APIs have moved away from KeyboardEvent.keyCode to KeyboardEvent.Code. 
     * For details see: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode#constants_for_keycode_value
     * We still use old KeyboardEvent.keyCode integers in the UE C++ side, so we need a way to map the new
-    * string-based KeyboardEvenet.Code to the old integers.
+    * string-based KeyboardEvent.Code to the old integers.
     */
     CodeToKeyCode : ICodeToKeyCode = {
         "Escape": 27,

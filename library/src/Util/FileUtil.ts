@@ -1,7 +1,7 @@
 import { Logger } from "../Logger/Logger";
 
 /**
- * Utility function for populate file infomration from byte buffers.
+ * Utility function for populate file information from byte buffers.
  */
 export class FileUtil {
 

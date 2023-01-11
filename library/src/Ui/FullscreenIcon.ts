@@ -1,5 +1,5 @@
 /**
- * Declare additions to base types for cross browser fullscreening.
+ * Declare additions to base types for cross browser fullscreen functionality.
  */
 declare global {
 	interface Document {

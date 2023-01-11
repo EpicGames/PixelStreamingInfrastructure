@@ -154,7 +154,7 @@ export class CoordinateConverter {
 }
 
 /**
- * A class for NormaliseAndQuantiseUnsigned objects
+ * A class for NormalizeAndQuantizeUnsigned objects
  */
 export class NormalizedQuantizedUnsignedCoord {
     inRange: boolean;
@@ -169,7 +169,7 @@ export class NormalizedQuantizedUnsignedCoord {
 }
 
 /**
- * A class for UnquantisedAndDenormaliseUnsigned objects
+ * A class for UnquantizedAndDenormalizeUnsigned objects
  */
 export class UnquantizedDenormalizedUnsignedCoord {
     x: number;
@@ -182,7 +182,7 @@ export class UnquantizedDenormalizedUnsignedCoord {
 }
 
 /**
- * A class for NormaliseAndQuantiseSigned objects
+ * A class for NormalizedQuantizedSignedCoord objects
  */
 export class NormalizedQuantizedSignedCoord {
     x: number;

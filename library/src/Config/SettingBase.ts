@@ -1,5 +1,5 @@
 /**
- * Base class for a setting that has a text label, an abitrary setting value it stores, an a HTML element that represents this setting.
+ * Base class for a setting that has a text label, an arbitrary setting value it stores, an a HTML element that represents this setting.
  */
 export class SettingBase {
     id: string;

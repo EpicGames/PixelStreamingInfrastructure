@@ -4,7 +4,7 @@ import { SettingNumber } from "./SettingNumber";
 import { SettingText } from "./SettingText";
 
 /**
- * A collection of toggable flags that are core to all Pixel Streaming experiences.
+ * A collection of flags that can be toggled and are core to all Pixel Streaming experiences.
  * These are used in the `Config.Flags` map. Note, that map can take any string but
  * these flags are provided for convenience to avoid hardcoded strings across the library.
  */
@@ -47,7 +47,7 @@ export class NumericParameters {
 }
 
 export class Config {
-	/* A map of toggable flags - options that can be set in the application - e.g. Use Mic? */
+	/* A map of flags that can be toggled - options that can be set in the application - e.g. Use Mic? */
 	private flags = new Map<string, SettingFlag>();
 
 	/* A map of numerical settings - options that can be in the application - e.g. MinBitrate */
@@ -63,7 +63,7 @@ export class Config {
 	}
 
 	/**
-	 * Make DOM elments for a settings section with a heading.
+	 * Make DOM elements for a settings section with a heading.
 	 * @param settingsElem The parent container for our DOM elements.
 	 * @param sectionHeading The heading element to go into the section.
 	 * @returns The constructed DOM element for the section.
@@ -408,7 +408,7 @@ export class Config {
 	}
 
 	/**
-	 * Get the value of the configruation flag which has the given id.
+	 * Get the value of the configuration flag which has the given id.
 	 * @param id The unique id for the flag.
 	 * @returns True if the flag is enabled.
 	 */
