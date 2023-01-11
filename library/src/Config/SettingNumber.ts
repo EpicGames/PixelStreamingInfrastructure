@@ -18,11 +18,13 @@ import { SettingBase } from "./SettingBase";
 
 		// attempt to read the number from the url params
 		const urlParams = new URLSearchParams(window.location.search);
-		if(urlParams.has(this.id)){
+		if(!urlParams.has(this.id)){
+			this.number = defaultNumber;
+		} 
+		else
+		{
 			const parsedValue = Number.parseInt(urlParams.get(this.id));
-			if(!Number.isNaN(parsedValue)) {
-				this.value = parsedValue;
-			}
+			this.number = Number.isNaN(parsedValue) ? defaultNumber : parsedValue
 		}
 
 		// setup onchange
@@ -35,15 +37,8 @@ import { SettingBase } from "./SettingBase";
 				Logger.Warning(Logger.GetStackTrace(), `Could not parse value change into a valid number - value was ${inputElem.value}, resetting value to ${this._min}`)
 				this.number = this._min;
 			} else {
-				const clampedValue = this.clamp(parsedValue);
-				this.value = clampedValue;
-				this._spinner.value = clampedValue.toString();
+				this.number = parsedValue;
 				this.updateURLParams();
-			}
-
-			// call onchange if we have set it
-			if(this.onChange) {
-				this.onChange(this.value);
 			}
 		};
 

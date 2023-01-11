@@ -67,10 +67,10 @@ export class SignallingProtocol {
 		});
 
 		// OFFER
-		websocketController.signallingProtocol.addMessageHandler(MessageRecvTypes.OFFER, (answerPayload : string) => {
+		websocketController.signallingProtocol.addMessageHandler(MessageRecvTypes.OFFER, (offerPayload : string) => {
 			// send our pong payload back to the signalling server
 			Logger.Log(Logger.GetStackTrace(), MessageRecvTypes.OFFER, 6);
-			const offer: MessageOffer = JSON.parse(answerPayload);
+			const offer: MessageOffer = JSON.parse(offerPayload);
 			websocketController.onWebRtcOffer(offer);
 		});
 

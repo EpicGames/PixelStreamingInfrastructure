@@ -12,7 +12,7 @@ export class Flags {
 	static AutoConnect = "AutoConnect";
 	static AutoPlayVideo = "AutoPlayVideo";
 	static AFKDetection = "TimeoutIfIdle";
-	static BrowserSendOffer = "offerToReceive";
+	static BrowserSendOffer = "OfferToReceive";
 	static HoveringMouseMode = "HoveringMouse"
 	static ForceMonoAudio = "ForceMonoAudio";
 	static ForceTURN = "ForceTURN";
@@ -286,7 +286,7 @@ export class Config {
 
 		const ControlSchemeFlag = this.flags.get(Flags.HoveringMouseMode);
 		this.addSettingFlag(viewSettingsSection, ControlSchemeFlag);
-		ControlSchemeFlag.label = `Control Scheme: ${(ControlSchemeFlag.value) ? "Hovering" : "Locked"} Mouse`;
+		ControlSchemeFlag.label = `Control Scheme: ${(ControlSchemeFlag.flag) ? "Hovering" : "Locked"} Mouse`;
 		
 
 		/* Setup all encoder related settings under this section */
@@ -413,7 +413,7 @@ export class Config {
 	 * @returns True if the flag is enabled.
 	 */
 	isFlagEnabled(id: string) : boolean {
-		return this.flags.get(id).value as boolean;
+		return this.flags.get(id).flag as boolean;
 	}
 
 	/**
@@ -425,7 +425,7 @@ export class Config {
 		if(!this.flags.has(id)) {
 			Logger.Warning(Logger.GetStackTrace(), `Cannot toggle flag called ${id} - it does not exist in the Config.flags map.`);
 		} else {
-			this.flags.get(id).value = flagEnabled;
+			this.flags.get(id).flag = flagEnabled;
 		}
 	}
 
@@ -438,7 +438,7 @@ export class Config {
 		if(!this.textParameters.has(id)) {
 			Logger.Warning(Logger.GetStackTrace(), `Cannot set text setting called ${id} - it does not exist in the Config.textParameters map.`);
 		} else {
-			this.textParameters.get(id).value = settingValue;
+			this.textParameters.get(id).text = settingValue;
 		}
 	}
 

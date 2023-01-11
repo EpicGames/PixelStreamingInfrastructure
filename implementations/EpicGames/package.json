@@ -7,10 +7,11 @@
     "build": "npx webpack",
     "watch": "npx webpack --watch",
     "serve": "webpack serve",
-    "build-all": "cd ../../library && npm run build && cd ../implementations/EpicGames && npm run build"
+	"install": "cd ../../library && npm run build && cd ../implementations/EpicGames && npm link ../../library",
+    "build-all": "npm run install && npm run build"
   },
   "devDependencies": {
-    "@epicgames/libfrontend": "file:../../library",
+	"@epicgames/libfrontend": "^0.0.1",
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.11.1",
 	"css-loader": "^6.7.3",

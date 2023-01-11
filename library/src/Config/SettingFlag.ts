@@ -13,14 +13,12 @@ export class SettingFlag extends SettingBase {
 
         const urlParams = new URLSearchParams(window.location.search);
         if(!urlParams.has(this.id)){
-            this.value = defaultFlagValue;
+            this.flag = defaultFlagValue;
         }
         else {
             // parse flag from url parameters
             const urlParamFlag = this.getUrlParamFlag();
-            if(urlParamFlag !== defaultFlagValue) {
-                this.value = urlParamFlag;
-            } 
+			this.flag = urlParamFlag;
         }
     }
 
@@ -86,8 +84,7 @@ export class SettingFlag extends SettingBase {
 
             // setup on change from checkbox
             this.checkbox.addEventListener("change", () => {
-                this.value = this.checkbox.checked;
-                this.onChange(this.checkbox.checked);
+				this.flag = this.checkbox.checked;
 
                 // set url params
                 const urlParams = new URLSearchParams(window.location.search);
@@ -108,27 +105,26 @@ export class SettingFlag extends SettingBase {
      * Enables this flag.
      */
     public enable() : void {
-        this.value = true;
+		this.flag = true;
     }
 
-    /**
-     * @return The setting's value.
-     */
-    public get value() : unknown{
-        return this.checkbox.checked;
-    }
+	/**
+	* @return The setting's value.
+	*/
+	public get flag() : boolean {
+		return this.checkbox.checked;
+	}
+
 
     /**
      * Update the setting's stored value.
      * @param inValue The new value for the setting.
      */
-     public set value(inValue : unknown) {
-        this._value = inValue;
-
+     public set flag(inValue : unknown) {
+        this.value = inValue;
         if(typeof inValue === "boolean") {
             this.checkbox.checked = inValue;
         }
-
     }
 
     /**

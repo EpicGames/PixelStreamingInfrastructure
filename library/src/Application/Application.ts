@@ -182,8 +182,10 @@ export class Application {
 		// This builds all the settings sections and flags under this `settingsContent` element.
 		this.config.populateSettingsElement(this.settingsPanel.settingsContentElement);
 
-		this.config.addOnSettingChangedListener(Flags.IsQualityController, (isQualityController: boolean)=>{ 
-			if (!isQualityController === false) {
+		this.config.addOnSettingChangedListener(Flags.IsQualityController, (wantsQualityController: boolean)=>{ 
+			// If the setting has been set to true (either programatically or the user has flicked the toggle) 
+			// and we aren't currently quality controller, send the request
+			if (wantsQualityController === true && !this.webRtcController.isQualityController) {
 				this.webRtcController.sendRequestQualityControlOwnership();
 			}
 		});
@@ -199,11 +201,9 @@ export class Application {
 		this.config.addOnSettingChangedListener(Flags.HoveringMouseMode, (isHoveringMouse : boolean) => {
 			if (isHoveringMouse) {
 				this.config.setFlagLabel(Flags.HoveringMouseMode, "Control Scheme: Hovering Mouse");
-				this.config.setFlagEnabled(Flags.HoveringMouseMode, true);
 				this.webRtcController.activateRegisterMouse();
 			} else {
 				this.config.setFlagLabel(Flags.HoveringMouseMode, "Control Scheme: Locked Mouse");
-				this.config.setFlagEnabled(Flags.HoveringMouseMode, false);
 				this.webRtcController.activateRegisterMouse();
 			}
 		});

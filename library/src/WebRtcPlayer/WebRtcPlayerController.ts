@@ -62,6 +62,7 @@ export class WebRtcPlayerController {
 	gamePadController: GamePadController;
 	coordinateConverter: CoordinateConverter;
 	isUsingSFU: boolean;
+	isQualityController: boolean;
 	statsTimerHandle: number;
 	file: FileTemplate;
 
@@ -151,6 +152,7 @@ export class WebRtcPlayerController {
 		this.inputClassesFactory = new InputClassesFactory(this.streamMessageController, this.videoPlayer, this.coordinateConverter);
 
 		this.isUsingSFU = false;
+		this.isQualityController = false;
 	}
 
 	/**
@@ -667,7 +669,11 @@ export class WebRtcPlayerController {
 		Logger.Log(Logger.GetStackTrace(), `Got offer sdp ${Offer.sdp}`, 6);
 
 		if (Offer.sfu) {
-			this.isUsingSFU = true;
+			this.isUsingSFU = Offer.sfu.toLowerCase() === "true";
+		}
+
+		if(Offer.defaultToHover) {
+			this.config.setFlagEnabled(Flags.HoveringMouseMode, Offer.defaultToHover.toLowerCase() === "true");
 		}
 
 		const sdpOffer: RTCSessionDescriptionInit = {
@@ -966,9 +972,9 @@ export class WebRtcPlayerController {
 	onQualityControlOwnership(message: ArrayBuffer) {
 		const view = new Uint8Array(message);
 		Logger.Log(Logger.GetStackTrace(), "DataChannelReceiveMessageType.QualityControlOwnership", 6);
-		const QualityOwnership = new Boolean(view[1]).valueOf();
-		Logger.Log(Logger.GetStackTrace(), `Received quality controller message, will control quality: ${QualityOwnership}`);
-		this.application.onQualityControlOwnership(QualityOwnership);
+		this.isQualityController = new Boolean(view[1]).valueOf();
+		Logger.Log(Logger.GetStackTrace(), `Received quality controller message, will control quality: ${this.isQualityController}`);
+		this.application.onQualityControlOwnership(this.isQualityController);
 	}
 
 	/**

@@ -13,14 +13,13 @@ export class SettingText extends SettingBase {
 
         const urlParams = new URLSearchParams(window.location.search);
         if(!urlParams.has(this.id)){
-            this.value = defaultTextValue;
+            this.text = defaultTextValue;
         }
-        else {
+        else 
+		{
             // parse flag from url parameters
             const urlParamFlag = this.getUrlParamText();
-            if(urlParamFlag !== defaultTextValue) {
-                this.value = urlParamFlag;
-            } 
+			this.text = urlParamFlag;
         }
     }
 
@@ -78,8 +77,7 @@ export class SettingText extends SettingBase {
 
             // setup on change from checkbox
             this.textbox.addEventListener("input", () => {
-                this.value = this.textbox.value;
-                this.onChange(this.value);
+                this.text = this.textbox.value;
 
                 // set url params
                 const urlParams = new URLSearchParams(window.location.search);
@@ -95,7 +93,7 @@ export class SettingText extends SettingBase {
     /**
      * @return The setting's value.
      */
-    public get value() : unknown{
+    public get text() : string {
         return this.textbox.value;
     }
 
@@ -103,8 +101,8 @@ export class SettingText extends SettingBase {
      * Update the setting's stored value.
      * @param inValue The new value for the setting.
      */
-     public set value(inValue : unknown) {
-        this._value = inValue;
+	public set text(inValue : unknown) {
+        this.value = inValue;
         if(typeof inValue === "string") {
             this.textbox.value = inValue;
         }
