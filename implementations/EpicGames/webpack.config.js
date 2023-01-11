@@ -1,26 +1,30 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
+const fs = require('fs');
+
+const pages = fs.readdirSync('./src', { withFileTypes: true })
+	.filter(item => !item.isDirectory())
+	.filter(item => path.parse(item.name).ext === '.html')
+	.map(htmlFile => path.parse(htmlFile.name).name);
 
 module.exports = (env) => {
   return {
     mode: 'development',
-    entry: {
-      index: './src/index.ts',
-    },
+    entry: pages.reduce((config, page) => {
+		config[page] = `./src/${page}.ts`;
+		return config;
+	}, {}),
     plugins: [
-
       new webpack.DefinePlugin({
         WEBSOCKET_URL: JSON.stringify((env.WEBSOCKET_URL !== undefined) ? env.WEBSOCKET_URL : '')
       }),
-
-      new HtmlWebpackPlugin({
-        title: 'Development',
-        template: './src/index.html',
-        filename: 'index.html'
-      }),
-
-    ],
+    ].concat(pages.map((page) => new HtmlWebpackPlugin({
+    	title: 'Development',
+    	template: `./src/${page}.html`,
+    	filename: `${page}.html`,
+		chunks: [page],
+    }), )),
     // turn off so we can see the source map for dom delegate so we can debug the library
     devtool: 'inline-source-map',
     module: {

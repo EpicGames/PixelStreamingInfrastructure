@@ -192,7 +192,7 @@ declare global {
 			|| (document.msFullscreenElement && document.msFullscreenElement !== null)
 			|| (document.fullscreenElement && document.fullscreenElement !== null));
 
-		const minimize = document.getElementById('minimizeIcon');
+		const minimize = this.minimizeIcon;
 		const maximize = this.maximizeIcon;
 		
 		if (this.isFullscreen) {

@@ -5,7 +5,6 @@ import { OverlayBase } from './BaseOverlay'
  * Class for the base action overlay structure 
  */
 export class ActionOverlay extends OverlayBase {
-	contentElementSpanId: string;
 	onActionCallback: (...args: []) => void;
 
 	/**
@@ -14,9 +13,8 @@ export class ActionOverlay extends OverlayBase {
 	 * @param rootElement the root element that is the overlay
 	 * @param contentElement an element that contains text for the action overlay 
 	 */
-	public constructor(rootDiv: HTMLElement, rootElement: HTMLElement, contentElement: HTMLElement, contentElementSpanId?: string) {
+	public constructor(rootDiv: HTMLElement, rootElement: HTMLElement, contentElement: HTMLElement) {
 		super(rootDiv, rootElement, contentElement);
-		this.contentElementSpanId = contentElementSpanId as string;
 		this.onActionCallback = () => { /* do nothing */ Logger.Info(Logger.GetStackTrace(), "Did you forget to set the onAction callback in your overlay?") };
 	}
 
@@ -25,8 +23,8 @@ export class ActionOverlay extends OverlayBase {
 	 * @param text the update text to be inserted into the overlay 
 	 */
 	public update(text: string): void {
-		if ((text != null || text != undefined) && (this.contentElementSpanId != null || this.contentElementSpanId != undefined)) {
-			document.getElementById(this.contentElementSpanId).innerHTML = text;
+		if ((text != null || text != undefined)) {
+			this.textElement.innerHTML = text;
 		}
 	}
 

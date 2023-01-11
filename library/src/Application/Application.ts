@@ -490,7 +490,7 @@ export class Application {
 			this.showErrorOverlay(`Disconnected: ${eventString}`);
 			this.showActionOrErrorOnDisconnect = true;
 		} else {
-			this.showDisconnectOverlay(`Disconnected: ${eventString}  \n Click To Restart`);
+			this.showDisconnectOverlay(`Disconnected: ${eventString}  <div class="clickableState">Click To Restart</div>`);
 		}
 
 		// update all of the tools upon disconnect 

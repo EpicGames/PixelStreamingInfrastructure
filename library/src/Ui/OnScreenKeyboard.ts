@@ -20,6 +20,9 @@ export class OnScreenKeyboard {
      * @param videoElementParent The div element the video player is injected into 
      */
     constructor(videoElementParent: HTMLElement) {
+		this.editTextButton = null;
+		this.hiddenInput = null;
+
         if ('ontouchstart' in document.documentElement) {
             this.createOnScreenKeyboardHelpers(videoElementParent);
         }
@@ -41,14 +44,14 @@ export class OnScreenKeyboard {
      * @param videoElementParent The div element the video player i injected into
      */
     createOnScreenKeyboardHelpers(videoElementParent: HTMLElement) {
-        if (document.getElementById('hiddenInput') === null) {
+        if (!this.hiddenInput) {
             this.hiddenInput = document.createElement('input');
             this.hiddenInput.id = 'hiddenInput';
             this.hiddenInput.maxLength = 0;
             videoElementParent.appendChild(this.hiddenInput);
         }
 
-        if (document.getElementById('editTextButton') === null) {
+        if (!this.editTextButton) {
             this.editTextButton = document.createElement('button');
             this.editTextButton.id = 'editTextButton';
             this.editTextButton.innerHTML = 'edit text';

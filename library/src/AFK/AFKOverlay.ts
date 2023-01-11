@@ -4,7 +4,6 @@ import { ActionOverlay } from "../Overlay/ActionOverlay";
  * Show an overlay for when the session is unattended, it begins a countdown timer, which when elapsed will disconnect the stream.
  */
 export class AFKOverlay extends ActionOverlay {
-
 	/**
 	* @returns The created root element of this overlay.
 	*/
@@ -42,10 +41,6 @@ export class AFKOverlay extends ActionOverlay {
 	 * @param countdown the count down number to be inserted into the span for updating
 	 */
 	public updateCountdown(countdown: number): void {
-		const countdownTimer = document.getElementById("afkCountDownNumber");
-		if(countdownTimer != null) {
-			countdownTimer.innerHTML = countdown.toString();
-		}
+		this.textElement.innerHTML = `<center>No activity detected<br>Disconnecting in <span id="afkCountDownNumber">${countdown}</span> seconds<br>Click to continue<br></center>`;
 	}
-
 }
