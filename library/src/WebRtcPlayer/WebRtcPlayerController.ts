@@ -143,7 +143,6 @@ export class WebRtcPlayerController {
 		this.sendDescriptorController = new SendDescriptorController(this.dataChannelSender, this.streamMessageController);
 		this.sendMessageController = new SendMessageController(this.dataChannelSender, this.streamMessageController);
 		this.toStreamerMessagesController = new ToStreamerMessagesController(this.sendMessageController);
-		this.application.setWebRtcPlayerController(this);
 		this.registerMessageHandlers();
 		this.streamMessageController.populateDefaultProtocol();
 

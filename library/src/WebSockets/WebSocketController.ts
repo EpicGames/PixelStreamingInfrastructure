@@ -38,7 +38,7 @@ export class WebSocketController {
         try {
 			this.webSocket = new WebSocket(connectionURL);
             this.webSocket.onopen = (event) => this.handleOnOpen(event);
-            this.webSocket.onerror = (event) => this.handleOnError(event);
+            this.webSocket.onerror = () => this.handleOnError();
             this.webSocket.onclose = (event) => this.handleOnClose(event);
             this.webSocket.onmessage = (event) => this.handleOnMessage(event);
             this.webSocket.onmessagebinary = (event) => this.handleOnMessageBinary(event);
@@ -107,9 +107,8 @@ export class WebSocketController {
      * Handles when there is an error on the websocket
      * @param event - Error Payload
      */
-    handleOnError(event: Event) {
-        Logger.Error(Logger.GetStackTrace(), 'WebSocket error: ');
-        Logger.Log(Logger.GetStackTrace(), event.toString());
+    handleOnError() {
+        Logger.Error(Logger.GetStackTrace(), 'WebSocket error');
     }
 
     /**
