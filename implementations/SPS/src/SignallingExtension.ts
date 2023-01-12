@@ -1,7 +1,7 @@
 
-import { MessageSend, WebSocketController } from "@epicgames/libfrontend";
-import { MessageRecv } from "@epicgames/libfrontend";
-import { Logger } from "@epicgames/libfrontend";
+import { MessageSend, WebSocketController } from "@epicgames/pixelstreamingfrontend";
+import { MessageRecv } from "@epicgames/pixelstreamingfrontend";
+import { Logger } from "@epicgames/pixelstreamingfrontend";
 
 /**
  * Auth Request Message Wrapper

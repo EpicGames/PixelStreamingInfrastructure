@@ -12,7 +12,7 @@
   "author": "TensorWorks Pty Ltd",
   "license": "MIT",
   "devDependencies": {
-    "@epicgames/libfrontend": "^0.0.1",
+    "@epicgames/pixelstreamingfrontend": "^0.0.1",
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.11.1",
 	"css-loader": "^6.7.3",

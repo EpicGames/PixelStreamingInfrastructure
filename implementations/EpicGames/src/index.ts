@@ -1,4 +1,4 @@
-import * as libfrontend from '@epicgames/libfrontend';
+import * as libfrontend from '@epicgames/pixelstreamingfrontend';
 
 // Example of how to set the logger level
 //libfrontend.Logger.SetLoggerVerbosity(10);

@@ -1,8 +1,8 @@
 {
-  "name": "@epicgames/libfrontend",
+  "name": "@epicgames/pixelstreamingfrontend",
   "version": "0.0.1",
   "description": "Frontend library for Pixel Streaming",
-  "main": "dist/libfrontend.min.js",
+  "main": "dist/pixelstreamingfrontend.min.js",
   "types": "types/index.d.ts",
   "scripts": {
     "build": "npx webpack",

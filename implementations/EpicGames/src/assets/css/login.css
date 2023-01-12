@@ -44,6 +44,7 @@ button {
     text-align: center;
 	line-height: 1.75rem;
 	font-family: 'Montserrat';
+	border-radius: 4px;
 }
 
 button:hover {

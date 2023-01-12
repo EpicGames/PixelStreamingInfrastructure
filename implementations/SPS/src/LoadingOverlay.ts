@@ -1,4 +1,4 @@
-import * as libfrontend from "@epicgames/libfrontend";
+import * as libfrontend from "@epicgames/pixelstreamingfrontend";
 
 export class LoadingOverlay extends libfrontend.TextOverlay {
 	maxDrops = 50;
