@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { SpecialKeyCodes } from "./SpecialKeyCodes";
 import { Logger } from "../Logger/Logger";
 import { ActiveKeys } from "./InputClassesFactory";

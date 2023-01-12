@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 export class TwoWayMap<KeyType, ValueType> {
 	map: Map<KeyType, ValueType>;
 	reverseMap: Map<ValueType, KeyType>;

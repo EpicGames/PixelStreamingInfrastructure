@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 
 import { UnquantizedDenormalizedUnsignedCoord } from "../Util/CoordinateConverter";
 import { MessageOnScreenKeyboard } from "../WebSockets/MessageReceive";

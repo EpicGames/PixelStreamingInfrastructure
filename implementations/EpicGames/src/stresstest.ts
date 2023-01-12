@@ -1,4 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
+
 import * as libfrontend from '@epicgames/pixelstreamingfrontend';
 
 // This is the entrypoint to the stress test, all setup happens here

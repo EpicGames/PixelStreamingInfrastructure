@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { ActionOverlay } from "../Overlay/ActionOverlay";
 
 /**

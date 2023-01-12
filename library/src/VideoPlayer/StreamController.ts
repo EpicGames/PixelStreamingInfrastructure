@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { MouseController } from "../Inputs/MouseController"
 import { Logger } from "../Logger/Logger";
 import { VideoPlayer } from "./VideoPlayer";

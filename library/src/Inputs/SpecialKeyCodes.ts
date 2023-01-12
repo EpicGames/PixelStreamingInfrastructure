@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 /**
  * Registers the Special Key codes
  *  Must be kept in sync with JavaScriptKeyCodeToFKey C++ array. 

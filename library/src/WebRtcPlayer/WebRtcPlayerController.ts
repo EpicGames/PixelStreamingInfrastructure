@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { WebSocketController } from "../WebSockets/WebSocketController";
 import { StreamController } from "../VideoPlayer/StreamController";
 import { MessageAnswer, MessageOffer, MessageConfig } from "../WebSockets/MessageReceive";

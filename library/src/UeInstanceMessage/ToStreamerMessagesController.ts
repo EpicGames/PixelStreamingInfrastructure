@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { SendMessageController } from "./SendMessageController";
 
 export class ToStreamerMessagesController {

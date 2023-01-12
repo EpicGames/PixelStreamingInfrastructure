@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import * as libfrontend from '@epicgames/pixelstreamingfrontend';
 
 // Example of how to set the logger level

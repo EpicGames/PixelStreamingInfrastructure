@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 /**
  * A UI element showing the QP (quantization parameter) of the video stream at the last encoded frame (well, last transmitted QP really).
  * A blockier encoding will have a higher QP and this will make the indicator turn more red.

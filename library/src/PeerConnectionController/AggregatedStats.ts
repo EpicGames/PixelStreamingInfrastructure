@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { InboundRTPStats, InboundVideoStats, InboundAudioStats } from './InboundRTPStats';
 import { InboundTrackStats } from './InboundTrackStats'
 import { DataChannelStats } from "./DataChannelStats";

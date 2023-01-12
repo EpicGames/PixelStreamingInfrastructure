@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { MouseButtonsMask, MouseButton } from "./MouseButtons";
 import { Logger } from "../Logger/Logger";
 import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";

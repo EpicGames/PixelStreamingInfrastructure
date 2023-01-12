@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { Config } from "../Config/Config";
 import { StatsPanel } from "../UI/StatsPanel";
 import { LatencyTestResults } from "../DataChannel/LatencyTestResults"

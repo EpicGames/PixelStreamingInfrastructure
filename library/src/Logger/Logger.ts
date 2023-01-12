@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 export class Logger {
     static verboseLogLevel = 5;
 

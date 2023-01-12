@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 /** 
  * ICE Candidate Stat collected from the RTC Stats Report
  */

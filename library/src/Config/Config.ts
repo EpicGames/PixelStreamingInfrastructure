@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { Logger } from "../Logger/Logger";
 import { SettingFlag } from "./SettingFlag";
 import { SettingNumber } from "./SettingNumber";

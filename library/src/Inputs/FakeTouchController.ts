@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { CoordinateConverter } from "../Util/CoordinateConverter";
 import { StreamMessageController } from "../UeInstanceMessage/StreamMessageController";
 import { VideoPlayer } from "../VideoPlayer/VideoPlayer";

@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { DataChannelSender } from "../DataChannel/DataChannelSender";
 import { Logger } from "../Logger/Logger";
 import { StreamMessageController } from "./StreamMessageController";

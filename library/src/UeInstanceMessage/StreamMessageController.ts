@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { TwoWayMap } from "./TwoWayMap";
 import { Logger } from "../Logger/Logger";
 

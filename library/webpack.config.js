@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 const package = require('./package.json');
 const path = require('path');
 const webpack = require('webpack');

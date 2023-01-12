@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { Logger } from "../Logger/Logger";
 import { Config, Flags } from "../Config/Config";
 import { AggregatedStats } from "./AggregatedStats";

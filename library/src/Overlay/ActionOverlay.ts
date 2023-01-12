@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { Logger } from "../Logger/Logger";
 import { OverlayBase } from './BaseOverlay'
 

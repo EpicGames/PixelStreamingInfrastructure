@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { Logger } from "../Logger/Logger";
 import * as MessageReceive from "./MessageReceive";
 import * as MessageSend from "./MessageSend";

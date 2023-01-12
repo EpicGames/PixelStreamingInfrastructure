@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 export { WebRtcPlayerController } from "./WebRtcPlayer/WebRtcPlayerController"
 export { Config, ControlSchemeType, Flags, NumericParameters, TextParameters } from "./Config/Config"
 export { SettingBase } from "./Config/SettingBase"

@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { Config, Flags, NumericParameters } from "../Config/Config";
 import { Logger } from "../Logger/Logger";
 import { AFKOverlay } from "./AFKOverlay";

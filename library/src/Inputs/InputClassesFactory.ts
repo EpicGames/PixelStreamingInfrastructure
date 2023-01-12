@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { FakeTouchController } from "./FakeTouchController";
 import { KeyboardController } from "./KeyboardController";
 import { MouseController } from "./MouseController";

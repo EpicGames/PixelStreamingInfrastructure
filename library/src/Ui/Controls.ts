@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import { FullScreenIcon } from "./FullscreenIcon";
 import { SettingsIcon } from "./SettingsIcon";
 import { StatsIcon } from "./StatsIcon";

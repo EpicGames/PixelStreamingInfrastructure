@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 /**
  * Declare additions to base types for cross browser fullscreen functionality.
  */
