@@ -48,7 +48,7 @@ export class PeerConnectionController {
         const isLocalhostConnection = location.hostname === "localhost" || location.hostname === "127.0.0.1";
         const isHttpsConnection = location.protocol === 'https:';
         let useMic = config.isFlagEnabled(Flags.UseMic);
-        if (useMic && isLocalhostConnection && !isHttpsConnection) {
+        if (useMic && !(isLocalhostConnection || isHttpsConnection)) {
             useMic = false;
             Logger.Error(Logger.GetStackTrace(), "Microphone access in the browser will not work if you are not on HTTPS or localhost. Disabling mic access.");
             Logger.Error(Logger.GetStackTrace(), "For testing you can enable HTTP microphone access Chrome by visiting chrome://flags/ and enabling 'unsafely-treat-insecure-origin-as-secure'");
@@ -76,7 +76,7 @@ export class PeerConnectionController {
 			const isLocalhostConnection = location.hostname === "localhost" || location.hostname === "127.0.0.1";
 			const isHttpsConnection = location.protocol === 'https:';
 			let useMic = config.isFlagEnabled(Flags.UseMic);
-			if (useMic && isLocalhostConnection && !isHttpsConnection) {
+			if (useMic && !(isLocalhostConnection || isHttpsConnection)) {
 				useMic = false;
 				Logger.Error(Logger.GetStackTrace(), "Microphone access in the browser will not work if you are not on HTTPS or localhost. Disabling mic access.");
 				Logger.Error(Logger.GetStackTrace(), "For testing you can enable HTTP microphone access Chrome by visiting chrome://flags/ and enabling 'unsafely-treat-insecure-origin-as-secure'");
