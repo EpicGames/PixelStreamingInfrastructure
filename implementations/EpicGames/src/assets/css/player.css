@@ -1,6 +1,5 @@
-/* Copyright Epic Games, Inc. All Rights Reserved. */
-
 :root {
+	/*Using color scheme https://color.adobe.com/TD-Colors---Option-3-color-theme-10394433/*/
 	--color0:#1D1F2280;
 	--color1:#000000;
 	--color2:#FFFFFF;
@@ -33,7 +32,7 @@ input {
 
 body {
 	margin: 0px;
-	background-color: black;
+	background-color: var(--color1);
 	font-family: 'Montserrat', sans-serif;
 }
 
@@ -52,7 +51,7 @@ canvas {
 	width: 100%;
 	height: 100%;
 	position: absolute;
-	background-color: black;
+	background-color: var(--color1);
 }
 
 /* UI STUFF */
@@ -240,7 +239,7 @@ object {
 	-webkit-backdrop-filter: blur(10px);
 	overflow-y: auto;
 	overflow-x: hidden;
-	background-color: rgba(30, 29, 34, 0.5)
+	background-color: var(--color0);
 }
 
 .panel-wrap-visible {
@@ -332,11 +331,10 @@ object {
 	font-size: 1.8em;
 	width: 100%;
 	height: 100%;
-	background-color: black;
+	background-color: var(--color1);
 	align-items: center;
 	justify-content: center;
 	text-transform: uppercase;
-
 }
 
 /* State for element to be clickable */
@@ -354,7 +352,7 @@ object {
 
 /* State to hide overlay, WebRTC communication is in progress and or is playing */
 .hiddenState {
-	display: none;
+	display: none !important;
 }
 
 #playButton,
