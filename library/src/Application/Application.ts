@@ -83,6 +83,7 @@ export class Application {
 		this.onScreenKeyboardHelper = new OnScreenKeyboard(this.videoElementParent);
 		this.onScreenKeyboardHelper.unquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.webRtcController.requestUnquantizedAndDenormalizeUnsigned(x, y);
 		this.activateOnScreenKeyboard = (command: MessageOnScreenKeyboard) => this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
+		
 		this.updateColors(this.config.isFlagEnabled(Flags.LightMode));
 	}
 

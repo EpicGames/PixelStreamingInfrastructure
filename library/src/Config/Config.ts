@@ -203,7 +203,7 @@ export class Config {
 			Flags.LightMode,
 			"Use a light color scheme",
 			"The Pixel Streaming player will be instructed to use a lighter color scheme",
-			(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) // Default value is system preference
+			false // (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches would use system preference
 		));
 
 		/**

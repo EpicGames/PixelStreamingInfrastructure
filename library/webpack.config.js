@@ -7,7 +7,7 @@ const webpack = require('webpack');
 module.exports = {
   mode: 'development',
   entry: {
-    index: './src/index.ts',
+    index: './src/pixelstreamingfrontend.ts',
   },
   devtool: 'inline-source-map',
   module: {
@@ -40,4 +40,5 @@ module.exports = {
   optimization: {
     minimize: false
   },
+  stats: 'errors-only'
 };

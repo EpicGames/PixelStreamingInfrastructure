@@ -37,6 +37,7 @@ export { CandidateStat } from "./PeerConnectionController/CandidateStat";
 export { DataChannelStats } from "./PeerConnectionController/DataChannelStats";
 export { InboundAudioStats, InboundVideoStats } from "./PeerConnectionController/InboundRTPStats";
 export { OutBoundVideoStats } from "./PeerConnectionController/OutBoundRTPStats";
+export { PixelStreamingApplicationStyle } from "./Application/PixelStreamingApplicationStyles"
 
-declare let LIBRARY_VERSION: string;
-export const version = LIBRARY_VERSION;
+import { PixelStreamingApplicationStyle } from "./Application/PixelStreamingApplicationStyles";
+export const  PixelStreamingApplicationStyles = new PixelStreamingApplicationStyle();

@@ -14,7 +14,7 @@
 	statsText = "";
 	color = "";
 
-	// qp colous 
+	// qp colors 
 	readonly orangeQP = 26;
 	readonly redQP = 35;
 
