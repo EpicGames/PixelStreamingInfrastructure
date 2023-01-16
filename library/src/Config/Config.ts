@@ -25,6 +25,7 @@ export class Flags {
 	static StartVideoMuted = "StartVideoMuted";
 	static SuppressBrowserKeys = "SuppressBrowserKeys";
 	static UseMic = "UseMic";
+	static LightMode = "LightMode";
 }
 
 /**
@@ -198,6 +199,13 @@ export class Config {
 			false
 		));
 
+		this.flags.set(Flags.LightMode, new SettingFlag(
+			Flags.LightMode,
+			"Use a light color scheme",
+			"The Pixel Streaming player will be instructed to use a lighter color scheme",
+			false // (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches would use system preference
+		));
+
 		/**
 		 * Numeric parameters
 		 */
@@ -289,7 +297,10 @@ export class Config {
 		const ControlSchemeFlag = this.flags.get(Flags.HoveringMouseMode);
 		this.addSettingFlag(viewSettingsSection, ControlSchemeFlag);
 		ControlSchemeFlag.label = `Control Scheme: ${(ControlSchemeFlag.flag) ? "Hovering" : "Locked"} Mouse`;
-		
+
+		const colorSchemeFlag = this.flags.get(Flags.LightMode);
+		this.addSettingFlag(viewSettingsSection, colorSchemeFlag);
+		colorSchemeFlag.label = `Color Scheme: ${(colorSchemeFlag.flag) ? "Light" : "Dark"} Mode`;
 
 		/* Setup all encoder related settings under this section */
 		const encoderSettingsSection = this.buildSectionWithHeading(settingsElem, "Encoder");

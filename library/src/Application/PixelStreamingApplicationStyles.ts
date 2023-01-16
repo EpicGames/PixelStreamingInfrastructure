@@ -10,13 +10,18 @@ export class PixelStreamingApplicationStyle {
 	{
 		"@global": {
 			":root": {
-				"--colour1": "#000000",
-				"--colour2": "#FFFFFF",
-				"--colour3": "#0585fe",
-				"--colour4": "#35b350",
-				"--colour5": "#ffab00",
-				"--colour6": "#1e1d22",
-				"--colour7": "#3c3b40"
+				"--color0": "#1D1F2280",
+				"--color1": "#000000",
+				"--color2": "#FFFFFF",
+				"--color3": "#0585fe",
+				"--color4": "#35b350",
+				"--color5": "#ffab00",
+				"--color6": "#1e1d22",
+				"--color7": "#3c3b40",
+				"--color8": "#41008c",
+				"--color9": "#3e0070",
+				"--color10": "#2e0052",
+				"--color11": "rgba(65,0,139,1)"
 			},
 			".noselect": {
 				"userSelect": "none"
@@ -30,21 +35,21 @@ export class PixelStreamingApplicationStyle {
 				"width": "100%",
 				"height": "100%",
 				"position": "absolute",
-				"backgroundColor": "black"
+				"backgroundColor": "var(--color1)"
 			},
 			"#uiFeatures": {
 				"width": "100%",
 				"height": "100%",
 				"zIndex": "30",
 				"position": "relative",
-				"color": "var(--colour2)",
+				"color": "var(--color2)",
 				"pointerEvents": "none",
 				"overflow": "hidden"
 			},
 			".UiTool .tooltiptext": {
 				"visibility": "hidden",
 				"width": "auto",
-				"color": "var(--colour2)",
+				"color": "var(--color2)",
 				"textAlign": "center",
 				"borderRadius": "15px",
 				"padding": "0px 10px",
@@ -59,7 +64,7 @@ export class PixelStreamingApplicationStyle {
 			},
 			".UiTool:hover .tooltiptext": {
 				"visibility": "visible",
-				"backgroundColor": "var(--colour7)"
+				"backgroundColor": "var(--color7)"
 			},
 			"#connection .tooltiptext": {
 				"top": "125%",
@@ -84,14 +89,14 @@ export class PixelStreamingApplicationStyle {
 				"left": "0",
 				"zIndex": "20",
 				"padding": "5px 10px",
-				"border": "3px solid var(--colour3)",
+				"border": "3px solid var(--color3)",
 				"width": "max-content",
 				"fallbacks": [
 					{
 						"width": "max-content"
 					},
 					{
-						"border": "3px solid var(--colour3)"
+						"border": "3px solid var(--color3)"
 					},
 					{
 						"padding": "5px 10px"
@@ -143,9 +148,9 @@ export class PixelStreamingApplicationStyle {
 				"cursor": "pointer"
 			},
 			"#uiFeatures button": {
-				"backgroundColor": "var(--colour7)",
-				"border": "1px solid var(--colour7)",
-				"color": "var(--colour2)",
+				"backgroundColor": "var(--color7)",
+				"border": "1px solid var(--color7)",
+				"color": "var(--color2)",
 				"position": "relative",
 				"width": "3rem",
 				"height": "3rem",
@@ -153,24 +158,24 @@ export class PixelStreamingApplicationStyle {
 				"textAlign": "center"
 			},
 			"#uiFeatures button:hover": {
-				"backgroundColor": "var(--colour3)",
-				"border": "3px solid var(--colour3)",
+				"backgroundColor": "var(--color3)",
+				"border": "3px solid var(--color3)",
 				"transition": "0.25s ease",
 				"paddingLeft": "0.55rem",
 				"paddingTop": "0.55rem"
 			},
 			"#uiFeatures button:active": {
-				"border": "3px solid var(--colour3)",
-				"backgroundColor": "var(--colour7)",
+				"border": "3px solid var(--color3)",
+				"backgroundColor": "var(--color7)",
 				"paddingLeft": "0.55rem",
 				"paddingTop": "0.55rem"
 			},
 			".btn-flat": {
 				"backgroundColor": "transparent",
-				"color": "var(--colour2)",
+				"color": "var(--color2)",
 				"fontFamily": "'Montserrat'",
 				"fontWeight": "bold",
-				"border": "3px solid var(--colour3)",
+				"border": "3px solid var(--color3)",
 				"borderRadius": "1rem",
 				"fontSize": "0.75rem",
 				"paddingLeft": "0.5rem",
@@ -179,13 +184,13 @@ export class PixelStreamingApplicationStyle {
 				"textAlign": "center"
 			},
 			".btn-flat:hover": {
-				"backgroundColor": "var(--colour3)",
+				"backgroundColor": "var(--color3)",
 				"transition": "ease 0.3s"
 			},
 			".btn-flat:disabled": {
-				"background": "var(--colour7)",
-				"borderColor": "var(--colour3)",
-				"color": "var(--colour3)",
+				"background": "var(--color7)",
+				"borderColor": "var(--color3)",
+				"color": "var(--color3)",
 				"cursor": "default"
 			},
 			".btn-flat:active": {
@@ -213,13 +218,12 @@ export class PixelStreamingApplicationStyle {
 				"webkitBackdropFilter": "blur(10px)",
 				"overflowY": "auto",
 				"overflowX": "hidden",
-				"backgroundColor": "rgba(30, 29, 34, 0.5)"
+				"backgroundColor": "var(--color0)"
 			},
 			".panel-wrap-visible": {
 				"transform": "translateX(0%)"
 			},
 			".panel": {
-				"color": "#eee",
 				"overflowY": "auto",
 				"padding": "1em"
 			},
@@ -247,7 +251,7 @@ export class PixelStreamingApplicationStyle {
 				"content": "\"\\00d7\""
 			},
 			"#settingsClose:hover, #statsClose:hover": {
-				"color": "var(--colour3)",
+				"color": "var(--color3)",
 				"transition": "ease 0.3s"
 			},
 			"#settingsContent, #statsContent": {
@@ -261,18 +265,18 @@ export class PixelStreamingApplicationStyle {
 				"padding": "0.15rem 10px 0.15rem 10px"
 			},
 			".settings-text": {
-				"color": "var(--colour2)",
+				"color": "var(--color2)",
 				"verticalAlign": "middle",
 				"fontWeight": "normal"
 			},
 			"#connectOverlay, #playOverlay, #infoOverlay, #errorOverlay, #afkOverlay, #disconnectOverlay": {
 				"zIndex": "30",
 				"position": "absolute",
-				"color": "var(--colour2)",
+				"color": "var(--color2)",
 				"fontSize": "1.8em",
 				"width": "100%",
 				"height": "100%",
-				"backgroundColor": "black",
+				"backgroundColor": "var(--color1)",
 				"alignItems": "center",
 				"justifyContent": "center",
 				"textTransform": "uppercase"
@@ -366,23 +370,23 @@ export class PixelStreamingApplicationStyle {
 				"padding": "2px",
 				"webkitTransition": "all .2s ease",
 				"transition": "all .2s ease",
-				"background": "var(--colour6)",
-				"border": "3px solid var(--colour7)",
+				"background": "var(--color6)",
+				"border": "3px solid var(--color7)",
 				"borderRadius": "2em"
 			},
 			".tgl-flat+.tgl-slider:after": {
 				"webkitTransition": "all .2s ease",
 				"transition": "all .2s ease",
-				"background": "var(--colour7)",
+				"background": "var(--color7)",
 				"content": "\"\"",
 				"borderRadius": "1em"
 			},
 			".tgl-flat:checked+.tgl-slider": {
-				"border": "3px solid var(--colour3)"
+				"border": "3px solid var(--color3)"
 			},
 			".tgl-flat:checked+.tgl-slider:after": {
 				"left": "50%",
-				"background": "var(--colour3)"
+				"background": "var(--color3)"
 			},
 			".btn-apply": {
 				"display": "block !important",
@@ -391,15 +395,15 @@ export class PixelStreamingApplicationStyle {
 				"width": "40%"
 			},
 			".form-control": {
-				"backgroundColor": "var(--colour7)",
-				"border": "2px solid var(--colour7)",
+				"backgroundColor": "var(--color7)",
+				"border": "2px solid var(--color7)",
 				"borderRadius": "4px",
-				"color": "var(--colour2)",
+				"color": "var(--color2)",
 				"textAlign": "right",
 				"fontFamily": "inherit"
 			},
 			".form-control:hover": {
-				"borderColor": "var(--colour7)"
+				"borderColor": "var(--color7)"
 			},
 			".form-group": {
 				"paddingTop": "4px",
@@ -416,7 +420,7 @@ export class PixelStreamingApplicationStyle {
 			".settingsContainer": {
 				"display": "flex",
 				"flexDirection": "column",
-				"borderBottom": "1px solid var(--colour7)",
+				"borderBottom": "1px solid var(--color7)",
 				"paddingTop": "10px",
 				"paddingBottom": "10px"
 			},
@@ -451,13 +455,13 @@ export class PixelStreamingApplicationStyle {
 				"flexDirection": "row",
 				"justifyContent": "space-between",
 				"borderBottom": "1px solid var(--colour8)",
-				"backgroundColor": "var(--colour7)"
+				"backgroundColor": "var(--color7)"
 			},
 			".streamTools": {
-				"backgroundColor": "var(--colour2)",
+				"backgroundColor": "var(--color2)",
 				"fontFamily": "var(--buttonFont)",
 				"fontWeight": "lighter",
-				"color": "var(--colour7)"
+				"color": "var(--color7)"
 			},
 			".streamTools-shown>#streamToolsSettings, .streamTools-shown>#streamToolsStats": {
 				"display": "block"
@@ -470,7 +474,7 @@ export class PixelStreamingApplicationStyle {
 				"paddingRight": "4px"
 			},
 			".svgIcon": {
-				"fill": "var(--colour2)"
+				"fill": "var(--color2)"
 			}
 		}
 	};

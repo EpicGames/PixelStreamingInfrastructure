@@ -76,7 +76,6 @@ export class LoadingOverlay extends libfrontend.TextOverlay {
 		while(i < this.maxDrops) {
 			const dropContainer = document.createElement("div");
 			dropContainer.id = "dropContainer";
-			dropContainer.classList.add("raindrop");
 
 			const raindrop = new Raindrop();
 			raindrop.size = Math.random() * this.maxSize + 0.2;

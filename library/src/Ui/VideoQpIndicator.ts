@@ -14,7 +14,7 @@
 	statsText = "";
 	color = "";
 
-	// qp colours 
+	// qp colors 
 	readonly orangeQP = 26;
 	readonly redQP = 35;
 
@@ -152,7 +152,7 @@
 	}
 
 	/**
-	  * updates the QP tooltip by converting the Video Encoder QP to a colour light
+	  * updates the QP tooltip by converting the Video Encoder QP to a color light
 	  * @param QP - The video encoder QP number needed to find the average
 	  */
 	updateQpTooltip(QP: number) {

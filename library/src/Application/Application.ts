@@ -83,6 +83,8 @@ export class Application {
 		this.onScreenKeyboardHelper = new OnScreenKeyboard(this.videoElementParent);
 		this.onScreenKeyboardHelper.unquantizeAndDenormalizeUnsigned = (x: number, y: number) => this.webRtcController.requestUnquantizedAndDenormalizeUnsigned(x, y);
 		this.activateOnScreenKeyboard = (command: MessageOnScreenKeyboard) => this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
+		
+		this.updateColors(this.config.isFlagEnabled(Flags.LightMode));
 	}
 
 	public createOverlays() : void {
@@ -201,13 +203,13 @@ export class Application {
 		});
 
 		this.config.addOnSettingChangedListener(Flags.HoveringMouseMode, (isHoveringMouse : boolean) => {
-			if (isHoveringMouse) {
-				this.config.setFlagLabel(Flags.HoveringMouseMode, "Control Scheme: Hovering Mouse");
-				this.webRtcController.activateRegisterMouse();
-			} else {
-				this.config.setFlagLabel(Flags.HoveringMouseMode, "Control Scheme: Locked Mouse");
-				this.webRtcController.activateRegisterMouse();
-			}
+			this.config.setFlagLabel(Flags.HoveringMouseMode, `Control Scheme: ${(isHoveringMouse) ? "Hovering" : "Locked"} Mouse`);
+			this.webRtcController.activateRegisterMouse();
+		});
+
+		this.config.addOnSettingChangedListener(Flags.LightMode, (isLightMode : boolean) => {
+			this.config.setFlagLabel(Flags.LightMode, `Color Scheme: ${(isLightMode) ? "Light" : "Dark"} Mode`);
+			this.updateColors(isLightMode);
 		});
 
 		// encoder settings
@@ -613,5 +615,32 @@ export class Application {
 	 */
 	onQualityControlOwnership(hasQualityOwnership: boolean) {
 		this.config.setFlagEnabled(Flags.IsQualityController, hasQualityOwnership);
+	}
+
+	/**
+	 * Update the players color variables
+	 * @param isLightMode - should we use a light or dark color scheme
+	 */
+	updateColors(isLightMode: boolean) {
+		const rootElement = document.querySelector(":root") as HTMLElement;
+		if(isLightMode) {
+			rootElement.style.setProperty('--color0', '#e2e0dd80');
+			rootElement.style.setProperty('--color1', '#FFFFFF');
+			rootElement.style.setProperty('--color2', '#000000');
+			rootElement.style.setProperty('--color3', '#0585fe');
+			rootElement.style.setProperty('--color4', '#35b350');
+			rootElement.style.setProperty('--color5', '#ffab00');
+			rootElement.style.setProperty('--color6', '#e1e2dd');
+			rootElement.style.setProperty('--color7', '#c3c4bf');
+		} else {
+			rootElement.style.setProperty('--color0', '#1D1F2280');
+			rootElement.style.setProperty('--color1', '#000000');
+			rootElement.style.setProperty('--color2', '#FFFFFF');
+			rootElement.style.setProperty('--color3', '#0585fe');
+			rootElement.style.setProperty('--color4', '#35b350');
+			rootElement.style.setProperty('--color5', '#ffab00');
+			rootElement.style.setProperty('--color6', '#1e1d22');
+			rootElement.style.setProperty('--color7', '#3c3b40');
+		}
 	}
 }
