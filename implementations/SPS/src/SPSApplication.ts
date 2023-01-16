@@ -66,7 +66,10 @@ export class SPSApplication extends libfrontend.Application {
 		this.hideCurrentOverlay();
 		this.loadingOverlay.show();
 		this.loadingOverlay.update(signallingResp);
-		this.loadingOverlay.animate();
+		
+		// disable rain animation for now as perf is too poor on mobile devices
+		// this.loadingOverlay.animate();
+		
 		this.currentOverlay = this.loadingOverlay;
 	}
 
