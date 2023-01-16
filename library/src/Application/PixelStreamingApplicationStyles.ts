@@ -2,6 +2,7 @@
 
 import jss from 'jss'
 import global from 'jss-plugin-global';
+import camelCase from "jss-plugin-camel-case"
 
 export class PixelStreamingApplicationStyle {
 
@@ -9,13 +10,13 @@ export class PixelStreamingApplicationStyle {
 	{
 		"@global": {
 			":root": {
-				"colour1": "#000000",
-				"colour2": "#FFFFFF",
-				"colour3": "#0585fe",
-				"colour4": "#35b350",
-				"colour5": "#ffab00",
-				"colour6": "#1e1d22",
-				"colour7": "#3c3b40"
+				"--colour1": "#000000",
+				"--colour2": "#FFFFFF",
+				"--colour3": "#0585fe",
+				"--colour4": "#35b350",
+				"--colour5": "#ffab00",
+				"--colour6": "#1e1d22",
+				"--colour7": "#3c3b40"
 			},
 			".noselect": {
 				"userSelect": "none"
@@ -258,7 +259,7 @@ export class PixelStreamingApplicationStyle {
 			"#settingsClose:after, #statsClose:after": {
 				"paddingLeft": "0.5rem",
 				"display": "inline-block",
-				"content": "\"\\\\00d7\""
+				"content": "\"\\00d7\""
 			},
 			"#settingsClose:hover, #statsClose:hover": {
 				"color": "var(--colour3)",
@@ -495,13 +496,15 @@ export class PixelStreamingApplicationStyle {
 		const jssOptions = {
 			// JSS has many interesting plugins we may wish to turn on
 			//plugins: [functions(), template(), global(), extend(), nested(), compose(), camelCase(), defaultUnit(options.defaultUnit), expand(), vendorPrefixer(), propsSort()]
-			plugins: [global()]
+			plugins: [global(), camelCase()]
 		}
 
 		jss.setup(jssOptions);
+
+		this.applyStyleSheet()
 	}
 
-	apply() {
+	applyStyleSheet() {
 		// Todo: refactor codebase to use jss at a component level, classes can be grabbed like so:
 		//const {pixelStreamingClasses} = jss.createStyleSheet(styles).attach();
 
