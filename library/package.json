@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Frontend library for Pixel Streaming",
   "main": "dist/pixelstreamingfrontend.min.js",
-  "types": "dist/ts/pixelstreamingfrontend.d.ts",
+  "types": "types/pixelstreamingfrontend.d.ts",
   "scripts": {
     "compile": "tsc --build --clean && tsc",
     "build": "tsc -noEmit && esbuild src/pixelstreamingfrontend.ts --bundle --minify --outfile=dist/pixelstreamingfrontend.min.js",

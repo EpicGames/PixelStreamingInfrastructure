@@ -7,7 +7,7 @@
     "build": "npx webpack",
     "watch": "npx webpack --watch",
     "serve": "webpack serve",
-    "build-all": "cd ../../library && npm run compile && cd ../implementations/SPS && npm link ../../library && npm run build"
+    "build-all": "cd ../../library && npm run build-webpack && cd ../implementations/SPS && npm link ../../library && npm run build"
   },
   "author": "TensorWorks Pty Ltd",
   "license": "MIT",
