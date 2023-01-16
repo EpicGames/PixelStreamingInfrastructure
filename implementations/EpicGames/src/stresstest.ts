@@ -16,10 +16,10 @@ export class StressTester {
 
 	constructor() {
 		this.play = false;
-		this.maxPeers = 1;
+		this.maxPeers = 3;
 		this.totalStreams = 0;
-		this.streamCreationIntervalMs = 10000;
-		this.streamDeletionIntervalMs = 100000;
+		this.streamCreationIntervalMs = 1000;
+		this.streamDeletionIntervalMs = 4000;
 		this.pixelStreamingFrames = [];
 		this.creationIntervalHandle = null;
 		this.deletionIntervalHandle = null;
