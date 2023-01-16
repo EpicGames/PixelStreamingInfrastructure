@@ -129,7 +129,7 @@ export class WebRtcPlayerController {
 		// set up websocket methods
 		this.webSocketController = new WebSocketController();
 		this.webSocketController.onConfig = (messageConfig: MessageReceive.MessageConfig) => this.handleOnConfigMessage(messageConfig);
-		this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => this.application.onDisconnect(`${event.code} - ${event.reason}`);
+		this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => this.application.onDisconnect(`Websocket disconnect (${event.code}) ${event.reason != "" ? "- " + event.reason : ""}`);
 		this.webSocketController.onClose.addEventListener("close", () => {
 			this.afkController.stopAfkWarningTimer();
 
