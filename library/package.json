@@ -6,8 +6,7 @@
   "types": "types/pixelstreamingfrontend.d.ts",
   "scripts": {
     "compile": "tsc --build --clean && tsc",
-    "build": "tsc -noEmit && esbuild src/pixelstreamingfrontend.ts --bundle --minify --outfile=dist/pixelstreamingfrontend.min.js",
-    "build-dev": "tsc -noEmit && esbuild src/pixelstreamingfrontend.ts --bundle --outfile=dist/pixelstreamingfrontend.js --sourcemap --target=es6",
+    "build": "npm run build-webpack",
     "build-webpack": "npx webpack",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "spellcheck": "cspell \"{README.md,.github/*.md,src/**/*.ts}\""
@@ -16,7 +15,6 @@
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
     "cspell": "^4.1.0",
-    "esbuild": "0.16.17",
     "eslint": "^8.11.0",
     "ts-loader": "^9.4.2",
     "webpack-cli": "^5.0.1"
