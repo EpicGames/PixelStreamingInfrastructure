@@ -85,6 +85,7 @@ declare global {
 
 			// create svg group for the paths
 			const svgGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+			svgGroup.classList.add("svgIcon");
 			this._maximizeIcon.appendChild(svgGroup);
 
 			// create paths for the icon itself, one for each corner
@@ -119,6 +120,7 @@ declare global {
 
 			// create svg group for the paths
 			const svgGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+			svgGroup.classList.add("svgIcon");
 			this._minimizeIcon.appendChild(svgGroup);
 
 			// create paths for the icon itself, one for each corner

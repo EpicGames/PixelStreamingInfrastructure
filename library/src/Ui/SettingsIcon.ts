@@ -43,6 +43,7 @@
 
 			// create svg group for the paths
 			const svgGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+			svgGroup.classList.add("svgIcon");
 			this._settingsIcon.appendChild(svgGroup);
 
 			// create paths for the icon itself, the inner and out path of a cog

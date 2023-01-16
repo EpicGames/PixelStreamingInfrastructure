@@ -21,22 +21,10 @@ export class PixelStreamingApplicationStyle {
 			".noselect": {
 				"userSelect": "none"
 			},
-			"input": {
-				"fontFamily": "'Montserrat'"
-			},
-			"body": {
-				"margin": "0px",
-				"backgroundColor": "black",
-				"fontFamily": "'Montserrat', sans-serif"
-			},
 			"#playerUI": {
 				"width": "100%",
 				"height": "100%",
 				"position": "relative"
-			},
-			"canvas": {
-				"imageRendering": "crisp-edges",
-				"position": "absolute"
 			},
 			"#videoElementParent": {
 				"width": "100%",
@@ -147,9 +135,6 @@ export class PixelStreamingApplicationStyle {
 			},
 			"#fullscreen-btn": {
 				"padding": "0.6rem !important"
-			},
-			"object": {
-				"pointerEvents": "none"
 			},
 			"#minimizeIcon": {
 				"display": "none"
@@ -410,7 +395,8 @@ export class PixelStreamingApplicationStyle {
 				"border": "2px solid var(--colour7)",
 				"borderRadius": "4px",
 				"color": "var(--colour2)",
-				"textAlign": "right"
+				"textAlign": "right",
+				"fontFamily": "inherit"
 			},
 			".form-control:hover": {
 				"borderColor": "var(--colour7)"
@@ -427,11 +413,14 @@ export class PixelStreamingApplicationStyle {
 				"verticalAlign": "middle",
 				"fontWeight": "normal"
 			},
-			"section": {
+			".settingsContainer": {
 				"display": "flex",
-				"flexDirection": "column"
+				"flexDirection": "column",
+				"borderBottom": "1px solid var(--colour7)",
+				"paddingTop": "10px",
+				"paddingBottom": "10px"
 			},
-			"section> :first-child": {
+			".settingsContainer> :first-child": {
 				"marginTop": "4px",
 				"marginBottom": "4px",
 				"fontWeight": "bold",
@@ -439,11 +428,6 @@ export class PixelStreamingApplicationStyle {
 				"display": "flex",
 				"flexDirection": "row",
 				"alignItems": "baseline"
-			},
-			".settingsContainer": {
-				"borderBottom": "1px solid var(--colour7)",
-				"paddingTop": "10px",
-				"paddingBottom": "10px"
 			},
 			".collapse": {
 				"paddingLeft": "5%"
@@ -485,7 +469,7 @@ export class PixelStreamingApplicationStyle {
 				"fontSize": "37px",
 				"paddingRight": "4px"
 			},
-			"g": {
+			".svgIcon": {
 				"fill": "var(--colour2)"
 			}
 		}
