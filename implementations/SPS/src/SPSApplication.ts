@@ -1,4 +1,4 @@
-import * as libfrontend from '@epicgames/libfrontend'
+import * as libfrontend from '@epicgames/pixelstreamingfrontend'
 import { LoadingOverlay } from './LoadingOverlay';
 import { SPSSignalling } from './SignallingExtension';
 import { MessageStats } from './Messages';
