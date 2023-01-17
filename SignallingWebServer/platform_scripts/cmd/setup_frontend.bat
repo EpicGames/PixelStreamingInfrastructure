@@ -40,6 +40,16 @@
 
   @Rem Build the web frontend files.
   @Rem Use our NodeJS (not system NodeJS!) to build the web frontend files.
-  call SignallingWebServer\platform_scripts\cmd\node\npm --prefix Frontend\implementations\EpicGames run build-all
+
+  @Rem Install dependencies of the frontend lib.
+  pushd %~dp0\..\..\..\Frontend\library
+  call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
+  popd
+
+  @Rem Install dependencies of the Epic Games implementation and build the frontend
+  pushd %~dp0\..\..\..\Frontend\implementations\EpicGames
+  call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
+  call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm run build-all
+  popd
 
   goto :eof
