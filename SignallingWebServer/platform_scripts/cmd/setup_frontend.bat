@@ -20,14 +20,11 @@
   if exist SignallingWebServer\Public\player.html (
     @Rem If --build is passed then we should build
     if "%shouldbuild%" == "true" (
-      echo pathA
       call :buildFrontend
     ) else (
-      echo pathB
       echo Skipping rebuilding frontend... SignallingWebServer/Public has content already, use --build to force a frontend rebuild.
     )
   ) else (
-    echo pathC
     call :buildFrontend
   )
 
