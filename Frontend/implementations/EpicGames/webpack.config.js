@@ -65,7 +65,7 @@ module.exports = (env) => {
       filename: '[name].js',
       library: 'frontend', // change this to something more meaningful
       libraryTarget: 'umd',
-      path: path.resolve(__dirname, 'dist'),
+      path: path.resolve(__dirname, '../../../SignallingWebServer/Public'),
       clean: true,
       globalObject: 'this',
       hashFunction: 'xxhash64',
@@ -78,7 +78,7 @@ module.exports = (env) => {
     },
     devServer: {
     	static: {
-    		directory: path.join(__dirname, 'dist'),
+    		directory: path.join(__dirname, '../../../SignallingWebServer/Public'),
     	},
     }
   };
