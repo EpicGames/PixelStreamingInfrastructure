@@ -18,6 +18,12 @@ Reference implementations for the various pieces needed to support a PixelStream
 - Matchmaker
 - Frontend (the javascript frontend library for the WebRTC player and input)
 
+## Container images
+
+The following container images are built from this repository:
+
+- [ghcr.io/epicgames/pixel-streaming-signalling-server](https://github.com/orgs/EpicGames/packages/container/package/pixel-streaming-signalling-server) (since Unreal Engine 5.1)
+
 ## Versions
 
 We maintain versions of the servers and frontend that are compatible with existing and in-development version of Unreal Engine. 

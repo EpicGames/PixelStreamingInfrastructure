@@ -40,7 +40,7 @@ console.log(`configFile ${configFile}`);
 const config = require('./modules/config.js').init(configFile, defaultConfig);
 
 if (config.LogToFile) {
-	logging.RegisterFileLogger('./logs');
+	logging.RegisterFileLogger('./logs/');
 }
 
 console.log("Config: " + JSON.stringify(config, null, '\t'));
@@ -193,7 +193,7 @@ sendGameSessionData();
 if(config.UseAuthentication){
 	if(config.EnableWebserver) {
 		app.get('/login', function(req, res){
-			res.sendFile(__dirname + '/login.htm');
+			res.sendFile(path.join(__dirname, '/Public', '/login.html'));
 		});
 	}
 
@@ -268,7 +268,7 @@ if (config.UseHTTPS) {
 	});
 }
 
-console.logColor(logging.Cyan, `Running Cirrus - The Pixel Streaming reference implementation signalling server for Unreal Engine 5.0.`);
+console.logColor(logging.Cyan, `Running Cirrus - The Pixel Streaming reference implementation signalling server for Unreal Engine 5.1.`);
 
 let nextPlayerId = 100; // reserve some player ids
 const SFUPlayerId = "1"; // sfu is a special kind of player
