@@ -11,10 +11,10 @@
     "build-all": "npm run install && npm run build"
   },
   "devDependencies": {
-	"@epicgames/pixelstreamingfrontend": "^0.0.1",
+    "@epicgames/pixelstreamingfrontend": "^0.0.1",
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.11.1",
-	"css-loader": "^6.7.3",
+    "css-loader": "^6.7.3",
     "html-loader": "^4.2.0",
     "html-webpack-plugin": "^5.5.0",
     "path": "^0.12.7",

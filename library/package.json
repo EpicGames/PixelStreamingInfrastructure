@@ -17,6 +17,7 @@
     "cspell": "^4.1.0",
     "eslint": "^8.11.0",
     "ts-loader": "^9.4.2",
+    "typedoc": "^0.23.24",
     "webpack-cli": "^5.0.1"
   },
   "dependencies": {

@@ -17,7 +17,7 @@
   "typedocOptions": {
     "exclude":"src/index.*",
     "entryPoints": [
-      "src/"
+      "src/pixelstreamingfrontend.ts"
     ],
     "sort": [
       "enum-value-ascending",
