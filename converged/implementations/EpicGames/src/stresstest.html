@@ -1,0 +1,42 @@
+<!-- Copyright Epic Games, Inc. All Rights Reserved. -->
+<!DOCTYPE HTML>
+<html style="width: 100%; height: 100%">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+
+	<!-- Required - the stress tester style sheet -->
+	<link rel="stylesheet" type="text/css" href="./assets/css/stresstest.css">
+
+	<!-- Optional: set some favicons -->
+	<link id="favPng" rel="icon" type="image/png" href="./assets/images/favicon.png">
+
+	<!-- Optional: set a title for your page -->
+	<title>Pixel Streaming Stress Tester</title>
+</head>
+
+<body style="width: 100vw; height: 100vh; min-height: -webkit-fill-available; font-family: 'Montserrat'; margin: 0px">
+	<div id="control">
+		<button id="playPause">Pause</button>
+		<div>Total streams: <span id="nStreamsLabel">0</span></div>
+		<div>
+			<span>Max peers: </span>
+			<span id="nPeerLabel">5</span>
+			<input type="range" min="1" max="8" value="5" class="slider" id="nPeersSlider">
+		</div>
+		<div>
+			<span>Peer creation interval (seconds): </span>
+			<input type="number" id="creationIntervalInput" min="0" max="100" step="1" value="1">
+		</div>
+		<div>
+			<span>Peer deletion interval (seconds): </span>
+			<input type="number" id="deletionIntervalInput" min="0" max="100" step="1" value="2">
+		</div>
+	</div>
+	<div id="streamsContainer"></div>
+
+</body>
+
+</html>
