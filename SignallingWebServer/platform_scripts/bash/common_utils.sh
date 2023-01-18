@@ -63,6 +63,7 @@ function use_args() {
    --debug ) IS_DEBUG=1; shift;;
    --nosudo ) NO_SUDO=1; shift;;
    --verbose ) VERBOSE=1; shift;;
+   --build ) FORCE_BUILD=1; shift;;
    --stun ) stunserver="$2"; shift 2;;
    --turn ) turnserver="$2"; shift 2;;
    --publicip ) publicip="$2"; turnserver="${publicip}:19303"; shift 2;;

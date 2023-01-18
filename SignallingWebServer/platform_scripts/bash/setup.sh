@@ -93,7 +93,7 @@ function setup_frontend() {
 	pushd ${BASH_LOCATION}/../../.. > /dev/null
 
 	# If player.html doesn't exist, or --build passed as arg, rebuild the frontend
-	if [ ! -f SignallingWebServer/Public/player.html ] || [ "$1" == "--build" ]; then
+	if [ ! -f SignallingWebServer/Public/player.html ] || [ ! -z "$FORCE_BUILD" ] ; then
 		echo "Building Typescript Frontend."
 		# Using our bundled NodeJS, build the web frontend files
 		pushd ${BASH_LOCATION}/../../../Frontend/library > /dev/null
@@ -104,6 +104,8 @@ function setup_frontend() {
 		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
 		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-all
 		popd
+	else
+		echo 'Skipping building Frontend because files already exist. Please run with "--build" to force a rebuild'
 	fi
 
 	popd > /dev/null # root
@@ -131,7 +133,7 @@ popd > /dev/null # SignallingWebServer
 
 # Trigger Frontend Build if needed or requested
 # This has to be done after check_and_install "node"
-setup_frontend $@
+setup_frontend
 
 popd > /dev/null # BASH_SOURCE
 
