@@ -1,4 +1,5 @@
 const net = require('net');
+const logging = require('./logging.js');
 
 module.exports = class Matchmaker{
 	socket;
