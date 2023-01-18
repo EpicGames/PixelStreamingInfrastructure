@@ -94,8 +94,8 @@ function setup_frontend() {
 
 	# If player.html doesn't exist, or --build passed as arg, rebuild the frontend
 	if [ ! -f SignallingWebServer/Public/player.html ] || [ "$1" == "--build" ]; then
-		# TODO Using our bundled NodeJS, build the web frontend files
-		# Remember to check_and_install node first
+		echo "Building Typescript Frontend."
+		# Using our bundled NodeJS, build the web frontend files
 		pushd ${BASH_LOCATION}/../../../Frontend/library > /dev/null
 		../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
 		popd
@@ -129,10 +129,9 @@ PATH="${BASH_LOCATION}/node/bin:$PATH"
 
 popd > /dev/null # SignallingWebServer
 
-
-echo "Building Frontend"
+# Trigger Frontend Build if needed or requested
+# This has to be done after check_and_install "node"
 setup_frontend $@
-
 
 popd > /dev/null # BASH_SOURCE
 
