@@ -88,10 +88,32 @@ function check_and_install() { #dep_name #get_version_string #version_min #insta
 	fi
 }
 
+function setup_frontend() {
+	# navigate to root
+	pushd ${BASH_LOCATION}/../../.. > /dev/null
+
+	# If player.html doesn't exist, or --build passed as arg, rebuild the frontend
+	if [ ! -f SignallingWebServer/Public/player.html ] || [ "$1" == "--build" ]; then
+		# TODO Using our bundled NodeJS, build the web frontend files
+		# Remember to check_and_install node first
+		pushd ${BASH_LOCATION}/../../../Frontend/library > /dev/null
+		../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
+		popd
+
+		pushd ${BASH_LOCATION}/../../../Frontend/implementations/EpicGames > /dev/null
+		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
+		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-all
+		popd
+	fi
+
+	popd > /dev/null # root
+}
+
+
 echo "Checking Pixel Streaming Server dependencies."
 
 # navigate to SignallingWebServer root
-pushd ../.. > /dev/null
+pushd ${BASH_LOCATION}/../.. > /dev/null
 
 node_version=""
 if [[ -f "${BASH_LOCATION}/node/bin/node" ]]; then
@@ -106,6 +128,11 @@ PATH="${BASH_LOCATION}/node/bin:$PATH"
 "${BASH_LOCATION}/node/lib/node_modules/npm/bin/npm-cli.js" install
 
 popd > /dev/null # SignallingWebServer
+
+
+echo "Building Frontend"
+setup_frontend $@
+
 
 popd > /dev/null # BASH_SOURCE
 
