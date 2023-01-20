@@ -1,17 +1,17 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Logger } from "../Logger/Logger";
+import { Logger } from '../Logger/Logger';
 
 /**
  * The Send Types that are pushed from the signaling server
  */
 export enum MessageSendTypes {
-    ICE_CANDIDATE = "iceCandidate",
-    OFFER = "offer",
-    ANSWER = "answer",
-	DATACHANNELREQUEST = "dataChannelRequest",
-	SFURECVDATACHANNELREADY = "peerDataChannelsReady",
-    PONG = "pong"
+    ICE_CANDIDATE = 'iceCandidate',
+    OFFER = 'offer',
+    ANSWER = 'answer',
+    DATACHANNELREQUEST = 'dataChannelRequest',
+    SFURECVDATACHANNELREADY = 'peerDataChannelsReady',
+    PONG = 'pong'
 }
 
 /**
@@ -26,7 +26,11 @@ export class MessageSend implements Send {
      * @returns - JSON String of the Message to send
      */
     payload() {
-        Logger.Log(Logger.GetStackTrace(), "Sending => \n" + JSON.stringify(this, undefined, 4), 6);
+        Logger.Log(
+            Logger.GetStackTrace(),
+            'Sending => \n' + JSON.stringify(this, undefined, 4),
+            6
+        );
         return JSON.stringify(this);
     }
 }
@@ -43,13 +47,12 @@ export interface Send {
  * Instance Request Message Wrapper
  */
 export class MessagePong extends MessageSend {
-
     time: number;
 
     constructor(time: number) {
         super();
         this.type = MessageSendTypes.PONG;
-        this.time = time
+        this.time = time;
     }
 }
 
@@ -77,40 +80,40 @@ export class MessageWebRTCOffer extends MessageSend {
  *  Web RTC Answer message wrapper
  */
 export class MessageWebRTCAnswer extends MessageSend {
-	sdp: string;
+    sdp: string;
 
-	/**
-	 * @param answer - Generated Web RTC Offer
-	 */
-	constructor(answer?: RTCSessionDescriptionInit) {
-		super();
-		this.type = MessageSendTypes.ANSWER;
+    /**
+     * @param answer - Generated Web RTC Offer
+     */
+    constructor(answer?: RTCSessionDescriptionInit) {
+        super();
+        this.type = MessageSendTypes.ANSWER;
 
-		if (answer) {
-			this.type = answer.type as MessageSendTypes;
-			this.sdp = answer.sdp;
-		}
-	}
+        if (answer) {
+            this.type = answer.type as MessageSendTypes;
+            this.sdp = answer.sdp;
+        }
+    }
 }
 
 /**
  *  Web RTC Data channel request message wrapper
  */
 export class MessageWebRTCDatachannelRequest extends MessageSend {
-	constructor() {
-		super();
-		this.type = MessageSendTypes.DATACHANNELREQUEST;
-	}
+    constructor() {
+        super();
+        this.type = MessageSendTypes.DATACHANNELREQUEST;
+    }
 }
 
 /**
  *  Web RTC SFU Data channel ready message wrapper
  */
 export class MessageSFURecvDataChannelReady extends MessageSend {
-	constructor() {
-		super();
-		this.type = MessageSendTypes.SFURECVDATACHANNELREADY;
-	}
+    constructor() {
+        super();
+        this.type = MessageSendTypes.SFURECVDATACHANNELREADY;
+    }
 }
 
 /**
@@ -133,7 +136,11 @@ export class MessageIceCandidate implements Send {
      * @returns - JSON String of the Message to send
      */
     payload() {
-        Logger.Log(Logger.GetStackTrace(), "Sending => \n" + JSON.stringify(this, undefined, 4), 6);
+        Logger.Log(
+            Logger.GetStackTrace(),
+            'Sending => \n' + JSON.stringify(this, undefined, 4),
+            6
+        );
         return JSON.stringify(this);
     }
 }

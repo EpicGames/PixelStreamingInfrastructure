@@ -11,8 +11,15 @@ export class SettingBase {
     _rootElement: HTMLElement;
     onChange: (changedValue: unknown) => void;
 
-    constructor(id: string, label: string, description: string, defaultSettingValue: unknown) {
-		this.onChange = () => { /* Do nothing, to be overridden. */ };
+    constructor(
+        id: string,
+        label: string,
+        description: string,
+        defaultSettingValue: unknown
+    ) {
+        this.onChange = () => {
+            /* Do nothing, to be overridden. */
+        };
         this.id = id;
         this.description = description;
         this.label = label;
@@ -37,7 +44,7 @@ export class SettingBase {
     /**
      * @return The setting's value.
      */
-    public get value() : unknown{
+    public get value(): unknown {
         return this._value;
     }
 
@@ -45,20 +52,18 @@ export class SettingBase {
      * Update the setting's stored value.
      * @param inValue The new value for the setting.
      */
-    public set value(inValue : unknown) {
+    public set value(inValue: unknown) {
         this._value = inValue;
         this.onChange(this._value);
     }
 
-
     /**
      * @returns Return or creates a HTML element that represents this setting in the DOM.
      */
-    public get rootElement() : HTMLElement {
-        if(!this._rootElement) {
-            this._rootElement = document.createElement("div");
+    public get rootElement(): HTMLElement {
+        if (!this._rootElement) {
+            this._rootElement = document.createElement('div');
         }
         return this._rootElement;
     }
-
 }

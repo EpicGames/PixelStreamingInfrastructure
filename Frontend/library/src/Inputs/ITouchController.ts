@@ -11,9 +11,9 @@ export interface ITouchController {
     onTouchStart(touchEvent: TouchEvent): void;
 
     /**
-    * Fire when a touch event ends
-    * @param touchEvent - Touch Event Data
-    */
+     * Fire when a touch event ends
+     * @param touchEvent - Touch Event Data
+     */
     onTouchEnd(touchEvent: TouchEvent): void;
 
     /**

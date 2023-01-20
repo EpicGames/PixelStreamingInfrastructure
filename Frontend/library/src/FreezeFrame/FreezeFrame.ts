@@ -35,14 +35,14 @@ export class FreezeFrame {
     }
 
     /**
-     * Set the freeze frame element for showing 
+     * Set the freeze frame element for showing
      */
     setElementForShow() {
         this.rootElement.style.display = 'block';
     }
 
     /**
-     * Set the freeze frame element for hiding 
+     * Set the freeze frame element for hiding
      */
     setElementForHide() {
         this.rootElement.style.display = 'none';
@@ -50,10 +50,12 @@ export class FreezeFrame {
 
     /**
      * Update the freeze frames image source
-     * @param jpeg - the freeze frame image as a byte array data  
+     * @param jpeg - the freeze frame image as a byte array data
      */
     updateImageElementSource(jpeg: Uint8Array) {
-        const base64 = btoa(jpeg.reduce((data, byte) => data + String.fromCharCode(byte), ''));
+        const base64 = btoa(
+            jpeg.reduce((data, byte) => data + String.fromCharCode(byte), '')
+        );
         this.imageElement.src = 'data:image/jpeg;base64,' + base64;
     }
 
@@ -67,7 +69,7 @@ export class FreezeFrame {
     }
 
     /**
-     * Resize a freeze frame element 
+     * Resize a freeze frame element
      */
     resize() {
         if (this.freezeFrameWidth !== 0 && this.freezeFrameHeight !== 0) {
@@ -75,19 +77,29 @@ export class FreezeFrame {
             let displayHeight = 0;
             let displayTop = 0;
             let displayLeft = 0;
-			const parentAspectRatio = this.rootDiv.clientWidth / this.rootDiv.clientHeight;
-			const videoAspectRatio = this.freezeFrameWidth / this.freezeFrameHeight;
-			if (parentAspectRatio < videoAspectRatio) {
-				displayWidth = this.rootDiv.clientWidth;
-				displayHeight = Math.floor(this.rootDiv.clientWidth / videoAspectRatio);
-				displayTop = Math.floor((this.rootDiv.clientHeight - displayHeight) * 0.5);
-				displayLeft = 0;
-			} else {
-				displayWidth = Math.floor(this.rootDiv.clientHeight * videoAspectRatio);
-				displayHeight = this.rootDiv.clientHeight;
-				displayTop = 0;
-				displayLeft = Math.floor((this.rootDiv.clientWidth - displayWidth) * 0.5);
-			}
+            const parentAspectRatio =
+                this.rootDiv.clientWidth / this.rootDiv.clientHeight;
+            const videoAspectRatio =
+                this.freezeFrameWidth / this.freezeFrameHeight;
+            if (parentAspectRatio < videoAspectRatio) {
+                displayWidth = this.rootDiv.clientWidth;
+                displayHeight = Math.floor(
+                    this.rootDiv.clientWidth / videoAspectRatio
+                );
+                displayTop = Math.floor(
+                    (this.rootDiv.clientHeight - displayHeight) * 0.5
+                );
+                displayLeft = 0;
+            } else {
+                displayWidth = Math.floor(
+                    this.rootDiv.clientHeight * videoAspectRatio
+                );
+                displayHeight = this.rootDiv.clientHeight;
+                displayTop = 0;
+                displayLeft = Math.floor(
+                    (this.rootDiv.clientWidth - displayWidth) * 0.5
+                );
+            }
             this.rootElement.style.width = this.rootDiv.offsetWidth + 'px';
             this.rootElement.style.height = this.rootDiv.offsetHeight + 'px';
             this.rootElement.style.left = 0 + 'px';

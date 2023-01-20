@@ -4,7 +4,6 @@
  * Interface for Mouse Events
  */
 export interface IMouseEvents {
-
     /**
      * Handle when the locked state Changed
      */
@@ -29,21 +28,21 @@ export interface IMouseEvents {
     handleMouseUp(mouseEvent: MouseEvent): void;
 
     /**
-    * Handle when the mouse wheel  
-    * @param wheelEvent - Mouse wheel
-    */
+     * Handle when the mouse wheel
+     * @param wheelEvent - Mouse wheel
+     */
     handleMouseWheel(wheelEvent: WheelEvent): void;
 
     /**
-    * Handle when the button double click
-    * @param mouseEvent - Mouse Event
-    */
+     * Handle when the button double click
+     * @param mouseEvent - Mouse Event
+     */
     handleMouseDouble(mouseEvent: MouseEvent): void;
 
     /**
-    * Handle the press mouse buttons event, sends the mouse data to the UE Instance
-    * @param mouseEvent - Mouse Event
-    */
+     * Handle the press mouse buttons event, sends the mouse data to the UE Instance
+     * @param mouseEvent - Mouse Event
+     */
     handlePressMouseButtons(mouseEvent: MouseEvent): void;
 
     /**
@@ -53,8 +52,8 @@ export interface IMouseEvents {
     handleReleaseMouseButtons(mouseEvent: MouseEvent): void;
 
     /**
-    * Handle the mouse context menu
-    * @param mouseEvent - mouse event
-    */
+     * Handle the mouse context menu
+     * @param mouseEvent - mouse event
+     */
     handleContextMenu?(mouseEvent: MouseEvent): void;
 }

@@ -3,52 +3,67 @@
 /**
  * Settings icon that can be clicked.
  */
- export class SettingsIcon {
+export class SettingsIcon {
+    _rootElement: HTMLButtonElement;
+    _settingsIcon: SVGElement;
+    _tooltipText: HTMLElement;
 
-	_rootElement: HTMLButtonElement;
-	_settingsIcon: SVGElement;
-	_tooltipText : HTMLElement;
+    /**
+     * Get the the button containing the settings icon.
+     */
+    public get rootElement(): HTMLButtonElement {
+        if (!this._rootElement) {
+            this._rootElement = document.createElement('button');
+            this._rootElement.type = 'button';
+            this._rootElement.classList.add('UiTool');
+            this._rootElement.id = 'settingsBtn';
+            this._rootElement.appendChild(this.settingsIcon);
+            this._rootElement.appendChild(this.tooltipText);
+        }
+        return this._rootElement;
+    }
 
-	/**
-	 * Get the the button containing the settings icon.
-	 */
-	public get rootElement() : HTMLButtonElement {
-		if(!this._rootElement) {
-			this._rootElement = document.createElement("button");
-			this._rootElement.type = "button";
-            this._rootElement.classList.add("UiTool");
-			this._rootElement.id = "settingsBtn";
-			this._rootElement.appendChild(this.settingsIcon);
-			this._rootElement.appendChild(this.tooltipText);
-		}
-		return this._rootElement;
-	}
+    public get tooltipText(): HTMLElement {
+        if (!this._tooltipText) {
+            this._tooltipText = document.createElement('span');
+            this._tooltipText.classList.add('tooltiptext');
+            this._tooltipText.innerHTML = 'Settings';
+        }
+        return this._tooltipText;
+    }
 
-	public get tooltipText() : HTMLElement {
-		if(!this._tooltipText) {
-			this._tooltipText = document.createElement("span");
-			this._tooltipText.classList.add("tooltiptext");
-			this._tooltipText.innerHTML = "Settings";
-		}
-		return this._tooltipText;
-	}
+    public get settingsIcon(): SVGElement {
+        if (!this._settingsIcon) {
+            this._settingsIcon = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'svg'
+            );
+            this._settingsIcon.setAttributeNS(null, 'id', 'settingsIcon');
+            this._settingsIcon.setAttributeNS(null, 'x', '0px');
+            this._settingsIcon.setAttributeNS(null, 'y', '0px');
+            this._settingsIcon.setAttributeNS(
+                null,
+                'viewBox',
+                '0 0 478.703 478.703'
+            );
 
-	public get settingsIcon() : SVGElement {
-		if(!this._settingsIcon) {
-			this._settingsIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-			this._settingsIcon.setAttributeNS(null, "id", "settingsIcon");
-			this._settingsIcon.setAttributeNS(null, "x", "0px");
-			this._settingsIcon.setAttributeNS(null, "y", "0px");
-			this._settingsIcon.setAttributeNS(null, "viewBox", "0 0 478.703 478.703");
+            // create svg group for the paths
+            const svgGroup = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'g'
+            );
+            svgGroup.classList.add('svgIcon');
+            this._settingsIcon.appendChild(svgGroup);
 
-			// create svg group for the paths
-			const svgGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-			svgGroup.classList.add("svgIcon");
-			this._settingsIcon.appendChild(svgGroup);
-
-			// create paths for the icon itself, the inner and out path of a cog
-			const path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-			path1.setAttributeNS(null, "d", "M454.2,189.101l-33.6-5.7c-3.5-11.3-8-22.2-13.5-32.6l19.8-27.7c8.4-11.8,7.1-27.9-3.2-38.1l-29.8-29.8\
+            // create paths for the icon itself, the inner and out path of a cog
+            const path1 = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'path'
+            );
+            path1.setAttributeNS(
+                null,
+                'd',
+                'M454.2,189.101l-33.6-5.7c-3.5-11.3-8-22.2-13.5-32.6l19.8-27.7c8.4-11.8,7.1-27.9-3.2-38.1l-29.8-29.8\
 			c-5.6-5.6-13-8.7-20.9-8.7c-6.2,0-12.1,1.9-17.1,5.5l-27.8,19.8c-10.8-5.7-22.1-10.4-33.8-13.9l-5.6-33.2\
 			c-2.4-14.3-14.7-24.7-29.2-24.7h-42.1c-14.5,0-26.8,10.4-29.2,24.7l-5.8,34c-11.2,3.5-22.1,8.1-32.5,13.7l-27.5-19.8\
 			c-5-3.6-11-5.5-17.2-5.5c-7.9,0-15.4,3.1-20.9,8.7l-29.9,29.8c-10.2,10.2-11.6,26.3-3.2,38.1l20,28.1\
@@ -68,16 +83,22 @@
 			c4.4,3.1,10.2,3.3,14.8,0.6c13-7.8,27.1-13.8,41.8-17.6c5.1-1.4,9-5.6,9.9-10.8l7.2-42.3c0.2-1.3,1.3-2.2,2.6-2.2h42.1\
 			c1.3,0,2.4,0.9,2.6,2.2l7,41.7c0.9,5.3,4.8,9.6,10,10.9c15.1,3.8,29.5,9.7,42.9,17.6c4.6,2.7,10.3,2.5,14.7-0.6l34.5-24.8\
 			c0.5-0.3,1-0.5,1.5-0.5c0.4,0,1.2,0.1,1.9,0.8l29.8,29.8c0.9,0.9,1,2.3,0.3,3.4l-24.7,34.7c-3.1,4.3-3.3,10.1-0.6,14.7\
-			c7.8,13.1,13.6,27.2,17.4,41.9c1.3,5.2,5.6,9.1,10.8,9.9l42,7.1c1.3,0.2,2.2,1.3,2.2,2.6v42.1H451.9z");
+			c7.8,13.1,13.6,27.2,17.4,41.9c1.3,5.2,5.6,9.1,10.8,9.9l42,7.1c1.3,0.2,2.2,1.3,2.2,2.6v42.1H451.9z'
+            );
 
-			const path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-			path2.setAttributeNS(null, "d", "M239.4,136.001c-57,0-103.3,46.3-103.3,103.3s46.3,103.3,103.3,103.3s103.3-46.3,103.3-103.3S296.4,136.001,239.4,136.001z M239.4,315.601c-42.1,0-76.3-34.2-76.3-76.3s34.2-76.3,76.3-76.3s76.3,34.2,76.3,76.3S281.5,315.601,239.4,315.601z");
+            const path2 = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'path'
+            );
+            path2.setAttributeNS(
+                null,
+                'd',
+                'M239.4,136.001c-57,0-103.3,46.3-103.3,103.3s46.3,103.3,103.3,103.3s103.3-46.3,103.3-103.3S296.4,136.001,239.4,136.001z M239.4,315.601c-42.1,0-76.3-34.2-76.3-76.3s34.2-76.3,76.3-76.3s76.3,34.2,76.3,76.3S281.5,315.601,239.4,315.601z'
+            );
 
-			svgGroup.appendChild(path1);
-			svgGroup.appendChild(path2);
-
-		}
-		return this._settingsIcon;
-	}
-
+            svgGroup.appendChild(path1);
+            svgGroup.appendChild(path2);
+        }
+        return this._settingsIcon;
+    }
 }

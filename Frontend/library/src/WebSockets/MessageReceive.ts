@@ -4,14 +4,14 @@
  * The Types of Messages that will be received
  */
 export enum MessageRecvTypes {
-    CONFIG = "config",
-    PLAYER_COUNT = "playerCount",
-    OFFER = "offer",
-    ANSWER = "answer",
-    ICE_CANDIDATE = "iceCandidate",
-	PEER_DATA_CHANNELS = "peerDataChannels",
-    PING = "ping",
-	WARNING = "warning"
+    CONFIG = 'config',
+    PLAYER_COUNT = 'playerCount',
+    OFFER = 'offer',
+    ANSWER = 'answer',
+    ICE_CANDIDATE = 'iceCandidate',
+    PEER_DATA_CHANNELS = 'peerDataChannels',
+    PING = 'ping',
+    WARNING = 'warning'
 }
 
 /**
@@ -25,15 +25,13 @@ export class MessageRecv {
 /**
  * Authentication Required Message wrapper
  */
-export class MessageAuthRequired extends MessageRecv { }
-
-
+export class MessageAuthRequired extends MessageRecv {}
 
 /**
  * Config Message Wrapper
  */
 export class MessageConfig extends MessageRecv {
-    peerConnectionOptions: RTCConfiguration; 
+    peerConnectionOptions: RTCConfiguration;
 }
 
 /**
@@ -55,8 +53,8 @@ export class MessageAnswer extends MessageRecv {
  */
 export class MessageOffer extends MessageRecv {
     sdp: string;
-	sfu?: string;
-	defaultToHover?: string;
+    sfu?: string;
+    defaultToHover?: string;
 }
 
 /**
@@ -70,14 +68,14 @@ export class MessageIceCandidate extends MessageRecv {
  * Peer Data Channels Message wrapper
  */
 export class MessagePeerDataChannels extends MessageRecv {
-	recvStreamId: number;
-	sendStreamId: number;
-	type: string;
+    recvStreamId: number;
+    sendStreamId: number;
+    type: string;
 }
 
 export class MessageOnScreenKeyboard {
-	command: string;
-	showOnScreenKeyboard: boolean;
-	x: number;
-	y: number;
+    command: string;
+    showOnScreenKeyboard: boolean;
+    x: number;
+    y: number;
 }

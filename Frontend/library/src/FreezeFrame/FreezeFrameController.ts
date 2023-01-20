@@ -1,10 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Logger } from "../Logger/Logger";
-import { FreezeFrame } from "./FreezeFrame";
+import { Logger } from '../Logger/Logger';
+import { FreezeFrame } from './FreezeFrame';
 
 /**
- * A class for controlling freeze frame functionality 
+ * A class for controlling freeze frame functionality
  */
 export class FreezeFrameController {
     freezeFrame: FreezeFrame;
@@ -15,7 +15,7 @@ export class FreezeFrameController {
     freezeFrameDelay = 50;
 
     /**
-     * Construct a freeze frame controller 
+     * Construct a freeze frame controller
      * @param rootDiv - the div that a freeze frame element will be injected into
      */
     constructor(rootDiv: HTMLElement) {
@@ -23,7 +23,7 @@ export class FreezeFrameController {
     }
 
     /**
-     * Show the freeze frame if it is valid 
+     * Show the freeze frame if it is valid
      */
     showFreezeFrame() {
         if (this.valid) {
@@ -40,7 +40,7 @@ export class FreezeFrameController {
     }
 
     /**
-     * Update the freeze frames image source and load it  
+     * Update the freeze frames image source and load it
      * @param jpeg - the freeze frame image as a byte array data
      * @param onLoadCallBack - a call back for managing if the play overlay needs to be shown or not
      */
@@ -48,7 +48,7 @@ export class FreezeFrameController {
         this.freezeFrame.updateImageElementSource(jpeg);
         this.freezeFrame.imageElement.onload = () => {
             this.freezeFrame.setDimensionsFromElementAndResize();
-            onLoadCallBack()
+            onLoadCallBack();
         };
     }
 
@@ -67,7 +67,7 @@ export class FreezeFrameController {
         }
 
         // Extract total size of freeze frame (across all chunks)
-        this.size = (new DataView(view.slice(1, 5).buffer)).getInt32(0, true);
+        this.size = new DataView(view.slice(1, 5).buffer).getInt32(0, true);
 
         // Get the jpeg part of the payload
         const jpegBytes = view.slice(1 + 4);
@@ -83,19 +83,30 @@ export class FreezeFrameController {
         else {
             this.jpeg = jpegBytes;
             this.receiving = true;
-            Logger.Log(Logger.GetStackTrace(), `received first chunk of freeze frame: ${this.jpeg.length}/${this.size}`, 6);
+            Logger.Log(
+                Logger.GetStackTrace(),
+                `received first chunk of freeze frame: ${this.jpeg.length}/${this.size}`,
+                6
+            );
         }
 
         // Finished receiving freeze frame, we can show it now
         if (this.jpeg.length === this.size) {
             this.receiving = false;
             this.valid = true;
-            Logger.Log(Logger.GetStackTrace(), `received complete freeze frame ${this.size}`, 6);
+            Logger.Log(
+                Logger.GetStackTrace(),
+                `received complete freeze frame ${this.size}`,
+                6
+            );
             this.updateFreezeFrameAndShow(this.jpeg, onLoadCallBack);
         }
         // We received more data than the freeze frame payload message indicate (this is an error)
         else if (this.jpeg.length > this.size) {
-            Logger.Error(Logger.GetStackTrace(), `received bigger freeze frame than advertised: ${this.jpeg.length}/${this.size}`);
+            Logger.Error(
+                Logger.GetStackTrace(),
+                `received bigger freeze frame than advertised: ${this.jpeg.length}/${this.size}`
+            );
             this.jpeg = undefined;
             this.receiving = false;
         }

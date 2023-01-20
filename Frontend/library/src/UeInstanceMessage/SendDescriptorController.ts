@@ -1,41 +1,43 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { DataChannelSender } from "../DataChannel/DataChannelSender";
-import { Logger } from "../Logger/Logger";
-import { StreamMessageController } from "./StreamMessageController";
+import { DataChannelSender } from '../DataChannel/DataChannelSender';
+import { Logger } from '../Logger/Logger';
+import { StreamMessageController } from './StreamMessageController';
 
 export class SendDescriptorController {
-
     toStreamerMessagesMapProvider: StreamMessageController;
     dataChannelSender: DataChannelSender;
 
-    constructor(dataChannelSender: DataChannelSender, toStreamerMessagesMapProvider: StreamMessageController) {
+    constructor(
+        dataChannelSender: DataChannelSender,
+        toStreamerMessagesMapProvider: StreamMessageController
+    ) {
         this.dataChannelSender = dataChannelSender;
         this.toStreamerMessagesMapProvider = toStreamerMessagesMapProvider;
     }
 
     /**
      * Send a Latency Test to the UE Instance
-     * @param descriptor - the descriptor for a latency test 
+     * @param descriptor - the descriptor for a latency test
      */
     sendLatencyTest(descriptor: object) {
-        this.sendDescriptor("LatencyTest", descriptor);
+        this.sendDescriptor('LatencyTest', descriptor);
     }
 
     /**
      * Send a Latency Test to the UE Instance
-     * @param descriptor - the descriptor for a command 
+     * @param descriptor - the descriptor for a command
      */
     emitCommand(descriptor: object) {
-        this.sendDescriptor("Command", descriptor);
+        this.sendDescriptor('Command', descriptor);
     }
 
     /**
      * Send a Latency Test to the UE Instance
-     * @param descriptor - the descriptor for a UI Interaction 
+     * @param descriptor - the descriptor for a UI Interaction
      */
     emitUIInteraction(descriptor: object) {
-        this.sendDescriptor("UIInteraction", descriptor);
+        this.sendDescriptor('UIInteraction', descriptor);
     }
 
     /**
@@ -46,16 +48,22 @@ export class SendDescriptorController {
     sendDescriptor(messageType: string, descriptor: object) {
         // Convert the descriptor object into a JSON string.
         const descriptorAsString = JSON.stringify(descriptor);
-        const toStreamerMessages = this.toStreamerMessagesMapProvider.getToStreamerMessageMap();
+        const toStreamerMessages =
+            this.toStreamerMessagesMapProvider.getToStreamerMessageMap();
         const messageFormat = toStreamerMessages.getFromKey(messageType);
         if (messageFormat === undefined) {
-            Logger.Error(Logger.GetStackTrace(), `Attempted to emit descriptor with message type: ${messageType}, but the frontend hasn't been configured to send such a message. Check you've added the message type in your cpp`);
+            Logger.Error(
+                Logger.GetStackTrace(),
+                `Attempted to emit descriptor with message type: ${messageType}, but the frontend hasn't been configured to send such a message. Check you've added the message type in your cpp`
+            );
         }
 
-        Logger.Log(Logger.GetStackTrace(), "Sending: " + descriptor, 6);
+        Logger.Log(Logger.GetStackTrace(), 'Sending: ' + descriptor, 6);
         // Add the UTF-16 JSON string to the array byte buffer, going two bytes at
         // a time.
-        const data = new DataView(new ArrayBuffer(1 + 2 + 2 * descriptorAsString.length));
+        const data = new DataView(
+            new ArrayBuffer(1 + 2 + 2 * descriptorAsString.length)
+        );
         let byteIdx = 0;
         data.setUint8(byteIdx, messageFormat.id);
         byteIdx++;
@@ -66,12 +74,14 @@ export class SendDescriptorController {
             byteIdx += 2;
         }
 
-        if(!this.dataChannelSender.canSend()){
-            Logger.Info(Logger.GetStackTrace(), `Data channel cannot send yet, skipping sending descriptor message: ${messageType} - ${descriptorAsString}`);
+        if (!this.dataChannelSender.canSend()) {
+            Logger.Info(
+                Logger.GetStackTrace(),
+                `Data channel cannot send yet, skipping sending descriptor message: ${messageType} - ${descriptorAsString}`
+            );
             return;
         }
 
         this.dataChannelSender.sendData(data.buffer);
     }
-
 }
