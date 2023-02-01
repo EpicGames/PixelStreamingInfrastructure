@@ -25,7 +25,7 @@ const defaultConfig = {
 	AdditionalRoutes: new Map(),
 	EnableWebserver: true,
 	MatchmakerAddress: "",
-	MatchmakerPort: "9999",
+	MatchmakerPort: 9999,
 	PublicIp: "localhost",
 	HttpPort: 80,
 	HttpsPort: 443,
@@ -350,7 +350,6 @@ function sendMessageToPlayer(playerId, msg) {
 }
 
 let WebSocket = require('ws');
-const { URL } = require('url');
 
 let streamerMessageHandlers = new Map();
 let sfuMessageHandlers = new Map();
@@ -1010,10 +1009,7 @@ function sendStreamerConnectedToMatchmaker() {
 
 function sendStreamerDisconnectedToMatchmaker(streamerId) {
 	if (!config.UseMatchmaker)
-	{
 		return;
-	}
-
 	try {
 		message = {
 			type: 'streamerDisconnected'
