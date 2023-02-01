@@ -11,6 +11,7 @@ import { CandidateStat } from './CandidateStat';
 import { CandidatePairStats } from './CandidatePairStats';
 import { OutBoundRTPStats, OutBoundVideoStats } from './OutBoundRTPStats';
 import { StreamStats } from './StreamStats';
+import { CodecStats } from './CodecStats';
 import { Logger } from '../Logger/Logger';
 
 /**
@@ -22,12 +23,14 @@ export class AggregatedStats {
     inboundVideoStats: InboundVideoStats;
     inboundAudioStats: InboundAudioStats;
     lastVideoStats: InboundVideoStats;
+	lastAudioStats: InboundAudioStats;
     candidatePair: CandidatePairStats;
     DataChannelStats: DataChannelStats;
     localCandidates: Array<CandidateStat>;
     remoteCandidates: Array<CandidateStat>;
     outBoundVideoStats: OutBoundVideoStats;
     streamStats: StreamStats;
+	codecs: Map<string, string>;
 
     constructor() {
         this.inboundVideoStats = new InboundVideoStats();
@@ -36,6 +39,7 @@ export class AggregatedStats {
         this.DataChannelStats = new DataChannelStats();
         this.outBoundVideoStats = new OutBoundVideoStats();
         this.streamStats = new StreamStats();
+		this.codecs = new Map<string, string>;
     }
 
     /**
@@ -56,6 +60,7 @@ export class AggregatedStats {
                 case 'certificate':
                     break;
                 case 'codec':
+					this.handleCodec(stat);
                     break;
                 case 'data-channel':
                     this.handleDataChannel(stat);
@@ -177,121 +182,42 @@ export class AggregatedStats {
     handleInBoundRTP(stat: InboundRTPStats) {
         switch (stat.kind) {
             case 'video':
-                this.inboundVideoStats.timestamp = stat.timestamp;
-                this.inboundVideoStats.bytesReceived = stat.bytesReceived;
-                this.inboundVideoStats.framesDecoded = stat.framesDecoded;
-                this.inboundVideoStats.packetsLost = stat.packetsLost;
-                this.inboundVideoStats.jitter = stat.jitter;
-
-                this.inboundVideoStats.bytesReceivedStart =
-                    this.inboundVideoStats.bytesReceivedStart == null
-                        ? stat.bytesReceived
-                        : this.inboundVideoStats.bytesReceivedStart;
-                this.inboundVideoStats.framesDecodedStart =
-                    this.inboundVideoStats.framesDecodedStart == null
-                        ? stat.framesDecoded
-                        : this.inboundVideoStats.framesDecodedStart;
-                this.inboundVideoStats.timestampStart =
-                    this.inboundVideoStats.timestampStart == null
-                        ? stat.timestamp
-                        : this.inboundVideoStats.timestampStart;
-                this.inboundVideoStats.framesDecodedStart =
-                    this.inboundVideoStats.framesDecodedStart == null
-                        ? stat.framesDecoded
-                        : this.inboundVideoStats.framesDecodedStart;
+				// Need to convert to unknown first to remove an error around
+				// InboundVideoStats having the bitrate member which isn't found on
+				// the InboundRTPStats
+				this.inboundVideoStats = stat as unknown as InboundVideoStats;
 
                 if (this.lastVideoStats != undefined) {
                     this.inboundVideoStats.bitrate =
                         (8 *
-                            (stat.bytesReceived -
+                            (this.inboundVideoStats.bytesReceived -
                                 this.lastVideoStats.bytesReceived)) /
-                        (stat.timestamp - this.lastVideoStats.timestamp);
+                        (this.inboundVideoStats.timestamp - this.lastVideoStats.timestamp);
                     this.inboundVideoStats.bitrate = Math.floor(
                         this.inboundVideoStats.bitrate
                     );
 
-                    this.inboundVideoStats.lowBitrate =
-                        this.inboundVideoStats.lowBitrate == undefined ||
-                        Number.isNaN(this.inboundVideoStats.lowBitrate)
-                            ? this.inboundVideoStats.bitrate
-                            : this.inboundVideoStats.lowBitrate;
-                    this.inboundVideoStats.lowBitrate =
-                        this.inboundVideoStats.bitrate <
-                            this.inboundVideoStats.lowBitrate ||
-                        Number.isNaN(this.inboundVideoStats.lowBitrate)
-                            ? this.inboundVideoStats.bitrate
-                            : this.inboundVideoStats.lowBitrate;
-
-                    this.inboundVideoStats.highBitrate =
-                        this.inboundVideoStats.highBitrate == undefined ||
-                        Number.isNaN(this.inboundVideoStats.highBitrate)
-                            ? this.inboundVideoStats.bitrate
-                            : this.inboundVideoStats.highBitrate;
-                    this.inboundVideoStats.highBitrate =
-                        this.inboundVideoStats.bitrate >
-                        this.inboundVideoStats.highBitrate
-                            ? this.inboundVideoStats.bitrate
-                            : this.inboundVideoStats.highBitrate;
-
-                    this.inboundVideoStats.avgBitrate =
-                        (8 *
-                            (this.inboundVideoStats.bytesReceived -
-                                this.lastVideoStats.bytesReceived)) /
-                        (this.inboundVideoStats.timestamp -
-                            this.lastVideoStats.timestamp);
-                    this.inboundVideoStats.avgBitrate = Math.floor(
-                        this.inboundVideoStats.avgBitrate
-                    );
-
-                    this.inboundVideoStats.framerate =
-                        (this.inboundVideoStats.framesDecoded -
-                            this.lastVideoStats.framesDecoded) /
-                        ((this.inboundVideoStats.timestamp -
-                            this.lastVideoStats.timestamp) /
-                            1000);
-                    this.inboundVideoStats.framerate = Math.floor(
-                        this.inboundVideoStats.framerate
-                    );
-
-                    this.inboundVideoStats.lowFramerate =
-                        this.inboundVideoStats.lowFramerate == undefined ||
-                        Number.isNaN(this.inboundVideoStats.lowFramerate)
-                            ? this.inboundVideoStats.framerate
-                            : this.inboundVideoStats.lowFramerate;
-                    this.inboundVideoStats.lowFramerate =
-                        this.inboundVideoStats.framerate <
-                        this.inboundVideoStats.lowFramerate
-                            ? this.inboundVideoStats.framerate
-                            : this.inboundVideoStats.lowFramerate;
-
-                    this.inboundVideoStats.highFramerate =
-                        this.inboundVideoStats.highFramerate == undefined ||
-                        Number.isNaN(this.inboundVideoStats.highFramerate)
-                            ? this.inboundVideoStats.framerate
-                            : this.inboundVideoStats.highFramerate;
-                    this.inboundVideoStats.highFramerate =
-                        this.inboundVideoStats.framerate <
-                        this.inboundVideoStats.highFramerate
-                            ? this.inboundVideoStats.framerate
-                            : this.inboundVideoStats.highFramerate;
-
-                    this.inboundVideoStats.averageFrameRate =
-                        (this.inboundVideoStats.framesDecoded -
-                            this.lastVideoStats.framesDecodedStart) /
-                        ((this.inboundVideoStats.timestamp -
-                            this.lastVideoStats.timestampStart) /
-                            1000);
-                    this.inboundVideoStats.averageFrameRate = Math.floor(
-                        this.inboundVideoStats.averageFrameRate
-                    );
                 }
                 this.lastVideoStats = { ...this.inboundVideoStats };
                 break;
             case 'audio':
-                this.inboundAudioStats.bytesReceived = stat.bytesReceived;
-                this.inboundAudioStats.jitter = stat.jitter;
-                this.inboundAudioStats.packetsLost = stat.packetsLost;
-                this.inboundAudioStats.timestamp = stat.timestamp;
+				// Need to convert to unknown first to remove an error around
+				// InboundAudioStats having the bitrate member which isn't found on
+				// the InboundRTPStats
+				this.inboundAudioStats = stat as unknown as InboundAudioStats;
+
+				if (this.lastAudioStats != undefined) {
+                    this.inboundAudioStats.bitrate =
+                        (8 *
+                            (this.inboundAudioStats.bytesReceived -
+                                this.lastAudioStats.bytesReceived)) /
+                        (this.inboundAudioStats.timestamp - this.lastAudioStats.timestamp);
+                    this.inboundAudioStats.bitrate = Math.floor(
+                        this.inboundAudioStats.bitrate
+                    );
+
+                }
+                this.lastAudioStats = { ...this.inboundAudioStats };
                 break;
             default:
                 Logger.Log(Logger.GetStackTrace(), 'Kind is not handled');
@@ -333,20 +259,16 @@ export class AggregatedStats {
         ) {
             this.inboundVideoStats.framesDropped = stat.framesDropped;
             this.inboundVideoStats.framesReceived = stat.framesReceived;
-            this.inboundVideoStats.framesDroppedPercentage =
-                (stat.framesDropped / stat.framesReceived) * 100;
             this.inboundVideoStats.frameHeight = stat.frameHeight;
             this.inboundVideoStats.frameWidth = stat.frameWidth;
-            this.inboundVideoStats.frameHeightStart =
-                this.inboundVideoStats.frameHeightStart == null
-                    ? stat.frameHeight
-                    : this.inboundVideoStats.frameHeightStart;
-            this.inboundVideoStats.frameWidthStart =
-                this.inboundVideoStats.frameWidthStart == null
-                    ? stat.frameWidth
-                    : this.inboundVideoStats.frameWidthStart;
         }
     }
+
+	handleCodec(stat: CodecStats) {
+		const codecId = stat.id;
+		const codecType = stat.mimeType.replace("video/", "").replace("audio/", "");
+		this.codecs.set(codecId, codecType);
+	}
 
     /**
      * Check if a value coming in from our stats is actually a number

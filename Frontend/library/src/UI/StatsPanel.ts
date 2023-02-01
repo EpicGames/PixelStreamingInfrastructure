@@ -180,9 +180,15 @@ export class StatsPanel {
 
         // Bitrate
         this.addOrUpdateStat(
-            'BitrateStat',
-            'Bitrate (kbps)',
+            'VideoBitrateStat',
+            'Video Bitrate (kbps)',
             stats.inboundVideoStats.bitrate.toString()
+        );
+
+		this.addOrUpdateStat(
+            'AudioBitrateStat',
+            'Audio Bitrate (kbps)',
+            stats.inboundAudioStats.bitrate.toString()
         );
 
         // Video resolution
@@ -220,7 +226,7 @@ export class StatsPanel {
         this.addOrUpdateStat(
             'FramerateStat',
             'Framerate',
-            stats.inboundVideoStats.framerate.toString()
+            stats.inboundVideoStats.framesPerSecond.toString()
         );
 
         // Frames dropped
@@ -229,6 +235,18 @@ export class StatsPanel {
             'Frames dropped',
             stats.inboundVideoStats.framesDropped.toString()
         );
+
+		this.addOrUpdateStat(
+			'VideoCodecStat',
+			'Video codec',
+			stats.codecs.get(stats.inboundVideoStats.codecId)
+		);
+
+		this.addOrUpdateStat(
+			'AudioCodecStat',
+			'Audio codec',
+			stats.codecs.get(stats.inboundAudioStats.codecId)
+		);
 
         // RTT
         const netRTT =
