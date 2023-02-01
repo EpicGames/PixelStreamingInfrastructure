@@ -1619,6 +1619,7 @@ export class WebRtcPlayerController {
 		this.preferredCodec = codec;
 		if(this.peerConnectionController) {
 			this.peerConnectionController.preferredCodec = codec;
+			this.peerConnectionController.updateCodecSelection = false;
 		}
 	}
 }

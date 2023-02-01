@@ -239,13 +239,15 @@ export class StatsPanel {
 		this.addOrUpdateStat(
 			'VideoCodecStat',
 			'Video codec',
-			stats.codecs.get(stats.inboundVideoStats.codecId)
+			// Split the codec to remove the Fmtp line
+			stats.codecs.get(stats.inboundVideoStats.codecId).split(" ")[0]
 		);
 
 		this.addOrUpdateStat(
 			'AudioCodecStat',
 			'Audio codec',
-			stats.codecs.get(stats.inboundAudioStats.codecId)
+			// Split the codec to remove the Fmtp line
+			stats.codecs.get(stats.inboundAudioStats.codecId).split(" ")[0]
 		);
 
         // RTT

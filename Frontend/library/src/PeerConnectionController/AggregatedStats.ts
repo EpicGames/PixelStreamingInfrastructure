@@ -266,7 +266,7 @@ export class AggregatedStats {
 
 	handleCodec(stat: CodecStats) {
 		const codecId = stat.id;
-		const codecType = stat.mimeType.replace("video/", "").replace("audio/", "");
+		const codecType = `${stat.mimeType.replace("video/", "").replace("audio/", "")}${(stat.sdpFmtpLine) ? ` ${stat.sdpFmtpLine}` : ""}`;
 		this.codecs.set(codecId, codecType);
 	}
 

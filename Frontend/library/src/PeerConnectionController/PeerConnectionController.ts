@@ -13,6 +13,7 @@ export class PeerConnectionController {
     aggregatedStats: AggregatedStats;
     config: Config;
 	preferredCodec: string;
+	updateCodecSelection: boolean;
 
     /**
      * Create a new RTC Peer Connection client
@@ -47,6 +48,7 @@ export class PeerConnectionController {
             this.handleDataChannel(ev);
         this.aggregatedStats = new AggregatedStats();
 		this.preferredCodec = preferredCodec;
+		this.updateCodecSelection = true;
     }
 
     /**
@@ -154,6 +156,11 @@ export class PeerConnectionController {
         this.peerConnection.getStats(null).then((StatsData: RTCStatsReport) => {
             this.aggregatedStats.processStats(StatsData);
             this.onVideoStats(this.aggregatedStats);
+
+			// Update the preferred codec selection based on what was actually negotiated
+			if(this.updateCodecSelection) {
+				this.config.getSettingOption(OptionParameters.PreferredCodec).selected = this.aggregatedStats.codecs.get(this.aggregatedStats.inboundVideoStats.codecId)
+			}
         });
     }
 

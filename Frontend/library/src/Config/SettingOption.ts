@@ -22,14 +22,8 @@ export class SettingOption extends SettingBase {
 		this.options = options
 
         const urlParams = new URLSearchParams(window.location.search);
-		// A user may not specify the full possible value so we instead use the closest match.
-		// eg ?xxx=H264 would select 'H264 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42001f'
 		const stringToMatch: string = (urlParams.has(this.id)) ? this.getUrlParamText() : defaultTextValue;
-		const filteredList = options.filter((value: string) => value.indexOf(stringToMatch) !== -1);
-		if(filteredList.length) {
-			this.selector.value = filteredList[0];
-			this.value = filteredList[0];
-		}
+		this.selected = stringToMatch;
     }
 
 	public get selector(): HTMLSelectElement {
@@ -139,8 +133,13 @@ export class SettingOption extends SettingBase {
 	}
 
 	public set selected(value: string) {
-		this.selector.value = value;
-		this.value = this.selector.value;
+		// A user may not specify the full possible value so we instead use the closest match.
+		// eg ?xxx=H264 would select 'H264 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42001f'
+		const filteredList = this.options.filter((option: string) => option.indexOf(value) !== -1);
+		if(filteredList.length) {
+			this.value = filteredList[0];
+			this.selector.value = filteredList[0];
+		}
 	}
 
 	public disable() {
