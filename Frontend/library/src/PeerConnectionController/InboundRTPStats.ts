@@ -30,7 +30,7 @@ export class InboundVideoStats {
     lowFramerate: number;
     highFramerate: number;
     averageFrameRate: number;
-    framesDropped: number;
+    framesDropped = 0;
     framesReceived: number;
     framesDroppedPercentage: number;
     frameHeight: number;

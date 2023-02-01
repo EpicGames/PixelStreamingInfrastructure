@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Config } from '../Config/Config';
+import { Config, OptionParameters } from '../Config/Config';
 import { StatsPanel } from '../UI/StatsPanel';
 import { LatencyTestResults } from '../DataChannel/LatencyTestResults';
 import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
@@ -393,6 +393,15 @@ export class Application {
                 );
             }
         );
+
+		this.config.addOnOptionSettingChangedListener(
+			OptionParameters.PreferredCodec,
+			(newValue: string) => {
+				if(this.webRtcController) {
+					this.webRtcController.setPreferredCodec(newValue);
+				}
+			}
+		);
     }
 
     /**
@@ -538,6 +547,7 @@ export class Application {
     setWebRtcPlayerController(webRtcPlayerController: WebRtcPlayerController) {
         this.webRtcController = webRtcPlayerController;
 
+		this.webRtcController.setPreferredCodec(this.config.getSettingOption(OptionParameters.PreferredCodec).selected);
         this.webRtcController.resizePlayerStyle();
 
         this.disconnectOverlay.onAction(() => {

@@ -4,6 +4,7 @@ import { Logger } from '../Logger/Logger';
 import { SettingFlag } from './SettingFlag';
 import { SettingNumber } from './SettingNumber';
 import { SettingText } from './SettingText';
+import { SettingOption } from './SettingOption';
 
 /**
  * A collection of flags that can be toggled and are core to all Pixel Streaming experiences.
@@ -47,6 +48,15 @@ export class NumericParameters {
  */
 export class TextParameters {
     static SignallingServerUrl = 'ss';
+	static PreferredCodec = 'PreferredCodec';
+}
+
+/**
+ * A collection of enum based parameters that are core to all Pixel Streaming experiences.
+ *
+ */
+export class OptionParameters {
+	static PreferredCodec = 'PreferredCodec';
 }
 
 export class Config {
@@ -58,6 +68,9 @@ export class Config {
 
     /* A map of text settings - e.g. signalling server url */
     private textParameters = new Map<string, SettingText>();
+
+	/* A map of enum based settings - e.g. preferred codec */
+	private optionParameters = new Map<string, SettingOption>();
 
     // ------------ Settings -----------------
 
@@ -106,6 +119,38 @@ export class Config {
                     window.location.hostname
             )
         );
+
+		/**
+		 * Enum Parameters
+		 */
+		this.optionParameters.set(OptionParameters.PreferredCodec,
+			new SettingOption(
+				OptionParameters.PreferredCodec,
+				'Preferred Codec',
+				'The preferred codec to be used during codec negotiation',
+				'H264',
+				(function(): Array<string> {
+					const browserSupportedCodecs: Array<string> = [];
+					// Try get the info needed from the RTCRtpReceiver. This is only available on chrome
+					if(!RTCRtpReceiver.getCapabilities)
+					{
+						browserSupportedCodecs.push("Only available on Chrome");
+						return browserSupportedCodecs;
+					}
+
+					const matcher = /(VP\d|H26\d|AV1).*/
+					const codecs = RTCRtpReceiver.getCapabilities('video').codecs;
+					codecs.forEach(codec => {
+						const str = codec.mimeType.split("/")[1] + ' ' + (codec.sdpFmtpLine || '');
+						const match = matcher.exec(str);
+						if(match !== null) {
+							browserSupportedCodecs.push(str);
+						}
+					});
+					return browserSupportedCodecs;
+				})()
+			)
+		);
 
         /**
          * Boolean parameters
@@ -394,6 +439,15 @@ export class Config {
             this.numericParameters.get(NumericParameters.AFKTimeoutSecs)
         );
 
+		const preferredCodecOption = this.optionParameters.get(OptionParameters.PreferredCodec);
+		this.addSettingOption(
+			psSettingsSection,
+			preferredCodecOption
+		);
+		if([...preferredCodecOption.selector.options].map(o => o.value).includes("Only available on Chrome")) {
+			preferredCodecOption.disable();
+		}
+
         /* Setup all view/ui related settings under this section */
         const viewSettingsSection = this.buildSectionWithHeading(
             settingsElem,
@@ -466,6 +520,15 @@ export class Config {
                 .addOnChangedListener(onChangedListener);
         }
     }
+
+	addOnOptionSettingChangedListener(
+		id: string,
+        onChangedListener: (newValue: string) => void
+	): void {
+		if(this.optionParameters.has(id)) {
+			this.optionParameters.get(id).addOnChangedListener(onChangedListener);
+		}
+	}
 
     /**
      * @param id The id of the numeric setting we are interested in getting a value for.
@@ -559,7 +622,7 @@ export class Config {
     }
 
     /**
-     * Add a SettingFlag element to a particular settings section in the DOM and registers that flag in the Config.flag map.
+     * Add a numeric setting element to a particular settings section in the DOM and registers that flag in the Config.numericParameters map.
      * @param settingsSection The settings section HTML element.
      * @param settingFlag The settings flag object.
      */
@@ -570,6 +633,22 @@ export class Config {
         settingsSection.appendChild(setting.rootElement);
         this.numericParameters.set(setting.id, setting);
     }
+
+	/**
+     * Add an enum based settings element to a particular settings section in the DOM and registers that flag in the Config.enumParameters map.
+     * @param settingsSection The settings section HTML element.
+     * @param settingFlag The settings flag object.
+     */
+	addSettingOption(settingsSection: HTMLElement,
+		setting: SettingOption
+	): void {
+		settingsSection.appendChild(setting.rootElement);
+		this.optionParameters.set(setting.id, setting);
+	}
+
+	getSettingOption(id: string): SettingOption {
+		return this.optionParameters.get(id);
+	}
 
     /**
      * Get the value of the configuration flag which has the given id.
@@ -609,6 +688,38 @@ export class Config {
             );
         } else {
             this.textParameters.get(id).text = settingValue;
+        }
+    }
+
+	/**
+     * Set the option setting list of options.
+     * @param id The id of the setting
+     * @param settingOptions The values the setting could take
+     */
+    setOptionSettingOptions(id: string, settingOptions: Array<string>) {
+        if (!this.optionParameters.has(id)) {
+            Logger.Warning(
+                Logger.GetStackTrace(),
+                `Cannot set text setting called ${id} - it does not exist in the Config.optionParameters map.`
+            );
+        } else {
+            this.optionParameters.get(id).options = settingOptions;
+        }
+    }
+
+	/**
+     * Set option enum settings selected option.
+     * @param id The id of the setting
+     * @param settingOptions The value to select out of all the options
+     */
+    setOptionSettingValue(id: string, settingValue: string) {
+        if (!this.optionParameters.has(id)) {
+            Logger.Warning(
+                Logger.GetStackTrace(),
+                `Cannot set text setting called ${id} - it does not exist in the Config.enumParameters map.`
+            );
+        } else {
+            this.optionParameters.get(id).selected = settingValue;
         }
     }
 

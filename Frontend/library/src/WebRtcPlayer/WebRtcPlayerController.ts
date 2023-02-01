@@ -86,6 +86,7 @@ export class WebRtcPlayerController {
     isQualityController: boolean;
     statsTimerHandle: number;
     file: FileTemplate;
+	preferredCodec: string;
 
     // if you override the disconnection message by calling the interface method setDisconnectMessageOverride
     // it will use this property to store the override message string
@@ -210,6 +211,7 @@ export class WebRtcPlayerController {
 
         this.isUsingSFU = false;
         this.isQualityController = false;
+		this.preferredCodec = '';
     }
 
     /**
@@ -1015,7 +1017,8 @@ export class WebRtcPlayerController {
         // set up the peer connection controller
         this.peerConnectionController = new PeerConnectionController(
             peerConfig,
-            this.config
+            this.config,
+			this.preferredCodec
         );
 
         // set up peer connection controller video stats
@@ -1611,4 +1614,11 @@ export class WebRtcPlayerController {
     setDisconnectMessageOverride(message: string): void {
         this.disconnectMessageOverride = message;
     }
+	
+	setPreferredCodec(codec: string) {
+		this.preferredCodec = codec;
+		if(this.peerConnectionController) {
+			this.peerConnectionController.preferredCodec = codec;
+		}
+	}
 }

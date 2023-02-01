@@ -4,3 +4,4 @@ node_modules/
 **/platform_scripts/bash/*/
 node.zip
 SignallingWebServer/Public/
+.vscode
