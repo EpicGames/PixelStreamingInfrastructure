@@ -14,7 +14,6 @@ export class SettingOption extends SettingBase {
         label: string,
         description: string,
         defaultTextValue: string,
-		//	 This tuple represents the underlying value and the human readable value
 		options: Array<string>
     ) {
         super(id, label, description, [defaultTextValue, defaultTextValue]);
