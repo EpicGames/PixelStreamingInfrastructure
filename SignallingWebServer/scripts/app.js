@@ -2712,6 +2712,15 @@ function connect() {
     ws = new WebSocket(connectionUrl);
     ws.attemptStreamReconnection = true;
 
+    ws.onopen = function(event) {
+        var params = new URLSearchParams(window.location.search);
+        let streamerId = "1";
+        if (params.has('streamerid')) {
+            streamerId = params.get('streamerid');
+        }
+        ws.send(JSON.stringify({ type: "subscribe", streamerId: streamerId }));
+    }
+
     ws.onmessagebinary = function(event) {
         if(!event || !event.data) { return; }
 
