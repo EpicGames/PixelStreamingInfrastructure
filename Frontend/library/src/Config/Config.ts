@@ -128,7 +128,7 @@ export class Config {
 				OptionParameters.PreferredCodec,
 				'Preferred Codec',
 				'The preferred codec to be used during codec negotiation',
-				'H264',
+				'H264 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f',
 				(function(): Array<string> {
 					const browserSupportedCodecs: Array<string> = [];
 					// Try get the info needed from the RTCRtpReceiver. This is only available on chrome
