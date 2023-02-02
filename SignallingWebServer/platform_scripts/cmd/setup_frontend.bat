@@ -41,15 +41,17 @@
   @Rem Build the web frontend files.
   @Rem Use our NodeJS (not system NodeJS!) to build the web frontend files.
 
-  @Rem Install dependencies of the frontend lib.
+  @Rem Install dependencies of the frontend library and build the library.
   pushd %~dp0\..\..\..\Frontend\library
   call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
+  call ..\..\SignallingWebServer\platform_scripts\cmd\node\npx webpack
   popd
 
-  @Rem Install dependencies of the Epic Games implementation and build the frontend
+  @Rem Install dependencies of the Epic Games implementation, link the location of the library and build the implementation
   pushd %~dp0\..\..\..\Frontend\implementations\EpicGames
   call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
-  call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm run build-all
+  call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm link ../../library
+  call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npx webpack
   popd
 
   goto :eof
