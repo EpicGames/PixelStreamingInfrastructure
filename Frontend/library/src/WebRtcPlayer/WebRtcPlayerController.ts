@@ -1155,10 +1155,7 @@ export class WebRtcPlayerController {
 
 		this.isUsingSFU = (Offer.sfu) ? Offer.sfu : false;
 		if(this.isUsingSFU) {
-			// Disable negotiating with the sfu until we can sort an elegant way of ensuring the fmtp lines are in the correct order
-			// eg. UE uses 			level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f
-			// but the sfu uses 	packetization-mode=1;level-asymmetry-allowed=1;profile-level-id=42e01f
-			// note the order difference
+			// Disable negotiating with the sfu as the sfu only supports one codec at a time
 			this.peerConnectionController.preferredCodec = "";
 		}
 
