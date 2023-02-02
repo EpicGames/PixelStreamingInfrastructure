@@ -1153,9 +1153,14 @@ export class WebRtcPlayerController {
     handleWebRtcOffer(Offer: MessageOffer) {
         Logger.Log(Logger.GetStackTrace(), `Got offer sdp ${Offer.sdp}`, 6);
 
-        if (Offer.sfu) {
-            this.isUsingSFU = Offer.sfu.toLowerCase() === 'true';
-        }
+		this.isUsingSFU = (Offer.sfu) ? Offer.sfu : false;
+		if(this.isUsingSFU) {
+			// Disable negotiating with the sfu until we can sort an elegant way of ensuring the fmtp lines are in the correct order
+			// eg. UE uses 			level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f
+			// but the sfu uses 	packetization-mode=1;level-asymmetry-allowed=1;profile-level-id=42e01f
+			// note the order difference
+			this.peerConnectionController.preferredCodec = "";
+		}
 
         if (Offer.defaultToHover) {
             this.config.setFlagEnabled(

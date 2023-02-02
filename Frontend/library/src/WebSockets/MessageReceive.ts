@@ -53,7 +53,7 @@ export class MessageAnswer extends MessageRecv {
  */
 export class MessageOffer extends MessageRecv {
     sdp: string;
-    sfu?: string;
+    sfu?: boolean;
     defaultToHover?: string;
 }
 

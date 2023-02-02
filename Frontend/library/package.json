@@ -27,6 +27,6 @@
         "jss": "^10.9.2",
         "jss-plugin-camel-case": "^10.9.2",
         "jss-plugin-global": "^10.9.2",
-        "sdp": "^3.0.3"
+        "sdp": "^3.1.0"
     }
 }

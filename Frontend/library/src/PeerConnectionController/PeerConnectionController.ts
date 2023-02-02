@@ -336,7 +336,7 @@ export class PeerConnectionController {
         // Setup a transceiver for getting UE video
         this.peerConnection.addTransceiver('video', { direction: 'recvonly' });
 		// We can only set preferrec codec on Chrome
-		if(RTCRtpReceiver.getCapabilities) {
+		if(RTCRtpReceiver.getCapabilities && this.preferredCodec != "") {
 			for(const transceiver of this.peerConnection.getTransceivers()) {
 				if(transceiver && transceiver.receiver && transceiver.receiver.track && transceiver.receiver.track.kind === "video")
 				{
