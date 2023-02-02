@@ -1,0 +1,37 @@
+<!-- Copyright Epic Games, Inc. All Rights Reserved. -->
+<!DOCTYPE html>
+<html style="width: 100%; height: 100%">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+
+	<!-- Required - the Login style sheet -->
+	<link rel="stylesheet" type="text/css" href="./assets/css/login.css">
+
+	<!-- Optional: set some favicons -->
+	<link id="favPng" rel="icon" type="image/png" href="./assets/images/favicon.png">
+
+	<!-- Optional: set a title for your page -->
+	<title>Pixel Streaming Login</title>
+</head>
+
+<body style="width: 100vw; height: 100vh; min-height: -webkit-fill-available; font-family: 'Montserrat'; margin: 0px">
+	<form action="/login" method="post">
+		<div class="entry">
+			<input type="text" id="username" name="username" placeholder="Username"
+				autocomplete="username">
+		</div>
+		<div class="entry">
+			<input type="password" id="password" name="password" placeholder="Password"
+				autocomplete="current-password">
+		</div>
+		<div class="entry button">
+			<button type="submit">LOGIN</button>
+		</div>
+	</form>
+</body>
+
+</html>

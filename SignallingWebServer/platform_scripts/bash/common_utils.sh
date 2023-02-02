@@ -23,6 +23,7 @@ function print_usage() {
     default value: as above, IP address downloaded from https://api.ipify.org; in case if download failure it is set to 127.0.0.1
   --stun defined what STUN server to be used, syntax: --stun stun.l.google.com:19302
     default value as above
+  --build will force a rebuild of the typescript frontend even if it already exists
   Other options: stored and passed to the Cirrus server.  All parameters printed once the script values are set.
   Command line options might be omitted to run with defaults and it is a good practice to omit specific ones when just starting the TURN or the STUN server alone, not the whole set of scripts.
  "
@@ -63,6 +64,7 @@ function use_args() {
    --debug ) IS_DEBUG=1; shift;;
    --nosudo ) NO_SUDO=1; shift;;
    --verbose ) VERBOSE=1; shift;;
+   --build ) FORCE_BUILD=1; shift;;
    --stun ) stunserver="$2"; shift 2;;
    --turn ) turnserver="$2"; shift 2;;
    --publicip ) publicip="$2"; turnserver="${publicip}:19303"; shift 2;;

@@ -1,0 +1,65 @@
+/* Copyright Epic Games, Inc. All Rights Reserved. */
+
+body {
+	margin: 0px;
+	background-color: black;
+	font-family: 'Montserrat', sans-serif;
+	justify-content: center;
+	display: flex;
+	align-items: center;
+	height: 100vh;
+}
+
+form {
+	background-color: white;
+	width: 50%;
+	padding: 5rem;
+}
+
+div {
+	padding: 1rem;
+	display: inline-flex;
+	width: 100%;
+}
+
+.button {
+	text-align: center;
+	display: block;
+	padding-bottom: 0;
+}
+
+input {
+	border: none;	
+	border-bottom: 2px solid #3c3b40;
+	width: 100%;
+	line-height: 3rem;
+	font-size: 1.25rem;
+	font-family: 'Montserrat', sans-serif;
+}
+
+button {
+	background-color: #3c3b40;
+    border: 3px solid #3c3b40;
+	color: #fff;
+	width: 6rem;
+	padding: 0.5rem;
+    text-align: center;
+	line-height: 1.75rem;
+	font-family: 'Montserrat';
+	border-radius: 4px;
+}
+
+button:hover {
+	background-color: #0585fe;
+	border: 3px solid #0585fe;
+	transition: 0.25s ease;
+}
+
+button:active {
+	background-color: #3c3b40;
+	border: 3px solid #0585fe;
+}
+
+*:focus {
+    outline: none;
+}
