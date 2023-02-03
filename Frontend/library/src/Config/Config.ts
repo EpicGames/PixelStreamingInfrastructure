@@ -116,7 +116,9 @@ export class Config {
                 'Signalling url',
                 'Url of the signalling server',
                 (location.protocol === 'https:' ? 'wss://' : 'ws://') +
-                    window.location.hostname
+                window.location.hostname + 
+				// for readability, we omit the port if it's 80
+				((window.location.port === '80' || window.location.port === '') ? '' : `:${window.location.port}`)
             )
         );
 
