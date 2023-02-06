@@ -4,6 +4,7 @@ import { Logger } from '../Logger/Logger';
 import { SettingFlag } from './SettingFlag';
 import { SettingNumber } from './SettingNumber';
 import { SettingText } from './SettingText';
+import { SettingSelect } from './SettingSelect';
 
 /**
  * A collection of flags that can be toggled and are core to all Pixel Streaming experiences.
@@ -49,6 +50,10 @@ export class TextParameters {
     static SignallingServerUrl = 'ss';
 }
 
+export class SelectParameters {
+    static StreamerId = 'Streamer_id';
+}
+
 export class Config {
     /* A map of flags that can be toggled - options that can be set in the application - e.g. Use Mic? */
     private flags = new Map<string, SettingFlag>();
@@ -58,6 +63,9 @@ export class Config {
 
     /* A map of text settings - e.g. signalling server url */
     private textParameters = new Map<string, SettingText>();
+
+    /* A map of select settings - e.g. streamer ids */
+    private selectParameters = new Map<string, SettingSelect>();
 
     // ------------ Settings -----------------
 
@@ -104,6 +112,15 @@ export class Config {
                 'Url of the signalling server',
                 (location.protocol === 'https:' ? 'wss://' : 'ws://') +
                     window.location.hostname
+            )
+        );
+
+        this.selectParameters.set(
+            SelectParameters.StreamerId,
+            new SettingSelect(
+                SelectParameters.StreamerId,
+                'Streamer ID',
+                'The ID of the streamer to stream.'
             )
         );
 
@@ -354,6 +371,10 @@ export class Config {
             psSettingsSection,
             this.textParameters.get(TextParameters.SignallingServerUrl)
         );
+        this.addSettingSelect(
+            psSettingsSection,
+            this.selectParameters.get(SelectParameters.StreamerId)
+        );
         this.addSettingFlag(
             psSettingsSection,
             this.flags.get(Flags.AutoConnect)
@@ -487,7 +508,19 @@ export class Config {
         if (this.textParameters.has(id)) {
             return this.textParameters.get(id).value as string;
         } else {
-            throw new Error(`There is no numeric setting with the id of ${id}`);
+            throw new Error(`There is no text setting with the id of ${id}`);
+        }
+    }
+
+    /**
+     * @param id The id of the text setting we are interested in getting a value for.
+     * @returns The text value stored in the parameter with the passed id.
+     */
+    getSelectSettingValue(id: string): string {
+        if (this.selectParameters.has(id)) {
+            return this.selectParameters.get(id).value as string;
+        } else {
+            throw new Error(`There is no select setting with the id of ${id}`);
         }
     }
 
@@ -533,6 +566,20 @@ export class Config {
     }
 
     /**
+     * Add a callback to fire when the select is changed.
+     * @param id The id of the select.
+     * @param onChangeListener The callback to fire when the value changes.
+     */
+    addOnSelectSettingChangedListener(
+        id: string,
+        onChangeListener: (newTextValue: string) => void
+    ): void {
+        if (this.selectParameters.has(id)) {
+            this.selectParameters.get(id).onChange = onChangeListener;
+        }
+    }
+
+    /**
      * Add a SettingText element to a particular settings section in the DOM and registers that text in the text settings map.
      * @param settingsSection The settings section HTML element.
      * @param settingText The textual settings object.
@@ -543,6 +590,19 @@ export class Config {
     ): void {
         settingsSection.appendChild(settingText.rootElement);
         this.textParameters.set(settingText.id, settingText);
+    }
+
+    /**
+     * Add a SettingSelect element to a particular settings section in the DOM and registers that text in the text settings map.
+     * @param settingsSection The settings section HTML element.
+     * @param settingSelect The select settings object.
+     */
+    addSettingSelect(
+        settingsSection: HTMLElement,
+        settingSelect: SettingSelect
+    ): void {
+        settingsSection.appendChild(settingSelect.rootElement);
+        this.selectParameters.set(settingSelect.id, settingSelect);
     }
 
     /**
@@ -625,6 +685,17 @@ export class Config {
             );
         } else {
             this.flags.get(id).label = label;
+        }
+    }
+
+    setSelectOptions(id: string, options: string[]) {
+        if (!this.selectParameters.has(id)) {
+            Logger.Warning(
+                Logger.GetStackTrace(),
+                `Cannot add options to select ${id} - it does not exist in the Config.selectParameters map.`
+            );
+        } else {
+            this.selectParameters.get(id).setOptions(options);
         }
     }
 }

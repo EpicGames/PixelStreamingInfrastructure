@@ -6,6 +6,9 @@ import { Logger } from '../Logger/Logger';
  * The Send Types that are pushed from the signaling server
  */
 export enum MessageSendTypes {
+    LIST_STREAMERS = 'listStreamers',
+    SUBSCRIBE = 'subscribe',
+    UNSUBSCRIBE = 'unsubscribe',
     ICE_CANDIDATE = 'iceCandidate',
     OFFER = 'offer',
     ANSWER = 'answer',
@@ -41,6 +44,30 @@ export interface Send {
      * @returns - JSON String of the Message to send
      */
     payload: () => string;
+}
+
+export class MessageListStreamers extends MessageSend {
+    constructor() {
+        super();
+        this.type = MessageSendTypes.LIST_STREAMERS;
+    }
+}
+
+export class MessageSubscribe extends MessageSend {
+    streamerId: string;
+
+    constructor(streamerid: string) {
+        super();
+        this.type = MessageSendTypes.SUBSCRIBE;
+        this.streamerId = streamerid;
+    }
+}
+
+export class MessageUnsubscribe extends MessageSend {
+    constructor() {
+        super();
+        this.type = MessageSendTypes.UNSUBSCRIBE;
+    }
 }
 
 /**

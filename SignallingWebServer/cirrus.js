@@ -626,7 +626,7 @@ function onPlayerMessageStats(player, msg) {
 function onPlayerMessageListStreamers(player, msg) {
 	logIncoming(player.id, msg);
 
-	let reply = { ids: [] };
+	let reply = { type: 'streamerList', ids: [] };
 	for (let [streamerId, streamer] of streamers) {
 		reply.ids.push(streamerId);
 	}

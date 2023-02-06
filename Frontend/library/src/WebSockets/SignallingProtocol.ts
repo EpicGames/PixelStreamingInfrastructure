@@ -5,6 +5,7 @@ import { WebSocketController } from './WebSocketController';
 import {
     MessageRecvTypes,
     MessageConfig,
+    MessageStreamerList,
     MessagePlayerCount,
     MessageAnswer,
     MessageOffer,
@@ -70,10 +71,19 @@ export class SignallingProtocol {
         websocketController.signallingProtocol.addMessageHandler(
             MessageRecvTypes.CONFIG,
             (configPayload: string) => {
-                // send our pong payload back to the signalling server
                 Logger.Log(Logger.GetStackTrace(), MessageRecvTypes.CONFIG, 6);
                 const config: MessageConfig = JSON.parse(configPayload);
                 websocketController.onConfig(config);
+            }
+        );
+
+        // STREAMER_LIST
+        websocketController.signallingProtocol.addMessageHandler(
+            MessageRecvTypes.STREAMER_LIST,
+            (listPayload: string) => {
+                Logger.Log(Logger.GetStackTrace(), MessageRecvTypes.STREAMER_LIST, 6);
+                const streamerList: MessageStreamerList = JSON.parse(listPayload);
+                websocketController.onStreamerList(streamerList);
             }
         );
 
@@ -81,7 +91,6 @@ export class SignallingProtocol {
         websocketController.signallingProtocol.addMessageHandler(
             MessageRecvTypes.PLAYER_COUNT,
             (playerCountPayload: string) => {
-                // send our pong payload back to the signalling server
                 Logger.Log(
                     Logger.GetStackTrace(),
                     MessageRecvTypes.PLAYER_COUNT,

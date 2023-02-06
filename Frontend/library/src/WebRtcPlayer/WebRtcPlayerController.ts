@@ -5,7 +5,8 @@ import { StreamController } from '../VideoPlayer/StreamController';
 import {
     MessageAnswer,
     MessageOffer,
-    MessageConfig
+    MessageConfig,
+    MessageStreamerList
 } from '../WebSockets/MessageReceive';
 import { FreezeFrameController } from '../FreezeFrame/FreezeFrameController';
 import { AFKController } from '../AFK/AFKController';
@@ -17,7 +18,8 @@ import {
     Config,
     Flags,
     ControlSchemeType,
-    TextParameters
+    TextParameters,
+    SelectParameters
 } from '../Config/Config';
 import {
     EncoderSettings,
@@ -166,12 +168,18 @@ export class WebRtcPlayerController {
         this.webSocketController.onConfig = (
             messageConfig: MessageReceive.MessageConfig
         ) => this.handleOnConfigMessage(messageConfig);
+        this.webSocketController.onStreamerList = (
+            messageList: MessageReceive.MessageStreamerList
+        ) => this.handleStreamerListMessage(messageList);
         this.webSocketController.onWebSocketOncloseOverlayMessage = (event) =>
             this.application.onDisconnect(
                 `Websocket disconnect (${event.code}) ${
                     event.reason != '' ? '- ' + event.reason : ''
                 }`
             );
+        this.webSocketController.onOpen.addEventListener('open', () => {
+            this.webSocketController.requestStreamerList();
+        });
         this.webSocketController.onClose.addEventListener('close', () => {
             this.afkController.stopAfkWarningTimer();
 
@@ -210,6 +218,11 @@ export class WebRtcPlayerController {
 
         this.isUsingSFU = false;
         this.isQualityController = false;
+
+        this.config.addOnSelectSettingChangedListener(SelectParameters.StreamerId, (streamerid) => {
+                this.webSocketController.sendSubscribe(streamerid);
+            }
+        );
     }
 
     /**
@@ -1125,6 +1138,18 @@ export class WebRtcPlayerController {
         this.webSocketController.onIceCandidate = (
             iceCandidate: RTCIceCandidateInit
         ) => this.handleIceCandidate(iceCandidate);
+    }
+
+    /**
+     * Handles when the signalling server gives us the list of streamer ids.
+     */
+    handleStreamerListMessage(messageStreamerList: MessageStreamerList) {
+        Logger.Log(Logger.GetStackTrace(), `Got streamer list ${messageStreamerList.ids}`, 6);
+        // if (messageStreamerList.ids.length > 0) {
+        //     this.webSocketController.sendSubscribe(messageStreamerList.ids[0]);
+        // }
+        messageStreamerList.ids.unshift('');
+        this.config.setSelectOptions(SelectParameters.StreamerId, messageStreamerList.ids);
     }
 
     /**
