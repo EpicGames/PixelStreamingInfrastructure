@@ -178,7 +178,12 @@ export class WebRtcPlayerController {
                 }`
             );
         this.webSocketController.onOpen.addEventListener('open', () => {
-            this.webSocketController.requestStreamerList();
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has(SelectParameters.StreamerId)) {
+                this.webSocketController.sendSubscribe(urlParams.get(SelectParameters.StreamerId));
+            } else {
+                this.webSocketController.requestStreamerList();
+            }
         });
         this.webSocketController.onClose.addEventListener('close', () => {
             this.afkController.stopAfkWarningTimer();
@@ -1145,10 +1150,7 @@ export class WebRtcPlayerController {
      */
     handleStreamerListMessage(messageStreamerList: MessageStreamerList) {
         Logger.Log(Logger.GetStackTrace(), `Got streamer list ${messageStreamerList.ids}`, 6);
-        // if (messageStreamerList.ids.length > 0) {
-        //     this.webSocketController.sendSubscribe(messageStreamerList.ids[0]);
-        // }
-        messageStreamerList.ids.unshift('');
+        messageStreamerList.ids.unshift(''); // add an empty option at the top
         this.config.setSelectOptions(SelectParameters.StreamerId, messageStreamerList.ids);
     }
 

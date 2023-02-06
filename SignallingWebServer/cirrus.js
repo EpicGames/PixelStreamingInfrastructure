@@ -728,6 +728,14 @@ playerServer.on('connection', function (ws, req) {
 	sendPlayerConnectedToMatchmaker();
 	player.ws.send(JSON.stringify(clientConfig));
 	sendPlayersCount();
+
+	// if we only have one streamer just subscribe this player to that one
+	if (streamers.size == 1) {
+		for (let [streamerId, streamer] of streamers) {
+			player.subscribe(streamerId);
+			break;
+		}
+	}
 });
 
 function disconnectAllPlayers(streamerId) {
