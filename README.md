@@ -33,15 +33,21 @@ We maintain versions of the servers and frontend that are compatible with existi
 
 This repository contains the following in branches that track Unreal Engine versions:
 
-[Master](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/master) (This is our dev branch.)
+| Branch | Status |
+|--------|--------|
+|[Master](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/master)| Dev |
+|[UE5.1](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.1)| Current |
+|[UE5.0](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.0)| Supported |
+|[UE4.27](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.27)| End of life |
+|[UE4.26](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.26)| Unsupported |
 
-[UE5.1 - Current](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.1)
-
-[UE5.0](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.0)
-
-[UE4.27 - End of life](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.27)
-
-[UE4.26 - Unsupported](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.26)
+| Legend | Meaning |
+|---------|-----------|
+| Dev | This is our dev branch tracking [ue5-main](https://github.com/EpicGames/UnrealEngine/tree/ue5-main) - experimental. |
+| Current | Supported and this is the branch tracking the **latest released** version of UE. |
+| Supported | We will accept bugfixes/issues for this version. |
+| End of life | Once the next UE version is released we will not support this version anymore. |
+| Unsupported | We will not be supporting this versions with bugfixes. |
 
 ## Legal
 © 2004-2022, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere. 
