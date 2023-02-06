@@ -29,17 +29,19 @@ We maintain versions of the servers and frontend that are compatible with existi
 
 :warning: **There are breaking changes between UE versions - so make sure you get the right version**. :warning:
 
-We maintain the following in branches right now:
+<ins>For a list of major changes between versions please refer to the [changelog](https://github.com/EpicGames/PixelStreamingInfrastructure/blob/master/CHANGELOG.md).</ins>
+
+This repository contains the following in branches that track Unreal Engine versions:
 
 [Master](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/master) (This is our dev branch.)
 
-[UE5.1](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.1)
+[UE5.1 - Current](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.1)
 
 [UE5.0](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.0)
 
-[UE4.27](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.27)
+[UE4.27 - End of life](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.27)
 
-[UE4.26](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.26)
+[UE4.26 - Unsupported](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.26)
 
 ## Legal
 © 2004-2022, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere. 
