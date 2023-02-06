@@ -91,18 +91,20 @@ function check_and_install() { #dep_name #get_version_string #version_min #insta
 function setup_frontend() {
 	# navigate to root
 	pushd ${BASH_LOCATION}/../../.. > /dev/null
-
+	export PATH="../../SignallingWebServer/platform_scripts/bash/node/bin:$PATH"
 	# If player.html doesn't exist, or --build passed as arg, rebuild the frontend
 	if [ ! -f SignallingWebServer/Public/player.html ] || [ ! -z "$FORCE_BUILD" ] ; then
 		echo "Building Typescript Frontend."
 		# Using our bundled NodeJS, build the web frontend files
 		pushd ${BASH_LOCATION}/../../../Frontend/library > /dev/null
 		../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
+		../../SignallingWebServer/platform_scripts/bash/node/bin/npx webpack
 		popd
 
 		pushd ${BASH_LOCATION}/../../../Frontend/implementations/EpicGames > /dev/null
 		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
-		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-all
+		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm link ../../library
+		../../../SignallingWebServer/platform_scripts/bash/node/bin/npx webpack
 		popd
 	else
 		echo 'Skipping building Frontend because files already exist. Please run with "--build" to force a rebuild'
