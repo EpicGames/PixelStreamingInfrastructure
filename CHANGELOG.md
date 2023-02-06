@@ -22,7 +22,7 @@ Coming soon...
 ## [UE 5.0](https://github.com/EpicGames/PixelStreamingInfrastructure/commits/UE5.0)
 
 ### Bug fixes
-- [3d641a](https://github.com/EpicGames/PixelStreamingInfrastructure/commit/3d641a4f5236792ed7f3014e092f2aa4b6269d5a) (https://github.com/EpicGames/PixelStreamingInfrastructure/commit/f8d1019a1d46a7289f3ace3c510c8f0e36e88ea5) Fixed `MatchViewportWidth` not working if toggled repeatedly.
+- [3d641a](https://github.com/EpicGames/PixelStreamingInfrastructure/commit/3d641a4f5236792ed7f3014e092f2aa4b6269d5a) Fixed `MatchViewportWidth` not working if toggled repeatedly.
 - [ca6644](https://github.com/EpicGames/PixelStreamingInfrastructure/commit/ca6644f85c63e308be54a5207a12cf745d558307) Fix controller button messages not being sent.
 - [bb4063](https://github.com/EpicGames/PixelStreamingInfrastructure/commit/bb40639227a0b1462109c66465b67ffa10bc9177) Fix missing `let` in loops.
 - [b59bfb](https://github.com/EpicGames/PixelStreamingInfrastructure/commit/b59bfba69e68e761d8d355bf412d071b6e98f0ab) Fix `removeResponseEventListener` using remove instead of delete.
