@@ -48,7 +48,6 @@ export class NumericParameters {
  */
 export class TextParameters {
     static SignallingServerUrl = 'ss';
-	static PreferredCodec = 'PreferredCodec';
 }
 
 /**
