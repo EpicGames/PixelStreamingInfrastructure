@@ -8,7 +8,7 @@ pushd "%~dp0"
 title Building Cirrus.exe
 
 @Rem Run setup to ensure we have node and cirrus installed.
-call setup.bat
+call setup.bat %*
 
 @Rem Look for a `nexe` directory next to this script
 if exist nexe\ (
