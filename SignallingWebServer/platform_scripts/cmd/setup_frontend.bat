@@ -48,29 +48,19 @@
   @Rem Refresh the cmd session with new PATH
   call %~dp0\refreshenv.cmd
 
-<<<<<<< HEAD
-  @Rem Install dependencies of the frontend library and build the library.
-  pushd %~dp0\..\..\..\Frontend\library
-=======
   @Rem Do npm install in the Frontend\lib directory (note we use start because that loads PATH)
   echo ----------------------------
   echo Building frontend library...
   pushd %CD%\Frontend\library
->>>>>>> 7853417220116625a42a3c1f8e4766addb8a44f3
   call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
   call ..\..\SignallingWebServer\platform_scripts\cmd\node\npx webpack
   popd
   echo End of build PS frontend lib step.
 
-<<<<<<< HEAD
-  @Rem Install dependencies of the Epic Games implementation, link the location of the library and build the implementation
-  pushd %~dp0\..\..\..\Frontend\implementations\EpicGames
-=======
   @Rem Do npm install in the Frontend\implementations\EpicGames directory (note we use start because that loads PATH)
   echo ----------------------------
   echo Building Epic Games reference frontend...
   pushd %CD%\Frontend\implementations\EpicGames
->>>>>>> 7853417220116625a42a3c1f8e4766addb8a44f3
   call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
   call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm link ../../library
   call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npx webpack
