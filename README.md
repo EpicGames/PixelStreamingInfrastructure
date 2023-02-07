@@ -1,5 +1,5 @@
-# The new home for the Pixel Streaming servers!
-The Pixel Streaming servers and web frontend that was in `Samples/PixelStreaming/WebServers` is now here. 
+# The official home for the Pixel Streaming servers and frontend!
+The Pixel Streaming servers and web frontend that was in `Samples/PixelStreaming/WebServers` is now here for all the contribute to. 
 
 ## Goals
 
