@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import * as libfrontend from '@epicgames/pixelstreamingfrontend';
+import * as libfrontend from '@epicgames/lib-pixelstreamingfrontend-dev';
 
 // This is the entrypoint to the stress test, all setup happens here
 export class StressTester {

@@ -1,8 +1,8 @@
 {
-    "name": "@epicgames/pixelstreamingfrontend",
+    "name": "@epicgames/lib-pixelstreamingfrontend-dev",
     "version": "0.0.1",
     "description": "Frontend library for Pixel Streaming",
-    "main": "dist/pixelstreamingfrontend.min.js",
+    "main": "dist/lib-pixelstreamingfrontend.min.js",
     "types": "types/pixelstreamingfrontend.d.ts",
     "scripts": {
         "compile": "tsc --build --clean && tsc",
