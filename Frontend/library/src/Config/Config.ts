@@ -127,7 +127,8 @@ export class Config {
                 OptionParameters.StreamerId,
                 'Streamer ID',
                 'The ID of the streamer to stream.',
-                '')
+                '',
+                [])
         );
 
 		/**
@@ -411,7 +412,7 @@ export class Config {
         );
         this.addSettingOption(
             psSettingsSection,
-            this.selectParameters.get(SelectParameters.StreamerId)
+            this.optionParameters.get(OptionParameters.StreamerId)
         );
         this.addSettingFlag(
             psSettingsSection,

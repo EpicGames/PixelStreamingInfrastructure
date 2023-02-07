@@ -180,8 +180,8 @@ export class WebRtcPlayerController {
             );
         this.webSocketController.onOpen.addEventListener('open', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has(SelectParameters.StreamerId)) {
-                this.webSocketController.sendSubscribe(urlParams.get(SelectParameters.StreamerId));
+            if (urlParams.has(OptionParameters.StreamerId)) {
+                this.webSocketController.sendSubscribe(urlParams.get(OptionParameters.StreamerId));
             } else {
                 this.webSocketController.requestStreamerList();
             }
