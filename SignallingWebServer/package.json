@@ -24,7 +24,7 @@
     "express": "^4.18.2",
     "express-session": "^1.15.6",
     "helmet": "^3.21.3",
-    "passport": "^0.4.0",
+    "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "run-script-os": "^1.1.6",
     "ws": "^7.1.2",
