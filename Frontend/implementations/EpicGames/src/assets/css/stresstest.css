@@ -1,0 +1,52 @@
+/* Copyright Epic Games, Inc. All Rights Reserved. */
+
+body {
+	height: 100vh;
+	color: #000;
+	background-color: #fff;
+}
+
+#control {
+	width: 100vw;
+	height: 10%;
+}
+
+#control > div, button {
+	margin-top: 15px;
+	display: inline-block;
+}
+
+#control > button {
+	background-color: #3c3b40;
+    border: 3px solid #3c3b40;
+	color: #fff;
+	width: 6rem;
+
+    padding: 0.5rem;
+    text-align: center;
+	line-height: 1.75rem;
+	font-family: 'Montserrat';
+	margin-left: 1%;
+}
+
+#control > button:hover {
+	background-color: #0585fe;
+	border: 3px solid #0585fe;
+	transition: 0.25s ease;
+}
+
+#control > button:active {
+	background-color: #3c3b40;
+	border: 3px solid #0585fe;
+}
+
+#streamsContainer {
+	height: 90%;
+	display: grid;
+	align-content: stretch;
+	grid-template-columns: 1fr 1fr 1fr;
+}
+
+#streamsContainer > div {
+	margin: 10px;
+}

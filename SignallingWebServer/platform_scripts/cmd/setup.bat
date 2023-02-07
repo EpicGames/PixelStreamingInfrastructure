@@ -8,6 +8,9 @@ pushd "%~dp0"
 @Rem Ensure we have NodeJs available for calling.
 call setup_node.bat
 
+@Rem Ensure we have frontend built.
+call setup_frontend.bat %*
+
 @Rem Ensure we have CoTURN available for calling.
 call setup_coturn.bat
 

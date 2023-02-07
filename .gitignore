@@ -1,5 +1,8 @@
 logs/
 node_modules/
 **/platform_scripts/cmd/*/
+!**/platform_scripts/cmd/setenv/
 **/platform_scripts/bash/*/
 node.zip
+SignallingWebServer/Public/
+.vscode
