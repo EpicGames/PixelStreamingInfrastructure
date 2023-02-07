@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "express": "^4.16.2",
+    "express": "^4.18.2",
     "express-session": "^1.15.6",
     "helmet": "^3.21.3",
     "passport": "^0.4.0",
