@@ -28,5 +28,13 @@
         "jss-plugin-camel-case": "^10.9.2",
         "jss-plugin-global": "^10.9.2",
         "sdp": "^3.1.0"
-    }
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/EpicGames/PixelStreamingInfrastructure.git"
+      },
+      "publishConfig": {
+        "registry":"https://npm.pkg.github.com/",
+        "access": "public"
+      }
 }
