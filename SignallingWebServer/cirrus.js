@@ -443,7 +443,7 @@ function forwardStreamerMessageToPlayer(streamer, msg) {
 	}
 }
 
-streamerMessageHandlers.set('streamerid', onStreamerMessageId);
+streamerMessageHandlers.set('endpointId', onStreamerMessageId);
 streamerMessageHandlers.set('ping', onStreamerMessagePing);
 streamerMessageHandlers.set('offer', forwardStreamerMessageToPlayer);
 streamerMessageHandlers.set('answer', forwardStreamerMessageToPlayer);
@@ -496,6 +496,11 @@ streamerServer.on('connection', function (ws, req) {
 	});
 
 	ws.send(JSON.stringify(clientConfig));
+
+	// request id
+	const msg = { type: "identify" };
+	logOutgoing("unknown", msg);
+	ws.send(JSON.stringify(msg));
 
 	registerStreamer(LegacyStreamerId, streamer);
 });
