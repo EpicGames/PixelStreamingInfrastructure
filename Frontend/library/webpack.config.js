@@ -28,8 +28,8 @@ module.exports = {
         })
     ],
     output: {
-        filename: 'pixelstreamingfrontend.min.js',
-        library: 'pixelstreamingfrontend', // exposed variable that will provide access to the library classes
+        filename: 'lib-pixelstreamingfrontend.min.js',
+        library: 'lib-pixelstreamingfrontend', // exposed variable that will provide access to the library classes
         libraryTarget: 'umd',
         path: path.resolve(__dirname, 'dist'),
         clean: false,

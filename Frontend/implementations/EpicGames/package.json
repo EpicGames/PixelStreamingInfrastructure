@@ -1,15 +1,16 @@
 {
-  "name": "ps-application",
+  "name": "@epicgames/reference-pixelstreamingfrontend",
   "version": "0.0.1",
   "description": "",
-  "main": "index.ts",
+  "main": "player.ts",
   "scripts": {
     "build": "npx webpack",
     "watch": "npx webpack --watch",
-    "serve": "webpack serve"
+    "serve": "webpack serve",
+    "install": "cd ../../library && npm run build-webpack && cd ../implementations/EpicGames && npm link ../../library",
+    "build-all": "npm run install && npm run build"
   },
   "devDependencies": {
-    "@epicgames/pixelstreamingfrontend": "^0.0.1",
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.11.1",
     "css-loader": "^6.7.3",

@@ -1,8 +1,8 @@
 {
-    "name": "@epicgames/pixelstreamingfrontend",
+    "name": "@epicgames/lib-pixelstreamingfrontend-dev",
     "version": "0.0.1",
     "description": "Frontend library for Pixel Streaming",
-    "main": "dist/pixelstreamingfrontend.min.js",
+    "main": "dist/lib-pixelstreamingfrontend.min.js",
     "types": "types/pixelstreamingfrontend.d.ts",
     "scripts": {
         "compile": "tsc --build --clean && tsc",
@@ -28,5 +28,13 @@
         "jss-plugin-camel-case": "^10.9.2",
         "jss-plugin-global": "^10.9.2",
         "sdp": "^3.1.0"
-    }
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/EpicGames/PixelStreamingInfrastructure.git"
+      },
+      "publishConfig": {
+        "registry":"https://npm.pkg.github.com/",
+        "access": "public"
+      }
 }
