@@ -326,6 +326,7 @@ class Player {
 let streamers = new Map();		// streamerId <-> streamer socket
 let players = new Map(); 		// playerId <-> player, where player is either a web-browser or a native webrtc player
 const SFUPlayerId = "SFU";
+const LegacyStreamerId = "__LEGACY__"; // old streamers that dont know how to ID will be assigned this id.
 
 function sfuIsConnected() {
 	const sfuPlayer = players.get(SFUPlayerId);
@@ -411,6 +412,9 @@ function onStreamerMessageId(streamer, msg) {
 	if (sfuPlayer) {
 		sfuPlayer.subscribe(streamer.id);
 	}
+
+	// if any streamer id's assume the legacy streamer is not needed.
+	streamers.delete(LegacyStreamerId);
 }
 
 function onStreamerMessagePing(streamer, msg) {
@@ -492,6 +496,8 @@ streamerServer.on('connection', function (ws, req) {
 	});
 
 	ws.send(JSON.stringify(clientConfig));
+
+	registerStreamer(LegacyStreamerId, streamer);
 });
 
 function forwardSFUMessageToPlayer(msg) {
