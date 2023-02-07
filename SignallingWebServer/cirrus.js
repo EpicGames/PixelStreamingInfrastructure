@@ -521,6 +521,7 @@ playerServer.on('connection', function (ws, req) {
 	const parsedUrl = url.parse(req.url);
 	const urlParams = new URLSearchParams(parsedUrl.search);
 	const preferSFU = urlParams.has('preferSFU') && urlParams.get('preferSFU') !== 'false';
+	const browserSendOffer = urlParams.has('OfferToReceive') && urlParams.get('OfferToReceive') !== 'false';
 	const skipSFU = !preferSFU;
 	const skipStreamer = preferSFU && sfu;
 
@@ -628,7 +629,7 @@ playerServer.on('connection', function (ws, req) {
 
 	ws.send(JSON.stringify(clientConfig));
 
-	sendMessageToController({ type: "playerConnected", playerId: playerId, dataChannel: true, sfu: false }, skipSFU, skipStreamer);
+	sendMessageToController({ type: "playerConnected", playerId: playerId, dataChannel: true, sfu: false, sendOffer: !browserSendOffer }, skipSFU, skipStreamer);
 	sendPlayersCount();
 });
 
