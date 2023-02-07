@@ -790,7 +790,7 @@ if (config.UseMatchmaker) {
 			type: 'connect',
 			address: typeof serverPublicIp === 'undefined' ? '127.0.0.1' : serverPublicIp,
 			port: httpPort,
-			ready: streamer && streamer.readyState === 1,
+			ready: streamers.size > 0,
 			playerConnected: playerConnected
 		};
 
