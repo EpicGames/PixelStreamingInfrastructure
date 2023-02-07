@@ -4,7 +4,7 @@ import { Logger } from '../Logger/Logger';
 import { SettingFlag } from './SettingFlag';
 import { SettingNumber } from './SettingNumber';
 import { SettingText } from './SettingText';
-import { SettingSelect } from './SettingSelect';
+import { SettingOption } from './SettingOption';
 
 /**
  * A collection of flags that can be toggled and are core to all Pixel Streaming experiences.
@@ -50,8 +50,13 @@ export class TextParameters {
     static SignallingServerUrl = 'ss';
 }
 
-export class SelectParameters {
-    static StreamerId = 'Streamer_id';
+/**
+ * A collection of enum based parameters that are core to all Pixel Streaming experiences.
+ *
+ */
+export class OptionParameters {
+	static PreferredCodec = 'PreferredCodec';
+    static StreamerId = 'StreamerId';
 }
 
 export class Config {
@@ -64,8 +69,8 @@ export class Config {
     /* A map of text settings - e.g. signalling server url */
     private textParameters = new Map<string, SettingText>();
 
-    /* A map of select settings - e.g. streamer ids */
-    private selectParameters = new Map<string, SettingSelect>();
+	/* A map of enum based settings - e.g. preferred codec */
+	private optionParameters = new Map<string, SettingOption>();
 
     // ------------ Settings -----------------
 
@@ -111,18 +116,51 @@ export class Config {
                 'Signalling url',
                 'Url of the signalling server',
                 (location.protocol === 'https:' ? 'wss://' : 'ws://') +
-                    window.location.hostname
+                window.location.hostname + 
+				// for readability, we omit the port if it's 80
+				((window.location.port === '80' || window.location.port === '') ? '' : `:${window.location.port}`)
             )
         );
 
-        this.selectParameters.set(
-            SelectParameters.StreamerId,
-            new SettingSelect(
-                SelectParameters.StreamerId,
+        this.optionParameters.set(OptionParameters.StreamerId,
+            new SettingOption(
+                OptionParameters.StreamerId,
                 'Streamer ID',
-                'The ID of the streamer to stream.'
-            )
+                'The ID of the streamer to stream.',
+                '')
         );
+
+		/**
+		 * Enum Parameters
+		 */
+		this.optionParameters.set(OptionParameters.PreferredCodec,
+			new SettingOption(
+				OptionParameters.PreferredCodec,
+				'Preferred Codec',
+				'The preferred codec to be used during codec negotiation',
+				'H264 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f',
+				(function(): Array<string> {
+					const browserSupportedCodecs: Array<string> = [];
+					// Try get the info needed from the RTCRtpReceiver. This is only available on chrome
+					if(!RTCRtpReceiver.getCapabilities)
+					{
+						browserSupportedCodecs.push("Only available on Chrome");
+						return browserSupportedCodecs;
+					}
+
+					const matcher = /(VP\d|H26\d|AV1).*/
+					const codecs = RTCRtpReceiver.getCapabilities('video').codecs;
+					codecs.forEach(codec => {
+						const str = codec.mimeType.split("/")[1] + ' ' + (codec.sdpFmtpLine || '');
+						const match = matcher.exec(str);
+						if(match !== null) {
+							browserSupportedCodecs.push(str);
+						}
+					});
+					return browserSupportedCodecs;
+				})()
+			)
+		);
 
         /**
          * Boolean parameters
@@ -371,7 +409,7 @@ export class Config {
             psSettingsSection,
             this.textParameters.get(TextParameters.SignallingServerUrl)
         );
-        this.addSettingSelect(
+        this.addSettingOption(
             psSettingsSection,
             this.selectParameters.get(SelectParameters.StreamerId)
         );
@@ -414,6 +452,15 @@ export class Config {
             psSettingsSection,
             this.numericParameters.get(NumericParameters.AFKTimeoutSecs)
         );
+
+		const preferredCodecOption = this.optionParameters.get(OptionParameters.PreferredCodec);
+		this.addSettingOption(
+			psSettingsSection,
+			preferredCodecOption
+		);
+		if([...preferredCodecOption.selector.options].map(o => o.value).includes("Only available on Chrome")) {
+			preferredCodecOption.disable();
+		}
 
         /* Setup all view/ui related settings under this section */
         const viewSettingsSection = this.buildSectionWithHeading(
@@ -488,6 +535,15 @@ export class Config {
         }
     }
 
+	addOnOptionSettingChangedListener(
+		id: string,
+        onChangedListener: (newValue: string) => void
+	): void {
+		if(this.optionParameters.has(id)) {
+			this.optionParameters.get(id).addOnChangedListener(onChangedListener);
+		}
+	}
+
     /**
      * @param id The id of the numeric setting we are interested in getting a value for.
      * @returns The numeric value stored in the parameter with the passed id.
@@ -508,19 +564,7 @@ export class Config {
         if (this.textParameters.has(id)) {
             return this.textParameters.get(id).value as string;
         } else {
-            throw new Error(`There is no text setting with the id of ${id}`);
-        }
-    }
-
-    /**
-     * @param id The id of the text setting we are interested in getting a value for.
-     * @returns The text value stored in the parameter with the passed id.
-     */
-    getSelectSettingValue(id: string): string {
-        if (this.selectParameters.has(id)) {
-            return this.selectParameters.get(id).value as string;
-        } else {
-            throw new Error(`There is no select setting with the id of ${id}`);
+            throw new Error(`There is no numeric setting with the id of ${id}`);
         }
     }
 
@@ -566,20 +610,6 @@ export class Config {
     }
 
     /**
-     * Add a callback to fire when the select is changed.
-     * @param id The id of the select.
-     * @param onChangeListener The callback to fire when the value changes.
-     */
-    addOnSelectSettingChangedListener(
-        id: string,
-        onChangeListener: (newTextValue: string) => void
-    ): void {
-        if (this.selectParameters.has(id)) {
-            this.selectParameters.get(id).onChange = onChangeListener;
-        }
-    }
-
-    /**
      * Add a SettingText element to a particular settings section in the DOM and registers that text in the text settings map.
      * @param settingsSection The settings section HTML element.
      * @param settingText The textual settings object.
@@ -590,19 +620,6 @@ export class Config {
     ): void {
         settingsSection.appendChild(settingText.rootElement);
         this.textParameters.set(settingText.id, settingText);
-    }
-
-    /**
-     * Add a SettingSelect element to a particular settings section in the DOM and registers that text in the text settings map.
-     * @param settingsSection The settings section HTML element.
-     * @param settingSelect The select settings object.
-     */
-    addSettingSelect(
-        settingsSection: HTMLElement,
-        settingSelect: SettingSelect
-    ): void {
-        settingsSection.appendChild(settingSelect.rootElement);
-        this.selectParameters.set(settingSelect.id, settingSelect);
     }
 
     /**
@@ -619,7 +636,7 @@ export class Config {
     }
 
     /**
-     * Add a SettingFlag element to a particular settings section in the DOM and registers that flag in the Config.flag map.
+     * Add a numeric setting element to a particular settings section in the DOM and registers that flag in the Config.numericParameters map.
      * @param settingsSection The settings section HTML element.
      * @param settingFlag The settings flag object.
      */
@@ -630,6 +647,22 @@ export class Config {
         settingsSection.appendChild(setting.rootElement);
         this.numericParameters.set(setting.id, setting);
     }
+
+	/**
+     * Add an enum based settings element to a particular settings section in the DOM and registers that flag in the Config.enumParameters map.
+     * @param settingsSection The settings section HTML element.
+     * @param settingFlag The settings flag object.
+     */
+	addSettingOption(settingsSection: HTMLElement,
+		setting: SettingOption
+	): void {
+		settingsSection.appendChild(setting.rootElement);
+		this.optionParameters.set(setting.id, setting);
+	}
+
+	getSettingOption(id: string): SettingOption {
+		return this.optionParameters.get(id);
+	}
 
     /**
      * Get the value of the configuration flag which has the given id.
@@ -672,6 +705,38 @@ export class Config {
         }
     }
 
+	/**
+     * Set the option setting list of options.
+     * @param id The id of the setting
+     * @param settingOptions The values the setting could take
+     */
+    setOptionSettingOptions(id: string, settingOptions: Array<string>) {
+        if (!this.optionParameters.has(id)) {
+            Logger.Warning(
+                Logger.GetStackTrace(),
+                `Cannot set text setting called ${id} - it does not exist in the Config.optionParameters map.`
+            );
+        } else {
+            this.optionParameters.get(id).options = settingOptions;
+        }
+    }
+
+	/**
+     * Set option enum settings selected option.
+     * @param id The id of the setting
+     * @param settingOptions The value to select out of all the options
+     */
+    setOptionSettingValue(id: string, settingValue: string) {
+        if (!this.optionParameters.has(id)) {
+            Logger.Warning(
+                Logger.GetStackTrace(),
+                `Cannot set text setting called ${id} - it does not exist in the Config.enumParameters map.`
+            );
+        } else {
+            this.optionParameters.get(id).selected = settingValue;
+        }
+    }
+
     /**
      * Set the label for the flag.
      * @param id The id of the flag.
@@ -685,17 +750,6 @@ export class Config {
             );
         } else {
             this.flags.get(id).label = label;
-        }
-    }
-
-    setSelectOptions(id: string, options: string[]) {
-        if (!this.selectParameters.has(id)) {
-            Logger.Warning(
-                Logger.GetStackTrace(),
-                `Cannot add options to select ${id} - it does not exist in the Config.selectParameters map.`
-            );
-        } else {
-            this.selectParameters.get(id).setOptions(options);
         }
     }
 }

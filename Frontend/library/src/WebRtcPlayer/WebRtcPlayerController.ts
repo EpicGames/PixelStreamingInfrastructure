@@ -19,7 +19,7 @@ import {
     Flags,
     ControlSchemeType,
     TextParameters,
-    SelectParameters
+    OptionParameters
 } from '../Config/Config';
 import {
     EncoderSettings,
@@ -88,6 +88,7 @@ export class WebRtcPlayerController {
     isQualityController: boolean;
     statsTimerHandle: number;
     file: FileTemplate;
+	preferredCodec: string;
 
     // if you override the disconnection message by calling the interface method setDisconnectMessageOverride
     // it will use this property to store the override message string
@@ -223,8 +224,9 @@ export class WebRtcPlayerController {
 
         this.isUsingSFU = false;
         this.isQualityController = false;
+		this.preferredCodec = '';
 
-        this.config.addOnSelectSettingChangedListener(SelectParameters.StreamerId, (streamerid) => {
+        this.config.addOnOptionSettingChangedListener(OptionParameters.StreamerId, (streamerid) => {
                 this.webSocketController.sendSubscribe(streamerid);
             }
         );
@@ -1033,7 +1035,8 @@ export class WebRtcPlayerController {
         // set up the peer connection controller
         this.peerConnectionController = new PeerConnectionController(
             peerConfig,
-            this.config
+            this.config,
+			this.preferredCodec
         );
 
         // set up peer connection controller video stats
@@ -1151,7 +1154,7 @@ export class WebRtcPlayerController {
     handleStreamerListMessage(messageStreamerList: MessageStreamerList) {
         Logger.Log(Logger.GetStackTrace(), `Got streamer list ${messageStreamerList.ids}`, 6);
         messageStreamerList.ids.unshift(''); // add an empty option at the top
-        this.config.setSelectOptions(SelectParameters.StreamerId, messageStreamerList.ids);
+        this.config.setOptionSettingOptions(OptionParameters.StreamerId, messageStreamerList.ids);
     }
 
     /**
@@ -1177,9 +1180,11 @@ export class WebRtcPlayerController {
     handleWebRtcOffer(Offer: MessageOffer) {
         Logger.Log(Logger.GetStackTrace(), `Got offer sdp ${Offer.sdp}`, 6);
 
-        if (Offer.sfu) {
-            this.isUsingSFU = Offer.sfu.toLowerCase() === 'true';
-        }
+		this.isUsingSFU = (Offer.sfu) ? Offer.sfu : false;
+		if(this.isUsingSFU) {
+			// Disable negotiating with the sfu as the sfu only supports one codec at a time
+			this.peerConnectionController.preferredCodec = "";
+		}
 
         if (Offer.defaultToHover) {
             this.config.setFlagEnabled(
@@ -1638,4 +1643,12 @@ export class WebRtcPlayerController {
     setDisconnectMessageOverride(message: string): void {
         this.disconnectMessageOverride = message;
     }
+	
+	setPreferredCodec(codec: string) {
+		this.preferredCodec = codec;
+		if(this.peerConnectionController) {
+			this.peerConnectionController.preferredCodec = codec;
+			this.peerConnectionController.updateCodecSelection = false;
+		}
+	}
 }
