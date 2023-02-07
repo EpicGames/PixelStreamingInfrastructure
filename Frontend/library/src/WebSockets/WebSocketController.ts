@@ -18,10 +18,12 @@ declare global {
 export class WebSocketController {
     WS_OPEN_STATE = 1;
     webSocket: WebSocket;
+    onOpen: EventTarget;
     onClose: EventTarget;
     signallingProtocol: SignallingProtocol;
 
     constructor() {
+        this.onOpen = new EventTarget();
         this.onClose = new EventTarget();
         this.signallingProtocol = new SignallingProtocol();
         SignallingProtocol.setupDefaultHandlers(this);
@@ -116,6 +118,7 @@ export class WebSocketController {
             'Connected to the signalling server via WebSocket',
             6
         );
+        this.onOpen.dispatchEvent(new Event('open'));
     }
 
     /**
@@ -140,6 +143,21 @@ export class WebSocketController {
                 event.reason
         );
         this.onClose.dispatchEvent(new Event('close'));
+    }
+
+    requestStreamerList() {
+        const payload = new MessageSend.MessageListStreamers();
+        this.webSocket.send(payload.payload());
+    }
+
+    sendSubscribe(streamerid: string) {
+        const payload = new MessageSend.MessageSubscribe(streamerid);
+        this.webSocket.send(payload.payload());
+    }
+
+    sendUnsubscribe() {
+        const payload = new MessageSend.MessageUnsubscribe();
+        this.webSocket.send(payload.payload());
     }
 
     sendWebRtcOffer(offer: RTCSessionDescriptionInit) {
@@ -196,6 +214,13 @@ export class WebSocketController {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
     onConfig(messageConfig: MessageReceive.MessageConfig) {}
+
+    /**
+     * The Message Contains the payload of the peer connection options used for the RTC Peer hand shake
+     * @param messageConfig - Config Message received from he signaling server
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+    onStreamerList(messageStreamerList: MessageReceive.MessageStreamerList) {}
 
     /**
      * @param iceCandidate - Ice Candidate sent from the Signaling server server's RTC hand shake
