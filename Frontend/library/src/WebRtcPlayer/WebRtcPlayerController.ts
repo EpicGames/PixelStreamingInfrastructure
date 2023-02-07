@@ -1159,13 +1159,6 @@ export class WebRtcPlayerController {
 			this.peerConnectionController.preferredCodec = "";
 		}
 
-        if (Offer.defaultToHover) {
-            this.config.setFlagEnabled(
-                Flags.HoveringMouseMode,
-                Offer.defaultToHover.toLowerCase() === 'true'
-            );
-        }
-
         const sdpOffer: RTCSessionDescriptionInit = {
             sdp: Offer.sdp,
             type: 'offer'
@@ -1533,6 +1526,13 @@ export class WebRtcPlayerController {
         if (parsedInitialSettings.PixelStreaming) {
             initialSettings.PixelStreamingSettings =
                 parsedInitialSettings.PixelStreaming;
+        }
+
+        if (parsedInitialSettings.ConfigOptions) {
+            this.config.setFlagEnabled(
+                Flags.HoveringMouseMode,
+                !!parsedInitialSettings.ConfigOptions.DefaultToHover
+            );
         }
 
         initialSettings.ueCompatible();
