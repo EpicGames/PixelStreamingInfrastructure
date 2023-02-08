@@ -15,6 +15,7 @@ function connectSignalling(server) {
   signalServer.addEventListener("error", result => { console.log(`Error: ${result.message}`); });
   signalServer.addEventListener("message", result => onSignallingMessage(result.data));
   signalServer.addEventListener("close", result => { 
+    onStreamerDisconnected();
     console.log(`Disconnected from signalling server: ${result.code} ${result.reason}`);
     console.log("Attempting reconnect to signalling server...");
     setTimeout(()=> { 

@@ -56,6 +56,7 @@ export class TextParameters {
  */
 export class OptionParameters {
 	static PreferredCodec = 'PreferredCodec';
+    static StreamerId = 'StreamerId';
 }
 
 export class Config {
@@ -119,6 +120,15 @@ export class Config {
 				// for readability, we omit the port if it's 80
 				((window.location.port === '80' || window.location.port === '') ? '' : `:${window.location.port}`)
             )
+        );
+
+        this.optionParameters.set(OptionParameters.StreamerId,
+            new SettingOption(
+                OptionParameters.StreamerId,
+                'Streamer ID',
+                'The ID of the streamer to stream.',
+                '',
+                [])
         );
 
 		/**
@@ -399,6 +409,10 @@ export class Config {
         this.addSettingText(
             psSettingsSection,
             this.textParameters.get(TextParameters.SignallingServerUrl)
+        );
+        this.addSettingOption(
+            psSettingsSection,
+            this.optionParameters.get(OptionParameters.StreamerId)
         );
         this.addSettingFlag(
             psSettingsSection,

@@ -5,6 +5,7 @@
  */
 export enum MessageRecvTypes {
     CONFIG = 'config',
+    STREAMER_LIST = 'streamerList',
     PLAYER_COUNT = 'playerCount',
     OFFER = 'offer',
     ANSWER = 'answer',
@@ -32,6 +33,13 @@ export class MessageAuthRequired extends MessageRecv {}
  */
 export class MessageConfig extends MessageRecv {
     peerConnectionOptions: RTCConfiguration;
+}
+
+/**
+ * Streamer List Message Wrapper
+ */
+export class MessageStreamerList extends MessageRecv {
+    ids: string[];
 }
 
 /**
