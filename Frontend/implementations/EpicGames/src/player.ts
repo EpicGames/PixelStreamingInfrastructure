@@ -1,6 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import * as libfrontend from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import { PixelStreamingApplicationStyle } from './Styles/PixelStreamingApplicationStyles';
+export const PixelStreamingApplicationStyles =
+    new PixelStreamingApplicationStyle();
 
 
 document.body.onload = function() {

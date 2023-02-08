@@ -51,8 +51,3 @@ export {
     InboundVideoStats
 } from './PeerConnectionController/InboundRTPStats';
 export { OutBoundVideoStats } from './PeerConnectionController/OutBoundRTPStats';
-export { PixelStreamingApplicationStyle } from './Application/PixelStreamingApplicationStyles';
-
-import { PixelStreamingApplicationStyle } from './Application/PixelStreamingApplicationStyles';
-export const PixelStreamingApplicationStyles =
-    new PixelStreamingApplicationStyle();
