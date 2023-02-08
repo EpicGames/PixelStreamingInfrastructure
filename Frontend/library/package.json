@@ -1,5 +1,5 @@
 {
-    "name": "@epicgames/lib-pixelstreamingfrontend-dev",
+    "name": "@epicgames-ps/lib-pixelstreamingfrontend-dev",
     "version": "0.0.1",
     "description": "Frontend library for Pixel Streaming",
     "main": "dist/lib-pixelstreamingfrontend.min.js",
@@ -34,8 +34,9 @@
         "type": "git",
         "url": "https://github.com/EpicGames/PixelStreamingInfrastructure.git"
     },
+    "author": "Epic Games",
+    "license": "MIT",
     "publishConfig": {
-        "registry": "https://npm.pkg.github.com/",
         "access": "public"
     }
 }
