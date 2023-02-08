@@ -9,13 +9,8 @@
     "watch": "npx webpack --watch",
     "serve": "webpack serve --config webpack.dev.js",
     "serve-prod": "webpack serve --config webpack.prod.js",
-    "build-all": "cd ../../library && npm run build && cd ../implementations/EpicGames && npm link ../../library && npm run build",
-    "build-all-dev": "cd ../../library && npm run build-dev && cd ../implementations/EpicGames && npm link ../../library && npm run build-dev"
-  },
-  "dependencies": {
-    "jss": "^10.9.2",
-    "jss-plugin-camel-case": "^10.9.2",
-    "jss-plugin-global": "^10.9.2"
+    "build-all": "cd ../../library/PixelStreaming && npm run build && cd ../UserInterface && npm run build && cd ../../implementations/EpicGames && npm link ../../library/PixelStreaming && npm link ../../library/UserInterface && npm run build",
+    "build-all-dev": "cd ../../library/PixelStreaming && npm run build-dev && cd ../UserInterface && npm run build-dev && cd ../../implementations/EpicGames && npm link ../../library/PixelStreaming && npm link ../../library/UserInterface && npm run build-dev"
   },
   "devDependencies": {
     "webpack-cli": "^5.0.1",

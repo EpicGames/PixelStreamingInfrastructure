@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "outDir": "./types",
+        "noImplicitAny": true,
+        "module": "es6",
+        "esModuleInterop": true,
+        "target": "ES6",
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "allowJs": true,
+        "declaration": true
+    },
+    "lib": ["es2015"],
+    "include": ["./src/*.ts"],
+    "typedocOptions": {
+        "exclude": "src/index.*",
+        "entryPoints": ["src/pixelstreamingfrontend-ui.ts"],
+        "sort": ["enum-value-ascending", "required-first", "source-order"],
+        "out": "docs",
+        "theme": "default",
+        "hideGenerator": "true"
+    }
+}
