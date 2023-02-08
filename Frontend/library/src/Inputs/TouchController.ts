@@ -128,7 +128,7 @@ export class TouchController implements ITouchController {
         const videoElementParent =
             this.videoElementProvider.getVideoParentElement();
         const toStreamerHandlers =
-            this.toStreamerMessagesProvider.getToStreamHandlersMap();
+            this.toStreamerMessagesProvider.toStreamerHandlers;
 
         for (let t = 0; t < touches.length; t++) {
             const numTouches = 1; // the number of touches to be sent this message

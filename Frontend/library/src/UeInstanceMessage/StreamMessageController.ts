@@ -31,23 +31,6 @@ export class StreamMessageController {
     }
 
     /**
-     * Get the current map for to streamer handlers
-     */
-    getToStreamHandlersMap(): Map<
-        string,
-        (messageData?: Array<number> | undefined) => void
-    > {
-        return this.toStreamerHandlers;
-    }
-
-    /**
-     * Get the current twoWayMap for to streamer messages
-     */
-    getToStreamerMessageMap(): TwoWayMap<string, ToStreamerMessage> {
-        return this.toStreamerMessages;
-    }
-
-    /**
      * Populate the Default message protocol
      */
     populateDefaultProtocol() {

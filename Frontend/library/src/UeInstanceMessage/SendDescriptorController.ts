@@ -49,7 +49,7 @@ export class SendDescriptorController {
         // Convert the descriptor object into a JSON string.
         const descriptorAsString = JSON.stringify(descriptor);
         const toStreamerMessages =
-            this.toStreamerMessagesMapProvider.getToStreamerMessageMap();
+            this.toStreamerMessagesMapProvider.toStreamerMessages;
         const messageFormat = toStreamerMessages.getFromKey(messageType);
         if (messageFormat === undefined) {
             Logger.Error(

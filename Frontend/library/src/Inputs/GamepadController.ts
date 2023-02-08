@@ -2,6 +2,7 @@
 
 import { Logger } from '../Logger/Logger';
 import { StreamMessageController } from '../UeInstanceMessage/StreamMessageController';
+import { Controller } from './GamepadTypes';
 
 /**
  * The class that handles the functionality of gamepads and controllers
@@ -105,7 +106,7 @@ export class GamePadController {
     updateStatus() {
         this.scanGamePads();
         const toStreamerHandlers =
-            this.toStreamerMessagesProvider.getToStreamHandlersMap();
+            this.toStreamerMessagesProvider.toStreamerHandlers;
 
         // Iterate over multiple controllers in the case the multiple gamepads are connected
         for (const controller of this.controllers) {
@@ -217,12 +218,4 @@ export enum gamepadLayout {
     LeftStickVertical = 1,
     RightStickHorizontal = 2,
     RightStickVertical = 3
-}
-
-/**
- * The interface for controllers
- */
-export interface Controller {
-    currentState: Gamepad;
-    prevState: Gamepad;
 }

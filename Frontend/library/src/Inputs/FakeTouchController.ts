@@ -70,7 +70,7 @@ export class FakeTouchController implements ITouchController {
                 this.fakeTouchFinger.y
             );
             const toStreamerHandlers =
-                this.toStreamerMessagesProvider.getToStreamHandlersMap();
+                this.toStreamerMessagesProvider.toStreamerHandlers;
             toStreamerHandlers.get('MouseDown')([
                 MouseButton.mainButton,
                 coord.x,
@@ -91,7 +91,7 @@ export class FakeTouchController implements ITouchController {
         const videoElementParent =
             this.videoElementProvider.getVideoParentElement();
         const toStreamerHandlers =
-            this.toStreamerMessagesProvider.getToStreamHandlersMap();
+            this.toStreamerMessagesProvider.toStreamerHandlers;
 
         for (let t = 0; t < touchEvent.changedTouches.length; t++) {
             const touch = touchEvent.changedTouches[t];
@@ -125,7 +125,7 @@ export class FakeTouchController implements ITouchController {
             return;
         }
         const toStreamerHandlers =
-            this.toStreamerMessagesProvider.getToStreamHandlersMap();
+            this.toStreamerMessagesProvider.toStreamerHandlers;
 
         for (let t = 0; t < touchEvent.touches.length; t++) {
             const touch = touchEvent.touches[t];

@@ -32,7 +32,7 @@ export class SendMessageController {
         }
 
         const toStreamerMessages =
-            this.toStreamerMessagesMapProvider.getToStreamerMessageMap();
+            this.toStreamerMessagesMapProvider.toStreamerMessages;
         const messageFormat = toStreamerMessages.getFromKey(messageType);
         if (messageFormat === undefined) {
             Logger.Error(

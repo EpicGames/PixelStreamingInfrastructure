@@ -3,6 +3,8 @@
 import { Logger } from "../Logger/Logger";
 import { WebRtcPlayerController } from "../pixelstreamingfrontend";
 import { WebGLUtils } from '../Util/WebGLUtils';
+import { Controller } from '../Inputs/GamepadTypes';
+import { XRGamepadController } from '../Inputs/XRGamepadController';
 
 export class WebXRController {
 	xrSession: XRSession;
@@ -18,10 +20,14 @@ export class WebXRController {
 	texcoordBuffer: WebGLBuffer;
 
 	webRtcController: WebRtcPlayerController;
+	xrGamepadController: XRGamepadController;
+	xrControllers: Array<Controller>;
 
 	constructor(webRtcPlayerController: WebRtcPlayerController) {
 		this.xrSession = null;
 		this.webRtcController = webRtcPlayerController;
+		this.xrControllers = [];
+		this.xrGamepadController = new XRGamepadController(this.webRtcController.streamMessageController);
 	}
 
 	public xrClicked() {
@@ -128,6 +134,9 @@ export class WebXRController {
 			this.render(this.webRtcController.videoPlayer.getVideoElement());
 		}
 
+		this.xrSession.inputSources.forEach((source: XRInputSource, index: number, array: XRInputSource[]) => {
+			this.xrGamepadController.updateStatus(source, frame, this.xrRefSpace);
+		}, this);
 
 		this.xrSession.requestAnimationFrame(this.onXrFrame)
 	}
