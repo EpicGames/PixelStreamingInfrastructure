@@ -65,6 +65,10 @@ export class XRGamepadController {
 
 			// Handle controller buttons and axes
 			if(this.controllers[handedness] === undefined) {
+				this.controllers[handedness] = { 
+					prevState: undefined, 
+					currentState: undefined 
+				};
 				this.controllers[handedness].prevState = WebXRUtils.deepCopyGamepad(source.gamepad);
 			}
 

@@ -40,6 +40,7 @@ export class WebXRController {
 
 	onXrSessionEnded() {
 		Logger.Log(Logger.GetStackTrace(), "XR Session ended");
+		this.xrSession = null;
 	}
 
 	onXrSessionStarted(session: XRSession) {
@@ -100,7 +101,7 @@ export class WebXRController {
 
 		session.requestReferenceSpace('local').then((refSpace) => {
 			this.xrRefSpace = refSpace;
-			this.xrSession.requestAnimationFrame(this.onXrFrame);
+			this.xrSession.requestAnimationFrame((time: DOMHighResTimeStamp, frame: XRFrame) => this.onXrFrame(time, frame));
 		})
 	}
 
@@ -113,7 +114,7 @@ export class WebXRController {
 				mat[i] = new Float32Array([matrix[i]])[0]
 			}
 
-			this.webRtcController.streamMessageController.toStreamerHandlers.get("HMDTransform")(
+			this.webRtcController.streamMessageController.toStreamerHandlers.get("XRHMDTransform")(
 				[
 				mat[0], mat[4], mat[8], mat[12],
 				mat[1], mat[5], mat[9], mat[13],
@@ -138,7 +139,7 @@ export class WebXRController {
 			this.xrGamepadController.updateStatus(source, frame, this.xrRefSpace);
 		}, this);
 
-		this.xrSession.requestAnimationFrame(this.onXrFrame)
+		this.xrSession.requestAnimationFrame((time: DOMHighResTimeStamp, frame: XRFrame) => this.onXrFrame(time, frame))
 	}
 
 	private render(videoElement: HTMLVideoElement) {
