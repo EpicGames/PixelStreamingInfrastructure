@@ -12,7 +12,7 @@ export class ToStreamerMessage {
 export class StreamMessageController {
     toStreamerHandlers: Map<
         string,
-        (messageType: string, messageData?: Array<number> | undefined) => void
+        (messageData?: Array<number> | undefined) => void
     >;
     fromStreamerHandlers: Map<
         string,
@@ -35,7 +35,7 @@ export class StreamMessageController {
      */
     getToStreamHandlersMap(): Map<
         string,
-        (messageType: string, messageData?: Array<number> | undefined) => void
+        (messageData?: Array<number> | undefined) => void
     > {
         return this.toStreamerHandlers;
     }
@@ -238,7 +238,6 @@ export class StreamMessageController {
         messageDirection: MessageDirection,
         messageType: string,
         messageHandler: (
-            messageType: string,
             messageData?: unknown | undefined
         ) => void
     ) {

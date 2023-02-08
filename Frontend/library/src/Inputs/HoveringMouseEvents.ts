@@ -38,7 +38,7 @@ export class HoveringMouseEvents implements IMouseEvents {
             );
         const toStreamerHandlers =
             this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseMove')('MouseMove', [
+        toStreamerHandlers.get('MouseMove')([
             coord.x,
             coord.y,
             delta.x,
@@ -63,7 +63,7 @@ export class HoveringMouseEvents implements IMouseEvents {
             );
         const toStreamerHandlers =
             this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseDown')('MouseDown', [
+        toStreamerHandlers.get('MouseDown')([
             mouseEvent.button,
             coord.x,
             coord.y
@@ -86,7 +86,7 @@ export class HoveringMouseEvents implements IMouseEvents {
             );
         const toStreamerHandlers =
             this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseUp')('MouseUp', [
+        toStreamerHandlers.get('MouseUp')([
             mouseEvent.button,
             coord.x,
             coord.y
@@ -109,7 +109,7 @@ export class HoveringMouseEvents implements IMouseEvents {
             );
         const toStreamerHandlers =
             this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseUp')('MouseUp', [
+        toStreamerHandlers.get('MouseUp')([
             mouseEvent.button,
             coord.x,
             coord.y
@@ -132,7 +132,7 @@ export class HoveringMouseEvents implements IMouseEvents {
             );
         const toStreamerHandlers =
             this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseWheel')('MouseWheel', [
+        toStreamerHandlers.get('MouseWheel')([
             wheelEvent.wheelDelta,
             coord.x,
             coord.y
@@ -155,7 +155,7 @@ export class HoveringMouseEvents implements IMouseEvents {
             );
         const toStreamerHandlers =
             this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseDouble')('MouseDouble', [
+        toStreamerHandlers.get('MouseDouble')([
             mouseEvent.button,
             coord.x,
             coord.y

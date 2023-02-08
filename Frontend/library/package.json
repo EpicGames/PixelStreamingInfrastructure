@@ -24,6 +24,7 @@
         "webpack-cli": "^5.0.1"
     },
     "dependencies": {
+        "@types/webxr": "^0.5.1",
         "jss": "^10.9.2",
         "jss-plugin-camel-case": "^10.9.2",
         "jss-plugin-global": "^10.9.2",
@@ -32,9 +33,9 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/EpicGames/PixelStreamingInfrastructure.git"
-      },
-      "publishConfig": {
-        "registry":"https://npm.pkg.github.com/",
+    },
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com/",
         "access": "public"
-      }
+    }
 }

@@ -90,7 +90,7 @@ export class LockedMouseEvents implements IMouseEvents {
             });
 
             newKeysIterable.forEach((uniqueKeycode) => {
-                toStreamerHandlers.get('KeyUp')('KeyUp', [uniqueKeycode]);
+                toStreamerHandlers.get('KeyUp')([uniqueKeycode]);
             });
             // Reset the active keys back to nothing
             activeKeys = [];
@@ -138,7 +138,7 @@ export class LockedMouseEvents implements IMouseEvents {
                 mouseEvent.movementX,
                 mouseEvent.movementY
             );
-        toStreamerHandlers.get('MouseMove')('MouseMove', [
+        toStreamerHandlers.get('MouseMove')([
             this.coord.x,
             this.coord.y,
             delta.x,
@@ -157,7 +157,7 @@ export class LockedMouseEvents implements IMouseEvents {
 
         const toStreamerHandlers =
             this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseDown')('MouseDown', [
+        toStreamerHandlers.get('MouseDown')([
             mouseEvent.button,
 			// We use the store value of this.coord as opposed to the mouseEvent.x/y as the mouseEvent location
 			// uses the system cursor location which hasn't moved
@@ -176,7 +176,7 @@ export class LockedMouseEvents implements IMouseEvents {
         }
         const toStreamerHandlers =
             this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseUp')('MouseUp', [
+        toStreamerHandlers.get('MouseUp')([
             mouseEvent.button,
 			// We use the store value of this.coord as opposed to the mouseEvent.x/y as the mouseEvent location
 			// uses the system cursor location which hasn't moved
@@ -195,7 +195,7 @@ export class LockedMouseEvents implements IMouseEvents {
         }
         const toStreamerHandlers =
             this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseWheel')('MouseWheel', [
+        toStreamerHandlers.get('MouseWheel')([
             wheelEvent.wheelDelta,
 			// We use the store value of this.coord as opposed to the mouseEvent.x/y as the mouseEvent location
 			// uses the system cursor location which hasn't moved
@@ -214,7 +214,7 @@ export class LockedMouseEvents implements IMouseEvents {
         }
         const toStreamerHandlers =
             this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseDouble')('MouseDouble', [
+        toStreamerHandlers.get('MouseDouble')([
             mouseEvent.button,
 			// We use the store value of this.coord as opposed to the mouseEvent.x/y as the mouseEvent location
 			// uses the system cursor location which hasn't moved
