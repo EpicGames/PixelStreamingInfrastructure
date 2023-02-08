@@ -978,6 +978,11 @@ export class WebRtcPlayerController {
             signallingServerUrl += '?' + Flags.PreferSFU + '=true';
         }
 
+		// If we are sending the offer add a special url parameter to the url, making sure we append correctly
+		if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
+            signallingServerUrl += (signallingServerUrl.includes('?') ? '&' : '?') + Flags.BrowserSendOffer + '=true';
+        }
+
         return signallingServerUrl;
     }
 
