@@ -1,5 +1,5 @@
 {
-  "name": "@epicgames/reference-pixelstreamingfrontend",
+  "name": "@epicgames-ps/reference-pixelstreamingfrontend",
   "version": "0.0.1",
   "description": "",
   "main": "player.ts",
