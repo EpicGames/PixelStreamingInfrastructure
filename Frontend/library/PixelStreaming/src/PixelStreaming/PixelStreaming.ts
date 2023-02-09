@@ -31,7 +31,7 @@ import { WebXRController } from '../WebXR/WebXRController';
 /**
  * Provides common base functionality for applications that extend this application
  */
-export class Application {
+export class PixelStreaming {
     public webRtcController: WebRtcPlayerController;
     public webXrController: WebXRController;
     public config: Config;

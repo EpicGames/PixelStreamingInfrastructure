@@ -15,7 +15,7 @@ export { SettingsPanel } from './UI/SettingsPanel';
 export { StatsPanel } from './UI/StatsPanel';
 export { SettingNumber } from './Config/SettingNumber';
 export { LabelledButton } from './UI/LabelledButton';
-export { Application } from './Application/Application';
+export { PixelStreaming } from './PixelStreaming/PixelStreaming';
 
 export { AFKController as AfkLogic } from './AFK/AFKController';
 

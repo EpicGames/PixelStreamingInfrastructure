@@ -14,7 +14,7 @@ document.body.onload = function() {
 	let config = new libfrontend.Config();
 
 	// Create a Native DOM delegate instance that implements the Delegate interface class
-	let application = new libfrontend.Application(config);
+	let application = new libfrontend.PixelStreaming(config);
 	// document.getElementById("centrebox").appendChild(application.rootElement);
 	document.body.appendChild(application.rootElement);
 }

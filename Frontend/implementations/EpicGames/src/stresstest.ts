@@ -145,7 +145,7 @@ export class StressTester {
 		config.setFlagEnabled(libfrontend.Flags.StartVideoMuted, true);
 
 		// Create a Native DOM delegate instance that implements the Delegate interface class
-		let application = new libfrontend.Application(config);
+		let application = new libfrontend.PixelStreaming(config);
 		streamFrame.appendChild(application.rootElement);
 		return streamFrame;
 	}
