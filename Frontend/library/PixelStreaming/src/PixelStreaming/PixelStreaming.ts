@@ -17,14 +17,6 @@ import {
 import { OnScreenKeyboard } from '../UI/OnScreenKeyboard';
 import { Controls } from '../UI/Controls';
 import { LabelledButton } from '../UI/LabelledButton';
-import { OverlayBase } from '../Overlay/BaseOverlay';
-import { ActionOverlay } from '../Overlay/ActionOverlay';
-import { TextOverlay } from '../Overlay/TextOverlay';
-import { ConnectOverlay } from '../Overlay/ConnectOverlay';
-import { DisconnectOverlay } from '../Overlay/DisconnectOverlay';
-import { PlayOverlay } from '../Overlay/PlayOverlay';
-import { InfoOverlay } from '../Overlay/InfoOverlay';
-import { ErrorOverlay } from '../Overlay/ErrorOverlay';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
 
@@ -47,14 +39,6 @@ export class PixelStreaming {
     videoQpIndicator: VideoQpIndicator;
     onScreenKeyboardHelper: OnScreenKeyboard;
 
-    // set the overlay placeholders
-    currentOverlay: OverlayBase;
-    disconnectOverlay: ActionOverlay;
-    connectOverlay: ActionOverlay;
-    playOverlay: ActionOverlay;
-    infoOverlay: TextOverlay;
-    errorOverlay: TextOverlay;
-
     videoStartTime: number;
     inputController: boolean;
 
@@ -64,8 +48,6 @@ export class PixelStreaming {
      */
     constructor(config: Config) {
         this.config = config;
-
-        this.createOverlays();
 
         // Add the video stream QP indicator
         this.videoQpIndicator = new VideoQpIndicator();
@@ -105,15 +87,6 @@ export class PixelStreaming {
         this.updateColors(this.config.isFlagEnabled(Flags.LightMode));
 
         this.webXrController = new WebXRController(this.webRtcController);
-    }
-
-    public createOverlays(): void {
-        // build all of the overlays
-        this.disconnectOverlay = new DisconnectOverlay(this.videoElementParent);
-        this.connectOverlay = new ConnectOverlay(this.videoElementParent);
-        this.playOverlay = new PlayOverlay(this.videoElementParent);
-        this.infoOverlay = new InfoOverlay(this.videoElementParent);
-        this.errorOverlay = new ErrorOverlay(this.videoElementParent);
     }
 
     /**
@@ -446,109 +419,6 @@ export class PixelStreaming {
     }
 
     /**
-     * Shows the disconnect overlay
-     * @param updateText - the text that will be displayed in the overlay
-     */
-    showDisconnectOverlay(updateText: string) {
-        this.hideCurrentOverlay();
-        this.updateDisconnectOverlay(updateText);
-        this.disconnectOverlay.show();
-        this.currentOverlay = this.disconnectOverlay;
-    }
-
-    /**
-     * Update the disconnect overlays span text
-     * @param updateText - the new countdown number
-     */
-    updateDisconnectOverlay(updateText: string) {
-        this.disconnectOverlay.update(updateText);
-    }
-
-    /**
-     * Activates the disconnect overlays action
-     */
-    onDisconnectionAction() {
-        this.disconnectOverlay.activate();
-    }
-
-    /**
-     * Hides the current overlay
-     */
-    hideCurrentOverlay() {
-        if (this.currentOverlay != null) {
-            this.currentOverlay.hide();
-            this.currentOverlay = null;
-        }
-    }
-
-    /**
-     * Shows the connect overlay
-     */
-    showConnectOverlay() {
-        this.hideCurrentOverlay();
-        this.connectOverlay.show();
-        this.currentOverlay = this.connectOverlay;
-    }
-
-    /**
-     * Shows the play overlay
-     */
-    showPlayOverlay() {
-        this.hideCurrentOverlay();
-        this.playOverlay.show();
-        this.currentOverlay = this.playOverlay;
-    }
-
-    /**
-     * Shows the text overlay
-     * @param text - the text that will be shown in the overlay
-     */
-    showTextOverlay(text: string) {
-        this.hideCurrentOverlay();
-        this.infoOverlay.update(text);
-        this.infoOverlay.show();
-        this.currentOverlay = this.infoOverlay;
-    }
-
-    /**
-     * Shows the error overlay
-     * @param text - the text that will be shown in the overlay
-     */
-    showErrorOverlay(text: string) {
-        this.hideCurrentOverlay();
-        this.errorOverlay.update(text);
-        this.errorOverlay.show();
-        this.currentOverlay = this.errorOverlay;
-    }
-
-    /**
-     * Activates the connect overlays action
-     */
-    onConnectAction() {
-        this.connectOverlay.activate();
-    }
-
-    /**
-     * Activates the play overlays action
-     */
-    onPlayAction() {
-        this.playOverlay.activate();
-    }
-
-    /**
-     * Shows the afk overlay
-     * @param countDown - the countdown number for the afk countdown
-     */
-    showAfkOverlay(countDown: number) {
-        this.hideCurrentOverlay();
-        this.webRtcController.afkController.afkOverlay.updateCountdown(
-            countDown
-        );
-        this.webRtcController.afkController.afkOverlay.show();
-        this.currentOverlay = this.webRtcController.afkController.afkOverlay;
-    }
-
-    /**
      * Instantiate the WebRTCPlayerController interface to provide WebRTCPlayerController functionality within this class and set up anything that requires it
      * @param webRtcPlayerController - a WebRtcPlayerController controller instance
      */
@@ -561,24 +431,22 @@ export class PixelStreaming {
         );
         this.webRtcController.resizePlayerStyle();
 
-        this.disconnectOverlay.onAction(() => {
-            this.onWebRtcAutoConnect();
-            this.webRtcController.connectToSignallingServer();
-        });
-
-        // Build the webRtc connect overlay Event Listener and show the connect overlay
-        this.connectOverlay.onAction(() =>
-            this.webRtcController.connectToSignallingServer()
-        );
-
-        // set up the play overlays action
-        this.playOverlay.onAction(() => {
-            this.onStreamLoading();
-            this.webRtcController.playStream();
-        });
-
         // set up the connect overlays action
         this.showConnectOrAutoConnectOverlays();
+    }
+
+    connect() {
+        this.webRtcController.connectToSignallingServer();
+    }
+
+    reconnect() {
+        this.onWebRtcAutoConnect();
+        this.connect();
+    }
+
+    play() {
+        this.onStreamLoading();
+        this.webRtcController.playStream();
     }
 
     /**
@@ -586,9 +454,7 @@ export class PixelStreaming {
      */
     showConnectOrAutoConnectOverlays() {
         // set up if the auto play will be used or regular click to start
-        if (!this.config.isFlagEnabled(Flags.AutoConnect)) {
-            this.showConnectOverlay();
-        } else {
+        if (this.config.isFlagEnabled(Flags.AutoConnect)) {
             // if autoplaying show an info overlay while while waiting for the connection to begin
             this.onWebRtcAutoConnect();
             this.webRtcController.connectToSignallingServer();
@@ -600,7 +466,6 @@ export class PixelStreaming {
      */
     onWebRtcAutoConnect() {
         this.config.options.onWebRtcAutoConnect?.();
-        this.showTextOverlay('Auto Connecting Now');
         this.showActionOrErrorOnDisconnect = true;
     }
 
@@ -609,7 +474,6 @@ export class PixelStreaming {
      */
     onWebRtcSdp() {
         this.config.options.onWebRtcSdp?.();
-        this.showTextOverlay('WebRTC Connection Negotiated');
     }
 
     /**
@@ -617,21 +481,6 @@ export class PixelStreaming {
      */
     onStreamLoading() {
         this.config.options.onStreamLoading?.();
-        // build the spinner span
-        const spinnerSpan: HTMLSpanElement = document.createElement('span');
-        spinnerSpan.className = 'visually-hidden';
-        spinnerSpan.innerHTML = 'Loading...';
-
-        // build the spinner div
-        const spinnerDiv: HTMLDivElement = document.createElement('div');
-        spinnerDiv.id = 'loading-spinner';
-        spinnerDiv.className = 'spinner-border ms-2';
-        spinnerDiv.setAttribute('role', 'status');
-
-        // append the spinner to the element
-        spinnerDiv.appendChild(spinnerSpan);
-
-        this.showTextOverlay('Loading Stream ' + spinnerDiv.outerHTML);
     }
 
     /**
@@ -652,12 +501,7 @@ export class PixelStreaming {
 
         this.config.options.onDisconnect?.(eventString, this.showActionOrErrorOnDisconnect);
         if (this.showActionOrErrorOnDisconnect == false) {
-            this.showErrorOverlay(`Disconnected: ${eventString}`);
             this.showActionOrErrorOnDisconnect = true;
-        } else {
-            this.showDisconnectOverlay(
-                `Disconnected: ${eventString}  <div class="clickableState">Click To Restart</div>`
-            );
         }
 
         // update all of the tools upon disconnect
@@ -674,7 +518,6 @@ export class PixelStreaming {
      */
     onWebRtcConnecting() {
         this.config.options.onWebRtcConnecting?.();
-        this.showTextOverlay('Starting connection to server, please wait');
     }
 
     /**
@@ -682,7 +525,6 @@ export class PixelStreaming {
      */
     onWebRtcConnected() {
         this.config.options.onWebRtcConnected?.();
-        this.showTextOverlay('WebRTC connected, waiting for video');
     }
 
     /**
@@ -690,7 +532,6 @@ export class PixelStreaming {
      */
     onWebRtcFailed() {
         this.config.options.onWebRtcFailed?.();
-        this.showErrorOverlay('Unable to setup video');
     }
 
     /**

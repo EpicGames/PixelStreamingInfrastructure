@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import * as libfrontend from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
-import { PixelStreamingApplicationStyle } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import { Application, PixelStreamingApplicationStyle } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 export const PixelStreamingApplicationStyles =
     new PixelStreamingApplicationStyle();
 
@@ -11,10 +11,11 @@ document.body.onload = function() {
 	//libfrontend.Logger.SetLoggerVerbosity(10);
 
 	// Create a config object
-	let config = new libfrontend.Config();
+	let config = new libfrontend.Config({onAfkWarningActivate: () => console.log("")});
 
 	// Create a Native DOM delegate instance that implements the Delegate interface class
-	let application = new libfrontend.PixelStreaming(config);
+	let pixelStreaming = new libfrontend.PixelStreaming(config);
+	let application = new Application({ pixelStreaming });
 	// document.getElementById("centrebox").appendChild(application.rootElement);
 	document.body.appendChild(application.rootElement);
 }
