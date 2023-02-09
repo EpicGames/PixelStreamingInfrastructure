@@ -186,10 +186,6 @@ export class PeerConnectionController {
             /(a=fmtp:\d+ .*level-asymmetry-allowed=.*)\r\n/gm,
             '$1;x-google-start-bitrate=10000;x-google-max-bitrate=100000\r\n'
         );
-        mungedSDP.replace(
-            'useinbandfec=1',
-            'useinbandfec=1;stereo=1;sprop-maxcapturerate=48000'
-        );
 
         let audioSDP = '';
 
@@ -202,9 +198,9 @@ export class PeerConnectionController {
         }
 
         // Force mono or stereo based on whether ?forceMono was passed or not
-        audioSDP += this.config.isFlagEnabled(Flags.ForceMonoAudio)
-            ? 'sprop-stereo=0;stereo=0;'
-            : 'sprop-stereo=1;stereo=1;';
+		audioSDP += this.config.isFlagEnabled(Flags.ForceMonoAudio)
+            ? 'stereo=0;'
+            : 'stereo=1;';
 
         // enable in-band forward error correction for opus audio
         audioSDP += 'useinbandfec=1';
