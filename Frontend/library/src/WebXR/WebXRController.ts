@@ -143,7 +143,70 @@ export class WebXRController {
 	}
 
 	private render(videoElement: HTMLVideoElement) {
-		// TODO
+		if(!this.gl) {
+			return;
+		}
+
+		const glLayer = this.xrSession.renderState.baseLayer;
+		this.gl.viewport(0, 0, glLayer.framebufferWidth, glLayer.framebufferHeight);
+		this.gl.uniform4f(this.offsetLocation, 1.0, 1.0, 0.0, 0.0);
+
+		// Set rectangle
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([
+			0, 0,
+			videoElement.videoWidth, 0,
+			0, videoElement.videoHeight,
+			0, videoElement.videoHeight,
+			videoElement.videoWidth, 0,
+			videoElement.videoWidth, videoElement.videoHeight,
+		]), this.gl.STATIC_DRAW);
+
+		// Provide texture coordinates for the rectangle
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texcoordBuffer);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([
+			0.0, 0.0,
+			1.0, 0.0,
+			0.0, 1.0,
+			0.0, 1.0,
+			1.0, 0.0,
+			1.0, 1.0,
+		]), this.gl.STATIC_DRAW);
+
+		let size; // components per iteration
+		let type; // the data type
+		let normalize; // normalize the data
+		let stride; // 0 = move forward size * sizeof(type) each iteration to get the next position
+		let offset; // start position of the buffer
+
+		// Bind the position buffer.
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
+		// Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+		size = 2; // 2 components per iteration
+		type = this.gl.FLOAT; // the data is 32bit floats
+		normalize = false; // don't normalize the data
+		stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
+		offset = 0; // start at the beginning of the buffer
+		this.gl.vertexAttribPointer(
+			this.positionLocation, size, type, normalize, stride, offset);
+		// Turn on the texcoord attribute
+		this.gl.enableVertexAttribArray(this.texcoordLocation);
+		// bind the texcoord buffer.
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texcoordBuffer);
+		// Tell the texcoord attribute how to get data out of texcoordBuffer (ARRAY_BUFFER)
+		size = 2; // 2 components per iteration
+		type = this.gl.FLOAT; // the data is 32bit floats
+		normalize = false; // don't normalize the data
+		stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
+		offset = 0; // start at the beginning of the buffer
+		this.gl.vertexAttribPointer(
+			this.texcoordLocation, size, type, normalize, stride, offset);
+		// set the resolution
+		this.gl.uniform2f(this.resolutionLocation, videoElement.videoWidth, videoElement.videoHeight);
+		// draw the rectangle.
+		const primitiveType = this.gl.TRIANGLES;
+		const count = 6;
+		offset = 0;
+		this.gl.drawArrays(primitiveType, offset, count);
 	}
 
 
