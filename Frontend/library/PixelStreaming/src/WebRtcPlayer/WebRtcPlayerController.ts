@@ -114,7 +114,7 @@ export class WebRtcPlayerController {
         // set up the afk logic class and connect up its method for closing the signaling server
         const afkOverlay = new AFKOverlay(this.pixelStreaming.videoElementParent);
         afkOverlay.onAction(() => this.onAfkTriggered());
-        this.afkController = new AFKController(this.config, afkOverlay);
+        this.afkController = new AFKController(this.config, afkOverlay, () => this.onAfkTriggered());
         this.afkController.onAFKTimedOutCallback = () => {
             this.setDisconnectMessageOverride(
                 'You have been disconnected due to inactivity'

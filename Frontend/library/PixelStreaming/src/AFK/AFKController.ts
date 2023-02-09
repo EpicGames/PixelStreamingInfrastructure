@@ -14,12 +14,14 @@ export class AFKController {
     countDownTimer: ReturnType<typeof setInterval> = undefined;
     config: Config;
     afkOverlay: AFKOverlay;
+    onDismissAfk: () => void;
 
     onAFKTimedOutCallback: () => void;
 
-    constructor(config: Config, afkOverlay: AFKOverlay) {
+    constructor(config: Config, afkOverlay: AFKOverlay, onDismissAfk: () => void) {
         this.config = config;
         this.afkOverlay = afkOverlay;
+        this.onDismissAfk = onDismissAfk;
         this.onAFKTimedOutCallback = () => {
             console.log(
                 'AFK timed out, did you want to override this callback?'
@@ -98,7 +100,7 @@ export class AFKController {
 
         // instantiate a new overlay
         this.showAfkOverlay();
-        this.config.options.onAfkWarningActivate?.(this.countDown);
+        this.config.options.onAfkWarningActivate?.(this.countDown, this.onDismissAfk);
 
         // update our countDown timer and overlay contents
         this.countDown = this.closeTimeout;

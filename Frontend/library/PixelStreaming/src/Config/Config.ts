@@ -60,7 +60,7 @@ export class OptionParameters {
 }
 
 export interface ConfigOptions {
-    onAfkWarningActivate?: (countDown: number) => void;
+    onAfkWarningActivate?: (countDown: number, dismissAfk: () => void) => void;
     onAfkWarningUpdate?: (countDown: number) => void;
     onAfkWarningDeactivate?: () => void;
     onAfkTimedOut?: () => void;
