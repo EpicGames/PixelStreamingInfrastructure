@@ -239,7 +239,7 @@ export class StatsPanel {
         this.addOrUpdateStat(
             'FramesDroppedStat',
             'Frames dropped',
-            stats.inboundVideoStats.framesDropped.toString()
+            stats.inboundVideoStats.framesDropped?.toString()
         );
 
         if (stats.inboundVideoStats.codecId) {
