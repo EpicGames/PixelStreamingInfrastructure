@@ -318,7 +318,7 @@ function webRtcPlayer(parOptions) {
         }
 
         // Force mono or stereo based on whether ?forceMono was passed or not
-        audioSDP += self.forceMonoAudio ? 'sprop-stereo=0;stereo=0;' : 'sprop-stereo=1;stereo=1;';
+        audioSDP += self.forceMonoAudio ? 'stereo=0;' : 'stereo=1;';
 
         // enable in-band forward error correction for opus audio
         audioSDP += 'useinbandfec=1';
