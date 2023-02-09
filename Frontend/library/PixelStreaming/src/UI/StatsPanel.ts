@@ -272,6 +272,21 @@ export class StatsPanel {
                 : "Can't calculate";
         this.addOrUpdateStat('RTTStat', 'Net RTT (ms)', netRTT);
 
+        this.addOrUpdateStat('DurationStat', 'Duration', stats.sessionStats.runTime);
+
+        this.addOrUpdateStat(
+            'ControlsInputStat',
+            'Controls stream input',
+            stats.sessionStats.controlsStreamInput
+        );
+
+        // QP
+        this.addOrUpdateStat(
+            'QPStat',
+            'Video quantization parameter',
+            stats.sessionStats.videoEncoderAvgQP.toString()
+        );
+
         // todo:
         //statsText += `<div>Browser receive to composite (ms): ${stats.inboundVideoStats.receiveToCompositeMs}</div>`;
 

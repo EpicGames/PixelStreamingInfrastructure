@@ -564,33 +564,7 @@ export class PixelStreaming {
         if (!this.videoStartTime || this.videoStartTime === undefined) {
             this.videoStartTime = Date.now();
         }
-
-        const deltaTime = Date.now() - this.videoStartTime;
-        const runTime = new Date(deltaTime)
-            .toISOString()
-            .substr(11, 8)
-            .toString();
-        this.statsPanel.addOrUpdateStat('DurationStat', 'Duration', runTime);
-
-        // Input control?
-        const controlsStreamInput =
-            this.inputController === null
-                ? 'Not sent yet'
-                : this.inputController
-                ? 'true'
-                : 'false';
-        this.statsPanel.addOrUpdateStat(
-            'ControlsInputStat',
-            'Controls stream input',
-            controlsStreamInput
-        );
-
-        // QP
-        this.statsPanel.addOrUpdateStat(
-            'QPStat',
-            'Video quantization parameter',
-            this.videoQpIndicator.videoEncoderAvgQP.toString()
-        );
+        videoStats.handleSessionStatistics(this.videoStartTime, this.inputController, this.videoQpIndicator.videoEncoderAvgQP);
 
         // Grab all stats we can off the aggregated stats
         this.statsPanel.handleStats(videoStats);
