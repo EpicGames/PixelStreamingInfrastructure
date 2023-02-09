@@ -64,6 +64,18 @@ export interface ConfigOptions {
     onAfkWarningUpdate?: (countDown: number) => void;
     onAfkWarningDeactivate?: () => void;
     onAfkTimedOut?: () => void;
+    onWebRtcSdp?: () => void;
+    onWebRtcAutoConnect?: () => void;
+    onWebRtcConnecting?: () => void;
+    onWebRtcConnected?: () => void;
+    onWebRtcFailed?: () => void;
+    onVideoInitialized?: () => void;
+    onStreamLoading?: () => void;
+    onDisconnect?: (eventString: string, showActionOrErrorOnDisconnect: boolean) => void;
+    onPlayStreamError?: (message: string) => void;
+    onPlayStream?: () => void;
+    onPlayStreamRejected?: (reason: unknown) => void;
+    onLoadFreezeFrame?: (shouldShowPlayOverlay: boolean) => void;
 }
 
 export class Config {

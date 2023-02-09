@@ -599,6 +599,7 @@ export class PixelStreaming {
      * Show the webRtcAutoConnect Overlay and connect
      */
     onWebRtcAutoConnect() {
+        this.config.options.onWebRtcAutoConnect?.();
         this.showTextOverlay('Auto Connecting Now');
         this.showActionOrErrorOnDisconnect = true;
     }
@@ -607,6 +608,7 @@ export class PixelStreaming {
      * Set up functionality to happen when receiving a webRTC answer
      */
     onWebRtcSdp() {
+        this.config.options.onWebRtcSdp?.();
         this.showTextOverlay('WebRTC Connection Negotiated');
     }
 
@@ -614,6 +616,7 @@ export class PixelStreaming {
      * Shows a text overlay to alert the user the stream is currently loading
      */
     onStreamLoading() {
+        this.config.options.onStreamLoading?.();
         // build the spinner span
         const spinnerSpan: HTMLSpanElement = document.createElement('span');
         spinnerSpan.className = 'visually-hidden';
@@ -647,6 +650,7 @@ export class PixelStreaming {
             this.webRtcController.setDisconnectMessageOverride('');
         }
 
+        this.config.options.onDisconnect?.(eventString, this.showActionOrErrorOnDisconnect);
         if (this.showActionOrErrorOnDisconnect == false) {
             this.showErrorOverlay(`Disconnected: ${eventString}`);
             this.showActionOrErrorOnDisconnect = true;
@@ -669,6 +673,7 @@ export class PixelStreaming {
      * Handles when Web Rtc is connecting
      */
     onWebRtcConnecting() {
+        this.config.options.onWebRtcConnecting?.();
         this.showTextOverlay('Starting connection to server, please wait');
     }
 
@@ -676,6 +681,7 @@ export class PixelStreaming {
      * Handles when Web Rtc has connected
      */
     onWebRtcConnected() {
+        this.config.options.onWebRtcConnected?.();
         this.showTextOverlay('WebRTC connected, waiting for video');
     }
 
@@ -683,6 +689,7 @@ export class PixelStreaming {
      * Handles when Web Rtc fails to connect
      */
     onWebRtcFailed() {
+        this.config.options.onWebRtcFailed?.();
         this.showErrorOverlay('Unable to setup video');
     }
 
@@ -690,6 +697,7 @@ export class PixelStreaming {
      * Handle when the Video has been Initialized
      */
     onVideoInitialized() {
+        this.config.options.onVideoInitialized?.();
         // starting a latency check
         this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
             this.webRtcController.sendLatencyTest();
