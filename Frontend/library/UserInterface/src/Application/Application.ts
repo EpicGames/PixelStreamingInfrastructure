@@ -70,9 +70,9 @@ export class Application {
 
     registerCallbacks() {
         this.pixelStreaming.config.options.onAfkWarningActivate = this.showAfkOverlay.bind(this);
-        this.pixelStreaming.config.options.onAfkWarningUpdate = this.afkOverlay.updateCountdown.bind(this);
-        this.pixelStreaming.config.options.onAfkWarningDeactivate = this.afkOverlay.hide.bind(this);
-        this.pixelStreaming.config.options.onAfkTimedOut = this.afkOverlay.hide.bind(this);
+        this.pixelStreaming.config.options.onAfkWarningUpdate = this.afkOverlay.updateCountdown.bind(this.afkOverlay);
+        this.pixelStreaming.config.options.onAfkWarningDeactivate = this.afkOverlay.hide.bind(this.afkOverlay);
+        this.pixelStreaming.config.options.onAfkTimedOut = this.afkOverlay.hide.bind(this.afkOverlay);
         this.pixelStreaming.config.options.onWebRtcSdp = this.onWebRtcSdp.bind(this);
         this.pixelStreaming.config.options.onWebRtcAutoConnect = this.onWebRtcAutoConnect.bind(this);
         this.pixelStreaming.config.options.onWebRtcConnecting = this.onWebRtcConnecting.bind(this);
@@ -185,11 +185,12 @@ export class Application {
      * Shows the afk overlay
      * @param countDown - the countdown number for the afk countdown
      */
-    showAfkOverlay(countDown: number) {
+    showAfkOverlay(countDown: number, dismissAfk: () => void) {
         this.hideCurrentOverlay();
         this.afkOverlay.updateCountdown(
             countDown
         );
+        this.afkOverlay.onAction(() => dismissAfk());
         this.afkOverlay.show();
         this.currentOverlay = this.afkOverlay;
     }
