@@ -59,6 +59,13 @@ export class OptionParameters {
     static StreamerId = 'StreamerId';
 }
 
+export interface ConfigOptions {
+    onAfkWarningActivate?: (countDown: number) => void;
+    onAfkWarningUpdate?: (countDown: number) => void;
+    onAfkWarningDeactivate?: () => void;
+    onAfkTimedOut?: () => void;
+}
+
 export class Config {
     /* A map of flags that can be toggled - options that can be set in the application - e.g. Use Mic? */
     private flags = new Map<string, SettingFlag>();
@@ -72,9 +79,12 @@ export class Config {
     /* A map of enum based settings - e.g. preferred codec */
     private optionParameters = new Map<string, SettingOption>();
 
+    options: ConfigOptions;
+
     // ------------ Settings -----------------
 
-    constructor() {
+    constructor(options?: ConfigOptions) {
+        this.options = options || {};
         this.populateDefaultSettings();
     }
 

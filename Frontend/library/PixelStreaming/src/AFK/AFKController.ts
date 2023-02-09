@@ -36,6 +36,7 @@ export class AFKController {
         if (this.active || this.countdownActive) {
             this.startAfkWarningTimer();
             this.hideCurrentOverlay();
+            this.config.options.onAfkWarningDeactivate?.();
         }
     }
 
@@ -97,11 +98,13 @@ export class AFKController {
 
         // instantiate a new overlay
         this.showAfkOverlay();
+        this.config.options.onAfkWarningActivate?.(this.countDown);
 
         // update our countDown timer and overlay contents
         this.countDown = this.closeTimeout;
         this.countdownActive = true;
         this.afkOverlay.updateCountdown(this.countDown);
+        this.config.options.onAfkWarningUpdate?.(this.countDown);
 
         // if we are in locked mouse exit pointerlock
         if (!this.config.isFlagEnabled(Flags.HoveringMouseMode)) {
@@ -118,6 +121,7 @@ export class AFKController {
                 // The user failed to click so hide the overlay and disconnect them.
                 this.hideCurrentOverlay();
                 this.onAFKTimedOutCallback();
+                this.config.options.onAfkTimedOut?.();
                 Logger.Log(
                     Logger.GetStackTrace(),
                     'You have been disconnected due to inactivity'
@@ -127,6 +131,7 @@ export class AFKController {
                 this.stopAfkWarningTimer();
             } else {
                 this.afkOverlay.updateCountdown(this.countDown);
+                this.config.options.onAfkWarningUpdate?.(this.countDown);
             }
         }, 1000);
     }
