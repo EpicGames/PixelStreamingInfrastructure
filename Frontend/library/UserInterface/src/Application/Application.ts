@@ -69,22 +69,22 @@ export class Application {
     }
 
     registerCallbacks() {
-        this.pixelStreaming.config.options.onAfkWarningActivate = this.showAfkOverlay;
-        this.pixelStreaming.config.options.onAfkWarningUpdate = this.afkOverlay.updateCountdown;
-        this.pixelStreaming.config.options.onAfkWarningDeactivate = this.afkOverlay.hide;
-        this.pixelStreaming.config.options.onAfkTimedOut = this.afkOverlay.hide;
-        this.pixelStreaming.config.options.onWebRtcSdp = this.onWebRtcSdp;
-        this.pixelStreaming.config.options.onWebRtcAutoConnect = this.onWebRtcAutoConnect;
-        this.pixelStreaming.config.options.onWebRtcConnecting = this.onWebRtcConnecting;
-        this.pixelStreaming.config.options.onWebRtcConnected = this.onWebRtcConnected;
-        this.pixelStreaming.config.options.onWebRtcFailed = this.onWebRtcFailed;
-        this.pixelStreaming.config.options.onVideoInitialized = this.onVideoInitialized;
-        this.pixelStreaming.config.options.onStreamLoading = this.onStreamLoading;
-        this.pixelStreaming.config.options.onDisconnect = this.onDisconnect;
-        this.pixelStreaming.config.options.onPlayStreamError = this.onPlayStreamError;
-        this.pixelStreaming.config.options.onPlayStream = this.onPlayStream;
-        this.pixelStreaming.config.options.onPlayStreamRejected = this.onPlayStreamRejected;
-        this.pixelStreaming.config.options.onLoadFreezeFrame = this.onLoadFreezeFrame;
+        this.pixelStreaming.config.options.onAfkWarningActivate = this.showAfkOverlay.bind(this);
+        this.pixelStreaming.config.options.onAfkWarningUpdate = this.afkOverlay.updateCountdown.bind(this);
+        this.pixelStreaming.config.options.onAfkWarningDeactivate = this.afkOverlay.hide.bind(this);
+        this.pixelStreaming.config.options.onAfkTimedOut = this.afkOverlay.hide.bind(this);
+        this.pixelStreaming.config.options.onWebRtcSdp = this.onWebRtcSdp.bind(this);
+        this.pixelStreaming.config.options.onWebRtcAutoConnect = this.onWebRtcAutoConnect.bind(this);
+        this.pixelStreaming.config.options.onWebRtcConnecting = this.onWebRtcConnecting.bind(this);
+        this.pixelStreaming.config.options.onWebRtcConnected = this.onWebRtcConnected.bind(this);
+        this.pixelStreaming.config.options.onWebRtcFailed = this.onWebRtcFailed.bind(this);
+        this.pixelStreaming.config.options.onVideoInitialized = this.onVideoInitialized.bind(this);
+        this.pixelStreaming.config.options.onStreamLoading = this.onStreamLoading.bind(this);
+        this.pixelStreaming.config.options.onDisconnect = this.onDisconnect.bind(this);
+        this.pixelStreaming.config.options.onPlayStreamError = this.onPlayStreamError.bind(this);
+        this.pixelStreaming.config.options.onPlayStream = this.onPlayStream.bind(this);
+        this.pixelStreaming.config.options.onPlayStreamRejected = this.onPlayStreamRejected.bind(this);
+        this.pixelStreaming.config.options.onLoadFreezeFrame = this.onLoadFreezeFrame.bind(this);
     }
 
     public get rootElement(): HTMLElement {
