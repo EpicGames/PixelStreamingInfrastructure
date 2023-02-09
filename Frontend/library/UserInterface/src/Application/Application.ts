@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { PixelStreaming, Flags, Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
+import { PixelStreaming, Flags, Logger, AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
 import { OverlayBase } from '../Overlay/BaseOverlay';
 import { ActionOverlay } from '../Overlay/ActionOverlay';
 import { TextOverlay } from '../Overlay/TextOverlay';
@@ -85,6 +85,7 @@ export class Application {
         this.pixelStreaming.config.options.onPlayStream = this.onPlayStream.bind(this);
         this.pixelStreaming.config.options.onPlayStreamRejected = this.onPlayStreamRejected.bind(this);
         this.pixelStreaming.config.options.onLoadFreezeFrame = this.onLoadFreezeFrame.bind(this);
+        this.pixelStreaming.config.options.onStatsReceived = this.onStatsReceived.bind(this);
     }
 
     public get rootElement(): HTMLElement {
@@ -298,5 +299,9 @@ export class Application {
         if (!this.pixelStreaming.config.isFlagEnabled(Flags.AutoPlayVideo)) {
             this.showPlayOverlay();
         }
+    }
+
+    onStatsReceived(aggregatedStats: AggregatedStats) {
+        // stats UI to be moved in UI side
     }
 }

@@ -566,6 +566,7 @@ export class PixelStreaming {
         }
         videoStats.handleSessionStatistics(this.videoStartTime, this.inputController, this.videoQpIndicator.videoEncoderAvgQP);
 
+        this.config.options.onStatsReceived?.(videoStats);
         // Grab all stats we can off the aggregated stats
         this.statsPanel.handleStats(videoStats);
     }

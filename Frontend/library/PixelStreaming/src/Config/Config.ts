@@ -5,6 +5,7 @@ import { SettingFlag } from './SettingFlag';
 import { SettingNumber } from './SettingNumber';
 import { SettingText } from './SettingText';
 import { SettingOption } from './SettingOption';
+import { AggregatedStats } from '../pixelstreamingfrontend';
 
 /**
  * A collection of flags that can be toggled and are core to all Pixel Streaming experiences.
@@ -76,6 +77,7 @@ export interface ConfigOptions {
     onPlayStream?: () => void;
     onPlayStreamRejected?: (reason: unknown) => void;
     onLoadFreezeFrame?: (shouldShowPlayOverlay: boolean) => void;
+    onStatsReceived?: (aggregatedStats: AggregatedStats) => void;
 }
 
 export class Config {
