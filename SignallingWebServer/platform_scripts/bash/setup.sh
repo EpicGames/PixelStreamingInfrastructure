@@ -96,14 +96,18 @@ function setup_frontend() {
 	if [ ! -f SignallingWebServer/Public/player.html ] || [ ! -z "$FORCE_BUILD" ] ; then
 		echo "Building Typescript Frontend."
 		# Using our bundled NodeJS, build the web frontend files
-		pushd ${BASH_LOCATION}/../../../Frontend/library > /dev/null
+		pushd ${BASH_LOCATION}/../../../Frontend/library/PixelStreaming > /dev/null
+		../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
+		../../SignallingWebServer/platform_scripts/bash/node/bin/npx webpack
+		popd
+		pushd ${BASH_LOCATION}/../../../Frontend/library/UserInterface > /dev/null
 		../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
 		../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-dev
 		popd
 
 		pushd ${BASH_LOCATION}/../../../Frontend/implementations/EpicGames > /dev/null
 		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
-		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm link ../../library
+		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm link ../../library/PixelStreaming ../../library/UserInterface
 		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-dev
 		popd
 	else
