@@ -9,7 +9,8 @@
         "build": "npx webpack --config webpack.prod.js",
         "build-dev": "npx webpack --config webpack.dev.js",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-        "spellcheck": "cspell \"{README.md,.github/*.md,src/**/*.ts}\""
+        "spellcheck": "cspell \"{README.md,.github/*.md,src/**/*.ts}\"",
+        "postinstall": "npm link ../PixelStreaming"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^5.16.0",
@@ -24,6 +25,7 @@
         "webpack-cli": "^5.0.1"
     },
     "dependencies": {
+        "@epicgames-ps/lib-pixelstreamingfrontend-dev": "0.0.1",
         "jss": "^10.9.2",
         "jss-plugin-camel-case": "^10.9.2",
         "jss-plugin-global": "^10.9.2"
