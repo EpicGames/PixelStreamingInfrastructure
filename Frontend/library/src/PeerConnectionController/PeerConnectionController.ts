@@ -343,11 +343,27 @@ export class PeerConnectionController {
 						sdpFmtpLine: preferredRTPCodec[1] /* sdpFmtpLine */ ? preferredRTPCodec[1] : '' 
 					}];
 
-					if(codecs[0].sdpFmtpLine === '') {
-						// We can't dynamically add members to the codec, so instead remove the field if it's empty
-						delete codecs[0].sdpFmtpLine;
-					}
+					this.config.getSettingOption(OptionParameters.PreferredCodec).options
+					.filter((option) => {
+						// Remove the preferred codec from the list of possible codecs as we've set it already
+						return option != this.preferredCodec;
+					}).forEach((option) => {
+						// Ammend the rest of the browsers supported codecs
+						const altCodec = option.split(" ");
+						codecs.push({
+							mimeType: 'video/' + altCodec[0] /* Name */,
+							clockRate: 90000,
+							sdpFmtpLine: altCodec[1] /* sdpFmtpLine */ ? altCodec[1] : '' 
+						})
+					})
 
+					for(const codec of codecs) {
+						if(codec.sdpFmtpLine === '') {
+							// We can't dynamically add members to the codec, so instead remove the field if it's empty
+							delete codec.sdpFmtpLine;
+						}
+					}
+					
 					transceiver.setCodecPreferences(codecs);
 				}
 			}
