@@ -10,6 +10,8 @@ import { PlayOverlay } from '../Overlay/PlayOverlay';
 import { InfoOverlay } from '../Overlay/InfoOverlay';
 import { ErrorOverlay } from '../Overlay/ErrorOverlay';
 import { AFKOverlay } from '../Overlay/AFKOverlay';
+import { LabelledButton } from '../UI/LabelledButton';
+import { SettingsPanel } from '../UI/SettingsPanel';
 import { StatsPanel } from '../UI/StatsPanel';
 
 export interface UIOptions {
@@ -30,6 +32,7 @@ export class Application {
     errorOverlay: TextOverlay;
     afkOverlay: AFKOverlay;
 
+    settingsPanel: SettingsPanel;
     statsPanel: StatsPanel;
 
     /**
@@ -44,6 +47,12 @@ export class Application {
         // Add stats panel
         this.statsPanel = new StatsPanel();
         this.pixelStreaming.uiFeaturesElement.appendChild(this.statsPanel.rootElement);
+
+        // Add settings panel
+        this.settingsPanel = new SettingsPanel();
+        this.pixelStreaming.uiFeaturesElement.appendChild(this.settingsPanel.rootElement);
+        
+        this.configureSettings();
 
         this.createButtons();
 
@@ -81,10 +90,60 @@ export class Application {
      * Set up button click functions and button functionality
      */
     public createButtons() {
+
+        // Add settings button to controls
+        this.pixelStreaming.controls.settingsIcon.rootElement.onclick = () =>
+            this.settingsClicked();
+        this.settingsPanel.settingsCloseButton.onclick = () =>
+            this.settingsClicked();
+    
         // setup the stats/info button
         this.pixelStreaming.controls.statsIcon.rootElement.onclick = () => this.statsClicked();
 
         this.statsPanel.statsCloseButton.onclick = () => this.statsClicked();
+
+        // Add button for toggle fps
+        const showFPSButton = new LabelledButton('Show FPS', 'Toggle');
+        showFPSButton.addOnClickListener(() => {
+            this.pixelStreaming.requestShowFps();
+        });
+
+        // Add button for restart stream
+        const restartStreamButton = new LabelledButton(
+            'Restart Stream',
+            'Restart'
+        );
+        restartStreamButton.addOnClickListener(() => {
+            this.pixelStreaming.restartStream();
+        });
+
+        // Add button for request keyframe
+        const requestKeyframeButton = new LabelledButton(
+            'Request keyframe',
+            'Request'
+        );
+        requestKeyframeButton.addOnClickListener(() => {
+            this.pixelStreaming.requestIframe();
+        });
+
+        const commandsSectionElem = this.pixelStreaming.config.buildSectionWithHeading(
+            this.settingsPanel.settingsContentElement,
+            'Commands'
+        );
+        commandsSectionElem.appendChild(showFPSButton.rootElement);
+        commandsSectionElem.appendChild(requestKeyframeButton.rootElement);
+        commandsSectionElem.appendChild(restartStreamButton.rootElement);
+
+    }
+
+    /**
+     * Configure the settings with on change listeners and any additional per experience settings.
+     */
+    configureSettings(): void {
+        // This builds all the settings sections and flags under this `settingsContent` element.
+        this.pixelStreaming.config.populateSettingsElement(
+            this.settingsPanel.settingsContentElement
+        );
     }
 
     registerCallbacks() {
@@ -190,10 +249,18 @@ export class Application {
     }
 
     /**
+     * Shows or hides the settings panel if clicked
+     */
+    settingsClicked() {
+        this.statsPanel.hide();
+        this.settingsPanel.toggleVisibility();
+    }
+    
+    /**
      * Shows or hides the stats panel if clicked
      */
     statsClicked() {
-        this.pixelStreaming.settingsPanel.hide(); // TODO: move to UI
+        this.settingsPanel.hide();
         this.statsPanel.toggleVisibility();
     }
     

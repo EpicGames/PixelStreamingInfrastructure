@@ -4,7 +4,6 @@ import { Config, OptionParameters } from '../Config/Config';
 import { LatencyTestResults } from '../DataChannel/LatencyTestResults';
 import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
 import { VideoQpIndicator } from '../UI/VideoQpIndicator';
-import { SettingsPanel } from '../UI/SettingsPanel';
 import { WebRtcPlayerController } from '../WebRtcPlayer/WebRtcPlayerController';
 import { Flags, NumericParameters } from '../Config/Config';
 import { Logger } from '../Logger/Logger';
@@ -15,7 +14,6 @@ import {
 } from '../DataChannel/InitialSettings';
 import { OnScreenKeyboard } from '../UI/OnScreenKeyboard';
 import { Controls } from '../UI/Controls';
-import { LabelledButton } from '../UI/LabelledButton';
 import { EventEmitter } from '../Util/EventEmitter';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
@@ -34,7 +32,6 @@ export class PixelStreaming {
 
     showActionOrErrorOnDisconnect = true;
 
-    settingsPanel: SettingsPanel;
     videoQpIndicator: VideoQpIndicator;
     onScreenKeyboardHelper: OnScreenKeyboard;
     controls: Controls;
@@ -57,9 +54,6 @@ export class PixelStreaming {
         this.videoQpIndicator = new VideoQpIndicator();
         this.uiFeaturesElement.appendChild(this.videoQpIndicator.rootElement);
 
-        // Add settings panel
-        this.settingsPanel = new SettingsPanel();
-        this.uiFeaturesElement.appendChild(this.settingsPanel.rootElement);
         this.configureSettings();
 
         this.createButtons();
@@ -100,47 +94,9 @@ export class PixelStreaming {
         controls.fullscreenIcon.fullscreenElement = this.rootElement;
         this.uiFeaturesElement.appendChild(controls.rootElement);
 
-        // Add settings button to controls
-        controls.settingsIcon.rootElement.onclick = () =>
-            this.settingsClicked();
-        this.settingsPanel.settingsCloseButton.onclick = () =>
-            this.settingsClicked();
-
         // Add WebXR button to controls
         controls.xrIcon.rootElement.onclick = () =>
             this.webXrController.xrClicked();
-
-        // Add button for toggle fps
-        const showFPSButton = new LabelledButton('Show FPS', 'Toggle');
-        showFPSButton.addOnClickListener(() => {
-            this.webRtcController.sendShowFps();
-        });
-
-        // Add button for restart stream
-        const restartStreamButton = new LabelledButton(
-            'Restart Stream',
-            'Restart'
-        );
-        restartStreamButton.addOnClickListener(() => {
-            this.webRtcController.restartStreamAutomatically();
-        });
-
-        // Add button for request keyframe
-        const requestKeyframeButton = new LabelledButton(
-            'Request keyframe',
-            'Request'
-        );
-        requestKeyframeButton.addOnClickListener(() => {
-            this.webRtcController.sendIframeRequest();
-        });
-
-        const commandsSectionElem = this.config.buildSectionWithHeading(
-            this.settingsPanel.settingsContentElement,
-            'Commands'
-        );
-        commandsSectionElem.appendChild(showFPSButton.rootElement);
-        commandsSectionElem.appendChild(requestKeyframeButton.rootElement);
-        commandsSectionElem.appendChild(restartStreamButton.rootElement);
 
         this.controls = controls;
     }
@@ -185,11 +141,6 @@ export class PixelStreaming {
      * Configure the settings with on change listeners and any additional per experience settings.
      */
     configureSettings(): void {
-        // This builds all the settings sections and flags under this `settingsContent` element.
-        this.config.populateSettingsElement(
-            this.settingsPanel.settingsContentElement
-        );
-
         this.config.addOnSettingChangedListener(
             Flags.IsQualityController,
             (wantsQualityController: boolean) => {
@@ -383,14 +334,6 @@ export class PixelStreaming {
     }
 
     /**
-     * Shows or hides the settings panel if clicked
-     */
-    settingsClicked() {
-        // this.statsPanel.hide(); // TODO: move to UI side
-        this.settingsPanel.toggleVisibility();
-    }
-
-    /**
      * Activate the on screen keyboard when receiving the command from the streamer
      * @param command - the keyboard command
      */
@@ -436,6 +379,10 @@ export class PixelStreaming {
     play() {
         this.onStreamLoading();
         this.webRtcController.playStream();
+    }
+
+    restartStream() {
+        this.webRtcController.restartStreamAutomatically();
     }
 
     /**
@@ -614,6 +561,22 @@ export class PixelStreaming {
             return false;
         }
         this.webRtcController.sendLatencyTest();
+        return true;
+    }
+
+    requestShowFps() {
+        if (!this.webRtcController.videoPlayer.isVideoReady()) {
+            return false;
+        }
+        this.webRtcController.sendShowFps();
+        return true;
+    }
+
+    requestIframe() {
+        if (!this.webRtcController.videoPlayer.isVideoReady()) {
+            return false;
+        }
+        this.webRtcController.sendIframeRequest();
         return true;
     }
 
