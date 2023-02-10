@@ -37,8 +37,8 @@ export class HoveringMouseEvents implements IMouseEvents {
                 mouseEvent.movementY
             );
         const toStreamerHandlers =
-            this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseMove')('MouseMove', [
+            this.mouseController.toStreamerMessagesProvider.toStreamerHandlers;
+        toStreamerHandlers.get('MouseMove')([
             coord.x,
             coord.y,
             delta.x,
@@ -62,8 +62,8 @@ export class HoveringMouseEvents implements IMouseEvents {
                 mouseEvent.offsetY
             );
         const toStreamerHandlers =
-            this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseDown')('MouseDown', [
+            this.mouseController.toStreamerMessagesProvider.toStreamerHandlers;
+        toStreamerHandlers.get('MouseDown')([
             mouseEvent.button,
             coord.x,
             coord.y
@@ -85,8 +85,8 @@ export class HoveringMouseEvents implements IMouseEvents {
                 mouseEvent.offsetY
             );
         const toStreamerHandlers =
-            this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseUp')('MouseUp', [
+            this.mouseController.toStreamerMessagesProvider.toStreamerHandlers;
+        toStreamerHandlers.get('MouseUp')([
             mouseEvent.button,
             coord.x,
             coord.y
@@ -108,8 +108,8 @@ export class HoveringMouseEvents implements IMouseEvents {
                 mouseEvent.offsetY
             );
         const toStreamerHandlers =
-            this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseUp')('MouseUp', [
+            this.mouseController.toStreamerMessagesProvider.toStreamerHandlers;
+        toStreamerHandlers.get('MouseUp')([
             mouseEvent.button,
             coord.x,
             coord.y
@@ -131,8 +131,8 @@ export class HoveringMouseEvents implements IMouseEvents {
                 wheelEvent.offsetY
             );
         const toStreamerHandlers =
-            this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseWheel')('MouseWheel', [
+            this.mouseController.toStreamerMessagesProvider.toStreamerHandlers;
+        toStreamerHandlers.get('MouseWheel')([
             wheelEvent.wheelDelta,
             coord.x,
             coord.y
@@ -154,8 +154,8 @@ export class HoveringMouseEvents implements IMouseEvents {
                 mouseEvent.offsetY
             );
         const toStreamerHandlers =
-            this.mouseController.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseDouble')('MouseDouble', [
+            this.mouseController.toStreamerMessagesProvider.toStreamerHandlers;
+        toStreamerHandlers.get('MouseDouble')([
             mouseEvent.button,
             coord.x,
             coord.y

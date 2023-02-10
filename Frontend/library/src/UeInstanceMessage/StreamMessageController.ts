@@ -12,7 +12,7 @@ export class ToStreamerMessage {
 export class StreamMessageController {
     toStreamerHandlers: Map<
         string,
-        (messageType: string, messageData?: Array<number> | undefined) => void
+        (messageData?: Array<number> | undefined) => void
     >;
     fromStreamerHandlers: Map<
         string,
@@ -28,23 +28,6 @@ export class StreamMessageController {
         this.fromStreamerHandlers = new Map();
         this.toStreamerMessages = new TwoWayMap();
         this.fromStreamerMessages = new TwoWayMap();
-    }
-
-    /**
-     * Get the current map for to streamer handlers
-     */
-    getToStreamHandlersMap(): Map<
-        string,
-        (messageType: string, messageData?: Array<number> | undefined) => void
-    > {
-        return this.toStreamerHandlers;
-    }
-
-    /**
-     * Get the current twoWayMap for to streamer messages
-     */
-    getToStreamerMessageMap(): TwoWayMap<string, ToStreamerMessage> {
-        return this.toStreamerMessages;
     }
 
     /**
@@ -237,10 +220,7 @@ export class StreamMessageController {
     registerMessageHandler(
         messageDirection: MessageDirection,
         messageType: string,
-        messageHandler: (
-            messageType: string,
-            messageData?: unknown | undefined
-        ) => void
+        messageHandler: (messageData?: unknown | undefined) => void
     ) {
         switch (messageDirection) {
             case MessageDirection.ToStreamer:

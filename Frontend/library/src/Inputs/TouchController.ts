@@ -128,7 +128,7 @@ export class TouchController implements ITouchController {
         const videoElementParent =
             this.videoElementProvider.getVideoParentElement();
         const toStreamerHandlers =
-            this.toStreamerMessagesProvider.getToStreamHandlersMap();
+            this.toStreamerMessagesProvider.toStreamerHandlers;
 
         for (let t = 0; t < touches.length; t++) {
             const numTouches = 1; // the number of touches to be sent this message
@@ -147,7 +147,7 @@ export class TouchController implements ITouchController {
             );
             switch (type) {
                 case 'TouchStart':
-                    toStreamerHandlers.get('TouchStart')('TouchStart', [
+                    toStreamerHandlers.get('TouchStart')([
                         numTouches,
                         coord.x,
                         coord.y,
@@ -157,7 +157,7 @@ export class TouchController implements ITouchController {
                     ]);
                     break;
                 case 'TouchEnd':
-                    toStreamerHandlers.get('TouchEnd')('TouchEnd', [
+                    toStreamerHandlers.get('TouchEnd')([
                         numTouches,
                         coord.x,
                         coord.y,
@@ -167,7 +167,7 @@ export class TouchController implements ITouchController {
                     ]);
                     break;
                 case 'TouchMove':
-                    toStreamerHandlers.get('TouchMove')('TouchMove', [
+                    toStreamerHandlers.get('TouchMove')([
                         numTouches,
                         coord.x,
                         coord.y,

@@ -12,15 +12,19 @@ export class PeerConnectionController {
     peerConnection: RTCPeerConnection;
     aggregatedStats: AggregatedStats;
     config: Config;
-	preferredCodec: string;
-	updateCodecSelection: boolean;
+    preferredCodec: string;
+    updateCodecSelection: boolean;
 
     /**
      * Create a new RTC Peer Connection client
      * @param options - Peer connection Options
      * @param config - The config for our PS experience.
      */
-    constructor(options: RTCConfiguration, config: Config, preferredCodec: string) {
+    constructor(
+        options: RTCConfiguration,
+        config: Config,
+        preferredCodec: string
+    ) {
         this.config = config;
 
         // Set the ICE transport to relay if TURN enabled
@@ -47,8 +51,8 @@ export class PeerConnectionController {
         this.peerConnection.ondatachannel = (ev: RTCDataChannelEvent) =>
             this.handleDataChannel(ev);
         this.aggregatedStats = new AggregatedStats();
-		this.preferredCodec = preferredCodec;
-		this.updateCodecSelection = true;
+        this.preferredCodec = preferredCodec;
+        this.updateCodecSelection = true;
     }
 
     /**
@@ -135,8 +139,15 @@ export class PeerConnectionController {
             });
         });
 
-		// Ugly syntax, but this achieves the intersection of the browser supported list and the UE supported list
-		this.config.setOptionSettingOptions(OptionParameters.PreferredCodec, this.parseAvailableCodecs(offer).filter(value => this.config.getSettingOption(OptionParameters.PreferredCodec).options.includes(value)));
+        // Ugly syntax, but this achieves the intersection of the browser supported list and the UE supported list
+        this.config.setOptionSettingOptions(
+            OptionParameters.PreferredCodec,
+            this.parseAvailableCodecs(offer).filter((value) =>
+                this.config
+                    .getSettingOption(OptionParameters.PreferredCodec)
+                    .options.includes(value)
+            )
+        );
     }
 
     /**
@@ -145,8 +156,15 @@ export class PeerConnectionController {
      */
     receiveAnswer(answer: RTCSessionDescriptionInit) {
         this.peerConnection.setRemoteDescription(answer);
-		// Ugly syntax, but this achieves the intersection of the browser supported list and the UE supported list
-		this.config.setOptionSettingOptions(OptionParameters.PreferredCodec, this.parseAvailableCodecs(answer).filter(value => this.config.getSettingOption(OptionParameters.PreferredCodec).options.includes(value)));
+        // Ugly syntax, but this achieves the intersection of the browser supported list and the UE supported list
+        this.config.setOptionSettingOptions(
+            OptionParameters.PreferredCodec,
+            this.parseAvailableCodecs(answer).filter((value) =>
+                this.config
+                    .getSettingOption(OptionParameters.PreferredCodec)
+                    .options.includes(value)
+            )
+        );
     }
 
     /**
@@ -157,10 +175,14 @@ export class PeerConnectionController {
             this.aggregatedStats.processStats(StatsData);
             this.onVideoStats(this.aggregatedStats);
 
-			// Update the preferred codec selection based on what was actually negotiated
-			if(this.updateCodecSelection) {
-				this.config.getSettingOption(OptionParameters.PreferredCodec).selected = this.aggregatedStats.codecs.get(this.aggregatedStats.inboundVideoStats.codecId)
-			}
+            // Update the preferred codec selection based on what was actually negotiated
+            if (this.updateCodecSelection) {
+                this.config.getSettingOption(
+                    OptionParameters.PreferredCodec
+                ).selected = this.aggregatedStats.codecs.get(
+                    this.aggregatedStats.inboundVideoStats.codecId
+                );
+            }
         });
     }
 
@@ -198,7 +220,7 @@ export class PeerConnectionController {
         }
 
         // Force mono or stereo based on whether ?forceMono was passed or not
-		audioSDP += this.config.isFlagEnabled(Flags.ForceMonoAudio)
+        audioSDP += this.config.isFlagEnabled(Flags.ForceMonoAudio)
             ? 'stereo=0;'
             : 'stereo=1;';
 
@@ -331,43 +353,57 @@ export class PeerConnectionController {
 
         // Setup a transceiver for getting UE video
         this.peerConnection.addTransceiver('video', { direction: 'recvonly' });
-		// We can only set preferrec codec on Chrome
-		if(RTCRtpReceiver.getCapabilities && this.preferredCodec != "") {
-			for(const transceiver of this.peerConnection.getTransceivers()) {
-				if(transceiver && transceiver.receiver && transceiver.receiver.track && transceiver.receiver.track.kind === "video")
-				{
-					const preferredRTPCodec = this.preferredCodec.split(" ");
-					const codecs = [{
-						mimeType: 'video/' + preferredRTPCodec[0] /* Name */,
-						clockRate: 90000,
-						sdpFmtpLine: preferredRTPCodec[1] /* sdpFmtpLine */ ? preferredRTPCodec[1] : '' 
-					}];
 
-					this.config.getSettingOption(OptionParameters.PreferredCodec).options
-					.filter((option) => {
-						// Remove the preferred codec from the list of possible codecs as we've set it already
-						return option != this.preferredCodec;
-					}).forEach((option) => {
-						// Ammend the rest of the browsers supported codecs
-						const altCodec = option.split(" ");
-						codecs.push({
-							mimeType: 'video/' + altCodec[0] /* Name */,
-							clockRate: 90000,
-							sdpFmtpLine: altCodec[1] /* sdpFmtpLine */ ? altCodec[1] : '' 
-						})
-					})
+        // We can only set preferrec codec on Chrome
+        if (RTCRtpReceiver.getCapabilities && this.preferredCodec != '') {
+            for (const transceiver of this.peerConnection.getTransceivers()) {
+                if (
+                    transceiver &&
+                    transceiver.receiver &&
+                    transceiver.receiver.track &&
+                    transceiver.receiver.track.kind === 'video'
+                ) {
+                    const preferredRTPCodec = this.preferredCodec.split(' ');
+                    const codecs = [
+                        {
+                            mimeType:
+                                'video/' + preferredRTPCodec[0] /* Name */,
+                            clockRate: 90000,
+                            sdpFmtpLine: preferredRTPCodec[1] /* sdpFmtpLine */
+                                ? preferredRTPCodec[1]
+                                : ''
+                        }
+                    ];
 
-					for(const codec of codecs) {
-						if(codec.sdpFmtpLine === '') {
-							// We can't dynamically add members to the codec, so instead remove the field if it's empty
-							delete codec.sdpFmtpLine;
-						}
-					}
-					
-					transceiver.setCodecPreferences(codecs);
-				}
-			}
-		}
+                    this.config
+                        .getSettingOption(OptionParameters.PreferredCodec)
+                        .options.filter((option) => {
+                            // Remove the preferred codec from the list of possible codecs as we've set it already
+                            return option != this.preferredCodec;
+                        })
+                        .forEach((option) => {
+                            // Ammend the rest of the browsers supported codecs
+                            const altCodec = option.split(' ');
+                            codecs.push({
+                                mimeType: 'video/' + altCodec[0] /* Name */,
+                                clockRate: 90000,
+                                sdpFmtpLine: altCodec[1] /* sdpFmtpLine */
+                                    ? altCodec[1]
+                                    : ''
+                            });
+                        });
+
+                    for (const codec of codecs) {
+                        if (codec.sdpFmtpLine === '') {
+                            // We can't dynamically add members to the codec, so instead remove the field if it's empty
+                            delete codec.sdpFmtpLine;
+                        }
+                    }
+
+                    transceiver.setCodecPreferences(codecs);
+                }
+            }
+        }
 
         // Setup a transceiver for sending mic audio to UE and receiving audio from UE
         if (!useMic) {
@@ -474,34 +510,47 @@ export class PeerConnectionController {
         // Default Functionality: Do Nothing
     }
 
-	parseAvailableCodecs(rtcSessionDescription: RTCSessionDescriptionInit): Array<string> {
-		// No point in updating the available codecs if on FF
-		if(!RTCRtpReceiver.getCapabilities) return ["Only available on Chrome"];
+    parseAvailableCodecs(
+        rtcSessionDescription: RTCSessionDescriptionInit
+    ): Array<string> {
+        // No point in updating the available codecs if on FF
+        if (!RTCRtpReceiver.getCapabilities)
+            return ['Only available on Chrome'];
 
-		const ueSupportedCodecs: Array<string> = [];
-		const sections = splitSections(rtcSessionDescription.sdp);
-		// discard the session information as we only want media related info
-		sections.shift();
-		sections.forEach(mediaSection => {
-			const {codecs} = parseRtpParameters(mediaSection);
-			// Filter only for VPX / H26X / AV1
-			const matcher = /(VP\d|H26\d|AV1).*/
-			codecs.forEach(c => {		
-				const str = c.name + ' ' + Object.keys(c.parameters || {}).map(p => p + '=' + c.parameters[p]).join(';');
-				const match = matcher.exec(str);
-				if(match !== null) {
-						if(c.name == "VP9") {
-							// UE answers don't specify profile but we know we want profile 0
-							c.parameters = {
-								"profile-id": "0"
-							}
-						}
-						const codecStr: string = c.name + " " + Object.keys(c.parameters || {}).map(p => p + '=' + c.parameters[p]).join(';');
-						ueSupportedCodecs.push(codecStr);
-				}
-			})
-		});
+        const ueSupportedCodecs: Array<string> = [];
+        const sections = splitSections(rtcSessionDescription.sdp);
+        // discard the session information as we only want media related info
+        sections.shift();
+        sections.forEach((mediaSection) => {
+            const { codecs } = parseRtpParameters(mediaSection);
+            // Filter only for VPX / H26X / AV1
+            const matcher = /(VP\d|H26\d|AV1).*/;
+            codecs.forEach((c) => {
+                const str =
+                    c.name +
+                    ' ' +
+                    Object.keys(c.parameters || {})
+                        .map((p) => p + '=' + c.parameters[p])
+                        .join(';');
+                const match = matcher.exec(str);
+                if (match !== null) {
+                    if (c.name == 'VP9') {
+                        // UE answers don't specify profile but we know we want profile 0
+                        c.parameters = {
+                            'profile-id': '0'
+                        };
+                    }
+                    const codecStr: string =
+                        c.name +
+                        ' ' +
+                        Object.keys(c.parameters || {})
+                            .map((p) => p + '=' + c.parameters[p])
+                            .join(';');
+                    ueSupportedCodecs.push(codecStr);
+                }
+            });
+        });
 
-		return ueSupportedCodecs;
-	}
+        return ueSupportedCodecs;
+    }
 }

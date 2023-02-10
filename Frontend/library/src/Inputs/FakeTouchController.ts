@@ -70,8 +70,8 @@ export class FakeTouchController implements ITouchController {
                 this.fakeTouchFinger.y
             );
             const toStreamerHandlers =
-                this.toStreamerMessagesProvider.getToStreamHandlersMap();
-            toStreamerHandlers.get('MouseDown')('MouseDown', [
+                this.toStreamerMessagesProvider.toStreamerHandlers;
+            toStreamerHandlers.get('MouseDown')([
                 MouseButton.mainButton,
                 coord.x,
                 coord.y
@@ -91,7 +91,7 @@ export class FakeTouchController implements ITouchController {
         const videoElementParent =
             this.videoElementProvider.getVideoParentElement();
         const toStreamerHandlers =
-            this.toStreamerMessagesProvider.getToStreamHandlersMap();
+            this.toStreamerMessagesProvider.toStreamerHandlers;
 
         for (let t = 0; t < touchEvent.changedTouches.length; t++) {
             const touch = touchEvent.changedTouches[t];
@@ -101,7 +101,7 @@ export class FakeTouchController implements ITouchController {
                 const y = touch.clientY - this.videoElementParentClientRect.top;
                 const coord =
                     this.coordinateConverter.normalizeAndQuantizeUnsigned(x, y);
-                toStreamerHandlers.get('MouseUp')('MouseUp', [
+                toStreamerHandlers.get('MouseUp')([
                     MouseButton.mainButton,
                     coord.x,
                     coord.y
@@ -125,7 +125,7 @@ export class FakeTouchController implements ITouchController {
             return;
         }
         const toStreamerHandlers =
-            this.toStreamerMessagesProvider.getToStreamHandlersMap();
+            this.toStreamerMessagesProvider.toStreamerHandlers;
 
         for (let t = 0; t < touchEvent.touches.length; t++) {
             const touch = touchEvent.touches[t];
@@ -140,7 +140,7 @@ export class FakeTouchController implements ITouchController {
                         x - this.fakeTouchFinger.x,
                         y - this.fakeTouchFinger.y
                     );
-                toStreamerHandlers.get('MoveMouse')('MouseMove', [
+                toStreamerHandlers.get('MoveMouse')([
                     coord.x,
                     coord.y,
                     delta.x,
