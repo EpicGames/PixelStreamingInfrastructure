@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { PixelStreaming, Flags, Logger, AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
+import { PixelStreaming, Flags, Logger, AggregatedStats, LatencyTestResults } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
 import { OverlayBase } from '../Overlay/BaseOverlay';
 import { ActionOverlay } from '../Overlay/ActionOverlay';
 import { TextOverlay } from '../Overlay/TextOverlay';
@@ -86,6 +86,7 @@ export class Application {
         this.pixelStreaming.events.on("playStreamRejected", this.onPlayStreamRejected.bind(this));
         this.pixelStreaming.events.on("loadFreezeFrame", this.onLoadFreezeFrame.bind(this));
         this.pixelStreaming.events.on("statsReceived", this.onStatsReceived.bind(this));
+        this.pixelStreaming.events.on("latencyTestResult", this.onLatencyTestResults.bind(this));
     }
 
     public get rootElement(): HTMLElement {
@@ -302,6 +303,10 @@ export class Application {
     }
 
     onStatsReceived(aggregatedStats: AggregatedStats) {
+        // stats UI to be moved in UI side
+    }
+
+    onLatencyTestResults(latencyTimings: LatencyTestResults) {
         // stats UI to be moved in UI side
     }
 }

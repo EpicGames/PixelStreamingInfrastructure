@@ -557,6 +557,7 @@ export class PixelStreaming {
      * @param latency - latency test results object
      */
     onLatencyTestResult(latencyTimings: LatencyTestResults) {
+        this.eventEmitter.emit("latencyTestResult", [latencyTimings]);
         this.statsPanel.latencyTest.handleTestResult(latencyTimings);
     }
 
@@ -645,6 +646,14 @@ export class PixelStreaming {
             Flags.IsQualityController,
             hasQualityOwnership
         );
+    }
+
+    requestLatencyTest() {
+        if (!this.webRtcController.videoPlayer.isVideoReady()) {
+            return false;
+        }
+        this.webRtcController.sendLatencyTest();
+        return true;
     }
 
     /**

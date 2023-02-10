@@ -1,3 +1,4 @@
+import { LatencyTestResults } from '../DataChannel/LatencyTestResults';
 import { AggregatedStats } from "../PeerConnectionController/AggregatedStats";
 
 export type EventType =
@@ -17,7 +18,8 @@ export type EventType =
     | 'playStream'
     | 'playStreamRejected'
     | 'loadFreezeFrame'
-    | 'statsReceived';
+    | 'statsReceived' 
+    | 'latencyTestResult';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type EventCallback<T extends any[] = any[]> = (...args: T) => void;
@@ -31,6 +33,7 @@ export type EventArgsPlayStreamError = [message: string];
 export type EventArgsPlayStreamRejected = [reason: unknown];
 export type EventArgsLoadFreezeFrame = [shouldShowPlayOverlay: boolean];
 export type EventArgsStatsReceived = [aggregatedStats: AggregatedStats];
+export type EventArgsLatencyTestResult = [latencyTimings: LatencyTestResults];
 
 export class EventEmitter {
     private callbacks: Record<EventType, EventCallback[]> = {
@@ -50,7 +53,8 @@ export class EventEmitter {
         playStream: [],
         playStreamRejected: [],
         loadFreezeFrame: [],
-        statsReceived: []
+        statsReceived: [],
+        latencyTestResult: []
     };
 
     on(event: "afkWarningActivate", callback: EventCallback<EventArgsAfkWarningActivate>): EventEmitterUnregisterCallback;
@@ -70,6 +74,7 @@ export class EventEmitter {
     on(event: "playStreamRejected", callback: EventCallback<EventArgsPlayStreamRejected>): EventEmitterUnregisterCallback;
     on(event: "loadFreezeFrame", callback: EventCallback<EventArgsLoadFreezeFrame>): EventEmitterUnregisterCallback;
     on(event: "statsReceived", callback: EventCallback<EventArgsStatsReceived>): EventEmitterUnregisterCallback;
+    on(event: "latencyTestResult", callback: EventCallback<EventArgsLatencyTestResult>): EventEmitterUnregisterCallback;
     on(event: EventType, callback: EventCallback): EventEmitterUnregisterCallback {
         this.callbacks[event].push(callback);
         return () => this.off(event, callback);
@@ -99,6 +104,7 @@ export class EventEmitter {
     emit(event: "playStreamRejected", args: EventArgsPlayStreamRejected): void;
     emit(event: "loadFreezeFrame", args: EventArgsLoadFreezeFrame): void;
     emit(event: "statsReceived", args: EventArgsStatsReceived): void;
+    emit(event: "latencyTestResult", args: EventArgsLatencyTestResult): void;
     emit(event: EventType, args?: unknown[]): void {
         this.callbacks[event].forEach((callback) => callback(...(args || [])));
     }
