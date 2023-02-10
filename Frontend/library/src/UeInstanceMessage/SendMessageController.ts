@@ -66,6 +66,11 @@ export class SendMessageController {
                     byteOffset += 2;
                     break;
 
+				case "float":
+					data.setFloat32(byteOffset, element, true);
+					byteOffset += 4;
+					break;
+
                 case 'double':
                     data.setFloat64(byteOffset, element, true);
                     byteOffset += 8;
