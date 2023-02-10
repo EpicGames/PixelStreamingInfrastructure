@@ -32,7 +32,7 @@ export class SendMessageController {
         }
 
         const toStreamerMessages =
-            this.toStreamerMessagesMapProvider.getToStreamerMessageMap();
+            this.toStreamerMessagesMapProvider.toStreamerMessages;
         const messageFormat = toStreamerMessages.getFromKey(messageType);
         if (messageFormat === undefined) {
             Logger.Error(
@@ -64,6 +64,11 @@ export class SendMessageController {
                 case 'int16':
                     data.setInt16(byteOffset, element, true);
                     byteOffset += 2;
+                    break;
+
+                case 'float':
+                    data.setFloat32(byteOffset, element, true);
+                    byteOffset += 4;
                     break;
 
                 case 'double':

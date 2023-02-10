@@ -26,12 +26,14 @@ import { PlayOverlay } from '../Overlay/PlayOverlay';
 import { InfoOverlay } from '../Overlay/InfoOverlay';
 import { ErrorOverlay } from '../Overlay/ErrorOverlay';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
+import { WebXRController } from '../WebXR/WebXRController';
 
 /**
  * Provides common base functionality for applications that extend this application
  */
 export class Application {
     public webRtcController: WebRtcPlayerController;
+    public webXrController: WebXRController;
     public config: Config;
 
     _rootElement: HTMLElement;
@@ -101,6 +103,8 @@ export class Application {
             this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
 
         this.updateColors(this.config.isFlagEnabled(Flags.LightMode));
+
+        this.webXrController = new WebXRController(this.webRtcController);
     }
 
     public createOverlays(): void {
@@ -129,6 +133,10 @@ export class Application {
         this.settingsPanel.settingsCloseButton.onclick = () =>
             this.settingsClicked();
 
+        // Add WebXR button to controls
+        controls.xrIcon.rootElement.onclick = () =>
+            this.webXrController.xrClicked();
+
         // setup the stats/info button
         controls.statsIcon.rootElement.onclick = () => this.statsClicked();
 
@@ -155,7 +163,7 @@ export class Application {
             'Request'
         );
         requestKeyframeButton.addOnClickListener(() => {
-            this.webRtcController.requestKeyFrame();
+            this.webRtcController.sendIframeRequest();
         });
 
         const commandsSectionElem = this.config.buildSectionWithHeading(
@@ -394,14 +402,14 @@ export class Application {
             }
         );
 
-		this.config.addOnOptionSettingChangedListener(
-			OptionParameters.PreferredCodec,
-			(newValue: string) => {
-				if(this.webRtcController) {
-					this.webRtcController.setPreferredCodec(newValue);
-				}
-			}
-		);
+        this.config.addOnOptionSettingChangedListener(
+            OptionParameters.PreferredCodec,
+            (newValue: string) => {
+                if (this.webRtcController) {
+                    this.webRtcController.setPreferredCodec(newValue);
+                }
+            }
+        );
     }
 
     /**
@@ -547,7 +555,10 @@ export class Application {
     setWebRtcPlayerController(webRtcPlayerController: WebRtcPlayerController) {
         this.webRtcController = webRtcPlayerController;
 
-		this.webRtcController.setPreferredCodec(this.config.getSettingOption(OptionParameters.PreferredCodec).selected);
+        this.webRtcController.setPreferredCodec(
+            this.config.getSettingOption(OptionParameters.PreferredCodec)
+                .selected
+        );
         this.webRtcController.resizePlayerStyle();
 
         this.disconnectOverlay.onAction(() => {
