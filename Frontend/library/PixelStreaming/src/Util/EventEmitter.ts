@@ -20,9 +20,17 @@ export type EventType =
     | 'statsReceived';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type EventCallback = (...args: any[]) => void;
+export type EventCallback<T extends any[] = any[]> = (...args: T) => void;
 
 export type EventEmitterUnregisterCallback = () => void;
+
+export type EventArgsAfkWarningActivate = [countDown: number, dismissAfk: () => void];
+export type EventArgsAfkWarningUpdate = [countDown: number];
+export type EventArgsDisconnect = [eventString: string, showActionOrErrorOnDisconnect: boolean];
+export type EventArgsPlayStreamError = [message: string];
+export type EventArgsPlayStreamRejected = [reason: unknown];
+export type EventArgsLoadFreezeFrame = [shouldShowPlayOverlay: boolean];
+export type EventArgsStatsReceived = [aggregatedStats: AggregatedStats];
 
 export class EventEmitter {
     private callbacks: Record<EventType, EventCallback[]> = {
@@ -45,23 +53,23 @@ export class EventEmitter {
         statsReceived: []
     };
 
-    on(event: "afkWarningActivate", callback: (countDown: number, dismissAfk: () => void) => void): EventEmitterUnregisterCallback;
-    on(event: "afkWarningUpdate", callback: (countDown: number) => void): EventEmitterUnregisterCallback;
-    on(event: "afkWarningDeactivate", callback: () => void): EventEmitterUnregisterCallback;
-    on(event: "afkTimedOut", callback: () => void): EventEmitterUnregisterCallback;
-    on(event: "webRtcSdp", callback: () => void): EventEmitterUnregisterCallback;
-    on(event: "webRtcAutoConnect", callback: () => void): EventEmitterUnregisterCallback;
-    on(event: "webRtcConnecting", callback: () => void): EventEmitterUnregisterCallback;
-    on(event: "webRtcConnected", callback: () => void): EventEmitterUnregisterCallback;
-    on(event: "webRtcFailed", callback: () => void): EventEmitterUnregisterCallback;
-    on(event: "videoInitialized", callback: () => void): EventEmitterUnregisterCallback;
-    on(event: "streamLoading", callback: () => void): EventEmitterUnregisterCallback;
-    on(event: "disconnect", callback: (eventString: string, showActionOrErrorOnDisconnect: boolean) => void): EventEmitterUnregisterCallback;
-    on(event: "playStreamError", callback: (message: string) => void): EventEmitterUnregisterCallback;
-    on(event: "playStream", callback: () => void): EventEmitterUnregisterCallback;
-    on(event: "playStreamRejected", callback: (reason: unknown) => void): EventEmitterUnregisterCallback;
-    on(event: "loadFreezeFrame", callback: (shouldShowPlayOverlay: boolean) => void): EventEmitterUnregisterCallback;
-    on(event: "statsReceived", callback: (aggregatedStats: AggregatedStats) => void): EventEmitterUnregisterCallback;
+    on(event: "afkWarningActivate", callback: EventCallback<EventArgsAfkWarningActivate>): EventEmitterUnregisterCallback;
+    on(event: "afkWarningUpdate", callback: EventCallback<EventArgsAfkWarningUpdate>): EventEmitterUnregisterCallback;
+    on(event: "afkWarningDeactivate", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
+    on(event: "afkTimedOut", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
+    on(event: "webRtcSdp", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
+    on(event: "webRtcAutoConnect", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
+    on(event: "webRtcConnecting", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
+    on(event: "webRtcConnected", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
+    on(event: "webRtcFailed", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
+    on(event: "videoInitialized", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
+    on(event: "streamLoading", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
+    on(event: "disconnect", callback: EventCallback<EventArgsDisconnect>): EventEmitterUnregisterCallback;
+    on(event: "playStreamError", callback: EventCallback<EventArgsPlayStreamError>): EventEmitterUnregisterCallback;
+    on(event: "playStream", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
+    on(event: "playStreamRejected", callback: EventCallback<EventArgsPlayStreamRejected>): EventEmitterUnregisterCallback;
+    on(event: "loadFreezeFrame", callback: EventCallback<EventArgsLoadFreezeFrame>): EventEmitterUnregisterCallback;
+    on(event: "statsReceived", callback: EventCallback<EventArgsStatsReceived>): EventEmitterUnregisterCallback;
     on(event: EventType, callback: EventCallback): EventEmitterUnregisterCallback {
         this.callbacks[event].push(callback);
         return () => this.off(event, callback);
@@ -74,8 +82,8 @@ export class EventEmitter {
         }
     }
 
-    emit(event: "afkWarningActivate", args: [countDown: number, dismissAfk: () => void]): void;
-    emit(event: "afkWarningUpdate", args: [countDown: number]): void;
+    emit(event: "afkWarningActivate", args: EventArgsAfkWarningActivate): void;
+    emit(event: "afkWarningUpdate", args: EventArgsAfkWarningUpdate): void;
     emit(event: "afkWarningDeactivate"): void;
     emit(event: "afkTimedOut"): void;
     emit(event: "webRtcSdp"): void;
@@ -85,12 +93,12 @@ export class EventEmitter {
     emit(event: "webRtcFailed"): void;
     emit(event: "videoInitialized"): void;
     emit(event: "streamLoading"): void;
-    emit(event: "disconnect", args: [eventString: string, showActionOrErrorOnDisconnect: boolean]): void;
-    emit(event: "playStreamError", args: [message: string]): void;
+    emit(event: "disconnect", args: EventArgsDisconnect): void;
+    emit(event: "playStreamError", args: EventArgsPlayStreamError): void;
     emit(event: "playStream"): void;
-    emit(event: "playStreamRejected", args: [reason: unknown]): void;
-    emit(event: "loadFreezeFrame", args: [shouldShowPlayOverlay: boolean]): void;
-    emit(event: "statsReceived", args: [aggregatedStats: AggregatedStats]): void;
+    emit(event: "playStreamRejected", args: EventArgsPlayStreamRejected): void;
+    emit(event: "loadFreezeFrame", args: EventArgsLoadFreezeFrame): void;
+    emit(event: "statsReceived", args: EventArgsStatsReceived): void;
     emit(event: EventType, args?: unknown[]): void {
         this.callbacks[event].forEach((callback) => callback(...(args || [])));
     }
