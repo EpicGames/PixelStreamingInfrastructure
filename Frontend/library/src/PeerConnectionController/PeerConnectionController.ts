@@ -22,9 +22,12 @@ export class PeerConnectionController {
      */
     constructor(options: RTCConfiguration, config: Config, preferredCodec: string) {
         this.config = config;
+		this.createPeerConnection(options, preferredCodec);
+    }
 
-        // Set the ICE transport to relay if TURN enabled
-        if (config.isFlagEnabled(Flags.ForceTURN)) {
+	createPeerConnection(options: RTCConfiguration, preferredCodec: string) {
+		// Set the ICE transport to relay if TURN enabled
+        if (this.config.isFlagEnabled(Flags.ForceTURN)) {
             options.iceTransportPolicy = 'relay';
             Logger.Log(
                 Logger.GetStackTrace(),
@@ -32,10 +35,6 @@ export class PeerConnectionController {
             );
         }
 
-		this.createPeerConnection(options, preferredCodec);
-    }
-
-	createPeerConnection(options: RTCConfiguration, preferredCodec: string) {
 		// build a new peer connection with the options
         this.peerConnection = new RTCPeerConnection(options);
         this.peerConnection.onsignalingstatechange = (ev: Event) =>

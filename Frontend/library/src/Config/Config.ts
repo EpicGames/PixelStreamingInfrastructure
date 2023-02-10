@@ -493,7 +493,7 @@ export class Config {
 
 		const preferredCodecOption = this.optionParameters.get(OptionParameters.PreferredCodec);
 		this.addSettingOption(
-			psSettingsSection,
+			encoderSettingsSection,
 			preferredCodecOption
 		);
 		if([...preferredCodecOption.selector.options].map(o => o.value).includes("Only available on Chrome")) {

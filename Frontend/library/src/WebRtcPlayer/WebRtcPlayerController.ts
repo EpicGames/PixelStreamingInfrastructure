@@ -89,6 +89,7 @@ export class WebRtcPlayerController {
     statsTimerHandle: number;
     file: FileTemplate;
 	preferredCodec: string;
+	peerConfig: RTCConfiguration
 
     // if you override the disconnection message by calling the interface method setDisconnectMessageOverride
     // it will use this property to store the override message string
@@ -222,6 +223,9 @@ export class WebRtcPlayerController {
 		this.preferredCodec = '';
 
         this.config.addOnOptionSettingChangedListener(OptionParameters.StreamerId, (streamerid) => {
+                // close the current peer connection and create a new one
+                this.peerConnectionController.peerConnection.close();
+                this.peerConnectionController.createPeerConnection(this.peerConfig, this.preferredCodec);
                 this.webSocketController.sendSubscribe(streamerid);
             }
         );
@@ -1013,6 +1017,7 @@ export class WebRtcPlayerController {
      * @remark RTC Peer Connection on Ice Candidate event have it handled by handle Send Ice Candidate
      */
     startSession(peerConfig: RTCConfiguration) {
+		this.peerConfig = peerConfig;
         // check for forcing turn
         if (this.config.isFlagEnabled(Flags.ForceTURN)) {
             // check for a turn server
@@ -1034,7 +1039,7 @@ export class WebRtcPlayerController {
 
         // set up the peer connection controller
         this.peerConnectionController = new PeerConnectionController(
-            peerConfig,
+            this.peerConfig,
             this.config,
 			this.preferredCodec
         );
@@ -1157,9 +1162,9 @@ export class WebRtcPlayerController {
         this.config.setOptionSettingOptions(OptionParameters.StreamerId, messageStreamerList.ids);
 
 		const urlParams = new URLSearchParams(window.location.search);
-		if(messageStreamerList.ids.length == 1) {
+		if(messageStreamerList.ids.length == 2) {
 			// if there's only a single streamer, subscribe to it regardless of what is in the URL
-			this.config.setOptionSettingValue(OptionParameters.StreamerId, messageStreamerList.ids[0]);
+			this.config.setOptionSettingValue(OptionParameters.StreamerId, messageStreamerList.ids[1]);
 		} else if (this.config.isFlagEnabled(Flags.PreferSFU)) {
 			// if the SFU toggle is on, subscribe to it regardless of what is in the URL
 			this.config.setOptionSettingValue(OptionParameters.StreamerId, "SFU");
