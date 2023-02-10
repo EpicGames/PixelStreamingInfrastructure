@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { Config, OptionParameters } from '../Config/Config';
-import { StatsPanel } from '../UI/StatsPanel';
 import { LatencyTestResults } from '../DataChannel/LatencyTestResults';
 import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
 import { VideoQpIndicator } from '../UI/VideoQpIndicator';
@@ -36,9 +35,9 @@ export class PixelStreaming {
     showActionOrErrorOnDisconnect = true;
 
     settingsPanel: SettingsPanel;
-    statsPanel: StatsPanel;
     videoQpIndicator: VideoQpIndicator;
     onScreenKeyboardHelper: OnScreenKeyboard;
+    controls: Controls;
 
     videoStartTime: number;
     inputController: boolean;
@@ -62,10 +61,6 @@ export class PixelStreaming {
         this.settingsPanel = new SettingsPanel();
         this.uiFeaturesElement.appendChild(this.settingsPanel.rootElement);
         this.configureSettings();
-
-        // Add stats panel
-        this.statsPanel = new StatsPanel();
-        this.uiFeaturesElement.appendChild(this.statsPanel.rootElement);
 
         this.createButtons();
 
@@ -115,11 +110,6 @@ export class PixelStreaming {
         controls.xrIcon.rootElement.onclick = () =>
             this.webXrController.xrClicked();
 
-        // setup the stats/info button
-        controls.statsIcon.rootElement.onclick = () => this.statsClicked();
-
-        this.statsPanel.statsCloseButton.onclick = () => this.statsClicked();
-
         // Add button for toggle fps
         const showFPSButton = new LabelledButton('Show FPS', 'Toggle');
         showFPSButton.addOnClickListener(() => {
@@ -151,6 +141,8 @@ export class PixelStreaming {
         commandsSectionElem.appendChild(showFPSButton.rootElement);
         commandsSectionElem.appendChild(requestKeyframeButton.rootElement);
         commandsSectionElem.appendChild(restartStreamButton.rootElement);
+
+        this.controls = controls;
     }
 
     /**
@@ -394,16 +386,8 @@ export class PixelStreaming {
      * Shows or hides the settings panel if clicked
      */
     settingsClicked() {
-        this.statsPanel.hide();
+        // this.statsPanel.hide(); // TODO: move to UI side
         this.settingsPanel.toggleVisibility();
-    }
-
-    /**
-     * Shows or hides the stats panel if clicked
-     */
-    statsClicked() {
-        this.settingsPanel.hide();
-        this.statsPanel.toggleVisibility();
     }
 
     /**
@@ -511,11 +495,6 @@ export class PixelStreaming {
 
         // update all of the tools upon disconnect
         this.onVideoEncoderAvgQP(0);
-
-        // disable starting a latency check
-        this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
-            // do nothing
-        };
     }
 
     /**
@@ -544,11 +523,6 @@ export class PixelStreaming {
      */
     onVideoInitialized() {
         this.eventEmitter.emit("videoInitialized");
-        // starting a latency check
-        this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
-            this.webRtcController.sendLatencyTest();
-        };
-
         this.videoStartTime = Date.now();
     }
 
@@ -558,7 +532,6 @@ export class PixelStreaming {
      */
     onLatencyTestResult(latencyTimings: LatencyTestResults) {
         this.eventEmitter.emit("latencyTestResult", [latencyTimings]);
-        this.statsPanel.latencyTest.handleTestResult(latencyTimings);
     }
 
     /**
@@ -573,8 +546,6 @@ export class PixelStreaming {
         videoStats.handleSessionStatistics(this.videoStartTime, this.inputController, this.videoQpIndicator.videoEncoderAvgQP);
 
         this.eventEmitter.emit("statsReceived", [videoStats]);
-        // Grab all stats we can off the aggregated stats
-        this.statsPanel.handleStats(videoStats);
     }
 
     /**
@@ -590,6 +561,7 @@ export class PixelStreaming {
      * @param settings - initial UE app settings
      */
     onInitialSettings(settings: InitialSettings) {
+        this.eventEmitter.emit("initialSettings", [settings]);
         if (settings.PixelStreamingSettings) {
             const allowConsoleCommands =
                 settings.PixelStreamingSettings.AllowPixelStreamingCommands;
@@ -597,17 +569,6 @@ export class PixelStreaming {
                 Logger.Info(
                     Logger.GetStackTrace(),
                     '-AllowPixelStreamingCommands=false, sending arbitrary console commands from browser to UE is disabled.'
-                );
-            }
-            const disableLatencyTest =
-                settings.PixelStreamingSettings.DisableLatencyTest;
-            if (disableLatencyTest) {
-                this.statsPanel.latencyTest.latencyTestButton.disabled = true;
-                this.statsPanel.latencyTest.latencyTestButton.title =
-                    'Disabled by -PixelStreamingDisableLatencyTester=true';
-                Logger.Info(
-                    Logger.GetStackTrace(),
-                    '-PixelStreamingDisableLatencyTester=true, requesting latency report from the the browser to UE is disabled.'
                 );
             }
         }

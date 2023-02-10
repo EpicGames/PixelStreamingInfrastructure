@@ -12,7 +12,6 @@ export {
 export { SettingBase } from './Config/SettingBase';
 export { SettingFlag } from './Config/SettingFlag';
 export { SettingsPanel } from './UI/SettingsPanel';
-export { StatsPanel } from './UI/StatsPanel';
 export { SettingNumber } from './Config/SettingNumber';
 export { LabelledButton } from './UI/LabelledButton';
 export { PixelStreaming } from './PixelStreaming/PixelStreaming';

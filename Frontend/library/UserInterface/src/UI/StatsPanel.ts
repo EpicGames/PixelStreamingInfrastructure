@@ -1,8 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { LatencyTest } from './LatencyTest';
-import { Logger } from '../Logger/Logger';
-import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
+import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
 import { MathUtils } from '../Util/MathUtils';
 
 /**
@@ -31,7 +31,6 @@ export class StatsPanel {
     statsMap = new Map<string, Stat>();
 
     constructor() {
-        this._rootElement = null;
         this.latencyTest = new LatencyTest();
     }
 
@@ -247,7 +246,7 @@ export class StatsPanel {
                 'VideoCodecStat',
                 'Video codec',
                 // Split the codec to remove the Fmtp line
-                stats.codecs.get(stats.inboundVideoStats.codecId).split(' ')[0]
+                stats.codecs.get(stats.inboundVideoStats.codecId)?.split(' ')[0] ?? ""
             );
         }
 
@@ -256,7 +255,7 @@ export class StatsPanel {
                 'AudioCodecStat',
                 'Audio codec',
                 // Split the codec to remove the Fmtp line
-                stats.codecs.get(stats.inboundAudioStats.codecId).split(' ')[0]
+                stats.codecs.get(stats.inboundAudioStats.codecId)?.split(' ')[0] ?? ""
             );
         }
 

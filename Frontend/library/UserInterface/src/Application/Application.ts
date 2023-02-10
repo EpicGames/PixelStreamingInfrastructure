@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { PixelStreaming, Flags, Logger, AggregatedStats, LatencyTestResults } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
+import { PixelStreaming, Flags, Logger, AggregatedStats, LatencyTestResults, InitialSettings } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
 import { OverlayBase } from '../Overlay/BaseOverlay';
 import { ActionOverlay } from '../Overlay/ActionOverlay';
 import { TextOverlay } from '../Overlay/TextOverlay';
@@ -10,6 +10,7 @@ import { PlayOverlay } from '../Overlay/PlayOverlay';
 import { InfoOverlay } from '../Overlay/InfoOverlay';
 import { ErrorOverlay } from '../Overlay/ErrorOverlay';
 import { AFKOverlay } from '../Overlay/AFKOverlay';
+import { StatsPanel } from '../UI/StatsPanel';
 
 export interface UIOptions {
     pixelStreaming: PixelStreaming;
@@ -29,6 +30,8 @@ export class Application {
     errorOverlay: TextOverlay;
     afkOverlay: AFKOverlay;
 
+    statsPanel: StatsPanel;
+
     /**
      * @param config - A newly instantiated config object
      * returns the base delegate object with the config inside it along with a new instance of the Overlay controller class
@@ -37,6 +40,12 @@ export class Application {
         this.pixelStreaming = options.pixelStreaming;
 
         this.createOverlays();
+
+        // Add stats panel
+        this.statsPanel = new StatsPanel();
+        this.pixelStreaming.uiFeaturesElement.appendChild(this.statsPanel.rootElement);
+
+        this.createButtons();
 
         this.registerCallbacks();
 
@@ -68,6 +77,16 @@ export class Application {
 
     }
 
+    /**
+     * Set up button click functions and button functionality
+     */
+    public createButtons() {
+        // setup the stats/info button
+        this.pixelStreaming.controls.statsIcon.rootElement.onclick = () => this.statsClicked();
+
+        this.statsPanel.statsCloseButton.onclick = () => this.statsClicked();
+    }
+
     registerCallbacks() {
         this.pixelStreaming.events.on("afkWarningActivate", this.showAfkOverlay.bind(this));
         this.pixelStreaming.events.on("afkWarningUpdate", this.afkOverlay.updateCountdown.bind(this.afkOverlay));
@@ -87,6 +106,7 @@ export class Application {
         this.pixelStreaming.events.on("loadFreezeFrame", this.onLoadFreezeFrame.bind(this));
         this.pixelStreaming.events.on("statsReceived", this.onStatsReceived.bind(this));
         this.pixelStreaming.events.on("latencyTestResult", this.onLatencyTestResults.bind(this));
+        this.pixelStreaming.events.on("initialSettings", this.onInitialSettings.bind(this));
     }
 
     public get rootElement(): HTMLElement {
@@ -169,6 +189,14 @@ export class Application {
         this.currentOverlay = this.errorOverlay;
     }
 
+    /**
+     * Shows or hides the stats panel if clicked
+     */
+    statsClicked() {
+        this.pixelStreaming.settingsPanel.hide(); // TODO: move to UI
+        this.statsPanel.toggleVisibility();
+    }
+    
     /**
      * Activates the connect overlays action
      */
@@ -254,6 +282,10 @@ export class Application {
                 `Disconnected: ${eventString}  <div class="clickableState">Click To Restart</div>`
             );
         }
+        // disable starting a latency check
+        this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
+            // do nothing
+        };
     }
 
     /**
@@ -300,13 +332,35 @@ export class Application {
         if (!this.pixelStreaming.config.isFlagEnabled(Flags.AutoPlayVideo)) {
             this.showPlayOverlay();
         }
+
+        // starting a latency check
+        this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
+            this.pixelStreaming.requestLatencyTest();
+        };
+    }
+
+    onInitialSettings(settings: InitialSettings) {
+        if (settings.PixelStreamingSettings) {
+            const disableLatencyTest =
+                settings.PixelStreamingSettings.DisableLatencyTest;
+            if (disableLatencyTest) {
+                this.statsPanel.latencyTest.latencyTestButton.disabled = true;
+                this.statsPanel.latencyTest.latencyTestButton.title =
+                    'Disabled by -PixelStreamingDisableLatencyTester=true';
+                Logger.Info(
+                    Logger.GetStackTrace(),
+                    '-PixelStreamingDisableLatencyTester=true, requesting latency report from the the browser to UE is disabled.'
+                );
+            }
+        }
     }
 
     onStatsReceived(aggregatedStats: AggregatedStats) {
-        // stats UI to be moved in UI side
+        // Grab all stats we can off the aggregated stats
+        this.statsPanel.handleStats(aggregatedStats);
     }
 
     onLatencyTestResults(latencyTimings: LatencyTestResults) {
-        // stats UI to be moved in UI side
+        this.statsPanel.latencyTest.handleTestResult(latencyTimings);
     }
 }
