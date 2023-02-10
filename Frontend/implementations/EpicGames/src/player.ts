@@ -11,7 +11,7 @@ document.body.onload = function() {
 	//libfrontend.Logger.SetLoggerVerbosity(10);
 
 	// Create a config object
-	let config = new libfrontend.Config({onAfkWarningActivate: () => console.log("")});
+	let config = new libfrontend.Config();
 
 	// Create a Native DOM delegate instance that implements the Delegate interface class
 	let pixelStreaming = new libfrontend.PixelStreaming(config);

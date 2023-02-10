@@ -17,6 +17,7 @@ import {
 import { OnScreenKeyboard } from '../UI/OnScreenKeyboard';
 import { Controls } from '../UI/Controls';
 import { LabelledButton } from '../UI/LabelledButton';
+import { EventEmitter } from '../Util/EventEmitter';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
 
@@ -42,12 +43,16 @@ export class PixelStreaming {
     videoStartTime: number;
     inputController: boolean;
 
+    eventEmitter: EventEmitter
+
     /**
      * @param config - A newly instantiated config object
      * returns the base delegate object with the config inside it along with a new instance of the Overlay controller class
      */
     constructor(config: Config) {
         this.config = config;
+
+        this.eventEmitter = new EventEmitter();
 
         // Add the video stream QP indicator
         this.videoQpIndicator = new VideoQpIndicator();
@@ -465,7 +470,7 @@ export class PixelStreaming {
      * Show the webRtcAutoConnect Overlay and connect
      */
     onWebRtcAutoConnect() {
-        this.config.options.onWebRtcAutoConnect?.();
+        this.eventEmitter.emit("webRtcAutoConnect");
         this.showActionOrErrorOnDisconnect = true;
     }
 
@@ -473,14 +478,14 @@ export class PixelStreaming {
      * Set up functionality to happen when receiving a webRTC answer
      */
     onWebRtcSdp() {
-        this.config.options.onWebRtcSdp?.();
+        this.eventEmitter.emit("webRtcSdp");
     }
 
     /**
      * Shows a text overlay to alert the user the stream is currently loading
      */
     onStreamLoading() {
-        this.config.options.onStreamLoading?.();
+        this.eventEmitter.emit("streamLoading");
     }
 
     /**
@@ -499,7 +504,7 @@ export class PixelStreaming {
             this.webRtcController.setDisconnectMessageOverride('');
         }
 
-        this.config.options.onDisconnect?.(eventString, this.showActionOrErrorOnDisconnect);
+        this.eventEmitter.emit("disconnect", [eventString, this.showActionOrErrorOnDisconnect])
         if (this.showActionOrErrorOnDisconnect == false) {
             this.showActionOrErrorOnDisconnect = true;
         }
@@ -517,28 +522,28 @@ export class PixelStreaming {
      * Handles when Web Rtc is connecting
      */
     onWebRtcConnecting() {
-        this.config.options.onWebRtcConnecting?.();
+        this.eventEmitter.emit("webRtcConnecting");
     }
 
     /**
      * Handles when Web Rtc has connected
      */
     onWebRtcConnected() {
-        this.config.options.onWebRtcConnected?.();
+        this.eventEmitter.emit("webRtcConnected");
     }
 
     /**
      * Handles when Web Rtc fails to connect
      */
     onWebRtcFailed() {
-        this.config.options.onWebRtcFailed?.();
+        this.eventEmitter.emit("webRtcFailed");
     }
 
     /**
      * Handle when the Video has been Initialized
      */
     onVideoInitialized() {
-        this.config.options.onVideoInitialized?.();
+        this.eventEmitter.emit("videoInitialized");
         // starting a latency check
         this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
             this.webRtcController.sendLatencyTest();
@@ -566,7 +571,7 @@ export class PixelStreaming {
         }
         videoStats.handleSessionStatistics(this.videoStartTime, this.inputController, this.videoQpIndicator.videoEncoderAvgQP);
 
-        this.config.options.onStatsReceived?.(videoStats);
+        this.eventEmitter.emit("statsReceived", [videoStats]);
         // Grab all stats we can off the aggregated stats
         this.statsPanel.handleStats(videoStats);
     }
@@ -667,5 +672,9 @@ export class PixelStreaming {
             rootElement.style.setProperty('--color6', '#1e1d22');
             rootElement.style.setProperty('--color7', '#3c3b40');
         }
+    }
+
+    public get events() {
+        return this.eventEmitter;
     }
 }

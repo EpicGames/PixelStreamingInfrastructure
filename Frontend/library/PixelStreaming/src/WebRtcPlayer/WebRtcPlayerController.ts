@@ -50,6 +50,7 @@ import {
 } from '../Util/CoordinateConverter';
 import { PixelStreaming } from '../PixelStreaming/PixelStreaming';
 import { ITouchController } from '../Inputs/ITouchController';
+import { EventType } from '../Util/EventEmitter';
 /**
  * Entry point for the WebRTC Player
  */
@@ -111,7 +112,7 @@ export class WebRtcPlayerController {
         };
 
         // set up the afk logic class and connect up its method for closing the signaling server
-        this.afkController = new AFKController(this.config, this.onAfkTriggered.bind(this));
+        this.afkController = new AFKController(this.config, this.pixelStreaming, this.onAfkTriggered.bind(this));
         this.afkController.onAFKTimedOutCallback = () => {
             this.setDisconnectMessageOverride(
                 'You have been disconnected due to inactivity'
@@ -859,7 +860,7 @@ export class WebRtcPlayerController {
      * Loads a freeze frame if it is required otherwise shows the play overlay
      */
     loadFreezeFrameOrShowPlayOverlay() {
-        this.config.options.onLoadFreezeFrame?.(this.shouldShowPlayOverlay);
+        this.pixelStreaming.events.emit("loadFreezeFrame", [this.shouldShowPlayOverlay]);
         if (this.shouldShowPlayOverlay === true) {
             Logger.Log(Logger.GetStackTrace(), 'showing play overlay');
             this.resizePlayerStyle();
@@ -938,7 +939,7 @@ export class WebRtcPlayerController {
     playStream() {
         if (!this.videoPlayer.getVideoElement()) {
             const message = 'Could not play video stream because the video player was not initialized correctly.';
-            this.config.options.onPlayStreamError?.(message);
+            this.pixelStreaming.events.emit("playStreamError", [message]);
             Logger.Error(
                 Logger.GetStackTrace(),
                 message
@@ -966,7 +967,7 @@ export class WebRtcPlayerController {
             this.config.isFlagEnabled(Flags.FakeMouseWithTouches),
             this.videoElementParentClientRect
         );
-        this.config.options.onPlayStream?.();
+        this.pixelStreaming.events.emit("playStream");
 
         if (this.streamController.audioElement.srcObject) {
             this.streamController.audioElement.muted =
@@ -983,7 +984,7 @@ export class WebRtcPlayerController {
                         Logger.GetStackTrace(),
                         'Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.'
                     );
-                    this.config.options.onPlayStreamRejected?.(onRejectedReason);
+                    this.pixelStreaming.events.emit("playStreamRejected", [onRejectedReason]);
                 });
         } else {
             this.playVideo();
@@ -1007,7 +1008,7 @@ export class WebRtcPlayerController {
                 Logger.GetStackTrace(),
                 'Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.'
             );
-            this.config.options.onPlayStreamRejected?.(onRejectedReason);
+            this.pixelStreaming.events.emit("playStreamRejected", [onRejectedReason]);
         });
     }
 

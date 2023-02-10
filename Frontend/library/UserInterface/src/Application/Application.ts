@@ -69,23 +69,23 @@ export class Application {
     }
 
     registerCallbacks() {
-        this.pixelStreaming.config.options.onAfkWarningActivate = this.showAfkOverlay.bind(this);
-        this.pixelStreaming.config.options.onAfkWarningUpdate = this.afkOverlay.updateCountdown.bind(this.afkOverlay);
-        this.pixelStreaming.config.options.onAfkWarningDeactivate = this.afkOverlay.hide.bind(this.afkOverlay);
-        this.pixelStreaming.config.options.onAfkTimedOut = this.afkOverlay.hide.bind(this.afkOverlay);
-        this.pixelStreaming.config.options.onWebRtcSdp = this.onWebRtcSdp.bind(this);
-        this.pixelStreaming.config.options.onWebRtcAutoConnect = this.onWebRtcAutoConnect.bind(this);
-        this.pixelStreaming.config.options.onWebRtcConnecting = this.onWebRtcConnecting.bind(this);
-        this.pixelStreaming.config.options.onWebRtcConnected = this.onWebRtcConnected.bind(this);
-        this.pixelStreaming.config.options.onWebRtcFailed = this.onWebRtcFailed.bind(this);
-        this.pixelStreaming.config.options.onVideoInitialized = this.onVideoInitialized.bind(this);
-        this.pixelStreaming.config.options.onStreamLoading = this.onStreamLoading.bind(this);
-        this.pixelStreaming.config.options.onDisconnect = this.onDisconnect.bind(this);
-        this.pixelStreaming.config.options.onPlayStreamError = this.onPlayStreamError.bind(this);
-        this.pixelStreaming.config.options.onPlayStream = this.onPlayStream.bind(this);
-        this.pixelStreaming.config.options.onPlayStreamRejected = this.onPlayStreamRejected.bind(this);
-        this.pixelStreaming.config.options.onLoadFreezeFrame = this.onLoadFreezeFrame.bind(this);
-        this.pixelStreaming.config.options.onStatsReceived = this.onStatsReceived.bind(this);
+        this.pixelStreaming.events.on("afkWarningActivate", this.showAfkOverlay.bind(this));
+        this.pixelStreaming.events.on("afkWarningUpdate", this.afkOverlay.updateCountdown.bind(this.afkOverlay));
+        this.pixelStreaming.events.on("afkWarningDeactivate", this.afkOverlay.hide.bind(this.afkOverlay));
+        this.pixelStreaming.events.on("afkTimedOut", this.afkOverlay.hide.bind(this.afkOverlay));
+        this.pixelStreaming.events.on("webRtcSdp", this.onWebRtcSdp.bind(this));
+        this.pixelStreaming.events.on("webRtcAutoConnect", this.onWebRtcAutoConnect.bind(this));
+        this.pixelStreaming.events.on("webRtcConnecting", this.onWebRtcConnecting.bind(this));
+        this.pixelStreaming.events.on("webRtcConnected", this.onWebRtcConnected.bind(this));
+        this.pixelStreaming.events.on("webRtcFailed", this.onWebRtcFailed.bind(this));
+        this.pixelStreaming.events.on("videoInitialized", this.onVideoInitialized.bind(this));
+        this.pixelStreaming.events.on("streamLoading", this.onStreamLoading.bind(this));
+        this.pixelStreaming.events.on("disconnect", this.onDisconnect.bind(this));
+        this.pixelStreaming.events.on("playStreamError", this.onPlayStreamError.bind(this));
+        this.pixelStreaming.events.on("playStream", this.onPlayStream.bind(this));
+        this.pixelStreaming.events.on("playStreamRejected", this.onPlayStreamRejected.bind(this));
+        this.pixelStreaming.events.on("loadFreezeFrame", this.onLoadFreezeFrame.bind(this));
+        this.pixelStreaming.events.on("statsReceived", this.onStatsReceived.bind(this));
     }
 
     public get rootElement(): HTMLElement {

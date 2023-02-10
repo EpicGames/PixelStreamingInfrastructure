@@ -2,6 +2,7 @@
 
 import { Config, Flags, NumericParameters } from '../Config/Config';
 import { Logger } from '../Logger/Logger';
+import { PixelStreaming } from '../PixelStreaming/PixelStreaming';
 
 export class AFKController {
     // time out logic details
@@ -12,12 +13,14 @@ export class AFKController {
     countDown = 0;
     countDownTimer: ReturnType<typeof setInterval> = undefined;
     config: Config;
+    pixelStreaming: PixelStreaming;
     onDismissAfk: () => void;
 
     onAFKTimedOutCallback: () => void;
 
-    constructor(config: Config, onDismissAfk: () => void) {
+    constructor(config: Config, pixelStreaming: PixelStreaming, onDismissAfk: () => void) {
         this.config = config;
+        this.pixelStreaming = pixelStreaming;
         this.onDismissAfk = onDismissAfk;
         this.onAFKTimedOutCallback = () => {
             console.log(
@@ -34,7 +37,7 @@ export class AFKController {
 
         if (this.active || this.countdownActive) {
             this.startAfkWarningTimer();
-            this.config.options.onAfkWarningDeactivate?.();
+            this.pixelStreaming.events.emit("afkWarningDeactivate");
         }
     }
 
@@ -95,12 +98,12 @@ export class AFKController {
         this.pauseAfkWarningTimer();
 
         // instantiate a new overlay
-        this.config.options.onAfkWarningActivate?.(this.countDown, this.onDismissAfk);
+        this.pixelStreaming.events.emit("afkWarningActivate", [this.countDown, this.onDismissAfk]);
 
         // update our countDown timer and overlay contents
         this.countDown = this.closeTimeout;
         this.countdownActive = true;
-        this.config.options.onAfkWarningUpdate?.(this.countDown);
+        this.pixelStreaming.events.emit("afkWarningUpdate", [this.countDown]);
 
         // if we are in locked mouse exit pointerlock
         if (!this.config.isFlagEnabled(Flags.HoveringMouseMode)) {
@@ -115,7 +118,7 @@ export class AFKController {
             this.countDown--;
             if (this.countDown == 0) {
                 // The user failed to click so hide the overlay and disconnect them.
-                this.config.options.onAfkTimedOut?.();
+                this.pixelStreaming.events.emit("afkTimedOut");
                 this.onAFKTimedOutCallback();
                 Logger.Log(
                     Logger.GetStackTrace(),
@@ -125,7 +128,7 @@ export class AFKController {
                 // switch off the afk feature as stream has closed
                 this.stopAfkWarningTimer();
             } else {
-                this.config.options.onAfkWarningUpdate?.(this.countDown);
+                this.pixelStreaming.events.emit("afkWarningUpdate", [this.countDown]);
             }
         }, 1000);
     }

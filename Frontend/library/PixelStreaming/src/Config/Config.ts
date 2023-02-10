@@ -5,7 +5,6 @@ import { SettingFlag } from './SettingFlag';
 import { SettingNumber } from './SettingNumber';
 import { SettingText } from './SettingText';
 import { SettingOption } from './SettingOption';
-import { AggregatedStats } from '../pixelstreamingfrontend';
 
 /**
  * A collection of flags that can be toggled and are core to all Pixel Streaming experiences.
@@ -60,26 +59,6 @@ export class OptionParameters {
     static StreamerId = 'StreamerId';
 }
 
-export interface ConfigOptions {
-    onAfkWarningActivate?: (countDown: number, dismissAfk: () => void) => void;
-    onAfkWarningUpdate?: (countDown: number) => void;
-    onAfkWarningDeactivate?: () => void;
-    onAfkTimedOut?: () => void;
-    onWebRtcSdp?: () => void;
-    onWebRtcAutoConnect?: () => void;
-    onWebRtcConnecting?: () => void;
-    onWebRtcConnected?: () => void;
-    onWebRtcFailed?: () => void;
-    onVideoInitialized?: () => void;
-    onStreamLoading?: () => void;
-    onDisconnect?: (eventString: string, showActionOrErrorOnDisconnect: boolean) => void;
-    onPlayStreamError?: (message: string) => void;
-    onPlayStream?: () => void;
-    onPlayStreamRejected?: (reason: unknown) => void;
-    onLoadFreezeFrame?: (shouldShowPlayOverlay: boolean) => void;
-    onStatsReceived?: (aggregatedStats: AggregatedStats) => void;
-}
-
 export class Config {
     /* A map of flags that can be toggled - options that can be set in the application - e.g. Use Mic? */
     private flags = new Map<string, SettingFlag>();
@@ -93,12 +72,9 @@ export class Config {
     /* A map of enum based settings - e.g. preferred codec */
     private optionParameters = new Map<string, SettingOption>();
 
-    options: ConfigOptions;
-
     // ------------ Settings -----------------
 
-    constructor(options?: ConfigOptions) {
-        this.options = options || {};
+    constructor() {
         this.populateDefaultSettings();
     }
 
