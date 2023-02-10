@@ -41,11 +41,7 @@ export class XRIcon {
             this._xrIcon.setAttributeNS(null, 'id', 'xrIcon');
             this._xrIcon.setAttributeNS(null, 'x', '0px');
             this._xrIcon.setAttributeNS(null, 'y', '0px');
-            this._xrIcon.setAttributeNS(
-                null,
-                'viewBox',
-                '0 0 100 100'
-            );
+            this._xrIcon.setAttributeNS(null, 'viewBox', '0 0 100 100');
 
             // create svg group for the paths
             const svgGroup = document.createElementNS(

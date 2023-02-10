@@ -196,10 +196,6 @@ export class MouseController {
         );
         const toStreamerHandlers =
             this.toStreamerMessagesProvider.toStreamerHandlers;
-        toStreamerHandlers.get('MouseUp')([
-            button,
-            coord.x,
-            coord.y
-        ]);
+        toStreamerHandlers.get('MouseUp')([button, coord.x, coord.y]);
     }
 }

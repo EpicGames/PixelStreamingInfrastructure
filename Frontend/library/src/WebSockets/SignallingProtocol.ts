@@ -81,8 +81,13 @@ export class SignallingProtocol {
         websocketController.signallingProtocol.addMessageHandler(
             MessageRecvTypes.STREAMER_LIST,
             (listPayload: string) => {
-                Logger.Log(Logger.GetStackTrace(), MessageRecvTypes.STREAMER_LIST, 6);
-                const streamerList: MessageStreamerList = JSON.parse(listPayload);
+                Logger.Log(
+                    Logger.GetStackTrace(),
+                    MessageRecvTypes.STREAMER_LIST,
+                    6
+                );
+                const streamerList: MessageStreamerList =
+                    JSON.parse(listPayload);
                 websocketController.onStreamerList(streamerList);
             }
         );

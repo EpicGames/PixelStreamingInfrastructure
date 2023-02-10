@@ -13,7 +13,7 @@ export class Controls {
     statsIcon: StatsIcon;
     fullscreenIcon: FullScreenIcon;
     settingsIcon: SettingsIcon;
-	xrIcon: XRIcon;
+    xrIcon: XRIcon;
 
     _rootElement: HTMLElement;
 
@@ -24,7 +24,7 @@ export class Controls {
         this.statsIcon = new StatsIcon();
         this.settingsIcon = new SettingsIcon();
         this.fullscreenIcon = new FullScreenIcon();
-		this.xrIcon = new XRIcon();
+        this.xrIcon = new XRIcon();
     }
 
     /**
@@ -37,11 +37,13 @@ export class Controls {
             this._rootElement.appendChild(this.fullscreenIcon.rootElement);
             this._rootElement.appendChild(this.settingsIcon.rootElement);
             this._rootElement.appendChild(this.statsIcon.rootElement);
-			WebXRController.isSessionSupported("immersive-vr").then((supported: boolean) => {
-				if(supported) {
-					this._rootElement.appendChild(this.xrIcon.rootElement);
-				}
-			})
+            WebXRController.isSessionSupported('immersive-vr').then(
+                (supported: boolean) => {
+                    if (supported) {
+                        this._rootElement.appendChild(this.xrIcon.rootElement);
+                    }
+                }
+            );
         }
         return this._rootElement;
     }

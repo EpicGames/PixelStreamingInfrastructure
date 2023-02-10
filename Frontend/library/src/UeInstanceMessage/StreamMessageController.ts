@@ -220,9 +220,7 @@ export class StreamMessageController {
     registerMessageHandler(
         messageDirection: MessageDirection,
         messageType: string,
-        messageHandler: (
-            messageData?: unknown | undefined
-        ) => void
+        messageHandler: (messageData?: unknown | undefined) => void
     ) {
         switch (messageDirection) {
             case MessageDirection.ToStreamer:

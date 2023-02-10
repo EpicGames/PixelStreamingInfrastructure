@@ -23,14 +23,14 @@ export class AggregatedStats {
     inboundVideoStats: InboundVideoStats;
     inboundAudioStats: InboundAudioStats;
     lastVideoStats: InboundVideoStats;
-	lastAudioStats: InboundAudioStats;
+    lastAudioStats: InboundAudioStats;
     candidatePair: CandidatePairStats;
     DataChannelStats: DataChannelStats;
     localCandidates: Array<CandidateStat>;
     remoteCandidates: Array<CandidateStat>;
     outBoundVideoStats: OutBoundVideoStats;
     streamStats: StreamStats;
-	codecs: Map<string, string>;
+    codecs: Map<string, string>;
 
     constructor() {
         this.inboundVideoStats = new InboundVideoStats();
@@ -39,7 +39,7 @@ export class AggregatedStats {
         this.DataChannelStats = new DataChannelStats();
         this.outBoundVideoStats = new OutBoundVideoStats();
         this.streamStats = new StreamStats();
-		this.codecs = new Map<string, string>;
+        this.codecs = new Map<string, string>();
     }
 
     /**
@@ -60,7 +60,7 @@ export class AggregatedStats {
                 case 'certificate':
                     break;
                 case 'codec':
-					this.handleCodec(stat);
+                    this.handleCodec(stat);
                     break;
                 case 'data-channel':
                     this.handleDataChannel(stat);
@@ -182,40 +182,40 @@ export class AggregatedStats {
     handleInBoundRTP(stat: InboundRTPStats) {
         switch (stat.kind) {
             case 'video':
-				// Need to convert to unknown first to remove an error around
-				// InboundVideoStats having the bitrate member which isn't found on
-				// the InboundRTPStats
-				this.inboundVideoStats = stat as unknown as InboundVideoStats;
+                // Need to convert to unknown first to remove an error around
+                // InboundVideoStats having the bitrate member which isn't found on
+                // the InboundRTPStats
+                this.inboundVideoStats = stat as unknown as InboundVideoStats;
 
                 if (this.lastVideoStats != undefined) {
                     this.inboundVideoStats.bitrate =
                         (8 *
                             (this.inboundVideoStats.bytesReceived -
                                 this.lastVideoStats.bytesReceived)) /
-                        (this.inboundVideoStats.timestamp - this.lastVideoStats.timestamp);
+                        (this.inboundVideoStats.timestamp -
+                            this.lastVideoStats.timestamp);
                     this.inboundVideoStats.bitrate = Math.floor(
                         this.inboundVideoStats.bitrate
                     );
-
                 }
                 this.lastVideoStats = { ...this.inboundVideoStats };
                 break;
             case 'audio':
-				// Need to convert to unknown first to remove an error around
-				// InboundAudioStats having the bitrate member which isn't found on
-				// the InboundRTPStats
-				this.inboundAudioStats = stat as unknown as InboundAudioStats;
+                // Need to convert to unknown first to remove an error around
+                // InboundAudioStats having the bitrate member which isn't found on
+                // the InboundRTPStats
+                this.inboundAudioStats = stat as unknown as InboundAudioStats;
 
-				if (this.lastAudioStats != undefined) {
+                if (this.lastAudioStats != undefined) {
                     this.inboundAudioStats.bitrate =
                         (8 *
                             (this.inboundAudioStats.bytesReceived -
                                 this.lastAudioStats.bytesReceived)) /
-                        (this.inboundAudioStats.timestamp - this.lastAudioStats.timestamp);
+                        (this.inboundAudioStats.timestamp -
+                            this.lastAudioStats.timestamp);
                     this.inboundAudioStats.bitrate = Math.floor(
                         this.inboundAudioStats.bitrate
                     );
-
                 }
                 this.lastAudioStats = { ...this.inboundAudioStats };
                 break;
@@ -264,11 +264,15 @@ export class AggregatedStats {
         }
     }
 
-	handleCodec(stat: CodecStats) {
-		const codecId = stat.id;
-		const codecType = `${stat.mimeType.replace("video/", "").replace("audio/", "")}${(stat.sdpFmtpLine) ? ` ${stat.sdpFmtpLine}` : ""}`;
-		this.codecs.set(codecId, codecType);
-	}
+    handleCodec(stat: CodecStats) {
+        const codecId = stat.id;
+        const codecType = `${stat.mimeType
+            .replace('video/', '')
+            .replace('audio/', '')}${
+            stat.sdpFmtpLine ? ` ${stat.sdpFmtpLine}` : ''
+        }`;
+        this.codecs.set(codecId, codecType);
+    }
 
     /**
      * Check if a value coming in from our stats is actually a number

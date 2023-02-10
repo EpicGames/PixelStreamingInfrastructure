@@ -8,7 +8,7 @@ import { Controller } from './GamepadTypes';
  * The class that handles the functionality of gamepads and controllers
  */
 export class GamePadController {
-    controllers: Controller[];
+    controllers: Array<Controller>;
     requestAnimationFrame: (callback: FrameRequestCallback) => number;
     toStreamerMessagesProvider: StreamMessageController;
 
@@ -119,35 +119,46 @@ export class GamePadController {
                     // press
                     if (i == gamepadLayout.LeftTrigger) {
                         //                       UEs left analog has a button index of 5
-                        toStreamerHandlers.get('GamepadAnalog')(
-							[controllerIndex, 5, currentButton.value]
-                        );
+                        toStreamerHandlers.get('GamepadAnalog')([
+                            controllerIndex,
+                            5,
+                            currentButton.value
+                        ]);
                     } else if (i == gamepadLayout.RightTrigger) {
                         //                       UEs right analog has a button index of 6
-                        toStreamerHandlers.get('GamepadAnalog')(
-                            [controllerIndex, 6, currentButton.value]
-                        );
+                        toStreamerHandlers.get('GamepadAnalog')([
+                            controllerIndex,
+                            6,
+                            currentButton.value
+                        ]);
                     } else {
-                        toStreamerHandlers.get('GamepadButtonPressed')(
-                            [controllerIndex, i, previousButton.pressed ? 1 : 0]
-                        );
+                        toStreamerHandlers.get('GamepadButtonPressed')([
+                            controllerIndex,
+                            i,
+                            previousButton.pressed ? 1 : 0
+                        ]);
                     }
                 } else if (!currentButton.pressed && previousButton.pressed) {
                     // release
                     if (i == gamepadLayout.LeftTrigger) {
                         //                       UEs left analog has a button index of 5
-                        toStreamerHandlers.get('GamepadAnalog')(
-                            [controllerIndex, 5, 0]
-                        );
+                        toStreamerHandlers.get('GamepadAnalog')([
+                            controllerIndex,
+                            5,
+                            0
+                        ]);
                     } else if (i == gamepadLayout.RightTrigger) {
                         //                       UEs right analog has a button index of 6
-                        toStreamerHandlers.get('GamepadAnalog')(
-                            [controllerIndex, 6, 0]
-                        );
+                        toStreamerHandlers.get('GamepadAnalog')([
+                            controllerIndex,
+                            6,
+                            0
+                        ]);
                     } else {
-                        toStreamerHandlers.get('GamepadButtonReleased')(
-                            [controllerIndex, i]
-                        );
+                        toStreamerHandlers.get('GamepadButtonReleased')([
+                            controllerIndex,
+                            i
+                        ]);
                     }
                 }
             }

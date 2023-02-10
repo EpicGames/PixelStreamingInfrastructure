@@ -1,8 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 export class WebGLUtils {
-	static vertexShader() : string {
-		return `
+    static vertexShader(): string {
+        return `
 		attribute vec2 a_position;
 		attribute vec2 a_texCoord;
 
@@ -28,11 +28,11 @@ export class WebGLUtils {
 		   // The GPU will interpolate this value between points.
 		   v_texCoord = (a_texCoord * u_offset.xy) + u_offset.zw;
 		}
-		`
-	}
+		`;
+    }
 
-	static fragmentShader() : string {
-		return `
+    static fragmentShader(): string {
+        return `
 		precision mediump float;
 
 		// our texture
@@ -44,6 +44,6 @@ export class WebGLUtils {
 		void main() {
 		   gl_FragColor = texture2D(u_image, v_texCoord);
 		}
-		`
-	}
+		`;
+    }
 }
