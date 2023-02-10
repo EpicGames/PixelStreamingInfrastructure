@@ -275,10 +275,11 @@ let nextPlayerId = 1;
 const PlayerType = { Regular: 0, SFU: 1 };
 
 class Player {
-	constructor(id, ws, type) {
+	constructor(id, ws, type, browserSendOffer) {
 		this.id = id;
 		this.ws = ws;
 		this.type = type;
+		this.browserSendOffer = browserSendOffer;
 	}
 
 	subscribe(streamerId) {
@@ -287,7 +288,7 @@ class Player {
 			return;
 		}
 		this.streamerId = streamerId;
-		const msg = { type: 'playerConnected', playerId: this.id, dataChannel: true, sfu: this.type == PlayerType.SFU };
+		const msg = { type: 'playerConnected', playerId: this.id, dataChannel: true, sfu: this.type == PlayerType.SFU, sendOffer: !this.browserSendOffer };
 		logOutgoing(this.streamerId, msg);
 		this.sendFrom(msg);
 	}
@@ -596,7 +597,7 @@ sfuServer.on('connection', function (ws, req) {
 		}
 	});
 
-	let sfuPlayer = new Player(SFUPlayerId, ws, PlayerType.SFU);
+	let sfuPlayer = new Player(SFUPlayerId, ws, PlayerType.SFU, false);
 	players.set(SFUPlayerId, sfuPlayer);
 	console.logColor(logging.Green, `SFU (${req.connection.remoteAddress}) connected `);
 
@@ -678,6 +679,7 @@ playerServer.on('connection', function (ws, req) {
 	var url = require('url');
 	const parsedUrl = url.parse(req.url);
 	const urlParams = new URLSearchParams(parsedUrl.search);
+	const browserSendOffer = urlParams.has('OfferToReceive') && urlParams.get('OfferToReceive') !== 'false';
 
 	if (playerCount + 1 > maxPlayerCount && maxPlayerCount !== -1)
 	{
@@ -689,7 +691,7 @@ playerServer.on('connection', function (ws, req) {
 	++playerCount;
 	let playerId = sanitizePlayerId(nextPlayerId++);
 	console.logColor(logging.Green, `player ${playerId} (${req.connection.remoteAddress}) connected`);
-	let player = new Player(playerId, ws, PlayerType.Regular);
+	let player = new Player(playerId, ws, PlayerType.Regular, browserSendOffer);
 	players.set(playerId, player);
 
 	ws.on('message', (msgRaw) =>{
@@ -739,14 +741,6 @@ playerServer.on('connection', function (ws, req) {
 	sendPlayerConnectedToMatchmaker();
 	player.ws.send(JSON.stringify(clientConfig));
 	sendPlayersCount();
-
-	// if we only have one streamer just subscribe this player to that one
-	if (streamers.size == 1) {
-		for (let [streamerId, streamer] of streamers) {
-			player.subscribe(streamerId);
-			break;
-		}
-	}
 });
 
 function disconnectAllPlayers(streamerId) {

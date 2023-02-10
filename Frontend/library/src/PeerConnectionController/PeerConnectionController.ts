@@ -32,7 +32,11 @@ export class PeerConnectionController {
             );
         }
 
-        // build a new peer connection with the options
+		this.createPeerConnection(options, preferredCodec);
+    }
+
+	createPeerConnection(options: RTCConfiguration, preferredCodec: string) {
+		// build a new peer connection with the options
         this.peerConnection = new RTCPeerConnection(options);
         this.peerConnection.onsignalingstatechange = (ev: Event) =>
             this.handleSignalStateChange(ev);
@@ -49,7 +53,7 @@ export class PeerConnectionController {
         this.aggregatedStats = new AggregatedStats();
 		this.preferredCodec = preferredCodec;
 		this.updateCodecSelection = true;
-    }
+	}
 
     /**
      * Create an offer for the Web RTC handshake and send the offer to the signaling server via websocket
@@ -159,7 +163,7 @@ export class PeerConnectionController {
 
 			// Update the preferred codec selection based on what was actually negotiated
 			if(this.updateCodecSelection) {
-				this.config.getSettingOption(OptionParameters.PreferredCodec).selected = this.aggregatedStats.codecs.get(this.aggregatedStats.inboundVideoStats.codecId)
+				this.config.setOptionSettingValue(OptionParameters.PreferredCodec, this.aggregatedStats.codecs.get(this.aggregatedStats.inboundVideoStats.codecId))
 			}
         });
     }

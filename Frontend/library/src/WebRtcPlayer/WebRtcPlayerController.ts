@@ -179,12 +179,7 @@ export class WebRtcPlayerController {
                 }`
             );
         this.webSocketController.onOpen.addEventListener('open', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has(OptionParameters.StreamerId)) {
-                this.webSocketController.sendSubscribe(urlParams.get(OptionParameters.StreamerId));
-            } else {
-                this.webSocketController.requestStreamerList();
-            }
+			this.webSocketController.requestStreamerList();
         });
         this.webSocketController.onClose.addEventListener('close', () => {
             this.afkController.stopAfkWarningTimer();
@@ -992,14 +987,14 @@ export class WebRtcPlayerController {
         );
 
         // If we are connecting to the SFU add a special url parameter to the url
-        if (this.config.isFlagEnabled(Flags.PreferSFU)) {
-            signallingServerUrl += '?' + Flags.PreferSFU + '=true';
+        if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
+            signallingServerUrl += '?' + Flags.BrowserSendOffer + '=true';
         }
 
-		// If we are sending the offer add a special url parameter to the url, making sure we append correctly
-		if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
-            signallingServerUrl += (signallingServerUrl.includes('?') ? '&' : '?') + Flags.BrowserSendOffer + '=true';
-        }
+		// This code is no longer needed, but is a good example for how subsequent config flags can be appended
+		// if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
+        //     signallingServerUrl += (signallingServerUrl.includes('?') ? '&' : '?') + Flags.BrowserSendOffer + '=true';
+        // }
 
         return signallingServerUrl;
     }
@@ -1160,6 +1155,18 @@ export class WebRtcPlayerController {
         Logger.Log(Logger.GetStackTrace(), `Got streamer list ${messageStreamerList.ids}`, 6);
         messageStreamerList.ids.unshift(''); // add an empty option at the top
         this.config.setOptionSettingOptions(OptionParameters.StreamerId, messageStreamerList.ids);
+
+		const urlParams = new URLSearchParams(window.location.search);
+		if(messageStreamerList.ids.length == 1) {
+			// if there's only a single streamer, subscribe to it regardless of what is in the URL
+			this.config.setOptionSettingValue(OptionParameters.StreamerId, messageStreamerList.ids[0]);
+		} else if (this.config.isFlagEnabled(Flags.PreferSFU)) {
+			// if the SFU toggle is on, subscribe to it regardless of what is in the URL
+			this.config.setOptionSettingValue(OptionParameters.StreamerId, "SFU");
+		} else if (urlParams.has(OptionParameters.StreamerId)) {
+			// If there's a streamer ID in the URL, set it as the selected streamer
+			this.config.setOptionSettingValue(OptionParameters.StreamerId, urlParams.get(OptionParameters.StreamerId));
+        }
     }
 
     /**
