@@ -186,10 +186,6 @@ export class PeerConnectionController {
             /(a=fmtp:\d+ .*level-asymmetry-allowed=.*)\r\n/gm,
             '$1;x-google-start-bitrate=10000;x-google-max-bitrate=100000\r\n'
         );
-        mungedSDP.replace(
-            'useinbandfec=1',
-            'useinbandfec=1;stereo=1;sprop-maxcapturerate=48000'
-        );
 
         let audioSDP = '';
 
@@ -202,9 +198,9 @@ export class PeerConnectionController {
         }
 
         // Force mono or stereo based on whether ?forceMono was passed or not
-        audioSDP += this.config.isFlagEnabled(Flags.ForceMonoAudio)
-            ? 'sprop-stereo=0;stereo=0;'
-            : 'sprop-stereo=1;stereo=1;';
+		audioSDP += this.config.isFlagEnabled(Flags.ForceMonoAudio)
+            ? 'stereo=0;'
+            : 'stereo=1;';
 
         // enable in-band forward error correction for opus audio
         audioSDP += 'useinbandfec=1';
@@ -347,11 +343,27 @@ export class PeerConnectionController {
 						sdpFmtpLine: preferredRTPCodec[1] /* sdpFmtpLine */ ? preferredRTPCodec[1] : '' 
 					}];
 
-					if(codecs[0].sdpFmtpLine === '') {
-						// We can't dynamically add members to the codec, so instead remove the field if it's empty
-						delete codecs[0].sdpFmtpLine;
-					}
+					this.config.getSettingOption(OptionParameters.PreferredCodec).options
+					.filter((option) => {
+						// Remove the preferred codec from the list of possible codecs as we've set it already
+						return option != this.preferredCodec;
+					}).forEach((option) => {
+						// Ammend the rest of the browsers supported codecs
+						const altCodec = option.split(" ");
+						codecs.push({
+							mimeType: 'video/' + altCodec[0] /* Name */,
+							clockRate: 90000,
+							sdpFmtpLine: altCodec[1] /* sdpFmtpLine */ ? altCodec[1] : '' 
+						})
+					})
 
+					for(const codec of codecs) {
+						if(codec.sdpFmtpLine === '') {
+							// We can't dynamically add members to the codec, so instead remove the field if it's empty
+							delete codec.sdpFmtpLine;
+						}
+					}
+					
 					transceiver.setCodecPreferences(codecs);
 				}
 			}
