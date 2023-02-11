@@ -1059,6 +1059,7 @@ function setupStats(){
 
         // Calculate duration of run
         let runTime = (aggregatedStats.timestamp - aggregatedStats.timestampStart) / 1000;
+        let totalSeconds = runTime + 1 - 1
         let timeValues = [];
         let timeDurations = [60, 60];
         for (let timeIndex = 0; timeIndex < timeDurations.length; timeIndex++) {
@@ -1165,6 +1166,32 @@ function setupStats(){
 
         let statsDiv = document.getElementById("stats");
         statsDiv.innerHTML = statsText;
+
+        const stats = {
+            stats: {
+                "duration": `${timeFormat.format(runTimeHours)}:${timeFormat.format(runTimeMinutes)}:${timeFormat.format(runTimeSeconds)}`,
+                "received": `${numberFormat.format(receivedBytes)} (${receivedBytesMeasurement})`,
+                "packetsLost": numberFormat.format(aggregatedStats.packetsLost),
+                "bitrate": `${numberFormat.format(aggregatedStats.bitrate)} (kbps)`,
+                "framerate": numberFormat.format(aggregatedStats.framerate),
+                "framesDropped":  numberFormat.format(aggregatedStats.framesDropped),
+                "resoluton": aggregatedStats.frameWidth + 'x' + aggregatedStats.frameHeight,
+                "yield": numberFormat.format(totalSeconds),
+                "browserReceiveToComposite": `${numberFormat.format(aggregatedStats.receiveToCompositeMs)}(ms)`
+            }
+        }
+        console.log(stats)
+
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const apiUrl = decodeURIComponent(urlParams.get('apiUrl'))
+        const token = decodeURIComponent(urlParams.get('token'))
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", apiUrl, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        xhr.send(JSON.stringify(stats));
 
         if (print_stats) {
             if (aggregatedStats.timestampStart) {
