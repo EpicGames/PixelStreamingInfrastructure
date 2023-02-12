@@ -184,6 +184,7 @@ export class WebRtcPlayerController {
                 this.webSocketController.sendSubscribe(urlParams.get(OptionParameters.StreamerId));
             } else {
                 this.webSocketController.requestStreamerList();
+                this.application.showTextOverlay('Multiple streamers. Use the dropdown in the settings menu to select streamer.');
             }
         });
         this.webSocketController.onClose.addEventListener('close', () => {
