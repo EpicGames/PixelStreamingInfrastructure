@@ -287,6 +287,7 @@ class Player {
 			return;
 		}
 		this.streamerId = streamerId;
+		this.sendTo(clientConfig);
 		const msg = { type: 'playerConnected', playerId: this.id, dataChannel: true, sfu: this.type == PlayerType.SFU };
 		logOutgoing(this.streamerId, msg);
 		this.sendFrom(msg);
