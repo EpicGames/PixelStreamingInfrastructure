@@ -179,22 +179,22 @@ export class StatsPanel {
         );
 
         // Bitrate
-		if(stats.inboundVideoStats.bitrate) {
-			this.addOrUpdateStat(
-				'VideoBitrateStat',
-				'Video Bitrate (kbps)',
-				stats.inboundVideoStats.bitrate.toString()
-			);
-		}
-        
-		if(stats.inboundAudioStats.bitrate) {
-			this.addOrUpdateStat(
-				'AudioBitrateStat',
-				'Audio Bitrate (kbps)',
-				stats.inboundAudioStats.bitrate.toString()
-			);
-		}
-		
+        if (stats.inboundVideoStats.bitrate) {
+            this.addOrUpdateStat(
+                'VideoBitrateStat',
+                'Video Bitrate (kbps)',
+                stats.inboundVideoStats.bitrate.toString()
+            );
+        }
+
+        if (stats.inboundAudioStats.bitrate) {
+            this.addOrUpdateStat(
+                'AudioBitrateStat',
+                'Audio Bitrate (kbps)',
+                stats.inboundAudioStats.bitrate.toString()
+            );
+        }
+
         // Video resolution
         const resStat =
             Object.prototype.hasOwnProperty.call(
@@ -227,13 +227,13 @@ export class StatsPanel {
         );
 
         // Framerate
-		if(stats.inboundVideoStats.framesPerSecond) {
-			this.addOrUpdateStat(
-				'FramerateStat',
-				'Framerate',
-				stats.inboundVideoStats.framesPerSecond.toString()
-			);
-		}
+        if (stats.inboundVideoStats.framesPerSecond) {
+            this.addOrUpdateStat(
+                'FramerateStat',
+                'Framerate',
+                stats.inboundVideoStats.framesPerSecond.toString()
+            );
+        }
 
         // Frames dropped
         this.addOrUpdateStat(
@@ -242,24 +242,23 @@ export class StatsPanel {
             stats.inboundVideoStats.framesDropped.toString()
         );
 
-		if(stats.inboundVideoStats.codecId) {
-			this.addOrUpdateStat(
-				'VideoCodecStat',
-				'Video codec',
-				// Split the codec to remove the Fmtp line
-				stats.codecs.get(stats.inboundVideoStats.codecId).split(" ")[0]
-			);
-		}
+        if (stats.inboundVideoStats.codecId) {
+            this.addOrUpdateStat(
+                'VideoCodecStat',
+                'Video codec',
+                // Split the codec to remove the Fmtp line
+                stats.codecs.get(stats.inboundVideoStats.codecId).split(' ')[0]
+            );
+        }
 
-		if(stats.inboundAudioStats.codecId) {
-			this.addOrUpdateStat(
-				'AudioCodecStat',
-				'Audio codec',
-				// Split the codec to remove the Fmtp line
-				stats.codecs.get(stats.inboundAudioStats.codecId).split(" ")[0]
-			);
-		}
-		
+        if (stats.inboundAudioStats.codecId) {
+            this.addOrUpdateStat(
+                'AudioCodecStat',
+                'Audio codec',
+                // Split the codec to remove the Fmtp line
+                stats.codecs.get(stats.inboundAudioStats.codecId).split(' ')[0]
+            );
+        }
 
         // RTT
         const netRTT =
