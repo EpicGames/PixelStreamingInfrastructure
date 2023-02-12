@@ -738,7 +738,6 @@ playerServer.on('connection', function (ws, req) {
 
 	sendPlayerConnectedToFrontend();
 	sendPlayerConnectedToMatchmaker();
-	player.ws.send(JSON.stringify(clientConfig));
 	sendPlayersCount();
 
 	// if we only have one streamer just subscribe this player to that one
