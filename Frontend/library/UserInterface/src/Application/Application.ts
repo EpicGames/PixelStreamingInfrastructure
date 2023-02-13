@@ -25,6 +25,9 @@ export interface UIOptions {
 export class Application {
     pixelStreaming: PixelStreaming;
 
+    _rootElement: HTMLElement;
+    _uiFeatureElement: HTMLElement;
+
     // set the overlay placeholders
     currentOverlay: OverlayBase | null;
     disconnectOverlay: ActionOverlay;
@@ -51,15 +54,15 @@ export class Application {
 
         // Add stats panel
         this.statsPanel = new StatsPanel();
-        this.pixelStreaming.uiFeaturesElement.appendChild(this.statsPanel.rootElement);
+        this.uiFeaturesElement.appendChild(this.statsPanel.rootElement);
 
         // Add settings panel
         this.settingsPanel = new SettingsPanel();
-        this.pixelStreaming.uiFeaturesElement.appendChild(this.settingsPanel.rootElement);
+        this.uiFeaturesElement.appendChild(this.settingsPanel.rootElement);
 
         // Add the video stream QP indicator
         this.videoQpIndicator = new VideoQpIndicator();
-        this.pixelStreaming.uiFeaturesElement.appendChild(this.videoQpIndicator.rootElement);
+        this.uiFeaturesElement.appendChild(this.videoQpIndicator.rootElement);
         
         this.configureSettings();
 
@@ -192,14 +195,25 @@ export class Application {
      * Gets the rootElement of the application, video stream and all UI are children of this element.
      */
     public get rootElement(): HTMLElement {
-        return this.pixelStreaming.rootElement;
+        if (!this._rootElement) {
+            this._rootElement = document.createElement('div');
+            this._rootElement.id = 'playerUI';
+            this._rootElement.classList.add('noselect');
+            this._rootElement.appendChild(this.pixelStreaming.videoElementParent);
+            this._rootElement.appendChild(this.uiFeaturesElement);
+        }
+        return this._rootElement;
     }
 
     /**
      * Gets the element that contains all the UI features, like the stats and settings panels.
      */
     public get uiFeaturesElement(): HTMLElement {
-        return this.pixelStreaming.uiFeaturesElement;
+        if (!this._uiFeatureElement) {
+            this._uiFeatureElement = document.createElement('div');
+            this._uiFeatureElement.id = 'uiFeatures';
+        }
+        return this._uiFeatureElement;
     }
 
     /**

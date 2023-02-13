@@ -24,8 +24,6 @@ export class PixelStreaming {
     public webXrController: WebXRController;
     public config: Config;
 
-    _rootElement: HTMLElement;
-    _uiFeatureElement: HTMLElement;
     _videoElementParent: HTMLElement;
 
     showActionOrErrorOnDisconnect = true;
@@ -74,20 +72,6 @@ export class PixelStreaming {
     }
 
     /**
-     * Gets the rootElement of the application, video stream and all UI are children of this element.
-     */
-    public get rootElement(): HTMLElement {
-        if (!this._rootElement) {
-            this._rootElement = document.createElement('div');
-            this._rootElement.id = 'playerUI';
-            this._rootElement.classList.add('noselect');
-            this._rootElement.appendChild(this.videoElementParent);
-            this._rootElement.appendChild(this.uiFeaturesElement);
-        }
-        return this._rootElement;
-    }
-
-    /**
      * Gets the element that contains the video stream element.
      */
     public get videoElementParent(): HTMLElement {
@@ -96,17 +80,6 @@ export class PixelStreaming {
             this._videoElementParent.id = 'videoElementParent';
         }
         return this._videoElementParent;
-    }
-
-    /**
-     * Gets the element that contains all the UI features, like the stats and settings panels.
-     */
-    public get uiFeaturesElement(): HTMLElement {
-        if (!this._uiFeatureElement) {
-            this._uiFeatureElement = document.createElement('div');
-            this._uiFeatureElement.id = 'uiFeatures';
-        }
-        return this._uiFeatureElement;
     }
 
     /**
