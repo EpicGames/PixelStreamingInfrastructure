@@ -41,6 +41,7 @@ export class PixelStreaming {
 
     /**
      * @param config - A newly instantiated config object
+     * @param overrides - Parameters to override default behaviour
      * returns the base delegate object with the config inside it along with a new instance of the Overlay controller class
      */
     constructor(config: Config, overrides?: PixelStreamingOverrides) {
