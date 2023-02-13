@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import * as libfrontend from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import { Config, Flags, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { Application, PixelStreamingApplicationStyle } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 export const PixelStreamingApplicationStyles =
     new PixelStreamingApplicationStyle();
@@ -139,13 +139,13 @@ export class StressTester {
 	private createPixelStreamingFrame() : HTMLElement {
 		const streamFrame = document.createElement("div");
 
-		const config = new libfrontend.Config();
-		config.setFlagEnabled(libfrontend.Flags.AutoConnect, true);
-		config.setFlagEnabled(libfrontend.Flags.AutoPlayVideo, true);
-		config.setFlagEnabled(libfrontend.Flags.StartVideoMuted, true);
+		const config = new Config();
+		config.setFlagEnabled(Flags.AutoConnect, true);
+		config.setFlagEnabled(Flags.AutoPlayVideo, true);
+		config.setFlagEnabled(Flags.StartVideoMuted, true);
 
 		// Create a Native DOM delegate instance that implements the Delegate interface class
-		const pixelStreaming = new libfrontend.PixelStreaming(config);
+		const pixelStreaming = new PixelStreaming(config);
 		const application = new Application({ pixelStreaming });
 		streamFrame.appendChild(application.rootElement);
 		return streamFrame;
