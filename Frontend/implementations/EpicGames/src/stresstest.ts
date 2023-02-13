@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import * as libfrontend from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
-import { PixelStreamingApplicationStyle } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import { Application, PixelStreamingApplicationStyle } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 export const PixelStreamingApplicationStyles =
     new PixelStreamingApplicationStyle();
 
@@ -145,7 +145,8 @@ export class StressTester {
 		config.setFlagEnabled(libfrontend.Flags.StartVideoMuted, true);
 
 		// Create a Native DOM delegate instance that implements the Delegate interface class
-		let application = new libfrontend.PixelStreaming(config);
+		let pixelStreaming = new libfrontend.PixelStreaming(config);
+		let application = new Application({ pixelStreaming });
 		streamFrame.appendChild(application.rootElement);
 		return streamFrame;
 	}
