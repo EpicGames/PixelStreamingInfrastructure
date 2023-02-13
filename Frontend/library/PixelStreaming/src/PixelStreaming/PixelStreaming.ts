@@ -16,6 +16,10 @@ import { EventEmitter } from '../Util/EventEmitter';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
 
+export interface PixelStreamingOverrides {
+    videoElementParent?: HTMLElement;
+}
+
 /**
  * Provides common base functionality for applications that extend this application
  */
@@ -39,8 +43,12 @@ export class PixelStreaming {
      * @param config - A newly instantiated config object
      * returns the base delegate object with the config inside it along with a new instance of the Overlay controller class
      */
-    constructor(config: Config) {
+    constructor(config: Config, overrides?: PixelStreamingOverrides) {
         this.config = config;
+
+        if (overrides?.videoElementParent) {
+            this._videoElementParent = overrides.videoElementParent;
+        }
 
         this.eventEmitter = new EventEmitter();
 
