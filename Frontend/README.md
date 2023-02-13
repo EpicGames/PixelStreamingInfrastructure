@@ -61,11 +61,11 @@ We recommend using the default player page as a starting point for creating 
 
 Additionally, if you have cloned the Pixel Streaming Infrastructure repository and made upstream changes, you can fork the repo and make a pull request.
 
-DEFAULT PLAYER PICTURE HERE:
+TO DO DEFAULT PLAYER PICTURE HERE:
 
 Default player page
 
-CUSTOMISED PLAYER PAGE HERE:
+TO DO CUSTOMISED PLAYER PAGE HERE:
 
 Customized player with HTML5 UI
 
@@ -160,16 +160,15 @@ The Pixel Streaming Plugin that runs within the Unreal Engine exposes a Blueprin
 
 To access this Blueprint API, add the **PixelStreamingInputComponent** to an Actor in your level. Your application's **PlayerController** is a safe choice. You can do this by clicking **Add Component** in the Blueprint menu and selecting the **Pixel Streaming Input** component from the dropdown.
 
-[REGION:lightbox]
-[![Adding the Pixel Streaming component.](pixelstreaming-add-component.jpg)(w:600)](pixelstreaming-add-component.jpg)
-[/REGION]
-[REGION:caption]
-Click image to enlarge.
-[/REGION]
 
-[REGION:note]
-Prior to UE 4.27, the PixelStreamingInput Component was automatically added when you loaded the Pixel Streaming plugin. This was problematic, and now requires users to add this to their project themselves, as seen above.
-[/REGION]
+![Adding the Pixel Streaming component.](Docs\Resources\Images\pixelstreaming-add-component.jpg)
+
+
+
+
+
+
+**_NOTE:_** Prior to UE 4.27, the PixelStreamingInput Component was automatically added when you loaded the Pixel Streaming plugin. This was problematic, and now requires users to add this to their project themselves, as seen above.
 
 ## Communicating from the Player Page to UE5
 
@@ -189,9 +188,9 @@ When you call the `emitCommand` function, you must pass it a JavaScript object.
         }
         emitCommand(descriptor);
 
-[REGION:note]
+**_NOTE:_**
 Due to the power of the Unreal Engine console commands, the `emitCommand` function can present a security risk. In order for this function to work, you also need to provide the `-AllowPixelStreamingCommands` parameter on the command line when you launch your Unreal Engine application or start it from the Unreal Editor using the Standalone Game option.
-[/REGION]
+
 
 ### Using the emitUIInteraction Function
 
@@ -212,12 +211,7 @@ or
 
 If you pass a JavaScript object, the `emitUIInteraction` function converts it to a JSON string internally. It then passes the resulting string back to the Pixel Streaming Plugin in your Unreal Engine application, which raises an event on the input controller. In your application's gameplay logic, you bind your own custom event to handle these inputs, using the **Bind Event to OnPixelStreamingInputEvent** node. For example:
 
-[REGION:lightbox]
-[![Bind Event to OnPixelStreamingInputEvent](pixelstreaming-uiinteractionrespond.JPG "Bind Event to OnPixelStreamingInputEvent")](pixelstreaming-uiinteractionrespond.JPG) 
-[/REGION]
-[REGION:caption]
-Click to enlarge image.
-[/REGION]
+![Bind Event to OnPixelStreamingInputEvent](Docs\Resources\Images\pixelstreaming-uiinteractionrespond.JPG "Bind Event to OnPixelStreamingInputEvent")
 
 You need to bind this event once, typically at the start of your game. Each time any player HTML page connected to an instance of your Unreal Engine application calls the `emitUIInteraction`function, your custom event is automatically invoked, regardless of the input passed to `emitUIInteraction`.  
 
@@ -225,25 +219,19 @@ The custom event you assign (for example, the **UI Interaction** node in the ima
 
 For example, the following Blueprint tests to see whether the input given to `emitUIInteraction` contains the string "MyCustomCommand", and calls a custom function to handle the event:
 
-[REGION:lightbox]
-[![Search for substring](pixelstreaming-respond-searchsubstring.JPG "Search for substring")](pixelstreaming-respond-searchsubstring.JPG) 
-[/REGION]
-[REGION:caption]
-Click to enlarge image.
-[/REGION]
+
+![Search for substring](Docs\Resources\Images\pixelstreaming-respond-searchsubstring.JPG "Search for substring")
 
 If you originally passed a JavaScript object to `emitUIInteraction`, you can retrieve the value of any key from that JSON object using the **Pixel Streaming > Get Json String Value** node. For example, the following Blueprint tests for a key named LoadLevel. If that key is present, it calls a custom function to handle the event:
 
 [REGION:lightbox]
-[![Get a JSON field value](pixelstreaming-respond-json.JPG "Get a JSON field value")](pixelstreaming-respond-json.JPG)
-[/REGION]
-[REGION:caption]
-Click to enlarge image.
-[/REGION]
+[![Get a JSON field value](Docs\Resources\Images\pixelstreaming-respond-json.JPG "Get a JSON field value")](pixelstreaming-respond-json.JPG)
 
-[REGION:tip]
-If you need to retrieve a nested key, use the dot notation common in JavaScript for your key. For example, `PlayerCharacter.Name` or `PlayerCharacter.Skin`.
-[/REGION]
+
+**_Tip:_**
+If you need to retrieve a nested key, use the dot notation common in JavaScript for your key. 
+For example, `PlayerCharacter.Name` or `PlayerCharacter.Skin`.
+
 
 ## Communicating from UE5 to the Player Page
 
@@ -253,12 +241,8 @@ To set this up:
 
 1.  In your Unreal Engine application, any time you want to emit an event to the player page, use the **Pixel Streaming > Send Pixel Streaming Response** node. Specify a custom string argument to the node to indicate to the player page what event has happened.  
 
-    [REGION:lightbox]
-    [![](pixelstreaming-send-game-event.JPG)](pixelstreaming-send-game-event.JPG)
-    [/REGION]
-	[REGION:caption]
-	Click to enlarge image.
-	[/REGION]
+
+    ![](Docs\Resources\Images\pixelstreaming-send-game-event.JPG)
 	
 2.  In the JavaScript of your player page, you'll need to write a custom event handler function that will be invoked each time the page receives a response event from the Unreal Engine application. It will be passed the original string argument that was sent by the **Send Pixel Streaming Response** node. For example:
 
@@ -280,11 +264,11 @@ To set this up:
 
         removeResponseEventListener("handle_responses");
 
-[REGION:tip]
+**_Tip:_**
 If you want to pass more complex data, you can format the string you pass to the **Send Pixel Streaming Response** node as JSON. For example:  
-![Send Pixel Streaming response using JSON](pixelstreaming-send-game-event-json.png "Send Pixel Streaming response using JSON")  
+![Send Pixel Streaming response using JSON](Docs\Resources\Images\pixelstreaming-send-game-event-json.png "Send Pixel Streaming response using JSON")  
 Then, in your JavaScript event handler function, use  `JSON.parse(data)` to decode the string back into a JavaScript object.
-[/REGION]
+
 
 ## Timing Out Inactive Connections
 
@@ -292,7 +276,7 @@ In some kinds of Pixel Streaming deployments, you may want to automatically disc
 
 You can configure your Pixel Streaming player page to detect when a user appears to be away from keyboard (AFK)—that is, when the user has not interacted with the player widget within a customizable time interval. The AFK system warns the user:
 
-![AFK timeout warning](afk-warning.png "AFK timeout warning")
+![AFK timeout warning](Docs\Resources\Images\afk-warning.png "AFK timeout warning")
 
 If the user continues not to respond, the AFK system ultimately disconnects their session.
 
@@ -306,6 +290,5 @@ To use the AFK system, set the following three properties in the JavaScript of y
 | `afk.warnTimeout` | Sets the maximum time interval, in seconds, that the user can remain away from keyboard before seeing a warning overlay in the player widget. The default is `120`, or two minutes. |
 | `afk.closeTimeout` | After the `afk.warnTimeout` interval has elapsed and the user sees a warning message about being disconnected, this variable sets the time interval, in seconds, before the user's connection is automatically disconnected unless they interact with the player widget. The default is `10`. |
 
-[REGION:tip]
+**_Tip:_**
 If you want to customize the content of the overlay, you can redefine the `updateAfkOverlayText()` function in your player page. In your implementation, set the `afk.overlay.innerHTML` property to the HTML that you want the player widget to display when users have been away longer than the AFK timeout value.
-[/REGION]
