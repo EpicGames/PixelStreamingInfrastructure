@@ -88,8 +88,8 @@ export class WebRtcPlayerController {
     isQualityController: boolean;
     statsTimerHandle: number;
     file: FileTemplate;
-	preferredCodec: string;
-	peerConfig: RTCConfiguration
+    preferredCodec: string;
+    peerConfig: RTCConfiguration
 
     // if you override the disconnection message by calling the interface method setDisconnectMessageOverride
     // it will use this property to store the override message string
@@ -180,7 +180,7 @@ export class WebRtcPlayerController {
                 }`
             );
         this.webSocketController.onOpen.addEventListener('open', () => {
-			this.webSocketController.requestStreamerList();
+            this.webSocketController.requestStreamerList();
         });
         this.webSocketController.onClose.addEventListener('close', () => {
             this.afkController.stopAfkWarningTimer();
@@ -700,7 +700,7 @@ export class WebRtcPlayerController {
                             Logger.Error(
                                 Logger.GetStackTrace(),
                                 `ToStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id and a byteLength\n
-										   Definition was: ${JSON.stringify(message, null, 2)}`
+                                           Definition was: ${JSON.stringify(message, null, 2)}`
                             );
                             // return in a forEach is equivalent to a continue in a normal for loop
                             return;
@@ -746,7 +746,7 @@ export class WebRtcPlayerController {
                             Logger.Error(
                                 Logger.GetStackTrace(),
                                 `FromStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id\n
-							Definition was: ${JSON.stringify(message, null, 2)}`
+                            Definition was: ${JSON.stringify(message, null, 2)}`
                             );
                             // return in a forEach is equivalent to a continue in a normal for loop
                             return;
@@ -1044,8 +1044,8 @@ export class WebRtcPlayerController {
             signallingServerUrl += '?' + Flags.BrowserSendOffer + '=true';
         }
 
-		// This code is no longer needed, but is a good example for how subsequent config flags can be appended
-		// if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
+        // This code is no longer needed, but is a good example for how subsequent config flags can be appended
+        // if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
         //     signallingServerUrl += (signallingServerUrl.includes('?') ? '&' : '?') + Flags.BrowserSendOffer + '=true';
         // }
 
@@ -1066,7 +1066,7 @@ export class WebRtcPlayerController {
      * @remark RTC Peer Connection on Ice Candidate event have it handled by handle Send Ice Candidate
      */
     startSession(peerConfig: RTCConfiguration) {
-		this.peerConfig = peerConfig;
+        this.peerConfig = peerConfig;
         // check for forcing turn
         if (this.config.isFlagEnabled(Flags.ForceTURN)) {
             // check for a turn server
@@ -1214,16 +1214,16 @@ export class WebRtcPlayerController {
         messageStreamerList.ids.unshift(''); // add an empty option at the top
         this.config.setOptionSettingOptions(OptionParameters.StreamerId, messageStreamerList.ids);
 
-		const urlParams = new URLSearchParams(window.location.search);
-		if(messageStreamerList.ids.length == 2) {
-			// if there's only a single streamer, subscribe to it regardless of what is in the URL
-			this.config.setOptionSettingValue(OptionParameters.StreamerId, messageStreamerList.ids[1]);
-		} else if (this.config.isFlagEnabled(Flags.PreferSFU)) {
-			// if the SFU toggle is on, subscribe to it regardless of what is in the URL
-			this.config.setOptionSettingValue(OptionParameters.StreamerId, "SFU");
-		} else if (urlParams.has(OptionParameters.StreamerId)) {
-			// If there's a streamer ID in the URL, set it as the selected streamer
-			this.config.setOptionSettingValue(OptionParameters.StreamerId, urlParams.get(OptionParameters.StreamerId));
+        const urlParams = new URLSearchParams(window.location.search);
+        if(messageStreamerList.ids.length == 2) {
+            // if there's only a single streamer, subscribe to it regardless of what is in the URL
+            this.config.setOptionSettingValue(OptionParameters.StreamerId, messageStreamerList.ids[1]);
+        } else if (this.config.isFlagEnabled(Flags.PreferSFU)) {
+            // if the SFU toggle is on, subscribe to it regardless of what is in the URL
+            this.config.setOptionSettingValue(OptionParameters.StreamerId, "SFU");
+        } else if (urlParams.has(OptionParameters.StreamerId)) {
+            // If there's a streamer ID in the URL, set it as the selected streamer
+            this.config.setOptionSettingValue(OptionParameters.StreamerId, urlParams.get(OptionParameters.StreamerId));
         }
     }
 

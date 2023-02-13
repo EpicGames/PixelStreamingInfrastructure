@@ -500,14 +500,14 @@ export class Config {
             this.numericParameters.get(NumericParameters.MaxQP)
         );
 
-		const preferredCodecOption = this.optionParameters.get(OptionParameters.PreferredCodec);
-		this.addSettingOption(
-			encoderSettingsSection,
-			preferredCodecOption
-		);
-		if([...preferredCodecOption.selector.options].map(o => o.value).includes("Only available on Chrome")) {
-			preferredCodecOption.disable();
-		}
+        const preferredCodecOption = this.optionParameters.get(OptionParameters.PreferredCodec);
+        this.addSettingOption(
+            encoderSettingsSection,
+            preferredCodecOption
+        );
+        if([...preferredCodecOption.selector.options].map(o => o.value).includes("Only available on Chrome")) {
+            preferredCodecOption.disable();
+        }
 
         /* Setup all webrtc related settings under this section */
         const webrtcSettingsSection = this.buildSectionWithHeading(

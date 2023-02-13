@@ -26,11 +26,11 @@ export class PeerConnectionController {
         preferredCodec: string
     ) {
         this.config = config;
-		this.createPeerConnection(options, preferredCodec);
+        this.createPeerConnection(options, preferredCodec);
     }
 
-	createPeerConnection(options: RTCConfiguration, preferredCodec: string) {
-		// Set the ICE transport to relay if TURN enabled
+    createPeerConnection(options: RTCConfiguration, preferredCodec: string) {
+        // Set the ICE transport to relay if TURN enabled
         if (this.config.isFlagEnabled(Flags.ForceTURN)) {
             options.iceTransportPolicy = 'relay';
             Logger.Log(
@@ -39,7 +39,7 @@ export class PeerConnectionController {
             );
         }
 
-		// build a new peer connection with the options
+        // build a new peer connection with the options
         this.peerConnection = new RTCPeerConnection(options);
         this.peerConnection.onsignalingstatechange = (ev: Event) =>
             this.handleSignalStateChange(ev);
@@ -54,9 +54,9 @@ export class PeerConnectionController {
         this.peerConnection.ondatachannel = (ev: RTCDataChannelEvent) =>
             this.handleDataChannel(ev);
         this.aggregatedStats = new AggregatedStats();
-		this.preferredCodec = preferredCodec;
-		this.updateCodecSelection = true;
-	}
+        this.preferredCodec = preferredCodec;
+        this.updateCodecSelection = true;
+    }
 
     /**
      * Create an offer for the Web RTC handshake and send the offer to the signaling server via websocket
@@ -178,10 +178,10 @@ export class PeerConnectionController {
             this.aggregatedStats.processStats(StatsData);
             this.onVideoStats(this.aggregatedStats);
 
-			// Update the preferred codec selection based on what was actually negotiated
-			if(this.updateCodecSelection) {
-				this.config.setOptionSettingValue(OptionParameters.PreferredCodec, this.aggregatedStats.codecs.get(this.aggregatedStats.inboundVideoStats.codecId))
-			}
+            // Update the preferred codec selection based on what was actually negotiated
+            if(this.updateCodecSelection) {
+                this.config.setOptionSettingValue(OptionParameters.PreferredCodec, this.aggregatedStats.codecs.get(this.aggregatedStats.inboundVideoStats.codecId))
+            }
         });
     }
 

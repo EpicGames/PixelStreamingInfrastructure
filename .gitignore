@@ -5,4 +5,5 @@ node_modules/
 **/platform_scripts/bash/*/
 node.zip
 SignallingWebServer/Public/
+SignallingWebServer/certificates
 .vscode
