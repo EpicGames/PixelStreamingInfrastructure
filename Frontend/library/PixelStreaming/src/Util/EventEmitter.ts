@@ -20,6 +20,7 @@ export type EventType =
     | 'playStream'
     | 'playStreamRejected'
     | 'loadFreezeFrame'
+    | 'hideFreezeFrame'
     | 'statsReceived' 
     | 'latencyTestResult'
     | 'initialSettings';
@@ -35,7 +36,7 @@ export type EventArgsVideoEncoderAvgQP = [avgQP: number];
 export type EventArgsDisconnect = [eventString: string, showActionOrErrorOnDisconnect: boolean];
 export type EventArgsPlayStreamError = [message: string];
 export type EventArgsPlayStreamRejected = [reason: unknown];
-export type EventArgsLoadFreezeFrame = [shouldShowPlayOverlay: boolean];
+export type EventArgsLoadFreezeFrame = [shouldShowPlayOverlay: boolean, isValid: boolean, jpegData?: Uint8Array];
 export type EventArgsStatsReceived = [aggregatedStats: AggregatedStats];
 export type EventArgsLatencyTestResult = [latencyTimings: LatencyTestResults];
 export type EventArgsInitialSettings = [settings: InitialSettings];
@@ -59,6 +60,7 @@ export class EventEmitter {
         playStream: [],
         playStreamRejected: [],
         loadFreezeFrame: [],
+        hideFreezeFrame: [],
         statsReceived: [],
         latencyTestResult: [],
         initialSettings: []
@@ -81,6 +83,7 @@ export class EventEmitter {
     on(event: "playStream", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
     on(event: "playStreamRejected", callback: EventCallback<EventArgsPlayStreamRejected>): EventEmitterUnregisterCallback;
     on(event: "loadFreezeFrame", callback: EventCallback<EventArgsLoadFreezeFrame>): EventEmitterUnregisterCallback;
+    on(event: "hideFreezeFrame", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
     on(event: "statsReceived", callback: EventCallback<EventArgsStatsReceived>): EventEmitterUnregisterCallback;
     on(event: "latencyTestResult", callback: EventCallback<EventArgsLatencyTestResult>): EventEmitterUnregisterCallback;
     on(event: "initialSettings", callback: EventCallback<EventArgsInitialSettings>): EventEmitterUnregisterCallback;
@@ -113,6 +116,7 @@ export class EventEmitter {
     emit(event: "playStream"): void;
     emit(event: "playStreamRejected", args: EventArgsPlayStreamRejected): void;
     emit(event: "loadFreezeFrame", args: EventArgsLoadFreezeFrame): void;
+    emit(event: "hideFreezeFrame"): void;
     emit(event: "statsReceived", args: EventArgsStatsReceived): void;
     emit(event: "latencyTestResult", args: EventArgsLatencyTestResult): void;
     emit(event: "initialSettings", args: EventArgsInitialSettings): void;

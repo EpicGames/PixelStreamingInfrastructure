@@ -50,7 +50,6 @@ import {
 } from '../Util/CoordinateConverter';
 import { PixelStreaming } from '../PixelStreaming/PixelStreaming';
 import { ITouchController } from '../Inputs/ITouchController';
-import { EventType } from '../Util/EventEmitter';
 /**
  * Entry point for the WebRTC Player
  */
@@ -865,7 +864,7 @@ export class WebRtcPlayerController {
      * Loads a freeze frame if it is required otherwise shows the play overlay
      */
     loadFreezeFrameOrShowPlayOverlay() {
-        this.pixelStreaming.events.emit("loadFreezeFrame", [this.shouldShowPlayOverlay]);
+        this.pixelStreaming.events.emit("loadFreezeFrame", [this.shouldShowPlayOverlay, this.freezeFrameController.valid, this.freezeFrameController.jpeg]);
         if (this.shouldShowPlayOverlay === true) {
             Logger.Log(Logger.GetStackTrace(), 'showing play overlay');
             this.resizePlayerStyle();
@@ -904,6 +903,7 @@ export class WebRtcPlayerController {
             6
         );
         setTimeout(() => {
+            this.pixelStreaming.events.emit("hideFreezeFrame");
             this.freezeFrameController.hideFreezeFrame();
         }, this.freezeFrameController.freezeFrameDelay);
         if (this.videoPlayer.getVideoElement()) {
