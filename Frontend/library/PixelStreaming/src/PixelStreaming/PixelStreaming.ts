@@ -3,7 +3,6 @@
 import { Config, OptionParameters } from '../Config/Config';
 import { LatencyTestResults } from '../DataChannel/LatencyTestResults';
 import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
-import { VideoQpIndicator } from '../UI/VideoQpIndicator';
 import { WebRtcPlayerController } from '../WebRtcPlayer/WebRtcPlayerController';
 import { Flags, NumericParameters } from '../Config/Config';
 import { Logger } from '../Logger/Logger';
@@ -32,7 +31,6 @@ export class PixelStreaming {
 
     showActionOrErrorOnDisconnect = true;
 
-    videoQpIndicator: VideoQpIndicator;
     onScreenKeyboardHelper: OnScreenKeyboard;
     controls: Controls;
 
@@ -49,10 +47,6 @@ export class PixelStreaming {
         this.config = config;
 
         this.eventEmitter = new EventEmitter();
-
-        // Add the video stream QP indicator
-        this.videoQpIndicator = new VideoQpIndicator();
-        this.uiFeaturesElement.appendChild(this.videoQpIndicator.rootElement);
 
         this.configureSettings();
 
@@ -439,9 +433,6 @@ export class PixelStreaming {
         if (this.showActionOrErrorOnDisconnect == false) {
             this.showActionOrErrorOnDisconnect = true;
         }
-
-        // update all of the tools upon disconnect
-        this.onVideoEncoderAvgQP(0);
     }
 
     /**
@@ -490,7 +481,7 @@ export class PixelStreaming {
         if (!this.videoStartTime || this.videoStartTime === undefined) {
             this.videoStartTime = Date.now();
         }
-        videoStats.handleSessionStatistics(this.videoStartTime, this.inputController, this.videoQpIndicator.videoEncoderAvgQP);
+        videoStats.handleSessionStatistics(this.videoStartTime, this.inputController, this.webRtcController.videoAvgQp);
 
         this.eventEmitter.emit("statsReceived", [videoStats]);
     }
@@ -500,7 +491,7 @@ export class PixelStreaming {
      * @param QP - the quality number of the stream
      */
     onVideoEncoderAvgQP(QP: number) {
-        this.videoQpIndicator.updateQpTooltip(QP);
+        this.eventEmitter.emit("videoEncoderAvgQP", [QP]);
     }
 
     /**

@@ -90,6 +90,7 @@ export class WebRtcPlayerController {
     file: FileTemplate;
     preferredCodec: string;
     peerConfig: RTCConfiguration
+    videoAvgQp: number;
 
     // if you override the disconnection message by calling the interface method setDisconnectMessageOverride
     // it will use this property to store the override message string
@@ -171,12 +172,14 @@ export class WebRtcPlayerController {
         this.webSocketController.onStreamerList = (
             messageList: MessageReceive.MessageStreamerList
         ) => this.handleStreamerListMessage(messageList);
-        this.webSocketController.onWebSocketOncloseOverlayMessage = (event) =>
+        this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => {
             this.pixelStreaming.onDisconnect(
                 `Websocket disconnect (${event.code}) ${
                     event.reason != '' ? '- ' + event.reason : ''
                 }`
             );
+            this.setVideoEncoderAvgQP(0);
+        };
         this.webSocketController.onOpen.addEventListener('open', () => {
             this.webSocketController.requestStreamerList();
         });
@@ -221,6 +224,8 @@ export class WebRtcPlayerController {
                 this.webSocketController.sendSubscribe(streamerid);
             }
         );
+
+        this.setVideoEncoderAvgQP(-1);
     }
 
     /**
@@ -1644,7 +1649,7 @@ export class WebRtcPlayerController {
         const AvgQP = Number(
             new TextDecoder('utf-16').decode(message.slice(1))
         );
-        this.pixelStreaming.onVideoEncoderAvgQP(AvgQP);
+        this.setVideoEncoderAvgQP(AvgQP);
     }
 
     /**
@@ -1713,5 +1718,10 @@ export class WebRtcPlayerController {
             this.peerConnectionController.preferredCodec = codec;
             this.peerConnectionController.updateCodecSelection = false;
         }
+    }
+
+    setVideoEncoderAvgQP(avgQP: number) {
+        this.videoAvgQp = avgQP;
+        this.pixelStreaming.onVideoEncoderAvgQP(this.videoAvgQp);
     }
 }

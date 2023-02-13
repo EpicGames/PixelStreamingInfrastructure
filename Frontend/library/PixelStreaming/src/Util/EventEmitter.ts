@@ -7,6 +7,7 @@ export type EventType =
     | 'afkWarningUpdate'
     | 'afkWarningDeactivate'
     | 'afkTimedOut'
+    | 'videoEncoderAvgQP'
     | 'webRtcSdp'
     | 'webRtcAutoConnect'
     | 'webRtcConnecting'
@@ -30,6 +31,7 @@ export type EventEmitterUnregisterCallback = () => void;
 
 export type EventArgsAfkWarningActivate = [countDown: number, dismissAfk: () => void];
 export type EventArgsAfkWarningUpdate = [countDown: number];
+export type EventArgsVideoEncoderAvgQP = [avgQP: number];
 export type EventArgsDisconnect = [eventString: string, showActionOrErrorOnDisconnect: boolean];
 export type EventArgsPlayStreamError = [message: string];
 export type EventArgsPlayStreamRejected = [reason: unknown];
@@ -44,6 +46,7 @@ export class EventEmitter {
         afkWarningUpdate: [],
         afkWarningDeactivate: [],
         afkTimedOut: [],
+        videoEncoderAvgQP: [],
         webRtcSdp: [],
         webRtcAutoConnect: [],
         webRtcConnecting: [],
@@ -65,6 +68,7 @@ export class EventEmitter {
     on(event: "afkWarningUpdate", callback: EventCallback<EventArgsAfkWarningUpdate>): EventEmitterUnregisterCallback;
     on(event: "afkWarningDeactivate", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
     on(event: "afkTimedOut", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
+    on(event: "videoEncoderAvgQP", callback: EventCallback<EventArgsVideoEncoderAvgQP>): EventEmitterUnregisterCallback;
     on(event: "webRtcSdp", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
     on(event: "webRtcAutoConnect", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
     on(event: "webRtcConnecting", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
@@ -96,6 +100,7 @@ export class EventEmitter {
     emit(event: "afkWarningUpdate", args: EventArgsAfkWarningUpdate): void;
     emit(event: "afkWarningDeactivate"): void;
     emit(event: "afkTimedOut"): void;
+    emit(event: "videoEncoderAvgQP", args: EventArgsVideoEncoderAvgQP): void;
     emit(event: "webRtcSdp"): void;
     emit(event: "webRtcAutoConnect"): void;
     emit(event: "webRtcConnecting"): void;

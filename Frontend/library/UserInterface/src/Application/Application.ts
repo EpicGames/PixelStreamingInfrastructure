@@ -13,6 +13,7 @@ import { AFKOverlay } from '../Overlay/AFKOverlay';
 import { LabelledButton } from '../UI/LabelledButton';
 import { SettingsPanel } from '../UI/SettingsPanel';
 import { StatsPanel } from '../UI/StatsPanel';
+import { VideoQpIndicator } from '../UI/VideoQpIndicator';
 
 export interface UIOptions {
     pixelStreaming: PixelStreaming;
@@ -34,6 +35,7 @@ export class Application {
 
     settingsPanel: SettingsPanel;
     statsPanel: StatsPanel;
+    videoQpIndicator: VideoQpIndicator;
 
     /**
      * @param config - A newly instantiated config object
@@ -51,6 +53,10 @@ export class Application {
         // Add settings panel
         this.settingsPanel = new SettingsPanel();
         this.pixelStreaming.uiFeaturesElement.appendChild(this.settingsPanel.rootElement);
+
+        // Add the video stream QP indicator
+        this.videoQpIndicator = new VideoQpIndicator();
+        this.pixelStreaming.uiFeaturesElement.appendChild(this.videoQpIndicator.rootElement);
         
         this.configureSettings();
 
@@ -151,6 +157,7 @@ export class Application {
         this.pixelStreaming.events.on("afkWarningUpdate", this.afkOverlay.updateCountdown.bind(this.afkOverlay));
         this.pixelStreaming.events.on("afkWarningDeactivate", this.afkOverlay.hide.bind(this.afkOverlay));
         this.pixelStreaming.events.on("afkTimedOut", this.afkOverlay.hide.bind(this.afkOverlay));
+        this.pixelStreaming.events.on("videoEncoderAvgQP", this.onVideoEncoderAvgQP.bind(this));
         this.pixelStreaming.events.on("webRtcSdp", this.onWebRtcSdp.bind(this));
         this.pixelStreaming.events.on("webRtcAutoConnect", this.onWebRtcAutoConnect.bind(this));
         this.pixelStreaming.events.on("webRtcConnecting", this.onWebRtcConnecting.bind(this));
@@ -406,6 +413,14 @@ export class Application {
         };
     }
 
+    /**
+     * Set up functionality to happen when calculating the average video encoder qp
+     * @param QP - the quality number of the stream
+     */
+    onVideoEncoderAvgQP(QP: number) {
+        this.videoQpIndicator.updateQpTooltip(QP);
+    }
+    
     onInitialSettings(settings: InitialSettings) {
         if (settings.PixelStreamingSettings) {
             const disableLatencyTest =
