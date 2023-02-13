@@ -1,7 +1,7 @@
 {
 	"UseFrontend": false,
 	"UseMatchmaker": false,
-	"UseHTTPS": false,
+	"UseHTTPS": true,
 	"UseAuthentication": false,
 	"LogToFile": true,
 	"LogVerbose": true,

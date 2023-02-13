@@ -169,8 +169,8 @@ export class KeyboardController {
             6
         );
         const toStreamerHandlers =
-            this.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('KeyDown')('KeyDown', [
+            this.toStreamerMessagesProvider.toStreamerHandlers;
+        toStreamerHandlers.get('KeyDown')([
             this.getKeycode(keyboardEvent),
             keyboardEvent.repeat ? 1 : 0
         ]);
@@ -206,8 +206,8 @@ export class KeyboardController {
 
         Logger.Log(Logger.GetStackTrace(), `key up ${keyCode}`, 6);
         const toStreamerHandlers =
-            this.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('KeyUp')('KeyUp', [
+            this.toStreamerMessagesProvider.toStreamerHandlers;
+        toStreamerHandlers.get('KeyUp')([
             keyCode,
             keyboardEvent.repeat ? 1 : 0
         ]);
@@ -237,8 +237,8 @@ export class KeyboardController {
         Logger.Log(Logger.GetStackTrace(), `key press ${charCode}`, 6);
 
         const toStreamerHandlers =
-            this.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('KeyPress')('KeyPress', [charCode]);
+            this.toStreamerMessagesProvider.toStreamerHandlers;
+        toStreamerHandlers.get('KeyPress')([charCode]);
     }
 
     /**

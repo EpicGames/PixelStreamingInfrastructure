@@ -139,8 +139,8 @@ export class MouseController {
             return;
         }
         const toStreamerHandlers =
-            this.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseEnter')('MouseEnter');
+            this.toStreamerMessagesProvider.toStreamerHandlers;
+        toStreamerHandlers.get('MouseEnter')();
     }
 
     /**
@@ -151,8 +151,8 @@ export class MouseController {
             return;
         }
         const toStreamerHandlers =
-            this.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseLeave')('MouseLeave');
+            this.toStreamerMessagesProvider.toStreamerHandlers;
+        toStreamerHandlers.get('MouseLeave')();
     }
 
     /**
@@ -171,8 +171,8 @@ export class MouseController {
             6
         );
         const toStreamerHandlers =
-            this.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseDown')('MouseDown', [button, X, Y]);
+            this.toStreamerMessagesProvider.toStreamerHandlers;
+        toStreamerHandlers.get('MouseDown')([button, X, Y]);
     }
 
     /**
@@ -195,11 +195,7 @@ export class MouseController {
             Y
         );
         const toStreamerHandlers =
-            this.toStreamerMessagesProvider.getToStreamHandlersMap();
-        toStreamerHandlers.get('MouseUp')('MouseUp', [
-            button,
-            coord.x,
-            coord.y
-        ]);
+            this.toStreamerMessagesProvider.toStreamerHandlers;
+        toStreamerHandlers.get('MouseUp')([button, coord.x, coord.y]);
     }
 }
