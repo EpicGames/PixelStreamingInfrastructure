@@ -11,11 +11,11 @@ document.body.onload = function() {
 	//libfrontend.Logger.SetLoggerVerbosity(10);
 
 	// Create a config object
-	let config = new libfrontend.Config();
+	const config = new libfrontend.Config();
 
 	// Create a Native DOM delegate instance that implements the Delegate interface class
-	let pixelStreaming = new libfrontend.PixelStreaming(config);
-	let application = new Application({ pixelStreaming });
+	const pixelStreaming = new libfrontend.PixelStreaming(config);
+	const application = new Application({ pixelStreaming });
 	// document.getElementById("centrebox").appendChild(application.rootElement);
 	document.body.appendChild(application.rootElement);
 }

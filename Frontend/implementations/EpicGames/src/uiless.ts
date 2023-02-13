@@ -7,8 +7,8 @@ document.body.onload = function() {
 	//libfrontend.Logger.SetLoggerVerbosity(10);
 
 	// Create a config object
-	let config = new libfrontend.Config();
+	const config = new libfrontend.Config();
 
 	// Create a PixelStreaming instance and attach the video element to an existing parent div
-	let pixelStreaming = new libfrontend.PixelStreaming(config, { videoElementParent: document.getElementById("videoParentElement")});
+	const pixelStreaming = new libfrontend.PixelStreaming(config, { videoElementParent: document.getElementById("videoParentElement")});
 }

@@ -37,8 +37,8 @@ export class StressTester {
 		this.setupPlayPause();
 
 		document.getElementById("creationIntervalInput").onchange = (event : Event) => {
-			let inputElem = document.getElementById("creationIntervalInput") as HTMLInputElement;
-			let parsedValue = Number.parseInt(inputElem.value);
+			const inputElem = document.getElementById("creationIntervalInput") as HTMLInputElement;
+			const parsedValue = Number.parseInt(inputElem.value);
 			if(!Number.isNaN(parsedValue)) {
 				this.streamCreationIntervalMs = parsedValue * 1000.0;
 				this.startStreamCreation();
@@ -46,18 +46,18 @@ export class StressTester {
 		}
 
 		document.getElementById("deletionIntervalInput").onchange = (event: Event) => {
-			let inputElem = document.getElementById("deletionIntervalInput") as HTMLInputElement;
-			let parsedValue = Number.parseInt(inputElem.value);
+			const inputElem = document.getElementById("deletionIntervalInput") as HTMLInputElement;
+			const parsedValue = Number.parseInt(inputElem.value);
 			if (!Number.isNaN(parsedValue)) {
 				this.streamDeletionIntervalMs = parsedValue * 1000.0;
 				this.startStreamDeletion();
 			}
 		}
 
-		let creationIntervalInput = document.getElementById("creationIntervalInput") as HTMLInputElement;
+		const creationIntervalInput = document.getElementById("creationIntervalInput") as HTMLInputElement;
 		creationIntervalInput.value = (this.streamCreationIntervalMs / 1000.0).toString();
 
-		let deletionIntervalInput = document.getElementById("deletionIntervalInput") as HTMLInputElement;
+		const deletionIntervalInput = document.getElementById("deletionIntervalInput") as HTMLInputElement;
 		deletionIntervalInput.value = (this.streamDeletionIntervalMs / 1000.0).toString();
 	}
 
@@ -88,15 +88,15 @@ export class StressTester {
 
 		this.creationIntervalHandle = setInterval(() => {
 			if(this.play) {
-				let curNPeers = this.pixelStreamingFrames.length;
+				const curNPeers = this.pixelStreamingFrames.length;
 				if(curNPeers >= this.maxPeers) return;
 
-				let maxPeersToCreate = this.maxPeers - curNPeers;
-				let nPeersToCreate = Math.ceil(Math.random() * maxPeersToCreate);
+				const maxPeersToCreate = this.maxPeers - curNPeers;
+				const nPeersToCreate = Math.ceil(Math.random() * maxPeersToCreate);
 
 				for(let i = 0; i < nPeersToCreate; i++) {
-					let frame = this.createPixelStreamingFrame();
-					let n = this.pixelStreamingFrames.length;
+					const frame = this.createPixelStreamingFrame();
+					const n = this.pixelStreamingFrames.length;
 					frame.id = `PixelStreamingFrame_${n + 1}`;
 					this.streamsContainer.append(frame);
 					this.pixelStreamingFrames.push(frame);
@@ -115,19 +115,19 @@ export class StressTester {
 		this.deletionIntervalHandle = setInterval(() => {
 			if(!this.play) return;
 
-			let curNPeers = this.pixelStreamingFrames.length;
+			const curNPeers = this.pixelStreamingFrames.length;
 			if(curNPeers === 0) return;
 
-			let nPeersToDelete = Math.ceil(Math.random() * curNPeers);
+			const nPeersToDelete = Math.ceil(Math.random() * curNPeers);
 			for(let i = 0; i < nPeersToDelete; i++) {
-				let frame = this.pixelStreamingFrames.shift();
+				const frame = this.pixelStreamingFrames.shift();
 				frame.parentNode.removeChild(frame);
 			}
 		}, this.streamDeletionIntervalMs);
 	}
 
 	private setupPlayPause() : void {
-		let playPauseBtn = document.getElementById("playPause");
+		const playPauseBtn = document.getElementById("playPause");
 		playPauseBtn.innerHTML = this.play ? "Pause" : "Play";
 
 		playPauseBtn.onclick = (event : Event) => {
@@ -137,25 +137,25 @@ export class StressTester {
 	}
 
 	private createPixelStreamingFrame() : HTMLElement {
-		let streamFrame = document.createElement("div");
+		const streamFrame = document.createElement("div");
 
-		let config = new libfrontend.Config();
+		const config = new libfrontend.Config();
 		config.setFlagEnabled(libfrontend.Flags.AutoConnect, true);
 		config.setFlagEnabled(libfrontend.Flags.AutoPlayVideo, true);
 		config.setFlagEnabled(libfrontend.Flags.StartVideoMuted, true);
 
 		// Create a Native DOM delegate instance that implements the Delegate interface class
-		let pixelStreaming = new libfrontend.PixelStreaming(config);
-		let application = new Application({ pixelStreaming });
+		const pixelStreaming = new libfrontend.PixelStreaming(config);
+		const application = new Application({ pixelStreaming });
 		streamFrame.appendChild(application.rootElement);
 		return streamFrame;
 	}
 
 	private updateTotalStreams() : void {
-		let nStreamsLabel = document.getElementById("nStreamsLabel");
+		const nStreamsLabel = document.getElementById("nStreamsLabel");
 		nStreamsLabel.innerHTML = this.totalStreams.toString();
 	}
 }
 
-let tester = new StressTester();
+const tester = new StressTester();
 tester.startStressTest();
