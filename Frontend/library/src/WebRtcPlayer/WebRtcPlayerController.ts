@@ -1218,8 +1218,8 @@ export class WebRtcPlayerController {
         if(messageStreamerList.ids.length == 2) {
             // if there's only a single streamer, subscribe to it regardless of what is in the URL
             this.config.setOptionSettingValue(OptionParameters.StreamerId, messageStreamerList.ids[1]);
-        } else if (this.config.isFlagEnabled(Flags.PreferSFU)) {
-            // if the SFU toggle is on, subscribe to it regardless of what is in the URL
+        } else if (this.config.isFlagEnabled(Flags.PreferSFU) && messageStreamerList.ids.includes("SFU")) {
+            // if the SFU toggle is on and there's an SFU connected, subscribe to it regardless of what is in the URL
             this.config.setOptionSettingValue(OptionParameters.StreamerId, "SFU");
         } else if (urlParams.has(OptionParameters.StreamerId)) {
             // If there's a streamer ID in the URL, set it as the selected streamer
