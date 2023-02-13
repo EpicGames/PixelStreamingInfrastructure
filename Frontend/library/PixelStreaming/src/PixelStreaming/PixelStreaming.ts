@@ -12,7 +12,6 @@ import {
     WebRTCSettings
 } from '../DataChannel/InitialSettings';
 import { OnScreenKeyboard } from '../UI/OnScreenKeyboard';
-import { Controls } from '../UI/Controls';
 import { EventEmitter } from '../Util/EventEmitter';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
@@ -32,7 +31,6 @@ export class PixelStreaming {
     showActionOrErrorOnDisconnect = true;
 
     onScreenKeyboardHelper: OnScreenKeyboard;
-    controls: Controls;
 
     videoStartTime: number;
     inputController: boolean;
@@ -49,8 +47,6 @@ export class PixelStreaming {
         this.eventEmitter = new EventEmitter();
 
         this.configureSettings();
-
-        this.createButtons();
 
         // setup WebRTC
         this.setWebRtcPlayerController(
@@ -75,24 +71,6 @@ export class PixelStreaming {
         this.updateColors(this.config.isFlagEnabled(Flags.LightMode));
 
         this.webXrController = new WebXRController(this.webRtcController);
-    }
-
-    /**
-     * Set up button click functions and button functionality
-     */
-    public createButtons() {
-        // Setup controls
-        const controls = new Controls();
-
-        // When we fullscreen we want this element to be the root
-        controls.fullscreenIcon.fullscreenElement = this.rootElement;
-        this.uiFeaturesElement.appendChild(controls.rootElement);
-
-        // Add WebXR button to controls
-        controls.xrIcon.rootElement.onclick = () =>
-            this.webXrController.xrClicked();
-
-        this.controls = controls;
     }
 
     /**

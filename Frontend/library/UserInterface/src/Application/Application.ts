@@ -10,6 +10,7 @@ import { PlayOverlay } from '../Overlay/PlayOverlay';
 import { InfoOverlay } from '../Overlay/InfoOverlay';
 import { ErrorOverlay } from '../Overlay/ErrorOverlay';
 import { AFKOverlay } from '../Overlay/AFKOverlay';
+import { Controls } from '../UI/Controls';
 import { LabelledButton } from '../UI/LabelledButton';
 import { SettingsPanel } from '../UI/SettingsPanel';
 import { StatsPanel } from '../UI/StatsPanel';
@@ -32,6 +33,8 @@ export class Application {
     infoOverlay: TextOverlay;
     errorOverlay: TextOverlay;
     afkOverlay: AFKOverlay;
+
+    controls: Controls;
 
     settingsPanel: SettingsPanel;
     statsPanel: StatsPanel;
@@ -96,15 +99,25 @@ export class Application {
      * Set up button click functions and button functionality
      */
     public createButtons() {
+        // Setup controls
+        const controls = new Controls();
+
+        // When we fullscreen we want this element to be the root
+        controls.fullscreenIcon.fullscreenElement = this.rootElement;
+        this.uiFeaturesElement.appendChild(controls.rootElement);
 
         // Add settings button to controls
-        this.pixelStreaming.controls.settingsIcon.rootElement.onclick = () =>
+        controls.settingsIcon.rootElement.onclick = () =>
             this.settingsClicked();
         this.settingsPanel.settingsCloseButton.onclick = () =>
             this.settingsClicked();
-    
+
+        // Add WebXR button to controls
+        controls.xrIcon.rootElement.onclick = () =>
+            this.pixelStreaming.webXrController.xrClicked();
+
         // setup the stats/info button
-        this.pixelStreaming.controls.statsIcon.rootElement.onclick = () => this.statsClicked();
+        controls.statsIcon.rootElement.onclick = () => this.statsClicked();
 
         this.statsPanel.statsCloseButton.onclick = () => this.statsClicked();
 
@@ -175,8 +188,18 @@ export class Application {
         this.pixelStreaming.events.on("initialSettings", this.onInitialSettings.bind(this));
     }
 
+    /**
+     * Gets the rootElement of the application, video stream and all UI are children of this element.
+     */
     public get rootElement(): HTMLElement {
         return this.pixelStreaming.rootElement;
+    }
+
+    /**
+     * Gets the element that contains all the UI features, like the stats and settings panels.
+     */
+    public get uiFeaturesElement(): HTMLElement {
+        return this.pixelStreaming.uiFeaturesElement;
     }
 
     /**
