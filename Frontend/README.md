@@ -61,13 +61,12 @@ We recommend using the default player page as a starting point for creating 
 
 Additionally, if you have cloned the Pixel Streaming Infrastructure repository and made upstream changes, you can fork the repo and make a pull request.
 
-TO DO DEFAULT PLAYER PICTURE HERE:
+_The default Pixel Streaming player page:_
+![PixelStreamingDefaultPlayer](Docs\Resources\Images\pixelstreaming-default-interface.JPG)
 
-Default player page
+_A customised Pixel Streaming player page:_
+![PixelStreamingCustomPlayer](Docs\Resources\Images\pixelstreaming-custom-player.JPG)
 
-TO DO CUSTOMISED PLAYER PAGE HERE:
-
-Customized player with HTML5 UI
 
 ## HTML Page Requirements
 
