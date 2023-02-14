@@ -49,8 +49,8 @@ export class DataChannelController {
     setupDataChannel() {
         //We Want an Array Buffer not a blob
         this.dataChannel.binaryType = 'arraybuffer';
-        this.dataChannel.onopen = () => this.handleOnOpen();
-        this.dataChannel.onclose = () => this.handleOnClose();
+        this.dataChannel.onopen = (ev: Event) => this.handleOnOpen(ev);
+        this.dataChannel.onclose = (ev: Event) => this.handleOnClose(ev);
         this.dataChannel.onmessage = (ev: MessageEvent) =>
             this.handleOnMessage(ev);
         this.dataChannel.onerror = (ev: MessageEvent) => this.handleOnError(ev);
@@ -59,23 +59,25 @@ export class DataChannelController {
     /**
      * Handles when the Data Channel is opened
      */
-    handleOnOpen() {
+    handleOnOpen(ev: Event) {
         Logger.Log(
             Logger.GetStackTrace(),
             `Data Channel (${this.label}) opened.`,
             7
         );
+        this.onOpen(this.dataChannel?.label, ev);
     }
 
     /**
      * Handles when the Data Channel is closed
      */
-    handleOnClose() {
+    handleOnClose(ev: Event) {
         Logger.Log(
             Logger.GetStackTrace(),
             `Data Channel (${this.label}) closed.`,
             7
         );
+        this.onClose(this.dataChannel?.label, ev);
     }
 
     /**
@@ -101,5 +103,30 @@ export class DataChannelController {
             `Data Channel (${this.label}) error: ${event}`,
             7
         );
+        this.onError(this.dataChannel?.label, event);
+    }
+
+    /**
+     * Override to register onOpen handler
+     * @param ev event
+     */
+    onOpen(label: string, ev: Event) {
+        // empty default implementation
+    }
+
+    /**
+     * Override to register onClose handler
+     * @param ev event
+     */
+    onClose(label: string, ev: Event) {
+        // empty default implementation
+    }
+
+    /**
+     * Override to register onError handler
+     * @param ev event
+     */
+    onError(label: string, ev: Event) {
+        // empty default implementation
     }
 }
