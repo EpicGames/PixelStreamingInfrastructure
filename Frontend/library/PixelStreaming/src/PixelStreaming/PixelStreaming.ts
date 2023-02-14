@@ -330,6 +330,10 @@ export class PixelStreaming {
         this.connect();
     }
 
+    disconnect() {
+        this.webRtcController.close();
+    }
+
     play() {
         this.onStreamLoading();
         this.webRtcController.playStream();

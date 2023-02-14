@@ -1439,6 +1439,21 @@ export class WebRtcPlayerController {
     }
 
     /**
+     * Close the peer connection
+     */
+    closePeerConnection() {
+        this.peerConnectionController.close();
+    }
+
+    /**
+     * Close all connections
+     */
+    close() {
+        this.closeSignalingServer();
+        this.closePeerConnection();
+    }
+
+    /**
      * Fires a Video Stats Event in the RTC Peer Connection
      */
     getStats() {
