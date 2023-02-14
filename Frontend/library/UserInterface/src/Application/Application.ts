@@ -179,9 +179,9 @@ export class Application {
         this.pixelStreaming.events.on("webRtcConnecting", this.onWebRtcConnecting.bind(this));
         this.pixelStreaming.events.on("webRtcConnected", this.onWebRtcConnected.bind(this));
         this.pixelStreaming.events.on("webRtcFailed", this.onWebRtcFailed.bind(this));
+        this.pixelStreaming.events.on("webRtcDisconnect", this.onDisconnect.bind(this));
         this.pixelStreaming.events.on("videoInitialized", this.onVideoInitialized.bind(this));
         this.pixelStreaming.events.on("streamLoading", this.onStreamLoading.bind(this));
-        this.pixelStreaming.events.on("disconnect", this.onDisconnect.bind(this));
         this.pixelStreaming.events.on("playStreamError", this.onPlayStreamError.bind(this));
         this.pixelStreaming.events.on("playStream", this.onPlayStream.bind(this));
         this.pixelStreaming.events.on("playStreamRejected", this.onPlayStreamRejected.bind(this));

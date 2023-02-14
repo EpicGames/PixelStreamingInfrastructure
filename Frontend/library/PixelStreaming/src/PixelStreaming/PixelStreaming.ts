@@ -389,7 +389,7 @@ export class PixelStreaming {
             this.webRtcController.setDisconnectMessageOverride('');
         }
 
-        this.eventEmitter.emit("disconnect", [eventString, this.showActionOrErrorOnDisconnect])
+        this.eventEmitter.emit("webRtcDisconnect", [eventString, this.showActionOrErrorOnDisconnect])
         if (this.showActionOrErrorOnDisconnect == false) {
             this.showActionOrErrorOnDisconnect = true;
         }

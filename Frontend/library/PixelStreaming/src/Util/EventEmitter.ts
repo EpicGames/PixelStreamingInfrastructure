@@ -13,9 +13,12 @@ export type EventType =
     | 'webRtcConnecting'
     | 'webRtcConnected'
     | 'webRtcFailed'
+    | 'webRtcDisconnect'
+    | 'dataChannelOpen'
+    | 'dataChannelClose'
+    | 'dataChannelError'
     | 'videoInitialized'
     | 'streamLoading'
-    | 'disconnect'
     | 'playStreamError'
     | 'playStream'
     | 'playStreamRejected'
@@ -40,6 +43,9 @@ export type EventArgsLoadFreezeFrame = [shouldShowPlayOverlay: boolean, isValid:
 export type EventArgsStatsReceived = [aggregatedStats: AggregatedStats];
 export type EventArgsLatencyTestResult = [latencyTimings: LatencyTestResults];
 export type EventArgsInitialSettings = [settings: InitialSettings];
+export type EventArgsDataChannelOpen = [channel: string, ev: Event];
+export type EventArgsDataChannelClose = [channel: string, ev: Event];
+export type EventArgsDataChannelError = [channel: string, ev: Event];
 
 export class EventEmitter {
     private callbacks: Record<EventType, EventCallback[]> = {
@@ -53,9 +59,9 @@ export class EventEmitter {
         webRtcConnecting: [],
         webRtcConnected: [],
         webRtcFailed: [],
+        webRtcDisconnect: [],
         videoInitialized: [],
         streamLoading: [],
-        disconnect: [],
         playStreamError: [],
         playStream: [],
         playStreamRejected: [],
@@ -63,7 +69,10 @@ export class EventEmitter {
         hideFreezeFrame: [],
         statsReceived: [],
         latencyTestResult: [],
-        initialSettings: []
+        initialSettings: [],
+        dataChannelOpen: [],
+        dataChannelClose: [],
+        dataChannelError: []
     };
 
     on(event: "afkWarningActivate", callback: EventCallback<EventArgsAfkWarningActivate>): EventEmitterUnregisterCallback;
@@ -78,7 +87,7 @@ export class EventEmitter {
     on(event: "webRtcFailed", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
     on(event: "videoInitialized", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
     on(event: "streamLoading", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
-    on(event: "disconnect", callback: EventCallback<EventArgsDisconnect>): EventEmitterUnregisterCallback;
+    on(event: "webRtcDisconnect", callback: EventCallback<EventArgsDisconnect>): EventEmitterUnregisterCallback;
     on(event: "playStreamError", callback: EventCallback<EventArgsPlayStreamError>): EventEmitterUnregisterCallback;
     on(event: "playStream", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
     on(event: "playStreamRejected", callback: EventCallback<EventArgsPlayStreamRejected>): EventEmitterUnregisterCallback;
@@ -87,6 +96,9 @@ export class EventEmitter {
     on(event: "statsReceived", callback: EventCallback<EventArgsStatsReceived>): EventEmitterUnregisterCallback;
     on(event: "latencyTestResult", callback: EventCallback<EventArgsLatencyTestResult>): EventEmitterUnregisterCallback;
     on(event: "initialSettings", callback: EventCallback<EventArgsInitialSettings>): EventEmitterUnregisterCallback;
+    on(event: "dataChannelOpen", callback: EventCallback<EventArgsDataChannelOpen>): EventEmitterUnregisterCallback;
+    on(event: "dataChannelClose", callback: EventCallback<EventArgsDataChannelClose>): EventEmitterUnregisterCallback;
+    on(event: "dataChannelError", callback: EventCallback<EventArgsDataChannelError>): EventEmitterUnregisterCallback;
     on(event: EventType, callback: EventCallback): EventEmitterUnregisterCallback {
         this.callbacks[event].push(callback);
         return () => this.off(event, callback);
@@ -109,9 +121,9 @@ export class EventEmitter {
     emit(event: "webRtcConnecting"): void;
     emit(event: "webRtcConnected"): void;
     emit(event: "webRtcFailed"): void;
+    emit(event: "webRtcDisconnect", args: EventArgsDisconnect): void;
     emit(event: "videoInitialized"): void;
     emit(event: "streamLoading"): void;
-    emit(event: "disconnect", args: EventArgsDisconnect): void;
     emit(event: "playStreamError", args: EventArgsPlayStreamError): void;
     emit(event: "playStream"): void;
     emit(event: "playStreamRejected", args: EventArgsPlayStreamRejected): void;
@@ -120,6 +132,9 @@ export class EventEmitter {
     emit(event: "statsReceived", args: EventArgsStatsReceived): void;
     emit(event: "latencyTestResult", args: EventArgsLatencyTestResult): void;
     emit(event: "initialSettings", args: EventArgsInitialSettings): void;
+    emit(event: "dataChannelOpen", args: EventArgsDataChannelOpen): void;
+    emit(event: "dataChannelClose", args: EventArgsDataChannelClose): void;
+    emit(event: "dataChannelError", args: EventArgsDataChannelError): void;
     emit(event: EventType, args?: unknown[]): void {
         this.callbacks[event].forEach((callback) => callback(...(args || [])));
     }

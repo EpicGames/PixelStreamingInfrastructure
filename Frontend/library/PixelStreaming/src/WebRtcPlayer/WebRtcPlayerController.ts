@@ -155,6 +155,8 @@ export class WebRtcPlayerController {
 
         this.sendrecvDataChannelController = new DataChannelController();
         this.recvDataChannelController = new DataChannelController();
+        this.registerDataChannelEventEmitters(this.sendrecvDataChannelController);
+        this.registerDataChannelEventEmitters(this.recvDataChannelController);
         this.dataChannelSender = new DataChannelSender(
             this.sendrecvDataChannelController
         );
@@ -1723,5 +1725,11 @@ export class WebRtcPlayerController {
     setVideoEncoderAvgQP(avgQP: number) {
         this.videoAvgQp = avgQP;
         this.pixelStreaming.onVideoEncoderAvgQP(this.videoAvgQp);
+    }
+
+    registerDataChannelEventEmitters(dataChannel: DataChannelController) {
+        dataChannel.onOpen = (label, ev) => this.pixelStreaming.events.emit("dataChannelOpen", [label , ev])
+        dataChannel.onClose = (label, ev) => this.pixelStreaming.events.emit("dataChannelClose", [label , ev])
+        dataChannel.onError = (label, ev) => this.pixelStreaming.events.emit("dataChannelError", [label , ev])
     }
 }
