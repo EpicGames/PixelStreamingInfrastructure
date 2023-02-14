@@ -40,7 +40,7 @@ If you are developing your implementation based on the library, the process is s
 
 Copyright &copy; 2022, Epic Games. Licensed under the MIT License, see the file [LICENSE](./LICENSE) for details.
 
-#Table of Contents
+# Table of Contents
 - [Customizing the Player Webpage](Docs\Customizing%20the%20Player%20Webpage.md)
 - [HTML Page Requirements](Docs\HTML%20Page%20Requirements.md)
   - [Player File Location and URL](Docs\HTML%20Page%20Requirements.md)
