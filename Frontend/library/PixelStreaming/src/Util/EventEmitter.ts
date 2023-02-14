@@ -13,7 +13,7 @@ export type EventType =
     | 'webRtcConnecting'
     | 'webRtcConnected'
     | 'webRtcFailed'
-    | 'webRtcDisconnect'
+    | 'webRtcDisconnected'
     | 'dataChannelOpen'
     | 'dataChannelClose'
     | 'dataChannelError'
@@ -59,7 +59,7 @@ export class EventEmitter {
         webRtcConnecting: [],
         webRtcConnected: [],
         webRtcFailed: [],
-        webRtcDisconnect: [],
+        webRtcDisconnected: [],
         videoInitialized: [],
         streamLoading: [],
         playStreamError: [],
@@ -87,7 +87,7 @@ export class EventEmitter {
     on(event: "webRtcFailed", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
     on(event: "videoInitialized", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
     on(event: "streamLoading", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
-    on(event: "webRtcDisconnect", callback: EventCallback<EventArgsDisconnect>): EventEmitterUnregisterCallback;
+    on(event: "webRtcDisconnected", callback: EventCallback<EventArgsDisconnect>): EventEmitterUnregisterCallback;
     on(event: "playStreamError", callback: EventCallback<EventArgsPlayStreamError>): EventEmitterUnregisterCallback;
     on(event: "playStream", callback: EventCallback<[]>): EventEmitterUnregisterCallback;
     on(event: "playStreamRejected", callback: EventCallback<EventArgsPlayStreamRejected>): EventEmitterUnregisterCallback;
@@ -121,7 +121,7 @@ export class EventEmitter {
     emit(event: "webRtcConnecting"): void;
     emit(event: "webRtcConnected"): void;
     emit(event: "webRtcFailed"): void;
-    emit(event: "webRtcDisconnect", args: EventArgsDisconnect): void;
+    emit(event: "webRtcDisconnected", args: EventArgsDisconnect): void;
     emit(event: "videoInitialized"): void;
     emit(event: "streamLoading"): void;
     emit(event: "playStreamError", args: EventArgsPlayStreamError): void;
