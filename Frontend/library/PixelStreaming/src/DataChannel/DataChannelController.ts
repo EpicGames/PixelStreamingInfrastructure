@@ -108,24 +108,30 @@ export class DataChannelController {
 
     /**
      * Override to register onOpen handler
+     * @param label Data channel label ("datachannel", "send-datachannel", "recv-datachannel")
      * @param ev event
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onOpen(label: string, ev: Event) {
         // empty default implementation
     }
 
     /**
      * Override to register onClose handler
+     * @param label Data channel label ("datachannel", "send-datachannel", "recv-datachannel")
      * @param ev event
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onClose(label: string, ev: Event) {
         // empty default implementation
     }
 
     /**
      * Override to register onError handler
+     * @param label Data channel label ("datachannel", "send-datachannel", "recv-datachannel")
      * @param ev event
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onError(label: string, ev: Event) {
         // empty default implementation
     }
