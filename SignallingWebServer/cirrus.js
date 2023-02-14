@@ -440,6 +440,7 @@ function forwardStreamerMessageToPlayer(streamer, msg) {
 	const player = players.get(playerId);
 	if (player) {
 		logForward(streamer.id, playerId, msg);
+		delete msg.playerId;
 		player.sendTo(msg);
 	}
 }
