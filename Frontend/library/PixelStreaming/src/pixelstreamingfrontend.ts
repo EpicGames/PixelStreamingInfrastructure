@@ -7,7 +7,8 @@ export {
     ControlSchemeType,
     Flags,
     NumericParameters,
-    TextParameters
+    TextParameters,
+    OptionParameters
 } from './Config/Config';
 export { SettingBase } from './Config/SettingBase';
 export { SettingFlag } from './Config/SettingFlag';
