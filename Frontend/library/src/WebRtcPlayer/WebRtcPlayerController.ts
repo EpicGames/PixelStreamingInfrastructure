@@ -1226,6 +1226,8 @@ export class WebRtcPlayerController {
         } else if (urlParams.has(OptionParameters.StreamerId) && messageStreamerList.ids.includes(urlParams.get(OptionParameters.StreamerId))) {
             // If there's a streamer ID in the URL and a streamer with this ID is connected, set it as the selected streamer
             this.config.setOptionSettingValue(OptionParameters.StreamerId, urlParams.get(OptionParameters.StreamerId));
+        } else {
+            this.application.showTextOverlay('Multiple streamers detected. Use the dropdown in the settings menu to select the streamer.');
         }
     }
 
