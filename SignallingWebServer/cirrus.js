@@ -520,6 +520,7 @@ function forwardSFUMessageToStreamer(msg) {
 	const sfuPlayer = getSFU();
 	if (sfuPlayer) {
 		logForward(SFUPlayerId, sfuPlayer.streamerId, msg);
+		msg.sfuId = SFUPlayerId;
 		sfuPlayer.sendFrom(msg);
 	}
 }
@@ -530,7 +531,6 @@ function onPeerDataChannelsSFUMessage(msg) {
 	const player = players.get(playerId);
 	if (player) {
 		logForward(SFUPlayerId, playerId, msg);
-		msg.sfuId = SFUPlayerId;
 		player.sendTo(msg);
 		player.datachannel = true;
 	}
