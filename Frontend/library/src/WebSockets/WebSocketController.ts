@@ -247,7 +247,5 @@ export class WebSocketController {
      * @param messageDataChannels - The data channels details
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-    onWebRtcPeerDataChannels(
-        messageDataChannels: MessageReceive.MessagePeerDataChannels
-    ) {}
+    onWebRtcPeerDataChannels(messageDataChannels: MessageReceive.MessagePeerDataChannels) {}
 }
