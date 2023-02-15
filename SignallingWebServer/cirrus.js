@@ -530,6 +530,7 @@ function onPeerDataChannelsSFUMessage(msg) {
 	const player = players.get(playerId);
 	if (player) {
 		logForward(SFUPlayerId, playerId, msg);
+		msg.sfuId = SFUPlayerId;
 		player.sendTo(msg);
 		player.datachannel = true;
 	}
