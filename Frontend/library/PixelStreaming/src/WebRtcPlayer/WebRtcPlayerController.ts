@@ -50,6 +50,7 @@ import {
 } from '../Util/CoordinateConverter';
 import { PixelStreaming } from '../PixelStreaming/PixelStreaming';
 import { ITouchController } from '../Inputs/ITouchController';
+import { DataChannelCloseEvent, DataChannelErrorEvent, DataChannelOpenEvent, HideFreezeFrameEvent, LoadFreezeFrameEvent, PlayStreamErrorEvent, PlayStreamEvent, PlayStreamRejectedEvent } from '../Util/EventEmitter';
 /**
  * Entry point for the WebRTC Player
  */
@@ -866,7 +867,7 @@ export class WebRtcPlayerController {
      * Loads a freeze frame if it is required otherwise shows the play overlay
      */
     loadFreezeFrameOrShowPlayOverlay() {
-        this.pixelStreaming.events.emit({ type: "loadFreezeFrame", data: { shouldShowPlayOverlay: this.shouldShowPlayOverlay, isValid: this.freezeFrameController.valid, jpegData: this.freezeFrameController.jpeg }});
+        this.pixelStreaming.events.dispatchEvent(new LoadFreezeFrameEvent({ shouldShowPlayOverlay: this.shouldShowPlayOverlay, isValid: this.freezeFrameController.valid, jpegData: this.freezeFrameController.jpeg }));
         if (this.shouldShowPlayOverlay === true) {
             Logger.Log(Logger.GetStackTrace(), 'showing play overlay');
             this.resizePlayerStyle();
@@ -905,7 +906,7 @@ export class WebRtcPlayerController {
             6
         );
         setTimeout(() => {
-            this.pixelStreaming.events.emit({ type: "hideFreezeFrame" });
+            this.pixelStreaming.events.dispatchEvent(new HideFreezeFrameEvent());
             this.freezeFrameController.hideFreezeFrame();
         }, this.freezeFrameController.freezeFrameDelay);
         if (this.videoPlayer.getVideoElement()) {
@@ -946,7 +947,7 @@ export class WebRtcPlayerController {
     playStream() {
         if (!this.videoPlayer.getVideoElement()) {
             const message = 'Could not play video stream because the video player was not initialized correctly.';
-            this.pixelStreaming.events.emit({ type: "playStreamError", data: { message }});
+            this.pixelStreaming.events.dispatchEvent(new PlayStreamErrorEvent({ message }));
             Logger.Error(
                 Logger.GetStackTrace(),
                 message
@@ -974,7 +975,7 @@ export class WebRtcPlayerController {
             this.config.isFlagEnabled(Flags.FakeMouseWithTouches),
             this.videoElementParentClientRect
         );
-        this.pixelStreaming.events.emit({ type: "playStream" });
+        this.pixelStreaming.events.dispatchEvent(new PlayStreamEvent());
 
         if (this.streamController.audioElement.srcObject) {
             this.streamController.audioElement.muted =
@@ -991,7 +992,7 @@ export class WebRtcPlayerController {
                         Logger.GetStackTrace(),
                         'Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.'
                     );
-                    this.pixelStreaming.events.emit({ type: "playStreamRejected", data: { reason: onRejectedReason }});
+                    this.pixelStreaming.events.dispatchEvent(new PlayStreamRejectedEvent({ reason: onRejectedReason }));
                 });
         } else {
             this.playVideo();
@@ -1015,7 +1016,7 @@ export class WebRtcPlayerController {
                 Logger.GetStackTrace(),
                 'Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.'
             );
-            this.pixelStreaming.events.emit({ type: "playStreamRejected", data: { reason: onRejectedReason }});
+            this.pixelStreaming.events.dispatchEvent(new PlayStreamRejectedEvent({ reason: onRejectedReason }));
         });
     }
 
@@ -1743,8 +1744,8 @@ export class WebRtcPlayerController {
     }
 
     registerDataChannelEventEmitters(dataChannel: DataChannelController) {
-        dataChannel.onOpen = (label, event) => this.pixelStreaming.events.emit({ type: "dataChannelOpen", data: { label , event }});
-        dataChannel.onClose = (label, event) => this.pixelStreaming.events.emit({ type: "dataChannelClose", data: { label , event }});
-        dataChannel.onError = (label, event) => this.pixelStreaming.events.emit({ type: "dataChannelError", data: { label , event }});
+        dataChannel.onOpen = (label, event) => this.pixelStreaming.events.dispatchEvent(new DataChannelOpenEvent({ label , event }));
+        dataChannel.onClose = (label, event) => this.pixelStreaming.events.dispatchEvent(new DataChannelCloseEvent({ label , event }));
+        dataChannel.onError = (label, event) => this.pixelStreaming.events.dispatchEvent(new DataChannelErrorEvent({ label , event }));
     }
 }

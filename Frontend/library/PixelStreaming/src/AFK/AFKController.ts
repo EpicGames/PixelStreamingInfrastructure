@@ -3,6 +3,7 @@
 import { Config, Flags, NumericParameters } from '../Config/Config';
 import { Logger } from '../Logger/Logger';
 import { PixelStreaming } from '../PixelStreaming/PixelStreaming';
+import { AfkTimedOutEvent, AfkWarningActivateEvent, AfkWarningDeactivateEvent, AfkWarningUpdateEvent } from '../Util/EventEmitter';
 
 export class AFKController {
     // time out logic details
@@ -37,7 +38,7 @@ export class AFKController {
 
         if (this.active || this.countdownActive) {
             this.startAfkWarningTimer();
-            this.pixelStreaming.events.emit({ type: "afkWarningDeactivate" });
+            this.pixelStreaming.events.dispatchEvent(new AfkWarningDeactivateEvent());
         }
     }
 
@@ -98,12 +99,12 @@ export class AFKController {
         this.pauseAfkWarningTimer();
 
         // instantiate a new overlay
-        this.pixelStreaming.events.emit({ type: "afkWarningActivate", data: { countDown: this.countDown, dismissAfk: this.onDismissAfk} });
+        this.pixelStreaming.events.dispatchEvent(new AfkWarningActivateEvent({ countDown: this.countDown, dismissAfk: this.onDismissAfk }));
 
         // update our countDown timer and overlay contents
         this.countDown = this.closeTimeout;
         this.countdownActive = true;
-        this.pixelStreaming.events.emit({ type: "afkWarningUpdate", data: { countDown: this.countDown }});
+        this.pixelStreaming.events.dispatchEvent(new AfkWarningUpdateEvent({ countDown: this.countDown }));
 
         // if we are in locked mouse exit pointerlock
         if (!this.config.isFlagEnabled(Flags.HoveringMouseMode)) {
@@ -118,7 +119,7 @@ export class AFKController {
             this.countDown--;
             if (this.countDown == 0) {
                 // The user failed to click so hide the overlay and disconnect them.
-                this.pixelStreaming.events.emit({ type: "afkTimedOut" });
+                this.pixelStreaming.events.dispatchEvent(new AfkTimedOutEvent());
                 this.onAFKTimedOutCallback();
                 Logger.Log(
                     Logger.GetStackTrace(),
@@ -128,7 +129,7 @@ export class AFKController {
                 // switch off the afk feature as stream has closed
                 this.stopAfkWarningTimer();
             } else {
-                this.pixelStreaming.events.emit({ type: "afkWarningUpdate", data: { countDown: this.countDown }});
+                this.pixelStreaming.events.dispatchEvent(new AfkWarningUpdateEvent({ countDown: this.countDown }));
             }
         }, 1000);
     }

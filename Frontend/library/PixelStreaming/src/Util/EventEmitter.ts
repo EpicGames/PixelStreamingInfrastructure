@@ -2,135 +2,216 @@ import { LatencyTestResults } from '../DataChannel/LatencyTestResults';
 import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
 import { InitialSettings } from '../pixelstreamingfrontend';
 
-export type EventAfkWarningActivate = {
+export class AfkWarningActivateEvent extends Event {
     readonly type: 'afkWarningActivate';
     readonly data: {
         countDown: number;
         dismissAfk: () => void;
     };
-};
-export type EventAfkWarningUpdate = {
+    constructor(data: AfkWarningActivateEvent['data']) {
+        super('afkWarningActivate');
+        this.data = data;
+    }
+}
+export class AfkWarningUpdateEvent extends Event {
     readonly type: 'afkWarningUpdate';
     readonly data: { countDown: number };
-};
-export type EventAfkWarningDeactivate = {
+    constructor(data: AfkWarningUpdateEvent['data']) {
+        super('afkWarningUpdate');
+        this.data = data;
+    }
+}
+export class AfkWarningDeactivateEvent extends Event {
     readonly type: 'afkWarningDeactivate';
-};
-export type EventAfkTimedOut = {
+    constructor() {
+        super('afkWarningDeactivate');
+    }
+}
+export class AfkTimedOutEvent extends Event {
     readonly type: 'afkTimedOut';
-};
-export type EventVideoEncoderAvgQP = {
+    constructor() {
+        super('afkTimedOut');
+    }
+}
+export class VideoEncoderAvgQPEvent extends Event {
     readonly type: 'videoEncoderAvgQP';
     readonly data: { avgQP: number };
-};
-export type EventWebRtcSdp = {
+    constructor(data: VideoEncoderAvgQPEvent['data']) {
+        super('videoEncoderAvgQP');
+        this.data = data;
+    }
+}
+export class WebRtcSdpEvent extends Event {
     readonly type: 'webRtcSdp';
-};
-export type EventWebRtcAutoConnect = {
+    constructor() {
+        super('webRtcSdp');
+    }
+}
+export class WebRtcAutoConnectEvent extends Event {
     readonly type: 'webRtcAutoConnect';
-};
-export type EventWebRtcConnecting = {
+    constructor() {
+        super('webRtcAutoConnect');
+    }
+}
+export class WebRtcConnectingEvent extends Event {
     readonly type: 'webRtcConnecting';
-};
-export type EventWebRtcConnected = {
+    constructor() {
+        super('webRtcConnecting');
+    }
+}
+export class WebRtcConnectedEvent extends Event {
     readonly type: 'webRtcConnected';
-};
-export type EventWebRtcFailed = {
+    constructor() {
+        super('webRtcConnected');
+    }
+}
+export class WebRtcFailedEvent extends Event {
     readonly type: 'webRtcFailed';
-};
-export type EventWebRtcDisconnected = {
+    constructor() {
+        super('webRtcFailed');
+    }
+}
+export class WebRtcDisconnectedEvent extends Event {
     readonly type: 'webRtcDisconnected';
     readonly data: {
         eventString: string;
         showActionOrErrorOnDisconnect: boolean;
     };
-};
-export type EventDataChannelOpen = {
+    constructor(data: WebRtcDisconnectedEvent['data']) {
+        super('webRtcDisconnected');
+        this.data = data;
+    }
+}
+export class DataChannelOpenEvent extends Event {
     readonly type: 'dataChannelOpen';
     readonly data: { label: string; event: Event };
-};
-export type EventDataChannelClose = {
+    constructor(data: DataChannelOpenEvent['data']) {
+        super('dataChannelOpen');
+        this.data = data;
+    }
+}
+export class DataChannelCloseEvent extends Event {
     readonly type: 'dataChannelClose';
     readonly data: { label: string; event: Event };
-};
-export type EventDataChannelError = {
+    constructor(data: DataChannelCloseEvent['data']) {
+        super('dataChannelClose');
+        this.data = data;
+    }
+}
+export class DataChannelErrorEvent extends Event {
     readonly type: 'dataChannelError';
     readonly data: { label: string; event: Event };
-};
-export type EventVideoInitialized = {
+    constructor(data: DataChannelErrorEvent['data']) {
+        super('dataChannelError');
+        this.data = data;
+    }
+}
+export class VideoInitializedEvent extends Event {
     readonly type: 'videoInitialized';
-};
-export type EventStreamLoading = {
+    constructor() {
+        super('videoInitialized');
+    }
+}
+export class StreamLoadingEvent extends Event {
     readonly type: 'streamLoading';
-};
-export type EventPlayStreamError = {
+    constructor() {
+        super('streamLoading');
+    }
+}
+export class PlayStreamErrorEvent extends Event {
     readonly type: 'playStreamError';
     readonly data: { message: string };
-};
-export type EventPlayStream = {
+    constructor(data: PlayStreamErrorEvent['data']) {
+        super('playStreamError');
+        this.data = data;
+    }
+}
+export class PlayStreamEvent extends Event {
     readonly type: 'playStream';
-};
-export type EventPlayStreamRejected = {
+    constructor() {
+        super('playStream');
+    }
+}
+export class PlayStreamRejectedEvent extends Event {
     readonly type: 'playStreamRejected';
     readonly data: { reason: unknown };
-};
-export type EventLoadFreezeFrame = {
+    constructor(data: PlayStreamRejectedEvent['data']) {
+        super('playStreamRejected');
+        this.data = data;
+    }
+}
+export class LoadFreezeFrameEvent extends Event {
     readonly type: 'loadFreezeFrame';
     readonly data: {
         shouldShowPlayOverlay: boolean;
         isValid: boolean;
         jpegData?: Uint8Array;
     };
-};
-export type EventHideFreezeFrame = {
+    constructor(data: LoadFreezeFrameEvent['data']) {
+        super('loadFreezeFrame');
+        this.data = data;
+    }
+}
+export class HideFreezeFrameEvent extends Event {
     readonly type: 'hideFreezeFrame';
-};
-export type EventStatsReceived = {
+    constructor() {
+        super('hideFreezeFrame');
+    }
+}
+export class StatsReceivedEvent extends Event {
     readonly type: 'statsReceived';
     readonly data: { aggregatedStats: AggregatedStats };
-};
-export type EventLatencyTestResult = {
+    constructor(data: StatsReceivedEvent['data']) {
+        super('statsReceived');
+        this.data = data;
+    }
+}
+export class LatencyTestResultEvent extends Event {
     readonly type: 'latencyTestResult';
     readonly data: { latencyTimings: LatencyTestResults };
-};
-export type EventInitialSettings = {
+    constructor(data: LatencyTestResultEvent['data']) {
+        super('latencyTestResult');
+        this.data = data;
+    }
+}
+export class InitialSettingsEvent extends Event {
     readonly type: 'initialSettings';
     readonly data: { settings: InitialSettings };
-};
+    constructor(data: InitialSettingsEvent['data']) {
+        super('initialSettings');
+        this.data = data;
+    }
+}
 
 export type PixelStreamingEvent =
-    | EventAfkWarningActivate
-    | EventAfkWarningUpdate
-    | EventAfkWarningDeactivate
-    | EventAfkTimedOut
-    | EventVideoEncoderAvgQP
-    | EventWebRtcSdp
-    | EventWebRtcAutoConnect
-    | EventWebRtcConnecting
-    | EventWebRtcConnected
-    | EventWebRtcFailed
-    | EventWebRtcDisconnected
-    | EventDataChannelOpen
-    | EventDataChannelClose
-    | EventDataChannelError
-    | EventVideoInitialized
-    | EventStreamLoading
-    | EventPlayStreamError
-    | EventPlayStream
-    | EventPlayStreamRejected
-    | EventLoadFreezeFrame
-    | EventHideFreezeFrame
-    | EventStatsReceived
-    | EventLatencyTestResult
-    | EventInitialSettings;
+    | AfkWarningActivateEvent
+    | AfkWarningUpdateEvent
+    | AfkWarningDeactivateEvent
+    | AfkTimedOutEvent
+    | VideoEncoderAvgQPEvent
+    | WebRtcSdpEvent
+    | WebRtcAutoConnectEvent
+    | WebRtcConnectingEvent
+    | WebRtcConnectedEvent
+    | WebRtcFailedEvent
+    | WebRtcDisconnectedEvent
+    | DataChannelOpenEvent
+    | DataChannelCloseEvent
+    | DataChannelErrorEvent
+    | VideoInitializedEvent
+    | StreamLoadingEvent
+    | PlayStreamErrorEvent
+    | PlayStreamEvent
+    | PlayStreamRejectedEvent
+    | LoadFreezeFrameEvent
+    | HideFreezeFrameEvent
+    | StatsReceivedEvent
+    | LatencyTestResultEvent
+    | InitialSettingsEvent;
 
 export class EventEmitter extends EventTarget {
-    public dispatchEvent(e: Event & PixelStreamingEvent): boolean {
+    public dispatchEvent(e: PixelStreamingEvent): boolean {
         return super.dispatchEvent(e);
-    }
-
-    public emit(event: PixelStreamingEvent): boolean {
-        return this.dispatchEvent(Object.assign(new Event(event.type), event));
     }
 
     public addEventListener<
