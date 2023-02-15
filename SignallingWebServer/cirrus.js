@@ -520,6 +520,7 @@ function forwardSFUMessageToStreamer(msg) {
 	const sfuPlayer = getSFU();
 	if (sfuPlayer) {
 		logForward(SFUPlayerId, sfuPlayer.streamerId, msg);
+		msg.sfuId = SFUPlayerId;
 		sfuPlayer.sendFrom(msg);
 	}
 }
