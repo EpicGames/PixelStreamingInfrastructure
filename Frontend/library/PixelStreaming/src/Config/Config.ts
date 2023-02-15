@@ -33,6 +33,9 @@ export class Flags {
 export type FlagsKeys = Exclude<keyof typeof Flags, "prototype">;
 export type FlagsIds = typeof Flags[FlagsKeys];
 
+const isFlagId = (id: string): id is FlagsIds =>
+    Object.getOwnPropertyNames(Flags).some((name: FlagsKeys) => Flags[name] === id);
+
 /**
  * A collection of numeric parameters that are core to all Pixel Streaming experiences.
  *
@@ -49,6 +52,9 @@ export class NumericParameters {
 export type NumericParametersKeys = Exclude<keyof typeof NumericParameters, "prototype">;
 export type NumericParametersIds = typeof NumericParameters[NumericParametersKeys];
 
+const isNumericId = (id: string): id is NumericParametersIds =>
+    Object.getOwnPropertyNames(NumericParameters).some((name: NumericParametersKeys) => NumericParameters[name] === id);
+
 /**
  * A collection of textual parameters that are core to all Pixel Streaming experiences.
  *
@@ -59,6 +65,9 @@ export class TextParameters {
 
 export type TextParametersKeys = Exclude<keyof typeof TextParameters, "prototype">;
 export type TextParametersIds = typeof TextParameters[TextParametersKeys];
+
+const isTextId = (id: string): id is TextParametersIds =>
+    Object.getOwnPropertyNames(TextParameters).some((name: TextParametersKeys) => TextParameters[name] === id);
 
 /**
  * A collection of enum based parameters that are core to all Pixel Streaming experiences.
@@ -71,6 +80,31 @@ export class OptionParameters {
 
 export type OptionParametersKeys = Exclude<keyof typeof OptionParameters, "prototype">;
 export type OptionParametersIds = typeof OptionParameters[OptionParametersKeys];
+
+const isOptionId = (id: string): id is OptionParametersIds =>
+    Object.getOwnPropertyNames(OptionParameters).some((name: OptionParametersKeys) => OptionParameters[name] === id);
+
+/**
+ * Utility types for inferring data type based on setting ID
+ */
+export type OptionIds =
+    | FlagsIds
+    | NumericParametersIds
+    | TextParametersIds
+    | OptionParametersIds;
+export type OptionKeys<T> = T extends FlagsIds
+    ? boolean
+    : T extends NumericParametersIds
+    ? number
+    : T extends TextParametersIds
+    ? string
+    : T extends OptionParametersIds
+    ? string
+    : never;
+
+export type AllSettings = {
+    [K in OptionIds]: OptionKeys<K>
+}
 
 export class Config {
     /* A map of flags that can be toggled - options that can be set in the application - e.g. Use Mic? */
@@ -548,7 +582,7 @@ export class Config {
      * @param onChangedListener The callback to fire when the numeric value changes.
      */
     addOnNumericSettingChangedListener(
-        id: string,
+        id: NumericParametersIds,
         onChangedListener: (newValue: number) => void
     ): void {
         if (this.numericParameters.has(id)) {
@@ -559,7 +593,7 @@ export class Config {
     }
 
     addOnOptionSettingChangedListener(
-        id: string,
+        id: OptionParametersIds,
         onChangedListener: (newValue: string) => void
     ): void {
         if (this.optionParameters.has(id)) {
@@ -573,7 +607,7 @@ export class Config {
      * @param id The id of the numeric setting we are interested in getting a value for.
      * @returns The numeric value stored in the parameter with the passed id.
      */
-    getNumericSettingValue(id: string): number {
+    getNumericSettingValue(id: NumericParametersIds): number {
         if (this.numericParameters.has(id)) {
             return this.numericParameters.get(id).number;
         } else {
@@ -585,7 +619,7 @@ export class Config {
      * @param id The id of the text setting we are interested in getting a value for.
      * @returns The text value stored in the parameter with the passed id.
      */
-    getTextSettingValue(id: string): string {
+    getTextSettingValue(id: TextParametersIds): string {
         if (this.textParameters.has(id)) {
             return this.textParameters.get(id).value as string;
         } else {
@@ -598,7 +632,7 @@ export class Config {
      * @param id The id of the numeric setting we are interested in.
      * @param value The numeric value to set.
      */
-    setNumericSetting(id: string, value: number): void {
+    setNumericSetting(id: NumericParametersIds, value: number): void {
         if (this.numericParameters.has(id)) {
             this.numericParameters.get(id).number = value;
         } else {
@@ -612,7 +646,7 @@ export class Config {
      * @param onChangeListener The callback to fire when the value changes.
      */
     addOnSettingChangedListener(
-        id: string,
+        id: FlagsIds,
         onChangeListener: (newFlagValue: boolean) => void
     ): void {
         if (this.flags.has(id)) {
@@ -626,7 +660,7 @@ export class Config {
      * @param onChangeListener The callback to fire when the value changes.
      */
     addOnTextSettingChangedListener(
-        id: string,
+        id: TextParametersIds,
         onChangeListener: (newTextValue: string) => void
     ): void {
         if (this.textParameters.has(id)) {
@@ -686,7 +720,7 @@ export class Config {
         this.optionParameters.set(setting.id, setting);
     }
 
-    getSettingOption(id: string): SettingOption {
+    getSettingOption(id: OptionParametersIds): SettingOption {
         return this.optionParameters.get(id);
     }
 
@@ -695,7 +729,7 @@ export class Config {
      * @param id The unique id for the flag.
      * @returns True if the flag is enabled.
      */
-    isFlagEnabled(id: string): boolean {
+    isFlagEnabled(id: FlagsIds): boolean {
         return this.flags.get(id).flag as boolean;
     }
 
@@ -704,7 +738,7 @@ export class Config {
      * @param id The id of the flag to toggle.
      * @param flagEnabled True if the flag should be enabled.
      */
-    setFlagEnabled(id: string, flagEnabled: boolean) {
+    setFlagEnabled(id: FlagsIds, flagEnabled: boolean) {
         if (!this.flags.has(id)) {
             Logger.Warning(
                 Logger.GetStackTrace(),
@@ -720,7 +754,7 @@ export class Config {
      * @param id The id of the setting
      * @param settingValue The value to set in the setting.
      */
-    setTextSetting(id: string, settingValue: string) {
+    setTextSetting(id: TextParametersIds, settingValue: string) {
         if (!this.textParameters.has(id)) {
             Logger.Warning(
                 Logger.GetStackTrace(),
@@ -736,7 +770,7 @@ export class Config {
      * @param id The id of the setting
      * @param settingOptions The values the setting could take
      */
-    setOptionSettingOptions(id: string, settingOptions: Array<string>) {
+    setOptionSettingOptions(id: OptionParametersIds, settingOptions: Array<string>) {
         if (!this.optionParameters.has(id)) {
             Logger.Warning(
                 Logger.GetStackTrace(),
@@ -752,7 +786,7 @@ export class Config {
      * @param id The id of the setting
      * @param settingOptions The value to select out of all the options
      */
-    setOptionSettingValue(id: string, settingValue: string) {
+    setOptionSettingValue(id: OptionParametersIds, settingValue: string) {
         if (!this.optionParameters.has(id)) {
             Logger.Warning(
                 Logger.GetStackTrace(),
@@ -768,7 +802,7 @@ export class Config {
      * @param id The id of the flag.
      * @param label The new label to use for the flag.
      */
-    setFlagLabel(id: string, label: string) {
+    setFlagLabel(id: FlagsIds, label: string) {
         if (!this.flags.has(id)) {
             Logger.Warning(
                 Logger.GetStackTrace(),
@@ -776,6 +810,25 @@ export class Config {
             );
         } else {
             this.flags.get(id).label = label;
+        }
+    }
+
+    /**
+     * Set a subset of all settings in one function call.
+     * 
+     * @param settings A (partial) list of settings to set
+     */
+    setSettings(settings: Partial<AllSettings>) {
+        for (const key of Object.keys(settings)) {
+            if (isFlagId(key)) {
+                this.setFlagEnabled(key, settings[key]);
+            } else if (isNumericId(key)) {
+                this.setNumericSetting(key, settings[key]);
+            } else if (isTextId(key)) {
+                this.setTextSetting(key, settings[key]);
+            } else if (isOptionId(key)) {
+                this.setOptionSettingValue(key, settings[key]);
+            }
         }
     }
 
