@@ -866,7 +866,7 @@ export class WebRtcPlayerController {
      * Loads a freeze frame if it is required otherwise shows the play overlay
      */
     loadFreezeFrameOrShowPlayOverlay() {
-        this.pixelStreaming.events.emit("loadFreezeFrame", [this.shouldShowPlayOverlay, this.freezeFrameController.valid, this.freezeFrameController.jpeg]);
+        this.pixelStreaming.events.emit({ type: "loadFreezeFrame", data: { shouldShowPlayOverlay: this.shouldShowPlayOverlay, isValid: this.freezeFrameController.valid, jpegData: this.freezeFrameController.jpeg }});
         if (this.shouldShowPlayOverlay === true) {
             Logger.Log(Logger.GetStackTrace(), 'showing play overlay');
             this.resizePlayerStyle();
@@ -905,7 +905,7 @@ export class WebRtcPlayerController {
             6
         );
         setTimeout(() => {
-            this.pixelStreaming.events.emit("hideFreezeFrame");
+            this.pixelStreaming.events.emit({ type: "hideFreezeFrame" });
             this.freezeFrameController.hideFreezeFrame();
         }, this.freezeFrameController.freezeFrameDelay);
         if (this.videoPlayer.getVideoElement()) {
@@ -946,7 +946,7 @@ export class WebRtcPlayerController {
     playStream() {
         if (!this.videoPlayer.getVideoElement()) {
             const message = 'Could not play video stream because the video player was not initialized correctly.';
-            this.pixelStreaming.events.emit("playStreamError", [message]);
+            this.pixelStreaming.events.emit({ type: "playStreamError", data: { message }});
             Logger.Error(
                 Logger.GetStackTrace(),
                 message
@@ -974,7 +974,7 @@ export class WebRtcPlayerController {
             this.config.isFlagEnabled(Flags.FakeMouseWithTouches),
             this.videoElementParentClientRect
         );
-        this.pixelStreaming.events.emit("playStream");
+        this.pixelStreaming.events.emit({ type: "playStream" });
 
         if (this.streamController.audioElement.srcObject) {
             this.streamController.audioElement.muted =
@@ -991,7 +991,7 @@ export class WebRtcPlayerController {
                         Logger.GetStackTrace(),
                         'Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.'
                     );
-                    this.pixelStreaming.events.emit("playStreamRejected", [onRejectedReason]);
+                    this.pixelStreaming.events.emit({ type: "playStreamRejected", data: { reason: onRejectedReason }});
                 });
         } else {
             this.playVideo();
@@ -1015,7 +1015,7 @@ export class WebRtcPlayerController {
                 Logger.GetStackTrace(),
                 'Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.'
             );
-            this.pixelStreaming.events.emit("playStreamRejected", [onRejectedReason]);
+            this.pixelStreaming.events.emit({ type: "playStreamRejected", data: { reason: onRejectedReason }});
         });
     }
 
@@ -1743,8 +1743,8 @@ export class WebRtcPlayerController {
     }
 
     registerDataChannelEventEmitters(dataChannel: DataChannelController) {
-        dataChannel.onOpen = (label, ev) => this.pixelStreaming.events.emit("dataChannelOpen", [label , ev])
-        dataChannel.onClose = (label, ev) => this.pixelStreaming.events.emit("dataChannelClose", [label , ev])
-        dataChannel.onError = (label, ev) => this.pixelStreaming.events.emit("dataChannelError", [label , ev])
+        dataChannel.onOpen = (label, event) => this.pixelStreaming.events.emit({ type: "dataChannelOpen", data: { label , event }});
+        dataChannel.onClose = (label, event) => this.pixelStreaming.events.emit({ type: "dataChannelClose", data: { label , event }});
+        dataChannel.onError = (label, event) => this.pixelStreaming.events.emit({ type: "dataChannelError", data: { label , event }});
     }
 }

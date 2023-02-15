@@ -359,7 +359,7 @@ export class PixelStreaming {
      * Show the webRtcAutoConnect Overlay and connect
      */
     onWebRtcAutoConnect() {
-        this.eventEmitter.emit("webRtcAutoConnect");
+        this.eventEmitter.emit({ type: "webRtcAutoConnect" });
         this.showActionOrErrorOnDisconnect = true;
     }
 
@@ -367,14 +367,14 @@ export class PixelStreaming {
      * Set up functionality to happen when receiving a webRTC answer
      */
     onWebRtcSdp() {
-        this.eventEmitter.emit("webRtcSdp");
+        this.eventEmitter.emit({ type: "webRtcSdp" });
     }
 
     /**
      * Shows a text overlay to alert the user the stream is currently loading
      */
     onStreamLoading() {
-        this.eventEmitter.emit("streamLoading");
+        this.eventEmitter.emit({ type: "streamLoading" });
     }
 
     /**
@@ -393,7 +393,7 @@ export class PixelStreaming {
             this.webRtcController.setDisconnectMessageOverride('');
         }
 
-        this.eventEmitter.emit("webRtcDisconnected", [eventString, this.showActionOrErrorOnDisconnect])
+        this.eventEmitter.emit({ type: "webRtcDisconnected", data: { eventString, showActionOrErrorOnDisconnect: this.showActionOrErrorOnDisconnect }})
         if (this.showActionOrErrorOnDisconnect == false) {
             this.showActionOrErrorOnDisconnect = true;
         }
@@ -403,28 +403,28 @@ export class PixelStreaming {
      * Handles when Web Rtc is connecting
      */
     onWebRtcConnecting() {
-        this.eventEmitter.emit("webRtcConnecting");
+        this.eventEmitter.emit({ type: "webRtcConnecting" });
     }
 
     /**
      * Handles when Web Rtc has connected
      */
     onWebRtcConnected() {
-        this.eventEmitter.emit("webRtcConnected");
+        this.eventEmitter.emit({ type: "webRtcConnected" });
     }
 
     /**
      * Handles when Web Rtc fails to connect
      */
     onWebRtcFailed() {
-        this.eventEmitter.emit("webRtcFailed");
+        this.eventEmitter.emit({ type: "webRtcFailed" });
     }
 
     /**
      * Handle when the Video has been Initialized
      */
     onVideoInitialized() {
-        this.eventEmitter.emit("videoInitialized");
+        this.eventEmitter.emit({ type: "videoInitialized" });
         this.videoStartTime = Date.now();
     }
 
@@ -433,7 +433,7 @@ export class PixelStreaming {
      * @param latency - latency test results object
      */
     onLatencyTestResult(latencyTimings: LatencyTestResults) {
-        this.eventEmitter.emit("latencyTestResult", [latencyTimings]);
+        this.eventEmitter.emit({ type: "latencyTestResult", data: { latencyTimings }});
     }
 
     /**
@@ -447,7 +447,7 @@ export class PixelStreaming {
         }
         videoStats.handleSessionStatistics(this.videoStartTime, this.inputController, this.webRtcController.videoAvgQp);
 
-        this.eventEmitter.emit("statsReceived", [videoStats]);
+        this.eventEmitter.emit({ type: "statsReceived", data: { aggregatedStats: videoStats }});
     }
 
     /**
@@ -455,7 +455,7 @@ export class PixelStreaming {
      * @param QP - the quality number of the stream
      */
     onVideoEncoderAvgQP(QP: number) {
-        this.eventEmitter.emit("videoEncoderAvgQP", [QP]);
+        this.eventEmitter.emit({ type: "videoEncoderAvgQP", data: { avgQP: QP }});
     }
 
     /**
@@ -463,7 +463,7 @@ export class PixelStreaming {
      * @param settings - initial UE app settings
      */
     onInitialSettings(settings: InitialSettings) {
-        this.eventEmitter.emit("initialSettings", [settings]);
+        this.eventEmitter.emit({ type: "initialSettings", data: { settings }});
         if (settings.PixelStreamingSettings) {
             const allowConsoleCommands =
                 settings.PixelStreamingSettings.AllowPixelStreamingCommands;

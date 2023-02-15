@@ -169,26 +169,26 @@ export class Application {
     }
 
     registerCallbacks() {
-        this.pixelStreaming.events.on("afkWarningActivate", this.showAfkOverlay.bind(this));
-        this.pixelStreaming.events.on("afkWarningUpdate", this.afkOverlay.updateCountdown.bind(this.afkOverlay));
-        this.pixelStreaming.events.on("afkWarningDeactivate", this.afkOverlay.hide.bind(this.afkOverlay));
-        this.pixelStreaming.events.on("afkTimedOut", this.afkOverlay.hide.bind(this.afkOverlay));
-        this.pixelStreaming.events.on("videoEncoderAvgQP", this.onVideoEncoderAvgQP.bind(this));
-        this.pixelStreaming.events.on("webRtcSdp", this.onWebRtcSdp.bind(this));
-        this.pixelStreaming.events.on("webRtcAutoConnect", this.onWebRtcAutoConnect.bind(this));
-        this.pixelStreaming.events.on("webRtcConnecting", this.onWebRtcConnecting.bind(this));
-        this.pixelStreaming.events.on("webRtcConnected", this.onWebRtcConnected.bind(this));
-        this.pixelStreaming.events.on("webRtcFailed", this.onWebRtcFailed.bind(this));
-        this.pixelStreaming.events.on("webRtcDisconnected", this.onDisconnect.bind(this));
-        this.pixelStreaming.events.on("videoInitialized", this.onVideoInitialized.bind(this));
-        this.pixelStreaming.events.on("streamLoading", this.onStreamLoading.bind(this));
-        this.pixelStreaming.events.on("playStreamError", this.onPlayStreamError.bind(this));
-        this.pixelStreaming.events.on("playStream", this.onPlayStream.bind(this));
-        this.pixelStreaming.events.on("playStreamRejected", this.onPlayStreamRejected.bind(this));
-        this.pixelStreaming.events.on("loadFreezeFrame", this.onLoadFreezeFrame.bind(this));
-        this.pixelStreaming.events.on("statsReceived", this.onStatsReceived.bind(this));
-        this.pixelStreaming.events.on("latencyTestResult", this.onLatencyTestResults.bind(this));
-        this.pixelStreaming.events.on("initialSettings", this.onInitialSettings.bind(this));
+        this.pixelStreaming.events.addEventListener("afkWarningActivate", ({ data: { countDown, dismissAfk }}) => this.showAfkOverlay(countDown, dismissAfk));
+        this.pixelStreaming.events.addEventListener("afkWarningUpdate", ({ data: { countDown }}) => this.afkOverlay.updateCountdown(countDown));
+        this.pixelStreaming.events.addEventListener("afkWarningDeactivate", () => this.afkOverlay.hide());
+        this.pixelStreaming.events.addEventListener("afkTimedOut", () => this.afkOverlay.hide());
+        this.pixelStreaming.events.addEventListener("videoEncoderAvgQP", ({ data: { avgQP }}) => this.onVideoEncoderAvgQP(avgQP));
+        this.pixelStreaming.events.addEventListener("webRtcSdp", () => this.onWebRtcSdp());
+        this.pixelStreaming.events.addEventListener("webRtcAutoConnect", () => this.onWebRtcAutoConnect());
+        this.pixelStreaming.events.addEventListener("webRtcConnecting", () => this.onWebRtcConnecting());
+        this.pixelStreaming.events.addEventListener("webRtcConnected", () => this.onWebRtcConnected());
+        this.pixelStreaming.events.addEventListener("webRtcFailed", () => this.onWebRtcFailed());
+        this.pixelStreaming.events.addEventListener("webRtcDisconnected", ({ data: { eventString, showActionOrErrorOnDisconnect }}) => this.onDisconnect(eventString, showActionOrErrorOnDisconnect));
+        this.pixelStreaming.events.addEventListener("videoInitialized", () => this.onVideoInitialized());
+        this.pixelStreaming.events.addEventListener("streamLoading", () => this.onStreamLoading());
+        this.pixelStreaming.events.addEventListener("playStreamError", ({ data: { message }}) => this.onPlayStreamError(message));
+        this.pixelStreaming.events.addEventListener("playStream", () => this.onPlayStream());
+        this.pixelStreaming.events.addEventListener("playStreamRejected", ({ data: { reason }}) => this.onPlayStreamRejected(reason));
+        this.pixelStreaming.events.addEventListener("loadFreezeFrame", ({ data: { shouldShowPlayOverlay }}) => this.onLoadFreezeFrame(shouldShowPlayOverlay));
+        this.pixelStreaming.events.addEventListener("statsReceived", ({ data: { aggregatedStats }}) => this.onStatsReceived(aggregatedStats));
+        this.pixelStreaming.events.addEventListener("latencyTestResult", ({ data: { latencyTimings }}) => this.onLatencyTestResults(latencyTimings));
+        this.pixelStreaming.events.addEventListener("initialSettings", ({ data: { settings }}) => this.onInitialSettings(settings));
     }
 
     /**
