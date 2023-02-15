@@ -50,7 +50,7 @@ import {
 } from '../Util/CoordinateConverter';
 import { PixelStreaming } from '../PixelStreaming/PixelStreaming';
 import { ITouchController } from '../Inputs/ITouchController';
-import { DataChannelCloseEvent, DataChannelErrorEvent, DataChannelOpenEvent, HideFreezeFrameEvent, LoadFreezeFrameEvent, PlayStreamErrorEvent, PlayStreamEvent, PlayStreamRejectedEvent } from '../Util/EventEmitter';
+import { DataChannelCloseEvent, DataChannelErrorEvent, DataChannelOpenEvent, HideFreezeFrameEvent, LoadFreezeFrameEvent, PlayStreamErrorEvent, PlayStreamEvent, PlayStreamRejectedEvent, StreamerListMessageEvent } from '../Util/EventEmitter';
 /**
  * Entry point for the WebRTC Player
  */
@@ -1214,18 +1214,21 @@ export class WebRtcPlayerController {
         this.config.setOptionSettingOptions(OptionParameters.StreamerId, settingOptions);
 
         const urlParams = new URLSearchParams(window.location.search);
+        let autoSelectedStreamerId: string | null = null;
         if(messageStreamerList.ids.length == 1) {
             // If there's only a single streamer, subscribe to it regardless of what is in the URL
-            this.config.setOptionSettingValue(OptionParameters.StreamerId, messageStreamerList.ids[0]);
+            autoSelectedStreamerId = messageStreamerList.ids[0];
         } else if (this.config.isFlagEnabled(Flags.PreferSFU) && messageStreamerList.ids.includes("SFU")) {
             // If the SFU toggle is on and there's an SFU connected, subscribe to it regardless of what is in the URL
-            this.config.setOptionSettingValue(OptionParameters.StreamerId, "SFU");
+            autoSelectedStreamerId = "SFU";
         } else if (urlParams.has(OptionParameters.StreamerId) && messageStreamerList.ids.includes(urlParams.get(OptionParameters.StreamerId))) {
             // If there's a streamer ID in the URL and a streamer with this ID is connected, set it as the selected streamer
-            this.config.setOptionSettingValue(OptionParameters.StreamerId, urlParams.get(OptionParameters.StreamerId));
-        } else {
-            this.application.showTextOverlay('Multiple streamers detected. Use the dropdown in the settings menu to select the streamer.');
+            autoSelectedStreamerId = urlParams.get(OptionParameters.StreamerId);
         }
+        if (autoSelectedStreamerId !== null) {
+            this.config.setOptionSettingValue(OptionParameters.StreamerId, autoSelectedStreamerId);
+        }
+        this.pixelStreaming.events.dispatchEvent(new StreamerListMessageEvent({ messageStreamerList, autoSelectedStreamerId }));
     }
 
     /**

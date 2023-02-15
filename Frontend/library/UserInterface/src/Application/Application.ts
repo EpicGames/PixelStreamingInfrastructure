@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { PixelStreaming, Flags, Logger, AggregatedStats, LatencyTestResults, InitialSettings } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
+import { PixelStreaming, Flags, Logger, AggregatedStats, LatencyTestResults, InitialSettings, MessageStreamerList } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
 import { OverlayBase } from '../Overlay/BaseOverlay';
 import { ActionOverlay } from '../Overlay/ActionOverlay';
 import { TextOverlay } from '../Overlay/TextOverlay';
@@ -188,7 +188,7 @@ export class Application {
         this.pixelStreaming.events.addEventListener("loadFreezeFrame", ({ data: { shouldShowPlayOverlay }}) => this.onLoadFreezeFrame(shouldShowPlayOverlay));
         this.pixelStreaming.events.addEventListener("statsReceived", ({ data: { aggregatedStats }}) => this.onStatsReceived(aggregatedStats));
         this.pixelStreaming.events.addEventListener("latencyTestResult", ({ data: { latencyTimings }}) => this.onLatencyTestResults(latencyTimings));
-        this.pixelStreaming.events.addEventListener("initialSettings", ({ data: { settings }}) => this.onInitialSettings(settings));
+        this.pixelStreaming.events.addEventListener("streamerListMessage", ({ data: { autoSelectedStreamerId }}) => this.handleStreamerListMessage(autoSelectedStreamerId));
     }
 
     /**
@@ -482,4 +482,11 @@ export class Application {
     onLatencyTestResults(latencyTimings: LatencyTestResults) {
         this.statsPanel.latencyTest.handleTestResult(latencyTimings);
     }
+
+    handleStreamerListMessage(autoSelectedStreamerId: string | null) {
+        if (autoSelectedStreamerId === null) {
+            this.showTextOverlay('Multiple streamers detected. Use the dropdown in the settings menu to select the streamer.');
+        }
+    }
+
 }

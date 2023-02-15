@@ -26,7 +26,7 @@ export { AggregatedStats } from './PeerConnectionController/AggregatedStats';
 export { Logger } from './Logger/Logger';
 export { UnquantizedDenormalizedUnsignedCoord as UnquantizedAndDenormalizeUnsigned } from './Util/CoordinateConverter';
 export { MessageSend } from './WebSockets/MessageSend';
-export { MessageRecv } from './WebSockets/MessageReceive';
+export { MessageRecv, MessageStreamerList } from './WebSockets/MessageReceive';
 export { WebSocketController } from './WebSockets/WebSocketController';
 export { SignallingProtocol } from './WebSockets/SignallingProtocol';
 

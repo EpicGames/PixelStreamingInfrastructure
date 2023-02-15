@@ -1,6 +1,7 @@
 import { LatencyTestResults } from '../DataChannel/LatencyTestResults';
 import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
 import { InitialSettings } from '../pixelstreamingfrontend';
+import { MessageStreamerList } from '../WebSockets/MessageReceive';
 
 export class AfkWarningActivateEvent extends Event {
     readonly type: 'afkWarningActivate';
@@ -166,6 +167,14 @@ export class StatsReceivedEvent extends Event {
         this.data = data;
     }
 }
+export class StreamerListMessageEvent extends Event {
+    readonly type: 'streamerListMessage';
+    readonly data: { messageStreamerList: MessageStreamerList; autoSelectedStreamerId: string | null };
+    constructor(data: StreamerListMessageEvent['data']) {
+        super('streamerListMessage');
+        this.data = data;
+    }
+}
 export class LatencyTestResultEvent extends Event {
     readonly type: 'latencyTestResult';
     readonly data: { latencyTimings: LatencyTestResults };
@@ -206,6 +215,7 @@ export type PixelStreamingEvent =
     | LoadFreezeFrameEvent
     | HideFreezeFrameEvent
     | StatsReceivedEvent
+    | StreamerListMessageEvent
     | LatencyTestResultEvent
     | InitialSettingsEvent;
 
