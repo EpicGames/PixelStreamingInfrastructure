@@ -285,6 +285,8 @@ export class PixelStreaming {
                 }
             }
         );
+
+        this.config.registerOnChangeEvents(this.eventEmitter);
     }
 
     /**

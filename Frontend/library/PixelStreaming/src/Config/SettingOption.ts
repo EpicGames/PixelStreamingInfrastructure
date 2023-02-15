@@ -1,5 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+import type { OptionParametersIds } from './Config';
 import { SettingBase } from './SettingBase';
 
 export class SettingOption extends SettingBase {
@@ -9,8 +10,11 @@ export class SettingOption extends SettingBase {
     /* This element contains a text node that reflects the setting's text label. */
     _settingsTextElem: HTMLElement;
 
+    id: OptionParametersIds;
+    onChangeEmit: (changedValue: string) => void;
+
     constructor(
-        id: string,
+        id: OptionParametersIds,
         label: string,
         description: string,
         defaultTextValue: string,

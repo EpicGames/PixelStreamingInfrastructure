@@ -1,5 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+import type { FlagsIds } from './Config';
 import { SettingBase } from './SettingBase';
 
 export class SettingFlag extends SettingBase {
@@ -9,8 +10,11 @@ export class SettingFlag extends SettingBase {
     /* This element contains a text node that reflects the setting's text label. */
     _settingsTextElem: HTMLElement;
 
+    id: FlagsIds;
+    onChangeEmit: (changedValue: boolean) => void;
+
     constructor(
-        id: string,
+        id: FlagsIds,
         label: string,
         description: string,
         defaultFlagValue: boolean

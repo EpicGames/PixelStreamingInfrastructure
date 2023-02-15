@@ -10,6 +10,7 @@ export class SettingBase {
     _value: unknown;
     _rootElement: HTMLElement;
     onChange: (changedValue: unknown) => void;
+    onChangeEmit: (changedValue: any) => void;
 
     constructor(
         id: string,
@@ -18,6 +19,9 @@ export class SettingBase {
         defaultSettingValue: unknown
     ) {
         this.onChange = () => {
+            /* Do nothing, to be overridden. */
+        };
+        this.onChangeEmit = () => {
             /* Do nothing, to be overridden. */
         };
         this.id = id;
@@ -55,6 +59,7 @@ export class SettingBase {
     public set value(inValue: unknown) {
         this._value = inValue;
         this.onChange(this._value);
+        this.onChangeEmit(this._value);
     }
 
     /**

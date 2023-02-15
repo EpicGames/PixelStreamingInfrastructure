@@ -5,6 +5,7 @@ import { SettingFlag } from './SettingFlag';
 import { SettingNumber } from './SettingNumber';
 import { SettingText } from './SettingText';
 import { SettingOption } from './SettingOption';
+import { EventEmitter, SettingsChangedEvent } from '../Util/EventEmitter';
 
 /**
  * A collection of flags that can be toggled and are core to all Pixel Streaming experiences.
@@ -12,52 +13,64 @@ import { SettingOption } from './SettingOption';
  * these flags are provided for convenience to avoid hardcoded strings across the library.
  */
 export class Flags {
-    static AutoConnect = 'AutoConnect';
-    static AutoPlayVideo = 'AutoPlayVideo';
-    static AFKDetection = 'TimeoutIfIdle';
-    static BrowserSendOffer = 'OfferToReceive';
-    static HoveringMouseMode = 'HoveringMouse';
-    static ForceMonoAudio = 'ForceMonoAudio';
-    static ForceTURN = 'ForceTURN';
-    static FakeMouseWithTouches = 'FakeMouseWithTouches';
-    static IsQualityController = 'ControlsQuality';
-    static MatchViewportResolution = 'MatchViewportRes';
-    static PreferSFU = 'preferSFU';
-    static StartVideoMuted = 'StartVideoMuted';
-    static SuppressBrowserKeys = 'SuppressBrowserKeys';
-    static UseMic = 'UseMic';
-    static LightMode = 'LightMode';
+    static AutoConnect = 'AutoConnect' as const;
+    static AutoPlayVideo = 'AutoPlayVideo' as const;
+    static AFKDetection = 'TimeoutIfIdle' as const;
+    static BrowserSendOffer = 'OfferToReceive' as const;
+    static HoveringMouseMode = 'HoveringMouse' as const;
+    static ForceMonoAudio = 'ForceMonoAudio' as const;
+    static ForceTURN = 'ForceTURN' as const;
+    static FakeMouseWithTouches = 'FakeMouseWithTouches' as const;
+    static IsQualityController = 'ControlsQuality' as const;
+    static MatchViewportResolution = 'MatchViewportRes' as const;
+    static PreferSFU = 'preferSFU' as const;
+    static StartVideoMuted = 'StartVideoMuted' as const;
+    static SuppressBrowserKeys = 'SuppressBrowserKeys' as const;
+    static UseMic = 'UseMic' as const;
+    static LightMode = 'LightMode' as const;
 }
+
+export type FlagsKeys = Exclude<keyof typeof Flags, "prototype">;
+export type FlagsIds = typeof Flags[FlagsKeys];
 
 /**
  * A collection of numeric parameters that are core to all Pixel Streaming experiences.
  *
  */
 export class NumericParameters {
-    static AFKTimeoutSecs = 'AFKTimeout';
-    static MinQP = 'MinQP';
-    static MaxQP = 'MaxQP';
-    static WebRTCFPS = 'WebRTCFPS';
-    static WebRTCMinBitrate = 'WebRTCMinBitrate';
-    static WebRTCMaxBitrate = 'WebRTCMaxBitrate';
+    static AFKTimeoutSecs = 'AFKTimeout' as const;
+    static MinQP = 'MinQP' as const;
+    static MaxQP = 'MaxQP' as const;
+    static WebRTCFPS = 'WebRTCFPS' as const;
+    static WebRTCMinBitrate = 'WebRTCMinBitrate' as const;
+    static WebRTCMaxBitrate = 'WebRTCMaxBitrate' as const;
 }
+
+export type NumericParametersKeys = Exclude<keyof typeof NumericParameters, "prototype">;
+export type NumericParametersIds = typeof NumericParameters[NumericParametersKeys];
 
 /**
  * A collection of textual parameters that are core to all Pixel Streaming experiences.
  *
  */
 export class TextParameters {
-    static SignallingServerUrl = 'ss';
+    static SignallingServerUrl = 'ss' as const;
 }
+
+export type TextParametersKeys = Exclude<keyof typeof TextParameters, "prototype">;
+export type TextParametersIds = typeof TextParameters[TextParametersKeys];
 
 /**
  * A collection of enum based parameters that are core to all Pixel Streaming experiences.
  *
  */
 export class OptionParameters {
-    static PreferredCodec = 'PreferredCodec';
-    static StreamerId = 'StreamerId';
+    static PreferredCodec = 'PreferredCodec' as const;
+    static StreamerId = 'StreamerId' as const;
 }
+
+export type OptionParametersKeys = Exclude<keyof typeof OptionParameters, "prototype">;
+export type OptionParametersIds = typeof OptionParameters[OptionParametersKeys];
 
 export class Config {
     /* A map of flags that can be toggled - options that can be set in the application - e.g. Use Mic? */
@@ -763,6 +776,33 @@ export class Config {
             );
         } else {
             this.flags.get(id).label = label;
+        }
+    }
+
+    registerOnChangeEvents(eventEmitter: EventEmitter) {
+        for (const key of this.flags.keys()) {
+            const flag = this.flags.get(key);
+            if (flag) {
+                flag.onChangeEmit = (newValue: boolean) => eventEmitter.dispatchEvent(new SettingsChangedEvent({ id: flag.id, type: "flag", value: newValue, target: flag }));
+            }
+        }
+        for (const key of this.numericParameters.keys()) {
+            const number = this.numericParameters.get(key);
+            if (number) {
+                number.onChangeEmit = (newValue: number) => eventEmitter.dispatchEvent(new SettingsChangedEvent({ id: number.id, type: "number", value: newValue, target: number }));
+            }
+        }
+        for (const key of this.textParameters.keys()) {
+            const text = this.textParameters.get(key);
+            if (text) {
+                text.onChangeEmit = (newValue: string) => eventEmitter.dispatchEvent(new SettingsChangedEvent({ id: text.id, type: "text", value: newValue, target: text }));
+            }
+        }
+        for (const key of this.optionParameters.keys()) {
+            const option = this.optionParameters.get(key);
+            if (option) {
+                option.onChangeEmit = (newValue: string) => eventEmitter.dispatchEvent(new SettingsChangedEvent({ id: option.id, type: "option", value: newValue, target: option }));
+            }
         }
     }
 }

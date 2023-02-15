@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { PixelStreaming, Flags, Logger, AggregatedStats, LatencyTestResults, InitialSettings, MessageStreamerList } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
+import { PixelStreaming, Flags, Logger, AggregatedStats, LatencyTestResults, InitialSettings } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
 import { OverlayBase } from '../Overlay/BaseOverlay';
 import { ActionOverlay } from '../Overlay/ActionOverlay';
 import { TextOverlay } from '../Overlay/TextOverlay';

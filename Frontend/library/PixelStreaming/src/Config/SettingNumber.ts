@@ -1,5 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+import type { NumericParametersIds } from './Config';
 import { Logger } from '../Logger/Logger';
 import { SettingBase } from './SettingBase';
 
@@ -12,8 +13,11 @@ export class SettingNumber extends SettingBase {
     _rootElement: HTMLElement;
     _spinner: HTMLInputElement;
 
+    id: NumericParametersIds;
+    onChangeEmit: (changedValue: number) => void;
+
     constructor(
-        id: string,
+        id: NumericParametersIds,
         label: string,
         description: string,
         min: number,

@@ -1,7 +1,17 @@
+import {
+    FlagsIds,
+    NumericParametersIds,
+    OptionParametersIds,
+    TextParametersIds
+} from '../Config/Config';
 import { LatencyTestResults } from '../DataChannel/LatencyTestResults';
 import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
 import { InitialSettings } from '../pixelstreamingfrontend';
 import { MessageStreamerList } from '../WebSockets/MessageReceive';
+import { SettingFlag } from '../Config/SettingFlag';
+import { SettingNumber } from '../Config/SettingNumber';
+import { SettingText } from '../Config/SettingText';
+import { SettingOption } from '../Config/SettingOption';
 
 export class AfkWarningActivateEvent extends Event {
     readonly type: 'afkWarningActivate';
@@ -169,7 +179,10 @@ export class StatsReceivedEvent extends Event {
 }
 export class StreamerListMessageEvent extends Event {
     readonly type: 'streamerListMessage';
-    readonly data: { messageStreamerList: MessageStreamerList; autoSelectedStreamerId: string | null };
+    readonly data: {
+        messageStreamerList: MessageStreamerList;
+        autoSelectedStreamerId: string | null;
+    };
     constructor(data: StreamerListMessageEvent['data']) {
         super('streamerListMessage');
         this.data = data;
@@ -188,6 +201,41 @@ export class InitialSettingsEvent extends Event {
     readonly data: { settings: InitialSettings };
     constructor(data: InitialSettingsEvent['data']) {
         super('initialSettings');
+        this.data = data;
+    }
+}
+
+export type SettingsData =
+    | {
+          id: FlagsIds;
+          type: 'flag';
+          value: boolean;
+          target: SettingFlag;
+      }
+    | {
+          id: NumericParametersIds;
+          type: 'number';
+          value: number;
+          target: SettingNumber;
+      }
+    | {
+          id: TextParametersIds;
+          type: 'text';
+          value: string;
+          target: SettingText;
+      }
+    | {
+          id: OptionParametersIds;
+          type: 'option';
+          value: string;
+          target: SettingOption;
+      };
+
+export class SettingsChangedEvent extends Event {
+    readonly type: 'settingsChanged';
+    readonly data: SettingsData;
+    constructor(data: SettingsChangedEvent['data']) {
+        super('settingsChanged');
         this.data = data;
     }
 }
@@ -217,7 +265,8 @@ export type PixelStreamingEvent =
     | StatsReceivedEvent
     | StreamerListMessageEvent
     | LatencyTestResultEvent
-    | InitialSettingsEvent;
+    | InitialSettingsEvent
+    | SettingsChangedEvent;
 
 export class EventEmitter extends EventTarget {
     public dispatchEvent(e: PixelStreamingEvent): boolean {
