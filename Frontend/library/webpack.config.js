@@ -5,11 +5,10 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-    mode: 'development',
+    mode: 'production',
     entry: {
         index: './src/pixelstreamingfrontend.ts'
     },
-    devtool: 'inline-source-map',
     module: {
         rules: [
             {
@@ -36,7 +35,11 @@ module.exports = {
         globalObject: 'this'
     },
     optimization: {
-        minimize: false
+        minimize: true,
+        usedExports: true,
     },
-    stats: 'errors-only'
+    stats: 'errors-only',
+    performance: {
+        hints: false
+    }
 };

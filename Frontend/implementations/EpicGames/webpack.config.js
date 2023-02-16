@@ -12,7 +12,7 @@ const pages = fs.readdirSync('./src', { withFileTypes: true })
 
 module.exports = (env) => {
   return {
-    mode: 'development',
+    mode: 'production',
     entry: pages.reduce((config, page) => {
 		config[page] = `./src/${page}.ts`;
 		return config;
@@ -28,7 +28,7 @@ module.exports = (env) => {
 		chunks: [page],
     }), )),
     // turn off so we can see the source map for dom delegate so we can debug the library
-    devtool: 'inline-source-map',
+    
     module: {
       rules: [
         {
@@ -74,12 +74,16 @@ module.exports = (env) => {
       futureDefaults: true
     },
     optimization: {
-      minimize: false
+      minimize: true
     },
     devServer: {
     	static: {
     		directory: path.join(__dirname, '../../../SignallingWebServer/Public'),
     	},
+    },
+    stats: 'none',
+    performance: {
+      hints: false
     }
   };
 }
