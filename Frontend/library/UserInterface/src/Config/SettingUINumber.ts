@@ -87,6 +87,7 @@ export class SettingUINumber extends SettingUIBase {
                 } else {
                     if (this.setting.number !== parsedValue) {
                         this.setting.number = parsedValue;
+                        this.setting.updateURLParams();
                     }
                 }
             };

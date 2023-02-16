@@ -84,6 +84,7 @@ export class SettingUIOption extends SettingUIBase {
             this.selector.onchange = () => {
                 if (this.setting.selected !== this.selector.value) {
                     this.setting.selected = this.selector.value;
+                    this.setting.updateURLParams();
                 }
             };
         }

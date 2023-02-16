@@ -40,7 +40,7 @@ export class SettingText extends SettingBase {
         return '';
     }
 
-    setUrlParamText() {
+    public updateURLParams() {
         if (this.useUrlParams) {
             // set url params
             const urlParams = new URLSearchParams(window.location.search);
@@ -68,7 +68,6 @@ export class SettingText extends SettingBase {
      */
     public set text(inValue: string) {
         this.value = inValue;
-        this.setUrlParamText();
     }
 
 }

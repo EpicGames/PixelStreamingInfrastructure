@@ -40,7 +40,7 @@ export class SettingOption extends SettingBase {
         return '';
     }
 
-    setUrlParamText() {
+    public updateURLParams() {
         if (this.useUrlParams) {
             // set url params
             const urlParams = new URLSearchParams(window.location.search);
@@ -83,7 +83,6 @@ export class SettingOption extends SettingBase {
         );
         if (filteredList.length) {
             this.value = filteredList[0];
-            this.setUrlParamText();
         }
     }
 }

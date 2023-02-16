@@ -69,6 +69,7 @@ export class SettingUIText extends SettingUIBase {
             this.textbox.addEventListener('input', () => {
                 if (this.setting.text !== this.textbox.value) {
                     this.setting.text = this.textbox.value;
+                    this.setting.updateURLParams();
                 }
             });
         }

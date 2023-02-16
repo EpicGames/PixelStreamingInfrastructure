@@ -61,7 +61,6 @@ export class SettingNumber extends SettingBase {
      */
     public set number(newNumber: number) {
         this.value = this.clamp(newNumber);
-        this.updateURLParams();
     }
 
     /**

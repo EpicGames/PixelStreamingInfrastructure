@@ -85,6 +85,5 @@ export class SettingFlag extends SettingBase {
      */
     public set flag(inValue: boolean) {
         this.value = inValue;
-        this.updateURLParams();
     }
 }

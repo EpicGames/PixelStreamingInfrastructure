@@ -76,6 +76,7 @@ export class SettingUIFlag extends SettingUIBase {
             this.checkbox.addEventListener('change', () => {
                 if (this.setting.flag !== this.checkbox.checked) {
                     this.setting.flag = this.checkbox.checked;
+                    this.setting.updateURLParams();
                 }
             });
         }
