@@ -108,16 +108,16 @@ export type AllSettings = {
 
 export class Config {
     /* A map of flags that can be toggled - options that can be set in the application - e.g. Use Mic? */
-    private flags = new Map<string, SettingFlag>();
+    private flags = new Map<FlagsIds, SettingFlag>();
 
     /* A map of numerical settings - options that can be in the application - e.g. MinBitrate */
-    private numericParameters = new Map<string, SettingNumber>();
+    private numericParameters = new Map<NumericParametersIds, SettingNumber>();
 
     /* A map of text settings - e.g. signalling server url */
-    private textParameters = new Map<string, SettingText>();
+    private textParameters = new Map<TextParametersIds, SettingText>();
 
     /* A map of enum based settings - e.g. preferred codec */
-    private optionParameters = new Map<string, SettingOption>();
+    private optionParameters = new Map<OptionParametersIds, SettingOption>();
 
     // ------------ Settings -----------------
 
@@ -830,6 +830,26 @@ export class Config {
                 this.setOptionSettingValue(key, settings[key]);
             }
         }
+    }
+
+    /**
+     * Get all settings
+     */
+    getSettings(): Partial<AllSettings> {
+        const settings: Partial<AllSettings> = {};
+        for (const [key, value] of this.flags.entries()) {
+            settings[key] = value.flag;
+        }
+        for (const [key, value] of this.numericParameters.entries()) {
+            settings[key] = value.number;
+        }
+        for (const [key, value] of this.textParameters.entries()) {
+            settings[key] = value.text;
+        }
+        for (const [key, value] of this.optionParameters.entries()) {
+            settings[key] = value.selected;
+        }
+        return settings;
     }
 
     registerOnChangeEvents(eventEmitter: EventEmitter) {
