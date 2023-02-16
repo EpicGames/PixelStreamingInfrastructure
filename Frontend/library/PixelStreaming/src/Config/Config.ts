@@ -121,8 +121,11 @@ export class Config {
 
     // ------------ Settings -----------------
 
-    constructor() {
+    constructor(initialSettings?: Partial<AllSettings>) {
         this.populateDefaultSettings();
+        if (initialSettings) {
+            this.setSettings(initialSettings);
+        }
     }
 
     /**
