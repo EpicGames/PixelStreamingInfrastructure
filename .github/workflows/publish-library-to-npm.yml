@@ -1,8 +1,8 @@
 name: Publish library package to npmjs
 on:
   push:
-    tags:
-      - '*'
+    branches: ['githubactions']
+    paths: ['Frontend/library/package.json']
 jobs:
   build:
     runs-on: ubuntu-latest
