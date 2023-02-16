@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./library
+        working-directory: Frontend/library
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
