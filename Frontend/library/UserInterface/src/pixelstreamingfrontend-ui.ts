@@ -13,3 +13,4 @@ export { ErrorOverlay } from './Overlay/ErrorOverlay';
 export { InfoOverlay } from './Overlay/InfoOverlay';
 export { PlayOverlay } from './Overlay/PlayOverlay';
 export { TextOverlay } from './Overlay/TextOverlay';
+export { ConfigUI } from './Config/ConfigUI';

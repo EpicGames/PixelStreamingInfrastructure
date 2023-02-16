@@ -15,10 +15,12 @@ import { LabelledButton } from '../UI/LabelledButton';
 import { SettingsPanel } from '../UI/SettingsPanel';
 import { StatsPanel } from '../UI/StatsPanel';
 import { VideoQpIndicator } from '../UI/VideoQpIndicator';
+import { ConfigUI } from '../Config/ConfigUI';
 
 export interface UIOptions {
     pixelStreaming: PixelStreaming;
 }
+
 /**
  * Provides common base functionality for applications that extend this application
  */
@@ -43,12 +45,14 @@ export class Application {
     statsPanel: StatsPanel;
     videoQpIndicator: VideoQpIndicator;
 
+    configUI: ConfigUI
+
     /**
-     * @param config - A newly instantiated config object
-     * returns the base delegate object with the config inside it along with a new instance of the Overlay controller class
+     * @param options - Initialization options
      */
     constructor(options: UIOptions) {
         this.pixelStreaming = options.pixelStreaming;
+        this.configUI = new ConfigUI(this.pixelStreaming.config);
 
         this.createOverlays();
 
@@ -148,7 +152,7 @@ export class Application {
             this.pixelStreaming.requestIframe();
         });
 
-        const commandsSectionElem = this.pixelStreaming.config.buildSectionWithHeading(
+        const commandsSectionElem = this.configUI.buildSectionWithHeading(
             this.settingsPanel.settingsContentElement,
             'Commands'
         );
@@ -163,7 +167,7 @@ export class Application {
      */
     configureSettings(): void {
         // This builds all the settings sections and flags under this `settingsContent` element.
-        this.pixelStreaming.config.populateSettingsElement(
+        this.configUI.populateSettingsElement(
             this.settingsPanel.settingsContentElement
         );
     }
@@ -189,6 +193,7 @@ export class Application {
         this.pixelStreaming.events.addEventListener("statsReceived", ({ data: { aggregatedStats }}) => this.onStatsReceived(aggregatedStats));
         this.pixelStreaming.events.addEventListener("latencyTestResult", ({ data: { latencyTimings }}) => this.onLatencyTestResults(latencyTimings));
         this.pixelStreaming.events.addEventListener("streamerListMessage", ({ data: { autoSelectedStreamerId }}) => this.handleStreamerListMessage(autoSelectedStreamerId));
+        this.pixelStreaming.events.addEventListener("settingsChanged", (event) => this.configUI.onSettingsChanged(event));
     }
 
     /**

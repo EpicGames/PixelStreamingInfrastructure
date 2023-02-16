@@ -129,29 +129,6 @@ export class Config {
     }
 
     /**
-     * Make DOM elements for a settings section with a heading.
-     * @param settingsElem The parent container for our DOM elements.
-     * @param sectionHeading The heading element to go into the section.
-     * @returns The constructed DOM element for the section.
-     */
-    buildSectionWithHeading(settingsElem: HTMLElement, sectionHeading: string) {
-        // make section element
-        const sectionElem = document.createElement('section');
-        sectionElem.classList.add('settingsContainer');
-
-        // make section heading
-        const psSettingsHeader = document.createElement('div');
-        psSettingsHeader.classList.add('settingsHeader');
-        psSettingsHeader.classList.add('settings-text');
-        psSettingsHeader.textContent = sectionHeading;
-
-        // add section and heading to parent settings element
-        sectionElem.appendChild(psSettingsHeader);
-        settingsElem.appendChild(sectionElem);
-        return sectionElem;
-    }
-
-    /**
      * Populate the default settings for a Pixel Streaming application
      */
     populateDefaultSettings(): void {
@@ -454,132 +431,6 @@ export class Config {
     }
 
     /**
-     * Setup flags with their default values and add them to the `Config.flags` map.
-     * @param settingsElem - The element that contains all the individual settings sections, flags, and so on.
-     */
-    populateSettingsElement(settingsElem: HTMLElement): void {
-        /* Setup all Pixel Streaming specific settings */
-        const psSettingsSection = this.buildSectionWithHeading(
-            settingsElem,
-            'Pixel Streaming'
-        );
-
-        // make settings show up in DOM
-        this.addSettingText(
-            psSettingsSection,
-            this.textParameters.get(TextParameters.SignallingServerUrl)
-        );
-        this.addSettingOption(
-            psSettingsSection,
-            this.optionParameters.get(OptionParameters.StreamerId)
-        );
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.AutoConnect)
-        );
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.AutoPlayVideo)
-        );
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.BrowserSendOffer)
-        );
-        this.addSettingFlag(psSettingsSection, this.flags.get(Flags.UseMic));
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.StartVideoMuted)
-        );
-        this.addSettingFlag(psSettingsSection, this.flags.get(Flags.PreferSFU));
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.IsQualityController)
-        );
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.ForceMonoAudio)
-        );
-        this.addSettingFlag(psSettingsSection, this.flags.get(Flags.ForceTURN));
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.SuppressBrowserKeys)
-        );
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.AFKDetection)
-        );
-        this.addSettingNumeric(
-            psSettingsSection,
-            this.numericParameters.get(NumericParameters.AFKTimeoutSecs)
-        );
-
-        /* Setup all view/ui related settings under this section */
-        const viewSettingsSection = this.buildSectionWithHeading(
-            settingsElem,
-            'UI'
-        );
-        this.addSettingFlag(
-            viewSettingsSection,
-            this.flags.get(Flags.MatchViewportResolution)
-        );
-
-        const ControlSchemeFlag = this.flags.get(Flags.HoveringMouseMode);
-        this.addSettingFlag(viewSettingsSection, ControlSchemeFlag);
-        ControlSchemeFlag.label = `Control Scheme: ${
-            ControlSchemeFlag.flag ? 'Hovering' : 'Locked'
-        } Mouse`;
-
-        const colorSchemeFlag = this.flags.get(Flags.LightMode);
-        this.addSettingFlag(viewSettingsSection, colorSchemeFlag);
-        colorSchemeFlag.label = `Color Scheme: ${
-            colorSchemeFlag.flag ? 'Light' : 'Dark'
-        } Mode`;
-
-        /* Setup all encoder related settings under this section */
-        const encoderSettingsSection = this.buildSectionWithHeading(
-            settingsElem,
-            'Encoder'
-        );
-
-        this.addSettingNumeric(
-            encoderSettingsSection,
-            this.numericParameters.get(NumericParameters.MinQP)
-        );
-        this.addSettingNumeric(
-            encoderSettingsSection,
-            this.numericParameters.get(NumericParameters.MaxQP)
-        );
-
-        const preferredCodecOption = this.optionParameters.get(OptionParameters.PreferredCodec);
-        this.addSettingOption(
-            encoderSettingsSection,
-            preferredCodecOption
-        );
-        if([...preferredCodecOption.selector.options].map(o => o.value).includes("Only available on Chrome")) {
-            preferredCodecOption.disable();
-        }
-
-        /* Setup all webrtc related settings under this section */
-        const webrtcSettingsSection = this.buildSectionWithHeading(
-            settingsElem,
-            'WebRTC'
-        );
-
-        this.addSettingNumeric(
-            webrtcSettingsSection,
-            this.numericParameters.get(NumericParameters.WebRTCFPS)
-        );
-        this.addSettingNumeric(
-            webrtcSettingsSection,
-            this.numericParameters.get(NumericParameters.WebRTCMinBitrate)
-        );
-        this.addSettingNumeric(
-            webrtcSettingsSection,
-            this.numericParameters.get(NumericParameters.WebRTCMaxBitrate)
-        );
-    }
-
-    /**
      * Add a callback to fire when the numeric setting is toggled.
      * @param id The id of the flag.
      * @param onChangedListener The callback to fire when the numeric value changes.
@@ -669,58 +520,6 @@ export class Config {
         if (this.textParameters.has(id)) {
             this.textParameters.get(id).onChange = onChangeListener;
         }
-    }
-
-    /**
-     * Add a SettingText element to a particular settings section in the DOM and registers that text in the text settings map.
-     * @param settingsSection The settings section HTML element.
-     * @param settingText The textual settings object.
-     */
-    addSettingText(
-        settingsSection: HTMLElement,
-        settingText: SettingText
-    ): void {
-        settingsSection.appendChild(settingText.rootElement);
-        this.textParameters.set(settingText.id, settingText);
-    }
-
-    /**
-     * Add a SettingFlag element to a particular settings section in the DOM and registers that flag in the Config.flag map.
-     * @param settingsSection The settings section HTML element.
-     * @param settingFlag The settings flag object.
-     */
-    addSettingFlag(
-        settingsSection: HTMLElement,
-        settingFlag: SettingFlag
-    ): void {
-        settingsSection.appendChild(settingFlag.rootElement);
-        this.flags.set(settingFlag.id, settingFlag);
-    }
-
-    /**
-     * Add a numeric setting element to a particular settings section in the DOM and registers that flag in the Config.numericParameters map.
-     * @param settingsSection The settings section HTML element.
-     * @param settingFlag The settings flag object.
-     */
-    addSettingNumeric(
-        settingsSection: HTMLElement,
-        setting: SettingNumber
-    ): void {
-        settingsSection.appendChild(setting.rootElement);
-        this.numericParameters.set(setting.id, setting);
-    }
-
-    /**
-     * Add an enum based settings element to a particular settings section in the DOM and registers that flag in the Config.enumParameters map.
-     * @param settingsSection The settings section HTML element.
-     * @param settingFlag The settings flag object.
-     */
-    addSettingOption(
-        settingsSection: HTMLElement,
-        setting: SettingOption
-    ): void {
-        settingsSection.appendChild(setting.rootElement);
-        this.optionParameters.set(setting.id, setting);
     }
 
     getSettingOption(id: OptionParametersIds): SettingOption {
@@ -853,6 +652,22 @@ export class Config {
             settings[key] = value.selected;
         }
         return settings;
+    }
+
+    getFlags(): Array<SettingFlag> {
+        return Array.from(this.flags.values());
+    }
+
+    getTextSettings(): Array<SettingText> {
+        return Array.from(this.textParameters.values());
+    }
+
+    getNumericSettings(): Array<SettingNumber> {
+        return Array.from(this.numericParameters.values());
+    }
+
+    getOptionSettings(): Array<SettingOption> {
+        return Array.from(this.optionParameters.values());
     }
 
     registerOnChangeEvents(eventEmitter: EventEmitter) {

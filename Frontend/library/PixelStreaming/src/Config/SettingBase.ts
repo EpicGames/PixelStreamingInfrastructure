@@ -8,7 +8,6 @@ export class SettingBase {
     description: string;
     _label: string;
     _value: unknown;
-    _rootElement: HTMLElement;
     onChange: (changedValue: unknown) => void;
     onChangeEmit: (changedValue: any) => void;
 
@@ -36,6 +35,7 @@ export class SettingBase {
      */
     public set label(inLabel: string) {
         this._label = inLabel;
+        this.onChangeEmit(this._value);
     }
 
     /**
@@ -62,13 +62,4 @@ export class SettingBase {
         this.onChangeEmit(this._value);
     }
 
-    /**
-     * @returns Return or creates a HTML element that represents this setting in the DOM.
-     */
-    public get rootElement(): HTMLElement {
-        if (!this._rootElement) {
-            this._rootElement = document.createElement('div');
-        }
-        return this._rootElement;
-    }
 }
