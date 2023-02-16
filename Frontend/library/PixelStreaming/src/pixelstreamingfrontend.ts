@@ -8,11 +8,18 @@ export {
     Flags,
     NumericParameters,
     TextParameters,
-    OptionParameters
+    OptionParameters,
+    FlagsIds,
+    NumericParametersIds,
+    TextParametersIds,
+    OptionParametersIds,
+    AllSettings
 } from './Config/Config';
 export { SettingBase } from './Config/SettingBase';
 export { SettingFlag } from './Config/SettingFlag';
 export { SettingNumber } from './Config/SettingNumber';
+export { SettingOption } from './Config/SettingOption';
+export { SettingText } from './Config/SettingText';
 export { PixelStreaming } from './PixelStreaming/PixelStreaming';
 
 export { AFKController as AfkLogic } from './AFK/AFKController';
@@ -39,3 +46,4 @@ export {
     InboundVideoStats
 } from './PeerConnectionController/InboundRTPStats';
 export { OutBoundVideoStats } from './PeerConnectionController/OutBoundRTPStats';
+export * from './Util/EventEmitter';
