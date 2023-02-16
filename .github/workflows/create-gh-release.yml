@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: Frontend
+        working-directory: ./
 
     permissions:
       contents: write
@@ -27,14 +27,25 @@ jobs:
       with:
         node-version: '16.x'
         registry-url: 'https://registry.npmjs.org'
-    - run: cd library
-    - run: npm ci
-    - run: npm run build
-    - run: cd ../implementations/EpicGames
-    - run: npm ci
-    - run: npm run build-all
-    - run: cd ../../..
-    - run: mkdir output
+
+    - name: Install library deps
+      working-directory: ./Frontend/library
+      run: npm ci
+
+    - name: Build frontend lib
+      working-directory: ./Frontend/library
+      run: npm run build
+
+    - name: Install implementations/EpicGames deps
+      working-directory: ./Frontend/implementations/EpicGames
+      run: npm ci
+
+    - name: Build implementations/EpicGames
+      working-directory: ./Frontend/implementations/EpicGames
+      run: npm run build-all
+
+    - name: Make output directory for archives
+      run: mkdir output
 
     - name: Archive Release tar.gz
       uses: thedoctor0/zip-release@0.7.1
