@@ -463,18 +463,6 @@ export class Config {
             this.numericParameters.get(NumericParameters.AFKTimeoutSecs)
         );
 
-        const preferredCodecOption = this.optionParameters.get(
-            OptionParameters.PreferredCodec
-        );
-        this.addSettingOption(psSettingsSection, preferredCodecOption);
-        if (
-            [...preferredCodecOption.selector.options]
-                .map((o) => o.value)
-                .includes('Only available on Chrome')
-        ) {
-            preferredCodecOption.disable();
-        }
-
         /* Setup all view/ui related settings under this section */
         const viewSettingsSection = this.buildSectionWithHeading(
             settingsElem,
@@ -511,6 +499,15 @@ export class Config {
             encoderSettingsSection,
             this.numericParameters.get(NumericParameters.MaxQP)
         );
+
+        const preferredCodecOption = this.optionParameters.get(OptionParameters.PreferredCodec);
+        this.addSettingOption(
+            encoderSettingsSection,
+            preferredCodecOption
+        );
+        if([...preferredCodecOption.selector.options].map(o => o.value).includes("Only available on Chrome")) {
+            preferredCodecOption.disable();
+        }
 
         /* Setup all webrtc related settings under this section */
         const webrtcSettingsSection = this.buildSectionWithHeading(

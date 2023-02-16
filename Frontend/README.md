@@ -39,3 +39,20 @@ If you are developing your implementation based on the library, the process is s
 ## Legal
 
 Copyright &copy; 2022, Epic Games. Licensed under the MIT License, see the file [LICENSE](./LICENSE) for details.
+
+# Table of Contents
+- [Customizing the Player Webpage](Docs\Customizing%20the%20Player%20Webpage.md)
+- [HTML Page Requirements](Docs\HTML%20Page%20Requirements.md)
+  - [Player File Location and URL](Docs\HTML%20Page%20Requirements.md)
+- [Customizing Player Input Options](Docs/Customizing%20Player%20Input%20Options.md)
+  - [Disabling User Input](Docs/Customizing%20Player%20Input%20Options.md)
+- [Customizing the Player Widget Style](Docs/Customizing%20the%20Player%20Widget%20Style.md)
+- [Accessing the Pixel Streaming Blueprint API](Docs/Accessing%20the%20Pixel%20Streaming%20Blueprint%20API.md)
+- [Communicating from the Player Page to UE5](Docs/Communicating%20from%20the%20Player%20Page%20to%20UE5.md)
+  - [Using the emitCommand Function](Docs/Communicating%20from%20the%20Player%20Page%20to%20UE5.md)
+  - [Using the emitUIInteraction Function](Docs/Communicating%20from%20the%20Player%20Page%20to%20UE5.md)
+- [Communicating from UE5 to the Player Page](Docs/Communicating%20from%20UE5%20to%20the%20Player%20Page.md)
+- [Timing Out Inactive Connections](Docs/Timing%20Out%20Inactive%20Connections.md)
+
+
+

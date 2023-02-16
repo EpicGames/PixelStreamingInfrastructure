@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 export { WebRtcPlayerController } from './WebRtcPlayer/WebRtcPlayerController';
-export { WebXRController } from './WebXr/WebXRController';
+export { WebXRController } from './WebXR/WebXRController';
 export {
     Config,
     ControlSchemeType,
