@@ -6,23 +6,26 @@ import { SettingBase } from './SettingBase';
 export class SettingFlag extends SettingBase {
     id: FlagsIds;
     onChangeEmit: (changedValue: boolean) => void;
+    useUrlParams: boolean;
 
     constructor(
         id: FlagsIds,
         label: string,
         description: string,
-        defaultFlagValue: boolean
+        defaultFlagValue: boolean,
+        useUrlParams: boolean
     ) {
         super(id, label, description, defaultFlagValue);
 
         const urlParams = new URLSearchParams(window.location.search);
-        if (!urlParams.has(this.id)) {
+        if (!useUrlParams || !urlParams.has(this.id)) {
             this.flag = defaultFlagValue;
         } else {
             // parse flag from url parameters
             const urlParamFlag = this.getUrlParamFlag();
             this.flag = urlParamFlag;
         }
+        this.useUrlParams = useUrlParams;
     }
 
     /**
@@ -44,20 +47,22 @@ export class SettingFlag extends SettingBase {
     }
 
     public updateURLParams() {
-        // set url params
-        const urlParams = new URLSearchParams(window.location.search);
-        if (this.flag === true) {
-            urlParams.set(this.id, 'true');
-        } else {
-            urlParams.set(this.id, 'false');
+        if (this.useUrlParams) {
+            // set url params
+            const urlParams = new URLSearchParams(window.location.search);
+            if (this.flag === true) {
+                urlParams.set(this.id, 'true');
+            } else {
+                urlParams.set(this.id, 'false');
+            }
+            window.history.replaceState(
+                {},
+                '',
+                urlParams.toString() !== ''
+                    ? `${location.pathname}?${urlParams}`
+                    : `${location.pathname}`
+            );
         }
-        window.history.replaceState(
-            {},
-            '',
-            urlParams.toString() !== ''
-                ? `${location.pathname}?${urlParams}`
-                : `${location.pathname}`
-        );
     }
 
     /**

@@ -8,10 +8,12 @@ document.body.onload = function() {
 
 	// Create a config object
 	const config = new Config({
-		AutoPlayVideo: true,
-		AutoConnect: true,
-		ss: "ws://localhost:80",
-		StartVideoMuted: true,
+		initialSettings: {
+			AutoPlayVideo: true,
+			AutoConnect: true,
+			ss: "ws://localhost:80",
+			StartVideoMuted: true,
+		}
 	});
 
 	// Create a PixelStreaming instance and attach the video element to an existing parent div

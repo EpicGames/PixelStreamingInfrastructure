@@ -106,6 +106,10 @@ export type AllSettings = {
     [K in OptionIds]: OptionKeys<K>
 }
 
+export interface ConfigParams {
+    initialSettings?: Partial<AllSettings>;
+    useUrlParams?: boolean;
+}
 export class Config {
     /* A map of flags that can be toggled - options that can be set in the application - e.g. Use Mic? */
     private flags = new Map<FlagsIds, SettingFlag>();
@@ -121,8 +125,9 @@ export class Config {
 
     // ------------ Settings -----------------
 
-    constructor(initialSettings?: Partial<AllSettings>) {
-        this.populateDefaultSettings();
+    constructor(config: ConfigParams = {}) {
+        const { initialSettings, useUrlParams } = config;
+        this.populateDefaultSettings(!!useUrlParams);
         if (initialSettings) {
             this.setSettings(initialSettings);
         }
@@ -131,7 +136,7 @@ export class Config {
     /**
      * Populate the default settings for a Pixel Streaming application
      */
-    populateDefaultSettings(): void {
+    populateDefaultSettings(useUrlParams: boolean): void {
         /**
          * Text Parameters
          */
@@ -148,7 +153,8 @@ export class Config {
                     (window.location.port === '80' ||
                     window.location.port === ''
                         ? ''
-                        : `:${window.location.port}`)
+                        : `:${window.location.port}`),
+                useUrlParams
             )
         );
 
@@ -159,7 +165,8 @@ export class Config {
                 'Streamer ID',
                 'The ID of the streamer to stream.',
                 '',
-                []
+                [],
+                useUrlParams
             )
         );
 
@@ -195,7 +202,8 @@ export class Config {
                         }
                     });
                     return browserSupportedCodecs;
-                })()
+                })(),
+                useUrlParams
             )
         );
 
@@ -209,7 +217,8 @@ export class Config {
                 Flags.AutoConnect,
                 'Auto connect to stream',
                 'Whether we should attempt to auto connect to the signalling server or show a click to start prompt.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -219,7 +228,8 @@ export class Config {
                 Flags.AutoPlayVideo,
                 'Auto play video',
                 'When video is ready automatically start playing it as opposed to showing a play button.',
-                true
+                true,
+                useUrlParams
             )
         );
 
@@ -229,7 +239,8 @@ export class Config {
                 Flags.BrowserSendOffer,
                 'Browser send offer',
                 'Browser will initiate the WebRTC handshake by sending the offer to the streamer',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -239,7 +250,8 @@ export class Config {
                 Flags.UseMic,
                 'Use microphone',
                 'Make browser request microphone access and open an input audio track.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -249,7 +261,8 @@ export class Config {
                 Flags.StartVideoMuted,
                 'Start video muted',
                 'Video will start muted if true.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -259,7 +272,8 @@ export class Config {
                 Flags.SuppressBrowserKeys,
                 'Suppress browser keys',
                 'Suppress certain browser keys that we use in UE, for example F5 to show shader complexity instead of refresh the page.',
-                true
+                true,
+                useUrlParams
             )
         );
 
@@ -269,7 +283,8 @@ export class Config {
                 Flags.PreferSFU,
                 'Prefer SFU',
                 'Try to connect to the SFU instead of P2P.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -279,7 +294,8 @@ export class Config {
                 Flags.IsQualityController,
                 'Is quality controller?',
                 'True if this peer controls stream quality',
-                true
+                true,
+                useUrlParams
             )
         );
 
@@ -289,7 +305,8 @@ export class Config {
                 Flags.ForceMonoAudio,
                 'Force mono audio',
                 'Force browser to request mono audio in the SDP',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -299,7 +316,8 @@ export class Config {
                 Flags.ForceTURN,
                 'Force TURN',
                 'Only generate TURN/Relayed ICE candidates.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -309,7 +327,8 @@ export class Config {
                 Flags.AFKDetection,
                 'AFK if idle',
                 'Timeout the experience if user is AFK for a period.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -319,7 +338,8 @@ export class Config {
                 Flags.MatchViewportResolution,
                 'Match viewport resolution',
                 'Pixel Streaming will be instructed to dynamically resize the video stream to match the size of the video element.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -329,7 +349,8 @@ export class Config {
                 Flags.HoveringMouseMode,
                 'Control Scheme: Locked Mouse',
                 'Either locked mouse, where the pointer is consumed by the video and locked to it, or hovering mouse, where the mouse is not consumed.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -339,7 +360,8 @@ export class Config {
                 Flags.FakeMouseWithTouches,
                 'Fake mouse with touches',
                 'A single finger touch is converted into a mouse event. This allows a non-touch application to be controlled partially via a touch device.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -349,7 +371,8 @@ export class Config {
                 Flags.LightMode,
                 'Use a light color scheme',
                 'The Pixel Streaming player will be instructed to use a lighter color scheme',
-                false // (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches would use system preference
+                false, // (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches would use system preference
+                useUrlParams
             )
         );
 
@@ -365,7 +388,8 @@ export class Config {
                 'The time (in seconds) it takes for the application to time out if AFK timeout is enabled.',
                 0 /*min*/,
                 600 /*max*/,
-                120 /*value*/
+                120 /*value*/,
+                useUrlParams
             )
         );
 
@@ -377,7 +401,8 @@ export class Config {
                 'The lower bound for the quantization parameter (QP) of the encoder. 0 = Best quality, 51 = worst quality.',
                 0 /*min*/,
                 51 /*max*/,
-                0 /*value*/
+                0 /*value*/,
+                useUrlParams
             )
         );
 
@@ -389,7 +414,8 @@ export class Config {
                 'The upper bound for the quantization parameter (QP) of the encoder. 0 = Best quality, 51 = worst quality.',
                 0 /*min*/,
                 51 /*max*/,
-                51 /*value*/
+                51 /*value*/,
+                useUrlParams
             )
         );
 
@@ -401,7 +427,8 @@ export class Config {
                 'The maximum FPS that WebRTC will try to transmit frames at.',
                 1 /*min*/,
                 999 /*max*/,
-                60 /*value*/
+                60 /*value*/,
+                useUrlParams
             )
         );
 
@@ -413,7 +440,8 @@ export class Config {
                 'The minimum bitrate that WebRTC should use.',
                 0 /*min*/,
                 100000 /*max*/,
-                0 /*value*/
+                0 /*value*/,
+                useUrlParams
             )
         );
 
@@ -425,7 +453,8 @@ export class Config {
                 'The maximum bitrate that WebRTC should use.',
                 0 /*min*/,
                 100000 /*max*/,
-                0 /*value*/
+                0 /*value*/,
+                useUrlParams
             )
         );
     }

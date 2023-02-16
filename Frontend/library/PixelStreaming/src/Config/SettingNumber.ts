@@ -12,6 +12,7 @@ export class SettingNumber extends SettingBase {
 
     id: NumericParametersIds;
     onChangeEmit: (changedValue: number) => void;
+    useUrlParams: boolean;
 
     constructor(
         id: NumericParametersIds,
@@ -19,7 +20,8 @@ export class SettingNumber extends SettingBase {
         description: string,
         min: number,
         max: number,
-        defaultNumber: number
+        defaultNumber: number,
+        useUrlParams: boolean
     ) {
         super(id, label, description, defaultNumber);
 
@@ -28,7 +30,7 @@ export class SettingNumber extends SettingBase {
 
         // attempt to read the number from the url params
         const urlParams = new URLSearchParams(window.location.search);
-        if (!urlParams.has(this.id)) {
+        if (!useUrlParams || !urlParams.has(this.id)) {
             this.number = defaultNumber;
         } else {
             const parsedValue = Number.parseInt(urlParams.get(this.id));
@@ -36,19 +38,22 @@ export class SettingNumber extends SettingBase {
                 ? defaultNumber
                 : parsedValue;
         }
+        this.useUrlParams = useUrlParams;
     }
 
     public updateURLParams(): void {
-        // set url params like ?id=number
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.set(this.id, this.number.toString());
-        window.history.replaceState(
-            {},
-            '',
-            urlParams.toString() !== ''
-                ? `${location.pathname}?${urlParams}`
-                : `${location.pathname}`
-        );
+        if (this.useUrlParams) {
+            // set url params like ?id=number
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set(this.id, this.number.toString());
+            window.history.replaceState(
+                {},
+                '',
+                urlParams.toString() !== ''
+                    ? `${location.pathname}?${urlParams}`
+                    : `${location.pathname}`
+            );
+        }
     }
 
     /**

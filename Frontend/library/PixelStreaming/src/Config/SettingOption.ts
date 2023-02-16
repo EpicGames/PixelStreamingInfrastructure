@@ -7,22 +7,25 @@ export class SettingOption extends SettingBase {
     id: OptionParametersIds;
     onChangeEmit: (changedValue: string) => void;
     _options: Array<string>;
+    useUrlParams: boolean;
 
     constructor(
         id: OptionParametersIds,
         label: string,
         description: string,
         defaultTextValue: string,
-        options: Array<string>
+        options: Array<string>,
+        useUrlParams: boolean
     ) {
         super(id, label, description, [defaultTextValue, defaultTextValue]);
 
         this.options = options;
         const urlParams = new URLSearchParams(window.location.search);
-        const stringToMatch: string = urlParams.has(this.id)
+        const stringToMatch: string = useUrlParams && urlParams.has(this.id)
             ? this.getUrlParamText()
             : defaultTextValue;
         this.selected = stringToMatch;
+        this.useUrlParams = useUrlParams;
     }
 
     /**
@@ -38,16 +41,18 @@ export class SettingOption extends SettingBase {
     }
 
     setUrlParamText() {
-        // set url params
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.set(this.id, this.selected);
-        window.history.replaceState(
-            {},
-            '',
-            urlParams.toString() !== ''
-                ? `${location.pathname}?${urlParams}`
-                : `${location.pathname}`
-        );
+        if (this.useUrlParams) {
+            // set url params
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set(this.id, this.selected);
+            window.history.replaceState(
+                {},
+                '',
+                urlParams.toString() !== ''
+                    ? `${location.pathname}?${urlParams}`
+                    : `${location.pathname}`
+            );
+        }
     }
 
     /**
