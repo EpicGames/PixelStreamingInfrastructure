@@ -1,0 +1,62 @@
+name: Releases
+
+on: 
+  push:
+    branches: ['githubactions']
+    paths: ['RELEASE_VERSION']
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Frontend
+
+    permissions:
+      contents: write
+    steps:
+    - name: "Checkout source code"
+      uses: actions/checkout@v2
+
+    - name: Read VERSION file
+      id: getversion
+      run: echo "::set-output name=version::$(cat VERSION)"
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+        registry-url: 'https://registry.npmjs.org'
+    - run: cd library
+    - run: npm ci
+    - run: npm run build
+    - run: cd ../implementations/EpicGames
+    - run: npm ci
+    - run: npm run build-all
+    - run: cd ../../..
+    - run: mkdir output
+
+    - name: Archive Release tar.gz
+      uses: thedoctor0/zip-release@0.7.1
+      with:
+        directory: './output'
+        path: '../'
+        type: 'tar'
+        filename: '{{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz'
+        exclusions: '*.git* /*node_modules/* .editorconfig /*types/* /*dist*/ /*output*/'
+
+    - name: Archive Release tar.gz
+      uses: thedoctor0/zip-release@0.7.1
+      with:
+        directory: './output'
+        path: '../'
+        type: 'zip'
+        filename: '{{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip'
+        exclusions: '*.git* /*node_modules/* .editorconfig /*types/* /*dist*/ /*output*/'
+
+    - name: "Make the release"
+      uses: ncipollo/release-action@v1
+      with:
+        tag: "{{ github.ref_name }}-${{ steps.getversion.outputs.version }}"
+        artifacts: "{{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip,{{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz"
+        generateReleaseNotes: true
