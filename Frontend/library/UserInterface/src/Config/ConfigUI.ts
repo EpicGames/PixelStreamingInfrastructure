@@ -291,7 +291,6 @@ export class ConfigUI {
                 const uiOptions = setting.options;
                 const targetOptions = _target.options;
                 if (uiOptions.length !== targetOptions.length || !uiOptions.every((value) => targetOptions.includes(value))) {
-                    console.log("Updating options", uiOptions, targetOptions)
                     setting.options = _target.options;
                 }
                 if (setting.selected !== _target.selected) {
