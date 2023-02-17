@@ -97,12 +97,12 @@ function setup_frontend() {
 		echo "Building Typescript Frontend."
 		# Using our bundled NodeJS, build the web frontend files
 		pushd ${BASH_LOCATION}/../../../Frontend/library/PixelStreaming > /dev/null
-		../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
-		../../SignallingWebServer/platform_scripts/bash/node/bin/npx webpack
+		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
+		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-dev
 		popd
 		pushd ${BASH_LOCATION}/../../../Frontend/library/UserInterface > /dev/null
-		../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
-		../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-dev
+		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
+		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-dev
 		popd
 
 		pushd ${BASH_LOCATION}/../../../Frontend/implementations/EpicGames > /dev/null
