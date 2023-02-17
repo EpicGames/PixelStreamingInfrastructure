@@ -7,7 +7,7 @@ The goals of this repository are to:
 
 - Increase the release cadence for the Pixel Streaming servers (to mitigate browser breaking changes sooner).
 - Encourage easier contribution of these components by Unreal Engine licensees.
-- Facilitate a more standard web release mechanism (e.g. NPM packages or similar... coming soon).
+- Facilitate a more standard web release mechanism.
 - Grant a permissive license to distribute and modify this code wherever you see fit (MIT licensed).
 
 ## Repository contents
@@ -23,6 +23,22 @@ Reference implementations for the various pieces needed to support a PixelStream
 The following container images are built from this repository:
 
 - [ghcr.io/epicgames/pixel-streaming-signalling-server](https://github.com/orgs/EpicGames/packages/container/package/pixel-streaming-signalling-server) (since Unreal Engine 5.1)
+
+## Releases
+
+### Frontend library (Unofficial NPM packages)
+
+- UE 5.2
+
+`npm i @epicgames-ps/lib-pixelstreamingfrontend-ue5.2`
+
+- Dev
+
+`npm i @epicgames-ps/lib-pixelstreamingfrontend-dev`
+
+### Full release + built reference implementation
+
+[Github releases](https://github.com/EpicGames/PixelStreamingInfrastructure/releases)
 
 ## Versions
 
