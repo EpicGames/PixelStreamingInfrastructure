@@ -273,7 +273,7 @@ export class PixelStreaming {
             }
         );
 
-        this.config.registerOnChangeEvents(this._eventEmitter);
+        this.config._registerOnChangeEvents(this._eventEmitter);
     }
 
     /**

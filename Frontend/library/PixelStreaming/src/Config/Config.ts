@@ -710,7 +710,7 @@ export class Config {
      * Emit events when settings change.
      * @param eventEmitter 
      */
-    registerOnChangeEvents(eventEmitter: EventEmitter) {
+    _registerOnChangeEvents(eventEmitter: EventEmitter) {
         for (const key of this.flags.keys()) {
             const flag = this.flags.get(key);
             if (flag) {
