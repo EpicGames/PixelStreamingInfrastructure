@@ -19,9 +19,9 @@ jobs:
     - name: "Checkout source code"
       uses: actions/checkout@v2
 
-    - name: Read VERSION file
+    - name: Read the RELEASE_VERSION file
       id: getversion
-      run: echo "::set-output name=version::$(cat VERSION)"
+      run: echo "::set-output name=version::$(cat RELEASE_VERSION)"
 
     - uses: actions/setup-node@v3
       with:
