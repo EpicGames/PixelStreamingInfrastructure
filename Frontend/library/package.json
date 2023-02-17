@@ -1,6 +1,6 @@
 {
     "name": "@epicgames-ps/lib-pixelstreamingfrontend-dev",
-    "version": "0.0.1",
+    "version": "0.1.1",
     "description": "Frontend library for Pixel Streaming",
     "main": "dist/lib-pixelstreamingfrontend.js",
     "types": "types/pixelstreamingfrontend.d.ts",
