@@ -1,28 +1,51 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Config, FlagsIds, NumericParametersIds, OptionParametersIds, TextParametersIds, TextParameters, OptionParameters, Flags, NumericParameters, SettingsChangedEvent, SettingFlag, SettingNumber, SettingText, SettingOption } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
+import { Config, FlagsIds, NumericParametersIds, OptionParametersIds, TextParametersIds, TextParameters, OptionParameters, Flags, NumericParameters, SettingsChangedEvent, SettingFlag, SettingNumber, SettingText, SettingOption, Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
 import { SettingUIFlag } from './SettingUIFlag';
 import { SettingUINumber } from './SettingUINumber';
 import { SettingUIText } from './SettingUIText';
 import { SettingUIOption } from './SettingUIOption';
 
+export const LightMode = 'LightMode' as const;
+type ExtraFlags = typeof LightMode;
+export type FlagsIdsExtended = FlagsIds | ExtraFlags;
+
 export class ConfigUI {
+    private customFlags = new Map<FlagsIdsExtended, SettingFlag<FlagsIdsExtended>>();
+
     /* A map of flags that can be toggled - options that can be set in the application - e.g. Use Mic? */
-    private flags = new Map<FlagsIds, SettingUIFlag>();
+    private flagsUi = new Map<FlagsIdsExtended, SettingUIFlag<FlagsIdsExtended>>();
 
     /* A map of numerical settings - options that can be in the application - e.g. MinBitrate */
-    private numericParameters = new Map<NumericParametersIds, SettingUINumber>();
+    private numericParametersUi = new Map<NumericParametersIds, SettingUINumber>();
 
     /* A map of text settings - e.g. signalling server url */
-    private textParameters = new Map<TextParametersIds, SettingUIText>();
+    private textParametersUi = new Map<TextParametersIds, SettingUIText>();
 
     /* A map of enum based settings - e.g. preferred codec */
-    private optionParameters = new Map<OptionParametersIds, SettingUIOption>();
+    private optionParametersUi = new Map<OptionParametersIds, SettingUIOption>();
 
     // ------------ Settings -----------------
 
     constructor(config: Config) {
+        this.createCustomUISettings(config.useUrlParams);
         this.registerSettingsUIComponents(config);
+    }
+
+    /**
+     * Create custom UI settings that are not provided by the Pixel Streaming library.
+     */
+    createCustomUISettings(useUrlParams: boolean) {
+        this.customFlags.set(
+            LightMode,
+            new SettingFlag<FlagsIdsExtended>(
+                LightMode,
+                'Use a light color scheme',
+                'The Pixel Streaming player will be instructed to use a lighter color scheme',
+                false, // (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches would use system preference
+                useUrlParams
+            )
+        );
     }
 
     /**
@@ -30,17 +53,20 @@ export class ConfigUI {
      * @param config 
      */
     registerSettingsUIComponents(config: Config) {
-        for (const setting of config.getFlags() ) {
-            this.flags.set(setting.id, new SettingUIFlag(setting));
+        for (const setting of config.getFlags()) {
+            this.flagsUi.set(setting.id, new SettingUIFlag(setting));
         }
-        for (const setting of config.getTextSettings() ) {
-            this.textParameters.set(setting.id, new SettingUIText(setting));
+        for (const setting of Array.from(this.customFlags.values())) {
+            this.flagsUi.set(setting.id, new SettingUIFlag<FlagsIdsExtended>(setting));
         }
-        for (const setting of config.getNumericSettings() ) {
-            this.numericParameters.set(setting.id, new SettingUINumber(setting));
+        for (const setting of config.getTextSettings()) {
+            this.textParametersUi.set(setting.id, new SettingUIText(setting));
         }
-        for (const setting of config.getOptionSettings() ) {
-            this.optionParameters.set(setting.id, new SettingUIOption(setting));
+        for (const setting of config.getNumericSettings()) {
+            this.numericParametersUi.set(setting.id, new SettingUINumber(setting));
+        }
+        for (const setting of config.getOptionSettings()) {
+            this.optionParametersUi.set(setting.id, new SettingUIOption(setting));
         }
     }
 
@@ -82,50 +108,50 @@ export class ConfigUI {
         // make settings show up in DOM
         this.addSettingText(
             psSettingsSection,
-            this.textParameters.get(TextParameters.SignallingServerUrl)
+            this.textParametersUi.get(TextParameters.SignallingServerUrl)
         );
         this.addSettingOption(
             psSettingsSection,
-            this.optionParameters.get(OptionParameters.StreamerId)
+            this.optionParametersUi.get(OptionParameters.StreamerId)
         );
         this.addSettingFlag(
             psSettingsSection,
-            this.flags.get(Flags.AutoConnect)
+            this.flagsUi.get(Flags.AutoConnect)
         );
         this.addSettingFlag(
             psSettingsSection,
-            this.flags.get(Flags.AutoPlayVideo)
+            this.flagsUi.get(Flags.AutoPlayVideo)
         );
         this.addSettingFlag(
             psSettingsSection,
-            this.flags.get(Flags.BrowserSendOffer)
+            this.flagsUi.get(Flags.BrowserSendOffer)
         );
-        this.addSettingFlag(psSettingsSection, this.flags.get(Flags.UseMic));
+        this.addSettingFlag(psSettingsSection, this.flagsUi.get(Flags.UseMic));
         this.addSettingFlag(
             psSettingsSection,
-            this.flags.get(Flags.StartVideoMuted)
+            this.flagsUi.get(Flags.StartVideoMuted)
         );
-        this.addSettingFlag(psSettingsSection, this.flags.get(Flags.PreferSFU));
+        this.addSettingFlag(psSettingsSection, this.flagsUi.get(Flags.PreferSFU));
         this.addSettingFlag(
             psSettingsSection,
-            this.flags.get(Flags.IsQualityController)
-        );
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.ForceMonoAudio)
-        );
-        this.addSettingFlag(psSettingsSection, this.flags.get(Flags.ForceTURN));
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.SuppressBrowserKeys)
+            this.flagsUi.get(Flags.IsQualityController)
         );
         this.addSettingFlag(
             psSettingsSection,
-            this.flags.get(Flags.AFKDetection)
+            this.flagsUi.get(Flags.ForceMonoAudio)
+        );
+        this.addSettingFlag(psSettingsSection, this.flagsUi.get(Flags.ForceTURN));
+        this.addSettingFlag(
+            psSettingsSection,
+            this.flagsUi.get(Flags.SuppressBrowserKeys)
+        );
+        this.addSettingFlag(
+            psSettingsSection,
+            this.flagsUi.get(Flags.AFKDetection)
         );
         this.addSettingNumeric(
             psSettingsSection,
-            this.numericParameters.get(NumericParameters.AFKTimeoutSecs)
+            this.numericParametersUi.get(NumericParameters.AFKTimeoutSecs)
         );
 
         /* Setup all view/ui related settings under this section */
@@ -135,12 +161,12 @@ export class ConfigUI {
         );
         this.addSettingFlag(
             viewSettingsSection,
-            this.flags.get(Flags.MatchViewportResolution)
+            this.flagsUi.get(Flags.MatchViewportResolution)
         );
 
-        this.addSettingFlag(viewSettingsSection, this.flags.get(Flags.HoveringMouseMode));
+        this.addSettingFlag(viewSettingsSection, this.flagsUi.get(Flags.HoveringMouseMode));
 
-        this.addSettingFlag(viewSettingsSection, this.flags.get(Flags.LightMode));
+        this.addSettingFlag(viewSettingsSection, this.flagsUi.get(LightMode));
 
         /* Setup all encoder related settings under this section */
         const encoderSettingsSection = this.buildSectionWithHeading(
@@ -150,17 +176,17 @@ export class ConfigUI {
 
         this.addSettingNumeric(
             encoderSettingsSection,
-            this.numericParameters.get(NumericParameters.MinQP)
+            this.numericParametersUi.get(NumericParameters.MinQP)
         );
         this.addSettingNumeric(
             encoderSettingsSection,
-            this.numericParameters.get(NumericParameters.MaxQP)
+            this.numericParametersUi.get(NumericParameters.MaxQP)
         );
 
-        const preferredCodecOption = this.optionParameters.get(OptionParameters.PreferredCodec);
+        const preferredCodecOption = this.optionParametersUi.get(OptionParameters.PreferredCodec);
         this.addSettingOption(
             encoderSettingsSection,
-            this.optionParameters.get(OptionParameters.PreferredCodec)
+            this.optionParametersUi.get(OptionParameters.PreferredCodec)
         );
         if(preferredCodecOption && [...preferredCodecOption.selector.options].map(o => o.value).includes("Only available on Chrome")) {
             preferredCodecOption.disable();
@@ -174,15 +200,15 @@ export class ConfigUI {
 
         this.addSettingNumeric(
             webrtcSettingsSection,
-            this.numericParameters.get(NumericParameters.WebRTCFPS)
+            this.numericParametersUi.get(NumericParameters.WebRTCFPS)
         );
         this.addSettingNumeric(
             webrtcSettingsSection,
-            this.numericParameters.get(NumericParameters.WebRTCMinBitrate)
+            this.numericParametersUi.get(NumericParameters.WebRTCMinBitrate)
         );
         this.addSettingNumeric(
             webrtcSettingsSection,
-            this.numericParameters.get(NumericParameters.WebRTCMaxBitrate)
+            this.numericParametersUi.get(NumericParameters.WebRTCMaxBitrate)
         );
     }
 
@@ -197,7 +223,7 @@ export class ConfigUI {
     ): void {
         if (settingText) {
             settingsSection.appendChild(settingText.rootElement);
-            this.textParameters.set(settingText.setting.id, settingText);
+            this.textParametersUi.set(settingText.setting.id, settingText);
         }
     }
 
@@ -208,11 +234,11 @@ export class ConfigUI {
      */
     addSettingFlag(
         settingsSection: HTMLElement,
-        settingFlag?: SettingUIFlag
+        settingFlag?: SettingUIFlag<FlagsIdsExtended>
     ): void {
         if (settingFlag) {
             settingsSection.appendChild(settingFlag.rootElement);
-            this.flags.set(settingFlag.setting.id, settingFlag);
+            this.flagsUi.set(settingFlag.setting.id, settingFlag);
         }
     }
 
@@ -227,7 +253,7 @@ export class ConfigUI {
     ): void {
         if (setting) {
             settingsSection.appendChild(setting.rootElement);
-            this.numericParameters.set(setting.setting.id, setting);
+            this.numericParametersUi.set(setting.setting.id, setting);
         }
     }
 
@@ -242,7 +268,7 @@ export class ConfigUI {
     ): void {
         if (setting) {
             settingsSection.appendChild(setting.rootElement);
-            this.optionParameters.set(setting.setting.id, setting);
+            this.optionParametersUi.set(setting.setting.id, setting);
         }
     }
 
@@ -250,7 +276,7 @@ export class ConfigUI {
         if (type === "flag") {
             const _id = id as FlagsIds;
             const _target = target as SettingFlag;
-            const setting = this.flags.get(_id);
+            const setting = this.flagsUi.get(_id);
             if (setting) {
                 if (setting.flag !== _target.flag) {
                     setting.flag = _target.flag;
@@ -262,7 +288,7 @@ export class ConfigUI {
         } else if (type === "number") {
             const _id = id as NumericParametersIds;
             const _target = target as SettingNumber;
-            const setting = this.numericParameters.get(_id);
+            const setting = this.numericParametersUi.get(_id);
             if (setting) {
                 if (setting.number !== _target.number) {
                     setting.number = _target.number;
@@ -274,7 +300,7 @@ export class ConfigUI {
         } else if (type === "text") {
             const _id = id as TextParametersIds;
             const _target = target as SettingText;
-            const setting = this.textParameters.get(_id);
+            const setting = this.textParametersUi.get(_id);
             if (setting) {
                 if (setting.text !== _target.text) {
                     setting.text = _target.text;
@@ -286,7 +312,7 @@ export class ConfigUI {
         } else if (type === "option") {
             const _id = id as OptionParametersIds;
             const _target = target as SettingOption;
-            const setting = this.optionParameters.get(_id);
+            const setting = this.optionParametersUi.get(_id);
             if (setting) {
                 const uiOptions = setting.options;
                 const targetOptions = _target.options;
@@ -302,4 +328,44 @@ export class ConfigUI {
             }
         }
     }
+
+    /**
+     * Add a callback to fire when the flag is toggled.
+     * @param id The id of the flag.
+     * @param onChangeListener The callback to fire when the value changes.
+     */
+    addCustomFlagOnSettingChangedListener(
+        id: ExtraFlags,
+        onChangeListener: (newFlagValue: boolean) => void
+    ): void {
+        if (this.customFlags.has(id)) {
+            this.customFlags.get(id).onChange = onChangeListener;
+        }
+    }
+
+    /**
+     * Set the label for the flag.
+     * @param id The id of the flag.
+     * @param label The new label to use for the flag.
+     */
+    setCustomFlagLabel(id: ExtraFlags, label: string) {
+        if (!this.customFlags.has(id)) {
+            Logger.Warning(
+                Logger.GetStackTrace(),
+                `Cannot set label for flag called ${id} - it does not exist in the Config.flags map.`
+            );
+        } else {
+            this.customFlags.get(id).label = label;
+        }
+    }
+
+    /**
+     * Get the value of the configuration flag which has the given id.
+     * @param id The unique id for the flag.
+     * @returns True if the flag is enabled.
+     */
+    isCustomFlagEnabled(id: ExtraFlags): boolean {
+        return this.customFlags.get(id).flag as boolean;
+    }
+
 }

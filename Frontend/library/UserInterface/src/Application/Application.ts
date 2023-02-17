@@ -15,7 +15,7 @@ import { LabelledButton } from '../UI/LabelledButton';
 import { SettingsPanel } from '../UI/SettingsPanel';
 import { StatsPanel } from '../UI/StatsPanel';
 import { VideoQpIndicator } from '../UI/VideoQpIndicator';
-import { ConfigUI } from '../Config/ConfigUI';
+import { ConfigUI, LightMode } from '../Config/ConfigUI';
 
 export interface UIOptions {
     pixelStreaming: PixelStreaming;
@@ -75,6 +75,8 @@ export class Application {
         this.registerCallbacks();
 
         this.showConnectOrAutoConnectOverlays();
+
+        this.updateColors(this.configUI.isCustomFlagEnabled(LightMode));
     }
 
     public createOverlays(): void {
@@ -170,6 +172,18 @@ export class Application {
         this.configUI.populateSettingsElement(
             this.settingsPanel.settingsContentElement
         );
+
+        this.configUI.addCustomFlagOnSettingChangedListener(
+            LightMode,
+            (isLightMode: boolean) => {
+                this.configUI.setCustomFlagLabel(
+                    LightMode,
+                    `Color Scheme: ${isLightMode ? 'Light' : 'Dark'} Mode`
+                );
+                this.updateColors(isLightMode);
+            }
+        );
+
     }
 
     registerCallbacks() {
@@ -494,4 +508,30 @@ export class Application {
         }
     }
 
+    /**
+     * Update the players color variables
+     * @param isLightMode - should we use a light or dark color scheme
+     */
+    updateColors(isLightMode: boolean) {
+        const rootElement = document.querySelector(':root') as HTMLElement;
+        if (isLightMode) {
+            rootElement.style.setProperty('--color0', '#e2e0dd80');
+            rootElement.style.setProperty('--color1', '#FFFFFF');
+            rootElement.style.setProperty('--color2', '#000000');
+            rootElement.style.setProperty('--color3', '#0585fe');
+            rootElement.style.setProperty('--color4', '#35b350');
+            rootElement.style.setProperty('--color5', '#ffab00');
+            rootElement.style.setProperty('--color6', '#e1e2dd');
+            rootElement.style.setProperty('--color7', '#c3c4bf');
+        } else {
+            rootElement.style.setProperty('--color0', '#1D1F2280');
+            rootElement.style.setProperty('--color1', '#000000');
+            rootElement.style.setProperty('--color2', '#FFFFFF');
+            rootElement.style.setProperty('--color3', '#0585fe');
+            rootElement.style.setProperty('--color4', '#35b350');
+            rootElement.style.setProperty('--color5', '#ffab00');
+            rootElement.style.setProperty('--color6', '#1e1d22');
+            rootElement.style.setProperty('--color7', '#3c3b40');
+        }
+    }
 }

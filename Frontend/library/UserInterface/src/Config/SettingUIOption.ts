@@ -1,9 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import type { SettingOption } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
+import type { OptionParametersIds, SettingOption } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
 import { SettingUIBase } from './SettingUIBase';
 
-export class SettingUIOption extends SettingUIBase {
+export class SettingUIOption<CustomIds extends string = OptionParametersIds> extends SettingUIBase {
     /* A select element that reflects the value of this setting. */
     _selector: HTMLSelectElement; // <select></select>
 
@@ -11,7 +11,7 @@ export class SettingUIOption extends SettingUIBase {
     _settingsTextElem: HTMLElement;
 
     constructor(
-        setting: SettingOption
+        setting: SettingOption<CustomIds>
     ) {
         super(setting);
 
@@ -23,8 +23,8 @@ export class SettingUIOption extends SettingUIBase {
     /**
      * @returns The setting component.
      */
-    public get setting(): SettingOption {
-        return this._setting as SettingOption;
+    public get setting(): SettingOption<CustomIds> {
+        return this._setting as SettingOption<CustomIds>;
     }
 
     public get selector(): HTMLSelectElement {

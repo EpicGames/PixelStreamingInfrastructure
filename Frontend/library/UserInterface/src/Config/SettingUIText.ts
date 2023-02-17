@@ -1,9 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import type { SettingText } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
+import type { SettingText, TextParametersIds } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
 import { SettingUIBase } from './SettingUIBase';
 
-export class SettingUIText extends SettingUIBase {
+export class SettingUIText<CustomIds extends string = TextParametersIds> extends SettingUIBase {
     /* A text box that reflects the value of this setting. */
     _textbox: HTMLInputElement; // input type="text"
 
@@ -11,7 +11,7 @@ export class SettingUIText extends SettingUIBase {
     _settingsTextElem: HTMLElement;
 
     constructor(
-        setting: SettingText
+        setting: SettingText<CustomIds>
     ) {
         super(setting);
 
@@ -22,8 +22,8 @@ export class SettingUIText extends SettingUIBase {
     /**
      * @returns The setting component.
      */
-    public get setting(): SettingText {
-        return this._setting as SettingText;
+    public get setting(): SettingText<CustomIds> {
+        return this._setting as SettingText<CustomIds>;
     }
 
     public get settingsTextElem(): HTMLElement {

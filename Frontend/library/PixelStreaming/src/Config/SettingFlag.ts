@@ -3,13 +3,13 @@
 import type { FlagsIds } from './Config';
 import { SettingBase } from './SettingBase';
 
-export class SettingFlag extends SettingBase {
-    id: FlagsIds;
+export class SettingFlag<CustomIds extends string = FlagsIds> extends SettingBase {
+    id: FlagsIds | CustomIds;
     onChangeEmit: (changedValue: boolean) => void;
     useUrlParams: boolean;
 
     constructor(
-        id: FlagsIds,
+        id: FlagsIds | CustomIds,
         label: string,
         description: string,
         defaultFlagValue: boolean,

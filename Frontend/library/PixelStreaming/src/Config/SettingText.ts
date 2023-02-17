@@ -3,13 +3,13 @@
 import type { TextParametersIds } from './Config';
 import { SettingBase } from './SettingBase';
 
-export class SettingText extends SettingBase {
-    id: TextParametersIds;
+export class SettingText<CustomIds extends string = TextParametersIds> extends SettingBase {
+    id: TextParametersIds | CustomIds;
     onChangeEmit: (changedValue: string) => void;
     useUrlParams: boolean;
 
     constructor(
-        id: TextParametersIds,
+        id: TextParametersIds | CustomIds,
         label: string,
         description: string,
         defaultTextValue: string,

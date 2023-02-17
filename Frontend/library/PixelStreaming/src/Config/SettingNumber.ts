@@ -6,16 +6,16 @@ import { SettingBase } from './SettingBase';
 /**
  * A number spinner with a text label beside it.
  */
-export class SettingNumber extends SettingBase {
+export class SettingNumber<CustomIds extends string = NumericParametersIds> extends SettingBase {
     _min: number;
     _max: number;
 
-    id: NumericParametersIds;
+    id: NumericParametersIds | CustomIds;
     onChangeEmit: (changedValue: number) => void;
     useUrlParams: boolean;
 
     constructor(
-        id: NumericParametersIds,
+        id: NumericParametersIds | CustomIds,
         label: string,
         description: string,
         min: number,

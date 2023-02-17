@@ -3,14 +3,14 @@
 import type { OptionParametersIds } from './Config';
 import { SettingBase } from './SettingBase';
 
-export class SettingOption extends SettingBase {
-    id: OptionParametersIds;
+export class SettingOption<CustomIds extends string = OptionParametersIds> extends SettingBase {
+    id: OptionParametersIds | CustomIds;
     onChangeEmit: (changedValue: string) => void;
     _options: Array<string>;
     useUrlParams: boolean;
 
     constructor(
-        id: OptionParametersIds,
+        id: OptionParametersIds | CustomIds,
         label: string,
         description: string,
         defaultTextValue: string,

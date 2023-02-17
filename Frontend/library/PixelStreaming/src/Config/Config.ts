@@ -27,7 +27,6 @@ export class Flags {
     static StartVideoMuted = 'StartVideoMuted' as const;
     static SuppressBrowserKeys = 'SuppressBrowserKeys' as const;
     static UseMic = 'UseMic' as const;
-    static LightMode = 'LightMode' as const;
 }
 
 export type FlagsKeys = Exclude<keyof typeof Flags, "prototype">;
@@ -123,11 +122,14 @@ export class Config {
     /* A map of enum based settings - e.g. preferred codec */
     private optionParameters = new Map<OptionParametersIds, SettingOption>();
 
+    useUrlParams: boolean;
+
     // ------------ Settings -----------------
 
     constructor(config: ConfigParams = {}) {
         const { initialSettings, useUrlParams } = config;
-        this.populateDefaultSettings(!!useUrlParams);
+        this.useUrlParams = !!useUrlParams;
+        this.populateDefaultSettings(this.useUrlParams);
         if (initialSettings) {
             this.setSettings(initialSettings);
         }
@@ -361,17 +363,6 @@ export class Config {
                 'Fake mouse with touches',
                 'A single finger touch is converted into a mouse event. This allows a non-touch application to be controlled partially via a touch device.',
                 false,
-                useUrlParams
-            )
-        );
-
-        this.flags.set(
-            Flags.LightMode,
-            new SettingFlag(
-                Flags.LightMode,
-                'Use a light color scheme',
-                'The Pixel Streaming player will be instructed to use a lighter color scheme',
-                false, // (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches would use system preference
                 useUrlParams
             )
         );

@@ -1,9 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import type { SettingFlag } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
+import type { FlagsIds, SettingFlag } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
 import { SettingUIBase } from './SettingUIBase';
 
-export class SettingUIFlag extends SettingUIBase {
+export class SettingUIFlag<CustomIds extends string = FlagsIds> extends SettingUIBase {
     /* We toggle this checkbox to reflect the value of our setting's boolean flag. */
     _checkbox: HTMLInputElement; // input type="checkbox"
 
@@ -13,7 +13,7 @@ export class SettingUIFlag extends SettingUIBase {
     onChangeEmit: (changedValue: boolean) => void;
 
     constructor(
-        setting: SettingFlag
+        setting: SettingFlag<CustomIds>
     ) {
         super(setting);
 
@@ -24,8 +24,8 @@ export class SettingUIFlag extends SettingUIBase {
     /**
      * @returns The setting component.
      */
-    public get setting(): SettingFlag {
-        return this._setting as SettingFlag;
+    public get setting(): SettingFlag<CustomIds> {
+        return this._setting as SettingFlag<CustomIds>;
     }
     
     public get settingsTextElem(): HTMLElement {
