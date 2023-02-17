@@ -53,8 +53,8 @@ jobs:
         directory: './output'
         path: '../'
         type: 'tar'
-        filename: '{{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz'
-        exclusions: '*.git* /*node_modules/* .editorconfig /*types/* /*dist*/ /*output*/'
+        filename: '${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz'
+        exclusions: '.git .github output Frontend/Docs Frontend/library/dist Frontend/library/types Frontend/library/node_modules Frontend/implementations/EpicGames/node_modules'
 
     - name: Archive Release tar.gz
       uses: thedoctor0/zip-release@0.7.1
@@ -62,12 +62,12 @@ jobs:
         directory: './output'
         path: '../'
         type: 'zip'
-        filename: '{{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip'
-        exclusions: '*.git* /*node_modules/* .editorconfig /*types/* /*dist*/ /*output*/'
+        filename: '${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip'
+        exclusions: '*.git* /*node_modules/* .editorconfig /*types/* /*dist/* /*output/* /*Docs/*'
 
     - name: "Make the release"
       uses: ncipollo/release-action@v1
       with:
-        tag: "{{ github.ref_name }}-${{ steps.getversion.outputs.version }}"
-        artifacts: "{{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip,{{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz"
+        tag: "${{ github.ref_name }}-${{ steps.getversion.outputs.version }}"
+        artifacts: "${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip,${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz"
         generateReleaseNotes: true
