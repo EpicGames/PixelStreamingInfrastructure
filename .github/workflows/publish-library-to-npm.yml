@@ -1,7 +1,7 @@
 name: Publish library package to npmjs
 on:
   push:
-    branches: ['master']
+    branches: ['UE5.2']
     paths: ['Frontend/library/package.json']
 jobs:
   build:
