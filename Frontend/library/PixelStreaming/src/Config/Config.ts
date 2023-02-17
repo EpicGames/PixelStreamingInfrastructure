@@ -122,17 +122,25 @@ export class Config {
     /* A map of enum based settings - e.g. preferred codec */
     private optionParameters = new Map<OptionParametersIds, SettingOption>();
 
-    useUrlParams: boolean;
+    _useUrlParams: boolean;
 
     // ------------ Settings -----------------
 
     constructor(config: ConfigParams = {}) {
         const { initialSettings, useUrlParams } = config;
-        this.useUrlParams = !!useUrlParams;
-        this.populateDefaultSettings(this.useUrlParams);
+        this._useUrlParams = !!useUrlParams;
+        this.populateDefaultSettings(this._useUrlParams);
         if (initialSettings) {
             this.setSettings(initialSettings);
         }
+    }
+
+    /**
+     * True if reading configuration initial values from URL parameters, and
+     * persisting changes in URL when changed.
+     */
+    public get useUrlParams() {
+        return this._useUrlParams;
     }
 
     /**
