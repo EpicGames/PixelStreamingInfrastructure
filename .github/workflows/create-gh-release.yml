@@ -2,7 +2,7 @@ name: Releases
 
 on: 
   push:
-    branches: ['githubactions']
+    branches: ['master']
     paths: ['RELEASE_VERSION']
 
 jobs:
