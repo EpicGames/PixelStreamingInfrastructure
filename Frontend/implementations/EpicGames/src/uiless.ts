@@ -18,4 +18,13 @@ document.body.onload = function() {
 
 	// Create a PixelStreaming instance and attach the video element to an existing parent div
 	const pixelStreaming = new PixelStreaming(config, { videoElementParent: document.getElementById("videoParentElement")});
+
+	// If browser denies autoplay, register a click-to-play handler
+	pixelStreaming.events.addEventListener("playStreamRejected", () => {
+		const parent = document.getElementById("videoParentElement");
+		parent.onclick = () => {
+			pixelStreaming.play();
+			parent.onclick = undefined;
+		}
+	})
 }
