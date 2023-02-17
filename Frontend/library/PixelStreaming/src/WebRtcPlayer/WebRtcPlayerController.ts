@@ -175,7 +175,7 @@ export class WebRtcPlayerController {
             messageList: MessageReceive.MessageStreamerList
         ) => this.handleStreamerListMessage(messageList);
         this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => {
-            this.pixelStreaming.onDisconnect(
+            this.pixelStreaming._onDisconnect(
                 `Websocket disconnect (${event.code}) ${
                     event.reason != '' ? '- ' + event.reason : ''
                 }`
@@ -649,7 +649,7 @@ export class WebRtcPlayerController {
         );
         const command: MessageOnScreenKeyboard = JSON.parse(commandAsString);
         if (command.command === 'onScreenKeyboard') {
-            this.pixelStreaming.activateOnScreenKeyboard(command);
+            this.pixelStreaming._activateOnScreenKeyboard(command);
         }
     }
 
@@ -799,7 +799,7 @@ export class WebRtcPlayerController {
             Logger.GetStackTrace(),
             `Received input controller message - will your input control the stream: ${inputControlOwnership}`
         );
-        this.pixelStreaming.onInputControlOwnership(inputControlOwnership);
+        this.pixelStreaming._onInputControlOwnership(inputControlOwnership);
     }
 
     onAfkTriggered(): void {
@@ -837,16 +837,16 @@ export class WebRtcPlayerController {
         }
 
         // if a websocket object has not been created connect normally without closing
-        if (!this.webSocketController.webSocket) {
+        if (!this.webSocketController.webSocket || this.webSocketController.webSocket.readyState === WebSocket.CLOSED) {
             Logger.Log(
                 Logger.GetStackTrace(),
                 'A websocket connection has not been made yet so we will start the stream'
             );
-            this.pixelStreaming.onWebRtcAutoConnect();
+            this.pixelStreaming._onWebRtcAutoConnect();
             this.connectToSignallingServer();
         } else {
             // set the replay status so we get a text overlay over an action overlay
-            this.pixelStreaming.showActionOrErrorOnDisconnect = false;
+            this.pixelStreaming._showActionOrErrorOnDisconnect = false;
 
             // set the disconnect message
             this.setDisconnectMessageOverride('Restarting stream...');
@@ -856,7 +856,7 @@ export class WebRtcPlayerController {
 
             // wait for the connection to close and restart the connection
             const autoConnectTimeout = setTimeout(() => {
-                this.pixelStreaming.onWebRtcAutoConnect();
+                this.pixelStreaming._onWebRtcAutoConnect();
                 this.connectToSignallingServer();
                 clearTimeout(autoConnectTimeout);
             }, 3000);
@@ -1116,9 +1116,9 @@ export class WebRtcPlayerController {
 
         // set up webRtc text overlays
         this.peerConnectionController.showTextOverlayConnecting = () =>
-            this.pixelStreaming.onWebRtcConnecting();
+            this.pixelStreaming._onWebRtcConnecting();
         this.peerConnectionController.showTextOverlaySetupFailure = () =>
-            this.pixelStreaming.onWebRtcFailed();
+            this.pixelStreaming._onWebRtcFailed();
 
         /* RTC Peer Connection on Track event -> handle on track */
         this.peerConnectionController.onTrack = (trackEvent: RTCTrackEvent) =>
@@ -1321,7 +1321,7 @@ export class WebRtcPlayerController {
         // start the afk warning timer as PS is now running
         this.afkController.startAfkWarningTimer();
         // show the overlay that we have negotiated a connection
-        this.pixelStreaming.onWebRtcSdp();
+        this.pixelStreaming._onWebRtcSdp();
 
         if (this.statsTimerHandle && this.statsTimerHandle !== undefined) {
             window.clearInterval(this.statsTimerHandle);
@@ -1611,7 +1611,7 @@ export class WebRtcPlayerController {
                     latencyTestResults.networkLatency,
                 +latencyTestResults.CaptureToSendMs);
         }
-        this.pixelStreaming.onLatencyTestResult(latencyTestResults);
+        this.pixelStreaming._onLatencyTestResult(latencyTestResults);
     }
 
     /**
@@ -1654,7 +1654,7 @@ export class WebRtcPlayerController {
         initialSettings.ueCompatible();
         Logger.Log(Logger.GetStackTrace(), payloadAsString, 6);
 
-        this.pixelStreaming.onInitialSettings(initialSettings);
+        this.pixelStreaming._onInitialSettings(initialSettings);
     }
 
     /**
@@ -1677,7 +1677,7 @@ export class WebRtcPlayerController {
      * Handles when the video element has been loaded with a srcObject
      */
     handleVideoInitialized() {
-        this.pixelStreaming.onVideoInitialized();
+        this.pixelStreaming._onVideoInitialized();
 
         // either autoplay the video or set up the play overlay
         this.autoPlayVideoOrSetUpPlayOverlay();
@@ -1701,7 +1701,7 @@ export class WebRtcPlayerController {
             Logger.GetStackTrace(),
             `Received quality controller message, will control quality: ${this.isQualityController}`
         );
-        this.pixelStreaming.onQualityControlOwnership(this.isQualityController);
+        this.pixelStreaming._onQualityControlOwnership(this.isQualityController);
     }
 
     /**
@@ -1709,7 +1709,7 @@ export class WebRtcPlayerController {
      * @param stats - Aggregated Stats
      */
     handleVideoStats(stats: AggregatedStats) {
-        this.pixelStreaming.onVideoStats(stats);
+        this.pixelStreaming._onVideoStats(stats);
     }
 
     /**
@@ -1743,7 +1743,7 @@ export class WebRtcPlayerController {
 
     setVideoEncoderAvgQP(avgQP: number) {
         this.videoAvgQp = avgQP;
-        this.pixelStreaming.onVideoEncoderAvgQP(this.videoAvgQp);
+        this.pixelStreaming._onVideoEncoderAvgQP(this.videoAvgQp);
     }
 
     registerDataChannelEventEmitters(dataChannel: DataChannelController) {

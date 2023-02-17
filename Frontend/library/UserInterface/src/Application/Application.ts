@@ -123,7 +123,7 @@ export class Application {
 
         // Add WebXR button to controls
         controls.xrIcon.rootElement.onclick = () =>
-            this.pixelStreaming.webXrController.xrClicked();
+            this.pixelStreaming.toggleXR();
 
         // setup the stats/info button
         controls.statsIcon.rootElement.onclick = () => this.statsClicked();
@@ -142,7 +142,7 @@ export class Application {
             'Restart'
         );
         restartStreamButton.addOnClickListener(() => {
-            this.pixelStreaming.restartStream();
+            this.pixelStreaming.reconnect();
         });
 
         // Add button for request keyframe

@@ -24,20 +24,20 @@ export interface PixelStreamingOverrides {
  * Provides common base functionality for applications that extend this application
  */
 export class PixelStreaming {
-    public webRtcController: WebRtcPlayerController;
-    public webXrController: WebXRController;
+    private webRtcController: WebRtcPlayerController;
+    private webXrController: WebXRController;
     public config: Config;
 
-    _videoElementParent: HTMLElement;
+    private _videoElementParent: HTMLElement;
 
-    showActionOrErrorOnDisconnect = true;
+    _showActionOrErrorOnDisconnect = true;
 
-    onScreenKeyboardHelper: OnScreenKeyboard;
+    private onScreenKeyboardHelper: OnScreenKeyboard;
 
-    videoStartTime: number;
-    inputController: boolean;
+    private _videoStartTime: number;
+    private _inputController: boolean;
 
-    eventEmitter: EventEmitter
+    private _eventEmitter: EventEmitter
 
     /**
      * @param config - A newly instantiated config object
@@ -51,7 +51,7 @@ export class PixelStreaming {
             this._videoElementParent = overrides.videoElementParent;
         }
 
-        this.eventEmitter = new EventEmitter();
+        this._eventEmitter = new EventEmitter();
 
         this.configureSettings();
 
@@ -72,7 +72,7 @@ export class PixelStreaming {
                 x,
                 y
             );
-        this.activateOnScreenKeyboard = (command: MessageOnScreenKeyboard) =>
+        this._activateOnScreenKeyboard = (command: MessageOnScreenKeyboard) =>
             this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
 
         this.webXrController = new WebXRController(this.webRtcController);
@@ -92,7 +92,7 @@ export class PixelStreaming {
     /**
      * Configure the settings with on change listeners and any additional per experience settings.
      */
-    configureSettings(): void {
+    private configureSettings(): void {
         this.config.addOnSettingChangedListener(
             Flags.IsQualityController,
             (wantsQualityController: boolean) => {
@@ -273,7 +273,7 @@ export class PixelStreaming {
             }
         );
 
-        this.config.registerOnChangeEvents(this.eventEmitter);
+        this.config.registerOnChangeEvents(this._eventEmitter);
     }
 
     /**
@@ -281,7 +281,7 @@ export class PixelStreaming {
      * @param command - the keyboard command
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    activateOnScreenKeyboard(command: MessageOnScreenKeyboard): void {
+    _activateOnScreenKeyboard(command: MessageOnScreenKeyboard): void {
         throw new Error('Method not implemented.');
     }
 
@@ -289,15 +289,15 @@ export class PixelStreaming {
      * Set the input control ownership
      * @param inputControlOwnership - does the user have input control ownership
      */
-    onInputControlOwnership(inputControlOwnership: boolean): void {
-        this.inputController = inputControlOwnership;
+    _onInputControlOwnership(inputControlOwnership: boolean): void {
+        this._inputController = inputControlOwnership;
     }
 
     /**
      * Instantiate the WebRTCPlayerController interface to provide WebRTCPlayerController functionality within this class and set up anything that requires it
      * @param webRtcPlayerController - a WebRtcPlayerController controller instance
      */
-    setWebRtcPlayerController(webRtcPlayerController: WebRtcPlayerController) {
+    private setWebRtcPlayerController(webRtcPlayerController: WebRtcPlayerController) {
         this.webRtcController = webRtcPlayerController;
 
         this.webRtcController.setPreferredCodec(
@@ -310,36 +310,44 @@ export class PixelStreaming {
         this.showConnectOrAutoConnectOverlays();
     }
 
-    connect() {
+    /**
+     * Connect to signaling server.
+     */
+    public connect() {
         this.webRtcController.connectToSignallingServer();
     }
 
-    reconnect() {
-        this.onWebRtcAutoConnect();
-        this.connect();
+    /**
+     * Reconnects to the signaling server. If connection is up, disconnects first
+     * establishing a new connection
+     */
+    public reconnect() {
+        this.webRtcController.restartStreamAutomatically();
     }
 
-    disconnect() {
+    /**
+     * Disconnect from the signaling server and close open peer connections.
+     */
+    public disconnect() {
         this.webRtcController.close();
     }
 
-    play() {
-        this.onStreamLoading();
+    /**
+     * Play the stream. Can be called only after a connection has been established.
+     */
+    public play() {
+        this._onStreamLoading();
         this.webRtcController.playStream();
-    }
-
-    restartStream() {
-        this.webRtcController.restartStreamAutomatically();
     }
 
     /**
      * Show the Connect Overlay or auto connect
      */
-    showConnectOrAutoConnectOverlays() {
+    private showConnectOrAutoConnectOverlays() {
         // set up if the auto play will be used or regular click to start
         if (this.config.isFlagEnabled(Flags.AutoConnect)) {
             // if autoplaying show an info overlay while while waiting for the connection to begin
-            this.onWebRtcAutoConnect();
+            this._onWebRtcAutoConnect();
             this.webRtcController.connectToSignallingServer();
         }
     }
@@ -347,30 +355,30 @@ export class PixelStreaming {
     /**
      * Show the webRtcAutoConnect Overlay and connect
      */
-    onWebRtcAutoConnect() {
-        this.eventEmitter.dispatchEvent(new WebRtcAutoConnectEvent());
-        this.showActionOrErrorOnDisconnect = true;
+    _onWebRtcAutoConnect() {
+        this._eventEmitter.dispatchEvent(new WebRtcAutoConnectEvent());
+        this._showActionOrErrorOnDisconnect = true;
     }
 
     /**
      * Set up functionality to happen when receiving a webRTC answer
      */
-    onWebRtcSdp() {
-        this.eventEmitter.dispatchEvent(new WebRtcSdpEvent());
+    _onWebRtcSdp() {
+        this._eventEmitter.dispatchEvent(new WebRtcSdpEvent());
     }
 
     /**
-     * Shows a text overlay to alert the user the stream is currently loading
+     * Emits a StreamLoading event
      */
-    onStreamLoading() {
-        this.eventEmitter.dispatchEvent(new StreamLoadingEvent());
+    _onStreamLoading() {
+        this._eventEmitter.dispatchEvent(new StreamLoadingEvent());
     }
 
     /**
      * Event fired when the video is disconnected - displays the error overlay and resets the buttons stream tools upon disconnect
      * @param eventString - the event text that will be shown in the overlay
      */
-    onDisconnect(eventString: string) {
+    _onDisconnect(eventString: string) {
         // if we have overridden the default disconnection message, assign the new value here
         if (
             this.webRtcController.getDisconnectMessageOverride() != '' &&
@@ -382,77 +390,77 @@ export class PixelStreaming {
             this.webRtcController.setDisconnectMessageOverride('');
         }
 
-        this.eventEmitter.dispatchEvent(new WebRtcDisconnectedEvent({ eventString, showActionOrErrorOnDisconnect: this.showActionOrErrorOnDisconnect }))
-        if (this.showActionOrErrorOnDisconnect == false) {
-            this.showActionOrErrorOnDisconnect = true;
+        this._eventEmitter.dispatchEvent(new WebRtcDisconnectedEvent({ eventString, showActionOrErrorOnDisconnect: this._showActionOrErrorOnDisconnect }))
+        if (this._showActionOrErrorOnDisconnect == false) {
+            this._showActionOrErrorOnDisconnect = true;
         }
     }
 
     /**
      * Handles when Web Rtc is connecting
      */
-    onWebRtcConnecting() {
-        this.eventEmitter.dispatchEvent(new WebRtcConnectingEvent());
+    _onWebRtcConnecting() {
+        this._eventEmitter.dispatchEvent(new WebRtcConnectingEvent());
     }
 
     /**
      * Handles when Web Rtc has connected
      */
-    onWebRtcConnected() {
-        this.eventEmitter.dispatchEvent(new WebRtcConnectedEvent());
+    _onWebRtcConnected() {
+        this._eventEmitter.dispatchEvent(new WebRtcConnectedEvent());
     }
 
     /**
      * Handles when Web Rtc fails to connect
      */
-    onWebRtcFailed() {
-        this.eventEmitter.dispatchEvent(new WebRtcFailedEvent());
+    _onWebRtcFailed() {
+        this._eventEmitter.dispatchEvent(new WebRtcFailedEvent());
     }
 
     /**
      * Handle when the Video has been Initialized
      */
-    onVideoInitialized() {
-        this.eventEmitter.dispatchEvent(new VideoInitializedEvent());
-        this.videoStartTime = Date.now();
+    _onVideoInitialized() {
+        this._eventEmitter.dispatchEvent(new VideoInitializedEvent());
+        this._videoStartTime = Date.now();
     }
 
     /**
      * Set up functionality to happen when receiving latency test results
      * @param latency - latency test results object
      */
-    onLatencyTestResult(latencyTimings: LatencyTestResults) {
-        this.eventEmitter.dispatchEvent(new LatencyTestResultEvent({ latencyTimings }));
+    _onLatencyTestResult(latencyTimings: LatencyTestResults) {
+        this._eventEmitter.dispatchEvent(new LatencyTestResultEvent({ latencyTimings }));
     }
 
     /**
      * Set up functionality to happen when receiving video statistics
      * @param videoStats - video statistics as a aggregate stats object
      */
-    onVideoStats(videoStats: AggregatedStats) {
+    _onVideoStats(videoStats: AggregatedStats) {
         // Duration
-        if (!this.videoStartTime || this.videoStartTime === undefined) {
-            this.videoStartTime = Date.now();
+        if (!this._videoStartTime || this._videoStartTime === undefined) {
+            this._videoStartTime = Date.now();
         }
-        videoStats.handleSessionStatistics(this.videoStartTime, this.inputController, this.webRtcController.videoAvgQp);
+        videoStats.handleSessionStatistics(this._videoStartTime, this._inputController, this.webRtcController.videoAvgQp);
 
-        this.eventEmitter.dispatchEvent(new StatsReceivedEvent({ aggregatedStats: videoStats }));
+        this._eventEmitter.dispatchEvent(new StatsReceivedEvent({ aggregatedStats: videoStats }));
     }
 
     /**
      * Set up functionality to happen when calculating the average video encoder qp
      * @param QP - the quality number of the stream
      */
-    onVideoEncoderAvgQP(QP: number) {
-        this.eventEmitter.dispatchEvent(new VideoEncoderAvgQPEvent({ avgQP: QP }));
+    _onVideoEncoderAvgQP(QP: number) {
+        this._eventEmitter.dispatchEvent(new VideoEncoderAvgQPEvent({ avgQP: QP }));
     }
 
     /**
      * Set up functionality to happen when receiving and handling initial settings for the UE app
      * @param settings - initial UE app settings
      */
-    onInitialSettings(settings: InitialSettings) {
-        this.eventEmitter.dispatchEvent(new InitialSettingsEvent({ settings }));
+    _onInitialSettings(settings: InitialSettings) {
+        this._eventEmitter.dispatchEvent(new InitialSettingsEvent({ settings }));
         if (settings.PixelStreamingSettings) {
             const allowConsoleCommands =
                 settings.PixelStreamingSettings.AllowPixelStreamingCommands;
@@ -493,14 +501,14 @@ export class PixelStreaming {
      * Set up functionality to happen when setting quality control ownership of a stream
      * @param hasQualityOwnership - does this user have quality ownership of the stream true / false
      */
-    onQualityControlOwnership(hasQualityOwnership: boolean) {
+    _onQualityControlOwnership(hasQualityOwnership: boolean) {
         this.config.setFlagEnabled(
             Flags.IsQualityController,
             hasQualityOwnership
         );
     }
 
-    requestLatencyTest() {
+    public requestLatencyTest() {
         if (!this.webRtcController.videoPlayer.isVideoReady()) {
             return false;
         }
@@ -508,7 +516,7 @@ export class PixelStreaming {
         return true;
     }
 
-    requestShowFps() {
+    public requestShowFps() {
         if (!this.webRtcController.videoPlayer.isVideoReady()) {
             return false;
         }
@@ -516,7 +524,7 @@ export class PixelStreaming {
         return true;
     }
 
-    requestIframe() {
+    public requestIframe() {
         if (!this.webRtcController.videoPlayer.isVideoReady()) {
             return false;
         }
@@ -525,6 +533,10 @@ export class PixelStreaming {
     }
 
     public get events() {
-        return this.eventEmitter;
+        return this._eventEmitter;
+    }
+
+    public toggleXR() {
+        this.webXrController.xrClicked();
     }
 }
