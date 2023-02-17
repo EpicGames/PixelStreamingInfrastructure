@@ -1,0 +1,31 @@
+name: Publish the Signalling Server container image from our dev branch
+
+on:
+  push:
+    branches: ['UE5.2']
+    paths: ['SignallingWebServer/**']
+
+jobs:
+  signalling-server-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Build and push the Signalling Server container image for Unreal Engine based on our development branch
+        uses: docker/build-push-action@v3
+        with:
+          context: ./SignallingWebServer
+          tags: 'ghcr.io/epicgames/pixel-streaming-signalling-server:dev'
+          push: true

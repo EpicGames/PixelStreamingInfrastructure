@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import * as libfrontend from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
+import * as libfrontend from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 
 
 document.body.onload = function() {

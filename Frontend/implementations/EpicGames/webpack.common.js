@@ -10,25 +10,19 @@ const pages = fs.readdirSync('./src', { withFileTypes: true })
 	.filter(item => path.parse(item.name).ext === '.html')
 	.map(htmlFile => path.parse(htmlFile.name).name);
 
-module.exports = (env) => {
-  return {
-    mode: 'production',
-    entry: pages.reduce((config, page) => {
+module.exports = {
+	entry: pages.reduce((config, page) => {
 		config[page] = `./src/${page}.ts`;
 		return config;
 	}, {}),
-    plugins: [
-      new webpack.DefinePlugin({
-        WEBSOCKET_URL: JSON.stringify((env.WEBSOCKET_URL !== undefined) ? env.WEBSOCKET_URL : '')
-      }),
-    ].concat(pages.map((page) => new HtmlWebpackPlugin({
-    	title: 'Development',
-    	template: `./src/${page}.html`,
-    	filename: `${page}.html`,
-		chunks: [page],
+
+    plugins: [].concat(pages.map((page) => new HtmlWebpackPlugin({
+          title: `${page}`,
+          template: `./src/${page}.html`,
+          filename: `${page}.html`,
+          chunks: [page],
     }), )),
-    // turn off so we can see the source map for dom delegate so we can debug the library
-    
+
     module: {
       rules: [
         {
@@ -59,11 +53,11 @@ module.exports = (env) => {
       ],
     },
     resolve: {
-      extensions: ['.tsx', '.ts', '.js', '.svg'],
+      extensions: ['.tsx', '.ts', '.js', '.svg', '.json'],
     },
     output: {
       filename: '[name].js',
-      library: 'frontend', // change this to something more meaningful
+      library: 'epicgames-frontend',
       libraryTarget: 'umd',
       path: path.resolve(__dirname, '../../../SignallingWebServer/Public'),
       clean: true,
@@ -73,17 +67,9 @@ module.exports = (env) => {
     experiments: {
       futureDefaults: true
     },
-    optimization: {
-      minimize: true
-    },
-    devServer: {
+	devServer: {
     	static: {
     		directory: path.join(__dirname, '../../../SignallingWebServer/Public'),
     	},
     },
-    stats: 'none',
-    performance: {
-      hints: false
-    }
-  };
 }

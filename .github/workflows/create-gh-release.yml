@@ -1,0 +1,73 @@
+name: Releases
+
+on: 
+  push:
+    branches: ['UE5.2']
+    paths: ['RELEASE_VERSION']
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+
+    permissions:
+      contents: write
+    steps:
+    - name: "Checkout source code"
+      uses: actions/checkout@v3
+
+    - name: Read the RELEASE_VERSION file
+      id: getversion
+      run: echo "version=$(cat RELEASE_VERSION)" >> $GITHUB_OUTPUT
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Install library deps
+      working-directory: ./Frontend/library
+      run: npm ci
+
+    - name: Build frontend lib
+      working-directory: ./Frontend/library
+      run: npm run build
+
+    - name: Install implementations/EpicGames deps
+      working-directory: ./Frontend/implementations/EpicGames
+      run: npm ci
+
+    - name: Build implementations/EpicGames
+      working-directory: ./Frontend/implementations/EpicGames
+      run: npm run build-all
+
+    - name: Make output directory for archives
+      run: mkdir output
+
+    - name: Archive Release tar.gz
+      uses: thedoctor0/zip-release@0.7.1
+      with:
+        directory: './output'
+        path: '../'
+        type: 'tar'
+        filename: '${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz'
+        exclusions: '.git .github output Frontend/Docs Frontend/library/dist Frontend/library/types Frontend/library/node_modules Frontend/implementations/EpicGames/node_modules'
+
+    - name: Archive Release tar.gz
+      uses: thedoctor0/zip-release@0.7.1
+      with:
+        directory: './output'
+        path: '../'
+        type: 'zip'
+        filename: '${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip'
+        exclusions: '*.git* /*node_modules/* .editorconfig /*types/* /*dist/* /*output/* /*Docs/*'
+
+    - name: "Make the release"
+      uses: ncipollo/release-action@v1
+      with:
+        tag: "${{ github.ref_name }}-${{ steps.getversion.outputs.version }}"
+        artifacts: "output/${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip,output/${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz"
+        generateReleaseNotes: true

@@ -1,14 +1,18 @@
 {
-  "name": "@epicgames-ps/reference-pixelstreamingfrontend",
+  "name": "@epicgames-ps/reference-pixelstreamingfrontend-ue5.2",
   "version": "0.0.1",
   "description": "",
   "main": "player.ts",
   "scripts": {
-    "build": "npx webpack",
+    "build": "npx webpack --config webpack.prod.js",
+    "build-dev": "npx webpack --config webpack.dev.js",
     "watch": "npx webpack --watch",
-    "serve": "webpack serve",
+    "serve": "webpack serve --config webpack.dev.js",
+    "serve-prod": "webpack serve --config webpack.prod.js",
     "install": "cd ../../library && npm run build-webpack && cd ../implementations/EpicGames && npm link ../../library",
-    "build-all": "npm run install && npm run build"
+    "install-dev": "cd ../../library && npm run build-webpack-dev && cd ../implementations/EpicGames && npm link ../../library",
+    "build-all": "npm run install && npm run build",
+    "build-all-dev": "npm run install-dev && npm run build-dev"
   },
   "devDependencies": {
     "webpack-cli": "^5.0.1",

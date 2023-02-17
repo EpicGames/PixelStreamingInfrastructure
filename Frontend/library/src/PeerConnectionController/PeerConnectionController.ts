@@ -26,9 +26,12 @@ export class PeerConnectionController {
         preferredCodec: string
     ) {
         this.config = config;
+        this.createPeerConnection(options, preferredCodec);
+    }
 
+    createPeerConnection(options: RTCConfiguration, preferredCodec: string) {
         // Set the ICE transport to relay if TURN enabled
-        if (config.isFlagEnabled(Flags.ForceTURN)) {
+        if (this.config.isFlagEnabled(Flags.ForceTURN)) {
             options.iceTransportPolicy = 'relay';
             Logger.Log(
                 Logger.GetStackTrace(),
@@ -176,12 +179,8 @@ export class PeerConnectionController {
             this.onVideoStats(this.aggregatedStats);
 
             // Update the preferred codec selection based on what was actually negotiated
-            if (this.updateCodecSelection) {
-                this.config.getSettingOption(
-                    OptionParameters.PreferredCodec
-                ).selected = this.aggregatedStats.codecs.get(
-                    this.aggregatedStats.inboundVideoStats.codecId
-                );
+            if(this.updateCodecSelection) {
+                this.config.setOptionSettingValue(OptionParameters.PreferredCodec, this.aggregatedStats.codecs.get(this.aggregatedStats.inboundVideoStats.codecId))
             }
         });
     }
