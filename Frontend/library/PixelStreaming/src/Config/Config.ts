@@ -541,7 +541,7 @@ export class Config {
      * @param id The id of the flag.
      * @param onChangeListener The callback to fire when the value changes.
      */
-    addOnTextSettingChangedListener(
+    _addOnTextSettingChangedListener(
         id: TextParametersIds,
         onChangeListener: (newTextValue: string) => void
     ): void {
