@@ -463,7 +463,7 @@ export class Config {
      * @param id The id of the flag.
      * @param onChangedListener The callback to fire when the numeric value changes.
      */
-    addOnNumericSettingChangedListener(
+    _addOnNumericSettingChangedListener(
         id: NumericParametersIds,
         onChangedListener: (newValue: number) => void
     ): void {
@@ -474,7 +474,7 @@ export class Config {
         }
     }
 
-    addOnOptionSettingChangedListener(
+    _addOnOptionSettingChangedListener(
         id: OptionParametersIds,
         onChangedListener: (newValue: string) => void
     ): void {
@@ -527,7 +527,7 @@ export class Config {
      * @param id The id of the flag.
      * @param onChangeListener The callback to fire when the value changes.
      */
-    addOnSettingChangedListener(
+    _addOnSettingChangedListener(
         id: FlagsIds,
         onChangeListener: (newFlagValue: boolean) => void
     ): void {

@@ -219,7 +219,7 @@ export class WebRtcPlayerController {
         this.isQualityController = false;
         this.preferredCodec = '';
 
-        this.config.addOnOptionSettingChangedListener(OptionParameters.StreamerId, (streamerid) => {
+        this.config._addOnOptionSettingChangedListener(OptionParameters.StreamerId, (streamerid) => {
                 // close the current peer connection and create a new one
                 this.peerConnectionController.peerConnection.close();
                 this.peerConnectionController.createPeerConnection(this.peerConfig, this.preferredCodec);

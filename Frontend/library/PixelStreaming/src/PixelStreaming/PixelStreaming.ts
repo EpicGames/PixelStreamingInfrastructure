@@ -93,7 +93,7 @@ export class PixelStreaming {
      * Configure the settings with on change listeners and any additional per experience settings.
      */
     private configureSettings(): void {
-        this.config.addOnSettingChangedListener(
+        this.config._addOnSettingChangedListener(
             Flags.IsQualityController,
             (wantsQualityController: boolean) => {
                 // If the setting has been set to true (either programatically or the user has flicked the toggle)
@@ -107,21 +107,21 @@ export class PixelStreaming {
             }
         );
 
-        this.config.addOnSettingChangedListener(
+        this.config._addOnSettingChangedListener(
             Flags.AFKDetection,
             (isAFKEnabled: boolean) => {
                 this.webRtcController.setAfkEnabled(isAFKEnabled);
             }
         );
 
-        this.config.addOnSettingChangedListener(
+        this.config._addOnSettingChangedListener(
             Flags.MatchViewportResolution,
             () => {
                 this.webRtcController.videoPlayer.updateVideoStreamSize();
             }
         );
 
-        this.config.addOnSettingChangedListener(
+        this.config._addOnSettingChangedListener(
             Flags.HoveringMouseMode,
             (isHoveringMouse: boolean) => {
                 this.config.setFlagLabel(
@@ -135,7 +135,7 @@ export class PixelStreaming {
         );
 
         // encoder settings
-        this.config.addOnNumericSettingChangedListener(
+        this.config._addOnNumericSettingChangedListener(
             NumericParameters.MinQP,
             (newValue: number) => {
                 Logger.Log(
@@ -158,7 +158,7 @@ export class PixelStreaming {
             }
         );
 
-        this.config.addOnNumericSettingChangedListener(
+        this.config._addOnNumericSettingChangedListener(
             NumericParameters.MaxQP,
             (newValue: number) => {
                 Logger.Log(
@@ -182,7 +182,7 @@ export class PixelStreaming {
         );
 
         // WebRTC settings
-        this.config.addOnNumericSettingChangedListener(
+        this.config._addOnNumericSettingChangedListener(
             NumericParameters.WebRTCMinBitrate,
             (newValue: number) => {
                 Logger.Log(
@@ -209,7 +209,7 @@ export class PixelStreaming {
             }
         );
 
-        this.config.addOnNumericSettingChangedListener(
+        this.config._addOnNumericSettingChangedListener(
             NumericParameters.WebRTCMaxBitrate,
             (newValue: number) => {
                 Logger.Log(
@@ -236,7 +236,7 @@ export class PixelStreaming {
             }
         );
 
-        this.config.addOnNumericSettingChangedListener(
+        this.config._addOnNumericSettingChangedListener(
             NumericParameters.WebRTCFPS,
             (newValue: number) => {
                 Logger.Log(
@@ -264,7 +264,7 @@ export class PixelStreaming {
             }
         );
 
-        this.config.addOnOptionSettingChangedListener(
+        this.config._addOnOptionSettingChangedListener(
             OptionParameters.PreferredCodec,
             (newValue: string) => {
                 if (this.webRtcController) {
