@@ -122,7 +122,7 @@ export class Config {
     /* A map of enum based settings - e.g. preferred codec */
     private optionParameters = new Map<OptionParametersIds, SettingOption>();
 
-    _useUrlParams: boolean;
+    private _useUrlParams: boolean;
 
     // ------------ Settings -----------------
 
