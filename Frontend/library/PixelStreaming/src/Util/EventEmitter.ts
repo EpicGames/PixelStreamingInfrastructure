@@ -269,10 +269,21 @@ export type PixelStreamingEvent =
     | SettingsChangedEvent;
 
 export class EventEmitter extends EventTarget {
+    
+    /**
+     * Dispatch a new event.
+     * @param e event
+     * @returns 
+     */
     public dispatchEvent(e: PixelStreamingEvent): boolean {
         return super.dispatchEvent(e);
     }
 
+    /**
+     * Register an event handler.
+     * @param type event name
+     * @param listener event handler function
+     */
     public addEventListener<
         T extends PixelStreamingEvent['type'],
         E extends PixelStreamingEvent & { type: T }
@@ -280,6 +291,11 @@ export class EventEmitter extends EventTarget {
         super.addEventListener(type, listener);
     }
 
+    /**
+     * Remove an event handler.
+     * @param type event name
+     * @param listener event handler function
+     */
     public removeEventListener<
         T extends PixelStreamingEvent['type'],
         E extends PixelStreamingEvent & { type: T }

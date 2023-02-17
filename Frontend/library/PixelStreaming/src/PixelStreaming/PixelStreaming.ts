@@ -42,7 +42,7 @@ export class PixelStreaming {
     /**
      * @param config - A newly instantiated config object
      * @param overrides - Parameters to override default behaviour
-     * returns the base delegate object with the config inside it along with a new instance of the Overlay controller class
+     * returns the base Pixel streaming object
      */
     constructor(config: Config, overrides?: PixelStreamingOverrides) {
         this.config = config;
@@ -307,7 +307,7 @@ export class PixelStreaming {
         this.webRtcController.resizePlayerStyle();
 
         // set up the connect overlays action
-        this.showConnectOrAutoConnectOverlays();
+        this.checkForAutoConnect();
     }
 
     /**
@@ -319,7 +319,7 @@ export class PixelStreaming {
 
     /**
      * Reconnects to the signaling server. If connection is up, disconnects first
-     * establishing a new connection
+     * before establishing a new connection
      */
     public reconnect() {
         this.webRtcController.restartStreamAutomatically();
@@ -333,7 +333,7 @@ export class PixelStreaming {
     }
 
     /**
-     * Play the stream. Can be called only after a connection has been established.
+     * Play the stream. Can be called only after a peer connection has been established.
      */
     public play() {
         this._onStreamLoading();
@@ -341,9 +341,9 @@ export class PixelStreaming {
     }
 
     /**
-     * Show the Connect Overlay or auto connect
+     * Auto connect
      */
-    private showConnectOrAutoConnectOverlays() {
+    private checkForAutoConnect() {
         // set up if the auto play will be used or regular click to start
         if (this.config.isFlagEnabled(Flags.AutoConnect)) {
             // if autoplaying show an info overlay while while waiting for the connection to begin
@@ -353,7 +353,7 @@ export class PixelStreaming {
     }
 
     /**
-     * Show the webRtcAutoConnect Overlay and connect
+     * Emit an event on auto connecting
      */
     _onWebRtcAutoConnect() {
         this._eventEmitter.dispatchEvent(new WebRtcAutoConnectEvent());
@@ -508,6 +508,10 @@ export class PixelStreaming {
         );
     }
 
+    /**
+     * Request a connection latency test.
+     * @returns 
+     */
     public requestLatencyTest() {
         if (!this.webRtcController.videoPlayer.isVideoReady()) {
             return false;
@@ -516,6 +520,10 @@ export class PixelStreaming {
         return true;
     }
 
+    /**
+     * Request for the UE application to show FPS counter.
+     * @returns 
+     */
     public requestShowFps() {
         if (!this.webRtcController.videoPlayer.isVideoReady()) {
             return false;
@@ -524,6 +532,10 @@ export class PixelStreaming {
         return true;
     }
 
+    /**
+     * Request for a new IFrame from the UE application.
+     * @returns 
+     */
     public requestIframe() {
         if (!this.webRtcController.videoPlayer.isVideoReady()) {
             return false;
@@ -532,10 +544,16 @@ export class PixelStreaming {
         return true;
     }
 
+    /**
+     * Event emitter. Use to register event handlers.
+     */
     public get events() {
         return this._eventEmitter;
     }
 
+    /**
+     * Enable/disable XR mode.
+     */
     public toggleXR() {
         this.webXrController.xrClicked();
     }

@@ -40,6 +40,9 @@ export class SettingOption<CustomIds extends string = OptionParametersIds> exten
         return '';
     }
 
+    /**
+     * Persist the setting value in URL.
+     */
     public updateURLParams() {
         if (this.useUrlParams) {
             // set url params

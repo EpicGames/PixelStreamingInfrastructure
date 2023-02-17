@@ -40,6 +40,9 @@ export class SettingText<CustomIds extends string = TextParametersIds> extends S
         return '';
     }
 
+    /**
+     * Persist the setting value in URL.
+     */
     public updateURLParams() {
         if (this.useUrlParams) {
             // set url params

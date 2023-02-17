@@ -674,22 +674,42 @@ export class Config {
         return settings;
     }
 
+    /**
+     * Get all Flag settings as an array.
+     * @returns 
+     */
     getFlags(): Array<SettingFlag> {
         return Array.from(this.flags.values());
     }
 
+    /**
+     * Get all Text settings as an array.
+     * @returns 
+     */
     getTextSettings(): Array<SettingText> {
         return Array.from(this.textParameters.values());
     }
 
+    /**
+     * Get all Number settings as an array.
+     * @returns 
+     */
     getNumericSettings(): Array<SettingNumber> {
         return Array.from(this.numericParameters.values());
     }
 
+    /**
+     * Get all Option settings as an array.
+     * @returns 
+     */
     getOptionSettings(): Array<SettingOption> {
         return Array.from(this.optionParameters.values());
     }
 
+    /**
+     * Emit events when settings change.
+     * @param eventEmitter 
+     */
     registerOnChangeEvents(eventEmitter: EventEmitter) {
         for (const key of this.flags.keys()) {
             const flag = this.flags.get(key);

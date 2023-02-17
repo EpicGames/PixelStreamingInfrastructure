@@ -46,6 +46,9 @@ export class SettingFlag<CustomIds extends string = FlagsIds> extends SettingBas
         return false;
     }
 
+    /**
+     * Persist the setting value in URL.
+     */
     public updateURLParams() {
         if (this.useUrlParams) {
             // set url params

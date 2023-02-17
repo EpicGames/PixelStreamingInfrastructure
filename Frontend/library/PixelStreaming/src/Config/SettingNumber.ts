@@ -41,6 +41,9 @@ export class SettingNumber<CustomIds extends string = NumericParametersIds> exte
         this.useUrlParams = useUrlParams;
     }
 
+    /**
+     * Persist the setting value in URL.
+     */
     public updateURLParams(): void {
         if (this.useUrlParams) {
             // set url params like ?id=number
