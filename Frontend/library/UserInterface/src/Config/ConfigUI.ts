@@ -356,6 +356,7 @@ export class ConfigUI {
             );
         } else {
             this.customFlags.get(id).label = label;
+            this.flagsUi.get(id).label = label;
         }
     }
 
