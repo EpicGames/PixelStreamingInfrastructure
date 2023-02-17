@@ -138,7 +138,7 @@ export class Config {
     /**
      * Populate the default settings for a Pixel Streaming application
      */
-    populateDefaultSettings(useUrlParams: boolean): void {
+    private populateDefaultSettings(useUrlParams: boolean): void {
         /**
          * Text Parameters
          */
