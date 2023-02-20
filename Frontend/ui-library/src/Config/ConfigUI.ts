@@ -68,7 +68,7 @@ export class ConfigUI {
             LightMode,
             new SettingFlag<FlagsIdsExtended>(
                 LightMode,
-                'Use a light color scheme',
+                'Color Scheme: Dark Mode',
                 'The Pixel Streaming player will be instructed to use a lighter color scheme',
                 false, // (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches would use system preference
                 useUrlParams

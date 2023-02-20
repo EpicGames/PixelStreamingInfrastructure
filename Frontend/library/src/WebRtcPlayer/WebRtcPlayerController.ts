@@ -895,7 +895,7 @@ export class WebRtcPlayerController {
      * Loads a freeze frame if it is required otherwise shows the play overlay
      */
     loadFreezeFrameOrShowPlayOverlay() {
-        this.pixelStreaming.events.dispatchEvent(
+        this.pixelStreaming.dispatchEvent(
             new LoadFreezeFrameEvent({
                 shouldShowPlayOverlay: this.shouldShowPlayOverlay,
                 isValid: this.freezeFrameController.valid,
@@ -940,7 +940,7 @@ export class WebRtcPlayerController {
             6
         );
         setTimeout(() => {
-            this.pixelStreaming.events.dispatchEvent(
+            this.pixelStreaming.dispatchEvent(
                 new HideFreezeFrameEvent()
             );
             this.freezeFrameController.hideFreezeFrame();
@@ -984,7 +984,7 @@ export class WebRtcPlayerController {
         if (!this.videoPlayer.getVideoElement()) {
             const message =
                 'Could not play video stream because the video player was not initialized correctly.';
-            this.pixelStreaming.events.dispatchEvent(
+            this.pixelStreaming.dispatchEvent(
                 new PlayStreamErrorEvent({ message })
             );
             Logger.Error(Logger.GetStackTrace(), message);
@@ -1011,7 +1011,7 @@ export class WebRtcPlayerController {
             this.config.isFlagEnabled(Flags.FakeMouseWithTouches),
             this.videoElementParentClientRect
         );
-        this.pixelStreaming.events.dispatchEvent(new PlayStreamEvent());
+        this.pixelStreaming.dispatchEvent(new PlayStreamEvent());
 
         if (this.streamController.audioElement.srcObject) {
             this.streamController.audioElement.muted =
@@ -1028,7 +1028,7 @@ export class WebRtcPlayerController {
                         Logger.GetStackTrace(),
                         'Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.'
                     );
-                    this.pixelStreaming.events.dispatchEvent(
+                    this.pixelStreaming.dispatchEvent(
                         new PlayStreamRejectedEvent({
                             reason: onRejectedReason
                         })
@@ -1056,7 +1056,7 @@ export class WebRtcPlayerController {
                 Logger.GetStackTrace(),
                 'Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.'
             );
-            this.pixelStreaming.events.dispatchEvent(
+            this.pixelStreaming.dispatchEvent(
                 new PlayStreamRejectedEvent({ reason: onRejectedReason })
             );
         });
@@ -1284,7 +1284,7 @@ export class WebRtcPlayerController {
                 autoSelectedStreamerId
             );
         }
-        this.pixelStreaming.events.dispatchEvent(
+        this.pixelStreaming.dispatchEvent(
             new StreamerListMessageEvent({
                 messageStreamerList,
                 autoSelectedStreamerId
@@ -1811,15 +1811,15 @@ export class WebRtcPlayerController {
 
     registerDataChannelEventEmitters(dataChannel: DataChannelController) {
         dataChannel.onOpen = (label, event) =>
-            this.pixelStreaming.events.dispatchEvent(
+            this.pixelStreaming.dispatchEvent(
                 new DataChannelOpenEvent({ label, event })
             );
         dataChannel.onClose = (label, event) =>
-            this.pixelStreaming.events.dispatchEvent(
+            this.pixelStreaming.dispatchEvent(
                 new DataChannelCloseEvent({ label, event })
             );
         dataChannel.onError = (label, event) =>
-            this.pixelStreaming.events.dispatchEvent(
+            this.pixelStreaming.dispatchEvent(
                 new DataChannelErrorEvent({ label, event })
             );
     }

@@ -197,85 +197,85 @@ export class Application {
     }
 
     registerCallbacks() {
-        this.pixelStreaming.events.addEventListener(
+        this.pixelStreaming.addEventListener(
             'afkWarningActivate',
             ({ data: { countDown, dismissAfk } }) =>
                 this.showAfkOverlay(countDown, dismissAfk)
         );
-        this.pixelStreaming.events.addEventListener(
+        this.pixelStreaming.addEventListener(
             'afkWarningUpdate',
             ({ data: { countDown } }) =>
                 this.afkOverlay.updateCountdown(countDown)
         );
-        this.pixelStreaming.events.addEventListener(
+        this.pixelStreaming.addEventListener(
             'afkWarningDeactivate',
             () => this.afkOverlay.hide()
         );
-        this.pixelStreaming.events.addEventListener('afkTimedOut', () =>
+        this.pixelStreaming.addEventListener('afkTimedOut', () =>
             this.afkOverlay.hide()
         );
-        this.pixelStreaming.events.addEventListener(
+        this.pixelStreaming.addEventListener(
             'videoEncoderAvgQP',
             ({ data: { avgQP } }) => this.onVideoEncoderAvgQP(avgQP)
         );
-        this.pixelStreaming.events.addEventListener('webRtcSdp', () =>
+        this.pixelStreaming.addEventListener('webRtcSdp', () =>
             this.onWebRtcSdp()
         );
-        this.pixelStreaming.events.addEventListener('webRtcAutoConnect', () =>
+        this.pixelStreaming.addEventListener('webRtcAutoConnect', () =>
             this.onWebRtcAutoConnect()
         );
-        this.pixelStreaming.events.addEventListener('webRtcConnecting', () =>
+        this.pixelStreaming.addEventListener('webRtcConnecting', () =>
             this.onWebRtcConnecting()
         );
-        this.pixelStreaming.events.addEventListener('webRtcConnected', () =>
+        this.pixelStreaming.addEventListener('webRtcConnected', () =>
             this.onWebRtcConnected()
         );
-        this.pixelStreaming.events.addEventListener('webRtcFailed', () =>
+        this.pixelStreaming.addEventListener('webRtcFailed', () =>
             this.onWebRtcFailed()
         );
-        this.pixelStreaming.events.addEventListener(
+        this.pixelStreaming.addEventListener(
             'webRtcDisconnected',
             ({ data: { eventString, showActionOrErrorOnDisconnect } }) =>
                 this.onDisconnect(eventString, showActionOrErrorOnDisconnect)
         );
-        this.pixelStreaming.events.addEventListener('videoInitialized', () =>
+        this.pixelStreaming.addEventListener('videoInitialized', () =>
             this.onVideoInitialized()
         );
-        this.pixelStreaming.events.addEventListener('streamLoading', () =>
+        this.pixelStreaming.addEventListener('streamLoading', () =>
             this.onStreamLoading()
         );
-        this.pixelStreaming.events.addEventListener(
+        this.pixelStreaming.addEventListener(
             'playStreamError',
             ({ data: { message } }) => this.onPlayStreamError(message)
         );
-        this.pixelStreaming.events.addEventListener('playStream', () =>
+        this.pixelStreaming.addEventListener('playStream', () =>
             this.onPlayStream()
         );
-        this.pixelStreaming.events.addEventListener(
+        this.pixelStreaming.addEventListener(
             'playStreamRejected',
             ({ data: { reason } }) => this.onPlayStreamRejected(reason)
         );
-        this.pixelStreaming.events.addEventListener(
+        this.pixelStreaming.addEventListener(
             'loadFreezeFrame',
             ({ data: { shouldShowPlayOverlay } }) =>
                 this.onLoadFreezeFrame(shouldShowPlayOverlay)
         );
-        this.pixelStreaming.events.addEventListener(
+        this.pixelStreaming.addEventListener(
             'statsReceived',
             ({ data: { aggregatedStats } }) =>
                 this.onStatsReceived(aggregatedStats)
         );
-        this.pixelStreaming.events.addEventListener(
+        this.pixelStreaming.addEventListener(
             'latencyTestResult',
             ({ data: { latencyTimings } }) =>
                 this.onLatencyTestResults(latencyTimings)
         );
-        this.pixelStreaming.events.addEventListener(
+        this.pixelStreaming.addEventListener(
             'streamerListMessage',
             ({ data: { autoSelectedStreamerId } }) =>
                 this.handleStreamerListMessage(autoSelectedStreamerId)
         );
-        this.pixelStreaming.events.addEventListener(
+        this.pixelStreaming.addEventListener(
             'settingsChanged',
             (event) => this.configUI.onSettingsChanged(event)
         );

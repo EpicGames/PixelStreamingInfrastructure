@@ -47,7 +47,7 @@ export class AFKController {
 
         if (this.active || this.countdownActive) {
             this.startAfkWarningTimer();
-            this.pixelStreaming.events.dispatchEvent(
+            this.pixelStreaming.dispatchEvent(
                 new AfkWarningDeactivateEvent()
             );
         }
@@ -110,7 +110,7 @@ export class AFKController {
         this.pauseAfkWarningTimer();
 
         // instantiate a new overlay
-        this.pixelStreaming.events.dispatchEvent(
+        this.pixelStreaming.dispatchEvent(
             new AfkWarningActivateEvent({
                 countDown: this.countDown,
                 dismissAfk: this.onDismissAfk
@@ -120,7 +120,7 @@ export class AFKController {
         // update our countDown timer and overlay contents
         this.countDown = this.closeTimeout;
         this.countdownActive = true;
-        this.pixelStreaming.events.dispatchEvent(
+        this.pixelStreaming.dispatchEvent(
             new AfkWarningUpdateEvent({ countDown: this.countDown })
         );
 
@@ -137,7 +137,7 @@ export class AFKController {
             this.countDown--;
             if (this.countDown == 0) {
                 // The user failed to click so hide the overlay and disconnect them.
-                this.pixelStreaming.events.dispatchEvent(
+                this.pixelStreaming.dispatchEvent(
                     new AfkTimedOutEvent()
                 );
                 this.onAFKTimedOutCallback();
@@ -149,7 +149,7 @@ export class AFKController {
                 // switch off the afk feature as stream has closed
                 this.stopAfkWarningTimer();
             } else {
-                this.pixelStreaming.events.dispatchEvent(
+                this.pixelStreaming.dispatchEvent(
                     new AfkWarningUpdateEvent({ countDown: this.countDown })
                 );
             }

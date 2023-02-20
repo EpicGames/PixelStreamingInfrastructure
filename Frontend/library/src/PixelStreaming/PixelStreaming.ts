@@ -16,6 +16,7 @@ import {
     EventEmitter,
     InitialSettingsEvent,
     LatencyTestResultEvent,
+    PixelStreamingEvent,
     StatsReceivedEvent,
     StreamLoadingEvent,
     VideoEncoderAvgQPEvent,
@@ -581,11 +582,37 @@ export class PixelStreaming {
         return true;
     }
 
-    /**
-     * Event emitter. Use to register event handlers.
+	/**
+     * Dispatch a new event.
+     * @param e event
+     * @returns
      */
-    public get events() {
-        return this._eventEmitter;
+    public dispatchEvent(e: PixelStreamingEvent): boolean {
+        return this._eventEmitter.dispatchEvent(e);
+    }
+	
+	/**
+     * Register an event handler.
+     * @param type event name
+     * @param listener event handler function
+     */
+    public addEventListener<
+        T extends PixelStreamingEvent['type'],
+        E extends PixelStreamingEvent & { type: T }
+    >(type: T, listener: (e: Event & E) => void) {
+        this._eventEmitter.addEventListener(type, listener);
+    }
+
+    /**
+     * Remove an event handler.
+     * @param type event name
+     * @param listener event handler function
+     */
+    public removeEventListener<
+        T extends PixelStreamingEvent['type'],
+        E extends PixelStreamingEvent & { type: T }
+    >(type: T, listener: (e: Event & E) => void) {
+        this._eventEmitter.removeEventListener(type, listener);
     }
 
     /**

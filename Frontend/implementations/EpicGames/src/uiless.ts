@@ -20,7 +20,7 @@ document.body.onload = function() {
 	const pixelStreaming = new PixelStreaming(config, { videoElementParent: document.getElementById("videoParentElement")});
 
 	// If browser denies autoplay, register a click-to-play handler
-	pixelStreaming.events.addEventListener("playStreamRejected", () => {
+	pixelStreaming.addEventListener("playStreamRejected", () => {
 		const parent = document.getElementById("videoParentElement");
 		parent.onclick = () => {
 			pixelStreaming.play();
