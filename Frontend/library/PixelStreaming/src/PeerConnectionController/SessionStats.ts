@@ -4,7 +4,7 @@
  * Session statistics
  */
 export class SessionStats {
-	runTime: string;
-	controlsStreamInput: string;
-	videoEncoderAvgQP: number;
+    runTime: string;
+    controlsStreamInput: string;
+    videoEncoderAvgQP: number;
 }

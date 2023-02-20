@@ -269,11 +269,10 @@ export type PixelStreamingEvent =
     | SettingsChangedEvent;
 
 export class EventEmitter extends EventTarget {
-    
     /**
      * Dispatch a new event.
      * @param e event
-     * @returns 
+     * @returns
      */
     public dispatchEvent(e: PixelStreamingEvent): boolean {
         return super.dispatchEvent(e);

@@ -277,7 +277,11 @@ export class AggregatedStats {
         this.codecs.set(codecId, codecType);
     }
 
-    handleSessionStatistics(videoStartTime: number, inputController: boolean | null, videoEncoderAvgQP: number ) {
+    handleSessionStatistics(
+        videoStartTime: number,
+        inputController: boolean | null,
+        videoEncoderAvgQP: number
+    ) {
         const deltaTime = Date.now() - videoStartTime;
         this.sessionStats.runTime = new Date(deltaTime)
             .toISOString()

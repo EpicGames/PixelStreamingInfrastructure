@@ -1,6 +1,13 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { PixelStreaming, Flags, Logger, AggregatedStats, LatencyTestResults, InitialSettings } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import {
+    PixelStreaming,
+    Flags,
+    Logger,
+    AggregatedStats,
+    LatencyTestResults,
+    InitialSettings
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { OverlayBase } from '../Overlay/BaseOverlay';
 import { ActionOverlay } from '../Overlay/ActionOverlay';
 import { TextOverlay } from '../Overlay/TextOverlay';
@@ -45,7 +52,7 @@ export class Application {
     statsPanel: StatsPanel;
     videoQpIndicator: VideoQpIndicator;
 
-    configUI: ConfigUI
+    configUI: ConfigUI;
 
     /**
      * @param options - Initialization options
@@ -67,7 +74,7 @@ export class Application {
         // Add the video stream QP indicator
         this.videoQpIndicator = new VideoQpIndicator();
         this.uiFeaturesElement.appendChild(this.videoQpIndicator.rootElement);
-        
+
         this.configureSettings();
 
         this.createButtons();
@@ -81,27 +88,32 @@ export class Application {
 
     public createOverlays(): void {
         // build all of the overlays
-        this.disconnectOverlay = new DisconnectOverlay(this.pixelStreaming.videoElementParent);
-        this.connectOverlay = new ConnectOverlay(this.pixelStreaming.videoElementParent);
-        this.playOverlay = new PlayOverlay(this.pixelStreaming.videoElementParent);
-        this.infoOverlay = new InfoOverlay(this.pixelStreaming.videoElementParent);
-        this.errorOverlay = new ErrorOverlay(this.pixelStreaming.videoElementParent);
-        this.afkOverlay = new AFKOverlay(this.pixelStreaming.videoElementParent);
-
-        this.disconnectOverlay.onAction(() => 
-          this.pixelStreaming.reconnect()
+        this.disconnectOverlay = new DisconnectOverlay(
+            this.pixelStreaming.videoElementParent
         );
+        this.connectOverlay = new ConnectOverlay(
+            this.pixelStreaming.videoElementParent
+        );
+        this.playOverlay = new PlayOverlay(
+            this.pixelStreaming.videoElementParent
+        );
+        this.infoOverlay = new InfoOverlay(
+            this.pixelStreaming.videoElementParent
+        );
+        this.errorOverlay = new ErrorOverlay(
+            this.pixelStreaming.videoElementParent
+        );
+        this.afkOverlay = new AFKOverlay(
+            this.pixelStreaming.videoElementParent
+        );
+
+        this.disconnectOverlay.onAction(() => this.pixelStreaming.reconnect());
 
         // Build the webRtc connect overlay Event Listener and show the connect overlay
-        this.connectOverlay.onAction(() =>
-          this.pixelStreaming.connect()
-        );
+        this.connectOverlay.onAction(() => this.pixelStreaming.connect());
 
         // set up the play overlays action
-        this.playOverlay.onAction(() => 
-          this.pixelStreaming.play()
-        );
-
+        this.playOverlay.onAction(() => this.pixelStreaming.play());
     }
 
     /**
@@ -161,7 +173,6 @@ export class Application {
         commandsSectionElem.appendChild(showFPSButton.rootElement);
         commandsSectionElem.appendChild(requestKeyframeButton.rootElement);
         commandsSectionElem.appendChild(restartStreamButton.rootElement);
-
     }
 
     /**
@@ -183,31 +194,91 @@ export class Application {
                 this.updateColors(isLightMode);
             }
         );
-
     }
 
     registerCallbacks() {
-        this.pixelStreaming.events.addEventListener("afkWarningActivate", ({ data: { countDown, dismissAfk }}) => this.showAfkOverlay(countDown, dismissAfk));
-        this.pixelStreaming.events.addEventListener("afkWarningUpdate", ({ data: { countDown }}) => this.afkOverlay.updateCountdown(countDown));
-        this.pixelStreaming.events.addEventListener("afkWarningDeactivate", () => this.afkOverlay.hide());
-        this.pixelStreaming.events.addEventListener("afkTimedOut", () => this.afkOverlay.hide());
-        this.pixelStreaming.events.addEventListener("videoEncoderAvgQP", ({ data: { avgQP }}) => this.onVideoEncoderAvgQP(avgQP));
-        this.pixelStreaming.events.addEventListener("webRtcSdp", () => this.onWebRtcSdp());
-        this.pixelStreaming.events.addEventListener("webRtcAutoConnect", () => this.onWebRtcAutoConnect());
-        this.pixelStreaming.events.addEventListener("webRtcConnecting", () => this.onWebRtcConnecting());
-        this.pixelStreaming.events.addEventListener("webRtcConnected", () => this.onWebRtcConnected());
-        this.pixelStreaming.events.addEventListener("webRtcFailed", () => this.onWebRtcFailed());
-        this.pixelStreaming.events.addEventListener("webRtcDisconnected", ({ data: { eventString, showActionOrErrorOnDisconnect }}) => this.onDisconnect(eventString, showActionOrErrorOnDisconnect));
-        this.pixelStreaming.events.addEventListener("videoInitialized", () => this.onVideoInitialized());
-        this.pixelStreaming.events.addEventListener("streamLoading", () => this.onStreamLoading());
-        this.pixelStreaming.events.addEventListener("playStreamError", ({ data: { message }}) => this.onPlayStreamError(message));
-        this.pixelStreaming.events.addEventListener("playStream", () => this.onPlayStream());
-        this.pixelStreaming.events.addEventListener("playStreamRejected", ({ data: { reason }}) => this.onPlayStreamRejected(reason));
-        this.pixelStreaming.events.addEventListener("loadFreezeFrame", ({ data: { shouldShowPlayOverlay }}) => this.onLoadFreezeFrame(shouldShowPlayOverlay));
-        this.pixelStreaming.events.addEventListener("statsReceived", ({ data: { aggregatedStats }}) => this.onStatsReceived(aggregatedStats));
-        this.pixelStreaming.events.addEventListener("latencyTestResult", ({ data: { latencyTimings }}) => this.onLatencyTestResults(latencyTimings));
-        this.pixelStreaming.events.addEventListener("streamerListMessage", ({ data: { autoSelectedStreamerId }}) => this.handleStreamerListMessage(autoSelectedStreamerId));
-        this.pixelStreaming.events.addEventListener("settingsChanged", (event) => this.configUI.onSettingsChanged(event));
+        this.pixelStreaming.events.addEventListener(
+            'afkWarningActivate',
+            ({ data: { countDown, dismissAfk } }) =>
+                this.showAfkOverlay(countDown, dismissAfk)
+        );
+        this.pixelStreaming.events.addEventListener(
+            'afkWarningUpdate',
+            ({ data: { countDown } }) =>
+                this.afkOverlay.updateCountdown(countDown)
+        );
+        this.pixelStreaming.events.addEventListener(
+            'afkWarningDeactivate',
+            () => this.afkOverlay.hide()
+        );
+        this.pixelStreaming.events.addEventListener('afkTimedOut', () =>
+            this.afkOverlay.hide()
+        );
+        this.pixelStreaming.events.addEventListener(
+            'videoEncoderAvgQP',
+            ({ data: { avgQP } }) => this.onVideoEncoderAvgQP(avgQP)
+        );
+        this.pixelStreaming.events.addEventListener('webRtcSdp', () =>
+            this.onWebRtcSdp()
+        );
+        this.pixelStreaming.events.addEventListener('webRtcAutoConnect', () =>
+            this.onWebRtcAutoConnect()
+        );
+        this.pixelStreaming.events.addEventListener('webRtcConnecting', () =>
+            this.onWebRtcConnecting()
+        );
+        this.pixelStreaming.events.addEventListener('webRtcConnected', () =>
+            this.onWebRtcConnected()
+        );
+        this.pixelStreaming.events.addEventListener('webRtcFailed', () =>
+            this.onWebRtcFailed()
+        );
+        this.pixelStreaming.events.addEventListener(
+            'webRtcDisconnected',
+            ({ data: { eventString, showActionOrErrorOnDisconnect } }) =>
+                this.onDisconnect(eventString, showActionOrErrorOnDisconnect)
+        );
+        this.pixelStreaming.events.addEventListener('videoInitialized', () =>
+            this.onVideoInitialized()
+        );
+        this.pixelStreaming.events.addEventListener('streamLoading', () =>
+            this.onStreamLoading()
+        );
+        this.pixelStreaming.events.addEventListener(
+            'playStreamError',
+            ({ data: { message } }) => this.onPlayStreamError(message)
+        );
+        this.pixelStreaming.events.addEventListener('playStream', () =>
+            this.onPlayStream()
+        );
+        this.pixelStreaming.events.addEventListener(
+            'playStreamRejected',
+            ({ data: { reason } }) => this.onPlayStreamRejected(reason)
+        );
+        this.pixelStreaming.events.addEventListener(
+            'loadFreezeFrame',
+            ({ data: { shouldShowPlayOverlay } }) =>
+                this.onLoadFreezeFrame(shouldShowPlayOverlay)
+        );
+        this.pixelStreaming.events.addEventListener(
+            'statsReceived',
+            ({ data: { aggregatedStats } }) =>
+                this.onStatsReceived(aggregatedStats)
+        );
+        this.pixelStreaming.events.addEventListener(
+            'latencyTestResult',
+            ({ data: { latencyTimings } }) =>
+                this.onLatencyTestResults(latencyTimings)
+        );
+        this.pixelStreaming.events.addEventListener(
+            'streamerListMessage',
+            ({ data: { autoSelectedStreamerId } }) =>
+                this.handleStreamerListMessage(autoSelectedStreamerId)
+        );
+        this.pixelStreaming.events.addEventListener(
+            'settingsChanged',
+            (event) => this.configUI.onSettingsChanged(event)
+        );
     }
 
     /**
@@ -218,7 +289,9 @@ export class Application {
             this._rootElement = document.createElement('div');
             this._rootElement.id = 'playerUI';
             this._rootElement.classList.add('noselect');
-            this._rootElement.appendChild(this.pixelStreaming.videoElementParent);
+            this._rootElement.appendChild(
+                this.pixelStreaming.videoElementParent
+            );
             this._rootElement.appendChild(this.uiFeaturesElement);
         }
         return this._rootElement;
@@ -318,7 +391,7 @@ export class Application {
         this.statsPanel.hide();
         this.settingsPanel.toggleVisibility();
     }
-    
+
     /**
      * Shows or hides the stats panel if clicked
      */
@@ -326,7 +399,7 @@ export class Application {
         this.settingsPanel.hide();
         this.statsPanel.toggleVisibility();
     }
-    
+
     /**
      * Activates the connect overlays action
      */
@@ -347,9 +420,7 @@ export class Application {
      */
     showAfkOverlay(countDown: number, dismissAfk: () => void) {
         this.hideCurrentOverlay();
-        this.afkOverlay.updateCountdown(
-            countDown
-        );
+        this.afkOverlay.updateCountdown(countDown);
         this.afkOverlay.onAction(() => dismissAfk());
         this.afkOverlay.show();
         this.currentOverlay = this.afkOverlay;
@@ -476,7 +547,7 @@ export class Application {
     onVideoEncoderAvgQP(QP: number) {
         this.videoQpIndicator.updateQpTooltip(QP);
     }
-    
+
     onInitialSettings(settings: InitialSettings) {
         if (settings.PixelStreamingSettings) {
             const disableLatencyTest =
@@ -504,7 +575,9 @@ export class Application {
 
     handleStreamerListMessage(autoSelectedStreamerId: string | null) {
         if (autoSelectedStreamerId === null) {
-            this.showTextOverlay('Multiple streamers detected. Use the dropdown in the settings menu to select the streamer.');
+            this.showTextOverlay(
+                'Multiple streamers detected. Use the dropdown in the settings menu to select the streamer.'
+            );
         }
     }
 

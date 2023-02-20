@@ -1,18 +1,21 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import type { OptionParametersIds, SettingOption } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import type {
+    OptionParametersIds,
+    SettingOption
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { SettingUIBase } from './SettingUIBase';
 
-export class SettingUIOption<CustomIds extends string = OptionParametersIds> extends SettingUIBase {
+export class SettingUIOption<
+    CustomIds extends string = OptionParametersIds
+> extends SettingUIBase {
     /* A select element that reflects the value of this setting. */
     _selector: HTMLSelectElement; // <select></select>
 
     /* This element contains a text node that reflects the setting's text label. */
     _settingsTextElem: HTMLElement;
 
-    constructor(
-        setting: SettingOption<CustomIds>
-    ) {
+    constructor(setting: SettingOption<CustomIds>) {
         super(setting);
 
         this.label = this.setting.label;

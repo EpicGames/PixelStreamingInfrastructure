@@ -3,7 +3,9 @@
 import type { TextParametersIds } from './Config';
 import { SettingBase } from './SettingBase';
 
-export class SettingText<CustomIds extends string = TextParametersIds> extends SettingBase {
+export class SettingText<
+    CustomIds extends string = TextParametersIds
+> extends SettingBase {
     id: TextParametersIds | CustomIds;
     onChangeEmit: (changedValue: string) => void;
     useUrlParams: boolean;
@@ -72,5 +74,4 @@ export class SettingText<CustomIds extends string = TextParametersIds> extends S
     public set text(inValue: string) {
         this.value = inValue;
     }
-
 }

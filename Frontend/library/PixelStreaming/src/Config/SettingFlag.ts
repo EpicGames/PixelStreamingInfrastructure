@@ -3,7 +3,9 @@
 import type { FlagsIds } from './Config';
 import { SettingBase } from './SettingBase';
 
-export class SettingFlag<CustomIds extends string = FlagsIds> extends SettingBase {
+export class SettingFlag<
+    CustomIds extends string = FlagsIds
+> extends SettingBase {
     id: FlagsIds | CustomIds;
     onChangeEmit: (changedValue: boolean) => void;
     useUrlParams: boolean;

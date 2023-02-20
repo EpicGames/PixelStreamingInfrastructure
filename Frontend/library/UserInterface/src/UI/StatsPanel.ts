@@ -246,7 +246,9 @@ export class StatsPanel {
                 'VideoCodecStat',
                 'Video codec',
                 // Split the codec to remove the Fmtp line
-                stats.codecs.get(stats.inboundVideoStats.codecId)?.split(' ')[0] ?? ""
+                stats.codecs
+                    .get(stats.inboundVideoStats.codecId)
+                    ?.split(' ')[0] ?? ''
             );
         }
 
@@ -255,7 +257,9 @@ export class StatsPanel {
                 'AudioCodecStat',
                 'Audio codec',
                 // Split the codec to remove the Fmtp line
-                stats.codecs.get(stats.inboundAudioStats.codecId)?.split(' ')[0] ?? ""
+                stats.codecs
+                    .get(stats.inboundAudioStats.codecId)
+                    ?.split(' ')[0] ?? ''
             );
         }
 
@@ -271,7 +275,11 @@ export class StatsPanel {
                 : "Can't calculate";
         this.addOrUpdateStat('RTTStat', 'Net RTT (ms)', netRTT);
 
-        this.addOrUpdateStat('DurationStat', 'Duration', stats.sessionStats.runTime);
+        this.addOrUpdateStat(
+            'DurationStat',
+            'Duration',
+            stats.sessionStats.runTime
+        );
 
         this.addOrUpdateStat(
             'ControlsInputStat',

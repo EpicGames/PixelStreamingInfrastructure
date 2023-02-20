@@ -29,11 +29,13 @@ export class Flags {
     static UseMic = 'UseMic' as const;
 }
 
-export type FlagsKeys = Exclude<keyof typeof Flags, "prototype">;
+export type FlagsKeys = Exclude<keyof typeof Flags, 'prototype'>;
 export type FlagsIds = typeof Flags[FlagsKeys];
 
 const isFlagId = (id: string): id is FlagsIds =>
-    Object.getOwnPropertyNames(Flags).some((name: FlagsKeys) => Flags[name] === id);
+    Object.getOwnPropertyNames(Flags).some(
+        (name: FlagsKeys) => Flags[name] === id
+    );
 
 /**
  * A collection of numeric parameters that are core to all Pixel Streaming experiences.
@@ -48,11 +50,17 @@ export class NumericParameters {
     static WebRTCMaxBitrate = 'WebRTCMaxBitrate' as const;
 }
 
-export type NumericParametersKeys = Exclude<keyof typeof NumericParameters, "prototype">;
-export type NumericParametersIds = typeof NumericParameters[NumericParametersKeys];
+export type NumericParametersKeys = Exclude<
+    keyof typeof NumericParameters,
+    'prototype'
+>;
+export type NumericParametersIds =
+    typeof NumericParameters[NumericParametersKeys];
 
 const isNumericId = (id: string): id is NumericParametersIds =>
-    Object.getOwnPropertyNames(NumericParameters).some((name: NumericParametersKeys) => NumericParameters[name] === id);
+    Object.getOwnPropertyNames(NumericParameters).some(
+        (name: NumericParametersKeys) => NumericParameters[name] === id
+    );
 
 /**
  * A collection of textual parameters that are core to all Pixel Streaming experiences.
@@ -62,11 +70,16 @@ export class TextParameters {
     static SignallingServerUrl = 'ss' as const;
 }
 
-export type TextParametersKeys = Exclude<keyof typeof TextParameters, "prototype">;
+export type TextParametersKeys = Exclude<
+    keyof typeof TextParameters,
+    'prototype'
+>;
 export type TextParametersIds = typeof TextParameters[TextParametersKeys];
 
 const isTextId = (id: string): id is TextParametersIds =>
-    Object.getOwnPropertyNames(TextParameters).some((name: TextParametersKeys) => TextParameters[name] === id);
+    Object.getOwnPropertyNames(TextParameters).some(
+        (name: TextParametersKeys) => TextParameters[name] === id
+    );
 
 /**
  * A collection of enum based parameters that are core to all Pixel Streaming experiences.
@@ -77,11 +90,16 @@ export class OptionParameters {
     static StreamerId = 'StreamerId' as const;
 }
 
-export type OptionParametersKeys = Exclude<keyof typeof OptionParameters, "prototype">;
+export type OptionParametersKeys = Exclude<
+    keyof typeof OptionParameters,
+    'prototype'
+>;
 export type OptionParametersIds = typeof OptionParameters[OptionParametersKeys];
 
 const isOptionId = (id: string): id is OptionParametersIds =>
-    Object.getOwnPropertyNames(OptionParameters).some((name: OptionParametersKeys) => OptionParameters[name] === id);
+    Object.getOwnPropertyNames(OptionParameters).some(
+        (name: OptionParametersKeys) => OptionParameters[name] === id
+    );
 
 /**
  * Utility types for inferring data type based on setting ID
@@ -102,8 +120,8 @@ export type OptionKeys<T> = T extends FlagsIds
     : never;
 
 export type AllSettings = {
-    [K in OptionIds]: OptionKeys<K>
-}
+    [K in OptionIds]: OptionKeys<K>;
+};
 
 export interface ConfigParams {
     initialSettings?: Partial<AllSettings>;
@@ -600,7 +618,10 @@ export class Config {
      * @param id The id of the setting
      * @param settingOptions The values the setting could take
      */
-    setOptionSettingOptions(id: OptionParametersIds, settingOptions: Array<string>) {
+    setOptionSettingOptions(
+        id: OptionParametersIds,
+        settingOptions: Array<string>
+    ) {
         if (!this.optionParameters.has(id)) {
             Logger.Warning(
                 Logger.GetStackTrace(),
@@ -645,7 +666,7 @@ export class Config {
 
     /**
      * Set a subset of all settings in one function call.
-     * 
+     *
      * @param settings A (partial) list of settings to set
      */
     setSettings(settings: Partial<AllSettings>) {
@@ -684,7 +705,7 @@ export class Config {
 
     /**
      * Get all Flag settings as an array.
-     * @returns 
+     * @returns
      */
     getFlags(): Array<SettingFlag> {
         return Array.from(this.flags.values());
@@ -692,7 +713,7 @@ export class Config {
 
     /**
      * Get all Text settings as an array.
-     * @returns 
+     * @returns
      */
     getTextSettings(): Array<SettingText> {
         return Array.from(this.textParameters.values());
@@ -700,7 +721,7 @@ export class Config {
 
     /**
      * Get all Number settings as an array.
-     * @returns 
+     * @returns
      */
     getNumericSettings(): Array<SettingNumber> {
         return Array.from(this.numericParameters.values());
@@ -708,7 +729,7 @@ export class Config {
 
     /**
      * Get all Option settings as an array.
-     * @returns 
+     * @returns
      */
     getOptionSettings(): Array<SettingOption> {
         return Array.from(this.optionParameters.values());
@@ -716,31 +737,63 @@ export class Config {
 
     /**
      * Emit events when settings change.
-     * @param eventEmitter 
+     * @param eventEmitter
      */
     _registerOnChangeEvents(eventEmitter: EventEmitter) {
         for (const key of this.flags.keys()) {
             const flag = this.flags.get(key);
             if (flag) {
-                flag.onChangeEmit = (newValue: boolean) => eventEmitter.dispatchEvent(new SettingsChangedEvent({ id: flag.id, type: "flag", value: newValue, target: flag }));
+                flag.onChangeEmit = (newValue: boolean) =>
+                    eventEmitter.dispatchEvent(
+                        new SettingsChangedEvent({
+                            id: flag.id,
+                            type: 'flag',
+                            value: newValue,
+                            target: flag
+                        })
+                    );
             }
         }
         for (const key of this.numericParameters.keys()) {
             const number = this.numericParameters.get(key);
             if (number) {
-                number.onChangeEmit = (newValue: number) => eventEmitter.dispatchEvent(new SettingsChangedEvent({ id: number.id, type: "number", value: newValue, target: number }));
+                number.onChangeEmit = (newValue: number) =>
+                    eventEmitter.dispatchEvent(
+                        new SettingsChangedEvent({
+                            id: number.id,
+                            type: 'number',
+                            value: newValue,
+                            target: number
+                        })
+                    );
             }
         }
         for (const key of this.textParameters.keys()) {
             const text = this.textParameters.get(key);
             if (text) {
-                text.onChangeEmit = (newValue: string) => eventEmitter.dispatchEvent(new SettingsChangedEvent({ id: text.id, type: "text", value: newValue, target: text }));
+                text.onChangeEmit = (newValue: string) =>
+                    eventEmitter.dispatchEvent(
+                        new SettingsChangedEvent({
+                            id: text.id,
+                            type: 'text',
+                            value: newValue,
+                            target: text
+                        })
+                    );
             }
         }
         for (const key of this.optionParameters.keys()) {
             const option = this.optionParameters.get(key);
             if (option) {
-                option.onChangeEmit = (newValue: string) => eventEmitter.dispatchEvent(new SettingsChangedEvent({ id: option.id, type: "option", value: newValue, target: option }));
+                option.onChangeEmit = (newValue: string) =>
+                    eventEmitter.dispatchEvent(
+                        new SettingsChangedEvent({
+                            id: option.id,
+                            type: 'option',
+                            value: newValue,
+                            target: option
+                        })
+                    );
             }
         }
     }

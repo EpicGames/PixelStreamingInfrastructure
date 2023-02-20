@@ -61,5 +61,4 @@ export class SettingBase {
         this.onChange(this._value);
         this.onChangeEmit(this._value);
     }
-
 }

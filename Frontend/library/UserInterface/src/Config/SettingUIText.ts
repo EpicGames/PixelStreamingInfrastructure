@@ -1,18 +1,21 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import type { SettingText, TextParametersIds } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import type {
+    SettingText,
+    TextParametersIds
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { SettingUIBase } from './SettingUIBase';
 
-export class SettingUIText<CustomIds extends string = TextParametersIds> extends SettingUIBase {
+export class SettingUIText<
+    CustomIds extends string = TextParametersIds
+> extends SettingUIBase {
     /* A text box that reflects the value of this setting. */
     _textbox: HTMLInputElement; // input type="text"
 
     /* This element contains a text node that reflects the setting's text label. */
     _settingsTextElem: HTMLElement;
 
-    constructor(
-        setting: SettingText<CustomIds>
-    ) {
+    constructor(setting: SettingText<CustomIds>) {
         super(setting);
 
         this.label = this.setting.label;

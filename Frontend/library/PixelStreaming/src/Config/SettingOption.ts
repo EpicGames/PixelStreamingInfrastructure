@@ -3,7 +3,9 @@
 import type { OptionParametersIds } from './Config';
 import { SettingBase } from './SettingBase';
 
-export class SettingOption<CustomIds extends string = OptionParametersIds> extends SettingBase {
+export class SettingOption<
+    CustomIds extends string = OptionParametersIds
+> extends SettingBase {
     id: OptionParametersIds | CustomIds;
     onChangeEmit: (changedValue: string) => void;
     _options: Array<string>;
@@ -21,9 +23,10 @@ export class SettingOption<CustomIds extends string = OptionParametersIds> exten
 
         this.options = options;
         const urlParams = new URLSearchParams(window.location.search);
-        const stringToMatch: string = useUrlParams && urlParams.has(this.id)
-            ? this.getUrlParamText()
-            : defaultTextValue;
+        const stringToMatch: string =
+            useUrlParams && urlParams.has(this.id)
+                ? this.getUrlParamText()
+                : defaultTextValue;
         this.selected = stringToMatch;
         this.useUrlParams = useUrlParams;
     }

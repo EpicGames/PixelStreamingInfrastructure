@@ -1,6 +1,22 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Config, FlagsIds, NumericParametersIds, OptionParametersIds, TextParametersIds, TextParameters, OptionParameters, Flags, NumericParameters, SettingsChangedEvent, SettingFlag, SettingNumber, SettingText, SettingOption, Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import {
+    Config,
+    FlagsIds,
+    NumericParametersIds,
+    OptionParametersIds,
+    TextParametersIds,
+    TextParameters,
+    OptionParameters,
+    Flags,
+    NumericParameters,
+    SettingsChangedEvent,
+    SettingFlag,
+    SettingNumber,
+    SettingText,
+    SettingOption,
+    Logger
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { SettingUIFlag } from './SettingUIFlag';
 import { SettingUINumber } from './SettingUINumber';
 import { SettingUIText } from './SettingUIText';
@@ -11,19 +27,31 @@ type ExtraFlags = typeof LightMode;
 export type FlagsIdsExtended = FlagsIds | ExtraFlags;
 
 export class ConfigUI {
-    private customFlags = new Map<FlagsIdsExtended, SettingFlag<FlagsIdsExtended>>();
+    private customFlags = new Map<
+        FlagsIdsExtended,
+        SettingFlag<FlagsIdsExtended>
+    >();
 
     /* A map of flags that can be toggled - options that can be set in the application - e.g. Use Mic? */
-    private flagsUi = new Map<FlagsIdsExtended, SettingUIFlag<FlagsIdsExtended>>();
+    private flagsUi = new Map<
+        FlagsIdsExtended,
+        SettingUIFlag<FlagsIdsExtended>
+    >();
 
     /* A map of numerical settings - options that can be in the application - e.g. MinBitrate */
-    private numericParametersUi = new Map<NumericParametersIds, SettingUINumber>();
+    private numericParametersUi = new Map<
+        NumericParametersIds,
+        SettingUINumber
+    >();
 
     /* A map of text settings - e.g. signalling server url */
     private textParametersUi = new Map<TextParametersIds, SettingUIText>();
 
     /* A map of enum based settings - e.g. preferred codec */
-    private optionParametersUi = new Map<OptionParametersIds, SettingUIOption>();
+    private optionParametersUi = new Map<
+        OptionParametersIds,
+        SettingUIOption
+    >();
 
     // ------------ Settings -----------------
 
@@ -50,23 +78,32 @@ export class ConfigUI {
 
     /**
      * Creates UI wrapper components for each setting element in config.
-     * @param config 
+     * @param config
      */
     registerSettingsUIComponents(config: Config) {
         for (const setting of config.getFlags()) {
             this.flagsUi.set(setting.id, new SettingUIFlag(setting));
         }
         for (const setting of Array.from(this.customFlags.values())) {
-            this.flagsUi.set(setting.id, new SettingUIFlag<FlagsIdsExtended>(setting));
+            this.flagsUi.set(
+                setting.id,
+                new SettingUIFlag<FlagsIdsExtended>(setting)
+            );
         }
         for (const setting of config.getTextSettings()) {
             this.textParametersUi.set(setting.id, new SettingUIText(setting));
         }
         for (const setting of config.getNumericSettings()) {
-            this.numericParametersUi.set(setting.id, new SettingUINumber(setting));
+            this.numericParametersUi.set(
+                setting.id,
+                new SettingUINumber(setting)
+            );
         }
         for (const setting of config.getOptionSettings()) {
-            this.optionParametersUi.set(setting.id, new SettingUIOption(setting));
+            this.optionParametersUi.set(
+                setting.id,
+                new SettingUIOption(setting)
+            );
         }
     }
 
@@ -92,7 +129,6 @@ export class ConfigUI {
         settingsElem.appendChild(sectionElem);
         return sectionElem;
     }
-
 
     /**
      * Setup flags with their default values and add them to the `Config.flags` map.
@@ -131,7 +167,10 @@ export class ConfigUI {
             psSettingsSection,
             this.flagsUi.get(Flags.StartVideoMuted)
         );
-        this.addSettingFlag(psSettingsSection, this.flagsUi.get(Flags.PreferSFU));
+        this.addSettingFlag(
+            psSettingsSection,
+            this.flagsUi.get(Flags.PreferSFU)
+        );
         this.addSettingFlag(
             psSettingsSection,
             this.flagsUi.get(Flags.IsQualityController)
@@ -140,7 +179,10 @@ export class ConfigUI {
             psSettingsSection,
             this.flagsUi.get(Flags.ForceMonoAudio)
         );
-        this.addSettingFlag(psSettingsSection, this.flagsUi.get(Flags.ForceTURN));
+        this.addSettingFlag(
+            psSettingsSection,
+            this.flagsUi.get(Flags.ForceTURN)
+        );
         this.addSettingFlag(
             psSettingsSection,
             this.flagsUi.get(Flags.SuppressBrowserKeys)
@@ -164,7 +206,10 @@ export class ConfigUI {
             this.flagsUi.get(Flags.MatchViewportResolution)
         );
 
-        this.addSettingFlag(viewSettingsSection, this.flagsUi.get(Flags.HoveringMouseMode));
+        this.addSettingFlag(
+            viewSettingsSection,
+            this.flagsUi.get(Flags.HoveringMouseMode)
+        );
 
         this.addSettingFlag(viewSettingsSection, this.flagsUi.get(LightMode));
 
@@ -183,12 +228,19 @@ export class ConfigUI {
             this.numericParametersUi.get(NumericParameters.MaxQP)
         );
 
-        const preferredCodecOption = this.optionParametersUi.get(OptionParameters.PreferredCodec);
+        const preferredCodecOption = this.optionParametersUi.get(
+            OptionParameters.PreferredCodec
+        );
         this.addSettingOption(
             encoderSettingsSection,
             this.optionParametersUi.get(OptionParameters.PreferredCodec)
         );
-        if(preferredCodecOption && [...preferredCodecOption.selector.options].map(o => o.value).includes("Only available on Chrome")) {
+        if (
+            preferredCodecOption &&
+            [...preferredCodecOption.selector.options]
+                .map((o) => o.value)
+                .includes('Only available on Chrome')
+        ) {
             preferredCodecOption.disable();
         }
 
@@ -272,8 +324,8 @@ export class ConfigUI {
         }
     }
 
-    onSettingsChanged({ data: { id, target, type }}: SettingsChangedEvent) {
-        if (type === "flag") {
+    onSettingsChanged({ data: { id, target, type } }: SettingsChangedEvent) {
+        if (type === 'flag') {
             const _id = id as FlagsIds;
             const _target = target as SettingFlag;
             const setting = this.flagsUi.get(_id);
@@ -285,7 +337,7 @@ export class ConfigUI {
                     setting.label = _target.label;
                 }
             }
-        } else if (type === "number") {
+        } else if (type === 'number') {
             const _id = id as NumericParametersIds;
             const _target = target as SettingNumber;
             const setting = this.numericParametersUi.get(_id);
@@ -297,7 +349,7 @@ export class ConfigUI {
                     setting.label = _target.label;
                 }
             }
-        } else if (type === "text") {
+        } else if (type === 'text') {
             const _id = id as TextParametersIds;
             const _target = target as SettingText;
             const setting = this.textParametersUi.get(_id);
@@ -309,14 +361,17 @@ export class ConfigUI {
                     setting.label = _target.label;
                 }
             }
-        } else if (type === "option") {
+        } else if (type === 'option') {
             const _id = id as OptionParametersIds;
             const _target = target as SettingOption;
             const setting = this.optionParametersUi.get(_id);
             if (setting) {
                 const uiOptions = setting.options;
                 const targetOptions = _target.options;
-                if (uiOptions.length !== targetOptions.length || !uiOptions.every((value) => targetOptions.includes(value))) {
+                if (
+                    uiOptions.length !== targetOptions.length ||
+                    !uiOptions.every((value) => targetOptions.includes(value))
+                ) {
                     setting.options = _target.options;
                 }
                 if (setting.selected !== _target.selected) {
@@ -368,5 +423,4 @@ export class ConfigUI {
     isCustomFlagEnabled(id: ExtraFlags): boolean {
         return this.customFlags.get(id).flag as boolean;
     }
-
 }

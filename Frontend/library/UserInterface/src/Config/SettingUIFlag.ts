@@ -1,9 +1,14 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import type { FlagsIds, SettingFlag } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import type {
+    FlagsIds,
+    SettingFlag
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { SettingUIBase } from './SettingUIBase';
 
-export class SettingUIFlag<CustomIds extends string = FlagsIds> extends SettingUIBase {
+export class SettingUIFlag<
+    CustomIds extends string = FlagsIds
+> extends SettingUIBase {
     /* We toggle this checkbox to reflect the value of our setting's boolean flag. */
     _checkbox: HTMLInputElement; // input type="checkbox"
 
@@ -12,9 +17,7 @@ export class SettingUIFlag<CustomIds extends string = FlagsIds> extends SettingU
 
     onChangeEmit: (changedValue: boolean) => void;
 
-    constructor(
-        setting: SettingFlag<CustomIds>
-    ) {
+    constructor(setting: SettingFlag<CustomIds>) {
         super(setting);
 
         this.label = setting.label;
@@ -27,7 +30,7 @@ export class SettingUIFlag<CustomIds extends string = FlagsIds> extends SettingU
     public get setting(): SettingFlag<CustomIds> {
         return this._setting as SettingFlag<CustomIds>;
     }
-    
+
     public get settingsTextElem(): HTMLElement {
         if (!this._settingsTextElem) {
             this._settingsTextElem = document.createElement('div');

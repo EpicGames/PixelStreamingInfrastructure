@@ -1,21 +1,24 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import type { NumericParametersIds, SettingNumber } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import type {
+    NumericParametersIds,
+    SettingNumber
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { SettingUIBase } from './SettingUIBase';
 
 /**
  * A number spinner with a text label beside it.
  */
-export class SettingUINumber<CustomIds extends string = NumericParametersIds> extends SettingUIBase {
+export class SettingUINumber<
+    CustomIds extends string = NumericParametersIds
+> extends SettingUIBase {
     _spinner: HTMLInputElement;
 
     /* This element contains a text node that reflects the setting's text label. */
     _settingsTextElem: HTMLElement;
 
-    constructor(
-        setting: SettingNumber<CustomIds>
-    ) {
+    constructor(setting: SettingNumber<CustomIds>) {
         super(setting);
 
         this.label = this.setting.label;
@@ -28,7 +31,7 @@ export class SettingUINumber<CustomIds extends string = NumericParametersIds> ex
     public get setting(): SettingNumber<CustomIds> {
         return this._setting as SettingNumber<CustomIds>;
     }
-    
+
     public get settingsTextElem(): HTMLElement {
         if (!this._settingsTextElem) {
             this._settingsTextElem = document.createElement('label');
@@ -123,5 +126,4 @@ export class SettingUINumber<CustomIds extends string = NumericParametersIds> ex
     public get label() {
         return this.settingsTextElem.innerText;
     }
-
 }

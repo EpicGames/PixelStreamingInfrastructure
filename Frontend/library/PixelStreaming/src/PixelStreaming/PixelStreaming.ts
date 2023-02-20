@@ -12,7 +12,21 @@ import {
     WebRTCSettings
 } from '../DataChannel/InitialSettings';
 import { OnScreenKeyboard } from '../UI/OnScreenKeyboard';
-import { EventEmitter, InitialSettingsEvent, LatencyTestResultEvent, StatsReceivedEvent, StreamLoadingEvent, VideoEncoderAvgQPEvent, VideoInitializedEvent, WebRtcAutoConnectEvent, WebRtcConnectedEvent, WebRtcConnectingEvent, WebRtcDisconnectedEvent, WebRtcFailedEvent, WebRtcSdpEvent } from '../Util/EventEmitter';
+import {
+    EventEmitter,
+    InitialSettingsEvent,
+    LatencyTestResultEvent,
+    StatsReceivedEvent,
+    StreamLoadingEvent,
+    VideoEncoderAvgQPEvent,
+    VideoInitializedEvent,
+    WebRtcAutoConnectEvent,
+    WebRtcConnectedEvent,
+    WebRtcConnectingEvent,
+    WebRtcDisconnectedEvent,
+    WebRtcFailedEvent,
+    WebRtcSdpEvent
+} from '../Util/EventEmitter';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
 
@@ -37,7 +51,7 @@ export class PixelStreaming {
     private _videoStartTime: number;
     private _inputController: boolean;
 
-    private _eventEmitter: EventEmitter
+    private _eventEmitter: EventEmitter;
 
     /**
      * @param config - A newly instantiated config object
@@ -297,7 +311,9 @@ export class PixelStreaming {
      * Instantiate the WebRTCPlayerController interface to provide WebRTCPlayerController functionality within this class and set up anything that requires it
      * @param webRtcPlayerController - a WebRtcPlayerController controller instance
      */
-    private setWebRtcPlayerController(webRtcPlayerController: WebRtcPlayerController) {
+    private setWebRtcPlayerController(
+        webRtcPlayerController: WebRtcPlayerController
+    ) {
         this.webRtcController = webRtcPlayerController;
 
         this.webRtcController.setPreferredCodec(
@@ -390,7 +406,13 @@ export class PixelStreaming {
             this.webRtcController.setDisconnectMessageOverride('');
         }
 
-        this._eventEmitter.dispatchEvent(new WebRtcDisconnectedEvent({ eventString, showActionOrErrorOnDisconnect: this._showActionOrErrorOnDisconnect }))
+        this._eventEmitter.dispatchEvent(
+            new WebRtcDisconnectedEvent({
+                eventString,
+                showActionOrErrorOnDisconnect:
+                    this._showActionOrErrorOnDisconnect
+            })
+        );
         if (this._showActionOrErrorOnDisconnect == false) {
             this._showActionOrErrorOnDisconnect = true;
         }
@@ -430,7 +452,9 @@ export class PixelStreaming {
      * @param latency - latency test results object
      */
     _onLatencyTestResult(latencyTimings: LatencyTestResults) {
-        this._eventEmitter.dispatchEvent(new LatencyTestResultEvent({ latencyTimings }));
+        this._eventEmitter.dispatchEvent(
+            new LatencyTestResultEvent({ latencyTimings })
+        );
     }
 
     /**
@@ -442,9 +466,15 @@ export class PixelStreaming {
         if (!this._videoStartTime || this._videoStartTime === undefined) {
             this._videoStartTime = Date.now();
         }
-        videoStats.handleSessionStatistics(this._videoStartTime, this._inputController, this.webRtcController.videoAvgQp);
+        videoStats.handleSessionStatistics(
+            this._videoStartTime,
+            this._inputController,
+            this.webRtcController.videoAvgQp
+        );
 
-        this._eventEmitter.dispatchEvent(new StatsReceivedEvent({ aggregatedStats: videoStats }));
+        this._eventEmitter.dispatchEvent(
+            new StatsReceivedEvent({ aggregatedStats: videoStats })
+        );
     }
 
     /**
@@ -452,7 +482,9 @@ export class PixelStreaming {
      * @param QP - the quality number of the stream
      */
     _onVideoEncoderAvgQP(QP: number) {
-        this._eventEmitter.dispatchEvent(new VideoEncoderAvgQPEvent({ avgQP: QP }));
+        this._eventEmitter.dispatchEvent(
+            new VideoEncoderAvgQPEvent({ avgQP: QP })
+        );
     }
 
     /**
@@ -460,7 +492,9 @@ export class PixelStreaming {
      * @param settings - initial UE app settings
      */
     _onInitialSettings(settings: InitialSettings) {
-        this._eventEmitter.dispatchEvent(new InitialSettingsEvent({ settings }));
+        this._eventEmitter.dispatchEvent(
+            new InitialSettingsEvent({ settings })
+        );
         if (settings.PixelStreamingSettings) {
             const allowConsoleCommands =
                 settings.PixelStreamingSettings.AllowPixelStreamingCommands;
@@ -510,7 +544,7 @@ export class PixelStreaming {
 
     /**
      * Request a connection latency test.
-     * @returns 
+     * @returns
      */
     public requestLatencyTest() {
         if (!this.webRtcController.videoPlayer.isVideoReady()) {
@@ -522,7 +556,7 @@ export class PixelStreaming {
 
     /**
      * Request for the UE application to show FPS counter.
-     * @returns 
+     * @returns
      */
     public requestShowFps() {
         if (!this.webRtcController.videoPlayer.isVideoReady()) {
@@ -534,7 +568,7 @@ export class PixelStreaming {
 
     /**
      * Request for a new IFrame from the UE application.
-     * @returns 
+     * @returns
      */
     public requestIframe() {
         if (!this.webRtcController.videoPlayer.isVideoReady()) {

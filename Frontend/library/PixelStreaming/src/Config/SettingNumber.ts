@@ -6,7 +6,9 @@ import { SettingBase } from './SettingBase';
 /**
  * A number spinner with a text label beside it.
  */
-export class SettingNumber<CustomIds extends string = NumericParametersIds> extends SettingBase {
+export class SettingNumber<
+    CustomIds extends string = NumericParametersIds
+> extends SettingBase {
     _min: number;
     _max: number;
 
@@ -104,5 +106,4 @@ export class SettingNumber<CustomIds extends string = NumericParametersIds> exte
     public addOnChangedListener(onChangedFunc: (newNumber: number) => void) {
         this.onChange = onChangedFunc;
     }
-
 }

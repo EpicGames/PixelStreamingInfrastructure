@@ -50,7 +50,17 @@ import {
 } from '../Util/CoordinateConverter';
 import { PixelStreaming } from '../PixelStreaming/PixelStreaming';
 import { ITouchController } from '../Inputs/ITouchController';
-import { DataChannelCloseEvent, DataChannelErrorEvent, DataChannelOpenEvent, HideFreezeFrameEvent, LoadFreezeFrameEvent, PlayStreamErrorEvent, PlayStreamEvent, PlayStreamRejectedEvent, StreamerListMessageEvent } from '../Util/EventEmitter';
+import {
+    DataChannelCloseEvent,
+    DataChannelErrorEvent,
+    DataChannelOpenEvent,
+    HideFreezeFrameEvent,
+    LoadFreezeFrameEvent,
+    PlayStreamErrorEvent,
+    PlayStreamEvent,
+    PlayStreamRejectedEvent,
+    StreamerListMessageEvent
+} from '../Util/EventEmitter';
 /**
  * Entry point for the WebRTC Player
  */
@@ -89,7 +99,7 @@ export class WebRtcPlayerController {
     statsTimerHandle: number;
     file: FileTemplate;
     preferredCodec: string;
-    peerConfig: RTCConfiguration
+    peerConfig: RTCConfiguration;
     videoAvgQp: number;
 
     // if you override the disconnection message by calling the interface method setDisconnectMessageOverride
@@ -113,7 +123,11 @@ export class WebRtcPlayerController {
         };
 
         // set up the afk logic class and connect up its method for closing the signaling server
-        this.afkController = new AFKController(this.config, this.pixelStreaming, this.onAfkTriggered.bind(this));
+        this.afkController = new AFKController(
+            this.config,
+            this.pixelStreaming,
+            this.onAfkTriggered.bind(this)
+        );
         this.afkController.onAFKTimedOutCallback = () => {
             this.setDisconnectMessageOverride(
                 'You have been disconnected due to inactivity'
@@ -156,7 +170,9 @@ export class WebRtcPlayerController {
 
         this.sendrecvDataChannelController = new DataChannelController();
         this.recvDataChannelController = new DataChannelController();
-        this.registerDataChannelEventEmitters(this.sendrecvDataChannelController);
+        this.registerDataChannelEventEmitters(
+            this.sendrecvDataChannelController
+        );
         this.registerDataChannelEventEmitters(this.recvDataChannelController);
         this.dataChannelSender = new DataChannelSender(
             this.sendrecvDataChannelController
@@ -219,10 +235,15 @@ export class WebRtcPlayerController {
         this.isQualityController = false;
         this.preferredCodec = '';
 
-        this.config._addOnOptionSettingChangedListener(OptionParameters.StreamerId, (streamerid) => {
+        this.config._addOnOptionSettingChangedListener(
+            OptionParameters.StreamerId,
+            (streamerid) => {
                 // close the current peer connection and create a new one
                 this.peerConnectionController.peerConnection.close();
-                this.peerConnectionController.createPeerConnection(this.peerConfig, this.preferredCodec);
+                this.peerConnectionController.createPeerConnection(
+                    this.peerConfig,
+                    this.preferredCodec
+                );
                 this.webSocketController.sendSubscribe(streamerid);
             }
         );
@@ -699,7 +720,11 @@ export class WebRtcPlayerController {
                             Logger.Error(
                                 Logger.GetStackTrace(),
                                 `ToStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id and a byteLength\n
-                                           Definition was: ${JSON.stringify(message, null, 2)}`
+                                           Definition was: ${JSON.stringify(
+                                               message,
+                                               null,
+                                               2
+                                           )}`
                             );
                             // return in a forEach is equivalent to a continue in a normal for loop
                             return;
@@ -837,7 +862,10 @@ export class WebRtcPlayerController {
         }
 
         // if a websocket object has not been created connect normally without closing
-        if (!this.webSocketController.webSocket || this.webSocketController.webSocket.readyState === WebSocket.CLOSED) {
+        if (
+            !this.webSocketController.webSocket ||
+            this.webSocketController.webSocket.readyState === WebSocket.CLOSED
+        ) {
             Logger.Log(
                 Logger.GetStackTrace(),
                 'A websocket connection has not been made yet so we will start the stream'
@@ -867,7 +895,13 @@ export class WebRtcPlayerController {
      * Loads a freeze frame if it is required otherwise shows the play overlay
      */
     loadFreezeFrameOrShowPlayOverlay() {
-        this.pixelStreaming.events.dispatchEvent(new LoadFreezeFrameEvent({ shouldShowPlayOverlay: this.shouldShowPlayOverlay, isValid: this.freezeFrameController.valid, jpegData: this.freezeFrameController.jpeg }));
+        this.pixelStreaming.events.dispatchEvent(
+            new LoadFreezeFrameEvent({
+                shouldShowPlayOverlay: this.shouldShowPlayOverlay,
+                isValid: this.freezeFrameController.valid,
+                jpegData: this.freezeFrameController.jpeg
+            })
+        );
         if (this.shouldShowPlayOverlay === true) {
             Logger.Log(Logger.GetStackTrace(), 'showing play overlay');
             this.resizePlayerStyle();
@@ -906,7 +940,9 @@ export class WebRtcPlayerController {
             6
         );
         setTimeout(() => {
-            this.pixelStreaming.events.dispatchEvent(new HideFreezeFrameEvent());
+            this.pixelStreaming.events.dispatchEvent(
+                new HideFreezeFrameEvent()
+            );
             this.freezeFrameController.hideFreezeFrame();
         }, this.freezeFrameController.freezeFrameDelay);
         if (this.videoPlayer.getVideoElement()) {
@@ -946,12 +982,12 @@ export class WebRtcPlayerController {
      */
     playStream() {
         if (!this.videoPlayer.getVideoElement()) {
-            const message = 'Could not play video stream because the video player was not initialized correctly.';
-            this.pixelStreaming.events.dispatchEvent(new PlayStreamErrorEvent({ message }));
-            Logger.Error(
-                Logger.GetStackTrace(),
-                message
+            const message =
+                'Could not play video stream because the video player was not initialized correctly.';
+            this.pixelStreaming.events.dispatchEvent(
+                new PlayStreamErrorEvent({ message })
             );
+            Logger.Error(Logger.GetStackTrace(), message);
 
             // set the disconnect message
             this.setDisconnectMessageOverride(
@@ -992,7 +1028,11 @@ export class WebRtcPlayerController {
                         Logger.GetStackTrace(),
                         'Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.'
                     );
-                    this.pixelStreaming.events.dispatchEvent(new PlayStreamRejectedEvent({ reason: onRejectedReason }));
+                    this.pixelStreaming.events.dispatchEvent(
+                        new PlayStreamRejectedEvent({
+                            reason: onRejectedReason
+                        })
+                    );
                 });
         } else {
             this.playVideo();
@@ -1016,7 +1056,9 @@ export class WebRtcPlayerController {
                 Logger.GetStackTrace(),
                 'Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.'
             );
-            this.pixelStreaming.events.dispatchEvent(new PlayStreamRejectedEvent({ reason: onRejectedReason }));
+            this.pixelStreaming.events.dispatchEvent(
+                new PlayStreamRejectedEvent({ reason: onRejectedReason })
+            );
         });
     }
 
@@ -1209,26 +1251,45 @@ export class WebRtcPlayerController {
             6
         );
 
-		const settingOptions = [...messageStreamerList.ids] // copy the original messageStreamerList.ids
-		settingOptions.unshift('') // add an empty option at the top
-        this.config.setOptionSettingOptions(OptionParameters.StreamerId, settingOptions);
+        const settingOptions = [...messageStreamerList.ids]; // copy the original messageStreamerList.ids
+        settingOptions.unshift(''); // add an empty option at the top
+        this.config.setOptionSettingOptions(
+            OptionParameters.StreamerId,
+            settingOptions
+        );
 
         const urlParams = new URLSearchParams(window.location.search);
         let autoSelectedStreamerId: string | null = null;
-        if(messageStreamerList.ids.length == 1) {
+        if (messageStreamerList.ids.length == 1) {
             // If there's only a single streamer, subscribe to it regardless of what is in the URL
             autoSelectedStreamerId = messageStreamerList.ids[0];
-        } else if (this.config.isFlagEnabled(Flags.PreferSFU) && messageStreamerList.ids.includes("SFU")) {
+        } else if (
+            this.config.isFlagEnabled(Flags.PreferSFU) &&
+            messageStreamerList.ids.includes('SFU')
+        ) {
             // If the SFU toggle is on and there's an SFU connected, subscribe to it regardless of what is in the URL
-            autoSelectedStreamerId = "SFU";
-        } else if (urlParams.has(OptionParameters.StreamerId) && messageStreamerList.ids.includes(urlParams.get(OptionParameters.StreamerId))) {
+            autoSelectedStreamerId = 'SFU';
+        } else if (
+            urlParams.has(OptionParameters.StreamerId) &&
+            messageStreamerList.ids.includes(
+                urlParams.get(OptionParameters.StreamerId)
+            )
+        ) {
             // If there's a streamer ID in the URL and a streamer with this ID is connected, set it as the selected streamer
             autoSelectedStreamerId = urlParams.get(OptionParameters.StreamerId);
         }
         if (autoSelectedStreamerId !== null) {
-            this.config.setOptionSettingValue(OptionParameters.StreamerId, autoSelectedStreamerId);
+            this.config.setOptionSettingValue(
+                OptionParameters.StreamerId,
+                autoSelectedStreamerId
+            );
         }
-        this.pixelStreaming.events.dispatchEvent(new StreamerListMessageEvent({ messageStreamerList, autoSelectedStreamerId }));
+        this.pixelStreaming.events.dispatchEvent(
+            new StreamerListMessageEvent({
+                messageStreamerList,
+                autoSelectedStreamerId
+            })
+        );
     }
 
     /**
@@ -1701,7 +1762,9 @@ export class WebRtcPlayerController {
             Logger.GetStackTrace(),
             `Received quality controller message, will control quality: ${this.isQualityController}`
         );
-        this.pixelStreaming._onQualityControlOwnership(this.isQualityController);
+        this.pixelStreaming._onQualityControlOwnership(
+            this.isQualityController
+        );
     }
 
     /**
@@ -1747,8 +1810,17 @@ export class WebRtcPlayerController {
     }
 
     registerDataChannelEventEmitters(dataChannel: DataChannelController) {
-        dataChannel.onOpen = (label, event) => this.pixelStreaming.events.dispatchEvent(new DataChannelOpenEvent({ label , event }));
-        dataChannel.onClose = (label, event) => this.pixelStreaming.events.dispatchEvent(new DataChannelCloseEvent({ label , event }));
-        dataChannel.onError = (label, event) => this.pixelStreaming.events.dispatchEvent(new DataChannelErrorEvent({ label , event }));
+        dataChannel.onOpen = (label, event) =>
+            this.pixelStreaming.events.dispatchEvent(
+                new DataChannelOpenEvent({ label, event })
+            );
+        dataChannel.onClose = (label, event) =>
+            this.pixelStreaming.events.dispatchEvent(
+                new DataChannelCloseEvent({ label, event })
+            );
+        dataChannel.onError = (label, event) =>
+            this.pixelStreaming.events.dispatchEvent(
+                new DataChannelErrorEvent({ label, event })
+            );
     }
 }
