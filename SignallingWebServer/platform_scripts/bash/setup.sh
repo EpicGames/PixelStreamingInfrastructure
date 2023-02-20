@@ -98,13 +98,13 @@ function setup_frontend() {
 		# Using our bundled NodeJS, build the web frontend files
 		pushd ${BASH_LOCATION}/../../../Frontend/library > /dev/null
 		../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
-		../../SignallingWebServer/platform_scripts/bash/node/bin/npx webpack
+		../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-dev
 		popd
 
 		pushd ${BASH_LOCATION}/../../../Frontend/implementations/EpicGames > /dev/null
 		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
 		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm link ../../library
-		../../../SignallingWebServer/platform_scripts/bash/node/bin/npx webpack
+		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-dev
 		popd
 	else
 		echo 'Skipping building Frontend because files already exist. Please run with "--build" to force a rebuild'
