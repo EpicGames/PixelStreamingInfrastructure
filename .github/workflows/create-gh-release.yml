@@ -45,12 +45,12 @@ jobs:
       run: npm run build-all
 
     - name: Make output directory for archives
-      run: mkdir output
+      run: mkdir 'PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }} && cp -R ./* PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }}/
 
     - name: Archive Release tar.gz
       uses: thedoctor0/zip-release@0.7.1
       with:
-        directory: './output'
+        directory: '.'
         path: 'PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }}'
         type: 'tar'
         filename: '${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz'
@@ -59,7 +59,7 @@ jobs:
     - name: Archive Release tar.gz
       uses: thedoctor0/zip-release@0.7.1
       with:
-        directory: './output'
+        directory: '.'
         path: 'PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }}'
         type: 'zip'
         filename: '${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip'
@@ -69,5 +69,5 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         tag: "${{ github.ref_name }}-${{ steps.getversion.outputs.version }}"
-        artifacts: "output/${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip,output/${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz"
+        artifacts: "${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip,${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz"
         generateReleaseNotes: true
