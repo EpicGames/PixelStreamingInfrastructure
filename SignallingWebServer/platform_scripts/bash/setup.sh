@@ -102,6 +102,7 @@ function setup_frontend() {
 		popd
 		pushd ${BASH_LOCATION}/../../../Frontend/ui-library > /dev/null
 		../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
+		../../SignallingWebServer/platform_scripts/bash/node/bin/npm link ../library
 		../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-dev
 		popd
 

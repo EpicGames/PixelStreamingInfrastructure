@@ -57,6 +57,7 @@
   popd
   pushd %CD%\Frontend\ui-library
   call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
+  call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm link ../library
   call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm run build-dev
   popd
   echo End of build PS frontend lib step.
