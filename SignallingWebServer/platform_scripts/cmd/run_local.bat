@@ -8,7 +8,7 @@ pushd "%~dp0"
 title Cirrus
 
 @Rem Run setup to ensure we have node and cirrus installed.
-call setup.bat
+call setup.bat %*
 
 @Rem Move to cirrus directory.
 pushd ..\..
