@@ -6,8 +6,10 @@
     "types": "types/pixelstreamingfrontend-ui.d.ts",
     "scripts": {
         "compile": "tsc --build --clean && tsc",
-        "build": "npm link ../library && npx webpack --config webpack.prod.js",
-        "build-dev": "npm link ../library & npx webpack --config webpack.dev.js",
+        "build": "npx webpack --config webpack.prod.js",
+        "build-dev": "npx webpack --config webpack.dev.js",
+        "build-all": "cd ../library && npm run build && cd ../ui-library && npm link ../library && npx webpack --config webpack.prod.js",
+        "build-dev-all": "cd ../library && npm run build-dev && cd ../ui-library && npm link ../library & npx webpack --config webpack.dev.js",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "spellcheck": "cspell \"{README.md,.github/*.md,src/**/*.ts}\""
     },
