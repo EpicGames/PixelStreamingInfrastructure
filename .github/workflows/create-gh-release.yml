@@ -44,23 +44,23 @@ jobs:
       working-directory: ./Frontend/implementations/EpicGames
       run: npm run build-all
 
-    - name: Make output directory for archives
-      run: mkdir output
+    - name: Move all content into output directory for archiving
+      run: items=(*) && mkdir PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }} && mv ${items[*]} PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }}/
 
     - name: Archive Release tar.gz
       uses: thedoctor0/zip-release@0.7.1
       with:
-        directory: './output'
-        path: '../'
+        directory: '.'
+        path: 'PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }}'
         type: 'tar'
         filename: '${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz'
         exclusions: '.git .github output Frontend/Docs Frontend/library/dist Frontend/library/types Frontend/library/node_modules Frontend/implementations/EpicGames/node_modules'
 
-    - name: Archive Release tar.gz
+    - name: Archive Release .zip
       uses: thedoctor0/zip-release@0.7.1
       with:
-        directory: './output'
-        path: '../'
+        directory: '.'
+        path: 'PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }}'
         type: 'zip'
         filename: '${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip'
         exclusions: '*.git* /*node_modules/* .editorconfig /*types/* /*dist/* /*output/* /*Docs/*'
@@ -69,5 +69,5 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         tag: "${{ github.ref_name }}-${{ steps.getversion.outputs.version }}"
-        artifacts: "output/${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip,output/${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz"
+        artifacts: "${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip,${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz"
         generateReleaseNotes: true
