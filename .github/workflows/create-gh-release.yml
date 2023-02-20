@@ -51,7 +51,7 @@ jobs:
       uses: thedoctor0/zip-release@0.7.1
       with:
         directory: './output'
-        path: '../'
+        path: 'PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }}'
         type: 'tar'
         filename: '${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz'
         exclusions: '.git .github output Frontend/Docs Frontend/library/dist Frontend/library/types Frontend/library/node_modules Frontend/implementations/EpicGames/node_modules'
@@ -60,7 +60,7 @@ jobs:
       uses: thedoctor0/zip-release@0.7.1
       with:
         directory: './output'
-        path: '../'
+        path: 'PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }}'
         type: 'zip'
         filename: '${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.zip'
         exclusions: '*.git* /*node_modules/* .editorconfig /*types/* /*dist/* /*output/* /*Docs/*'
