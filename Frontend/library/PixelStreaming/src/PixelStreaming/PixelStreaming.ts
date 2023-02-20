@@ -544,6 +544,7 @@ export class PixelStreaming {
 
     /**
      * Request a connection latency test.
+     * NOTE: There are plans to refactor all request* functions. Expect changes if you use this!
      * @returns
      */
     public requestLatencyTest() {
@@ -556,6 +557,7 @@ export class PixelStreaming {
 
     /**
      * Request for the UE application to show FPS counter.
+     * NOTE: There are plans to refactor all request* functions. Expect changes if you use this!
      * @returns
      */
     public requestShowFps() {
@@ -568,6 +570,7 @@ export class PixelStreaming {
 
     /**
      * Request for a new IFrame from the UE application.
+     * NOTE: There are plans to refactor all request* functions. Expect changes if you use this!
      * @returns
      */
     public requestIframe() {
