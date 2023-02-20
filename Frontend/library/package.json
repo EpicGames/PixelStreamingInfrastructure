@@ -1,14 +1,13 @@
 {
     "name": "@epicgames-ps/lib-pixelstreamingfrontend-ue5.2",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Frontend library for Pixel Streaming",
     "main": "dist/lib-pixelstreamingfrontend.js",
     "types": "types/pixelstreamingfrontend.d.ts",
     "scripts": {
         "compile": "tsc --build --clean && tsc",
-        "build": "npm run build-webpack",
-        "build-webpack": "npx webpack --config webpack.prod.js",
-        "build-webpack-dev": "npx webpack --config webpack.dev.js",
+        "build": "npx webpack --config webpack.prod.js",
+        "build-dev": "npx webpack --config webpack.dev.js",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "spellcheck": "cspell \"{README.md,.github/*.md,src/**/*.ts}\""
     },
