@@ -44,8 +44,8 @@ jobs:
       working-directory: ./Frontend/implementations/EpicGames
       run: npm run build-all
 
-    - name: Copy all content into output directory for archiving
-      run: cp -R ./ PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }}/
+    - name: Move all content into output directory for archiving
+      run: items=(*) && mkdir PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }} && mv ${items[*]} PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }}/
 
     - name: Archive Release tar.gz
       uses: thedoctor0/zip-release@0.7.1
