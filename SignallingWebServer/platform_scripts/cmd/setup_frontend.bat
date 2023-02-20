@@ -51,13 +51,13 @@
   @Rem Do npm install in the Frontend\lib directory (note we use start because that loads PATH)
   echo ----------------------------
   echo Building frontend library...
-  pushd %CD%\Frontend\library\PixelStreaming
-  call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
-  call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm run build-dev
+  pushd %CD%\Frontend\library
+  call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
+  call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm run build-dev
   popd
-  pushd %CD%\Frontend\library\UserInterface
-  call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
-  call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm run build-dev
+  pushd %CD%\Frontend\ui-library
+  call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
+  call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm run build-dev
   popd
   echo End of build PS frontend lib step.
 
@@ -66,7 +66,7 @@
   echo Building Epic Games reference frontend...
   pushd %CD%\Frontend\implementations\EpicGames
   call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
-  call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm link ../../library/PixelStreaming ../../library/UserInterface
+  call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm link ../../library ../../ui-library
   call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm run build-dev
   popd
   echo End of build reference frontend step.

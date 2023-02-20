@@ -21,15 +21,15 @@ If part of the library is not exposed and you wish to extend it, please do so in
 
 ## Developing
 
-Changes to the library occur in the /library/PixelStreaming directory and require you to have NodeJS installed as part of your development environment.
+Changes to the library occur in the /library directory and require you to have NodeJS installed as part of your development environment.
 Once you have NodeJS installed, 
 
-- `cd library/PixelStreaming`
+- `cd library`
 - `npm install`
 - `npm run build`
 
-The default user interface is provided in /library/UserInterface directory. You can either use it or provide your own user interface. To build the default UI, run
-- `cd library/UserInterface`
+The default user interface is provided in /ui-library directory. You can either use it or provide your own user interface. To build the default UI, run
+- `cd ui-library`
 - `npm install`
 - `npm run build`
 

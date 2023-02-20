@@ -6,11 +6,10 @@
     "types": "types/pixelstreamingfrontend-ui.d.ts",
     "scripts": {
         "compile": "tsc --build --clean && tsc",
-        "build": "npx webpack --config webpack.prod.js",
-        "build-dev": "npx webpack --config webpack.dev.js",
+        "build": "npm link ../library && npx webpack --config webpack.prod.js",
+        "build-dev": "npm link ../library & npx webpack --config webpack.dev.js",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-        "spellcheck": "cspell \"{README.md,.github/*.md,src/**/*.ts}\"",
-        "postinstall": "npm link ../PixelStreaming"
+        "spellcheck": "cspell \"{README.md,.github/*.md,src/**/*.ts}\""
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^5.16.0",
