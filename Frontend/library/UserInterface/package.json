@@ -2,7 +2,7 @@
     "name": "@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2",
     "version": "0.0.1",
     "description": "Frontend library default UI for Pixel Streaming",
-    "main": "dist/lib-pixelstreamingfrontend-ui.min.js",
+    "main": "dist/lib-pixelstreamingfrontend-ui.js",
     "types": "types/pixelstreamingfrontend-ui.d.ts",
     "scripts": {
         "compile": "tsc --build --clean && tsc",
@@ -25,7 +25,7 @@
         "webpack-cli": "^5.0.1"
     },
     "dependencies": {
-        "@epicgames-ps/lib-pixelstreamingfrontend-dev": "0.0.1",
+        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.2": "0.0.1",
         "jss": "^10.9.2",
         "jss-plugin-camel-case": "^10.9.2",
         "jss-plugin-global": "^10.9.2"

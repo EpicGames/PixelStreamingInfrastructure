@@ -10,6 +10,6 @@ module.exports = merge(common, {
       static: './dist',
     },
     output: {
-        filename: 'lib-pixelstreamingfrontend.js',
+        filename: 'lib-pixelstreamingfrontend-ui.js',
     }
 });

@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { SettingBase } from "@epicgames-ps/lib-pixelstreamingfrontend-dev";
+import { SettingBase } from "@epicgames-ps/lib-pixelstreamingfrontend-ue5.2";
 
 /**
  * Base class for a setting that has a text label, an arbitrary setting value it stores, an a HTML element that represents this setting.

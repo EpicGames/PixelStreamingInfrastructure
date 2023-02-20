@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import type { NumericParametersIds, SettingNumber } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
-import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
+import type { NumericParametersIds, SettingNumber } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { SettingUIBase } from './SettingUIBase';
 
 /**

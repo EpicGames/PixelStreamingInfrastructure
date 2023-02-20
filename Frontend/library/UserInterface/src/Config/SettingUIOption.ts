@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import type { OptionParametersIds, SettingOption } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
+import type { OptionParametersIds, SettingOption } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { SettingUIBase } from './SettingUIBase';
 
 export class SettingUIOption<CustomIds extends string = OptionParametersIds> extends SettingUIBase {

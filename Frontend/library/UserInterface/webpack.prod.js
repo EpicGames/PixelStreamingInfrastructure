@@ -11,6 +11,6 @@ module.exports = merge(common, {
     },
     stats: 'errors-only',
     output: {
-      filename: 'lib-pixelstreamingfrontend.js',
+      filename: 'lib-pixelstreamingfrontend-ui.js',
     },
 });

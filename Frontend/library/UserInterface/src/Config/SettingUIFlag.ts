@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import type { FlagsIds, SettingFlag } from '@epicgames-ps/lib-pixelstreamingfrontend-dev';
+import type { FlagsIds, SettingFlag } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { SettingUIBase } from './SettingUIBase';
 
 export class SettingUIFlag<CustomIds extends string = FlagsIds> extends SettingUIBase {
