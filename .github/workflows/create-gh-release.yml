@@ -45,7 +45,7 @@ jobs:
       run: npm run build-all
 
     - name: Make output directory for archives
-      run: mkdir 'PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }} && cp -R ./* PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }}/
+      run: mkdir PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }} && cp -R ./* PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }}/
 
     - name: Archive Release tar.gz
       uses: thedoctor0/zip-release@0.7.1
