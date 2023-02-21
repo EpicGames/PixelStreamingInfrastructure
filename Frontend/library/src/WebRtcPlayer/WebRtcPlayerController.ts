@@ -1161,6 +1161,17 @@ export class WebRtcPlayerController {
             this.pixelStreaming._onWebRtcConnecting();
         this.peerConnectionController.showTextOverlaySetupFailure = () =>
             this.pixelStreaming._onWebRtcFailed();
+        let webRtcConnectedSent = false;
+        this.peerConnectionController.onIceConnectionStateChange = () => {
+            // Browsers emit "connected" when getting first connection and "completed" when finishing
+            // candidate checking. However, sometimes browsers can skip "connected" and only emit "completed".
+            // Therefore need to check both cases and emit onWebRtcConnected only once on the first hit.
+            if (!webRtcConnectedSent && 
+                ["connected", "completed"].includes(this.peerConnectionController.peerConnection.iceConnectionState)) {
+                this.pixelStreaming._onWebRtcConnected();
+                webRtcConnectedSent = true;
+            }
+        };
 
         /* RTC Peer Connection on Track event -> handle on track */
         this.peerConnectionController.onTrack = (trackEvent: RTCTrackEvent) =>

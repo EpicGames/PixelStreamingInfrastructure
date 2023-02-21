@@ -282,6 +282,7 @@ export class PeerConnectionController {
             'ice connection state change: ' + state,
             6
         );
+        this.onIceConnectionStateChange(state);
     }
 
     /**
@@ -326,6 +327,15 @@ export class PeerConnectionController {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onTrack(trackEvent: RTCTrackEvent) {
+        // Default Functionality: Do Nothing
+    }
+
+    /**
+     * An override method for onIceConnectionStateChange for use outside of the PeerConnectionController
+     * @param event - The webRtc iceconnectionstatechange event
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onIceConnectionStateChange(event: Event) {
         // Default Functionality: Do Nothing
     }
 
