@@ -410,7 +410,7 @@ export class PixelStreamingApplicationStyle {
             '.form-group': {
                 paddingTop: '4px',
                 display: 'grid',
-                gridTemplateColumns: '50% 50%',
+                gridTemplateColumns: '85% 15%',
                 rowGap: '4px',
                 paddingRight: '10px',
                 paddingLeft: '10px'
