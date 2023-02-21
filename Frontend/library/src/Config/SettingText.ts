@@ -15,9 +15,11 @@ export class SettingText<
         label: string,
         description: string,
         defaultTextValue: string,
-        useUrlParams: boolean
+        useUrlParams: boolean,
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		defaultOnChangeListener: (changedValue: unknown, setting: SettingBase) => void = () => { /* Do nothing, to be overridden. */ }
     ) {
-        super(id, label, description, defaultTextValue);
+        super(id, label, description, defaultTextValue, defaultOnChangeListener);
 
         const urlParams = new URLSearchParams(window.location.search);
         if (!useUrlParams || !urlParams.has(this.id)) {

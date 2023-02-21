@@ -6,6 +6,7 @@ import { SettingNumber } from './SettingNumber';
 import { SettingText } from './SettingText';
 import { SettingOption } from './SettingOption';
 import { EventEmitter, SettingsChangedEvent } from '../Util/EventEmitter';
+import { SettingBase } from './SettingBase';
 
 /**
  * A collection of flags that can be toggled and are core to all Pixel Streaming experiences.
@@ -378,7 +379,10 @@ export class Config {
                 'Control Scheme: Locked Mouse',
                 'Either locked mouse, where the pointer is consumed by the video and locked to it, or hovering mouse, where the mouse is not consumed.',
                 false,
-                useUrlParams
+                useUrlParams,
+				(isHoveringMouse: boolean, setting: SettingBase) => {
+                    setting.label = `Control Scheme: ${isHoveringMouse ? 'Hovering' : 'Locked'} Mouse`;
+                }
             )
         );
 

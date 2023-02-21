@@ -15,7 +15,8 @@ import {
     SettingNumber,
     SettingText,
     SettingOption,
-    Logger
+    Logger,
+    SettingBase
 } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { SettingUIFlag } from './SettingUIFlag';
 import { SettingUINumber } from './SettingUINumber';
@@ -70,8 +71,11 @@ export class ConfigUI {
                 LightMode,
                 'Color Scheme: Dark Mode',
                 'The Pixel Streaming player will be instructed to use a lighter color scheme',
-                false, // (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches would use system preference
-                useUrlParams
+                (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches), // Use system preference
+                useUrlParams,
+                (isLightMode: boolean, setting: SettingBase) => {
+                    setting.label = `Color Scheme: ${isLightMode ? 'Light' : 'Dark'} Mode`;
+                }
             )
         );
     }
@@ -162,7 +166,10 @@ export class ConfigUI {
             psSettingsSection,
             this.flagsUi.get(Flags.BrowserSendOffer)
         );
-        this.addSettingFlag(psSettingsSection, this.flagsUi.get(Flags.UseMic));
+        this.addSettingFlag(
+            psSettingsSection, 
+            this.flagsUi.get(Flags.UseMic)
+        );
         this.addSettingFlag(
             psSettingsSection,
             this.flagsUi.get(Flags.StartVideoMuted)

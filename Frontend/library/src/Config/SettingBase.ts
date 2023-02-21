@@ -8,18 +8,19 @@ export class SettingBase {
     description: string;
     _label: string;
     _value: unknown;
-    onChange: (changedValue: unknown) => void;
-    onChangeEmit: (changedValue: any) => void;
+    onChange: (changedValue: unknown, setting: SettingBase) => void;
+    onChangeEmit: (changedValue: unknown) => void;
 
     constructor(
         id: string,
         label: string,
         description: string,
-        defaultSettingValue: unknown
+        defaultSettingValue: unknown,
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		defaultOnChangeListener: (changedValue: unknown, setting: SettingBase) => void = () => { /* Do nothing, to be overridden. */ }
     ) {
-        this.onChange = () => {
-            /* Do nothing, to be overridden. */
-        };
+        this.onChange = defaultOnChangeListener;
+
         this.onChangeEmit = () => {
             /* Do nothing, to be overridden. */
         };
@@ -58,7 +59,7 @@ export class SettingBase {
      */
     public set value(inValue: unknown) {
         this._value = inValue;
-        this.onChange(this._value);
+        this.onChange(this._value, this);
         this.onChangeEmit(this._value);
     }
 }

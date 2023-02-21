@@ -23,9 +23,11 @@ export class SettingNumber<
         min: number,
         max: number,
         defaultNumber: number,
-        useUrlParams: boolean
+        useUrlParams: boolean,
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		defaultOnChangeListener: (changedValue: unknown, setting: SettingBase) => void = () => { /* Do nothing, to be overridden. */ }
     ) {
-        super(id, label, description, defaultNumber);
+        super(id, label, description, defaultNumber, defaultOnChangeListener);
 
         this._min = min;
         this._max = max;
