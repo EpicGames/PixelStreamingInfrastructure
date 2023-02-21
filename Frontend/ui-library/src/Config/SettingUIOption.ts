@@ -34,6 +34,7 @@ export class SettingUIOption<
         if (!this._selector) {
             this._selector = document.createElement('select');
             this._selector.classList.add('form-control');
+            this._selector.classList.add('settings-option');
         }
         return this._selector;
     }
@@ -71,6 +72,7 @@ export class SettingUIOption<
             this._rootElement = document.createElement('div');
             this._rootElement.id = this.setting.id;
             this._rootElement.classList.add('setting');
+            this._rootElement.classList.add('form-group');
 
             // create div element to contain our setting's text
             this._rootElement.appendChild(this.settingsTextElem);
