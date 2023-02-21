@@ -4,7 +4,7 @@ import type { NumericParametersIds } from './Config';
 import { SettingBase } from './SettingBase';
 
 /**
- * A number spinner with a text label beside it.
+ * A number setting object with a text label. Min and max limit the range of allowed values.
  */
 export class SettingNumber<
     CustomIds extends string = NumericParametersIds
@@ -64,14 +64,14 @@ export class SettingNumber<
     }
 
     /**
-     * Set the number in the spinner (will be clamped within range).
+     * Set the number value (will be clamped within range).
      */
     public set number(newNumber: number) {
         this.value = this.clamp(newNumber);
     }
 
     /**
-     * @returns The number stored in the spinner.
+     * @returns The number stored.
      */
     public get number(): number {
         return this.value as number;
@@ -103,7 +103,7 @@ export class SettingNumber<
     }
 
     /**
-     * Add a change listener to the spinner element.
+     * Add a change listener to the number object.
      */
     public addOnChangedListener(onChangedFunc: (newNumber: number) => void) {
         this.onChange = onChangedFunc;

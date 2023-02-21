@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 /**
- * Base class for a setting that has a text label, an arbitrary setting value it stores, an a HTML element that represents this setting.
+ * Base class for a setting that has a text label and an arbitrary setting value it stores.
  */
 export class SettingBase {
     id: string;

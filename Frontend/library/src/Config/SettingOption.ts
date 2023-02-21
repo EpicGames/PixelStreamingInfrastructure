@@ -3,6 +3,9 @@
 import type { OptionParametersIds } from './Config';
 import { SettingBase } from './SettingBase';
 
+/**
+ * An Option setting object with a text label. Allows you to specify an array of options and select one of them.
+ */
 export class SettingOption<
     CustomIds extends string = OptionParametersIds
 > extends SettingBase {
@@ -70,19 +73,33 @@ export class SettingOption<
         this.onChange = onChangedFunc;
     }
 
+    /**
+     * @returns All available options as an array
+     */
     public get options(): Array<string> {
         return this._options;
     }
 
+    /**
+     * Set options
+     * @param values Array of options
+     */
     public set options(values: Array<string>) {
         this._options = values;
         this.onChangeEmit(this.selected);
     }
 
+    /**
+     * @returns Selected option as a string
+     */
     public get selected(): string {
         return this.value as string;
     }
 
+    /**
+     * Set selected option if it matches one of the available options
+     * @param value Selected option
+     */
     public set selected(value: string) {
         // A user may not specify the full possible value so we instead use the closest match.
         // eg ?xxx=H264 would select 'H264 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42001f'

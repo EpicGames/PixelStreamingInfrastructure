@@ -10,8 +10,7 @@ import { SettingBase } from './SettingBase';
 
 /**
  * A collection of flags that can be toggled and are core to all Pixel Streaming experiences.
- * These are used in the `Config.Flags` map. Note, that map can take any string but
- * these flags are provided for convenience to avoid hardcoded strings across the library.
+ * These are used in the `Config.Flags` map.
  */
 export class Flags {
     static AutoConnect = 'AutoConnect' as const;
@@ -125,7 +124,9 @@ export type AllSettings = {
 };
 
 export interface ConfigParams {
+    /** Initial Pixel Streaming settings */
     initialSettings?: Partial<AllSettings>;
+    /** If useUrlParams is set true, will read initial values from URL parameters and persist changed settings into URL */
     useUrlParams?: boolean;
 }
 export class Config {
@@ -572,6 +573,11 @@ export class Config {
         }
     }
 
+    /**
+     * Get the option which has the given id.
+     * @param id The id of the option.
+     * @returns The SettingOption object matching id
+     */
     getSettingOption(id: OptionParametersIds): SettingOption {
         return this.optionParameters.get(id);
     }
@@ -689,6 +695,7 @@ export class Config {
 
     /**
      * Get all settings
+     * @returns All setting values as an object with setting ids as keys
      */
     getSettings(): Partial<AllSettings> {
         const settings: Partial<AllSettings> = {};
@@ -709,7 +716,7 @@ export class Config {
 
     /**
      * Get all Flag settings as an array.
-     * @returns
+     * @returns All SettingFlag objects
      */
     getFlags(): Array<SettingFlag> {
         return Array.from(this.flags.values());
@@ -717,7 +724,7 @@ export class Config {
 
     /**
      * Get all Text settings as an array.
-     * @returns
+     * @returns All SettingText objects
      */
     getTextSettings(): Array<SettingText> {
         return Array.from(this.textParameters.values());
@@ -725,7 +732,7 @@ export class Config {
 
     /**
      * Get all Number settings as an array.
-     * @returns
+     * @returns All SettingNumber objects
      */
     getNumericSettings(): Array<SettingNumber> {
         return Array.from(this.numericParameters.values());
@@ -733,7 +740,7 @@ export class Config {
 
     /**
      * Get all Option settings as an array.
-     * @returns
+     * @returns All SettingOption objects
      */
     getOptionSettings(): Array<SettingOption> {
         return Array.from(this.optionParameters.values());

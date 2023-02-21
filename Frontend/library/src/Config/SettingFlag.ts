@@ -3,6 +3,9 @@
 import type { FlagsIds } from './Config';
 import { SettingBase } from './SettingBase';
 
+/**
+ * A boolean flag setting object with a text label.
+ */
 export class SettingFlag<
     CustomIds extends string = FlagsIds
 > extends SettingBase {

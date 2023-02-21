@@ -3,6 +3,9 @@
 import type { TextParametersIds } from './Config';
 import { SettingBase } from './SettingBase';
 
+/**
+ * A text setting object with a text label.
+ */
 export class SettingText<
     CustomIds extends string = TextParametersIds
 > extends SettingBase {
