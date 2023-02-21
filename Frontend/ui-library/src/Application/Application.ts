@@ -6,7 +6,8 @@ import {
     Logger,
     AggregatedStats,
     LatencyTestResults,
-    InitialSettings
+    InitialSettings,
+    MessageStreamerList
 } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { OverlayBase } from '../Overlay/BaseOverlay';
 import { ActionOverlay } from '../Overlay/ActionOverlay';
@@ -272,8 +273,8 @@ export class Application {
         );
         this.pixelStreaming.addEventListener(
             'streamerListMessage',
-            ({ data: { autoSelectedStreamerId } }) =>
-                this.handleStreamerListMessage(autoSelectedStreamerId)
+            ({ data: { messageStreamerList, autoSelectedStreamerId } }) =>
+                this.handleStreamerListMessage(messageStreamerList, autoSelectedStreamerId)
         );
         this.pixelStreaming.addEventListener(
             'settingsChanged',
@@ -573,11 +574,17 @@ export class Application {
         this.statsPanel.latencyTest.handleTestResult(latencyTimings);
     }
 
-    handleStreamerListMessage(autoSelectedStreamerId: string | null) {
+    handleStreamerListMessage(messageStreamingList: MessageStreamerList, autoSelectedStreamerId: string | null) {
         if (autoSelectedStreamerId === null) {
-            this.showTextOverlay(
-                'Multiple streamers detected. Use the dropdown in the settings menu to select the streamer.'
-            );
+            if(messageStreamingList.ids.length === 0) {
+                this.showDisconnectOverlay(
+                    'No streamers connected. <div class="clickableState">Click To Restart</div>'
+                );
+            } else {
+                this.showTextOverlay(
+                    'Multiple streamers detected. Use the dropdown in the settings menu to select the streamer'
+                );
+            }
         }
     }
 
