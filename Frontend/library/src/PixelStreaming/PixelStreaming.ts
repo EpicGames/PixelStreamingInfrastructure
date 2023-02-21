@@ -32,15 +32,26 @@ import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
 
 export interface PixelStreamingOverrides {
+    /** The DOM elment where Pixel Streaming video and user input event handlers are attached to.
+     * You can give an existing DOM element here. If not given, the library will create a new div element
+     * that is not attached anywhere. In this case you can later get access to this new element and
+     * attach it to your web page. */
     videoElementParent?: HTMLElement;
 }
 
 /**
- * Provides common base functionality for applications that extend this application
+ * The key class for the browser side of a Pixel Streaming application, it includes:
+ * WebRTC handling, XR support, input handling, and emitters for lifetime and state change events.
+ * Users are encouraged to use this class as is, through composition, or extend it. In any case, 
+ * this will likely be the core of your Pixel Streaming experience in terms of functionality.
  */
 export class PixelStreaming {
     private webRtcController: WebRtcPlayerController;
     private webXrController: WebXRController;
+    /**
+     * Configuration object. You can read or modify config through this object. Whenever
+     * the configuration is changed, the library will emit a `settingsChanged` event.
+     */
     public config: Config;
 
     private _videoElementParent: HTMLElement;
@@ -323,7 +334,7 @@ export class PixelStreaming {
         );
         this.webRtcController.resizePlayerStyle();
 
-        // set up the connect overlays action
+        // connect if auto connect flag is enabled
         this.checkForAutoConnect();
     }
 
@@ -358,7 +369,7 @@ export class PixelStreaming {
     }
 
     /**
-     * Auto connect
+     * Auto connect if AutoConnect flag is enabled
      */
     private checkForAutoConnect() {
         // set up if the auto play will be used or regular click to start
@@ -392,8 +403,9 @@ export class PixelStreaming {
     }
 
     /**
-     * Event fired when the video is disconnected - displays the error overlay and resets the buttons stream tools upon disconnect
-     * @param eventString - the event text that will be shown in the overlay
+     * Event fired when the video is disconnected - emits given eventString or an override
+     * message from webRtcController if one has been set
+     * @param eventString - the event text that will be emitted
      */
     _onDisconnect(eventString: string) {
         // if we have overridden the default disconnection message, assign the new value here
