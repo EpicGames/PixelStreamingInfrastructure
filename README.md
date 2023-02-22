@@ -18,25 +18,36 @@ Reference implementations for the various pieces needed to support a PixelStream
 - Matchmaker
 - Frontend (the javascript frontend library for the WebRTC player and input)
 
-## Container images
+
+## Releases
+We release a number of different things under this repository, currently they are:
+
+- container images for the signalling server
+- npm packages for the frontend
+- source releases of this repo with the reference frontend built as a minified js bundle
+
+### Container images
 
 The following container images are built from this repository:
 
 - [ghcr.io/epicgames/pixel-streaming-signalling-server](https://github.com/orgs/EpicGames/packages/container/package/pixel-streaming-signalling-server) (since Unreal Engine 5.1)
 
-## Releases
+### NPM Packages
 
-### Frontend library (Unofficial NPM packages)
+| Branch | Frontend library | Frontend reference ui |
+|--------|------------------|-----------------------|
+| UE5.2  |[lib-pixelstreamingfrontend-ue5.2](https://www.npmjs.com/package/@epicgames-ps/lib-pixelstreamingfrontend-ue5.2)|[lib-pixelstreamingfrontend-ui-ue5.2](https://www.npmjs.com/package/@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2)|
 
-- UE 5.2
+### NPM getting started
 
-`npm i @epicgames-ps/lib-pixelstreamingfrontend-ue5.2`
+```bash
+#frontend (core lib)
+npm i @epicgames-ps/lib-pixelstreamingfrontend-ue5.2
+#frontend ui
+npm i @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2
+```
 
-- Dev
-
-`npm i @epicgames-ps/lib-pixelstreamingfrontend-dev`
-
-### Full release + built reference implementation
+### Tagged source releases + built typescript frontend
 
 [Github releases](https://github.com/EpicGames/PixelStreamingInfrastructure/releases)
 
