@@ -27,5 +27,5 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./SignallingWebServer
-          tags: 'ghcr.io/epicgames/pixel-streaming-signalling-server:dev'
+          tags: 'ghcr.io/epicgames/pixel-streaming-signalling-server:5.2'
           push: true
