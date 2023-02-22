@@ -33,6 +33,7 @@ The following container images are built from this repository:
 - [ghcr.io/epicgames/pixel-streaming-signalling-server](https://github.com/orgs/EpicGames/packages/container/package/pixel-streaming-signalling-server) (since Unreal Engine 5.1)
 
 ### NPM Packages
+The following are `unofficial` NPM packages (official ones coming soon):
 
 | Branch | Frontend library | Frontend reference ui |
 |--------|------------------|-----------------------|
