@@ -461,7 +461,7 @@ export class Config {
                 'Min Bitrate (kbps)',
                 'The minimum bitrate that WebRTC should use.',
                 0 /*min*/,
-                100000 /*max*/,
+                500000 /*max*/,
                 0 /*value*/,
                 useUrlParams
             )
@@ -474,7 +474,7 @@ export class Config {
                 'Max Bitrate (kbps)',
                 'The maximum bitrate that WebRTC should use.',
                 0 /*min*/,
-                100000 /*max*/,
+                500000 /*max*/,
                 0 /*value*/,
                 useUrlParams
             )

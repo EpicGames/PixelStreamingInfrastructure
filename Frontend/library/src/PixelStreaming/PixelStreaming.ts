@@ -216,17 +216,7 @@ export class PixelStreaming {
                     '--------  Sending web rtc settings  --------',
                     7
                 );
-                const webRtcSettings: WebRTCSettings = {
-                    FPS: this.config.getNumericSettingValue(
-                        NumericParameters.WebRTCFPS
-                    ),
-                    MinBitrate: newValue * 1000,
-                    MaxBitrate:
-                        this.config.getNumericSettingValue(
-                            NumericParameters.WebRTCMaxBitrate
-                        ) * 1000
-                };
-                this.webRtcController.sendWebRtcSettings(webRtcSettings);
+                this.webRtcController.sendWebRTCMinBitrate(newValue * 1000 /* kbps to bps */);
                 Logger.Log(
                     Logger.GetStackTrace(),
                     '-------------------------------------------',
@@ -243,17 +233,7 @@ export class PixelStreaming {
                     '--------  Sending web rtc settings  --------',
                     7
                 );
-                const webRtcSettings: WebRTCSettings = {
-                    FPS: this.config.getNumericSettingValue(
-                        NumericParameters.WebRTCFPS
-                    ),
-                    MinBitrate:
-                        this.config.getNumericSettingValue(
-                            NumericParameters.WebRTCMinBitrate
-                        ) * 1000,
-                    MaxBitrate: newValue * 1000
-                };
-                this.webRtcController.sendWebRtcSettings(webRtcSettings);
+                this.webRtcController.sendWebRTCMaxBitrate(newValue * 1000 /* kbps to bps */);
                 Logger.Log(
                     Logger.GetStackTrace(),
                     '-------------------------------------------',
@@ -270,18 +250,7 @@ export class PixelStreaming {
                     '--------  Sending web rtc settings  --------',
                     7
                 );
-                const webRtcSettings: WebRTCSettings = {
-                    FPS: newValue,
-                    MinBitrate:
-                        this.config.getNumericSettingValue(
-                            NumericParameters.WebRTCMinBitrate
-                        ) * 1000,
-                    MaxBitrate:
-                        this.config.getNumericSettingValue(
-                            NumericParameters.WebRTCMaxBitrate
-                        ) * 1000
-                };
-                this.webRtcController.sendWebRtcSettings(webRtcSettings);
+                this.webRtcController.sendWebRTCFps(newValue);
                 Logger.Log(
                     Logger.GetStackTrace(),
                     '-------------------------------------------',
@@ -531,11 +500,11 @@ export class PixelStreaming {
         if (settings.WebRTCSettings) {
             this.config.setNumericSetting(
                 NumericParameters.WebRTCMinBitrate,
-                settings.WebRTCSettings.MinBitrate
+                settings.WebRTCSettings.MinBitrate / 1000 /* bps to kbps */
             );
             this.config.setNumericSetting(
-                NumericParameters.WebRTCMinBitrate,
-                settings.WebRTCSettings.MaxBitrate
+                NumericParameters.WebRTCMaxBitrate,
+                settings.WebRTCSettings.MaxBitrate / 1000 /* bps to kbps */
             );
             this.config.setNumericSetting(
                 NumericParameters.WebRTCFPS,

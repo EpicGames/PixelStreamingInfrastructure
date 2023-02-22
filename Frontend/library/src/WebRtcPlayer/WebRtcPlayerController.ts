@@ -1572,36 +1572,46 @@ export class WebRtcPlayerController {
     }
 
     /**
-     * Send the WebRTC Settings to the UE Instance as a UE UI Descriptor.
-     * @param webRTC - Web RTC Settings
+     * Send the { WebRTC.MinBitrate: SomeNumber }} command to UE to set 
+     * the minimum bitrate that we allow WebRTC to use 
+     * (note setting this too high in poor networks can be problematic).
+     * @param minBitrate - The minimum bitrate we would like WebRTC to not fall below.
      */
-    sendWebRtcSettings(webRTC: WebRTCSettings) {
-        Logger.Log(
-            Logger.GetStackTrace(),
-            '----   WebRTC Settings    ----\n' +
-                JSON.stringify(webRTC, undefined, 4) +
-                '\n-------------------------------',
-            6
-        );
+    sendWebRTCMinBitrate(minBitrate: number) {
+        Logger.Log(Logger.GetStackTrace(), `WebRTC Min Bitrate=${minBitrate}`, 6);
+        if (minBitrate != null) {
+            this.sendDescriptorController.emitCommand({
+                'WebRTC.MinBitrate': minBitrate
+            });
+        }
+    }
 
-        // 4.27 and 5 compatibility
-        if (webRTC.FPS != null) {
+    /**
+     * Send the { WebRTC.MaxBitrate: SomeNumber }} command to UE to set 
+     * the minimum bitrate that we allow WebRTC to use 
+     * (note setting this too low could result in blocky video).
+     * @param minBitrate - The minimum bitrate we would like WebRTC to not fall below.
+     */
+     sendWebRTCMaxBitrate(maxBitrate: number) {
+        Logger.Log(Logger.GetStackTrace(), `WebRTC Max Bitrate=${maxBitrate}`, 6);
+        if (maxBitrate != null) {
             this.sendDescriptorController.emitCommand({
-                'WebRTC.Fps': webRTC.FPS
-            });
-            this.sendDescriptorController.emitCommand({
-                'WebRTC.MaxFps': webRTC.FPS
+                'WebRTC.MaxBitrate': maxBitrate
             });
         }
-        if (webRTC.MinBitrate != null) {
-            this.sendDescriptorController.emitCommand({
-                'PixelStreaming.WebRTC.MinBitrate': webRTC.MinBitrate
-            });
-        }
-        if (webRTC.MaxBitrate != null) {
-            this.sendDescriptorController.emitCommand({
-                'PixelStreaming.WebRTC.MaxBitrate ': webRTC.MaxBitrate
-            });
+    }
+
+    /**
+     * Send the { WebRTC.Fps: SomeNumber }} UE 5.0+
+     * and { WebRTC.MaxFps } UE 4.27 command to set 
+     * the maximum fps we would like WebRTC to stream at. 
+     * @param fps - The maximum stream fps.
+     */
+     sendWebRTCFps(fps: number) {
+        Logger.Log(Logger.GetStackTrace(), `WebRTC FPS=${fps}`, 6);
+        if (fps != null) {
+            this.sendDescriptorController.emitCommand({'WebRTC.Fps': fps});
+            this.sendDescriptorController.emitCommand({'WebRTC.MaxFps': fps}); /* TODO: Remove when UE 4.27 unsupported. */
         }
     }
 
