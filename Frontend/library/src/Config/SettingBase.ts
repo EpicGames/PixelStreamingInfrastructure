@@ -1,23 +1,27 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 /**
- * Base class for a setting that has a text label, an arbitrary setting value it stores, an a HTML element that represents this setting.
+ * Base class for a setting that has a text label and an arbitrary setting value it stores.
  */
 export class SettingBase {
     id: string;
     description: string;
     _label: string;
     _value: unknown;
-    _rootElement: HTMLElement;
-    onChange: (changedValue: unknown) => void;
+    onChange: (changedValue: unknown, setting: SettingBase) => void;
+    onChangeEmit: (changedValue: unknown) => void;
 
     constructor(
         id: string,
         label: string,
         description: string,
-        defaultSettingValue: unknown
+        defaultSettingValue: unknown,
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		defaultOnChangeListener: (changedValue: unknown, setting: SettingBase) => void = () => { /* Do nothing, to be overridden. */ }
     ) {
-        this.onChange = () => {
+        this.onChange = defaultOnChangeListener;
+
+        this.onChangeEmit = () => {
             /* Do nothing, to be overridden. */
         };
         this.id = id;
@@ -32,6 +36,7 @@ export class SettingBase {
      */
     public set label(inLabel: string) {
         this._label = inLabel;
+        this.onChangeEmit(this._value);
     }
 
     /**
@@ -54,16 +59,7 @@ export class SettingBase {
      */
     public set value(inValue: unknown) {
         this._value = inValue;
-        this.onChange(this._value);
-    }
-
-    /**
-     * @returns Return or creates a HTML element that represents this setting in the DOM.
-     */
-    public get rootElement(): HTMLElement {
-        if (!this._rootElement) {
-            this._rootElement = document.createElement('div');
-        }
-        return this._rootElement;
+        this.onChange(this._value, this);
+        this.onChangeEmit(this._value);
     }
 }

@@ -10,6 +10,7 @@ import { DataChannelStats } from './DataChannelStats';
 import { CandidateStat } from './CandidateStat';
 import { CandidatePairStats } from './CandidatePairStats';
 import { OutBoundRTPStats, OutBoundVideoStats } from './OutBoundRTPStats';
+import { SessionStats } from './SessionStats';
 import { StreamStats } from './StreamStats';
 import { CodecStats } from './CodecStats';
 import { Logger } from '../Logger/Logger';
@@ -29,6 +30,7 @@ export class AggregatedStats {
     localCandidates: Array<CandidateStat>;
     remoteCandidates: Array<CandidateStat>;
     outBoundVideoStats: OutBoundVideoStats;
+    sessionStats: SessionStats;
     streamStats: StreamStats;
     codecs: Map<string, string>;
 
@@ -38,6 +40,7 @@ export class AggregatedStats {
         this.candidatePair = new CandidatePairStats();
         this.DataChannelStats = new DataChannelStats();
         this.outBoundVideoStats = new OutBoundVideoStats();
+        this.sessionStats = new SessionStats();
         this.streamStats = new StreamStats();
         this.codecs = new Map<string, string>();
     }
@@ -272,6 +275,28 @@ export class AggregatedStats {
             stat.sdpFmtpLine ? ` ${stat.sdpFmtpLine}` : ''
         }`;
         this.codecs.set(codecId, codecType);
+    }
+
+    handleSessionStatistics(
+        videoStartTime: number,
+        inputController: boolean | null,
+        videoEncoderAvgQP: number
+    ) {
+        const deltaTime = Date.now() - videoStartTime;
+        this.sessionStats.runTime = new Date(deltaTime)
+            .toISOString()
+            .substr(11, 8)
+            .toString();
+
+        const controlsStreamInput =
+            inputController === null
+                ? 'Not sent yet'
+                : inputController
+                ? 'true'
+                : 'false';
+        this.sessionStats.controlsStreamInput = controlsStreamInput;
+
+        this.sessionStats.videoEncoderAvgQP = videoEncoderAvgQP;
     }
 
     /**

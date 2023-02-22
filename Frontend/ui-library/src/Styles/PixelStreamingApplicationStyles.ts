@@ -267,6 +267,11 @@ export class PixelStreamingApplicationStyle {
                 verticalAlign: 'middle',
                 fontWeight: 'normal'
             },
+            '.settings-option': {
+                width: '100%',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+            },
             '#connectOverlay, #playOverlay, #infoOverlay, #errorOverlay, #afkOverlay, #disconnectOverlay':
                 {
                     zIndex: '30',
@@ -410,7 +415,7 @@ export class PixelStreamingApplicationStyle {
             '.form-group': {
                 paddingTop: '4px',
                 display: 'grid',
-                gridTemplateColumns: '50% 50%',
+                gridTemplateColumns: '80% 20%',
                 rowGap: '4px',
                 paddingRight: '10px',
                 paddingLeft: '10px'

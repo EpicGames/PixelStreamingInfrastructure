@@ -9,8 +9,8 @@
     "watch": "npx webpack --watch",
     "serve": "webpack serve --config webpack.dev.js",
     "serve-prod": "webpack serve --config webpack.prod.js",
-    "build-all": "cd ../../library && npm run build && cd ../implementations/EpicGames && npm link ../../library && npm run build",
-    "build-all-dev": "cd ../../library && npm run build-dev && cd ../implementations/EpicGames && npm link ../../library && npm run build-dev"
+    "build-all": "cd ../../library && npm run build && cd ../ui-library && npm run build-all && cd ../implementations/EpicGames && npm link ../../library ../../ui-library && npm run build",
+    "build-dev-all": "cd ../../library && npm run build-dev && cd ../ui-library && npm run build-dev-all && cd ../implementations/EpicGames && npm link ../../library ../../ui-library && npm run build-dev"
   },
   "devDependencies": {
     "webpack-cli": "^5.0.1",

@@ -36,6 +36,14 @@ jobs:
       working-directory: ./Frontend/library
       run: npm run build
 
+    - name: Install ui-library deps
+      working-directory: ./Frontend/ui-library
+      run: npm ci
+
+    - name: Build frontend ui-library
+      working-directory: ./Frontend/ui-library
+      run: npm run build-all
+
     - name: Install implementations/EpicGames deps
       working-directory: ./Frontend/implementations/EpicGames
       run: npm ci
@@ -54,7 +62,7 @@ jobs:
         path: 'PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }}'
         type: 'tar'
         filename: '${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz'
-        exclusions: '.git .github output Frontend/Docs Frontend/library/dist Frontend/library/types Frontend/library/node_modules Frontend/implementations/EpicGames/node_modules'
+        exclusions: '.git .github output Frontend/Docs Frontend/library/dist Frontend/library/types Frontend/library/node_modules Frontend/ui-library/dist Frontend/ui-library/types Frontend/ui-library/node_modules Frontend/implementations/EpicGames/node_modules'
 
     - name: Archive Release .zip
       uses: thedoctor0/zip-release@0.7.1

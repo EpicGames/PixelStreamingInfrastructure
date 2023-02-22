@@ -1,96 +1,39 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+import type { OptionParametersIds } from './Config';
 import { SettingBase } from './SettingBase';
 
-export class SettingOption extends SettingBase {
-    /* A select element that reflects the value of this setting. */
-    _selector: HTMLSelectElement; // <select></select>
-
-    /* This element contains a text node that reflects the setting's text label. */
-    _settingsTextElem: HTMLElement;
+/**
+ * An Option setting object with a text label. Allows you to specify an array of options and select one of them.
+ */
+export class SettingOption<
+    CustomIds extends string = OptionParametersIds
+> extends SettingBase {
+    id: OptionParametersIds | CustomIds;
+    onChangeEmit: (changedValue: string) => void;
+    _options: Array<string>;
+    useUrlParams: boolean;
 
     constructor(
-        id: string,
+        id: OptionParametersIds | CustomIds,
         label: string,
         description: string,
         defaultTextValue: string,
-        options: Array<string>
+        options: Array<string>,
+        useUrlParams: boolean,
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		defaultOnChangeListener: (changedValue: unknown, setting: SettingBase) => void = () => { /* Do nothing, to be overridden. */ }
     ) {
-        super(id, label, description, [defaultTextValue, defaultTextValue]);
+        super(id, label, description, [defaultTextValue, defaultTextValue], defaultOnChangeListener);
 
         this.options = options;
-
         const urlParams = new URLSearchParams(window.location.search);
-        const stringToMatch: string = urlParams.has(this.id)
-            ? this.getUrlParamText()
-            : defaultTextValue;
+        const stringToMatch: string =
+            useUrlParams && urlParams.has(this.id)
+                ? this.getUrlParamText()
+                : defaultTextValue;
         this.selected = stringToMatch;
-    }
-
-    public get selector(): HTMLSelectElement {
-        if (!this._selector) {
-            this._selector = document.createElement('select');
-            this._selector.classList.add('form-control');
-        }
-        return this._selector;
-    }
-
-    public get settingsTextElem(): HTMLElement {
-        if (!this._settingsTextElem) {
-            this._settingsTextElem = document.createElement('div');
-            this._settingsTextElem.innerText = this._label;
-            this._settingsTextElem.title = this.description;
-        }
-        return this._settingsTextElem;
-    }
-
-    /**
-     * Set the label text for the setting.
-     * @param label setting label.
-     */
-    public set label(inLabel: string) {
-        this._label = inLabel;
-        this.settingsTextElem.innerText = this._label;
-    }
-
-    /**
-     * @returns Return or creates a HTML element that represents this setting in the DOM.
-     */
-    public get rootElement(): HTMLElement {
-        if (!this._rootElement) {
-            // create root div with "setting" css class
-            this._rootElement = document.createElement('div');
-            this._rootElement.id = this.id;
-            this._rootElement.classList.add('setting');
-
-            // create div element to contain our setting's text
-            this._rootElement.appendChild(this.settingsTextElem);
-
-            // create label element to wrap out input type
-            const wrapperLabel = document.createElement('label');
-            this._rootElement.appendChild(wrapperLabel);
-
-            // create select element
-            this.selector.title = this.description;
-            wrapperLabel.appendChild(this.selector);
-
-            // setup on change from selector
-            this.selector.onchange = () => {
-                this.value = this.selector.value;
-
-                // set url params
-                const urlParams = new URLSearchParams(window.location.search);
-                urlParams.set(this.id, this.selector.value);
-                window.history.replaceState(
-                    {},
-                    '',
-                    urlParams.toString() !== ''
-                        ? `${location.pathname}?${urlParams}`
-                        : `${location.pathname}`
-                );
-            };
-        }
-        return this._rootElement;
+        this.useUrlParams = useUrlParams;
     }
 
     /**
@@ -100,9 +43,27 @@ export class SettingOption extends SettingBase {
     getUrlParamText(): string {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has(this.id)) {
-            return urlParams.get(this.id);
+            return urlParams.get(this.id) ?? '';
         }
         return '';
+    }
+
+    /**
+     * Persist the setting value in URL.
+     */
+    public updateURLParams() {
+        if (this.useUrlParams) {
+            // set url params
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set(this.id, this.selected);
+            window.history.replaceState(
+                {},
+                '',
+                urlParams.toString() !== ''
+                    ? `${location.pathname}?${urlParams}`
+                    : `${location.pathname}`
+            );
+        }
     }
 
     /**
@@ -112,27 +73,33 @@ export class SettingOption extends SettingBase {
         this.onChange = onChangedFunc;
     }
 
+    /**
+     * @returns All available options as an array
+     */
     public get options(): Array<string> {
-        return [...this.selector.options].map((o) => o.value);
+        return this._options;
     }
 
+    /**
+     * Set options
+     * @param values Array of options
+     */
     public set options(values: Array<string>) {
-        for (let i = this.selector.options.length - 1; i >= 0; i--) {
-            this.selector.remove(i);
-        }
-
-        values.forEach((value: string) => {
-            const opt = document.createElement('option');
-            opt.value = value;
-            opt.innerHTML = value;
-            this.selector.appendChild(opt);
-        });
+        this._options = values;
+        this.onChangeEmit(this.selected);
     }
 
+    /**
+     * @returns Selected option as a string
+     */
     public get selected(): string {
         return this.value as string;
     }
 
+    /**
+     * Set selected option if it matches one of the available options
+     * @param value Selected option
+     */
     public set selected(value: string) {
         // A user may not specify the full possible value so we instead use the closest match.
         // eg ?xxx=H264 would select 'H264 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42001f'
@@ -141,15 +108,6 @@ export class SettingOption extends SettingBase {
         );
         if (filteredList.length) {
             this.value = filteredList[0];
-            this.selector.value = filteredList[0];
         }
-    }
-
-    public disable() {
-        this.selector.disabled = true;
-    }
-
-    public enable() {
-        this.selector.disabled = false;
     }
 }

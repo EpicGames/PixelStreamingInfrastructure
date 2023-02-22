@@ -1,8 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { LatencyTest } from './LatencyTest';
-import { Logger } from '../Logger/Logger';
-import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { MathUtils } from '../Util/MathUtils';
 
 /**
@@ -31,7 +31,6 @@ export class StatsPanel {
     statsMap = new Map<string, Stat>();
 
     constructor() {
-        this._rootElement = null;
         this.latencyTest = new LatencyTest();
     }
 
@@ -239,7 +238,7 @@ export class StatsPanel {
         this.addOrUpdateStat(
             'FramesDroppedStat',
             'Frames dropped',
-            stats.inboundVideoStats.framesDropped.toString()
+            stats.inboundVideoStats.framesDropped?.toString()
         );
 
         if (stats.inboundVideoStats.codecId) {
@@ -247,7 +246,9 @@ export class StatsPanel {
                 'VideoCodecStat',
                 'Video codec',
                 // Split the codec to remove the Fmtp line
-                stats.codecs.get(stats.inboundVideoStats.codecId).split(' ')[0]
+                stats.codecs
+                    .get(stats.inboundVideoStats.codecId)
+                    ?.split(' ')[0] ?? ''
             );
         }
 
@@ -256,7 +257,9 @@ export class StatsPanel {
                 'AudioCodecStat',
                 'Audio codec',
                 // Split the codec to remove the Fmtp line
-                stats.codecs.get(stats.inboundAudioStats.codecId).split(' ')[0]
+                stats.codecs
+                    .get(stats.inboundAudioStats.codecId)
+                    ?.split(' ')[0] ?? ''
             );
         }
 
@@ -271,6 +274,25 @@ export class StatsPanel {
                   )
                 : "Can't calculate";
         this.addOrUpdateStat('RTTStat', 'Net RTT (ms)', netRTT);
+
+        this.addOrUpdateStat(
+            'DurationStat',
+            'Duration',
+            stats.sessionStats.runTime
+        );
+
+        this.addOrUpdateStat(
+            'ControlsInputStat',
+            'Controls stream input',
+            stats.sessionStats.controlsStreamInput
+        );
+
+        // QP
+        this.addOrUpdateStat(
+            'QPStat',
+            'Video quantization parameter',
+            stats.sessionStats.videoEncoderAvgQP.toString()
+        );
 
         // todo:
         //statsText += `<div>Browser receive to composite (ms): ${stats.inboundVideoStats.receiveToCompositeMs}</div>`;

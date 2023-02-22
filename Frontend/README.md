@@ -28,6 +28,11 @@ Once you have NodeJS installed,
 - `npm install`
 - `npm run build`
 
+The default user interface is provided in /ui-library directory. You can either use it or provide your own user interface. To build the default UI, run
+- `cd ui-library`
+- `npm install`
+- `npm run build`
+
 
 If you are developing your implementation based on the library, the process is similar:
 

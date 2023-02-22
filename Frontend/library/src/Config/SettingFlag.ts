@@ -1,30 +1,38 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+import type { FlagsIds } from './Config';
 import { SettingBase } from './SettingBase';
 
-export class SettingFlag extends SettingBase {
-    /* We toggle this checkbox to reflect the value of our setting's boolean flag. */
-    _checkbox: HTMLInputElement; // input type="checkbox"
-
-    /* This element contains a text node that reflects the setting's text label. */
-    _settingsTextElem: HTMLElement;
+/**
+ * A boolean flag setting object with a text label.
+ */
+export class SettingFlag<
+    CustomIds extends string = FlagsIds
+> extends SettingBase {
+    id: FlagsIds | CustomIds;
+    onChangeEmit: (changedValue: boolean) => void;
+    useUrlParams: boolean;
 
     constructor(
-        id: string,
+        id: FlagsIds | CustomIds,
         label: string,
         description: string,
-        defaultFlagValue: boolean
+        defaultFlagValue: boolean,
+        useUrlParams: boolean,
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		defaultOnChangeListener: (changedValue: unknown, setting: SettingBase) => void = () => { /* Do nothing, to be overridden. */ }
     ) {
-        super(id, label, description, defaultFlagValue);
+        super(id, label, description, defaultFlagValue, defaultOnChangeListener);
 
         const urlParams = new URLSearchParams(window.location.search);
-        if (!urlParams.has(this.id)) {
+        if (!useUrlParams || !urlParams.has(this.id)) {
             this.flag = defaultFlagValue;
         } else {
             // parse flag from url parameters
             const urlParamFlag = this.getUrlParamFlag();
             this.flag = urlParamFlag;
         }
+        this.useUrlParams = useUrlParams;
     }
 
     /**
@@ -45,71 +53,26 @@ export class SettingFlag extends SettingBase {
         return false;
     }
 
-    public get settingsTextElem(): HTMLElement {
-        if (!this._settingsTextElem) {
-            this._settingsTextElem = document.createElement('div');
-            this._settingsTextElem.innerText = this._label;
-            this._settingsTextElem.title = this.description;
-        }
-        return this._settingsTextElem;
-    }
-
-    public get checkbox(): HTMLInputElement {
-        if (!this._checkbox) {
-            this._checkbox = document.createElement('input');
-            this._checkbox.type = 'checkbox';
-        }
-        return this._checkbox;
-    }
-
     /**
-     * @returns Return or creates a HTML element that represents this setting in the DOM.
+     * Persist the setting value in URL.
      */
-    public get rootElement(): HTMLElement {
-        if (!this._rootElement) {
-            // create root div with "setting" css class
-            this._rootElement = document.createElement('div');
-            this._rootElement.id = this.id;
-            this._rootElement.classList.add('setting');
-
-            // create div element to contain our setting's text
-            this._rootElement.appendChild(this.settingsTextElem);
-
-            // create label element to wrap out input type
-            const wrapperLabel = document.createElement('label');
-            wrapperLabel.classList.add('tgl-switch');
-            this._rootElement.appendChild(wrapperLabel);
-
-            // create input type=checkbox
-            this.checkbox.title = this.description;
-            this.checkbox.classList.add('tgl');
-            this.checkbox.classList.add('tgl-flat');
-            const slider = document.createElement('div');
-            slider.classList.add('tgl-slider');
-            wrapperLabel.appendChild(this.checkbox);
-            wrapperLabel.appendChild(slider);
-
-            // setup on change from checkbox
-            this.checkbox.addEventListener('change', () => {
-                this.flag = this.checkbox.checked;
-
-                // set url params
-                const urlParams = new URLSearchParams(window.location.search);
-                if (this.checkbox.checked === true) {
-                    urlParams.set(this.id, 'true');
-                } else {
-                    urlParams.delete(this.id);
-                }
-                window.history.replaceState(
-                    {},
-                    '',
-                    urlParams.toString() !== ''
-                        ? `${location.pathname}?${urlParams}`
-                        : `${location.pathname}`
-                );
-            });
+    public updateURLParams() {
+        if (this.useUrlParams) {
+            // set url params
+            const urlParams = new URLSearchParams(window.location.search);
+            if (this.flag === true) {
+                urlParams.set(this.id, 'true');
+            } else {
+                urlParams.set(this.id, 'false');
+            }
+            window.history.replaceState(
+                {},
+                '',
+                urlParams.toString() !== ''
+                    ? `${location.pathname}?${urlParams}`
+                    : `${location.pathname}`
+            );
         }
-        return this._rootElement;
     }
 
     /**
@@ -123,33 +86,14 @@ export class SettingFlag extends SettingBase {
      * @return The setting's value.
      */
     public get flag(): boolean {
-        return this.checkbox.checked;
+        return !!this.value;
     }
 
     /**
      * Update the setting's stored value.
      * @param inValue The new value for the setting.
      */
-    public set flag(inValue: unknown) {
+    public set flag(inValue: boolean) {
         this.value = inValue;
-        if (typeof inValue === 'boolean') {
-            this.checkbox.checked = inValue;
-        }
-    }
-
-    /**
-     * Set the label text for the setting.
-     * @param label setting label.
-     */
-    public set label(inLabel: string) {
-        this._label = inLabel;
-        this.settingsTextElem.innerText = this._label;
-    }
-
-    /**
-     * @returns The label text for the setting.
-     */
-    public get label(): string {
-        return this._label;
     }
 }

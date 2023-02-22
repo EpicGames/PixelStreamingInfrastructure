@@ -1,20 +1,21 @@
 {
-    "name": "@epicgames-ps/lib-pixelstreamingfrontend-ue5.2",
-    "version": "0.1.0",
-    "description": "Frontend library for Pixel Streaming",
-    "main": "dist/lib-pixelstreamingfrontend.js",
-    "types": "types/pixelstreamingfrontend.d.ts",
+    "name": "@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2",
+    "version": "0.0.1",
+    "description": "Frontend library default UI for Pixel Streaming",
+    "main": "dist/lib-pixelstreamingfrontend-ui.js",
+    "types": "types/pixelstreamingfrontend-ui.d.ts",
     "scripts": {
         "compile": "tsc --build --clean && tsc",
         "build": "npx webpack --config webpack.prod.js",
         "build-dev": "npx webpack --config webpack.dev.js",
+        "build-all": "cd ../library && npm run build && cd ../ui-library && npm link ../library && npx webpack --config webpack.prod.js",
+        "build-dev-all": "cd ../library && npm run build-dev && cd ../ui-library && npm link ../library & npx webpack --config webpack.dev.js",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "spellcheck": "cspell \"{README.md,.github/*.md,src/**/*.ts}\""
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^5.16.0",
         "@typescript-eslint/parser": "^5.16.0",
-        "@types/webxr": "^0.5.1",
         "cspell": "^4.1.0",
         "eslint": "^8.11.0",
         "prettier": "2.8.3",
@@ -25,7 +26,10 @@
         "webpack-cli": "^5.0.1"
     },
     "dependencies": {
-        "sdp": "^3.1.0"
+        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.2": "0.0.1",
+        "jss": "^10.9.2",
+        "jss-plugin-camel-case": "^10.9.2",
+        "jss-plugin-global": "^10.9.2"
     },
     "repository": {
         "type": "git",
