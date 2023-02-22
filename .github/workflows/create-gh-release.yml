@@ -48,13 +48,13 @@ jobs:
       working-directory: ./Frontend/ui-library
       run: npm run build-all
 
-    - name: NPM link frontend and ui-library into implementations/EpicGames
-      working-directory: ./Frontend/implementations/EpicGames
-      run: npm link ../../library ../../ui-library
-
     - name: Install implementations/EpicGames deps
       working-directory: ./Frontend/implementations/EpicGames
       run: npm ci
+
+    - name: NPM link frontend and ui-library into implementations/EpicGames
+      working-directory: ./Frontend/implementations/EpicGames
+      run: npm link ../../library ../../ui-library
 
     - name: Build implementations/EpicGames
       working-directory: ./Frontend/implementations/EpicGames
