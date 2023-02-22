@@ -3,7 +3,9 @@
     "version": "0.0.2",
     "description": "Frontend library default UI for Pixel Streaming",
     "main": "dist/lib-pixelstreamingfrontend-ui.js",
+    "module": "dist/lib-pixelstreamingfrontend-ui.esm.js",
     "types": "types/pixelstreamingfrontend-ui.d.ts",
+    "sideEffects": false,
     "scripts": {
         "compile": "tsc --build --clean && tsc",
         "build": "npx webpack --config webpack.prod.js",

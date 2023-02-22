@@ -32,10 +32,7 @@ module.exports = {
         })
     ],
     output: {
-        library: 'lib-pixelstreamingfrontend-ui', // exposed variable that will provide access to the library classes
-        libraryTarget: 'umd',
         path: path.resolve(__dirname, 'dist'),
-        clean: true,
         globalObject: 'this'
     }
 };
