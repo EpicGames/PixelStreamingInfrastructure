@@ -1547,26 +1547,39 @@ export class WebRtcPlayerController {
     }
 
     /**
-     * Send the Encoder Settings to the UE Instance as a UE UI Descriptor.
-     * @param encoder - Encoder Settings
+     * Send the MinQP encoder setting to the UE Instance.
+     * @param minQP - The lower bound for QP when encoding
+     * valid values are (1-51) where:
+     * 1 = Best quality but highest bitrate.
+     * 51 = Worst quality but lowest bitrate.
+     * By default the minQP is 1 meaning the encoder is free
+     * to aim for the best quality it can on the given network link.
      */
-    sendEncoderSettings(encoder: EncoderSettings) {
-        Logger.Log(
-            Logger.GetStackTrace(),
-            '----   Encoder Settings    ----\n' +
-                JSON.stringify(encoder, undefined, 4) +
-                '\n-------------------------------',
-            6
-        );
+    sendEncoderMinQP(minQP: number) {
+        Logger.Log(Logger.GetStackTrace(), `MinQP=${minQP}\n`, 6);
 
-        if (encoder.MinQP != null) {
+        if (minQP != null) {
             this.sendDescriptorController.emitCommand({
-                'Encoder.MinQP': encoder.MinQP
+                'Encoder.MinQP': minQP
             });
         }
-        if (encoder.MaxQP != null) {
+    }
+
+    /**
+     * Send the MaxQP encoder setting to the UE Instance.
+     * @param maxQP - The upper bound for QP when encoding
+     * valid values are (1-51) where:
+     * 1 = Best quality but highest bitrate.
+     * 51 = Worst quality but lowest bitrate.
+     * By default the maxQP is 51 meaning the encoder is free
+     * to drop quality as low as needed on the given network link.
+     */
+     sendEncoderMaxQP(maxQP: number) {
+        Logger.Log(Logger.GetStackTrace(), `MaxQP=${maxQP}\n`, 6);
+
+        if (maxQP != null) {
             this.sendDescriptorController.emitCommand({
-                'Encoder.MaxQP': encoder.MaxQP
+                'Encoder.MaxQP': maxQP
             });
         }
     }

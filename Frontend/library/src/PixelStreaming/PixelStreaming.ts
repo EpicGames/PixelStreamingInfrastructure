@@ -166,16 +166,10 @@ export class PixelStreaming {
             (newValue: number) => {
                 Logger.Log(
                     Logger.GetStackTrace(),
-                    '--------  Sending encoder settings  --------',
+                    '--------  Sending MinQP  --------',
                     7
                 );
-                const encode: EncoderSettings = {
-                    MinQP: newValue,
-                    MaxQP: this.config.getNumericSettingValue(
-                        NumericParameters.MaxQP
-                    )
-                };
-                this.webRtcController.sendEncoderSettings(encode);
+                this.webRtcController.sendEncoderMinQP(newValue);
                 Logger.Log(
                     Logger.GetStackTrace(),
                     '-------------------------------------------',
@@ -192,13 +186,7 @@ export class PixelStreaming {
                     '--------  Sending encoder settings  --------',
                     7
                 );
-                const encode: EncoderSettings = {
-                    MinQP: this.config.getNumericSettingValue(
-                        NumericParameters.MinQP
-                    ),
-                    MaxQP: newValue
-                };
-                this.webRtcController.sendEncoderSettings(encode);
+                this.webRtcController.sendEncoderMaxQP(newValue);
                 Logger.Log(
                     Logger.GetStackTrace(),
                     '-------------------------------------------',
