@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { ActionOverlay } from '../Overlay/ActionOverlay';
+import { ActionOverlay } from './ActionOverlay';
 
 /**
  * Show an overlay for when the session is unattended, it begins a countdown timer, which when elapsed will disconnect the stream.

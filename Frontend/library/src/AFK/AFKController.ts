@@ -2,7 +2,13 @@
 
 import { Config, Flags, NumericParameters } from '../Config/Config';
 import { Logger } from '../Logger/Logger';
-import { AFKOverlay } from './AFKOverlay';
+import { PixelStreaming } from '../PixelStreaming/PixelStreaming';
+import {
+    AfkTimedOutEvent,
+    AfkWarningActivateEvent,
+    AfkWarningDeactivateEvent,
+    AfkWarningUpdateEvent
+} from '../Util/EventEmitter';
 
 export class AFKController {
     // time out logic details
@@ -13,13 +19,19 @@ export class AFKController {
     countDown = 0;
     countDownTimer: ReturnType<typeof setInterval> = undefined;
     config: Config;
-    afkOverlay: AFKOverlay;
+    pixelStreaming: PixelStreaming;
+    onDismissAfk: () => void;
 
     onAFKTimedOutCallback: () => void;
 
-    constructor(config: Config, afkOverlay: AFKOverlay) {
+    constructor(
+        config: Config,
+        pixelStreaming: PixelStreaming,
+        onDismissAfk: () => void
+    ) {
         this.config = config;
-        this.afkOverlay = afkOverlay;
+        this.pixelStreaming = pixelStreaming;
+        this.onDismissAfk = onDismissAfk;
         this.onAFKTimedOutCallback = () => {
             console.log(
                 'AFK timed out, did you want to override this callback?'
@@ -35,7 +47,9 @@ export class AFKController {
 
         if (this.active || this.countdownActive) {
             this.startAfkWarningTimer();
-            this.hideCurrentOverlay();
+            this.pixelStreaming.dispatchEvent(
+                new AfkWarningDeactivateEvent()
+            );
         }
     }
 
@@ -96,12 +110,19 @@ export class AFKController {
         this.pauseAfkWarningTimer();
 
         // instantiate a new overlay
-        this.showAfkOverlay();
+        this.pixelStreaming.dispatchEvent(
+            new AfkWarningActivateEvent({
+                countDown: this.countDown,
+                dismissAfk: this.onDismissAfk
+            })
+        );
 
         // update our countDown timer and overlay contents
         this.countDown = this.closeTimeout;
         this.countdownActive = true;
-        this.afkOverlay.updateCountdown(this.countDown);
+        this.pixelStreaming.dispatchEvent(
+            new AfkWarningUpdateEvent({ countDown: this.countDown })
+        );
 
         // if we are in locked mouse exit pointerlock
         if (!this.config.isFlagEnabled(Flags.HoveringMouseMode)) {
@@ -116,7 +137,9 @@ export class AFKController {
             this.countDown--;
             if (this.countDown == 0) {
                 // The user failed to click so hide the overlay and disconnect them.
-                this.hideCurrentOverlay();
+                this.pixelStreaming.dispatchEvent(
+                    new AfkTimedOutEvent()
+                );
                 this.onAFKTimedOutCallback();
                 Logger.Log(
                     Logger.GetStackTrace(),
@@ -126,22 +149,10 @@ export class AFKController {
                 // switch off the afk feature as stream has closed
                 this.stopAfkWarningTimer();
             } else {
-                this.afkOverlay.updateCountdown(this.countDown);
+                this.pixelStreaming.dispatchEvent(
+                    new AfkWarningUpdateEvent({ countDown: this.countDown })
+                );
             }
         }, 1000);
-    }
-
-    /**
-     * An override method for showing the afk overlay
-     */
-    showAfkOverlay() {
-        // Base Functionality: Do Nothing
-    }
-
-    /**
-     * An override method for hiding the afk overlay
-     */
-    hideCurrentOverlay() {
-        // Base Functionality: Do Nothing
     }
 }

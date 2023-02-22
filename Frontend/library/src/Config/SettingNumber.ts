@@ -1,33 +1,40 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Logger } from '../Logger/Logger';
+import type { NumericParametersIds } from './Config';
 import { SettingBase } from './SettingBase';
 
 /**
- * A number spinner with a text label beside it.
+ * A number setting object with a text label. Min and max limit the range of allowed values.
  */
-export class SettingNumber extends SettingBase {
+export class SettingNumber<
+    CustomIds extends string = NumericParametersIds
+> extends SettingBase {
     _min: number;
     _max: number;
-    _rootElement: HTMLElement;
-    _spinner: HTMLInputElement;
+
+    id: NumericParametersIds | CustomIds;
+    onChangeEmit: (changedValue: number) => void;
+    useUrlParams: boolean;
 
     constructor(
-        id: string,
+        id: NumericParametersIds | CustomIds,
         label: string,
         description: string,
         min: number,
         max: number,
-        defaultNumber: number
+        defaultNumber: number,
+        useUrlParams: boolean,
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		defaultOnChangeListener: (changedValue: unknown, setting: SettingBase) => void = () => { /* Do nothing, to be overridden. */ }
     ) {
-        super(id, label, description, defaultNumber);
+        super(id, label, description, defaultNumber, defaultOnChangeListener);
 
         this._min = min;
         this._max = max;
 
         // attempt to read the number from the url params
         const urlParams = new URLSearchParams(window.location.search);
-        if (!urlParams.has(this.id)) {
+        if (!useUrlParams || !urlParams.has(this.id)) {
             this.number = defaultNumber;
         } else {
             const parsedValue = Number.parseInt(urlParams.get(this.id));
@@ -35,36 +42,36 @@ export class SettingNumber extends SettingBase {
                 ? defaultNumber
                 : parsedValue;
         }
-
-        // setup onchange
-        this.spinner.onchange = (event: Event) => {
-            const inputElem = event.target as HTMLInputElement;
-
-            const parsedValue = Number.parseInt(inputElem.value);
-
-            if (Number.isNaN(parsedValue)) {
-                Logger.Warning(
-                    Logger.GetStackTrace(),
-                    `Could not parse value change into a valid number - value was ${inputElem.value}, resetting value to ${this._min}`
-                );
-                this.number = this._min;
-            } else {
-                this.number = parsedValue;
-                this.updateURLParams();
-            }
-        };
+        this.useUrlParams = useUrlParams;
     }
 
     /**
-     * Set the number in the spinner (will be clamped within range).
+     * Persist the setting value in URL.
+     */
+    public updateURLParams(): void {
+        if (this.useUrlParams) {
+            // set url params like ?id=number
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set(this.id, this.number.toString());
+            window.history.replaceState(
+                {},
+                '',
+                urlParams.toString() !== ''
+                    ? `${location.pathname}?${urlParams}`
+                    : `${location.pathname}`
+            );
+        }
+    }
+
+    /**
+     * Set the number value (will be clamped within range).
      */
     public set number(newNumber: number) {
         this.value = this.clamp(newNumber);
-        this.spinner.value = this.value.toString();
     }
 
     /**
-     * @returns The number stored in the spinner.
+     * @returns The number stored.
      */
     public get number(): number {
         return this.value as number;
@@ -80,60 +87,25 @@ export class SettingNumber extends SettingBase {
     }
 
     /**
-     * Add a change listener to the spinner element.
+     * Returns the minimum value
+     * @returns The minimum value
+     */
+    public get min(): number {
+        return this._min;
+    }
+
+    /**
+     * Returns the maximum value
+     * @returns The maximum value
+     */
+    public get max(): number {
+        return this._max;
+    }
+
+    /**
+     * Add a change listener to the number object.
      */
     public addOnChangedListener(onChangedFunc: (newNumber: number) => void) {
         this.onChange = onChangedFunc;
-    }
-
-    public updateURLParams(): void {
-        // set url params like ?id=number
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.set(this.id, this.value.toString());
-        window.history.replaceState(
-            {},
-            '',
-            urlParams.toString() !== ''
-                ? `${location.pathname}?${urlParams}`
-                : `${location.pathname}`
-        );
-    }
-
-    /**
-     * Get the HTMLInputElement for the button.
-     */
-    public get spinner(): HTMLInputElement {
-        if (!this._spinner) {
-            this._spinner = document.createElement('input');
-            this._spinner.type = 'number';
-            this._spinner.min = this._min.toString();
-            this._spinner.max = this._max.toString();
-            this._spinner.value = this.value.toString();
-            this._spinner.title = this.description;
-            this._spinner.classList.add('form-control');
-        }
-        return this._spinner;
-    }
-
-    /**
-     * @returns Return or creates a HTML element that represents this setting in the DOM.
-     */
-    public get rootElement(): HTMLElement {
-        if (!this._rootElement) {
-            // create root div with "setting" css class
-            this._rootElement = document.createElement('div');
-            this._rootElement.classList.add('setting');
-            this._rootElement.classList.add('form-group');
-
-            // create div element to contain our setting's text
-            const settingsTextElem = document.createElement('label');
-            settingsTextElem.innerText = this._label;
-            settingsTextElem.title = this.description;
-            this._rootElement.appendChild(settingsTextElem);
-
-            // create label element to wrap out input type
-            this._rootElement.appendChild(this.spinner);
-        }
-        return this._rootElement;
     }
 }

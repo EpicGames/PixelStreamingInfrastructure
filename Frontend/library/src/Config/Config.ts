@@ -5,106 +5,168 @@ import { SettingFlag } from './SettingFlag';
 import { SettingNumber } from './SettingNumber';
 import { SettingText } from './SettingText';
 import { SettingOption } from './SettingOption';
+import { EventEmitter, SettingsChangedEvent } from '../Util/EventEmitter';
+import { SettingBase } from './SettingBase';
 
 /**
  * A collection of flags that can be toggled and are core to all Pixel Streaming experiences.
- * These are used in the `Config.Flags` map. Note, that map can take any string but
- * these flags are provided for convenience to avoid hardcoded strings across the library.
+ * These are used in the `Config.Flags` map.
  */
 export class Flags {
-    static AutoConnect = 'AutoConnect';
-    static AutoPlayVideo = 'AutoPlayVideo';
-    static AFKDetection = 'TimeoutIfIdle';
-    static BrowserSendOffer = 'OfferToReceive';
-    static HoveringMouseMode = 'HoveringMouse';
-    static ForceMonoAudio = 'ForceMonoAudio';
-    static ForceTURN = 'ForceTURN';
-    static FakeMouseWithTouches = 'FakeMouseWithTouches';
-    static IsQualityController = 'ControlsQuality';
-    static MatchViewportResolution = 'MatchViewportRes';
-    static PreferSFU = 'preferSFU';
-    static StartVideoMuted = 'StartVideoMuted';
-    static SuppressBrowserKeys = 'SuppressBrowserKeys';
-    static UseMic = 'UseMic';
-    static LightMode = 'LightMode';
+    static AutoConnect = 'AutoConnect' as const;
+    static AutoPlayVideo = 'AutoPlayVideo' as const;
+    static AFKDetection = 'TimeoutIfIdle' as const;
+    static BrowserSendOffer = 'OfferToReceive' as const;
+    static HoveringMouseMode = 'HoveringMouse' as const;
+    static ForceMonoAudio = 'ForceMonoAudio' as const;
+    static ForceTURN = 'ForceTURN' as const;
+    static FakeMouseWithTouches = 'FakeMouseWithTouches' as const;
+    static IsQualityController = 'ControlsQuality' as const;
+    static MatchViewportResolution = 'MatchViewportRes' as const;
+    static PreferSFU = 'preferSFU' as const;
+    static StartVideoMuted = 'StartVideoMuted' as const;
+    static SuppressBrowserKeys = 'SuppressBrowserKeys' as const;
+    static UseMic = 'UseMic' as const;
 }
+
+export type FlagsKeys = Exclude<keyof typeof Flags, 'prototype'>;
+export type FlagsIds = typeof Flags[FlagsKeys];
+
+const isFlagId = (id: string): id is FlagsIds =>
+    Object.getOwnPropertyNames(Flags).some(
+        (name: FlagsKeys) => Flags[name] === id
+    );
 
 /**
  * A collection of numeric parameters that are core to all Pixel Streaming experiences.
  *
  */
 export class NumericParameters {
-    static AFKTimeoutSecs = 'AFKTimeout';
-    static MinQP = 'MinQP';
-    static MaxQP = 'MaxQP';
-    static WebRTCFPS = 'WebRTCFPS';
-    static WebRTCMinBitrate = 'WebRTCMinBitrate';
-    static WebRTCMaxBitrate = 'WebRTCMaxBitrate';
+    static AFKTimeoutSecs = 'AFKTimeout' as const;
+    static MinQP = 'MinQP' as const;
+    static MaxQP = 'MaxQP' as const;
+    static WebRTCFPS = 'WebRTCFPS' as const;
+    static WebRTCMinBitrate = 'WebRTCMinBitrate' as const;
+    static WebRTCMaxBitrate = 'WebRTCMaxBitrate' as const;
 }
+
+export type NumericParametersKeys = Exclude<
+    keyof typeof NumericParameters,
+    'prototype'
+>;
+export type NumericParametersIds =
+    typeof NumericParameters[NumericParametersKeys];
+
+const isNumericId = (id: string): id is NumericParametersIds =>
+    Object.getOwnPropertyNames(NumericParameters).some(
+        (name: NumericParametersKeys) => NumericParameters[name] === id
+    );
 
 /**
  * A collection of textual parameters that are core to all Pixel Streaming experiences.
  *
  */
 export class TextParameters {
-    static SignallingServerUrl = 'ss';
+    static SignallingServerUrl = 'ss' as const;
 }
+
+export type TextParametersKeys = Exclude<
+    keyof typeof TextParameters,
+    'prototype'
+>;
+export type TextParametersIds = typeof TextParameters[TextParametersKeys];
+
+const isTextId = (id: string): id is TextParametersIds =>
+    Object.getOwnPropertyNames(TextParameters).some(
+        (name: TextParametersKeys) => TextParameters[name] === id
+    );
 
 /**
  * A collection of enum based parameters that are core to all Pixel Streaming experiences.
  *
  */
 export class OptionParameters {
-    static PreferredCodec = 'PreferredCodec';
-    static StreamerId = 'StreamerId';
+    static PreferredCodec = 'PreferredCodec' as const;
+    static StreamerId = 'StreamerId' as const;
 }
 
+export type OptionParametersKeys = Exclude<
+    keyof typeof OptionParameters,
+    'prototype'
+>;
+export type OptionParametersIds = typeof OptionParameters[OptionParametersKeys];
+
+const isOptionId = (id: string): id is OptionParametersIds =>
+    Object.getOwnPropertyNames(OptionParameters).some(
+        (name: OptionParametersKeys) => OptionParameters[name] === id
+    );
+
+/**
+ * Utility types for inferring data type based on setting ID
+ */
+export type OptionIds =
+    | FlagsIds
+    | NumericParametersIds
+    | TextParametersIds
+    | OptionParametersIds;
+export type OptionKeys<T> = T extends FlagsIds
+    ? boolean
+    : T extends NumericParametersIds
+    ? number
+    : T extends TextParametersIds
+    ? string
+    : T extends OptionParametersIds
+    ? string
+    : never;
+
+export type AllSettings = {
+    [K in OptionIds]: OptionKeys<K>;
+};
+
+export interface ConfigParams {
+    /** Initial Pixel Streaming settings */
+    initialSettings?: Partial<AllSettings>;
+    /** If useUrlParams is set true, will read initial values from URL parameters and persist changed settings into URL */
+    useUrlParams?: boolean;
+}
 export class Config {
     /* A map of flags that can be toggled - options that can be set in the application - e.g. Use Mic? */
-    private flags = new Map<string, SettingFlag>();
+    private flags = new Map<FlagsIds, SettingFlag>();
 
     /* A map of numerical settings - options that can be in the application - e.g. MinBitrate */
-    private numericParameters = new Map<string, SettingNumber>();
+    private numericParameters = new Map<NumericParametersIds, SettingNumber>();
 
     /* A map of text settings - e.g. signalling server url */
-    private textParameters = new Map<string, SettingText>();
+    private textParameters = new Map<TextParametersIds, SettingText>();
 
     /* A map of enum based settings - e.g. preferred codec */
-    private optionParameters = new Map<string, SettingOption>();
+    private optionParameters = new Map<OptionParametersIds, SettingOption>();
+
+    private _useUrlParams: boolean;
 
     // ------------ Settings -----------------
 
-    constructor() {
-        this.populateDefaultSettings();
+    constructor(config: ConfigParams = {}) {
+        const { initialSettings, useUrlParams } = config;
+        this._useUrlParams = !!useUrlParams;
+        this.populateDefaultSettings(this._useUrlParams);
+        if (initialSettings) {
+            this.setSettings(initialSettings);
+        }
     }
 
     /**
-     * Make DOM elements for a settings section with a heading.
-     * @param settingsElem The parent container for our DOM elements.
-     * @param sectionHeading The heading element to go into the section.
-     * @returns The constructed DOM element for the section.
+     * True if reading configuration initial values from URL parameters, and
+     * persisting changes in URL when changed.
      */
-    buildSectionWithHeading(settingsElem: HTMLElement, sectionHeading: string) {
-        // make section element
-        const sectionElem = document.createElement('section');
-        sectionElem.classList.add('settingsContainer');
-
-        // make section heading
-        const psSettingsHeader = document.createElement('div');
-        psSettingsHeader.classList.add('settingsHeader');
-        psSettingsHeader.classList.add('settings-text');
-        psSettingsHeader.textContent = sectionHeading;
-
-        // add section and heading to parent settings element
-        sectionElem.appendChild(psSettingsHeader);
-        settingsElem.appendChild(sectionElem);
-        return sectionElem;
+    public get useUrlParams() {
+        return this._useUrlParams;
     }
 
     /**
      * Populate the default settings for a Pixel Streaming application
      */
-    populateDefaultSettings(): void {
+    private populateDefaultSettings(useUrlParams: boolean): void {
         /**
          * Text Parameters
          */
@@ -121,7 +183,8 @@ export class Config {
                     (window.location.port === '80' ||
                     window.location.port === ''
                         ? ''
-                        : `:${window.location.port}`)
+                        : `:${window.location.port}`),
+                useUrlParams
             )
         );
 
@@ -132,7 +195,8 @@ export class Config {
                 'Streamer ID',
                 'The ID of the streamer to stream.',
                 '',
-                []
+                [],
+                useUrlParams
             )
         );
 
@@ -168,7 +232,8 @@ export class Config {
                         }
                     });
                     return browserSupportedCodecs;
-                })()
+                })(),
+                useUrlParams
             )
         );
 
@@ -182,7 +247,8 @@ export class Config {
                 Flags.AutoConnect,
                 'Auto connect to stream',
                 'Whether we should attempt to auto connect to the signalling server or show a click to start prompt.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -192,7 +258,8 @@ export class Config {
                 Flags.AutoPlayVideo,
                 'Auto play video',
                 'When video is ready automatically start playing it as opposed to showing a play button.',
-                true
+                true,
+                useUrlParams
             )
         );
 
@@ -202,7 +269,8 @@ export class Config {
                 Flags.BrowserSendOffer,
                 'Browser send offer',
                 'Browser will initiate the WebRTC handshake by sending the offer to the streamer',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -212,7 +280,8 @@ export class Config {
                 Flags.UseMic,
                 'Use microphone',
                 'Make browser request microphone access and open an input audio track.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -222,7 +291,8 @@ export class Config {
                 Flags.StartVideoMuted,
                 'Start video muted',
                 'Video will start muted if true.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -232,7 +302,8 @@ export class Config {
                 Flags.SuppressBrowserKeys,
                 'Suppress browser keys',
                 'Suppress certain browser keys that we use in UE, for example F5 to show shader complexity instead of refresh the page.',
-                true
+                true,
+                useUrlParams
             )
         );
 
@@ -242,7 +313,8 @@ export class Config {
                 Flags.PreferSFU,
                 'Prefer SFU',
                 'Try to connect to the SFU instead of P2P.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -252,7 +324,8 @@ export class Config {
                 Flags.IsQualityController,
                 'Is quality controller?',
                 'True if this peer controls stream quality',
-                true
+                true,
+                useUrlParams
             )
         );
 
@@ -262,7 +335,8 @@ export class Config {
                 Flags.ForceMonoAudio,
                 'Force mono audio',
                 'Force browser to request mono audio in the SDP',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -272,7 +346,8 @@ export class Config {
                 Flags.ForceTURN,
                 'Force TURN',
                 'Only generate TURN/Relayed ICE candidates.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -282,7 +357,8 @@ export class Config {
                 Flags.AFKDetection,
                 'AFK if idle',
                 'Timeout the experience if user is AFK for a period.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -292,7 +368,8 @@ export class Config {
                 Flags.MatchViewportResolution,
                 'Match viewport resolution',
                 'Pixel Streaming will be instructed to dynamically resize the video stream to match the size of the video element.',
-                false
+                false,
+                useUrlParams
             )
         );
 
@@ -302,7 +379,11 @@ export class Config {
                 Flags.HoveringMouseMode,
                 'Control Scheme: Locked Mouse',
                 'Either locked mouse, where the pointer is consumed by the video and locked to it, or hovering mouse, where the mouse is not consumed.',
-                false
+                false,
+                useUrlParams,
+				(isHoveringMouse: boolean, setting: SettingBase) => {
+                    setting.label = `Control Scheme: ${isHoveringMouse ? 'Hovering' : 'Locked'} Mouse`;
+                }
             )
         );
 
@@ -312,17 +393,8 @@ export class Config {
                 Flags.FakeMouseWithTouches,
                 'Fake mouse with touches',
                 'A single finger touch is converted into a mouse event. This allows a non-touch application to be controlled partially via a touch device.',
-                false
-            )
-        );
-
-        this.flags.set(
-            Flags.LightMode,
-            new SettingFlag(
-                Flags.LightMode,
-                'Use a light color scheme',
-                'The Pixel Streaming player will be instructed to use a lighter color scheme',
-                false // (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches would use system preference
+                false,
+                useUrlParams
             )
         );
 
@@ -338,7 +410,8 @@ export class Config {
                 'The time (in seconds) it takes for the application to time out if AFK timeout is enabled.',
                 0 /*min*/,
                 600 /*max*/,
-                120 /*value*/
+                120 /*value*/,
+                useUrlParams
             )
         );
 
@@ -350,7 +423,8 @@ export class Config {
                 'The lower bound for the quantization parameter (QP) of the encoder. 0 = Best quality, 51 = worst quality.',
                 0 /*min*/,
                 51 /*max*/,
-                0 /*value*/
+                0 /*value*/,
+                useUrlParams
             )
         );
 
@@ -362,7 +436,8 @@ export class Config {
                 'The upper bound for the quantization parameter (QP) of the encoder. 0 = Best quality, 51 = worst quality.',
                 0 /*min*/,
                 51 /*max*/,
-                51 /*value*/
+                51 /*value*/,
+                useUrlParams
             )
         );
 
@@ -374,7 +449,8 @@ export class Config {
                 'The maximum FPS that WebRTC will try to transmit frames at.',
                 1 /*min*/,
                 999 /*max*/,
-                60 /*value*/
+                60 /*value*/,
+                useUrlParams
             )
         );
 
@@ -385,8 +461,9 @@ export class Config {
                 'Min Bitrate (kbps)',
                 'The minimum bitrate that WebRTC should use.',
                 0 /*min*/,
-                100000 /*max*/,
-                0 /*value*/
+                500000 /*max*/,
+                0 /*value*/,
+                useUrlParams
             )
         );
 
@@ -397,135 +474,10 @@ export class Config {
                 'Max Bitrate (kbps)',
                 'The maximum bitrate that WebRTC should use.',
                 0 /*min*/,
-                100000 /*max*/,
-                0 /*value*/
+                500000 /*max*/,
+                0 /*value*/,
+                useUrlParams
             )
-        );
-    }
-
-    /**
-     * Setup flags with their default values and add them to the `Config.flags` map.
-     * @param settingsElem - The element that contains all the individual settings sections, flags, and so on.
-     */
-    populateSettingsElement(settingsElem: HTMLElement): void {
-        /* Setup all Pixel Streaming specific settings */
-        const psSettingsSection = this.buildSectionWithHeading(
-            settingsElem,
-            'Pixel Streaming'
-        );
-
-        // make settings show up in DOM
-        this.addSettingText(
-            psSettingsSection,
-            this.textParameters.get(TextParameters.SignallingServerUrl)
-        );
-        this.addSettingOption(
-            psSettingsSection,
-            this.optionParameters.get(OptionParameters.StreamerId)
-        );
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.AutoConnect)
-        );
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.AutoPlayVideo)
-        );
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.BrowserSendOffer)
-        );
-        this.addSettingFlag(psSettingsSection, this.flags.get(Flags.UseMic));
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.StartVideoMuted)
-        );
-        this.addSettingFlag(psSettingsSection, this.flags.get(Flags.PreferSFU));
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.IsQualityController)
-        );
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.ForceMonoAudio)
-        );
-        this.addSettingFlag(psSettingsSection, this.flags.get(Flags.ForceTURN));
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.SuppressBrowserKeys)
-        );
-        this.addSettingFlag(
-            psSettingsSection,
-            this.flags.get(Flags.AFKDetection)
-        );
-        this.addSettingNumeric(
-            psSettingsSection,
-            this.numericParameters.get(NumericParameters.AFKTimeoutSecs)
-        );
-
-        /* Setup all view/ui related settings under this section */
-        const viewSettingsSection = this.buildSectionWithHeading(
-            settingsElem,
-            'UI'
-        );
-        this.addSettingFlag(
-            viewSettingsSection,
-            this.flags.get(Flags.MatchViewportResolution)
-        );
-
-        const ControlSchemeFlag = this.flags.get(Flags.HoveringMouseMode);
-        this.addSettingFlag(viewSettingsSection, ControlSchemeFlag);
-        ControlSchemeFlag.label = `Control Scheme: ${
-            ControlSchemeFlag.flag ? 'Hovering' : 'Locked'
-        } Mouse`;
-
-        const colorSchemeFlag = this.flags.get(Flags.LightMode);
-        this.addSettingFlag(viewSettingsSection, colorSchemeFlag);
-        colorSchemeFlag.label = `Color Scheme: ${
-            colorSchemeFlag.flag ? 'Light' : 'Dark'
-        } Mode`;
-
-        /* Setup all encoder related settings under this section */
-        const encoderSettingsSection = this.buildSectionWithHeading(
-            settingsElem,
-            'Encoder'
-        );
-
-        this.addSettingNumeric(
-            encoderSettingsSection,
-            this.numericParameters.get(NumericParameters.MinQP)
-        );
-        this.addSettingNumeric(
-            encoderSettingsSection,
-            this.numericParameters.get(NumericParameters.MaxQP)
-        );
-
-        const preferredCodecOption = this.optionParameters.get(OptionParameters.PreferredCodec);
-        this.addSettingOption(
-            encoderSettingsSection,
-            preferredCodecOption
-        );
-        if([...preferredCodecOption.selector.options].map(o => o.value).includes("Only available on Chrome")) {
-            preferredCodecOption.disable();
-        }
-
-        /* Setup all webrtc related settings under this section */
-        const webrtcSettingsSection = this.buildSectionWithHeading(
-            settingsElem,
-            'WebRTC'
-        );
-
-        this.addSettingNumeric(
-            webrtcSettingsSection,
-            this.numericParameters.get(NumericParameters.WebRTCFPS)
-        );
-        this.addSettingNumeric(
-            webrtcSettingsSection,
-            this.numericParameters.get(NumericParameters.WebRTCMinBitrate)
-        );
-        this.addSettingNumeric(
-            webrtcSettingsSection,
-            this.numericParameters.get(NumericParameters.WebRTCMaxBitrate)
         );
     }
 
@@ -534,8 +486,8 @@ export class Config {
      * @param id The id of the flag.
      * @param onChangedListener The callback to fire when the numeric value changes.
      */
-    addOnNumericSettingChangedListener(
-        id: string,
+    _addOnNumericSettingChangedListener(
+        id: NumericParametersIds,
         onChangedListener: (newValue: number) => void
     ): void {
         if (this.numericParameters.has(id)) {
@@ -545,8 +497,8 @@ export class Config {
         }
     }
 
-    addOnOptionSettingChangedListener(
-        id: string,
+    _addOnOptionSettingChangedListener(
+        id: OptionParametersIds,
         onChangedListener: (newValue: string) => void
     ): void {
         if (this.optionParameters.has(id)) {
@@ -560,7 +512,7 @@ export class Config {
      * @param id The id of the numeric setting we are interested in getting a value for.
      * @returns The numeric value stored in the parameter with the passed id.
      */
-    getNumericSettingValue(id: string): number {
+    getNumericSettingValue(id: NumericParametersIds): number {
         if (this.numericParameters.has(id)) {
             return this.numericParameters.get(id).number;
         } else {
@@ -572,7 +524,7 @@ export class Config {
      * @param id The id of the text setting we are interested in getting a value for.
      * @returns The text value stored in the parameter with the passed id.
      */
-    getTextSettingValue(id: string): string {
+    getTextSettingValue(id: TextParametersIds): string {
         if (this.textParameters.has(id)) {
             return this.textParameters.get(id).value as string;
         } else {
@@ -585,7 +537,7 @@ export class Config {
      * @param id The id of the numeric setting we are interested in.
      * @param value The numeric value to set.
      */
-    setNumericSetting(id: string, value: number): void {
+    setNumericSetting(id: NumericParametersIds, value: number): void {
         if (this.numericParameters.has(id)) {
             this.numericParameters.get(id).number = value;
         } else {
@@ -598,8 +550,8 @@ export class Config {
      * @param id The id of the flag.
      * @param onChangeListener The callback to fire when the value changes.
      */
-    addOnSettingChangedListener(
-        id: string,
+    _addOnSettingChangedListener(
+        id: FlagsIds,
         onChangeListener: (newFlagValue: boolean) => void
     ): void {
         if (this.flags.has(id)) {
@@ -612,8 +564,8 @@ export class Config {
      * @param id The id of the flag.
      * @param onChangeListener The callback to fire when the value changes.
      */
-    addOnTextSettingChangedListener(
-        id: string,
+    _addOnTextSettingChangedListener(
+        id: TextParametersIds,
         onChangeListener: (newTextValue: string) => void
     ): void {
         if (this.textParameters.has(id)) {
@@ -622,58 +574,11 @@ export class Config {
     }
 
     /**
-     * Add a SettingText element to a particular settings section in the DOM and registers that text in the text settings map.
-     * @param settingsSection The settings section HTML element.
-     * @param settingText The textual settings object.
+     * Get the option which has the given id.
+     * @param id The id of the option.
+     * @returns The SettingOption object matching id
      */
-    addSettingText(
-        settingsSection: HTMLElement,
-        settingText: SettingText
-    ): void {
-        settingsSection.appendChild(settingText.rootElement);
-        this.textParameters.set(settingText.id, settingText);
-    }
-
-    /**
-     * Add a SettingFlag element to a particular settings section in the DOM and registers that flag in the Config.flag map.
-     * @param settingsSection The settings section HTML element.
-     * @param settingFlag The settings flag object.
-     */
-    addSettingFlag(
-        settingsSection: HTMLElement,
-        settingFlag: SettingFlag
-    ): void {
-        settingsSection.appendChild(settingFlag.rootElement);
-        this.flags.set(settingFlag.id, settingFlag);
-    }
-
-    /**
-     * Add a numeric setting element to a particular settings section in the DOM and registers that flag in the Config.numericParameters map.
-     * @param settingsSection The settings section HTML element.
-     * @param settingFlag The settings flag object.
-     */
-    addSettingNumeric(
-        settingsSection: HTMLElement,
-        setting: SettingNumber
-    ): void {
-        settingsSection.appendChild(setting.rootElement);
-        this.numericParameters.set(setting.id, setting);
-    }
-
-    /**
-     * Add an enum based settings element to a particular settings section in the DOM and registers that flag in the Config.enumParameters map.
-     * @param settingsSection The settings section HTML element.
-     * @param settingFlag The settings flag object.
-     */
-    addSettingOption(
-        settingsSection: HTMLElement,
-        setting: SettingOption
-    ): void {
-        settingsSection.appendChild(setting.rootElement);
-        this.optionParameters.set(setting.id, setting);
-    }
-
-    getSettingOption(id: string): SettingOption {
+    getSettingOption(id: OptionParametersIds): SettingOption {
         return this.optionParameters.get(id);
     }
 
@@ -682,7 +587,7 @@ export class Config {
      * @param id The unique id for the flag.
      * @returns True if the flag is enabled.
      */
-    isFlagEnabled(id: string): boolean {
+    isFlagEnabled(id: FlagsIds): boolean {
         return this.flags.get(id).flag as boolean;
     }
 
@@ -691,7 +596,7 @@ export class Config {
      * @param id The id of the flag to toggle.
      * @param flagEnabled True if the flag should be enabled.
      */
-    setFlagEnabled(id: string, flagEnabled: boolean) {
+    setFlagEnabled(id: FlagsIds, flagEnabled: boolean) {
         if (!this.flags.has(id)) {
             Logger.Warning(
                 Logger.GetStackTrace(),
@@ -707,7 +612,7 @@ export class Config {
      * @param id The id of the setting
      * @param settingValue The value to set in the setting.
      */
-    setTextSetting(id: string, settingValue: string) {
+    setTextSetting(id: TextParametersIds, settingValue: string) {
         if (!this.textParameters.has(id)) {
             Logger.Warning(
                 Logger.GetStackTrace(),
@@ -723,7 +628,10 @@ export class Config {
      * @param id The id of the setting
      * @param settingOptions The values the setting could take
      */
-    setOptionSettingOptions(id: string, settingOptions: Array<string>) {
+    setOptionSettingOptions(
+        id: OptionParametersIds,
+        settingOptions: Array<string>
+    ) {
         if (!this.optionParameters.has(id)) {
             Logger.Warning(
                 Logger.GetStackTrace(),
@@ -739,7 +647,7 @@ export class Config {
      * @param id The id of the setting
      * @param settingOptions The value to select out of all the options
      */
-    setOptionSettingValue(id: string, settingValue: string) {
+    setOptionSettingValue(id: OptionParametersIds, settingValue: string) {
         if (!this.optionParameters.has(id)) {
             Logger.Warning(
                 Logger.GetStackTrace(),
@@ -755,7 +663,7 @@ export class Config {
      * @param id The id of the flag.
      * @param label The new label to use for the flag.
      */
-    setFlagLabel(id: string, label: string) {
+    setFlagLabel(id: FlagsIds, label: string) {
         if (!this.flags.has(id)) {
             Logger.Warning(
                 Logger.GetStackTrace(),
@@ -763,6 +671,141 @@ export class Config {
             );
         } else {
             this.flags.get(id).label = label;
+        }
+    }
+
+    /**
+     * Set a subset of all settings in one function call.
+     *
+     * @param settings A (partial) list of settings to set
+     */
+    setSettings(settings: Partial<AllSettings>) {
+        for (const key of Object.keys(settings)) {
+            if (isFlagId(key)) {
+                this.setFlagEnabled(key, settings[key]);
+            } else if (isNumericId(key)) {
+                this.setNumericSetting(key, settings[key]);
+            } else if (isTextId(key)) {
+                this.setTextSetting(key, settings[key]);
+            } else if (isOptionId(key)) {
+                this.setOptionSettingValue(key, settings[key]);
+            }
+        }
+    }
+
+    /**
+     * Get all settings
+     * @returns All setting values as an object with setting ids as keys
+     */
+    getSettings(): Partial<AllSettings> {
+        const settings: Partial<AllSettings> = {};
+        for (const [key, value] of this.flags.entries()) {
+            settings[key] = value.flag;
+        }
+        for (const [key, value] of this.numericParameters.entries()) {
+            settings[key] = value.number;
+        }
+        for (const [key, value] of this.textParameters.entries()) {
+            settings[key] = value.text;
+        }
+        for (const [key, value] of this.optionParameters.entries()) {
+            settings[key] = value.selected;
+        }
+        return settings;
+    }
+
+    /**
+     * Get all Flag settings as an array.
+     * @returns All SettingFlag objects
+     */
+    getFlags(): Array<SettingFlag> {
+        return Array.from(this.flags.values());
+    }
+
+    /**
+     * Get all Text settings as an array.
+     * @returns All SettingText objects
+     */
+    getTextSettings(): Array<SettingText> {
+        return Array.from(this.textParameters.values());
+    }
+
+    /**
+     * Get all Number settings as an array.
+     * @returns All SettingNumber objects
+     */
+    getNumericSettings(): Array<SettingNumber> {
+        return Array.from(this.numericParameters.values());
+    }
+
+    /**
+     * Get all Option settings as an array.
+     * @returns All SettingOption objects
+     */
+    getOptionSettings(): Array<SettingOption> {
+        return Array.from(this.optionParameters.values());
+    }
+
+    /**
+     * Emit events when settings change.
+     * @param eventEmitter
+     */
+    _registerOnChangeEvents(eventEmitter: EventEmitter) {
+        for (const key of this.flags.keys()) {
+            const flag = this.flags.get(key);
+            if (flag) {
+                flag.onChangeEmit = (newValue: boolean) =>
+                    eventEmitter.dispatchEvent(
+                        new SettingsChangedEvent({
+                            id: flag.id,
+                            type: 'flag',
+                            value: newValue,
+                            target: flag
+                        })
+                    );
+            }
+        }
+        for (const key of this.numericParameters.keys()) {
+            const number = this.numericParameters.get(key);
+            if (number) {
+                number.onChangeEmit = (newValue: number) =>
+                    eventEmitter.dispatchEvent(
+                        new SettingsChangedEvent({
+                            id: number.id,
+                            type: 'number',
+                            value: newValue,
+                            target: number
+                        })
+                    );
+            }
+        }
+        for (const key of this.textParameters.keys()) {
+            const text = this.textParameters.get(key);
+            if (text) {
+                text.onChangeEmit = (newValue: string) =>
+                    eventEmitter.dispatchEvent(
+                        new SettingsChangedEvent({
+                            id: text.id,
+                            type: 'text',
+                            value: newValue,
+                            target: text
+                        })
+                    );
+            }
+        }
+        for (const key of this.optionParameters.keys()) {
+            const option = this.optionParameters.get(key);
+            if (option) {
+                option.onChangeEmit = (newValue: string) =>
+                    eventEmitter.dispatchEvent(
+                        new SettingsChangedEvent({
+                            id: option.id,
+                            type: 'option',
+                            value: newValue,
+                            target: option
+                        })
+                    );
+            }
         }
     }
 }

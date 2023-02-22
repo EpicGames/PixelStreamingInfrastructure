@@ -179,8 +179,13 @@ export class PeerConnectionController {
             this.onVideoStats(this.aggregatedStats);
 
             // Update the preferred codec selection based on what was actually negotiated
-            if(this.updateCodecSelection) {
-                this.config.setOptionSettingValue(OptionParameters.PreferredCodec, this.aggregatedStats.codecs.get(this.aggregatedStats.inboundVideoStats.codecId))
+            if (this.updateCodecSelection) {
+                this.config.setOptionSettingValue(
+                    OptionParameters.PreferredCodec,
+                    this.aggregatedStats.codecs.get(
+                        this.aggregatedStats.inboundVideoStats.codecId
+                    )
+                );
             }
         });
     }
@@ -277,6 +282,7 @@ export class PeerConnectionController {
             'ice connection state change: ' + state,
             6
         );
+        this.onIceConnectionStateChange(state);
     }
 
     /**
@@ -321,6 +327,15 @@ export class PeerConnectionController {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onTrack(trackEvent: RTCTrackEvent) {
+        // Default Functionality: Do Nothing
+    }
+
+    /**
+     * An override method for onIceConnectionStateChange for use outside of the PeerConnectionController
+     * @param event - The webRtc iceconnectionstatechange event
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onIceConnectionStateChange(event: Event) {
         // Default Functionality: Do Nothing
     }
 

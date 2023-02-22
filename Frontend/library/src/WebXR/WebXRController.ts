@@ -289,10 +289,12 @@ export class WebXRController {
     }
 
     static isSessionSupported(mode: XRSessionMode): Promise<boolean> {
-        if(navigator.xr) {
+        if (navigator.xr) {
             return navigator.xr.isSessionSupported(mode);
         } else {
-            return new Promise<boolean>(() => { return false; })
+            return new Promise<boolean>(() => {
+                return false;
+            });
         }
     }
 }
