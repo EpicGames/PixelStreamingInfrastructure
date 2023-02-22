@@ -36,25 +36,25 @@ jobs:
       working-directory: ./Frontend/library
       run: npm run build
 
-    - name: NPM link frontend lib into ui-library
-      working-directory: ./Frontend/ui-library
-      run: npm link ../library
-
     - name: Install ui-library deps
       working-directory: ./Frontend/ui-library
       run: npm ci
+
+    - name: NPM link frontend lib into ui-library
+      working-directory: ./Frontend/ui-library
+      run: npm link ../library
 
     - name: Build frontend ui-library
       working-directory: ./Frontend/ui-library
       run: npm run build-all
 
-    - name: NPM link frontend and ui-library into implementations/EpicGames
-      working-directory: ./Frontend/implementations/EpicGames
-      run: npm link ../../library ../../ui-library
-
     - name: Install implementations/EpicGames deps
       working-directory: ./Frontend/implementations/EpicGames
       run: npm ci
+
+    - name: NPM link frontend and ui-library into implementations/EpicGames
+      working-directory: ./Frontend/implementations/EpicGames
+      run: npm link ../../library ../../ui-library
 
     - name: Build implementations/EpicGames
       working-directory: ./Frontend/implementations/EpicGames

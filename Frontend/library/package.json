@@ -3,7 +3,9 @@
     "version": "0.1.0",
     "description": "Frontend library for Pixel Streaming",
     "main": "dist/lib-pixelstreamingfrontend.js",
+    "module": "dist/lib-pixelstreamingfrontend.esm.js",
     "types": "types/pixelstreamingfrontend.d.ts",
+    "sideEffects": false,
     "scripts": {
         "compile": "tsc --build --clean && tsc",
         "build": "npx webpack --config webpack.prod.js",

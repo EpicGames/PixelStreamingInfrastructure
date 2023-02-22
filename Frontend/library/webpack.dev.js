@@ -3,13 +3,33 @@
 const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 
-module.exports = merge(common, {
-    mode: 'development',
-    devtool: 'inline-source-map',
-    devServer: {
-      static: './dist',
-    },
+const devCommon = {
+  mode: 'development',
+  devtool: 'inline-source-map',
+  devServer: {
+    static: './dist',
+  }
+};
+
+module.exports = [
+  merge(common, devCommon, {
     output: {
-        filename: 'lib-pixelstreamingfrontend.js',
+      filename: 'lib-pixelstreamingfrontend.js',
+      library: {
+        name: 'lib-pixelstreamingfrontend', // exposed variable that will provide access to the library classes
+        type: 'umd'
+      },
+    },
+  }),
+  merge(common, devCommon, {
+    output: {
+      filename: 'lib-pixelstreamingfrontend.esm.js',
+      library: {
+        type: 'module'
+      },
+    },
+    experiments: {
+      outputModule: true
     }
-});
+  })
+];
