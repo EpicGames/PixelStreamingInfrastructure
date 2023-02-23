@@ -1,7 +1,7 @@
 {
     "name": "@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2",
-    "version": "0.0.2",
-    "description": "Frontend library default UI for Pixel Streaming",
+    "version": "0.0.3",
+    "description": "Reference frontend UI library for Pixel Streaming - gives the stock look and feel.",
     "main": "dist/lib-pixelstreamingfrontend-ui.js",
     "module": "dist/lib-pixelstreamingfrontend-ui.esm.js",
     "types": "types/pixelstreamingfrontend-ui.d.ts",
@@ -16,7 +16,7 @@
         "spellcheck": "cspell \"{README.md,.github/*.md,src/**/*.ts}\""
     },
     "devDependencies": {
-        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.2": "0.1.0",
+        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.2": "^0.1.1",
         "@typescript-eslint/eslint-plugin": "^5.16.0",
         "@typescript-eslint/parser": "^5.16.0",
         "cspell": "^4.1.0",
@@ -34,7 +34,7 @@
         "jss-plugin-global": "^10.9.2"
     },
     "peerDependencies": {
-        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.2": "0.1.0"
+        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.2": "^0.1.1"
     },
     "repository": {
         "type": "git",
