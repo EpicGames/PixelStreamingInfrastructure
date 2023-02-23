@@ -20,16 +20,16 @@ module.exports = {
     resolve: {
         extensions: ['.tsx', '.ts', '.js']
     },
+    externals: {
+        sdp: "sdp"
+    },
     plugins: [
         new webpack.DefinePlugin({
             LIBRARY_VERSION: JSON.stringify(package.version)
         })
     ],
     output: {
-        library: 'lib-pixelstreamingfrontend', // exposed variable that will provide access to the library classes
-        libraryTarget: 'umd',
         path: path.resolve(__dirname, 'dist'),
-        clean: true,
         globalObject: 'this'
     }
 };

@@ -9,8 +9,8 @@
     "watch": "npx webpack --watch",
     "serve": "webpack serve --config webpack.dev.js",
     "serve-prod": "webpack serve --config webpack.prod.js",
-    "build-all": "cd ../../library && npm run build && cd ../ui-library && npm run build-all && cd ../implementations/EpicGames && npm link ../../library ../../ui-library && npm run build",
-    "build-dev-all": "cd ../../library && npm run build-dev && cd ../ui-library && npm run build-dev-all && cd ../implementations/EpicGames && npm link ../../library ../../ui-library && npm run build-dev"
+    "build-all": "npm link ../../library ../../ui-library && cd ../../library && npm run build && cd ../ui-library && npm run build-all && cd ../implementations/EpicGames && npm run build",
+    "build-dev-all": "npm link ../../library ../../ui-library && cd ../../library && npm run build-dev && cd ../ui-library && npm run build-dev-all && cd ../implementations/EpicGames && npm run build-dev"
   },
   "devDependencies": {
     "webpack-cli": "^5.0.1",
@@ -22,5 +22,9 @@
     "ts-loader": "^9.4.2",
     "typescript": "^4.9.4",
     "webpack": "^5.75.0"
+  },
+  "dependencies": {
+    "@epicgames-ps/lib-pixelstreamingfrontend-ue5.2": "0.1.0",
+    "@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2": "0.0.2"
   }
 }
