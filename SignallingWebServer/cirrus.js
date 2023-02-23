@@ -10,7 +10,11 @@ const path = require('path');
 const querystring = require('querystring');
 const bodyParser = require('body-parser');
 const logging = require('./modules/logging.js');
+const WebSocket = require('ws');
+const Matchmaker = require('./modules/matchmaker.js');
+const Player = require('./modules/player.js');
 logging.RegisterConsoleLogger();
+
 
 // Command line argument --configFile needs to be checked before loading the config, all other command line arguments are dealt with through the config object
 
@@ -71,7 +75,6 @@ if (config.UseAuthentication && config.UseHTTPS) {
 
 const helmet = require('helmet');
 var hsts = require('hsts');
-var net = require('net');
 
 var FRONTEND_WEBSERVER = 'https://localhost';
 if (config.UseFrontend) {
@@ -91,6 +94,8 @@ if (config.UseFrontend) {
 var streamerPort = config.StreamerPort; // port to listen to Streamer connections
 var sfuPort = config.SFUPort;
 
+/** @type {Matchmaker} */
+let matchmaker;
 var matchmakerAddress = '127.0.0.1';
 var matchmakerPort = 9999;
 var matchmakerRetryInterval = 5;
@@ -274,56 +279,6 @@ let nextPlayerId = 1;
 
 const PlayerType = { Regular: 0, SFU: 1 };
 
-class Player {
-	constructor(id, ws, type, browserSendOffer) {
-		this.id = id;
-		this.ws = ws;
-		this.type = type;
-		this.browserSendOffer = browserSendOffer;
-	}
-
-	subscribe(streamerId) {
-		if (!streamers.has(streamerId)) {
-			console.error(`subscribe: Player ${this.id} tried to subscribe to a non-existent streamer ${streamerId}`);
-			return;
-		}
-		this.streamerId = streamerId;
-		const msg = { type: 'playerConnected', playerId: this.id, dataChannel: true, sfu: this.type == PlayerType.SFU, sendOffer: !this.browserSendOffer };
-		logOutgoing(this.streamerId, msg);
-		this.sendFrom(msg);
-	}
-
-	unsubscribe() {
-		if (this.streamerId && streamers.has(this.streamerId)) {
-			const msg = { type: 'playerDisconnected', playerId: this.id };
-			logOutgoing(this.streamerId, msg);
-			this.sendFrom(msg);
-		}
-		this.streamerId = null;
-	}
-
-	sendFrom(message) {
-		if (!this.streamerId) {
-			return;
-		}
-
-		message.playerId = this.id;
-		const msgString = JSON.stringify(message);
-
-		let streamer = streamers.get(this.streamerId);
-		if (!streamer) {
-			console.error(`sendFrom: Player ${this.id} subscribed to non-existent streamer: ${this.streamerId}`);
-		} else {
-			streamer.ws.send(msgString);
-		}
-	}
-
-	sendTo(message) {
-		const msgString = JSON.stringify(message);
-		this.ws.send(msgString);
-	}
-};
-
 let streamers = new Map();		// streamerId <-> streamer socket
 let players = new Map(); 		// playerId <-> player, where player is either a web-browser or a native webrtc player
 const SFUPlayerId = "SFU";
@@ -451,12 +406,22 @@ streamerMessageHandlers.set('offer', forwardStreamerMessageToPlayer);
 streamerMessageHandlers.set('answer', forwardStreamerMessageToPlayer);
 streamerMessageHandlers.set('iceCandidate', forwardStreamerMessageToPlayer);
 streamerMessageHandlers.set('disconnectPlayer', onStreamerMessageDisconnectPlayer);
+/**
+ * Function that handles the connection to the matchmaker.
+ */
+
+if (config.UseMatchmaker) {
+	matchmaker = new Matchmaker(matchmakerPort, matchmakerAddress, matchmakerRetryInterval, serverPublicIp);
+	matchmaker.connect();
+	matchmaker.registerKeepAlive(matchmakerKeepAliveInterval);
+}
 
 console.logColor(logging.Green, `WebSocket listening for Streamer connections on :${streamerPort}`)
 let streamerServer = new WebSocket.Server({ port: streamerPort, backlog: 1 });
 streamerServer.on('connection', function (ws, req) {
 	console.logColor(logging.Green, `Streamer connected: ${req.connection.remoteAddress}`);
-	sendStreamerConnectedToMatchmaker();
+	matchmaker?.setStreamerReadyState(streamer.readyState);
+	matchmaker?.sendStreamerConnected();
 
 	let streamer = { ws: ws };
 
@@ -481,6 +446,16 @@ streamerServer.on('connection', function (ws, req) {
 		}
 		handler(streamer, msg);
 	});
+
+	function onStreamerDisconnected() {
+		matchmaker?.sendStreamerDisconnected();
+		disconnectAllPlayers();
+		if (sfuIsConnected()) {
+			const msg = { type: "streamerDisconnected" };
+			sfu.send(JSON.stringify(msg));
+		}
+		streamer = null;
+	}
 	
 	ws.on('close', function(code, reason) {
 		console.error(`streamer ${streamer.id} disconnected: ${code} - ${reason}`);
@@ -598,7 +573,7 @@ sfuServer.on('connection', function (ws, req) {
 			console.error(`ERROR: ws.on error: ${err.message}`);
 		}
 	});
-
+	/** @type {Player} */
 	let sfuPlayer = new Player(SFUPlayerId, ws, PlayerType.SFU, false);
 	players.set(SFUPlayerId, sfuPlayer);
 	console.logColor(logging.Green, `SFU (${req.connection.remoteAddress}) connected `);
@@ -693,9 +668,17 @@ playerServer.on('connection', function (ws, req) {
 	++playerCount;
 	let playerId = sanitizePlayerId(nextPlayerId++);
 	console.logColor(logging.Green, `player ${playerId} (${req.connection.remoteAddress}) connected`);
+	/** @type {Player} */
 	let player = new Player(playerId, ws, PlayerType.Regular, browserSendOffer);
 	players.set(playerId, player);
-
+	matchmaker?.setPlayers(players);
+	function sendPlayersCount() {
+		let playerCountMsg = JSON.stringify({ type: 'playerCount', count: players.size });
+		for (let p of players.values()) {
+			p.ws.send(playerCountMsg);
+		}
+	}
+	
 	ws.on('message', (msgRaw) =>{
 		var msg;
 		try {
@@ -725,6 +708,24 @@ playerServer.on('connection', function (ws, req) {
 		handler(player, msg);
 	});
 
+	function onPlayerDisconnected() {
+		try {
+			--playerCount;
+			const player = players.get(playerId);
+			if (player.datachannel) {
+				// have to notify the streamer that the datachannel can be closed
+				sendMessageToController({ type: 'playerDisconnected', playerId: playerId }, true, false);
+			}
+			players.delete(playerId);
+			sendMessageToController({ type: 'playerDisconnected', playerId: playerId }, skipSFU);
+			sendPlayerDisconnectedToFrontend();
+			matchmaker?.sendPlayerDisconnected();
+			sendPlayersCount();
+		} catch(err) {
+			console.logColor(logging.Red, `ERROR:: onPlayerDisconnected error: ${err.message}`);
+		}
+	}
+
 	ws.on('close', function(code, reason) {
 		console.logColor(logging.Yellow, `player ${playerId} connection closed: ${code} - ${reason}`);
 		onPlayerDisconnected(playerId);
@@ -740,7 +741,7 @@ playerServer.on('connection', function (ws, req) {
 	});
 
 	sendPlayerConnectedToFrontend();
-	sendPlayerConnectedToMatchmaker();
+	matchmaker?.sendPlayerConnected();
 	player.ws.send(JSON.stringify(clientConfig));
 	sendPlayersCount();
 });
@@ -761,79 +762,13 @@ function disconnectAllPlayers(streamerId) {
 	}
 }
 
-/**
- * Function that handles the connection to the matchmaker.
- */
-
-if (config.UseMatchmaker) {
-	var matchmaker = new net.Socket();
-
-	matchmaker.on('connect', function() {
-		console.log(`Cirrus connected to Matchmaker ${matchmakerAddress}:${matchmakerPort}`);
-
-		// message.playerConnected is a new variable sent from the SS to help track whether or not a player 
-		// is already connected when a 'connect' message is sent (i.e., reconnect). This happens when the MM
-		// and the SS get disconnected unexpectedly (was happening often at scale for some reason).
-		var playerConnected = false;
-
-		// Set the playerConnected flag to tell the MM if there is already a player active (i.e., don't send a new one here)
-		if( players && players.size > 0) {
-			playerConnected = true;
-		}
-
-		// Add the new playerConnected flag to the message body to the MM
-		message = {
-			type: 'connect',
-			address: typeof serverPublicIp === 'undefined' ? '127.0.0.1' : serverPublicIp,
-			port: httpPort,
-			ready: streamers.size > 0,
-			playerConnected: playerConnected
-		};
-
-		matchmaker.write(JSON.stringify(message));
-	});
-
-	matchmaker.on('error', (err) => {
-		console.log(`Matchmaker connection error ${JSON.stringify(err)}`);
-	});
-
-	matchmaker.on('end', () => {
-		console.log('Matchmaker connection ended');
-	});
-
-	matchmaker.on('close', (hadError) => {
-		console.logColor(logging.Blue, 'Setting Keep Alive to true');
-        matchmaker.setKeepAlive(true, 60000); // Keeps it alive for 60 seconds
-		
-		console.log(`Matchmaker connection closed (hadError=${hadError})`);
-
-		reconnect();
-	});
-
-	// Attempt to connect to the Matchmaker
-	function connect() {
-		matchmaker.connect(matchmakerPort, matchmakerAddress);
+function disconnectSFUPlayer() {
+	console.log("disconnecting SFU from streamer");
+	if(players.has(SFUPlayerId)) {
+		players.get(SFUPlayerId).ws.close(4000, "SFU Disconnected");
+		players.delete(SFUPlayerId);
 	}
-
-	// Try to reconnect to the Matchmaker after a given period of time
-	function reconnect() {
-		console.log(`Try reconnect to Matchmaker in ${matchmakerRetryInterval} seconds`)
-		setTimeout(function() {
-			connect();
-		}, matchmakerRetryInterval * 1000);
-	}
-
-	function registerMMKeepAlive() {
-		setInterval(function() {
-			message = {
-				type: 'ping'
-			};
-			matchmaker.write(JSON.stringify(message));
-		}, matchmakerKeepAliveInterval * 1000);
-	}
-
-	connect();
-	registerMMKeepAlive();
+	sendMessageToController({ type: 'playerDisconnected', playerId: SFUPlayerId }, true, false);
 }
 
 //Keep trying to send gameSessionId in case the server isn't ready yet
@@ -982,61 +917,5 @@ function sendPlayerDisconnectedToFrontend() {
 			});
 	} catch(err) {
 		console.logColor(logging.Red, `ERROR::: sendPlayerDisconnectedToFrontend error: ${err.message}`);
-	}
-}
-
-function sendStreamerConnectedToMatchmaker() {
-	if (!config.UseMatchmaker)
-		return;
-	try {
-		message = {
-			type: 'streamerConnected'
-		};
-		matchmaker.write(JSON.stringify(message));
-	} catch (err) {
-		console.logColor(logging.Red, `ERROR sending streamerConnected: ${err.message}`);
-	}
-}
-
-function sendStreamerDisconnectedToMatchmaker() {
-	if (!config.UseMatchmaker)
-		return;
-	try {
-		message = {
-			type: 'streamerDisconnected'
-		};
-		matchmaker.write(JSON.stringify(message));	
-	} catch (err) {
-		console.logColor(logging.Red, `ERROR sending streamerDisconnected: ${err.message}`);
-	}
-}
-
-// The Matchmaker will not re-direct clients to this Cirrus server if any client
-// is connected.
-function sendPlayerConnectedToMatchmaker() {
-	if (!config.UseMatchmaker)
-		return;
-	try {
-		message = {
-			type: 'clientConnected'
-		};
-		matchmaker.write(JSON.stringify(message));
-	} catch (err) {
-		console.logColor(logging.Red, `ERROR sending clientConnected: ${err.message}`);
-	}
-}
-
-// The Matchmaker is interested when nobody is connected to a Cirrus server
-// because then it can re-direct clients to this re-cycled Cirrus server.
-function sendPlayerDisconnectedToMatchmaker() {
-	if (!config.UseMatchmaker)
-		return;
-	try {
-		message = {
-			type: 'clientDisconnected'
-		};
-		matchmaker.write(JSON.stringify(message));
-	} catch (err) {
-		console.logColor(logging.Red, `ERROR sending clientDisconnected: ${err.message}`);
 	}
 }
