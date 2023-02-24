@@ -41,7 +41,9 @@ or
 
 If you pass a JavaScript object, the `emitUIInteraction` function converts it to a JSON string internally. It then passes the resulting string back to the Pixel Streaming Plugin in your Unreal Engine application, which raises an event on the input controller. In your application's gameplay logic, you bind your own custom event to handle these inputs, using the **Bind Event to OnPixelStreamingInputEvent** node. For example:
 
-![Bind Event to OnPixelStreamingInputEvent](Resources\Images\pixelstreaming-uiinteractionrespond.JPG "Bind Event to OnPixelStreamingInputEvent")
+<p align="center">
+    <img src="Resources\Images\pixelstreaming-uiinteractionrespond.JPG" alt="Bind Event to OnPixelStreamingInputEvent">
+</p>
 
 You need to bind this event once, typically at the start of your game. Each time any player HTML page connected to an instance of your Unreal Engine application calls the `emitUIInteraction`function, your custom event is automatically invoked, regardless of the input passed to `emitUIInteraction`.  
 
@@ -50,11 +52,16 @@ The custom event you assign (for example, the **UI Interaction** node in the ima
 For example, the following Blueprint tests to see whether the input given to `emitUIInteraction` contains the string "MyCustomCommand", and calls a custom function to handle the event:
 
 
-![Search for substring](Resources\Images\pixelstreaming-respond-searchsubstring.JPG "Search for substring")
+<p align="center">
+    <img src="Resources\Images\pixelstreaming-respond-searchsubstring.JPG" alt="Search for substring">
+</p>
 
 If you originally passed a JavaScript object to `emitUIInteraction`, you can retrieve the value of any key from that JSON object using the **Pixel Streaming > Get Json String Value** node. For example, the following Blueprint tests for a key named LoadLevel. If that key is present, it calls a custom function to handle the event:
 
-[![Get a JSON field value](Resources\Images\pixelstreaming-respond-json.JPG "Get a JSON field value")](pixelstreaming-respond-json.JPG)
+
+<p align="center">
+    <img src="Resources\Images\pixelstreaming-respond-json.JPG" alt="Get a JSON field value">
+</p>
 
 
 **_Tip:_**
