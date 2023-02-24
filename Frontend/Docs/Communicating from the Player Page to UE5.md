@@ -4,8 +4,8 @@
 
 The `app.js` file provides two JavaScript functions that you can call in your HTML player page to allow the user to send events and commands from the browser to the Unreal Engine application:
 
-*   You can use `emitCommand` to send console commands back to Unreal Engine. For example, `stat fps` to show the frame rate. See [Using the emitCommand Function below](#usingtheemitcommandfunction).
-*   `emitUIInteraction` sends any arbitrary string or JavaScript object to the game. Use this function to send your own custom commands from your player UI, which you can respond to in your gameplay logic to produce any effect you need in your application. See [Using the emitUIInteraction Function below](#usingtheemituiinteractionfunction).
+*   You can use `emitCommand` to send console commands back to Unreal Engine. For example, `stat fps` to show the frame rate. See [Using the emitCommand Function below](#using-the-emitcommand-function).
+*   `emitUIInteraction` sends any arbitrary string or JavaScript object to the game. Use this function to send your own custom commands from your player UI, which you can respond to in your gameplay logic to produce any effect you need in your application. See [Using the emitUIInteraction Function below](#using-the-emituiinteraction-function).
 
 ### Using the emitCommand Function
 
