@@ -101,6 +101,7 @@ export class WebRtcPlayerController {
     preferredCodec: string;
     peerConfig: RTCConfiguration;
     videoAvgQp: number;
+    signallingUrlBuilder: () => string;
 
     // if you override the disconnection message by calling the interface method setDisconnectMessageOverride
     // it will use this property to store the override message string
@@ -249,6 +250,24 @@ export class WebRtcPlayerController {
         );
 
         this.setVideoEncoderAvgQP(-1);
+
+        this.signallingUrlBuilder =  () => {
+            let signallingServerUrl = this.config.getTextSettingValue(
+                TextParameters.SignallingServerUrl
+            );
+    
+            // If we are connecting to the SFU add a special url parameter to the url
+            if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
+                signallingServerUrl += '?' + Flags.BrowserSendOffer + '=true';
+            }
+    
+            // This code is no longer needed, but is a good example for how subsequent config flags can be appended
+            // if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
+            //     signallingServerUrl += (signallingServerUrl.includes('?') ? '&' : '?') + Flags.BrowserSendOffer + '=true';
+            // }
+    
+            return signallingServerUrl;
+        }
     }
 
     /**
@@ -1073,29 +1092,29 @@ export class WebRtcPlayerController {
         this.resizePlayerStyle();
     }
 
-    buildSignallingServerUrl() {
-        let signallingServerUrl = this.config.getTextSettingValue(
-            TextParameters.SignallingServerUrl
-        );
+    // buildSignallingServerUrl() {
+    //     let signallingServerUrl = this.config.getTextSettingValue(
+    //         TextParameters.SignallingServerUrl
+    //     );
 
-        // If we are connecting to the SFU add a special url parameter to the url
-        if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
-            signallingServerUrl += '?' + Flags.BrowserSendOffer + '=true';
-        }
+    //     // If we are connecting to the SFU add a special url parameter to the url
+    //     if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
+    //         signallingServerUrl += '?' + Flags.BrowserSendOffer + '=true';
+    //     }
 
-        // This code is no longer needed, but is a good example for how subsequent config flags can be appended
-        // if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
-        //     signallingServerUrl += (signallingServerUrl.includes('?') ? '&' : '?') + Flags.BrowserSendOffer + '=true';
-        // }
+    //     // This code is no longer needed, but is a good example for how subsequent config flags can be appended
+    //     // if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
+    //     //     signallingServerUrl += (signallingServerUrl.includes('?') ? '&' : '?') + Flags.BrowserSendOffer + '=true';
+    //     // }
 
-        return signallingServerUrl;
-    }
+    //     return signallingServerUrl;
+    // }
 
     /**
      * Connect to the Signaling server
      */
     connectToSignallingServer() {
-        const signallingUrl = this.buildSignallingServerUrl();
+        const signallingUrl = this.signallingUrlBuilder();
         this.webSocketController.connect(signallingUrl);
     }
 

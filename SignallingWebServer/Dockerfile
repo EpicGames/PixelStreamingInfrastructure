@@ -1,13 +1,12 @@
 # Use the current Long Term Support (LTS) version of Node.js
 FROM node:lts
 
-# Copy the signalling server source code from the build context
-COPY . /opt/SignallingWebServer
-COPY . /opt/Frontend
+# Copy the signalling server and frontend source code from the build context
+COPY /SignallingWebServer /SignallingWebServer
+COPY /Frontend /Frontend
 
-# Install the dependencies for the signalling server
-WORKDIR /opt/SignallingWebServer
-RUN ./platform_scripts/bash/setup.sh --build
+# Install the dependencies for the signalling server and build the frontend
+RUN SignallingWebServer/platform_scripts/bash/setup.sh --build
 
 # Expose TCP ports 80 and 443 for player WebSocket connections and web server HTTP(S) access
 EXPOSE 80
@@ -23,4 +22,4 @@ EXPOSE 8889
 EXPOSE 9999
 
 # Set the signalling server as the container's entrypoint
-ENTRYPOINT ["/usr/local/bin/node", "/opt/SignallingWebServer/cirrus.js"]
+ENTRYPOINT ["/usr/local/bin/node", "/SignallingWebServer/cirrus.js"]

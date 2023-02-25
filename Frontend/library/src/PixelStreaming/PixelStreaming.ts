@@ -588,6 +588,15 @@ export class PixelStreaming {
     }
 
     /**
+     * Pass in a function to generate a signalling server URL.
+     * This function is useful if you need to programmatically construct your signalling server URL.
+     * @param signallingUrlBuilderFunc A function that generates a signalling server url.
+     */
+    public setSignallingUrlBuilder(signallingUrlBuilderFunc: ()=>string) {
+        this._webRtcController.signallingUrlBuilder = signallingUrlBuilderFunc;
+    }
+
+    /**
      * Public getter for the websocket controller. Access to this property allows you to send
      * custom websocket messages.
      */
