@@ -6,11 +6,7 @@ import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
 import { WebRtcPlayerController } from '../WebRtcPlayer/WebRtcPlayerController';
 import { Flags, NumericParameters } from '../Config/Config';
 import { Logger } from '../Logger/Logger';
-import {
-    InitialSettings,
-    EncoderSettings,
-    WebRTCSettings
-} from '../DataChannel/InitialSettings';
+import { InitialSettings } from '../DataChannel/InitialSettings';
 import { OnScreenKeyboard } from '../UI/OnScreenKeyboard';
 import {
     EventEmitter,
