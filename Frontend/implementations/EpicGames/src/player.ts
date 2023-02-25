@@ -14,8 +14,8 @@ document.body.onload = function() {
 	const config = new Config({ useUrlParams: true });
 
 	// Create a Native DOM delegate instance that implements the Delegate interface class
-	const pixelStreaming = new PixelStreaming(config);
-	const application = new Application({ pixelStreaming });
+	const stream = new PixelStreaming(config);
+	const application = new Application({ stream });
 	// document.getElementById("centrebox").appendChild(application.rootElement);
 	document.body.appendChild(application.rootElement);
 }
