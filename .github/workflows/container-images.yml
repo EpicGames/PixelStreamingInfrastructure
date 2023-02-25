@@ -29,3 +29,4 @@ jobs:
           context: .
           tags: 'ghcr.io/epicgames/pixel-streaming-signalling-server:5.2'
           push: true
+          file: SignallingWebServer/Dockerfile
