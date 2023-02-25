@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-export { Application } from './Application/Application';
+export { Application, UIOptions } from './Application/Application';
 
 export { PixelStreamingApplicationStyle } from './Styles/PixelStreamingApplicationStyles';
 
@@ -14,3 +14,8 @@ export { InfoOverlay } from './Overlay/InfoOverlay';
 export { PlayOverlay } from './Overlay/PlayOverlay';
 export { TextOverlay } from './Overlay/TextOverlay';
 export { ConfigUI } from './Config/ConfigUI';
+export { SettingUIBase } from './Config/SettingUIBase';
+export { SettingUIFlag } from './Config/SettingUIFlag';
+export { SettingUINumber } from './Config/SettingUINumber';
+export { SettingUIOption } from './Config/SettingUIOption';
+export { SettingUIText } from './Config/SettingUIText';
