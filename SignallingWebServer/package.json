@@ -1,7 +1,7 @@
 {
   "name": "cirrus-webserver",
   "version": "0.0.1",
-  "description": "cirrus web server",
+  "description": "The reference signalling and web server for Pixel Streaming: Cirrus",
   "scripts": {
     "store_password": "run-script-os",
     "store_password:default": "./platform_scripts/bash/node/bin/node ./modules/authentication/db/store_password.js --usersFile=./modules/authentication/db/users.json",
