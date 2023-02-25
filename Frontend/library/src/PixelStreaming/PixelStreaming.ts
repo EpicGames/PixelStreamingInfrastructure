@@ -601,4 +601,11 @@ export class PixelStreaming {
     public get webXrController() {
         return this._webXrController;
     }
+
+    /**
+     * Public getter for the webRtcController controller. Used for all WebRTC interactions.
+     */
+    public get webRtcController() {
+        return this._webRtcController;
+    }
 }
