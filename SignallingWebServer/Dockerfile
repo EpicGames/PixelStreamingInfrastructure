@@ -7,7 +7,7 @@ COPY . /opt/Frontend
 
 # Install the dependencies for the signalling server
 WORKDIR /opt/SignallingWebServer
-RUN ./platform_scripts/bash/setup.sh --build
+RUN /opt/SignallingWebServer/platform_scripts/bash/setup.sh --build
 
 # Expose TCP ports 80 and 443 for player WebSocket connections and web server HTTP(S) access
 EXPOSE 80
