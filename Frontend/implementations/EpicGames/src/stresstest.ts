@@ -145,8 +145,8 @@ export class StressTester {
 		config.setFlagEnabled(Flags.StartVideoMuted, true);
 
 		// Create a Native DOM delegate instance that implements the Delegate interface class
-		const pixelStreaming = new PixelStreaming(config);
-		const application = new Application({ pixelStreaming });
+		const stream = new PixelStreaming(config);
+		const application = new Application({ stream });
 		streamFrame.appendChild(application.rootElement);
 		return streamFrame;
 	}

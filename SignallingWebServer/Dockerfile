@@ -3,10 +3,11 @@ FROM node:lts
 
 # Copy the signalling server source code from the build context
 COPY . /opt/SignallingWebServer
+COPY . /opt/Frontend
 
 # Install the dependencies for the signalling server
 WORKDIR /opt/SignallingWebServer
-RUN npm install .
+RUN ./platform_scripts/bash/setup.sh --build
 
 # Expose TCP ports 80 and 443 for player WebSocket connections and web server HTTP(S) access
 EXPOSE 80

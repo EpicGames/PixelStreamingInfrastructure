@@ -30,4 +30,4 @@ You have a few options for where you can place your custom HTML player page, an
     For example, if you save a file to `Engine/Source/Programs/PixelStreaming/WebServers/SignallingWebServer/myfolder/myplayerpage.html`, and you set the `HomepageFile` parameter to `myfolder/myplayerpage.html`, the page would be accessible without needing to provide a file name in the URL: `http://127.0.0.1/`.
 *   You can also use the **AdditionalRoutes** parameter for the Signaling and Web Server to customize the mapping between URL paths and local folders on your computer.
 
-For additional details on these parameters, see also the [Pixel Streaming Reference](sharing-and-releasing-projects/pixel-streaming/pixel-streaming-reference).
+For additional details on these parameters, see also the [Pixel Streaming Reference](https://docs.unrealengine.com/5.1/en-US/unreal-engine-pixel-streaming-reference/).
