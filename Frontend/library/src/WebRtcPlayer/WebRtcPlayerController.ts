@@ -1671,6 +1671,15 @@ export class WebRtcPlayerController {
         this.streamMessageController.toStreamerHandlers.get('IFrameRequest')();
     }
 
+    sendUIInteraction(descriptor: object) {
+        Logger.Log(
+            Logger.GetStackTrace(),
+            '----   Sending custom UIInteraction message   ----',
+            6
+        );
+        this.sendDescriptorController.emitUIInteraction(descriptor);
+    }
+
     /**
      * Sends a request to the UE Instance to have ownership of Quality
      */

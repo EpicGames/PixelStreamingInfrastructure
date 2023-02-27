@@ -565,6 +565,19 @@ export class PixelStreaming {
     }
 
     /**
+     * Send data to UE application. The data will be run through JSON.stringify() so e.g. strings
+     * and any serializable objects with no recurrence can be sent.
+     * @returns
+     */
+    public sendUIInteraction(descriptor: object) {
+        if (!this._webRtcController.videoPlayer.isVideoReady()) {
+            return false;
+        }
+        this._webRtcController.sendUIInteraction(descriptor);
+        return true;
+    }
+
+	/**
      * Dispatch a new event.
      * @param e event
      * @returns
