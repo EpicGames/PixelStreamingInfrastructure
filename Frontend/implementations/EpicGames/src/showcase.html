@@ -1,0 +1,69 @@
+﻿<!-- Copyright Epic Games, Inc. All Rights Reserved. -->
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <title>Pixel Streaming Showcase</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Optional: set some favicons -->
+    <link rel="shortcut icon" href="./assets/images/favicon.ico" type="image/x-icon">
+	<link rel="icon" type="image/png" sizes="96x96" href="./assets/images/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="./assets/images/favicon-16x16.png">
+
+    <!-- Apply the showcase CSS -->
+    <link type="text/css" rel="stylesheet" href="./assets/css/showcase.css">
+
+</head>
+
+<body>
+    <div class="wrapper">
+
+        <!-- The details panels for the examples sidebar -->
+        <div id="sidebar">
+            <div id="sidebar-header">Details</div>
+
+            <div id="sidebarContent">
+                <div>
+                    <p>Select a character:</p>
+                    <div onclick="onConfigButton(0,0)"">
+                        <img class="characterBtn" src="./assets/images/Aurora.jpg" />
+                    </div>
+                    <div onclick="onConfigButton(0,1)"">
+                        <img class="characterBtn" src="./assets/images/Crunch.jpg" />
+                    </div>
+                </div>
+
+                <div>
+                    <p>Select a skin:</p>
+                    <button onclick="onConfigButton(1,0)">Skin 1</button>
+                    <button onclick="onConfigButton(1,1)">Skin 2</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="content">
+            <div id="exampletitle">
+                <div id="psdemotext"> Pixel Streaming Demo</div>
+                <div id="sep"> - </div>
+                <select title="Select an example...">
+                    <option>Getting Started</option>
+                    <option>Send UE Data</option>
+                </select>
+            </div>
+
+            <div id="playercontainer"></div>
+
+            <div id="infocontainer">
+                <div id="infoinstructions">
+                    Information here
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
