@@ -566,7 +566,7 @@ export class PixelStreaming {
 
     /**
      * Send data to UE application. The data will be run through JSON.stringify() so e.g. strings
-     * and any serializable objects with no recurrence can be sent.
+     * and any serializable plain JSON objects with no recurrence can be sent.
      * @returns
      */
     public sendUIInteraction(descriptor: object) {
