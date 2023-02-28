@@ -1686,7 +1686,7 @@ export class WebRtcPlayerController {
     /**
      * Send a console command message
      */
-    sendConsoleCommand(command: string) {
+    emitConsoleCommand(command: string) {
         Logger.Log(
             Logger.GetStackTrace(),
             '----   Sending custom Command:ConsoleCommand message   ----',

@@ -583,11 +583,11 @@ export class PixelStreaming {
      * console commands.
      * @returns true if succeeded, false if rejected
      */
-    public sendConsoleCommand(command: string) {
+    public emitConsoleCommand(command: string) {
         if (!this.allowConsoleCommands || !this._webRtcController.videoPlayer.isVideoReady()) {
             return false;
         }
-        this._webRtcController.sendConsoleCommand(command);
+        this._webRtcController.emitConsoleCommand(command);
         return true;
     }
 
