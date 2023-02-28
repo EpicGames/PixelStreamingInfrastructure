@@ -53,6 +53,7 @@ export class PixelStreaming {
     private _videoElementParent: HTMLElement;
 
     _showActionOrErrorOnDisconnect = true;
+    private allowConsoleCommands = false;
 
     private onScreenKeyboardHelper: OnScreenKeyboard;
 
@@ -462,9 +463,9 @@ export class PixelStreaming {
             new InitialSettingsEvent({ settings })
         );
         if (settings.PixelStreamingSettings) {
-            const allowConsoleCommands =
-                settings.PixelStreamingSettings.AllowPixelStreamingCommands;
-            if (allowConsoleCommands === false) {
+            this.allowConsoleCommands =
+                settings.PixelStreamingSettings.AllowPixelStreamingCommands ?? false;
+            if (this.allowConsoleCommands === false) {
                 Logger.Info(
                     Logger.GetStackTrace(),
                     '-AllowPixelStreamingCommands=false, sending arbitrary console commands from browser to UE is disabled.'
@@ -567,13 +568,26 @@ export class PixelStreaming {
     /**
      * Send data to UE application. The data will be run through JSON.stringify() so e.g. strings
      * and any serializable plain JSON objects with no recurrence can be sent.
-     * @returns
+     * @returns true if succeeded, false if rejected
      */
     public sendUIInteraction(descriptor: object) {
         if (!this._webRtcController.videoPlayer.isVideoReady()) {
             return false;
         }
         this._webRtcController.sendUIInteraction(descriptor);
+        return true;
+    }
+
+    /**
+     * Send a console command to UE application. Only allowed if UE has signaled that it allows
+     * console commands.
+     * @returns true if succeeded, false if rejected
+     */
+    public sendConsoleCommand(command: string) {
+        if (!this.allowConsoleCommands || !this._webRtcController.videoPlayer.isVideoReady()) {
+            return false;
+        }
+        this._webRtcController.sendConsoleCommand(command);
         return true;
     }
 

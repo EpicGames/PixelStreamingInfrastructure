@@ -1671,6 +1671,9 @@ export class WebRtcPlayerController {
         this.streamMessageController.toStreamerHandlers.get('IFrameRequest')();
     }
 
+    /**
+     * Send a UIInteraction message
+     */
     sendUIInteraction(descriptor: object) {
         Logger.Log(
             Logger.GetStackTrace(),
@@ -1678,6 +1681,20 @@ export class WebRtcPlayerController {
             6
         );
         this.sendDescriptorController.emitUIInteraction(descriptor);
+    }
+
+    /**
+     * Send a console command message
+     */
+    sendConsoleCommand(command: string) {
+        Logger.Log(
+            Logger.GetStackTrace(),
+            '----   Sending custom Command:ConsoleCommand message   ----',
+            6
+        );
+        this.sendDescriptorController.emitCommand({
+            ConsoleCommand: command,
+        });
     }
 
     /**
