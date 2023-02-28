@@ -1674,7 +1674,7 @@ export class WebRtcPlayerController {
     /**
      * Send a UIInteraction message
      */
-    sendUIInteraction(descriptor: object) {
+    emitUIInteraction(descriptor: object) {
         Logger.Log(
             Logger.GetStackTrace(),
             '----   Sending custom UIInteraction message   ----',
