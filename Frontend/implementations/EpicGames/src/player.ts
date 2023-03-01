@@ -2,9 +2,9 @@
 
 import { Config, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { Application, PixelStreamingApplicationStyle } from '@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2';
-export const PixelStreamingApplicationStyles =
+const PixelStreamingApplicationStyles =
     new PixelStreamingApplicationStyle();
-
+PixelStreamingApplicationStyles.applyStyleSheet();
 
 document.body.onload = function() {
 	// Example of how to set the logger level

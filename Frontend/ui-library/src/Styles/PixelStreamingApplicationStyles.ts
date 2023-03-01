@@ -485,6 +485,8 @@ export class PixelStreamingApplicationStyle {
         }
     };
 
+    customStyles?: Partial<Styles>;
+
     constructor(customStyles?: Partial<Styles>) {
         // One time setup with default plugins and settings.
         const jssOptions = {
@@ -495,10 +497,10 @@ export class PixelStreamingApplicationStyle {
 
         jss.setup(jssOptions);
 
-        this.applyStyleSheet(customStyles);
+        this.customStyles = customStyles;
     }
 
-    applyStyleSheet(customStyles?: Partial<Styles>) {
+    applyStyleSheet() {
         // Todo: refactor codebase to use jss at a component level, classes can be grabbed like so:
         //const {pixelStreamingClasses} = jss.createStyleSheet(styles).attach();
 
@@ -506,7 +508,7 @@ export class PixelStreamingApplicationStyle {
         jss.createStyleSheet({
             '@global': {
                 ...this.defaultStyles,
-                ...customStyles
+                ...this.customStyles
             }
         }).attach();
     }
