@@ -570,7 +570,7 @@ export class PixelStreaming {
      * and any serializable plain JSON objects with no recurrence can be sent.
      * @returns true if succeeded, false if rejected
      */
-    public emitUIInteraction(descriptor: object) {
+    public emitUIInteraction(descriptor: object | string) {
         if (!this._webRtcController.videoPlayer.isVideoReady()) {
             return false;
         }
