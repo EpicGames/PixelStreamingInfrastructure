@@ -597,6 +597,8 @@ export class Application {
      * @param isLightMode - should we use a light or dark color scheme
      */
     updateColors(isLightMode: boolean) {
-        this.onUpdateColors(isLightMode);
+        if (this.onUpdateColors) {
+            this.onUpdateColors(isLightMode);
+        }
     }
 }
