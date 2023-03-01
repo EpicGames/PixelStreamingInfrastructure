@@ -2,8 +2,9 @@
 
 import { Config, Flags, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { Application, PixelStreamingApplicationStyle } from '@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2';
-export const PixelStreamingApplicationStyles =
+const PixelStreamingApplicationStyles =
     new PixelStreamingApplicationStyle();
+PixelStreamingApplicationStyles.applyStyleSheet();
 
 // This is the entrypoint to the stress test, all setup happens here
 export class StressTester {
