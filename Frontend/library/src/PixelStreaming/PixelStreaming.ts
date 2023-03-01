@@ -591,7 +591,27 @@ export class PixelStreaming {
         return true;
     }
 
-	/**
+    /**
+     * Add a UE -> browser response event listener
+     * @param name - The name of the response handler
+     * @param listener - The method to be activated when a message is received
+     */
+    addResponseEventListener(
+        name: string,
+        listener: (response: string) => void
+    ) {
+        this._webRtcController.responseController.addResponseEventListener(name, listener);
+    }
+
+    /**
+     * Remove a UE -> browser response event listener
+     * @param name - The name of the response handler
+     */
+    removeResponseEventListener(name: string) {
+        this._webRtcController.responseController.removeResponseEventListener(name);
+    }
+
+    /**
      * Dispatch a new event.
      * @param e event
      * @returns
