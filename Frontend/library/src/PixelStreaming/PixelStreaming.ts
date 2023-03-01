@@ -471,28 +471,45 @@ export class PixelStreaming {
                 );
             }
         }
+
+        const useUrlParams = this.config.useUrlParams;
+        const urlParams = new URLSearchParams(window.location.search);
         if (settings.EncoderSettings) {
             this.config.setNumericSetting(
                 NumericParameters.MinQP,
-                settings.EncoderSettings.MinQP
+                // If a setting is set in the URL, make sure we respect that value as opposed to what the application sends us
+                (useUrlParams && urlParams.has(NumericParameters.MinQP)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.MinQP)) 
+                    : settings.EncoderSettings.MinQP
             );
+
+            
             this.config.setNumericSetting(
                 NumericParameters.MaxQP,
-                settings.EncoderSettings.MaxQP
+                (useUrlParams && urlParams.has(NumericParameters.MaxQP)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.MaxQP)) 
+                    : settings.EncoderSettings.MaxQP
             );
         }
         if (settings.WebRTCSettings) {
             this.config.setNumericSetting(
                 NumericParameters.WebRTCMinBitrate,
-                settings.WebRTCSettings.MinBitrate / 1000 /* bps to kbps */
+                (useUrlParams && urlParams.has(NumericParameters.WebRTCMinBitrate)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCMinBitrate)) / 1000 /* bps to kbps */
+                    : settings.WebRTCSettings.MinBitrate / 1000 /* bps to kbps */
             );
             this.config.setNumericSetting(
                 NumericParameters.WebRTCMaxBitrate,
-                settings.WebRTCSettings.MaxBitrate / 1000 /* bps to kbps */
+                (useUrlParams && urlParams.has(NumericParameters.WebRTCMaxBitrate)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCMaxBitrate)) / 1000 /* bps to kbps */
+                    : settings.WebRTCSettings.MaxBitrate / 1000 /* bps to kbps */
+                
             );
             this.config.setNumericSetting(
                 NumericParameters.WebRTCFPS,
-                settings.WebRTCSettings.FPS
+                (useUrlParams && urlParams.has(NumericParameters.WebRTCFPS)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCFPS))
+                    : settings.WebRTCSettings.FPS
             );
         }
     }
@@ -547,7 +564,7 @@ export class PixelStreaming {
         return true;
     }
 
-	/**
+    /**
      * Dispatch a new event.
      * @param e event
      * @returns
@@ -555,8 +572,8 @@ export class PixelStreaming {
     public dispatchEvent(e: PixelStreamingEvent): boolean {
         return this._eventEmitter.dispatchEvent(e);
     }
-	
-	/**
+    
+    /**
      * Register an event handler.
      * @param type event name
      * @param listener event handler function
