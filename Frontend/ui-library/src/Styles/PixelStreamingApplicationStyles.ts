@@ -4,7 +4,40 @@ import jss, { Styles } from 'jss';
 import global from 'jss-plugin-global';
 import camelCase from 'jss-plugin-camel-case';
 
+export interface ColorPalette {
+    '--color0': string;
+    '--color1': string;
+    '--color2': string;
+    '--color3': string;
+    '--color4': string;
+    '--color5': string;
+    '--color6': string;
+    '--color7': string;
+}
+
 export class PixelStreamingApplicationStyle {
+    defaultLightModePalette: ColorPalette = {
+        '--color0': '#e2e0dd80',
+        '--color1': '#FFFFFF',
+        '--color2': '#000000',
+        '--color3': '#0585fe',
+        '--color4': '#35b350',
+        '--color5': '#ffab00',
+        '--color6': '#e1e2dd',
+        '--color7': '#c3c4bf'
+    };
+
+    defaultDarkModePalette: ColorPalette = {
+        '--color0': '#1D1F2280',
+        '--color1': '#000000',
+        '--color2': '#FFFFFF',
+        '--color3': '#0585fe',
+        '--color4': '#35b350',
+        '--color5': '#ffab00',
+        '--color6': '#1e1d22',
+        '--color7': '#3c3b40'
+    };
+
     defaultStyles = {
         ':root': {
             '--color0': '#1D1F2280',
@@ -486,8 +519,16 @@ export class PixelStreamingApplicationStyle {
     };
 
     customStyles?: Partial<Styles>;
+    lightModePalette: ColorPalette;
+    darkModePalette: ColorPalette;
 
-    constructor(customStyles?: Partial<Styles>) {
+    constructor(options?: {
+        customStyles?: Partial<Styles>;
+        lightModePalette?: ColorPalette;
+        darkModePalette?: ColorPalette;
+    }) {
+        const { customStyles, lightModePalette, darkModePalette } =
+            options ?? {};
         // One time setup with default plugins and settings.
         const jssOptions = {
             // JSS has many interesting plugins we may wish to turn on
@@ -498,6 +539,9 @@ export class PixelStreamingApplicationStyle {
         jss.setup(jssOptions);
 
         this.customStyles = customStyles;
+        this.lightModePalette =
+            lightModePalette ?? this.defaultLightModePalette;
+        this.darkModePalette = darkModePalette ?? this.defaultDarkModePalette;
     }
 
     applyStyleSheet() {
@@ -511,5 +555,29 @@ export class PixelStreamingApplicationStyle {
                 ...this.customStyles
             }
         }).attach();
+    }
+
+    applyPalette(palette: ColorPalette) {
+        const rootElement = document.querySelector(':root') as HTMLElement;
+        rootElement.style.setProperty('--color0', palette['--color0']);
+        rootElement.style.setProperty('--color1', palette['--color1']);
+        rootElement.style.setProperty('--color2', palette['--color2']);
+        rootElement.style.setProperty('--color3', palette['--color3']);
+        rootElement.style.setProperty('--color4', palette['--color4']);
+        rootElement.style.setProperty('--color5', palette['--color5']);
+        rootElement.style.setProperty('--color6', palette['--color6']);
+        rootElement.style.setProperty('--color7', palette['--color7']);
+    }
+
+    /**
+     * Update the players color variables
+     * @param isLightMode - should we use a light or dark color scheme
+     */
+    updateColors(isLightMode: boolean) {
+        if (isLightMode) {
+            this.applyPalette(this.lightModePalette);
+        } else {
+            this.applyPalette(this.darkModePalette);
+        }
     }
 }

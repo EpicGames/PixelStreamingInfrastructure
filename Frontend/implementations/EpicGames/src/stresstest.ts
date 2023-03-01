@@ -147,7 +147,10 @@ export class StressTester {
 
 		// Create a Native DOM delegate instance that implements the Delegate interface class
 		const stream = new PixelStreaming(config);
-		const application = new Application({ stream });
+		const application = new Application({
+			stream,
+			onUpdateColors: (isLightMode) => PixelStreamingApplicationStyles.updateColors(isLightMode)
+		});
 		streamFrame.appendChild(application.rootElement);
 		return streamFrame;
 	}
