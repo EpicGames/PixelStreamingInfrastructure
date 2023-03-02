@@ -34,20 +34,22 @@ If part of the library is not exposed and you wish to extend it, please do so in
 ## Developing
 
 Changes to the library occur in the [/library](/Frontend/library) directory and require you to have NodeJS installed as part of your development environment.
-Once you have NodeJS installed, 
+Once you have NodeJS installed: 
 
 - `cd library`
 - `npm install`
 - `npm run build`
 
-The default user interface is provided in [/ui-library](/Frontend/ui-library) directory. You can either use it or provide your own user interface. To build the default UI, run
+The default user interface is provided in [/ui-library](/Frontend/ui-library) directory. You can either use it or provide your own user interface. To build the default UI, run:
 - `cd ui-library`
 - `npm install`
 - `npm run build`
 
+This will produce `player.js` under the `SignallingWebServer/Public` directory - this is the default UI.
 
-If you are developing your implementation based on the library, the process is similar:
+### Making your own UI
 
+We recommend studying `/ui-library` and `player.ts`, then once you have copied and modified the `package.json` and `.ts` into your own `implementation/your_implementation` directory, the process is similar:
 
 - `cd implementation/your_implementation`
 - `npm build-all`
@@ -55,4 +57,4 @@ If you are developing your implementation based on the library, the process is s
 
 ## Legal
 
-Copyright &copy; 2022, Epic Games. Licensed under the MIT License, see the file [LICENSE](./LICENSE) for details.
+Copyright &copy; 2023, Epic Games. Licensed under the MIT License, see the file [LICENSE](./LICENSE) for details.
