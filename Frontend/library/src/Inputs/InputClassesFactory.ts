@@ -61,7 +61,6 @@ export class InputClassesFactory {
             this.coordinateConverter,
             this.activeKeys
         );
-        mouseController.clearMouseEvents();
 
         switch (controlScheme) {
             case ControlSchemeType.LockedMouse:

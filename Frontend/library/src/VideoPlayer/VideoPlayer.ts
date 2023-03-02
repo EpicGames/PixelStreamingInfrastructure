@@ -8,8 +8,6 @@ import { Logger } from '../Logger/Logger';
  */
 declare global {
     interface HTMLElement {
-        pressMouseButtons?(mouseEvent: MouseEvent): void;
-        releaseMouseButtons?(mouseEvent: MouseEvent): void;
         mozRequestPointerLock?(): void;
     }
 }

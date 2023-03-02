@@ -1026,6 +1026,7 @@ export class WebRtcPlayerController {
             return;
         }
 
+        this.touchController?.unregisterTouchEvents();
         this.touchController = this.inputClassesFactory.registerTouch(
             this.config.isFlagEnabled(Flags.FakeMouseWithTouches),
             this.videoElementParentClientRect
@@ -1422,9 +1423,11 @@ export class WebRtcPlayerController {
 
         /*  */
         this.activateRegisterMouse();
+        this.keyboardController?.unregisterKeyBoardEvents();
         this.keyboardController = this.inputClassesFactory.registerKeyBoard(
             this.config
         );
+        this.gamePadController?.unregisterGamePadEvents();
         this.gamePadController = this.inputClassesFactory.registerGamePad();
     }
 
@@ -1510,6 +1513,7 @@ export class WebRtcPlayerController {
         const mouseMode = this.config.isFlagEnabled(Flags.HoveringMouseMode)
             ? ControlSchemeType.HoveringMouse
             : ControlSchemeType.LockedMouse;
+        this.mouseController?.unregisterMouseEvents();
         this.mouseController =
             this.inputClassesFactory.registerMouse(mouseMode);
     }
