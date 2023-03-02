@@ -2,6 +2,7 @@
 
 import { Logger } from '../Logger/Logger';
 import { StreamMessageController } from '../UeInstanceMessage/StreamMessageController';
+import { EventListenerTracker } from '../Util/EventListenerTracker';
 import { Controller } from './GamepadTypes';
 
 /**
@@ -11,6 +12,9 @@ export class GamePadController {
     controllers: Array<Controller>;
     requestAnimationFrame: (callback: FrameRequestCallback) => number;
     toStreamerMessagesProvider: StreamMessageController;
+
+    // Utility for keeping track of event handlers and unregistering them
+    private gamePadEventListenerTracker = new EventListenerTracker();
 
     /**
      * @param toStreamerMessagesProvider - Stream message instance
@@ -24,23 +28,38 @@ export class GamePadController {
             window.requestAnimationFrame;
         const browserWindow = window as Window;
         if ('GamepadEvent' in browserWindow) {
-            window.addEventListener('gamepadconnected', (ev: GamepadEvent) =>
-                this.gamePadConnectHandler(ev)
+            const onGamePadConnected = (ev: GamepadEvent) =>
+                this.gamePadConnectHandler(ev);
+            const onGamePadDisconnected = (ev: GamepadEvent) =>
+                this.gamePadDisconnectHandler(ev);
+            window.addEventListener('gamepadconnected', onGamePadConnected);
+            window.addEventListener('gamepaddisconnected', onGamePadDisconnected);
+            this.gamePadEventListenerTracker.addUnregisterCallback(
+                () => window.removeEventListener('gamepadconnected', onGamePadConnected)
             );
-            window.addEventListener('gamepaddisconnected', (ev: GamepadEvent) =>
-                this.gamePadDisconnectHandler(ev)
+            this.gamePadEventListenerTracker.addUnregisterCallback(
+                () => window.removeEventListener('gamepaddisconnected', onGamePadDisconnected)
             );
         } else if ('WebKitGamepadEvent' in browserWindow) {
-            window.addEventListener(
-                'webkitgamepadconnected',
-                (ev: GamepadEvent) => this.gamePadConnectHandler(ev)
+            const onWebkitGamePadConnected = (ev: GamepadEvent) => this.gamePadConnectHandler(ev);
+            const onWebkitGamePadDisconnected = (ev: GamepadEvent) => this.gamePadDisconnectHandler(ev);
+            window.addEventListener('webkitgamepadconnected', onWebkitGamePadConnected);
+            window.addEventListener('webkitgamepaddisconnected', onWebkitGamePadDisconnected);
+            this.gamePadEventListenerTracker.addUnregisterCallback(
+                () => window.removeEventListener('webkitgamepadconnected', onWebkitGamePadConnected)
             );
-            window.addEventListener(
-                'webkitgamepaddisconnected',
-                (ev: GamepadEvent) => this.gamePadDisconnectHandler(ev)
+            this.gamePadEventListenerTracker.addUnregisterCallback(
+                () => window.removeEventListener('webkitgamepaddisconnected', onWebkitGamePadDisconnected)
             );
         }
         this.controllers = [];
+    }
+
+    /**
+     * Unregisters all event handlers
+     */
+    unregisterGamePadEvents() {
+        this.gamePadEventListenerTracker.unregisterAll();
     }
 
     /**
