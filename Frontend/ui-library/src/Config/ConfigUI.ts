@@ -218,6 +218,26 @@ export class ConfigUI {
             this.flagsUi.get(Flags.HoveringMouseMode)
         );
 
+        this.addSettingFlag(
+            viewSettingsSection,
+            this.flagsUi.get(Flags.EnableKeyboardInput)
+        );
+
+        this.addSettingFlag(
+            viewSettingsSection,
+            this.flagsUi.get(Flags.EnableMouseInput)
+        );
+
+        this.addSettingFlag(
+            viewSettingsSection,
+            this.flagsUi.get(Flags.EnableTouchInput)
+        );
+
+        this.addSettingFlag(
+            viewSettingsSection,
+            this.flagsUi.get(Flags.EnableGamePadInput)
+        );
+
         this.addSettingFlag(viewSettingsSection, this.flagsUi.get(LightMode));
 
         /* Setup all encoder related settings under this section */
