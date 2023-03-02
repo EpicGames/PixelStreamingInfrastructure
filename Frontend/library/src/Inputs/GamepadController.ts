@@ -22,10 +22,11 @@ export class GamePadController {
     constructor(toStreamerMessagesProvider: StreamMessageController) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
 
-        this.requestAnimationFrame =
+        this.requestAnimationFrame = (
             window.mozRequestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
-            window.requestAnimationFrame;
+            window.requestAnimationFrame
+        ).bind(window);
         const browserWindow = window as Window;
         if ('GamepadEvent' in browserWindow) {
             const onGamePadConnected = (ev: GamepadEvent) =>
@@ -83,7 +84,7 @@ export class GamePadController {
             'gamepad: ' + gamepad.id + ' connected',
             6
         );
-        window.requestAnimationFrame(() => this.updateStatus());
+        this.requestAnimationFrame(() => this.updateStatus());
     }
 
     /**
