@@ -1,7 +1,8 @@
-# Front End Setting Panel
+# Frontend Setting Panel
 
-With the new Pixel Streaming Front End, we've created a settings panel that allows you to adjust and change settings of your stream on the fly.
-This page will be updated with new features and commands available.
+The Pixel Streaming frontend contains a settings panel that allows you to configure your Pixel Streaming user experience as needed - whether that be toggling features or connecting to different signalling servers.
+
+This page will be updated with new features and commands as they become available.
 
 
 ## Settings
@@ -14,13 +15,13 @@ This page will be updated with new features and commands available.
 | **Signalling URL** | The URL of the signalling server. |
 | **Streamer ID** | Allows you to select which streamer to stream. |
 | **Auto connect to stream** | Browser will automatically connect to the stream when loaded. Prevents having to click to start |
-| **Auto play video** | When stream is ready, starts playing video immediately instead of showing a play button. |
-| **Browser send offer** | The browser will start the WebRTC handshake instead of the Unreal Engine application. This is an advanced setting for people customising the front end. Primarily for backwards compatibility for 4.x versions of the engine. |
-| **Use microphone** | Will start receiving audio input from your microphone and play it back through the stream. |
-| **Start video muted** | Muted audio when stream starts |
-| **Prefer SFU** | Will attempt to use the Selective Forwarding Unit, will only work if you have one running. |
+| **Auto play video** | When the stream is ready, starts playing video immediately instead of showing a play button. |
+| **Browser send offer** | The browser will start the WebRTC handshake instead of the Unreal Engine application. This is an advanced setting for users customising the frontend. Primarily for backwards compatibility for 4.x versions of the engine. |
+| **Use microphone** | Will start receiving audio input from your microphone and transmit it to the Unreal Engine. |
+| **Start video muted** | Muted audio when the stream starts. |
+| **Prefer SFU** | Will attempt to use the Selective Forwarding Unit (SFU), if you have one running. |
 | **Is quality controller?** | Makes the encoder of the Pixel Streaming Plugin use the current browser connection to determine the bandwidth available, and therefore the quality of the stream encoding. **See notes below** |
-| **Force mono audio** | Force browser to request mono audio in the SDP. |
+| **Force mono audio** | Force the browser to request mono audio in the SDP. |
 | **Force TURN** | Will attempt to connect exclusively via the TURN server. Will not work without an active TURN server. |
 | **Suppress browser keys** | Suppress or allow certain keys we use in UE, for example F5 to show shader complexity instead of refreshing the page. |
 | **AFK if Idle** | Timeout the connection if no input is detected for a period of time. |
@@ -30,8 +31,8 @@ This page will be updated with new features and commands available.
 ### UI
 | **Setting** | **Description** |
 | --- | --- |
-| **Match viewport resolution** | Visualizes statistics about the connection between the browser and the Unreal Engine application. |
-| **Control scheme** | Will dictate if the stream captures your mouse or keeps it free. |
+| **Match viewport resolution** | Resizes the Unreal Engine application resolution to match the browser's video element size.|
+| **Control scheme** | If the scheme is `locked mouse` the browser will use `pointerlock` to capture your mouse, whereas if the scheme is `hovering mouse` you will retain your OS/browser cursor. |
 | **Color scheme** | Allows you to switch between light mode and dark mode. |
 
 ### Encoder
@@ -54,18 +55,17 @@ This page will be updated with new features and commands available.
 | --- | --- |
 | **Show FPS** | Will display the current FPS |
 | **Request Keyframe** | Will ask the stream for a keyframe. This is helpful if your stream is choppy and needs to catch up.  |
-| **Restart Stream** | Restarts the peer connection to the stream. Should be used if you change above settings to ensure they are applied. |
+| **Restart Stream** | Restarts the stream by disconnecting and reconnecting the websocket connection. |
 
 
 ### Notes
 
 **Quality Controller**
-Although Pixel Streaming adapts the quality of the stream to match the available bandwidth, the video frames are only encoded once by the Pixel Streaming Plugin. That one encoding is used for all clients. Therefore, only one client connection can "own" the quality used for adaptive streaming. If the other clients have a much better connection to the server, they may end up seeing a lower quality stream than necessary. On the other hand, if other clients have a much worse connection to the server, they may end up with lag or jitter.
-By default, each time a new browser connects, it adopts the ownership of the stream. Use this checkbox from any other connected browser to retake ownership.
+Although Pixel Streaming adapts the quality of the stream to match the available bandwidth, when using H.264, the video frames are only encoded once by the Pixel Streaming Plugin. That one encoding is used for all clients. Therefore, only one client connection can "own" the quality used for adaptive streaming. If the other clients have a much better connection to the server, they may end up seeing a lower quality stream than necessary. On the other hand, if other clients have a much worse connection to the server, they may end up with lag or jitter. **Note**, this quality controller setting is completely irrelevant if you are streaming using any codec other than H.264 (such as VP8 or VP9).
 
 
 ## Legal
 
-Copyright &copy; 2022, Epic Games. Licensed under the MIT License, see the file [LICENSE](./LICENSE) for details.
+Copyright &copy; 2022, Epic Games. Licensed under the MIT License, see the file [LICENSE](../../LICENSE.md) for details.
 
 
