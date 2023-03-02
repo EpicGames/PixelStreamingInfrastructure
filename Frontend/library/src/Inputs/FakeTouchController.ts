@@ -140,7 +140,7 @@ export class FakeTouchController implements ITouchController {
                         x - this.fakeTouchFinger.x,
                         y - this.fakeTouchFinger.y
                     );
-                toStreamerHandlers.get('MoveMouse')([
+                toStreamerHandlers.get('MouseMove')([
                     coord.x,
                     coord.y,
                     delta.x,
