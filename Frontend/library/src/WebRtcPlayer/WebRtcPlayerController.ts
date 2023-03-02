@@ -1684,17 +1684,15 @@ export class WebRtcPlayerController {
     }
 
     /**
-     * Send a console command message
+     * Send a Command message
      */
-    emitConsoleCommand(command: string) {
+    emitCommand(descriptor: object) {
         Logger.Log(
             Logger.GetStackTrace(),
-            '----   Sending custom Command:ConsoleCommand message   ----',
+            '----   Sending custom Command message   ----',
             6
         );
-        this.sendDescriptorController.emitCommand({
-            ConsoleCommand: command,
-        });
+        this.sendDescriptorController.emitCommand(descriptor);
     }
 
     /**

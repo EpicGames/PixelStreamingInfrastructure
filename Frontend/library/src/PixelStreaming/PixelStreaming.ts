@@ -579,15 +579,18 @@ export class PixelStreaming {
     }
 
     /**
-     * Send a console command to UE application. Only allowed if UE has signaled that it allows
-     * console commands.
+     * Send a command to UE application. Blocks ConsoleCommand descriptors unless UE
+     * has signaled that it allows console commands.
      * @returns true if succeeded, false if rejected
      */
-    public emitConsoleCommand(command: string) {
-        if (!this.allowConsoleCommands || !this._webRtcController.videoPlayer.isVideoReady()) {
+    public emitCommand(descriptor: object) {
+        if (!this._webRtcController.videoPlayer.isVideoReady()) {
             return false;
         }
-        this._webRtcController.emitConsoleCommand(command);
+        if (!this.allowConsoleCommands && 'ConsoleCommand' in descriptor) {
+            return false;
+        }
+        this._webRtcController.emitCommand(descriptor);
         return true;
     }
 
