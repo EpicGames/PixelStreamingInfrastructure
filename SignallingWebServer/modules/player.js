@@ -1,12 +1,15 @@
+const Logger = require('./logger.js');
+
 module.exports = class Player {
-	constructor(id, ws, type, browserSendOffer) {
+	constructor(id, ws, type, browserSendOffer, config) {
 		this.id = id;
 		this.ws = ws;
 		this.type = type;
 		this.browserSendOffer = browserSendOffer;
+		this.logger = new Logger(config);
 	}
 
-	subscribe(streamerId) {
+	subscribe(streamers, streamerId) {
 		if (!streamers.has(streamerId)) {
 			console.error(`subscribe: Player ${this.id} tried to subscribe to a non-existent streamer ${streamerId}`);
 			return;
@@ -17,7 +20,7 @@ module.exports = class Player {
 		this.sendFrom(msg);
 	}
 
-	unsubscribe() {
+	unsubscribe(streamers) {
 		if (this.streamerId && streamers.has(this.streamerId)) {
 			const msg = { type: 'playerDisconnected', playerId: this.id };
 			logOutgoing(this.streamerId, msg);

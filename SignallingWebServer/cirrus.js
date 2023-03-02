@@ -13,6 +13,7 @@ const logging = require('./modules/logging.js');
 const WebSocket = require('ws');
 const Matchmaker = require('./modules/matchmaker.js');
 const Player = require('./modules/player.js');
+const Logger = require('./modules/logger.js');
 logging.RegisterConsoleLogger();
 
 
@@ -42,7 +43,7 @@ const argv = require('yargs').argv;
 var configFile = (typeof argv.configFile != 'undefined') ? argv.configFile.toString() : path.join(__dirname, 'config.json');
 console.log(`configFile ${configFile}`);
 const config = require('./modules/config.js').init(configFile, defaultConfig);
-
+const logger = new Logger(config);
 if (config.LogToFile) {
 	logging.RegisterFileLogger('./logs/');
 }
@@ -75,6 +76,7 @@ if (config.UseAuthentication && config.UseHTTPS) {
 
 const helmet = require('helmet');
 var hsts = require('hsts');
+const Logger = require('./modules/logger.js');
 
 var FRONTEND_WEBSERVER = 'https://localhost';
 if (config.UseFrontend) {
@@ -293,28 +295,7 @@ function getSFU() {
 	return players.get(SFUPlayerId);
 }
 
-function logIncoming(sourceName, msg) {
-	if (config.LogVerbose)
-		console.logColor(logging.Blue, "\x1b[37m%s ->\x1b[34m %s", sourceName, JSON.stringify(msg));
-	else
-		console.logColor(logging.Blue, "\x1b[37m%s ->\x1b[34m %s", sourceName, msg.type);
-}
 
-function logOutgoing(destName, msg) {
-	if (config.LogVerbose)
-		console.logColor(logging.Green, "\x1b[37m%s <-\x1b[32m %s", destName, JSON.stringify(msg));
-	else
-		console.logColor(logging.Green, "\x1b[37m%s <-\x1b[32m %s", destName, msg.type);
-}
-
-function logForward(srcName, destName, msg) {
-	if (config.LogVerbose)
-		console.logColor(logging.Green, "\x1b[37m%s -> %s\x1b[32m %s", srcName, destName, JSON.stringify(msg));
-	else
-		console.logColor(logging.Green, "\x1b[37m%s -> %s\x1b[32m %s", srcName, destName, msg.type);
-}
-
-let WebSocket = require('ws');
 
 let streamerMessageHandlers = new Map();
 let sfuMessageHandlers = new Map();
@@ -348,7 +329,7 @@ function onStreamerDisconnected(streamer) {
 		let sfuPlayer = getSFU();
 		if (sfuPlayer) {
 			const msg = { type: "streamerDisconnected" };
-			logOutgoing(sfuPlayer.id, msg);
+			logger.logOutgoing(sfuPlayer.id, msg);
 			sfuPlayer.sendTo(msg);
 			disconnectAllPlayers(sfuPlayer.id);
 		}
@@ -358,7 +339,7 @@ function onStreamerDisconnected(streamer) {
 }
 
 function onStreamerMessageId(streamer, msg) {
-	logIncoming(streamer.id, msg);
+	logger.logIncoming(streamer.id, msg);
 
 	let streamerId = msg.id;
 	registerStreamer(streamerId, streamer);
@@ -366,7 +347,7 @@ function onStreamerMessageId(streamer, msg) {
 	// subscribe any sfu to the latest connected streamer
 	const sfuPlayer = getSFU();
 	if (sfuPlayer) {
-		sfuPlayer.subscribe(streamer.id);
+		sfuPlayer.subscribe(streamers, streamer.id);
 	}
 
 	// if any streamer id's assume the legacy streamer is not needed.
@@ -374,14 +355,14 @@ function onStreamerMessageId(streamer, msg) {
 }
 
 function onStreamerMessagePing(streamer, msg) {
-	logIncoming(streamer.id, msg);
+	logger.logIncoming(streamer.id, msg);
 
 	const pongMsg = JSON.stringify({ type: "pong", time: msg.time});
 	streamer.ws.send(pongMsg);
 }
 
 function onStreamerMessageDisconnectPlayer(streamer, msg) {
-	logIncoming(streamer.id, msg);
+	logger.logIncoming(streamer.id, msg);
 
 	const playerId = getPlayerIdFromMessage(msg);
 	const player = players.get(playerId);
@@ -394,7 +375,7 @@ function forwardStreamerMessageToPlayer(streamer, msg) {
 	const playerId = getPlayerIdFromMessage(msg);
 	const player = players.get(playerId);
 	if (player) {
-		logForward(streamer.id, playerId, msg);
+		logger.logForward(streamer.id, playerId, msg);
 		delete msg.playerId;
 		player.sendTo(msg);
 	}
@@ -476,7 +457,7 @@ streamerServer.on('connection', function (ws, req) {
 
 	// request id
 	const msg = { type: "identify" };
-	logOutgoing("unknown", msg);
+	logger.logOutgoing("unknown", msg);
 	ws.send(JSON.stringify(msg));
 
 	registerStreamer(LegacyStreamerId, streamer);
@@ -486,7 +467,7 @@ function forwardSFUMessageToPlayer(msg) {
 	const playerId = getPlayerIdFromMessage(msg);
 	const player = players.get(playerId);
 	if (player) {
-		logForward(SFUPlayerId, playerId, msg);
+		logger.logForward(SFUPlayerId, playerId, msg);
 		player.sendTo(msg);
 	}
 }
@@ -494,7 +475,7 @@ function forwardSFUMessageToPlayer(msg) {
 function forwardSFUMessageToStreamer(msg) {
 	const sfuPlayer = getSFU();
 	if (sfuPlayer) {
-		logForward(SFUPlayerId, sfuPlayer.streamerId, msg);
+		logger.logForward(SFUPlayerId, sfuPlayer.streamerId, msg);
 		msg.sfuId = SFUPlayerId;
 		sfuPlayer.sendFrom(msg);
 	}
@@ -505,7 +486,7 @@ function onPeerDataChannelsSFUMessage(msg) {
 	const playerId = getPlayerIdFromMessage(msg);
 	const player = players.get(playerId);
 	if (player) {
-		logForward(SFUPlayerId, playerId, msg);
+		logger.logForward(SFUPlayerId, playerId, msg);
 		player.sendTo(msg);
 		player.datachannel = true;
 	}
@@ -516,7 +497,7 @@ function onSFUDisconnected() {
 	disconnectAllPlayers(SFUPlayerId);
 	const sfuPlayer = getSFU();
 	if (sfuPlayer) {
-		sfuPlayer.subscribe();
+		sfuPlayer.unsubscribe(streamers);
 		sfuPlayer.ws.close(4000, "SFU Disconnected");
 	}
 	players.delete(SFUPlayerId);
@@ -574,13 +555,13 @@ sfuServer.on('connection', function (ws, req) {
 		}
 	});
 	/** @type {Player} */
-	let sfuPlayer = new Player(SFUPlayerId, ws, PlayerType.SFU, false);
+	let sfuPlayer = new Player(SFUPlayerId, ws, PlayerType.SFU, false, config);
 	players.set(SFUPlayerId, sfuPlayer);
 	console.logColor(logging.Green, `SFU (${req.connection.remoteAddress}) connected `);
 
 	// TODO subscribe it to one of any of the streamers for now
 	for (let [streamerId, streamer] of streamers) {
-		sfuPlayer.subscribe(streamerId);
+		sfuPlayer.subscribe(streamers, streamerId);
 		break;
 	}
 
@@ -592,20 +573,20 @@ let playerCount = 0;
 
 function sendPlayersCount() {
 	const msg = { type: 'playerCount', count: players.size };
-	logOutgoing("[players]", msg);
+	logger.logOutgoing("[players]", msg);
 	for (let player of players.values()) {
 		player.sendTo(msg);
 	}
 }
 
 function onPlayerMessageSubscribe(player, msg) {
-	logIncoming(player.id, msg);
-	player.subscribe(msg.streamerId);
+	logger.logIncoming(player.id, msg);
+	player.subscribe(streamers, msg.streamerId);
 }
 
 function onPlayerMessageUnsubscribe(player, msg) {
-	logIncoming(player.id, msg);
-	player.unsubscribe();
+	logger.logIncoming(player.id, msg);
+	player.unsubscribe(streamers);
 }
 
 function onPlayerMessageStats(player, msg) {
@@ -613,25 +594,25 @@ function onPlayerMessageStats(player, msg) {
 }
 
 function onPlayerMessageListStreamers(player, msg) {
-	logIncoming(player.id, msg);
+	logger.logIncoming(player.id, msg);
 
 	let reply = { type: 'streamerList', ids: [] };
 	for (let [streamerId, streamer] of streamers) {
 		reply.ids.push(streamerId);
 	}
 
-	logOutgoing(player.id, reply);
+	logger.logOutgoing(player.id, reply);
 	player.sendTo(reply);
 }
 
 function forwardPlayerMessage(player, msg) {
-	logForward(player.id, player.streamerId, msg);
+	logger.logForward(player.id, player.streamerId, msg);
 	player.sendFrom(msg);
 }
 
 function onPlayerDisconnected(playerId) {
 	const player = players.get(playerId);
-	player.unsubscribe();
+	player.unsubscribe(streamers);
 	players.delete(playerId);
 	--playerCount;
 	sendPlayersCount();
@@ -669,7 +650,7 @@ playerServer.on('connection', function (ws, req) {
 	let playerId = sanitizePlayerId(nextPlayerId++);
 	console.logColor(logging.Green, `player ${playerId} (${req.connection.remoteAddress}) connected`);
 	/** @type {Player} */
-	let player = new Player(playerId, ws, PlayerType.Regular, browserSendOffer);
+	let player = new Player(playerId, ws, PlayerType.Regular, browserSendOffer, config);
 	players.set(playerId, player);
 	matchmaker?.setPlayers(players);
 	function sendPlayersCount() {
@@ -754,7 +735,7 @@ function disconnectAllPlayers(streamerId) {
 		 	// disconnect players but just unsubscribe the SFU
 		 	if (player.id == SFUPlayerId) {
 		 		// because we're working on a clone here we have to access directly
-				getSFU().unsubscribe();
+				getSFU().unsubscribe(streamers);
 			} else {
 				player.ws.close();
 			}
