@@ -21,4 +21,9 @@ export interface ITouchController {
      * @param touchEvent - Touch Event Data
      */
     onTouchMove(touchEvent: TouchEvent): void;
+
+    /**
+     * Unregisters all touch event handlers
+     */
+    unregisterTouchEvents(): void;
 }
