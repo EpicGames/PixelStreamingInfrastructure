@@ -4,8 +4,8 @@ The **frontend** refers to the HTML, CSS, images, and JavaScript/TypeScript code
 
 The frontend consists of two packages:
 
-1. `lib-pixelstreamingfrontend`: the core Pixel Streaming frontend for WebRTC, settings, input, and general functionality.
-2. `lib-pixelstreamingfrontend-ui`: the reference UI that users can either optionally apply on top of the core library or build on top of.
+1. [lib-pixelstreamingfrontend](/Frontend/library/): the core Pixel Streaming frontend for WebRTC, settings, input, and general functionality.
+2. [lib-pixelstreamingfrontend-ui](/Frontend/implementations/EpicGames): the reference UI that users can either optionally apply on top of the core library or build on top of.
 
 
 ## Docs
