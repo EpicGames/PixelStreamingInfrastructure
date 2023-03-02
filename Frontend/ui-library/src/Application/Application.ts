@@ -27,6 +27,7 @@ import { ConfigUI, LightMode } from '../Config/ConfigUI';
 
 export interface UIOptions {
     stream: PixelStreaming;
+    onColorModeChanged?: (isLightMode: boolean) => void;
 }
 
 /**
@@ -55,11 +56,14 @@ export class Application {
 
     configUI: ConfigUI;
 
+    onColorModeChanged: UIOptions["onColorModeChanged"];
+
     /**
      * @param options - Initialization options
      */
     constructor(options: UIOptions) {
         this.stream = options.stream;
+        this.onColorModeChanged = options.onColorModeChanged;
         this.configUI = new ConfigUI(this.stream.config);
 
         this.createOverlays();
@@ -84,7 +88,7 @@ export class Application {
 
         this.showConnectOrAutoConnectOverlays();
 
-        this.updateColors(this.configUI.isCustomFlagEnabled(LightMode));
+        this.setColorMode(this.configUI.isCustomFlagEnabled(LightMode));
     }
 
     public createOverlays(): void {
@@ -192,7 +196,7 @@ export class Application {
                     LightMode,
                     `Color Scheme: ${isLightMode ? 'Light' : 'Dark'} Mode`
                 );
-                this.updateColors(isLightMode);
+                this.setColorMode(isLightMode);
             }
         );
     }
@@ -589,29 +593,12 @@ export class Application {
     }
 
     /**
-     * Update the players color variables
+     * Set light/dark color mode
      * @param isLightMode - should we use a light or dark color scheme
      */
-    updateColors(isLightMode: boolean) {
-        const rootElement = document.querySelector(':root') as HTMLElement;
-        if (isLightMode) {
-            rootElement.style.setProperty('--color0', '#e2e0dd80');
-            rootElement.style.setProperty('--color1', '#FFFFFF');
-            rootElement.style.setProperty('--color2', '#000000');
-            rootElement.style.setProperty('--color3', '#0585fe');
-            rootElement.style.setProperty('--color4', '#35b350');
-            rootElement.style.setProperty('--color5', '#ffab00');
-            rootElement.style.setProperty('--color6', '#e1e2dd');
-            rootElement.style.setProperty('--color7', '#c3c4bf');
-        } else {
-            rootElement.style.setProperty('--color0', '#1D1F2280');
-            rootElement.style.setProperty('--color1', '#000000');
-            rootElement.style.setProperty('--color2', '#FFFFFF');
-            rootElement.style.setProperty('--color3', '#0585fe');
-            rootElement.style.setProperty('--color4', '#35b350');
-            rootElement.style.setProperty('--color5', '#ffab00');
-            rootElement.style.setProperty('--color6', '#1e1d22');
-            rootElement.style.setProperty('--color7', '#3c3b40');
+    setColorMode(isLightMode: boolean) {
+        if (this.onColorModeChanged) {
+            this.onColorModeChanged(isLightMode);
         }
     }
 }

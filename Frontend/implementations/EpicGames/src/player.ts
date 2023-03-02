@@ -2,9 +2,9 @@
 
 import { Config, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { Application, PixelStreamingApplicationStyle } from '@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2';
-export const PixelStreamingApplicationStyles =
+const PixelStreamingApplicationStyles =
     new PixelStreamingApplicationStyle();
-
+PixelStreamingApplicationStyles.applyStyleSheet();
 
 document.body.onload = function() {
 	// Example of how to set the logger level
@@ -15,7 +15,10 @@ document.body.onload = function() {
 
 	// Create a Native DOM delegate instance that implements the Delegate interface class
 	const stream = new PixelStreaming(config);
-	const application = new Application({ stream });
+	const application = new Application({
+		stream,
+		onColorModeChanged: (isLightMode) => PixelStreamingApplicationStyles.setColorMode(isLightMode)
+	});
 	// document.getElementById("centrebox").appendChild(application.rootElement);
 	document.body.appendChild(application.rootElement);
 }
