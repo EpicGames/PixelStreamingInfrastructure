@@ -22,6 +22,9 @@ The frontend consists of two packages:
 - [Communicating from UE5 to the Player Page](Docs/Communicating%20from%20UE5%20to%20the%20Player%20Page.md)
 - [Timing Out Inactive Connections](Docs/Timing%20Out%20Inactive%20Connections.md)
 
+## Integrating the libraries into your project
+Tthe TypeScript libraries are provided as both an [NPM](https://www.npmjs.com/settings/epicgames-ps/packages) package and a [UMD](https://github.com/umdjs/umd) module (available via [unpkg](https://unpkg.com/)), making it easy to consume the libraries from either TypeScript code or plain JavaScript code using modern web development tools and workflows.
+
 ## Usage from source
 
 When developing your own Pixel Streaming experience the intent is you will start with this library and extend it through the use of 
@@ -49,7 +52,7 @@ This will produce `player.js` under the `SignallingWebServer/Public` directory -
 
 ### Making your own UI
 
-We recommend studying `/ui-library` and `player.ts`, then once you have copied and modified the `package.json` and `.ts` into your own `implementation/your_implementation` directory, the process is similar:
+We recommend studying [/ui-library](/Frontend/ui-library) and [player.ts](/Frontend/implementations/EpicGames/src/player.ts)/[player.html](/Frontend/implementations/EpicGames/src/player.html), then once you have copied and modified the [package.json](/Frontend/implementations/EpicGames/package.json) and `.ts` into your own `implementation/your_implementation` directory, the process is similar:
 
 - `cd implementation/your_implementation`
 - `npm build-all`
