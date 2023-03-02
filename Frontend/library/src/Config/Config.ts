@@ -27,6 +27,10 @@ export class Flags {
     static StartVideoMuted = 'StartVideoMuted' as const;
     static SuppressBrowserKeys = 'SuppressBrowserKeys' as const;
     static UseMic = 'UseMic' as const;
+    static EnableKeyboardInput = 'EnableKeyboardInput' as const;
+    static EnableMouseInput = 'EnableMouseInput' as const;
+    static EnableTouchInput = 'EnableTouchInput' as const;
+    static EnableGamePadInput = 'EnableGamePadInput' as const;
 }
 
 export type FlagsKeys = Exclude<keyof typeof Flags, 'prototype'>;
@@ -394,6 +398,50 @@ export class Config {
                 'Fake mouse with touches',
                 'A single finger touch is converted into a mouse event. This allows a non-touch application to be controlled partially via a touch device.',
                 false,
+                useUrlParams
+            )
+        );
+
+        this.flags.set(
+            Flags.EnableKeyboardInput,
+            new SettingFlag(
+                Flags.EnableKeyboardInput,
+                'Enable keyboard input',
+                'If enabled, send keyboard events to streamer',
+                true,
+                useUrlParams
+            )
+        );
+
+        this.flags.set(
+            Flags.EnableMouseInput,
+            new SettingFlag(
+                Flags.EnableMouseInput,
+                'Enable mouse input',
+                'If enabled, send mouse events to streamer',
+                true,
+                useUrlParams
+            )
+        );
+
+        this.flags.set(
+            Flags.EnableTouchInput,
+            new SettingFlag(
+                Flags.EnableTouchInput,
+                'Enable touch input',
+                'If enabled, send touch events to streamer',
+                true,
+                useUrlParams
+            )
+        );
+
+        this.flags.set(
+            Flags.EnableGamePadInput,
+            new SettingFlag(
+                Flags.EnableGamePadInput,
+                'Enable game pad input',
+                'If enabled, send game pad events to streamer',
+                true,
                 useUrlParams
             )
         );

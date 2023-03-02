@@ -1026,11 +1026,7 @@ export class WebRtcPlayerController {
             return;
         }
 
-        this.touchController?.unregisterTouchEvents();
-        this.touchController = this.inputClassesFactory.registerTouch(
-            this.config.isFlagEnabled(Flags.FakeMouseWithTouches),
-            this.videoElementParentClientRect
-        );
+        this.setTouchInputEnabled(this.config.isFlagEnabled(Flags.EnableTouchInput));
         this.pixelStreaming.dispatchEvent(new PlayStreamEvent());
 
         if (this.streamController.audioElement.srcObject) {
@@ -1422,13 +1418,9 @@ export class WebRtcPlayerController {
         this.statsTimerHandle = window.setInterval(() => this.getStats(), 1000);
 
         /*  */
-        this.activateRegisterMouse();
-        this.keyboardController?.unregisterKeyBoardEvents();
-        this.keyboardController = this.inputClassesFactory.registerKeyBoard(
-            this.config
-        );
-        this.gamePadController?.unregisterGamePadEvents();
-        this.gamePadController = this.inputClassesFactory.registerGamePad();
+        this.setMouseInputEnabled(this.config.isFlagEnabled(Flags.EnableMouseInput));
+        this.setKeyboardInputEnabled(this.config.isFlagEnabled(Flags.EnableKeyboardInput));
+        this.setGamePadInputEnabled(this.config.isFlagEnabled(Flags.EnableGamePadInput));
     }
 
     /**
@@ -1504,18 +1496,6 @@ export class WebRtcPlayerController {
         if (this.isUsingSFU) {
             this.webSocketController.sendWebRtcDatachannelRequest();
         }
-    }
-
-    /**
-     * registers the mouse for use in WebRtcPlayerController
-     */
-    activateRegisterMouse() {
-        const mouseMode = this.config.isFlagEnabled(Flags.HoveringMouseMode)
-            ? ControlSchemeType.HoveringMouse
-            : ControlSchemeType.LockedMouse;
-        this.mouseController?.unregisterMouseEvents();
-        this.mouseController =
-            this.inputClassesFactory.registerMouse(mouseMode);
     }
 
     /**
@@ -1864,6 +1844,55 @@ export class WebRtcPlayerController {
     setVideoEncoderAvgQP(avgQP: number) {
         this.videoAvgQp = avgQP;
         this.pixelStreaming._onVideoEncoderAvgQP(this.videoAvgQp);
+    }
+
+    /**
+     * enables/disables keyboard event listeners
+     */
+    setKeyboardInputEnabled(isEnabled: boolean) {
+        this.keyboardController?.unregisterKeyBoardEvents();
+        if (isEnabled) {
+            this.keyboardController = this.inputClassesFactory.registerKeyBoard(
+                this.config
+            );
+        }
+    }
+
+    /**
+     * enables/disables mouse event listeners
+     */
+    setMouseInputEnabled(isEnabled: boolean) {
+        this.mouseController?.unregisterMouseEvents();
+        if (isEnabled) {
+            const mouseMode = this.config.isFlagEnabled(Flags.HoveringMouseMode)
+            ? ControlSchemeType.HoveringMouse
+            : ControlSchemeType.LockedMouse;
+            this.mouseController =
+            this.inputClassesFactory.registerMouse(mouseMode);
+        }
+    }
+
+    /**
+     * enables/disables touch event listeners
+     */
+    setTouchInputEnabled(isEnabled: boolean) {
+        this.touchController?.unregisterTouchEvents();
+        if (isEnabled) {
+            this.touchController = this.inputClassesFactory.registerTouch(
+                this.config.isFlagEnabled(Flags.FakeMouseWithTouches),
+                this.videoElementParentClientRect
+            );
+        }
+    }
+
+    /**
+     * enables/disables game pad event listeners
+     */
+    setGamePadInputEnabled(isEnabled: boolean) {
+        this.gamePadController?.unregisterGamePadEvents();
+        if (isEnabled) {
+            this.gamePadController = this.inputClassesFactory.registerGamePad();
+        }
     }
 
     registerDataChannelEventEmitters(dataChannel: DataChannelController) {
