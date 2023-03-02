@@ -54,6 +54,11 @@ export class GamePadController {
             );
         }
         this.controllers = [];
+        for (const gamepad of navigator.getGamepads()) {
+            if (gamepad) {
+                this.gamePadConnectHandler(new GamepadEvent('gamepadconnected', { gamepad }));
+            }
+        }
     }
 
     /**
@@ -61,6 +66,7 @@ export class GamePadController {
      */
     unregisterGamePadEvents() {
         this.gamePadEventListenerTracker.unregisterAll();
+        this.controllers = [];
     }
 
     /**
@@ -205,7 +211,9 @@ export class GamePadController {
             }
             this.controllers[controllerIndex].prevState = currentState;
         }
-        this.requestAnimationFrame(() => this.updateStatus());
+        if (this.controllers.length > 0) {
+            this.requestAnimationFrame(() => this.updateStatus());
+        }
     }
 }
 
