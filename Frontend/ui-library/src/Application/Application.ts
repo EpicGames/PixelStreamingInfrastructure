@@ -27,7 +27,7 @@ import { ConfigUI, LightMode } from '../Config/ConfigUI';
 
 export interface UIOptions {
     stream: PixelStreaming;
-    onUpdateColors?: (isLightMode: boolean) => void;
+    onColorModeChanged?: (isLightMode: boolean) => void;
 }
 
 /**
@@ -56,14 +56,14 @@ export class Application {
 
     configUI: ConfigUI;
 
-    onUpdateColors: UIOptions["onUpdateColors"];
+    onColorModeChanged: UIOptions["onColorModeChanged"];
 
     /**
      * @param options - Initialization options
      */
     constructor(options: UIOptions) {
         this.stream = options.stream;
-        this.onUpdateColors = options.onUpdateColors;
+        this.onColorModeChanged = options.onColorModeChanged;
         this.configUI = new ConfigUI(this.stream.config);
 
         this.createOverlays();
@@ -88,7 +88,7 @@ export class Application {
 
         this.showConnectOrAutoConnectOverlays();
 
-        this.updateColors(this.configUI.isCustomFlagEnabled(LightMode));
+        this.setColorMode(this.configUI.isCustomFlagEnabled(LightMode));
     }
 
     public createOverlays(): void {
@@ -196,7 +196,7 @@ export class Application {
                     LightMode,
                     `Color Scheme: ${isLightMode ? 'Light' : 'Dark'} Mode`
                 );
-                this.updateColors(isLightMode);
+                this.setColorMode(isLightMode);
             }
         );
     }
@@ -593,12 +593,12 @@ export class Application {
     }
 
     /**
-     * Update the players color variables
+     * Set light/dark color mode
      * @param isLightMode - should we use a light or dark color scheme
      */
-    updateColors(isLightMode: boolean) {
-        if (this.onUpdateColors) {
-            this.onUpdateColors(isLightMode);
+    setColorMode(isLightMode: boolean) {
+        if (this.onColorModeChanged) {
+            this.onColorModeChanged(isLightMode);
         }
     }
 }

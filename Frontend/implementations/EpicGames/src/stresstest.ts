@@ -149,7 +149,7 @@ export class StressTester {
 		const stream = new PixelStreaming(config);
 		const application = new Application({
 			stream,
-			onUpdateColors: (isLightMode) => PixelStreamingApplicationStyles.updateColors(isLightMode)
+			onColorModeChanged: (isLightMode) => PixelStreamingApplicationStyles.setColorMode(isLightMode)
 		});
 		streamFrame.appendChild(application.rootElement);
 		return streamFrame;

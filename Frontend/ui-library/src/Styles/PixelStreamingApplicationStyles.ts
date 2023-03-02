@@ -573,7 +573,7 @@ export class PixelStreamingApplicationStyle {
      * Update the players color variables
      * @param isLightMode - should we use a light or dark color scheme
      */
-    updateColors(isLightMode: boolean) {
+    setColorMode(isLightMode: boolean) {
         if (isLightMode) {
             this.applyPalette(this.lightModePalette);
         } else {

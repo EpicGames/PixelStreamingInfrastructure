@@ -17,7 +17,7 @@ document.body.onload = function() {
 	const stream = new PixelStreaming(config);
 	const application = new Application({
 		stream,
-		onUpdateColors: (isLightMode) => PixelStreamingApplicationStyles.updateColors(isLightMode)
+		onColorModeChanged: (isLightMode) => PixelStreamingApplicationStyles.setColorMode(isLightMode)
 	});
 	// document.getElementById("centrebox").appendChild(application.rootElement);
 	document.body.appendChild(application.rootElement);
