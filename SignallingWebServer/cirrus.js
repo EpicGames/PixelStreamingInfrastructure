@@ -307,6 +307,8 @@ class Player {
 			return;
 		}
 
+		// normally we want to indicate what player this message came from
+		// but in some instances we might already have set this (streamerDataChannels) due to poor choices
 		if (!message.playerId) {
 			message.playerId = this.id;
 		}
