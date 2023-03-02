@@ -5,6 +5,10 @@ import { Logger } from '../Logger/Logger';
 import { StreamMessageController } from '../UeInstanceMessage/StreamMessageController';
 import { CoordinateConverter } from '../Util/CoordinateConverter';
 import { VideoPlayer } from '../VideoPlayer/VideoPlayer';
+import { IMouseEvents } from './IMouseEvents';
+import { LockedMouseEvents } from './LockedMouseEvents';
+import { HoveringMouseEvents } from './HoveringMouseEvents';
+import type { ActiveKeys } from './InputClassesFactory';
 
 /**
  * Handles the Mouse Inputs for the document
@@ -13,6 +17,7 @@ export class MouseController {
     videoElementProvider: VideoPlayer;
     toStreamerMessagesProvider: StreamMessageController;
     coordinateConverter: CoordinateConverter;
+    activeKeysProvider: ActiveKeys;
 
     /**
      * @param toStreamerMessagesProvider - Stream message instance
@@ -22,11 +27,13 @@ export class MouseController {
     constructor(
         toStreamerMessagesProvider: StreamMessageController,
         videoElementProvider: VideoPlayer,
-        coordinateConverter: CoordinateConverter
+        coordinateConverter: CoordinateConverter,
+        activeKeysProvider: ActiveKeys
     ) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.coordinateConverter = coordinateConverter;
         this.videoElementProvider = videoElementProvider;
+        this.activeKeysProvider = activeKeysProvider;
         this.registerMouseEnterAndLeaveEvents();
     }
 
@@ -42,6 +49,87 @@ export class MouseController {
         videoElementParent.onwheel = null;
         videoElementParent.onmousemove = null;
         videoElementParent.oncontextmenu = null;
+    }
+
+    /**
+     * Register a locked mouse class
+     * @param mouseController - a mouse controller instance
+     * @param playerStyleAttributesProvider - a player style attributes instance
+     */
+    registerLockedMouseEvents(mouseController: MouseController) {
+        const videoElementParent =
+            this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
+        const lockedMouseEvents: IMouseEvents = new LockedMouseEvents(
+            this.videoElementProvider,
+            mouseController,
+            this.activeKeysProvider
+        );
+
+        videoElementParent.requestPointerLock =
+            videoElementParent.requestPointerLock ||
+            videoElementParent.mozRequestPointerLock;
+        document.exitPointerLock =
+            document.exitPointerLock || document.mozExitPointerLock;
+
+        // minor hack to alleviate ios not supporting pointerlock
+        if (videoElementParent.requestPointerLock) {
+            videoElementParent.onclick = () => {
+                videoElementParent.requestPointerLock();
+            };
+        }
+
+        const lockStateChangeListener = () =>
+            lockedMouseEvents.lockStateChange();
+        document.addEventListener(
+            'pointerlockchange',
+            lockStateChangeListener,
+            false
+        );
+        document.addEventListener(
+            'mozpointerlockchange',
+            lockStateChangeListener,
+            false
+        );
+
+        videoElementParent.onmousedown = (mouseEvent: MouseEvent) =>
+            lockedMouseEvents.handleMouseDown(mouseEvent);
+        videoElementParent.onmouseup = (mouseEvent: MouseEvent) =>
+            lockedMouseEvents.handleMouseUp(mouseEvent);
+        videoElementParent.onwheel = (wheelEvent: WheelEvent) =>
+            lockedMouseEvents.handleMouseWheel(wheelEvent);
+        videoElementParent.ondblclick = (mouseEvent: MouseEvent) =>
+            lockedMouseEvents.handleMouseDouble(mouseEvent);
+        videoElementParent.pressMouseButtons = (mouseEvent: MouseEvent) =>
+            lockedMouseEvents.handlePressMouseButtons(mouseEvent);
+        videoElementParent.releaseMouseButtons = (mouseEvent: MouseEvent) =>
+            lockedMouseEvents.handleReleaseMouseButtons(mouseEvent);
+    }
+
+    /**
+     * Register a hovering mouse class
+     * @param mouseController - A mouse controller object
+     */
+    registerHoveringMouseEvents(mouseController: MouseController) {
+        const videoElementParent =
+            this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
+        const hoveringMouseEvents = new HoveringMouseEvents(mouseController);
+
+        videoElementParent.onmousemove = (mouseEvent: MouseEvent) =>
+            hoveringMouseEvents.updateMouseMovePosition(mouseEvent);
+        videoElementParent.onmousedown = (mouseEvent: MouseEvent) =>
+            hoveringMouseEvents.handleMouseDown(mouseEvent);
+        videoElementParent.onmouseup = (mouseEvent: MouseEvent) =>
+            hoveringMouseEvents.handleMouseUp(mouseEvent);
+        videoElementParent.oncontextmenu = (mouseEvent: MouseEvent) =>
+            hoveringMouseEvents.handleContextMenu(mouseEvent);
+        videoElementParent.onwheel = (wheelEvent: WheelEvent) =>
+            hoveringMouseEvents.handleMouseWheel(wheelEvent);
+        videoElementParent.ondblclick = (mouseEvent: MouseEvent) =>
+            hoveringMouseEvents.handleMouseDouble(mouseEvent);
+        videoElementParent.pressMouseButtons = (mouseEvent: MouseEvent) =>
+            hoveringMouseEvents.handlePressMouseButtons(mouseEvent);
+        videoElementParent.releaseMouseButtons = (mouseEvent: MouseEvent) =>
+            hoveringMouseEvents.handleReleaseMouseButtons(mouseEvent);
     }
 
     /**
