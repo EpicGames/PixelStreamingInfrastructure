@@ -33,6 +33,11 @@ This page will be updated with new features and commands as they become availabl
 | --- | --- |
 | **Match viewport resolution** | Resizes the Unreal Engine application resolution to match the browser's video element size.|
 | **Control scheme** | If the scheme is `locked mouse` the browser will use `pointerlock` to capture your mouse, whereas if the scheme is `hovering mouse` you will retain your OS/browser cursor. |
+| **Enable keyboard input** | If enabled, captures and sends keyboard events to the Unreal Engine application. |
+| **Enable mouse input** | If enabled, captures and sends mouse events to the Unreal Engine application. |
+| **Enable touch input** | If enabled, captures and sends touch events to the Unreal Engine application. |
+| **Enable game pad input** | If enabled, captures and sends game pad events to the Unreal Engine application. |
+| **Enable XR controller input** | If enabled, captures and sends XR controller events to the Unreal Engine application. |
 | **Color scheme** | Allows you to switch between light mode and dark mode. |
 
 ### Encoder
