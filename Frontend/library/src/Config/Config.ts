@@ -31,6 +31,7 @@ export class Flags {
     static EnableMouseInput = 'EnableMouseInput' as const;
     static EnableTouchInput = 'EnableTouchInput' as const;
     static EnableGamePadInput = 'EnableGamePadInput' as const;
+    static EnableXRControllerInput = 'EnableXRControllerInput' as const;
 }
 
 export type FlagsKeys = Exclude<keyof typeof Flags, 'prototype'>;
@@ -441,6 +442,17 @@ export class Config {
                 Flags.EnableGamePadInput,
                 'Enable game pad input',
                 'If enabled, send game pad events to streamer',
+                true,
+                useUrlParams
+            )
+        );
+
+        this.flags.set(
+            Flags.EnableXRControllerInput,
+            new SettingFlag(
+                Flags.EnableXRControllerInput,
+                'Enable XR controller input',
+                'If enabled, send XR controller events to streamer',
                 true,
                 useUrlParams
             )

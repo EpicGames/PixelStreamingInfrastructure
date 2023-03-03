@@ -238,6 +238,11 @@ export class ConfigUI {
             this.flagsUi.get(Flags.EnableGamePadInput)
         );
 
+        this.addSettingFlag(
+            viewSettingsSection,
+            this.flagsUi.get(Flags.EnableXRControllerInput)
+        );
+
         this.addSettingFlag(viewSettingsSection, this.flagsUi.get(LightMode));
 
         /* Setup all encoder related settings under this section */
