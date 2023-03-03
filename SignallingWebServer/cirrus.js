@@ -78,9 +78,10 @@ const helmet = require('helmet');
 var hsts = require('hsts');
 
 var FRONTEND_WEBSERVER = 'https://localhost';
+let httpPort,httpsPort;
 if (config.UseFrontend) {
-	var httpPort = 3000;
-	var httpsPort = 8000;
+	httpPort = 3000;
+	httpsPort = 8000;
 
 	//Required for self signed certs otherwise just get an error back when sending request to frontend see https://stackoverflow.com/a/35633993
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
@@ -88,8 +89,8 @@ if (config.UseFrontend) {
 	const httpsClient = require('./modules/httpsClient.js');
 	var webRequest = new httpsClient();
 } else {
-	var httpPort = config.HttpPort;
-	var httpsPort = config.HttpsPort;
+	httpPort = config.HttpPort;
+	httpsPort = config.HttpsPort;
 }
 
 var streamerPort = config.StreamerPort; // port to listen to Streamer connections
@@ -286,15 +287,13 @@ const SFUPlayerId = "SFU";
 const LegacyStreamerId = "__LEGACY__"; // old streamers that dont know how to ID will be assigned this id.
 
 function sfuIsConnected() {
-	const sfuPlayer = players.get(SFUPlayerId);
+	const sfuPlayer = getSFU();
 	return sfuPlayer && sfuPlayer.ws && sfuPlayer.ws.readyState == 1;
 }
 
 function getSFU() {
 	return players.get(SFUPlayerId);
 }
-
-
 
 let streamerMessageHandlers = new Map();
 let sfuMessageHandlers = new Map();
@@ -606,7 +605,7 @@ function onPlayerDisconnected(playerId) {
 	--playerCount;
 	sendPlayersCount();
 	sendPlayerDisconnectedToFrontend();
-	sendPlayerDisconnectedToMatchmaker();
+	matchmaker?.sendPlayerDisconnected();
 }
 
 playerMessageHandlers.set('subscribe', onPlayerMessageSubscribe);
