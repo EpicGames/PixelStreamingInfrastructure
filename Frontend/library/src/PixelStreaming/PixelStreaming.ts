@@ -595,6 +595,19 @@ export class PixelStreaming {
     }
 
     /**
+     * Send a console command to UE application. Only allowed if UE has signaled that it allows
+     * console commands.
+     * @returns true if succeeded, false if rejected
+     */
+    public emitConsoleCommand(command: string) {
+        if (!this.allowConsoleCommands || !this._webRtcController.videoPlayer.isVideoReady()) {
+            return false;
+        }
+        this._webRtcController.emitConsoleCommand(command);
+        return true;
+    }
+
+    /**
      * Add a UE -> browser response event listener
      * @param name - The name of the response handler
      * @param listener - The method to be activated when a message is received

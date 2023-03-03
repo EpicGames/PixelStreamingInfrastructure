@@ -1696,6 +1696,20 @@ export class WebRtcPlayerController {
     }
 
     /**
+     * Send a console command message
+     */
+    emitConsoleCommand(command: string) {
+        Logger.Log(
+            Logger.GetStackTrace(),
+            '----   Sending custom Command:ConsoleCommand message   ----',
+            6
+        );
+        this.sendDescriptorController.emitCommand({
+            ConsoleCommand: command,
+        });
+    }
+
+    /**
      * Sends a request to the UE Instance to have ownership of Quality
      */
     sendRequestQualityControlOwnership(): void {
