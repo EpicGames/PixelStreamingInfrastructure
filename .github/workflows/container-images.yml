@@ -26,6 +26,7 @@ jobs:
         name: Build and push the Signalling Server container image for Unreal Engine based on our development branch
         uses: docker/build-push-action@v3
         with:
-          context: ./SignallingWebServer
+          context: .
           tags: 'ghcr.io/epicgames/pixel-streaming-signalling-server:5.2'
           push: true
+          file: SignallingWebServer/Dockerfile

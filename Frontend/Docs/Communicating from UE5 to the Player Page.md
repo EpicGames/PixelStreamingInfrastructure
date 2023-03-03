@@ -9,7 +9,9 @@ To set this up:
 1.  In your Unreal Engine application, any time you want to emit an event to the player page, use the **Pixel Streaming > Send Pixel Streaming Response** node. Specify a custom string argument to the node to indicate to the player page what event has happened.  
 
 
-    ![](Docs\Resources\Images\pixelstreaming-send-game-event.JPG)
+<p align="center">
+    <img src="Resources\Images\pixelstreaming-send-game-event.JPG" alt="Send game event">
+</p>
 
 2.  In the JavaScript of your player page, you'll need to write a custom event handler function that will be invoked each time the page receives a response event from the Unreal Engine application. It will be passed the original string argument that was sent by the **Send Pixel Streaming Response** node. For example:
 
@@ -33,6 +35,10 @@ To set this up:
 
 **_Tip:_**
 If you want to pass more complex data, you can format the string you pass to the **Send Pixel Streaming Response** node as JSON. For example:  
-![Send Pixel Streaming response using JSON](Resources\Images\pixelstreaming-send-game-event-json.png "Send Pixel Streaming response using JSON")  
+
+<p align="center">
+    <img src="Resources\Images\pixelstreaming-send-game-event-json.png" alt="Send Pixel Streaming response using JSON">
+</p>
+
 Then, in your JavaScript event handler function, use  `JSON.parse(data)` to decode the string back into a JavaScript object.
 

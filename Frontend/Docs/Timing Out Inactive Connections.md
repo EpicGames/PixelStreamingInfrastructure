@@ -6,7 +6,9 @@ In some kinds of Pixel Streaming deployments, you may want to automatically disc
 
 You can configure your Pixel Streaming player page to detect when a user appears to be away from keyboard (AFK)—that is, when the user has not interacted with the player widget within a customizable time interval. The AFK system warns the user:
 
-![AFK timeout warning](Resources\Images\afk-warning.png "AFK timeout warning")
+<p align="center">
+    <img src="Resources\Images\afk-warning.png" alt="AFK timeout warning">
+</p>
 
 If the user continues not to respond, the AFK system ultimately disconnects their session.
 

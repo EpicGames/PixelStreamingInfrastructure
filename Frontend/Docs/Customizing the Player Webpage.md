@@ -19,10 +19,3 @@ However, with a little creativity and some knowledge of web technologies like J
 We recommend using the default player page as a starting point for creating your own custom player page. You'll find this page at `PixelStreamingInfrastructure\SignallingWebServer\Public\player.html` under your Unreal Engine installation folder. Then, use the information on this page to learn how to extend your page and tie it in with your Project's gameplay logic.  
 
 Additionally, if you have cloned the Pixel Streaming Infrastructure repository and made upstream changes, you can fork the repo and make a pull request.
-
-_The default Pixel Streaming player page:_
-![PixelStreamingDefaultPlayer](Resources\Images\pixelstreaming-default-interface.JPG)
-
-_A customised Pixel Streaming player page:_
-![PixelStreamingCustomPlayer](Resources\Images\pixelstreaming-custom-player.JPG)
-

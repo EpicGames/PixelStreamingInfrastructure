@@ -6,11 +6,7 @@ import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
 import { WebRtcPlayerController } from '../WebRtcPlayer/WebRtcPlayerController';
 import { Flags, NumericParameters } from '../Config/Config';
 import { Logger } from '../Logger/Logger';
-import {
-    InitialSettings,
-    EncoderSettings,
-    WebRTCSettings
-} from '../DataChannel/InitialSettings';
+import { InitialSettings } from '../DataChannel/InitialSettings';
 import { OnScreenKeyboard } from '../UI/OnScreenKeyboard';
 import {
     EventEmitter,
@@ -46,8 +42,8 @@ export interface PixelStreamingOverrides {
  * this will likely be the core of your Pixel Streaming experience in terms of functionality.
  */
 export class PixelStreaming {
-    private webRtcController: WebRtcPlayerController;
-    private webXrController: WebXRController;
+    private _webRtcController: WebRtcPlayerController;
+    private _webXrController: WebXRController;
     /**
      * Configuration object. You can read or modify config through this object. Whenever
      * the configuration is changed, the library will emit a `settingsChanged` event.
@@ -94,14 +90,14 @@ export class PixelStreaming {
             x: number,
             y: number
         ) =>
-            this.webRtcController.requestUnquantizedAndDenormalizeUnsigned(
+            this._webRtcController.requestUnquantizedAndDenormalizeUnsigned(
                 x,
                 y
             );
         this._activateOnScreenKeyboard = (command: MessageOnScreenKeyboard) =>
             this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
 
-        this.webXrController = new WebXRController(this.webRtcController);
+        this._webXrController = new WebXRController(this._webRtcController);
     }
 
     /**
@@ -126,9 +122,9 @@ export class PixelStreaming {
                 // and we aren't currently quality controller, send the request
                 if (
                     wantsQualityController === true &&
-                    !this.webRtcController.isQualityController
+                    !this._webRtcController.isQualityController
                 ) {
-                    this.webRtcController.sendRequestQualityControlOwnership();
+                    this._webRtcController.sendRequestQualityControlOwnership();
                 }
             }
         );
@@ -136,14 +132,14 @@ export class PixelStreaming {
         this.config._addOnSettingChangedListener(
             Flags.AFKDetection,
             (isAFKEnabled: boolean) => {
-                this.webRtcController.setAfkEnabled(isAFKEnabled);
+                this._webRtcController.setAfkEnabled(isAFKEnabled);
             }
         );
 
         this.config._addOnSettingChangedListener(
             Flags.MatchViewportResolution,
             () => {
-                this.webRtcController.videoPlayer.updateVideoStreamSize();
+                this._webRtcController.videoPlayer.updateVideoStreamSize();
             }
         );
 
@@ -156,7 +152,7 @@ export class PixelStreaming {
                         isHoveringMouse ? 'Hovering' : 'Locked'
                     } Mouse`
                 );
-                this.webRtcController.activateRegisterMouse();
+                this._webRtcController.activateRegisterMouse();
             }
         );
 
@@ -169,7 +165,7 @@ export class PixelStreaming {
                     '--------  Sending MinQP  --------',
                     7
                 );
-                this.webRtcController.sendEncoderMinQP(newValue);
+                this._webRtcController.sendEncoderMinQP(newValue);
                 Logger.Log(
                     Logger.GetStackTrace(),
                     '-------------------------------------------',
@@ -186,7 +182,7 @@ export class PixelStreaming {
                     '--------  Sending encoder settings  --------',
                     7
                 );
-                this.webRtcController.sendEncoderMaxQP(newValue);
+                this._webRtcController.sendEncoderMaxQP(newValue);
                 Logger.Log(
                     Logger.GetStackTrace(),
                     '-------------------------------------------',
@@ -204,7 +200,7 @@ export class PixelStreaming {
                     '--------  Sending web rtc settings  --------',
                     7
                 );
-                this.webRtcController.sendWebRTCMinBitrate(newValue * 1000 /* kbps to bps */);
+                this._webRtcController.sendWebRTCMinBitrate(newValue * 1000 /* kbps to bps */);
                 Logger.Log(
                     Logger.GetStackTrace(),
                     '-------------------------------------------',
@@ -221,7 +217,7 @@ export class PixelStreaming {
                     '--------  Sending web rtc settings  --------',
                     7
                 );
-                this.webRtcController.sendWebRTCMaxBitrate(newValue * 1000 /* kbps to bps */);
+                this._webRtcController.sendWebRTCMaxBitrate(newValue * 1000 /* kbps to bps */);
                 Logger.Log(
                     Logger.GetStackTrace(),
                     '-------------------------------------------',
@@ -238,7 +234,7 @@ export class PixelStreaming {
                     '--------  Sending web rtc settings  --------',
                     7
                 );
-                this.webRtcController.sendWebRTCFps(newValue);
+                this._webRtcController.sendWebRTCFps(newValue);
                 Logger.Log(
                     Logger.GetStackTrace(),
                     '-------------------------------------------',
@@ -250,8 +246,8 @@ export class PixelStreaming {
         this.config._addOnOptionSettingChangedListener(
             OptionParameters.PreferredCodec,
             (newValue: string) => {
-                if (this.webRtcController) {
-                    this.webRtcController.setPreferredCodec(newValue);
+                if (this._webRtcController) {
+                    this._webRtcController.setPreferredCodec(newValue);
                 }
             }
         );
@@ -283,13 +279,13 @@ export class PixelStreaming {
     private setWebRtcPlayerController(
         webRtcPlayerController: WebRtcPlayerController
     ) {
-        this.webRtcController = webRtcPlayerController;
+        this._webRtcController = webRtcPlayerController;
 
-        this.webRtcController.setPreferredCodec(
+        this._webRtcController.setPreferredCodec(
             this.config.getSettingOption(OptionParameters.PreferredCodec)
                 .selected
         );
-        this.webRtcController.resizePlayerStyle();
+        this._webRtcController.resizePlayerStyle();
 
         // connect if auto connect flag is enabled
         this.checkForAutoConnect();
@@ -299,7 +295,7 @@ export class PixelStreaming {
      * Connect to signaling server.
      */
     public connect() {
-        this.webRtcController.connectToSignallingServer();
+        this._webRtcController.connectToSignallingServer();
     }
 
     /**
@@ -307,14 +303,14 @@ export class PixelStreaming {
      * before establishing a new connection
      */
     public reconnect() {
-        this.webRtcController.restartStreamAutomatically();
+        this._webRtcController.restartStreamAutomatically();
     }
 
     /**
      * Disconnect from the signaling server and close open peer connections.
      */
     public disconnect() {
-        this.webRtcController.close();
+        this._webRtcController.close();
     }
 
     /**
@@ -322,7 +318,7 @@ export class PixelStreaming {
      */
     public play() {
         this._onStreamLoading();
-        this.webRtcController.playStream();
+        this._webRtcController.playStream();
     }
 
     /**
@@ -333,7 +329,7 @@ export class PixelStreaming {
         if (this.config.isFlagEnabled(Flags.AutoConnect)) {
             // if autoplaying show an info overlay while while waiting for the connection to begin
             this._onWebRtcAutoConnect();
-            this.webRtcController.connectToSignallingServer();
+            this._webRtcController.connectToSignallingServer();
         }
     }
 
@@ -367,13 +363,13 @@ export class PixelStreaming {
     _onDisconnect(eventString: string) {
         // if we have overridden the default disconnection message, assign the new value here
         if (
-            this.webRtcController.getDisconnectMessageOverride() != '' &&
-            this.webRtcController.getDisconnectMessageOverride() !==
+            this._webRtcController.getDisconnectMessageOverride() != '' &&
+            this._webRtcController.getDisconnectMessageOverride() !==
                 undefined &&
-            this.webRtcController.getDisconnectMessageOverride() != null
+            this._webRtcController.getDisconnectMessageOverride() != null
         ) {
-            eventString = this.webRtcController.getDisconnectMessageOverride();
-            this.webRtcController.setDisconnectMessageOverride('');
+            eventString = this._webRtcController.getDisconnectMessageOverride();
+            this._webRtcController.setDisconnectMessageOverride('');
         }
 
         this._eventEmitter.dispatchEvent(
@@ -439,7 +435,7 @@ export class PixelStreaming {
         videoStats.handleSessionStatistics(
             this._videoStartTime,
             this._inputController,
-            this.webRtcController.videoAvgQp
+            this._webRtcController.videoAvgQp
         );
 
         this._eventEmitter.dispatchEvent(
@@ -475,28 +471,45 @@ export class PixelStreaming {
                 );
             }
         }
+
+        const useUrlParams = this.config.useUrlParams;
+        const urlParams = new URLSearchParams(window.location.search);
         if (settings.EncoderSettings) {
             this.config.setNumericSetting(
                 NumericParameters.MinQP,
-                settings.EncoderSettings.MinQP
+                // If a setting is set in the URL, make sure we respect that value as opposed to what the application sends us
+                (useUrlParams && urlParams.has(NumericParameters.MinQP)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.MinQP)) 
+                    : settings.EncoderSettings.MinQP
             );
+
+            
             this.config.setNumericSetting(
                 NumericParameters.MaxQP,
-                settings.EncoderSettings.MaxQP
+                (useUrlParams && urlParams.has(NumericParameters.MaxQP)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.MaxQP)) 
+                    : settings.EncoderSettings.MaxQP
             );
         }
         if (settings.WebRTCSettings) {
             this.config.setNumericSetting(
                 NumericParameters.WebRTCMinBitrate,
-                settings.WebRTCSettings.MinBitrate / 1000 /* bps to kbps */
+                (useUrlParams && urlParams.has(NumericParameters.WebRTCMinBitrate)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCMinBitrate)) / 1000 /* bps to kbps */
+                    : settings.WebRTCSettings.MinBitrate / 1000 /* bps to kbps */
             );
             this.config.setNumericSetting(
                 NumericParameters.WebRTCMaxBitrate,
-                settings.WebRTCSettings.MaxBitrate / 1000 /* bps to kbps */
+                (useUrlParams && urlParams.has(NumericParameters.WebRTCMaxBitrate)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCMaxBitrate)) / 1000 /* bps to kbps */
+                    : settings.WebRTCSettings.MaxBitrate / 1000 /* bps to kbps */
+                
             );
             this.config.setNumericSetting(
                 NumericParameters.WebRTCFPS,
-                settings.WebRTCSettings.FPS
+                (useUrlParams && urlParams.has(NumericParameters.WebRTCFPS)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCFPS))
+                    : settings.WebRTCSettings.FPS
             );
         }
     }
@@ -518,10 +531,10 @@ export class PixelStreaming {
      * @returns
      */
     public requestLatencyTest() {
-        if (!this.webRtcController.videoPlayer.isVideoReady()) {
+        if (!this._webRtcController.videoPlayer.isVideoReady()) {
             return false;
         }
-        this.webRtcController.sendLatencyTest();
+        this._webRtcController.sendLatencyTest();
         return true;
     }
 
@@ -531,10 +544,10 @@ export class PixelStreaming {
      * @returns
      */
     public requestShowFps() {
-        if (!this.webRtcController.videoPlayer.isVideoReady()) {
+        if (!this._webRtcController.videoPlayer.isVideoReady()) {
             return false;
         }
-        this.webRtcController.sendShowFps();
+        this._webRtcController.sendShowFps();
         return true;
     }
 
@@ -544,14 +557,14 @@ export class PixelStreaming {
      * @returns
      */
     public requestIframe() {
-        if (!this.webRtcController.videoPlayer.isVideoReady()) {
+        if (!this._webRtcController.videoPlayer.isVideoReady()) {
             return false;
         }
-        this.webRtcController.sendIframeRequest();
+        this._webRtcController.sendIframeRequest();
         return true;
     }
 
-	/**
+    /**
      * Dispatch a new event.
      * @param e event
      * @returns
@@ -559,8 +572,8 @@ export class PixelStreaming {
     public dispatchEvent(e: PixelStreamingEvent): boolean {
         return this._eventEmitter.dispatchEvent(e);
     }
-	
-	/**
+    
+    /**
      * Register an event handler.
      * @param type event name
      * @param listener event handler function
@@ -589,5 +602,29 @@ export class PixelStreaming {
      */
     public toggleXR() {
         this.webXrController.xrClicked();
+    }
+
+    /**
+     * Pass in a function to generate a signalling server URL.
+     * This function is useful if you need to programmatically construct your signalling server URL.
+     * @param signallingUrlBuilderFunc A function that generates a signalling server url.
+     */
+    public setSignallingUrlBuilder(signallingUrlBuilderFunc: ()=>string) {
+        this._webRtcController.signallingUrlBuilder = signallingUrlBuilderFunc;
+    }
+
+    /**
+     * Public getter for the websocket controller. Access to this property allows you to send
+     * custom websocket messages.
+     */
+    public get webSocketController() {
+        return this._webRtcController.webSocketController;
+    }
+
+    /**
+     * Public getter for the webXrController controller. Used for all XR features.
+     */
+    public get webXrController() {
+        return this._webXrController;
     }
 }
