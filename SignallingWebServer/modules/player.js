@@ -19,14 +19,14 @@ module.exports = class Player {
 		this.streamerId = streamerId;
 		const msg = { type: 'playerConnected', playerId: this.id, dataChannel: true, sfu: this.type == PlayerType.SFU, sendOffer: !this.browserSendOffer };
 		this.logger.logOutgoing(this.streamerId, msg);
-		this.sendFrom(msg);
+		this.sendFrom(msg, streamers);
 	}
 
 	unsubscribe(streamers) {
 		if (this.streamerId && streamers.has(this.streamerId)) {
 			const msg = { type: 'playerDisconnected', playerId: this.id };
 			this.logger.logOutgoing(this.streamerId, msg);
-			this.sendFrom(msg);
+			this.sendFrom(msg, streamers);
 		}
 		this.streamerId = null;
 	}

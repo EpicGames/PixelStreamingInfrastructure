@@ -17,7 +17,8 @@
     "start-wiht-turn-signalling-server:windows": ".\\platform_scripts\\cmd\\Start_WithTurn_SignallingServer.bat",
     "start": "run-script-os",
     "start:default": "if [ `id -u` -eq 0 ] || [ ! -z $NO_SUDO ]\nthen\n export process=\"./platform_scripts/bash/node/bin/node cirrus.js\"\nelse\n export process=\"sudo ./platform_scripts/bash/node/bin/node cirrus.js\"\nfi\n$process ",
-    "start:windows": "platform_scripts\\cmd\\node\\node.exe cirrus.js"
+    "start:windows": "platform_scripts\\cmd\\node\\node.exe cirrus.js",
+    "test": "jest"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -30,5 +31,8 @@
     "ws": "^7.1.2",
     "y18n": "^5.0.5",
     "yargs": "^15.3.0"
+  },
+  "devDependencies": {
+    "jest": "^29.4.3"
   }
 }
