@@ -1,4 +1,6 @@
 const Logger = require('./logger.js');
+//TODO: duplicated in cirrus, make it common with constants
+const PlayerType = { Regular: 0, SFU: 1 };
 
 module.exports = class Player {
 	constructor(id, ws, type, browserSendOffer, config) {
@@ -16,20 +18,20 @@ module.exports = class Player {
 		}
 		this.streamerId = streamerId;
 		const msg = { type: 'playerConnected', playerId: this.id, dataChannel: true, sfu: this.type == PlayerType.SFU, sendOffer: !this.browserSendOffer };
-		logOutgoing(this.streamerId, msg);
+		this.logger.logOutgoing(this.streamerId, msg);
 		this.sendFrom(msg);
 	}
 
 	unsubscribe(streamers) {
 		if (this.streamerId && streamers.has(this.streamerId)) {
 			const msg = { type: 'playerDisconnected', playerId: this.id };
-			logOutgoing(this.streamerId, msg);
+			this.logger.logOutgoing(this.streamerId, msg);
 			this.sendFrom(msg);
 		}
 		this.streamerId = null;
 	}
 
-	sendFrom(message) {
+	sendFrom(message, streamers) {
 		if (!this.streamerId) {
 			return;
 		}

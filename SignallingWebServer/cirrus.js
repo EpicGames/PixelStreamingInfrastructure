@@ -76,7 +76,6 @@ if (config.UseAuthentication && config.UseHTTPS) {
 
 const helmet = require('helmet');
 var hsts = require('hsts');
-const Logger = require('./modules/logger.js');
 
 var FRONTEND_WEBSERVER = 'https://localhost';
 if (config.UseFrontend) {
@@ -325,7 +324,7 @@ function onStreamerDisconnected(streamer) {
 	if (!streamers.has(streamer.id)) {
 		console.error(`Disconnecting streamer ${streamer.id} does not exist.`);
 	} else {
-		sendStreamerDisconnectedToMatchmaker();
+		matchmaker?.sendStreamerDisconnected();
 		let sfuPlayer = getSFU();
 		if (sfuPlayer) {
 			const msg = { type: "streamerDisconnected" };
@@ -427,16 +426,6 @@ streamerServer.on('connection', function (ws, req) {
 		}
 		handler(streamer, msg);
 	});
-
-	function onStreamerDisconnected() {
-		matchmaker?.sendStreamerDisconnected();
-		disconnectAllPlayers();
-		if (sfuIsConnected()) {
-			const msg = { type: "streamerDisconnected" };
-			sfu.send(JSON.stringify(msg));
-		}
-		streamer = null;
-	}
 	
 	ws.on('close', function(code, reason) {
 		console.error(`streamer ${streamer.id} disconnected: ${code} - ${reason}`);
@@ -590,7 +579,7 @@ function onPlayerMessageUnsubscribe(player, msg) {
 }
 
 function onPlayerMessageStats(player, msg) {
-	console.log(`player ${playerId}: stats\n${msg.data}`);
+	console.log(`player ${player.id}: stats\n${msg.data}`);
 }
 
 function onPlayerMessageListStreamers(player, msg) {
@@ -652,14 +641,7 @@ playerServer.on('connection', function (ws, req) {
 	/** @type {Player} */
 	let player = new Player(playerId, ws, PlayerType.Regular, browserSendOffer, config);
 	players.set(playerId, player);
-	matchmaker?.setPlayers(players);
-	function sendPlayersCount() {
-		let playerCountMsg = JSON.stringify({ type: 'playerCount', count: players.size });
-		for (let p of players.values()) {
-			p.ws.send(playerCountMsg);
-		}
-	}
-	
+	matchmaker?.setPlayers(players);	
 	ws.on('message', (msgRaw) =>{
 		var msg;
 		try {
@@ -689,24 +671,6 @@ playerServer.on('connection', function (ws, req) {
 		handler(player, msg);
 	});
 
-	function onPlayerDisconnected() {
-		try {
-			--playerCount;
-			const player = players.get(playerId);
-			if (player.datachannel) {
-				// have to notify the streamer that the datachannel can be closed
-				sendMessageToController({ type: 'playerDisconnected', playerId: playerId }, true, false);
-			}
-			players.delete(playerId);
-			sendMessageToController({ type: 'playerDisconnected', playerId: playerId }, skipSFU);
-			sendPlayerDisconnectedToFrontend();
-			matchmaker?.sendPlayerDisconnected();
-			sendPlayersCount();
-		} catch(err) {
-			console.logColor(logging.Red, `ERROR:: onPlayerDisconnected error: ${err.message}`);
-		}
-	}
-
 	ws.on('close', function(code, reason) {
 		console.logColor(logging.Yellow, `player ${playerId} connection closed: ${code} - ${reason}`);
 		onPlayerDisconnected(playerId);
@@ -718,7 +682,7 @@ playerServer.on('connection', function (ws, req) {
 		onPlayerDisconnected(playerId);
 
 		console.logColor(logging.Red, `Trying to reconnect...`);
-		reconnect();
+		//reconnect();// this doesn't exist
 	});
 
 	sendPlayerConnectedToFrontend();
@@ -731,25 +695,16 @@ function disconnectAllPlayers(streamerId) {
 	console.log(`unsubscribing all players on ${streamerId}`);
 	let clone = new Map(players);
 	for (let player of clone.values()) {
-		 if (player.streamerId == streamerId) {
-		 	// disconnect players but just unsubscribe the SFU
-		 	if (player.id == SFUPlayerId) {
-		 		// because we're working on a clone here we have to access directly
+		if (player.streamerId == streamerId) {
+			// disconnect players but just unsubscribe the SFU
+			if (player.id == SFUPlayerId) {
+				// because we're working on a clone here we have to access directly
 				getSFU().unsubscribe(streamers);
 			} else {
 				player.ws.close();
 			}
 		}
 	}
-}
-
-function disconnectSFUPlayer() {
-	console.log("disconnecting SFU from streamer");
-	if(players.has(SFUPlayerId)) {
-		players.get(SFUPlayerId).ws.close(4000, "SFU Disconnected");
-		players.delete(SFUPlayerId);
-	}
-	sendMessageToController({ type: 'playerDisconnected', playerId: SFUPlayerId }, true, false);
 }
 
 //Keep trying to send gameSessionId in case the server isn't ready yet
