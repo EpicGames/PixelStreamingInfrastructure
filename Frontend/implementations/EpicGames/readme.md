@@ -4,6 +4,7 @@ A plugin library that can be optionally applied on top of the core library to cr
 
 **This is great starting point for building your UI or studying the Pixel Streaming feature set.**
 
+![Frontend](/Frontend/implementations/EpicGames/docs/images/frontend.jpg)
 
 ### Key features
 - An info panel (screen right) that provides a UI for displaying live statistics to the user.
