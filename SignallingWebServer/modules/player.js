@@ -34,7 +34,11 @@ module.exports = class Player {
 			return;
 		}
 
-		message.playerId = this.id;
+		// normally we want to indicate what player this message came from
+		// but in some instances we might already have set this (streamerDataChannels) due to poor choices
+		if (!message.playerId) {
+			message.playerId = this.id;
+		}
 		const msgString = JSON.stringify(message);
 
 		let streamer = streamers.get(this.streamerId);

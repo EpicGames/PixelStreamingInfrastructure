@@ -375,8 +375,8 @@ function forwardStreamerMessageToPlayer(streamer, msg) {
 	const playerId = getPlayerIdFromMessage(msg);
 	const player = players.get(playerId);
 	if (player) {
-		logger.logForward(streamer.id, playerId, msg);
 		delete msg.playerId;
+		logger.logForward(streamer.id, playerId, msg);
 		player.sendTo(msg);
 	}
 }
