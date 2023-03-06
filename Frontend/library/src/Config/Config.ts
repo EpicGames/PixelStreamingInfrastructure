@@ -27,11 +27,11 @@ export class Flags {
     static StartVideoMuted = 'StartVideoMuted' as const;
     static SuppressBrowserKeys = 'SuppressBrowserKeys' as const;
     static UseMic = 'UseMic' as const;
-    static EnableKeyboardInput = 'EnableKeyboardInput' as const;
-    static EnableMouseInput = 'EnableMouseInput' as const;
-    static EnableTouchInput = 'EnableTouchInput' as const;
-    static EnableGamePadInput = 'EnableGamePadInput' as const;
-    static EnableXRControllerInput = 'EnableXRControllerInput' as const;
+    static KeyboardInput = 'KeyboardInput' as const;
+    static MouseInput = 'MouseInput' as const;
+    static TouchInput = 'TouchInput' as const;
+    static GamepadInput = 'GamepadInput' as const;
+    static XRControllerInput = 'XRControllerInput' as const;
 }
 
 export type FlagsKeys = Exclude<keyof typeof Flags, 'prototype'>;
@@ -404,10 +404,10 @@ export class Config {
         );
 
         this.flags.set(
-            Flags.EnableKeyboardInput,
+            Flags.KeyboardInput,
             new SettingFlag(
-                Flags.EnableKeyboardInput,
-                'Enable keyboard input',
+                Flags.KeyboardInput,
+                'Keyboard input',
                 'If enabled, send keyboard events to streamer',
                 true,
                 useUrlParams
@@ -415,10 +415,10 @@ export class Config {
         );
 
         this.flags.set(
-            Flags.EnableMouseInput,
+            Flags.MouseInput,
             new SettingFlag(
-                Flags.EnableMouseInput,
-                'Enable mouse input',
+                Flags.MouseInput,
+                'Mouse input',
                 'If enabled, send mouse events to streamer',
                 true,
                 useUrlParams
@@ -426,10 +426,10 @@ export class Config {
         );
 
         this.flags.set(
-            Flags.EnableTouchInput,
+            Flags.TouchInput,
             new SettingFlag(
-                Flags.EnableTouchInput,
-                'Enable touch input',
+                Flags.TouchInput,
+                'Touch input',
                 'If enabled, send touch events to streamer',
                 true,
                 useUrlParams
@@ -437,21 +437,21 @@ export class Config {
         );
 
         this.flags.set(
-            Flags.EnableGamePadInput,
+            Flags.GamepadInput,
             new SettingFlag(
-                Flags.EnableGamePadInput,
-                'Enable game pad input',
-                'If enabled, send game pad events to streamer',
+                Flags.GamepadInput,
+                'Gamepad input',
+                'If enabled, send gamepad events to streamer',
                 true,
                 useUrlParams
             )
         );
 
         this.flags.set(
-            Flags.EnableXRControllerInput,
+            Flags.XRControllerInput,
             new SettingFlag(
-                Flags.EnableXRControllerInput,
-                'Enable XR controller input',
+                Flags.XRControllerInput,
+                'XR controller input',
                 'If enabled, send XR controller events to streamer',
                 true,
                 useUrlParams

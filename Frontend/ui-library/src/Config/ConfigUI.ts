@@ -218,32 +218,38 @@ export class ConfigUI {
             this.flagsUi.get(Flags.HoveringMouseMode)
         );
 
-        this.addSettingFlag(
-            viewSettingsSection,
-            this.flagsUi.get(Flags.EnableKeyboardInput)
-        );
-
-        this.addSettingFlag(
-            viewSettingsSection,
-            this.flagsUi.get(Flags.EnableMouseInput)
-        );
-
-        this.addSettingFlag(
-            viewSettingsSection,
-            this.flagsUi.get(Flags.EnableTouchInput)
-        );
-
-        this.addSettingFlag(
-            viewSettingsSection,
-            this.flagsUi.get(Flags.EnableGamePadInput)
-        );
-
-        this.addSettingFlag(
-            viewSettingsSection,
-            this.flagsUi.get(Flags.EnableXRControllerInput)
-        );
-
         this.addSettingFlag(viewSettingsSection, this.flagsUi.get(LightMode));
+
+        /* Setup all encoder related settings under this section */
+        const inputSettingsSection = this.buildSectionWithHeading(
+            settingsElem,
+            'Input'
+        );
+        
+        this.addSettingFlag(
+            inputSettingsSection,
+            this.flagsUi.get(Flags.KeyboardInput)
+        );
+
+        this.addSettingFlag(
+            inputSettingsSection,
+            this.flagsUi.get(Flags.MouseInput)
+        );
+
+        this.addSettingFlag(
+            inputSettingsSection,
+            this.flagsUi.get(Flags.TouchInput)
+        );
+
+        this.addSettingFlag(
+            inputSettingsSection,
+            this.flagsUi.get(Flags.GamepadInput)
+        );
+
+        this.addSettingFlag(
+            inputSettingsSection,
+            this.flagsUi.get(Flags.XRControllerInput)
+        );
 
         /* Setup all encoder related settings under this section */
         const encoderSettingsSection = this.buildSectionWithHeading(

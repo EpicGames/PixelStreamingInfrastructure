@@ -1026,7 +1026,7 @@ export class WebRtcPlayerController {
             return;
         }
 
-        this.setTouchInputEnabled(this.config.isFlagEnabled(Flags.EnableTouchInput));
+        this.setTouchInputEnabled(this.config.isFlagEnabled(Flags.TouchInput));
         this.pixelStreaming.dispatchEvent(new PlayStreamEvent());
 
         if (this.streamController.audioElement.srcObject) {
@@ -1418,9 +1418,9 @@ export class WebRtcPlayerController {
         this.statsTimerHandle = window.setInterval(() => this.getStats(), 1000);
 
         /*  */
-        this.setMouseInputEnabled(this.config.isFlagEnabled(Flags.EnableMouseInput));
-        this.setKeyboardInputEnabled(this.config.isFlagEnabled(Flags.EnableKeyboardInput));
-        this.setGamePadInputEnabled(this.config.isFlagEnabled(Flags.EnableGamePadInput));
+        this.setMouseInputEnabled(this.config.isFlagEnabled(Flags.MouseInput));
+        this.setKeyboardInputEnabled(this.config.isFlagEnabled(Flags.KeyboardInput));
+        this.setGamePadInputEnabled(this.config.isFlagEnabled(Flags.GamepadInput));
     }
 
     /**

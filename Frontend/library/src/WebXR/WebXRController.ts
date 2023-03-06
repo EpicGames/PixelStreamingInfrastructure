@@ -191,7 +191,7 @@ export class WebXRController {
             this.render(this.webRtcController.videoPlayer.getVideoElement());
         }
 
-        if (this.webRtcController.config.isFlagEnabled(Flags.EnableXRControllerInput)) {
+        if (this.webRtcController.config.isFlagEnabled(Flags.XRControllerInput)) {
             this.xrSession.inputSources.forEach(
                 (source: XRInputSource, index: number, array: XRInputSource[]) => {
                     this.xrGamepadController.updateStatus(

@@ -152,34 +152,34 @@ export class PixelStreaming {
                         isHoveringMouse ? 'Hovering' : 'Locked'
                     } Mouse`
                 );
-                this._webRtcController.setMouseInputEnabled(this.config.isFlagEnabled(Flags.EnableMouseInput));
+                this._webRtcController.setMouseInputEnabled(this.config.isFlagEnabled(Flags.MouseInput));
             }
         );
 
         // user input
         this.config._addOnSettingChangedListener(
-            Flags.EnableKeyboardInput,
+            Flags.KeyboardInput,
             (isEnabled: boolean) => {
                 this._webRtcController.setKeyboardInputEnabled(isEnabled);
             }
         );
 
         this.config._addOnSettingChangedListener(
-            Flags.EnableMouseInput,
+            Flags.MouseInput,
             (isEnabled: boolean) => {
                 this._webRtcController.setMouseInputEnabled(isEnabled);
             }
         );
 
         this.config._addOnSettingChangedListener(
-            Flags.EnableTouchInput,
+            Flags.TouchInput,
             (isEnabled: boolean) => {
                 this._webRtcController.setTouchInputEnabled(isEnabled);
             }
         );
 
         this.config._addOnSettingChangedListener(
-            Flags.EnableGamePadInput,
+            Flags.GamepadInput,
             (isEnabled: boolean) => {
                 this._webRtcController.setGamePadInputEnabled(isEnabled);
             }
