@@ -183,6 +183,7 @@ a[data-toggle="collapse"] {
 
 .characterBtn {
 	width: 100%;
+	cursor: pointer;
 }
 
 .characterBtn:hover {
