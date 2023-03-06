@@ -221,6 +221,37 @@ export class ConfigUI {
         this.addSettingFlag(viewSettingsSection, this.flagsUi.get(LightMode));
 
         /* Setup all encoder related settings under this section */
+        const inputSettingsSection = this.buildSectionWithHeading(
+            settingsElem,
+            'Input'
+        );
+        
+        this.addSettingFlag(
+            inputSettingsSection,
+            this.flagsUi.get(Flags.KeyboardInput)
+        );
+
+        this.addSettingFlag(
+            inputSettingsSection,
+            this.flagsUi.get(Flags.MouseInput)
+        );
+
+        this.addSettingFlag(
+            inputSettingsSection,
+            this.flagsUi.get(Flags.TouchInput)
+        );
+
+        this.addSettingFlag(
+            inputSettingsSection,
+            this.flagsUi.get(Flags.GamepadInput)
+        );
+
+        this.addSettingFlag(
+            inputSettingsSection,
+            this.flagsUi.get(Flags.XRControllerInput)
+        );
+
+        /* Setup all encoder related settings under this section */
         const encoderSettingsSection = this.buildSectionWithHeading(
             settingsElem,
             'Encoder'

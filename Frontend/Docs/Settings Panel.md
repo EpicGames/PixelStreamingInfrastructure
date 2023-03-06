@@ -35,6 +35,15 @@ This page will be updated with new features and commands as they become availabl
 | **Control scheme** | If the scheme is `locked mouse` the browser will use `pointerlock` to capture your mouse, whereas if the scheme is `hovering mouse` you will retain your OS/browser cursor. |
 | **Color scheme** | Allows you to switch between light mode and dark mode. |
 
+### Input
+| **Setting** | **Description** |
+| --- | --- |
+| **Keyboard input** | If enabled, captures and sends keyboard events to the Unreal Engine application. |
+| **Mouse input** | If enabled, captures and sends mouse events to the Unreal Engine application. |
+| **Touch input** | If enabled, captures and sends touch events to the Unreal Engine application. |
+| **Gamepad input** | If enabled, captures and sends gamepad events to the Unreal Engine application. |
+| **XR controller input** | If enabled, captures and sends XR controller events to the Unreal Engine application. |
+
 ### Encoder
 | **Setting** | **Description** |
 | --- | --- |

@@ -27,6 +27,11 @@ export class Flags {
     static StartVideoMuted = 'StartVideoMuted' as const;
     static SuppressBrowserKeys = 'SuppressBrowserKeys' as const;
     static UseMic = 'UseMic' as const;
+    static KeyboardInput = 'KeyboardInput' as const;
+    static MouseInput = 'MouseInput' as const;
+    static TouchInput = 'TouchInput' as const;
+    static GamepadInput = 'GamepadInput' as const;
+    static XRControllerInput = 'XRControllerInput' as const;
 }
 
 export type FlagsKeys = Exclude<keyof typeof Flags, 'prototype'>;
@@ -394,6 +399,61 @@ export class Config {
                 'Fake mouse with touches',
                 'A single finger touch is converted into a mouse event. This allows a non-touch application to be controlled partially via a touch device.',
                 false,
+                useUrlParams
+            )
+        );
+
+        this.flags.set(
+            Flags.KeyboardInput,
+            new SettingFlag(
+                Flags.KeyboardInput,
+                'Keyboard input',
+                'If enabled, send keyboard events to streamer',
+                true,
+                useUrlParams
+            )
+        );
+
+        this.flags.set(
+            Flags.MouseInput,
+            new SettingFlag(
+                Flags.MouseInput,
+                'Mouse input',
+                'If enabled, send mouse events to streamer',
+                true,
+                useUrlParams
+            )
+        );
+
+        this.flags.set(
+            Flags.TouchInput,
+            new SettingFlag(
+                Flags.TouchInput,
+                'Touch input',
+                'If enabled, send touch events to streamer',
+                true,
+                useUrlParams
+            )
+        );
+
+        this.flags.set(
+            Flags.GamepadInput,
+            new SettingFlag(
+                Flags.GamepadInput,
+                'Gamepad input',
+                'If enabled, send gamepad events to streamer',
+                true,
+                useUrlParams
+            )
+        );
+
+        this.flags.set(
+            Flags.XRControllerInput,
+            new SettingFlag(
+                Flags.XRControllerInput,
+                'XR controller input',
+                'If enabled, send XR controller events to streamer',
+                true,
                 useUrlParams
             )
         );

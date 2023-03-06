@@ -6,6 +6,7 @@ import { IMouseEvents } from './IMouseEvents';
 import { NormalizedQuantizedUnsignedCoord } from '../Util/CoordinateConverter';
 import { ActiveKeys } from './InputClassesFactory';
 import { VideoPlayer } from '../VideoPlayer/VideoPlayer';
+import { EventListenerTracker } from '../Util/EventListenerTracker';
 
 /**
  * Handle the mouse locked events
@@ -20,6 +21,9 @@ export class LockedMouseEvents implements IMouseEvents {
     updateMouseMovePositionEvent = (mouseEvent: MouseEvent) => {
         this.updateMouseMovePosition(mouseEvent);
     };
+
+    // Utility for keeping track of event handlers and unregistering them
+    private mouseEventListenerTracker = new EventListenerTracker();
 
     /**
      * @param videoElementProvider - Video Player instance
@@ -47,6 +51,13 @@ export class LockedMouseEvents implements IMouseEvents {
     }
 
     /**
+     * Unregisters all event handlers
+     */
+    unregisterMouseEvents() {
+        this.mouseEventListenerTracker.unregisterAll();
+    }
+
+    /**
      * Handle when the locked state Changed
      */
     lockStateChange() {
@@ -64,6 +75,13 @@ export class LockedMouseEvents implements IMouseEvents {
                 'mousemove',
                 this.updateMouseMovePositionEvent,
                 false
+            );
+            this.mouseEventListenerTracker.addUnregisterCallback(
+                () => document.removeEventListener(
+                    'mousemove',
+                    this.updateMouseMovePositionEvent,
+                    false
+                )
             );
         } else {
             Logger.Log(
