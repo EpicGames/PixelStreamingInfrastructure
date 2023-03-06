@@ -17,4 +17,21 @@ document.body.onload = function() {
 	const pixelStreaming = new PixelStreaming(config);
 	const application = new Application({ pixelStreaming });
 	document.getElementById("playercontainer").appendChild(application.rootElement);
+
+	// Bind example selection to the onExampleChanged function
+	document.getElementById("exampleSelect").onchange = onExampleChanged;
+}
+
+/**
+ * Event fired for when the selection drop down containing our showcase examples changes.
+ * @param event The change event.
+ */
+function onExampleChanged(event : Event) : void {
+
+	if(!event) { return; }
+
+	const selectElement = event.target as HTMLSelectElement;
+    const selectedValue = selectElement.value;
+
+	console.log(selectedValue);
 }
