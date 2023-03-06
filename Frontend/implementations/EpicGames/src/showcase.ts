@@ -16,9 +16,5 @@ document.body.onload = function() {
 	// Create Pixel Streaming application
 	const pixelStreaming = new PixelStreaming(config);
 	const application = new Application({ pixelStreaming });
-
-	// Append the Pixel Streaming application's DOM elements to the "body" element,
-	// but could also add to any element, like so:
-	// document.getElementById("centrebox").appendChild(application.rootElement);
-	document.body.appendChild(application.rootElement);
+	document.getElementById("playercontainer").appendChild(application.rootElement);
 }

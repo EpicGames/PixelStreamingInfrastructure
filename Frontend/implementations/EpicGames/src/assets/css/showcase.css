@@ -1,13 +1,13 @@
 
 :root {
-	--color0: rgba(15, 15, 15, 1);
-	--color1: #000000;
-	--color2: #FFFFFF;
-	--color3: #0585fe;
-	--color4: rgba(26, 26, 26, 1);
-	--color5: rgba(36, 36, 36, 1);
-	--color6: rgba(53, 53, 53, 1);
-	--color7: rgba(180, 180, 180, 1);
+	--democolor0: rgba(15, 15, 15, 1);
+	--democolor1: #000000;
+	--democolor2: #FFFFFF;
+	--democolor3: #0585fe;
+	--democolor4: rgba(26, 26, 26, 1);
+	--democolor5: rgba(36, 36, 36, 1);
+	--democolor6: rgba(53, 53, 53, 1);
+	--democolor7: rgba(180, 180, 180, 1);
 }
 
 body {
@@ -15,9 +15,9 @@ body {
 	padding: 0px;
 	height: 100vh;
 	width: 100vw;
-    background-color: var(--color5);
+    background-color: var(--democolor5);
 	font-family: verdana,sans-serif;
-	color: var(--color7);
+	color: var(--democolor7);
 }
 
 .wrapper {
@@ -38,7 +38,7 @@ body {
 }
 
 #infoinstructions {
-	background-color: var(--color4);
+	background-color: var(--democolor4);
 	padding: 0.5em;
 	font-size: medium;
 	flex-grow: 1;
@@ -68,10 +68,10 @@ body {
 #sidebar {
     min-width: 250px;
 	max-width: 250px;
-	background-color: var(--color4);
+	background-color: var(--democolor4);
     transition: all 0.3s;
 	font-size: small;
-	border-color: var(--color4);
+	border-color: var(--democolor4);
   	border-style: solid;
   	border-width: 0.33em 0.33em 0em 0em;
 	align-content: flex-start;
@@ -85,8 +85,8 @@ body {
 
 #sidebar-header {
     padding: 0.25rem 2rem 0.25rem 0.5rem;
-	background-color: var(--color5);
-	border-top: 1px solid var(--color3);
+	background-color: var(--democolor5);
+	border-top: 1px solid var(--democolor3);
 	border-radius: 5px 5px 0px 0px;
 	margin-left: 1em;
 	width: -moz-fit-content;
@@ -96,14 +96,14 @@ body {
 #sidebarContent {
 	max-height:100%;
 	overflow-y:auto;
-	background-color: var(--color5);
+	background-color: var(--democolor5);
 	flex-grow: 1;
 	padding-left: 1em;
 	padding-right: 1em;
 }
 
 #sidebar-example-selector {
-	background-color: var(--color5);
+	background-color: var(--democolor5);
 	padding-top: 1em;
 	padding-bottom: 1em;
 	padding-left: 1em;
@@ -114,22 +114,23 @@ body {
 }
 
 #playercontainer {
-	background-color: var(--color0);
+	background-color: var(--democolor0);
 	flex-grow: 1;
+	font-family: 'Montserrat', sans-serif;
 }
 
 select {
 	font-size: large;
 	padding: 0.5em;
-	color: var(--color7);
-	background-color: var(--color0);
-	border: 2px solid var(--color6);
+	color: var(--democolor7);
+	background-color: var(--democolor0);
+	border: 2px solid var(--democolor6);
 	outline: none !important;
 	border-radius: 5px;
 }
 
 select:hover {
-	color: var(--color2);
+	color: var(--democolor2);
 }
 
 a, a:hover, a:focus {
@@ -185,9 +186,9 @@ a[data-toggle="collapse"] {
 }
 
 .characterBtn:hover {
-	box-shadow: var(--color3) 0px 0px 0px 3px;
+	box-shadow: var(--democolor3) 0px 0px 0px 3px;
 }
 
 .characterBtn:active {
-	box-shadow: var(--color5) 0px 0px 0px 3px;
+	box-shadow: var(--democolor5) 0px 0px 0px 3px;
 }
