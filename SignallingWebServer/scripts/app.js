@@ -489,6 +489,11 @@ function onProtocolMessage(data) {
                         return;
                     }
 
+					if(messageType === "GamepadAnalog") {
+						// We don't want to update the GamepadAnalog message type as UE sends it with an incorrect bytelength
+						return;
+					}
+
                     if (toStreamerHandlers[messageType]) {
                         // If we've registered a handler for this message type we can add it to our supported messages. ie registerMessageHandler(...)
                         toStreamerMessages.add(messageType, message);
