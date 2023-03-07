@@ -201,7 +201,7 @@ export class WebSocketController {
      * Closes the Websocket connection
      */
     close() {
-        this.webSocket.close();
+        this.webSocket?.close();
     }
 
     /** Event used for Displaying websocket closed messages */

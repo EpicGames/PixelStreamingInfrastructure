@@ -1520,14 +1520,14 @@ export class WebRtcPlayerController {
      * Close the Connection to the signaling server
      */
     closeSignalingServer() {
-        this.webSocketController.close();
+        this.webSocketController?.close();
     }
 
     /**
      * Close the peer connection
      */
     closePeerConnection() {
-        this.peerConnectionController.close();
+        this.peerConnectionController?.close();
     }
 
     /**
