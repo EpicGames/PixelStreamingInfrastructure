@@ -76,7 +76,7 @@ export class AFKController {
     stopAfkWarningTimer() {
         this.active = false;
         this.countdownActive = false;
-        clearInterval(this.warnTimer);
+        clearTimeout(this.warnTimer);
         clearInterval(this.countDownTimer);
     }
 
