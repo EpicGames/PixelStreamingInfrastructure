@@ -23,30 +23,17 @@
 </head>
 
 <body>
+
+    <!-- Load images in page body load -->
+    <img src="./assets/images/Aurora.jpg" style="display: none;" />
+    <img src="./assets/images/Crunch.jpg" style="display: none;" />
+
     <div class="wrapper">
 
         <!-- The details panels for the examples sidebar -->
         <div id="sidebar">
             <div id="sidebar-header">Details</div>
-
-            <div id="sidebarContent">
-                <div>
-                    <p>Select a character:</p>
-                    <div onclick="onConfigButton(0,0)"">
-                        <img class="characterBtn" src="./assets/images/Aurora.jpg" />
-                    </div>
-                    <div onclick="onConfigButton(0,1)"">
-                        <img class="characterBtn" src="./assets/images/Crunch.jpg" />
-                    </div>
-                </div>
-
-                <div>
-                    <p>Select a skin:</p>
-                    <button class="btn-flat" onclick="onConfigButton(1,0)">Skin 1</button>
-                    <button class="btn-flat" onclick="onConfigButton(1,1)">Skin 2</button>
-                </div>
-
-            </div>
+            <div id="sidebarContent"></div>
         </div>
 
         <div id="content">
