@@ -465,7 +465,7 @@ function forwardSFUMessageToStreamer(msg) {
 	if (sfuPlayer) {
 		logger.logForward(SFUPlayerId, sfuPlayer.streamerId, msg);
 		msg.sfuId = SFUPlayerId;
-		sfuPlayer.sendFrom(msg);
+		sfuPlayer.sendFrom(msg, streamers);
 	}
 }
 
@@ -595,7 +595,7 @@ function onPlayerMessageListStreamers(player, msg) {
 
 function forwardPlayerMessage(player, msg) {
 	logger.logForward(player.id, player.streamerId, msg);
-	player.sendFrom(msg);
+	player.sendFrom(msg, streamers);
 }
 
 function onPlayerDisconnected(playerId) {
