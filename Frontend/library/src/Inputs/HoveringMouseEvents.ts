@@ -18,6 +18,13 @@ export class HoveringMouseEvents implements IMouseEvents {
     }
 
     /**
+     * Unregister event handlers
+     */
+    unregisterMouseEvents(): void {
+        // empty for HoveringMouseEvents implementation
+    }
+
+    /**
      * Handle the mouse move event, sends the mouse data to the UE Instance
      * @param mouseEvent - Mouse Event
      */

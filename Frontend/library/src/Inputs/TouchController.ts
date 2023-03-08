@@ -5,6 +5,7 @@ import { CoordinateConverter } from '../Util/CoordinateConverter';
 import { StreamMessageController } from '../UeInstanceMessage/StreamMessageController';
 import { VideoPlayer } from '../VideoPlayer/VideoPlayer';
 import { ITouchController } from './ITouchController';
+import { EventListenerTracker } from '../Util/EventListenerTracker';
 /**
  * Handles the Touch input Events
  */
@@ -16,6 +17,9 @@ export class TouchController implements ITouchController {
     fingers = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
     fingerIds = new Map();
     maxByteValue = 255;
+
+    // Utility for keeping track of event handlers and unregistering them
+    private touchEventListenerTracker = new EventListenerTracker();
 
     /**
      * @param toStreamerMessagesProvider - Stream message instance
@@ -31,18 +35,41 @@ export class TouchController implements ITouchController {
         this.videoElementProvider = videoElementProvider;
         this.coordinateConverter = coordinateConverter;
         this.videoElementParent = videoElementProvider.getVideoElement();
-        this.videoElementParent.ontouchstart = (ev: TouchEvent) =>
+        const ontouchstart = (ev: TouchEvent) =>
             this.onTouchStart(ev);
-        this.videoElementParent.ontouchend = (ev: TouchEvent) =>
+        const ontouchend = (ev: TouchEvent) =>
             this.onTouchEnd(ev);
-        this.videoElementParent.ontouchmove = (ev: TouchEvent) =>
+        const ontouchmove = (ev: TouchEvent) =>
             this.onTouchMove(ev);
+        this.videoElementParent.addEventListener('touchstart', ontouchstart, { passive: false });
+        this.videoElementParent.addEventListener('touchend', ontouchend, { passive: false });
+        this.videoElementParent.addEventListener('touchmove', ontouchmove, { passive: false });
+        this.touchEventListenerTracker.addUnregisterCallback(
+            () => this.videoElementParent.removeEventListener('touchstart', ontouchstart)
+        );
+        this.touchEventListenerTracker.addUnregisterCallback(
+            () => this.videoElementParent.removeEventListener('touchend', ontouchend)
+        );
+        this.touchEventListenerTracker.addUnregisterCallback(
+            () => this.videoElementParent.removeEventListener('touchmove', ontouchmove)
+        );
         Logger.Log(Logger.GetStackTrace(), 'Touch Events Registered', 6);
 
         // is this strictly necessary?
-        document.ontouchmove = (event: TouchEvent) => {
+        const preventOnTouchMove = (event: TouchEvent) => {
             event.preventDefault();
         };
+        document.addEventListener('touchmove', preventOnTouchMove, { passive: false });
+        this.touchEventListenerTracker.addUnregisterCallback(
+            () => document.removeEventListener('touchmove', preventOnTouchMove)
+        );
+    }
+
+    /**
+     * Unregister all touch events
+     */
+    unregisterTouchEvents() {
+        this.touchEventListenerTracker.unregisterAll();
     }
 
     /**

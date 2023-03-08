@@ -307,7 +307,11 @@ class Player {
 			return;
 		}
 
-		message.playerId = this.id;
+		// normally we want to indicate what player this message came from
+		// but in some instances we might already have set this (streamerDataChannels) due to poor choices
+		if (!message.playerId) {
+			message.playerId = this.id;
+		}
 		const msgString = JSON.stringify(message);
 
 		let streamer = streamers.get(this.streamerId);
@@ -439,8 +443,8 @@ function forwardStreamerMessageToPlayer(streamer, msg) {
 	const playerId = getPlayerIdFromMessage(msg);
 	const player = players.get(playerId);
 	if (player) {
-		logForward(streamer.id, playerId, msg);
 		delete msg.playerId;
+		logForward(streamer.id, playerId, msg);
 		player.sendTo(msg);
 	}
 }

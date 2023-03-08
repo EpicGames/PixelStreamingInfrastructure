@@ -6,6 +6,7 @@ import { WebGLUtils } from '../Util/WebGLUtils';
 import { Controller } from '../Inputs/GamepadTypes';
 import { XRGamepadController } from '../Inputs/XRGamepadController';
 import { XrFrameEvent } from '../Util/EventEmitter'
+import { Flags } from '../pixelstreamingfrontend';
 
 export class WebXRController {
     private xrSession: XRSession;
@@ -190,16 +191,18 @@ export class WebXRController {
             this.render(this.webRtcController.videoPlayer.getVideoElement());
         }
 
-        this.xrSession.inputSources.forEach(
-            (source: XRInputSource, index: number, array: XRInputSource[]) => {
-                this.xrGamepadController.updateStatus(
-                    source,
-                    frame,
-                    this.xrRefSpace
-                );
-            },
-            this
-        );
+        if (this.webRtcController.config.isFlagEnabled(Flags.XRControllerInput)) {
+            this.xrSession.inputSources.forEach(
+                (source: XRInputSource, index: number, array: XRInputSource[]) => {
+                    this.xrGamepadController.updateStatus(
+                        source,
+                        frame,
+                        this.xrRefSpace
+                    );
+                },
+                this
+            );
+        }
 
         this.xrSession.requestAnimationFrame(
             (time: DOMHighResTimeStamp, frame: XRFrame) =>

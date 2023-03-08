@@ -53,6 +53,7 @@ export class PixelStreaming {
     private _videoElementParent: HTMLElement;
 
     _showActionOrErrorOnDisconnect = true;
+    private allowConsoleCommands = false;
 
     private onScreenKeyboardHelper: OnScreenKeyboard;
 
@@ -152,7 +153,36 @@ export class PixelStreaming {
                         isHoveringMouse ? 'Hovering' : 'Locked'
                     } Mouse`
                 );
-                this._webRtcController.activateRegisterMouse();
+                this._webRtcController.setMouseInputEnabled(this.config.isFlagEnabled(Flags.MouseInput));
+            }
+        );
+
+        // user input
+        this.config._addOnSettingChangedListener(
+            Flags.KeyboardInput,
+            (isEnabled: boolean) => {
+                this._webRtcController.setKeyboardInputEnabled(isEnabled);
+            }
+        );
+
+        this.config._addOnSettingChangedListener(
+            Flags.MouseInput,
+            (isEnabled: boolean) => {
+                this._webRtcController.setMouseInputEnabled(isEnabled);
+            }
+        );
+
+        this.config._addOnSettingChangedListener(
+            Flags.TouchInput,
+            (isEnabled: boolean) => {
+                this._webRtcController.setTouchInputEnabled(isEnabled);
+            }
+        );
+
+        this.config._addOnSettingChangedListener(
+            Flags.GamepadInput,
+            (isEnabled: boolean) => {
+                this._webRtcController.setGamePadInputEnabled(isEnabled);
             }
         );
 
@@ -462,37 +492,54 @@ export class PixelStreaming {
             new InitialSettingsEvent({ settings })
         );
         if (settings.PixelStreamingSettings) {
-            const allowConsoleCommands =
-                settings.PixelStreamingSettings.AllowPixelStreamingCommands;
-            if (allowConsoleCommands === false) {
+            this.allowConsoleCommands =
+                settings.PixelStreamingSettings.AllowPixelStreamingCommands ?? false;
+            if (this.allowConsoleCommands === false) {
                 Logger.Info(
                     Logger.GetStackTrace(),
                     '-AllowPixelStreamingCommands=false, sending arbitrary console commands from browser to UE is disabled.'
                 );
             }
         }
+
+        const useUrlParams = this.config.useUrlParams;
+        const urlParams = new URLSearchParams(window.location.search);
         if (settings.EncoderSettings) {
             this.config.setNumericSetting(
                 NumericParameters.MinQP,
-                settings.EncoderSettings.MinQP
+                // If a setting is set in the URL, make sure we respect that value as opposed to what the application sends us
+                (useUrlParams && urlParams.has(NumericParameters.MinQP)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.MinQP)) 
+                    : settings.EncoderSettings.MinQP
             );
+
+            
             this.config.setNumericSetting(
                 NumericParameters.MaxQP,
-                settings.EncoderSettings.MaxQP
+                (useUrlParams && urlParams.has(NumericParameters.MaxQP)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.MaxQP)) 
+                    : settings.EncoderSettings.MaxQP
             );
         }
         if (settings.WebRTCSettings) {
             this.config.setNumericSetting(
                 NumericParameters.WebRTCMinBitrate,
-                settings.WebRTCSettings.MinBitrate / 1000 /* bps to kbps */
+                (useUrlParams && urlParams.has(NumericParameters.WebRTCMinBitrate)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCMinBitrate)) / 1000 /* bps to kbps */
+                    : settings.WebRTCSettings.MinBitrate / 1000 /* bps to kbps */
             );
             this.config.setNumericSetting(
                 NumericParameters.WebRTCMaxBitrate,
-                settings.WebRTCSettings.MaxBitrate / 1000 /* bps to kbps */
+                (useUrlParams && urlParams.has(NumericParameters.WebRTCMaxBitrate)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCMaxBitrate)) / 1000 /* bps to kbps */
+                    : settings.WebRTCSettings.MaxBitrate / 1000 /* bps to kbps */
+                
             );
             this.config.setNumericSetting(
                 NumericParameters.WebRTCFPS,
-                settings.WebRTCSettings.FPS
+                (useUrlParams && urlParams.has(NumericParameters.WebRTCFPS)) 
+                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCFPS))
+                    : settings.WebRTCSettings.FPS
             );
         }
     }
@@ -547,7 +594,69 @@ export class PixelStreaming {
         return true;
     }
 
-	/**
+    /**
+     * Send data to UE application. The data will be run through JSON.stringify() so e.g. strings
+     * and any serializable plain JSON objects with no recurrence can be sent.
+     * @returns true if succeeded, false if rejected
+     */
+    public emitUIInteraction(descriptor: object | string) {
+        if (!this._webRtcController.videoPlayer.isVideoReady()) {
+            return false;
+        }
+        this._webRtcController.emitUIInteraction(descriptor);
+        return true;
+    }
+
+    /**
+     * Send a command to UE application. Blocks ConsoleCommand descriptors unless UE
+     * has signaled that it allows console commands.
+     * @returns true if succeeded, false if rejected
+     */
+    public emitCommand(descriptor: object) {
+        if (!this._webRtcController.videoPlayer.isVideoReady()) {
+            return false;
+        }
+        if (!this.allowConsoleCommands && 'ConsoleCommand' in descriptor) {
+            return false;
+        }
+        this._webRtcController.emitCommand(descriptor);
+        return true;
+    }
+
+    /**
+     * Send a console command to UE application. Only allowed if UE has signaled that it allows
+     * console commands.
+     * @returns true if succeeded, false if rejected
+     */
+    public emitConsoleCommand(command: string) {
+        if (!this.allowConsoleCommands || !this._webRtcController.videoPlayer.isVideoReady()) {
+            return false;
+        }
+        this._webRtcController.emitConsoleCommand(command);
+        return true;
+    }
+
+    /**
+     * Add a UE -> browser response event listener
+     * @param name - The name of the response handler
+     * @param listener - The method to be activated when a message is received
+     */
+    public addResponseEventListener(
+        name: string,
+        listener: (response: string) => void
+    ) {
+        this._webRtcController.responseController.addResponseEventListener(name, listener);
+    }
+
+    /**
+     * Remove a UE -> browser response event listener
+     * @param name - The name of the response handler
+     */
+    public removeResponseEventListener(name: string) {
+        this._webRtcController.responseController.removeResponseEventListener(name);
+    }
+
+    /**
      * Dispatch a new event.
      * @param e event
      * @returns
@@ -555,8 +664,8 @@ export class PixelStreaming {
     public dispatchEvent(e: PixelStreamingEvent): boolean {
         return this._eventEmitter.dispatchEvent(e);
     }
-	
-	/**
+    
+    /**
      * Register an event handler.
      * @param type event name
      * @param listener event handler function
