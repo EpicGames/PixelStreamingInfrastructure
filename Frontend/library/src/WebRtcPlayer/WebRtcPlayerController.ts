@@ -209,6 +209,12 @@ export class WebRtcPlayerController {
             if (this.statsTimerHandle && this.statsTimerHandle !== undefined) {
                 window.clearInterval(this.statsTimerHandle);
             }
+
+            // unregister all input device event handlers on disconnect
+            this.setTouchInputEnabled(false);
+            this.setMouseInputEnabled(false);
+            this.setKeyboardInputEnabled(false);
+            this.setGamePadInputEnabled(false);
         });
 
         // set up the final webRtc player controller methods from within our application so a connection can be activated
@@ -1514,14 +1520,14 @@ export class WebRtcPlayerController {
      * Close the Connection to the signaling server
      */
     closeSignalingServer() {
-        this.webSocketController.close();
+        this.webSocketController?.close();
     }
 
     /**
      * Close the peer connection
      */
     closePeerConnection() {
-        this.peerConnectionController.close();
+        this.peerConnectionController?.close();
     }
 
     /**
