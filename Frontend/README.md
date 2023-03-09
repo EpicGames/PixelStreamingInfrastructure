@@ -9,9 +9,9 @@ The frontend consists of two packages:
 
 
 ## Docs
-- [Customizing the Player Webpage](Docs\Customizing%20the%20Player%20Webpage.md)
-- [HTML Page Requirements](Docs\HTML%20Page%20Requirements.md)
-  - [Player File Location and URL](Docs\HTML%20Page%20Requirements.md)
+- [Customizing the Player Webpage](Docs/Customizing%20the%20Player%20Webpage.md)
+- [HTML Page Requirements](Docs/HTML%20Page%20Requirements.md)
+  - [Player File Location and URL](Docs/HTML%20Page%20Requirements.md)
 - [Customizing Player Input Options](Docs/Customizing%20Player%20Input%20Options.md)
   - [Disabling User Input](Docs/Customizing%20Player%20Input%20Options.md)
 - [Customizing the Player Widget Style](Docs/Customizing%20the%20Player%20Widget%20Style.md)
