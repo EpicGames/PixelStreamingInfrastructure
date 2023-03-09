@@ -134,6 +134,15 @@ export class MouseController {
         this.mouseEventListenerTracker.addUnregisterCallback(
             () => lockedMouseEvents.unregisterMouseEvents()
         );
+        this.mouseEventListenerTracker.addUnregisterCallback(() => {
+            if (
+                document.exitPointerLock &&
+                (document.pointerLockElement === videoElementParent ||
+                    document.mozPointerLockElement === videoElementParent)
+            ) {
+                document.exitPointerLock();
+            }
+        });
     }
 
     /**
