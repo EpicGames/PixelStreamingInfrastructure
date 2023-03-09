@@ -64,6 +64,10 @@ class Showcase {
 				break;
 			case "Getting Started":
 				this._createGettingStartedExample();
+				break;
+			case "Trigger UE Commands":
+				this._createUECommandExample();
+				break;
 			default:
 				break;
 		}
@@ -122,14 +126,15 @@ class Showcase {
 		crunchImg.src = "./images/Crunch.jpg";
 		crunchElem.appendChild(crunchImg);
 
-		// Make skin selection
-		const skinSelectElem = document.createElement("div");
-		this._exampleSettingsElem.appendChild(skinSelectElem);
-
 		// Make skin selection title
 		const skinSelectTitle = document.createElement("p");
 		skinSelectTitle.innerText = "Select a skin: ";
-		skinSelectElem.appendChild(skinSelectTitle);
+		this._exampleSettingsElem.appendChild(skinSelectTitle);
+
+		// Make skin selection
+		const skinSelectElem = document.createElement("div");
+		skinSelectElem.classList.add("spaced-row");
+		this._exampleSettingsElem.appendChild(skinSelectElem);
 
 		// Make skin selection buttons
 
@@ -146,6 +151,70 @@ class Showcase {
 		// todo: onclick=onConfigButton(1,1)
 		skin2Btn.innerText = "Skin 2";
 		skinSelectElem.appendChild(skin2Btn);
+	}
+
+	private _createUECommandExample() {
+
+		this._infoElem.innerHTML = 
+		`
+		<p> <u>Example: Triggering Commands in Unreal Engine</u> </p>
+		<ul>
+			<li>Click on the resolution buttons to change your Unreal Engine application's resolution (requires a <code>-windowed</code> application).</li>
+		</ul>
+		<p>Under the hood these interactions use the WebRTC data channel to send command messages that we interpret on the UE side to call specific UE functions.</p>
+		<p>There are a very select set of built-in commands such as <i>changing resolution</i> and <i>change encoder QP</i>, which can be triggered like so:</p>
+		<code>pixelStreaming.emitCommand({"Encoder.MinQP": 51,})</code>
+
+		<p>However, you can bind your own custom commands in C++ using:</p>
+		<code>
+			// C++ side 
+			</br>
+			IPixelStreamingInputHandler::SetCommandHandler(const FString& CommandName, const TFunction<void(FString, FString)>& Handler)
+			</br>
+			// JS side
+			</br>
+			pixelstreaming.emitCommand({"MyCustomCommand": "MyCustomCommandParameter"});
+		</code>
+
+		<p>Additionally you can also trigger Unreal Engine console commands like <code>stat gpu</code> if you launch Pixel Streaming with <code>-AllowPixelStreamingCommands</code> then calling:</p>
+		<code>pixelstreaming.emitConsoleCommand(command: string)</code>
+		`;
+
+		const changeResElem = document.createElement("div");
+		this._exampleSettingsElem.appendChild(changeResElem);
+
+		// Make res change title title
+		const changeResTitle = document.createElement("p");
+		changeResTitle.innerText = "Change resolution: ";
+		changeResElem.appendChild(changeResTitle);
+
+		// Make res change button container
+		const changeResBtnContainer = document.createElement("div");
+		changeResBtnContainer.classList.add("spaced-row");
+		this._exampleSettingsElem.appendChild(changeResBtnContainer);
+
+		// Make res change buttons
+
+		// 720p
+		const res720pBtn = document.createElement("button");
+		res720pBtn.classList.add("btn-flat");
+		// todo: onclick=onConfigButton(1,0)
+		res720pBtn.innerText = "720p";
+		changeResBtnContainer.appendChild(res720pBtn);
+
+		// 1080p
+		const res1080pBtn = document.createElement("button");
+		res1080pBtn.classList.add("btn-flat");
+		// todo: onclick=onConfigButton(1,0)
+		res1080pBtn.innerText = "1080p";
+		changeResBtnContainer.appendChild(res1080pBtn);
+
+		// 4k
+		const res4kBtn = document.createElement("button");
+		res4kBtn.classList.add("btn-flat");
+		// todo: onclick=onConfigButton(1,0)
+		res4kBtn.innerText = "4k";
+		changeResBtnContainer.appendChild(res4kBtn);
 	}
 
 }

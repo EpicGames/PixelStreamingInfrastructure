@@ -20,11 +20,21 @@ body {
 	color: var(--democolor7);
 }
 
+code {
+	background-color: var(--democolor6);
+}
+
 .wrapper {
     display: flex;
     align-items: stretch;
 	height: 100%;
 	width: 100%;
+}
+
+.spaced-row {
+	display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
 }
 
 #infocontainer {
