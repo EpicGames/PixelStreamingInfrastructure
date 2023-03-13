@@ -17,7 +17,7 @@ document.body.onload = function() {
 	const application = new Application({ pixelStreaming });
 	document.getElementById("playercontainer").appendChild(application.rootElement);
 
-	const showcase = new Showcase();
+	const showcase = new Showcase(pixelStreaming);
 
 	// Bind example selection to the onExampleChanged function
 	document.getElementById("exampleSelect").onchange = (event : Event) => { showcase.onExampleChanged(event); };
@@ -27,10 +27,12 @@ document.body.onload = function() {
 
 class Showcase {
 
+	private _pixelStreaming : PixelStreaming;
 	private _infoElem : HTMLElement;
 	private _exampleSettingsElem : HTMLElement;
 
-	constructor () {
+	constructor (pixelStreaming : PixelStreaming) {
+		this._pixelStreaming = pixelStreaming;
 		this._infoElem = document.getElementById("infoinstructions") as HTMLElement;
 		this._exampleSettingsElem = document.getElementById("sidebarContent") as HTMLElement;
 		this._createGettingStartedExample();
@@ -73,6 +75,11 @@ class Showcase {
 		}
 	}
 
+	private _onCharacterClicked(characterName : string) {
+		// move to latest version of PS
+		//this._pixelStreaming.
+	}
+
 	private _createGettingStartedExample() {
 		this._infoElem.innerHTML = 
 		`
@@ -86,7 +93,7 @@ class Showcase {
 		</ol>
 		`;
 	}
-	
+
 	private _createSendUEDataExample() {
 
 		this._infoElem.innerHTML = 
@@ -115,6 +122,9 @@ class Showcase {
 		const auroraImg = document.createElement("img");
 		auroraImg.classList.add("characterBtn");
 		auroraImg.src = "./images/Aurora.jpg";
+		auroraImg.onclick = function(ev: MouseEvent){
+
+		}
 		auroraElem.appendChild(auroraImg);
 
 		// Make Crunch character
