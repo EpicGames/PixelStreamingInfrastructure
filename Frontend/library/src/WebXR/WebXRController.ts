@@ -1,27 +1,33 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { Logger } from '../Logger/Logger';
-import { WebRtcPlayerController } from '../pixelstreamingfrontend';
+import { WebRtcPlayerController } from '../WebRtcPlayer/WebRtcPlayerController';
 import { WebGLUtils } from '../Util/WebGLUtils';
 import { Controller } from '../Inputs/GamepadTypes';
 import { XRGamepadController } from '../Inputs/XRGamepadController';
+import { XrFrameEvent } from '../Util/EventEmitter'
+import { Flags } from '../pixelstreamingfrontend';
 
 export class WebXRController {
-    xrSession: XRSession;
-    xrRefSpace: XRReferenceSpace;
-    gl: WebGL2RenderingContext;
+    private xrSession: XRSession;
+    private xrRefSpace: XRReferenceSpace;
+    private gl: WebGL2RenderingContext;
 
-    positionLocation: number;
-    texcoordLocation: number;
-    resolutionLocation: WebGLUniformLocation;
-    offsetLocation: WebGLUniformLocation;
+    private positionLocation: number;
+    private texcoordLocation: number;
+    private resolutionLocation: WebGLUniformLocation;
+    private offsetLocation: WebGLUniformLocation;
 
-    positionBuffer: WebGLBuffer;
-    texcoordBuffer: WebGLBuffer;
+    private positionBuffer: WebGLBuffer;
+    private texcoordBuffer: WebGLBuffer;
 
-    webRtcController: WebRtcPlayerController;
-    xrGamepadController: XRGamepadController;
-    xrControllers: Array<Controller>;
+    private webRtcController: WebRtcPlayerController;
+    private xrGamepadController: XRGamepadController;
+    private xrControllers: Array<Controller>;
+
+    onSessionStarted: EventTarget;
+    onSessionEnded: EventTarget;
+    onFrame: EventTarget;
 
     constructor(webRtcPlayerController: WebRtcPlayerController) {
         this.xrSession = null;
@@ -30,6 +36,9 @@ export class WebXRController {
         this.xrGamepadController = new XRGamepadController(
             this.webRtcController.streamMessageController
         );
+        this.onSessionEnded = new EventTarget();
+        this.onSessionStarted = new EventTarget();
+        this.onFrame = new EventTarget();
     }
 
     public xrClicked() {
@@ -47,6 +56,7 @@ export class WebXRController {
     onXrSessionEnded() {
         Logger.Log(Logger.GetStackTrace(), 'XR Session ended');
         this.xrSession = null;
+        this.onSessionEnded.dispatchEvent(new Event('xrSessionEnded'));
     }
 
     onXrSessionStarted(session: XRSession) {
@@ -142,6 +152,8 @@ export class WebXRController {
                     this.onXrFrame(time, frame)
             );
         });
+
+        this.onSessionStarted.dispatchEvent(new Event('xrSessionStarted'));
     }
 
     onXrFrame(time: DOMHighResTimeStamp, frame: XRFrame) {
@@ -179,21 +191,28 @@ export class WebXRController {
             this.render(this.webRtcController.videoPlayer.getVideoElement());
         }
 
-        this.xrSession.inputSources.forEach(
-            (source: XRInputSource, index: number, array: XRInputSource[]) => {
-                this.xrGamepadController.updateStatus(
-                    source,
-                    frame,
-                    this.xrRefSpace
-                );
-            },
-            this
-        );
+        if (this.webRtcController.config.isFlagEnabled(Flags.XRControllerInput)) {
+            this.xrSession.inputSources.forEach(
+                (source: XRInputSource, index: number, array: XRInputSource[]) => {
+                    this.xrGamepadController.updateStatus(
+                        source,
+                        frame,
+                        this.xrRefSpace
+                    );
+                },
+                this
+            );
+        }
 
         this.xrSession.requestAnimationFrame(
             (time: DOMHighResTimeStamp, frame: XRFrame) =>
                 this.onXrFrame(time, frame)
         );
+
+        this.onFrame.dispatchEvent(new XrFrameEvent({
+            time,
+            frame
+        }));
     }
 
     private render(videoElement: HTMLVideoElement) {

@@ -5,6 +5,7 @@ import { StreamMessageController } from '../UeInstanceMessage/StreamMessageContr
 import { VideoPlayer } from '../VideoPlayer/VideoPlayer';
 import { ITouchController } from './ITouchController';
 import { MouseButton } from './MouseButtons';
+import { EventListenerTracker } from '../Util/EventListenerTracker';
 
 /**
  * Allows for the usage of fake touch events and implements ITouchController
@@ -17,6 +18,9 @@ export class FakeTouchController implements ITouchController {
     videoElementProvider: VideoPlayer;
     coordinateConverter: CoordinateConverter;
     videoElementParentClientRect: DOMRect;
+
+    // Utility for keeping track of event handlers and unregistering them
+    private touchEventListenerTracker = new EventListenerTracker();
 
     /**
      * @param toStreamerMessagesProvider - Stream message instance
@@ -31,9 +35,28 @@ export class FakeTouchController implements ITouchController {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.videoElementProvider = videoElementProvider;
         this.coordinateConverter = coordinateConverter;
-        document.ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
-        document.ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
-        document.ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
+        const ontouchstart = (ev: TouchEvent) => this.onTouchStart(ev);
+        const ontouchend = (ev: TouchEvent) => this.onTouchEnd(ev);
+        const ontouchmove = (ev: TouchEvent) => this.onTouchMove(ev);
+        document.addEventListener('touchstart', ontouchstart, { passive: false });
+        document.addEventListener('touchend', ontouchend, { passive: false });
+        document.addEventListener('touchmove', ontouchmove, { passive: false });
+        this.touchEventListenerTracker.addUnregisterCallback(
+            () => document.removeEventListener('touchstart', ontouchstart)
+        );
+        this.touchEventListenerTracker.addUnregisterCallback(
+            () => document.removeEventListener('touchend', ontouchend)
+        );
+        this.touchEventListenerTracker.addUnregisterCallback(
+            () => document.removeEventListener('touchmove', ontouchmove)
+        );
+    }
+
+    /**
+     * Unregister all touch events
+     */
+    unregisterTouchEvents() {
+        this.touchEventListenerTracker.unregisterAll();
     }
 
     /**
@@ -62,8 +85,8 @@ export class FakeTouchController implements ITouchController {
 
             const videoElementParent =
                 this.videoElementProvider.getVideoParentElement() as HTMLDivElement;
-            const mouseEvent = new MouseEvent(touch.type, first_touch);
-            videoElementParent.onmouseenter(mouseEvent);
+            const mouseEvent = new MouseEvent('mouseenter', first_touch);
+            videoElementParent.dispatchEvent(mouseEvent);
 
             const coord = this.coordinateConverter.normalizeAndQuantizeUnsigned(
                 this.fakeTouchFinger.x,
@@ -107,8 +130,8 @@ export class FakeTouchController implements ITouchController {
                     coord.y
                 ]);
 
-                const mouseEvent = new MouseEvent(touchEvent.type, touch);
-                videoElementParent.onmouseleave(mouseEvent);
+                const mouseEvent = new MouseEvent('mouseleave', touch);
+                videoElementParent.dispatchEvent(mouseEvent);
                 this.fakeTouchFinger = null;
                 break;
             }
@@ -140,7 +163,7 @@ export class FakeTouchController implements ITouchController {
                         x - this.fakeTouchFinger.x,
                         y - this.fakeTouchFinger.y
                     );
-                toStreamerHandlers.get('MoveMouse')([
+                toStreamerHandlers.get('MouseMove')([
                     coord.x,
                     coord.y,
                     delta.x,

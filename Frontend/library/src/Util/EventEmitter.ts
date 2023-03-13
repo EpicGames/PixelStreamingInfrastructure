@@ -401,6 +401,45 @@ export class SettingsChangedEvent extends Event {
     }
 }
 
+/**
+ * Event emitted when an XR Session starts
+ */
+export class XrSessionStartedEvent extends Event {
+    readonly type: 'xrSessionStarted';
+    constructor() {
+        super('xrSessionStarted');
+    }
+}
+
+/**
+ * Event emitted when an XR Session ends
+ */
+export class XrSessionEndedEvent extends Event {
+    readonly type: 'xrSessionEnded';
+    constructor() {
+        super('xrSessionEnded');
+    }
+}
+
+export type XrFrameData = {
+    /** The frame timestamp  */
+    time: DOMHighResTimeStamp;
+    /** The XRFrame */
+    frame: XRFrame;
+};
+
+/**
+ * Event emitted when an XR Frame is complete
+ */
+export class XrFrameEvent extends Event {
+    readonly type: 'xrFrame';
+    readonly data: XrFrameData
+    constructor(data: XrFrameEvent['data']) {
+        super('xrFrame');
+        this.data = data;
+    }
+}
+
 export type PixelStreamingEvent =
     | AfkWarningActivateEvent
     | AfkWarningUpdateEvent
@@ -427,7 +466,10 @@ export type PixelStreamingEvent =
     | StreamerListMessageEvent
     | LatencyTestResultEvent
     | InitialSettingsEvent
-    | SettingsChangedEvent;
+    | SettingsChangedEvent
+    | XrSessionStartedEvent
+    | XrSessionEndedEvent
+    | XrFrameEvent;
 
 export class EventEmitter extends EventTarget {
     /**

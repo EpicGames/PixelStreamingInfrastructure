@@ -101,6 +101,7 @@ export class WebRtcPlayerController {
     preferredCodec: string;
     peerConfig: RTCConfiguration;
     videoAvgQp: number;
+    signallingUrlBuilder: () => string;
 
     // if you override the disconnection message by calling the interface method setDisconnectMessageOverride
     // it will use this property to store the override message string
@@ -208,6 +209,12 @@ export class WebRtcPlayerController {
             if (this.statsTimerHandle && this.statsTimerHandle !== undefined) {
                 window.clearInterval(this.statsTimerHandle);
             }
+
+            // unregister all input device event handlers on disconnect
+            this.setTouchInputEnabled(false);
+            this.setMouseInputEnabled(false);
+            this.setKeyboardInputEnabled(false);
+            this.setGamePadInputEnabled(false);
         });
 
         // set up the final webRtc player controller methods from within our application so a connection can be activated
@@ -249,6 +256,24 @@ export class WebRtcPlayerController {
         );
 
         this.setVideoEncoderAvgQP(-1);
+
+        this.signallingUrlBuilder =  () => {
+            let signallingServerUrl = this.config.getTextSettingValue(
+                TextParameters.SignallingServerUrl
+            );
+    
+            // If we are connecting to the SFU add a special url parameter to the url
+            if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
+                signallingServerUrl += '?' + Flags.BrowserSendOffer + '=true';
+            }
+    
+            // This code is no longer needed, but is a good example for how subsequent config flags can be appended
+            // if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
+            //     signallingServerUrl += (signallingServerUrl.includes('?') ? '&' : '?') + Flags.BrowserSendOffer + '=true';
+            // }
+    
+            return signallingServerUrl;
+        }
     }
 
     /**
@@ -1007,10 +1032,7 @@ export class WebRtcPlayerController {
             return;
         }
 
-        this.touchController = this.inputClassesFactory.registerTouch(
-            this.config.isFlagEnabled(Flags.FakeMouseWithTouches),
-            this.videoElementParentClientRect
-        );
+        this.setTouchInputEnabled(this.config.isFlagEnabled(Flags.TouchInput));
         this.pixelStreaming.dispatchEvent(new PlayStreamEvent());
 
         if (this.streamController.audioElement.srcObject) {
@@ -1073,29 +1095,29 @@ export class WebRtcPlayerController {
         this.resizePlayerStyle();
     }
 
-    buildSignallingServerUrl() {
-        let signallingServerUrl = this.config.getTextSettingValue(
-            TextParameters.SignallingServerUrl
-        );
+    // buildSignallingServerUrl() {
+    //     let signallingServerUrl = this.config.getTextSettingValue(
+    //         TextParameters.SignallingServerUrl
+    //     );
 
-        // If we are connecting to the SFU add a special url parameter to the url
-        if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
-            signallingServerUrl += '?' + Flags.BrowserSendOffer + '=true';
-        }
+    //     // If we are connecting to the SFU add a special url parameter to the url
+    //     if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
+    //         signallingServerUrl += '?' + Flags.BrowserSendOffer + '=true';
+    //     }
 
-        // This code is no longer needed, but is a good example for how subsequent config flags can be appended
-        // if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
-        //     signallingServerUrl += (signallingServerUrl.includes('?') ? '&' : '?') + Flags.BrowserSendOffer + '=true';
-        // }
+    //     // This code is no longer needed, but is a good example for how subsequent config flags can be appended
+    //     // if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
+    //     //     signallingServerUrl += (signallingServerUrl.includes('?') ? '&' : '?') + Flags.BrowserSendOffer + '=true';
+    //     // }
 
-        return signallingServerUrl;
-    }
+    //     return signallingServerUrl;
+    // }
 
     /**
      * Connect to the Signaling server
      */
     connectToSignallingServer() {
-        const signallingUrl = this.buildSignallingServerUrl();
+        const signallingUrl = this.signallingUrlBuilder();
         this.webSocketController.connect(signallingUrl);
     }
 
@@ -1402,11 +1424,9 @@ export class WebRtcPlayerController {
         this.statsTimerHandle = window.setInterval(() => this.getStats(), 1000);
 
         /*  */
-        this.activateRegisterMouse();
-        this.keyboardController = this.inputClassesFactory.registerKeyBoard(
-            this.config
-        );
-        this.gamePadController = this.inputClassesFactory.registerGamePad();
+        this.setMouseInputEnabled(this.config.isFlagEnabled(Flags.MouseInput));
+        this.setKeyboardInputEnabled(this.config.isFlagEnabled(Flags.KeyboardInput));
+        this.setGamePadInputEnabled(this.config.isFlagEnabled(Flags.GamepadInput));
     }
 
     /**
@@ -1485,17 +1505,6 @@ export class WebRtcPlayerController {
     }
 
     /**
-     * registers the mouse for use in WebRtcPlayerController
-     */
-    activateRegisterMouse() {
-        const mouseMode = this.config.isFlagEnabled(Flags.HoveringMouseMode)
-            ? ControlSchemeType.HoveringMouse
-            : ControlSchemeType.LockedMouse;
-        this.mouseController =
-            this.inputClassesFactory.registerMouse(mouseMode);
-    }
-
-    /**
      * Set the freeze frame overlay to the player div
      */
     setUpMouseAndFreezeFrame() {
@@ -1511,14 +1520,14 @@ export class WebRtcPlayerController {
      * Close the Connection to the signaling server
      */
     closeSignalingServer() {
-        this.webSocketController.close();
+        this.webSocketController?.close();
     }
 
     /**
      * Close the peer connection
      */
     closePeerConnection() {
-        this.peerConnectionController.close();
+        this.peerConnectionController?.close();
     }
 
     /**
@@ -1650,6 +1659,44 @@ export class WebRtcPlayerController {
             6
         );
         this.streamMessageController.toStreamerHandlers.get('IFrameRequest')();
+    }
+
+    /**
+     * Send a UIInteraction message
+     */
+    emitUIInteraction(descriptor: object | string) {
+        Logger.Log(
+            Logger.GetStackTrace(),
+            '----   Sending custom UIInteraction message   ----',
+            6
+        );
+        this.sendDescriptorController.emitUIInteraction(descriptor);
+    }
+
+    /**
+     * Send a Command message
+     */
+    emitCommand(descriptor: object) {
+        Logger.Log(
+            Logger.GetStackTrace(),
+            '----   Sending custom Command message   ----',
+            6
+        );
+        this.sendDescriptorController.emitCommand(descriptor);
+    }
+
+    /**
+     * Send a console command message
+     */
+    emitConsoleCommand(command: string) {
+        Logger.Log(
+            Logger.GetStackTrace(),
+            '----   Sending custom Command:ConsoleCommand message   ----',
+            6
+        );
+        this.sendDescriptorController.emitCommand({
+            ConsoleCommand: command,
+        });
     }
 
     /**
@@ -1841,6 +1888,55 @@ export class WebRtcPlayerController {
     setVideoEncoderAvgQP(avgQP: number) {
         this.videoAvgQp = avgQP;
         this.pixelStreaming._onVideoEncoderAvgQP(this.videoAvgQp);
+    }
+
+    /**
+     * enables/disables keyboard event listeners
+     */
+    setKeyboardInputEnabled(isEnabled: boolean) {
+        this.keyboardController?.unregisterKeyBoardEvents();
+        if (isEnabled) {
+            this.keyboardController = this.inputClassesFactory.registerKeyBoard(
+                this.config
+            );
+        }
+    }
+
+    /**
+     * enables/disables mouse event listeners
+     */
+    setMouseInputEnabled(isEnabled: boolean) {
+        this.mouseController?.unregisterMouseEvents();
+        if (isEnabled) {
+            const mouseMode = this.config.isFlagEnabled(Flags.HoveringMouseMode)
+            ? ControlSchemeType.HoveringMouse
+            : ControlSchemeType.LockedMouse;
+            this.mouseController =
+            this.inputClassesFactory.registerMouse(mouseMode);
+        }
+    }
+
+    /**
+     * enables/disables touch event listeners
+     */
+    setTouchInputEnabled(isEnabled: boolean) {
+        this.touchController?.unregisterTouchEvents();
+        if (isEnabled) {
+            this.touchController = this.inputClassesFactory.registerTouch(
+                this.config.isFlagEnabled(Flags.FakeMouseWithTouches),
+                this.videoElementParentClientRect
+            );
+        }
+    }
+
+    /**
+     * enables/disables game pad event listeners
+     */
+    setGamePadInputEnabled(isEnabled: boolean) {
+        this.gamePadController?.unregisterGamePadEvents();
+        if (isEnabled) {
+            this.gamePadController = this.inputClassesFactory.registerGamePad();
+        }
     }
 
     registerDataChannelEventEmitters(dataChannel: DataChannelController) {

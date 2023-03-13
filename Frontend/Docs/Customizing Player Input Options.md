@@ -1,8 +1,10 @@
+## Configuring library behaviour
+
+The frontend library exposes a number of configuration options through the [Config](/Frontend/library/src/Config/Config.ts) class. The values of these options can be modified to tweak certain inbuilt behaviour of the frontend.
+
+The following options are available in the frontend library:
+
 **TO DO**: Update this information to match the new front end.
-
-## Customizing Player Input Options
-
-The `app.js` file offers some JavaScript configuration parameters that you can override in your custom player page to control the way the player widget responds to user interactions. The `inputOptions` object exposes the following properties:
 
 | Property | Default | Description |
 | --- | --- | --- |
