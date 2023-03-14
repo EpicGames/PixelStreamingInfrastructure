@@ -4,23 +4,29 @@ import {
     NumericParameters,
 } from '../Config/Config';
 import { PixelStreaming } from './PixelStreaming';
-import { SettingsChangedEvent } from '../pixelstreamingfrontend';
+import { SettingsChangedEvent, StreamerListMessageEvent, WebRtcConnectedEvent } from '../Util/EventEmitter';
 import { mockWebSocket, MockWebSocketSpyFunctions, MockWebSocketTriggerFunctions, unmockWebSocket } from '../__test__/mockWebSocket';
+import { MessageRecvTypes } from '../WebSockets/MessageReceive';
+import { mockRTCPeerConnection, MockRTCPeerConnectionSpyFunctions, MockRTCPeerConnectionTriggerFunctions, unmockRTCPeerConnection } from '../__test__/mockRTCPeerConnection';
 
 describe('PixelStreaming', () => {
     let webSocketSpyFunctions: MockWebSocketSpyFunctions;
     let webSocketTriggerFunctions: MockWebSocketTriggerFunctions;
+    let wrtcPeerConnectionSpyFunctions: MockRTCPeerConnectionSpyFunctions;
+    let rtcPeerConnectionTriggerFunctions: MockRTCPeerConnectionTriggerFunctions;
     const mockSignallingUrl = 'ws://localhost:24680/';
 
     beforeEach(() => {
         mockRTCRtpReceiver();
         [webSocketSpyFunctions, webSocketTriggerFunctions] = mockWebSocket();
+        [wrtcPeerConnectionSpyFunctions, rtcPeerConnectionTriggerFunctions] = mockRTCPeerConnection();
         jest.useFakeTimers();
     });
 
     afterEach(() => {
         unmockRTCRtpReceiver();
         unmockWebSocket();
+        unmockRTCPeerConnection();
         jest.resetAllMocks();
     });
 
@@ -109,6 +115,63 @@ describe('PixelStreaming', () => {
         expect(webSocketSpyFunctions.sendSpy).toHaveBeenCalledWith(
             expect.stringMatching(/"type":"listStreamers"/)
         );
+    });
+
+    it('should emit webRtcConnected event when ICE connection state is connected', () => {
+        const config = new Config({ initialSettings: {ss: mockSignallingUrl, AutoConnect: true}});
+        const peerConnectionOptions: RTCConfiguration = {
+
+        };
+        const candidate: RTCIceCandidateInit = {
+
+        };
+        const connectedSpy = jest.fn();
+
+        const pixelStreaming = new PixelStreaming(config);
+        pixelStreaming.addEventListener("webRtcConnected", connectedSpy);
+
+        webSocketTriggerFunctions.triggerOnOpen?.();
+        expect(wrtcPeerConnectionSpyFunctions.constructorSpy).not.toHaveBeenCalled();
+        webSocketTriggerFunctions.triggerOnMessage?.({
+            type: MessageRecvTypes.CONFIG,
+            peerConnectionOptions
+        });
+        expect(wrtcPeerConnectionSpyFunctions.constructorSpy).toHaveBeenCalled();
+        webSocketTriggerFunctions.triggerOnMessage?.({
+            type: MessageRecvTypes.ICE_CANDIDATE,
+            candidate
+        });
+        rtcPeerConnectionTriggerFunctions.triggerIceConnectionStateChange?.("connected");
+        expect(connectedSpy).toHaveBeenCalledWith(new WebRtcConnectedEvent());
+    });
+
+    it('should autoselect a streamer if receiving only one streamer in streamerList message', () => {
+        const config = new Config({ initialSettings: {ss: mockSignallingUrl, AutoConnect: true}});
+        const streamerId = "MOCK_PIXEL_STREAMING";
+        const streamerIdList = [streamerId];
+        const streamerListSpy = jest.fn();
+        const peerConnectionOptions: RTCConfiguration = {
+        };
+
+        const pixelStreaming = new PixelStreaming(config);
+        pixelStreaming.addEventListener("streamerListMessage", streamerListSpy);
+
+        webSocketTriggerFunctions.triggerOnOpen?.();
+        webSocketTriggerFunctions.triggerOnMessage?.({
+            type: MessageRecvTypes.CONFIG,
+            peerConnectionOptions
+        });
+        webSocketTriggerFunctions.triggerOnMessage?.({
+            type: MessageRecvTypes.STREAMER_LIST,
+            ids: streamerIdList
+        });
+        expect(streamerListSpy).toHaveBeenCalledWith(new StreamerListMessageEvent({
+            messageStreamerList: expect.objectContaining({
+                type: MessageRecvTypes.STREAMER_LIST,
+                ids: streamerIdList
+            }),
+            autoSelectedStreamerId: streamerId
+        }));
     });
 
 });
