@@ -3,6 +3,7 @@
 import { Config, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 import { Application, PixelStreamingApplicationStyle } from '@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2';
 export const PixelStreamingApplicationStyles = new PixelStreamingApplicationStyle();
+PixelStreamingApplicationStyles.applyStyleSheet();
 
 
 document.body.onload = function() {
@@ -13,11 +14,14 @@ document.body.onload = function() {
 	const config = new Config({ useUrlParams: true });
 
 	// Create Pixel Streaming application
-	const pixelStreaming = new PixelStreaming(config);
-	const application = new Application({ pixelStreaming });
+	const stream = new PixelStreaming(config);
+	const application = new Application({
+		stream,
+		onColorModeChanged: (isLightMode) => PixelStreamingApplicationStyles.setColorMode(isLightMode)
+	});
 	document.getElementById("playercontainer").appendChild(application.rootElement);
 
-	const showcase = new Showcase(pixelStreaming);
+	const showcase = new Showcase(stream);
 
 	// Bind example selection to the onExampleChanged function
 	document.getElementById("exampleSelect").onchange = (event : Event) => { showcase.onExampleChanged(event); };
@@ -48,7 +52,6 @@ class Showcase {
 
 		const selectElement = event.target as HTMLSelectElement;
 		const exampleName = selectElement.value;
-		console.log(exampleName);
 		this._createExample(exampleName);
 	}
 
@@ -76,8 +79,11 @@ class Showcase {
 	}
 
 	private _onCharacterClicked(characterName : string) {
-		// move to latest version of PS
-		//this._pixelStreaming.
+		this._pixelStreaming.emitUIInteraction({ Character: characterName });
+	}
+
+	private _onSkinClicked(skinIndex : number) {
+		this._pixelStreaming.emitUIInteraction({ Skin: skinIndex });
 	}
 
 	private _createGettingStartedExample() {
@@ -118,22 +124,19 @@ class Showcase {
 		// Make Aurora character
 		const auroraElem = document.createElement("div");
 		characterSelectElem.appendChild(auroraElem);
-		// todo: onclick=onCOnfigButton(0,0)
 		const auroraImg = document.createElement("img");
 		auroraImg.classList.add("characterBtn");
 		auroraImg.src = "./images/Aurora.jpg";
-		auroraImg.onclick = function(ev: MouseEvent){
-
-		}
+		auroraImg.onclick = () => { this._onCharacterClicked("Aurora"); }
 		auroraElem.appendChild(auroraImg);
 
 		// Make Crunch character
 		const crunchElem = document.createElement("div");
 		characterSelectElem.appendChild(crunchElem);
-		// todo: onclick=onCOnfigButton(0,1)
 		const crunchImg = document.createElement("img");
 		crunchImg.classList.add("characterBtn");
 		crunchImg.src = "./images/Crunch.jpg";
+		crunchImg.onclick = () => { this._onCharacterClicked("Crunch"); }
 		crunchElem.appendChild(crunchImg);
 
 		// Make skin selection title
@@ -151,16 +154,23 @@ class Showcase {
 		// Skin1
 		const skin1Btn = document.createElement("button");
 		skin1Btn.classList.add("btn-flat");
-		// todo: onclick=onConfigButton(1,0)
+		skin1Btn.onclick = () => { this._onSkinClicked(0); }
 		skin1Btn.innerText = "Skin 1";
 		skinSelectElem.appendChild(skin1Btn);
 
 		// Skin2
 		const skin2Btn = document.createElement("button");
 		skin2Btn.classList.add("btn-flat");
-		// todo: onclick=onConfigButton(1,1)
+		skin2Btn.onclick = () => { this._onSkinClicked(1); }
 		skin2Btn.innerText = "Skin 2";
 		skinSelectElem.appendChild(skin2Btn);
+
+		// Skin3
+		const skin3Btn = document.createElement("button");
+		skin3Btn.classList.add("btn-flat");
+		skin3Btn.onclick = () => { this._onSkinClicked(2); }
+		skin3Btn.innerText = "Skin 3";
+		skinSelectElem.appendChild(skin3Btn);
 	}
 
 	private _createUECommandExample() {
