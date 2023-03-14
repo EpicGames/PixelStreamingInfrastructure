@@ -20,6 +20,7 @@ describe('PixelStreaming', () => {
     beforeEach(() => {
         mockRTCRtpReceiver();
         webSocketSpyFunctions = mockWebSocket();
+        jest.useFakeTimers();
     });
 
     afterEach(() => {
@@ -74,5 +75,33 @@ describe('PixelStreaming', () => {
         expect(webSocketSpyFunctions.closeSpy).not.toHaveBeenCalled();
         pixelStreaming.disconnect();
         expect(webSocketSpyFunctions.closeSpy).toHaveBeenCalled();
+    });
+
+    it('should connect immediately to signalling server if reconnect is called and connection is not up', () => {
+        const mockUrl = 'ws://localhost:24680/';
+        const config = new Config({ initialSettings: {ss: mockUrl}});
+
+        const pixelStreaming = new PixelStreaming(config);
+        expect(webSocketSpyFunctions.constructorSpy).not.toHaveBeenCalled();
+        pixelStreaming.reconnect();
+        expect(webSocketSpyFunctions.closeSpy).not.toHaveBeenCalled();
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockUrl);
+    });
+
+    it('should disconnect and reconnect to signalling server if reconnect is called and connection is up', () => {
+        const mockUrl = 'ws://localhost:24680/';
+        const config = new Config({ initialSettings: {ss: mockUrl, AutoConnect: true}});
+
+        const pixelStreaming = new PixelStreaming(config);
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockUrl);
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledTimes(1);
+        expect(webSocketSpyFunctions.closeSpy).not.toHaveBeenCalled();
+        pixelStreaming.reconnect();
+        expect(webSocketSpyFunctions.closeSpy).toHaveBeenCalled();
+
+        // delayed reconnect after 3 seconds
+        jest.advanceTimersByTime(3000);
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockUrl);
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledTimes(2);
     });
 });
