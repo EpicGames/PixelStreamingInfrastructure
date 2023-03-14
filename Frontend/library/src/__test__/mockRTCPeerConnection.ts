@@ -4,6 +4,7 @@ export interface MockRTCPeerConnectionSpyFunctions {
     setRemoteDescriptionSpy: null | ((description: RTCSessionDescriptionInit) => void);
     createAnswerSpy: null | (() => void);
     addTransceiverSpy: null | ((trackOrKind: string | MediaStreamTrack, init?: RTCRtpTransceiverInit | undefined) => void);
+    addIceCandidateSpy: null | ((candidate: RTCIceCandidateInit) => void);
 }
 
 export interface MockRTCPeerConnectionTriggerFunctions {
@@ -19,6 +20,7 @@ const spyFunctions: MockRTCPeerConnectionSpyFunctions = {
     setRemoteDescriptionSpy: null,
     createAnswerSpy: null,
     addTransceiverSpy: null,
+    addIceCandidateSpy: null,
 };
 
 const triggerFunctions: MockRTCPeerConnectionTriggerFunctions = {
@@ -66,8 +68,11 @@ export class MockRTCPeerConnectionImpl implements RTCPeerConnection {
     addIceCandidate(candidate?: RTCIceCandidateInit | undefined): Promise<void>;
     addIceCandidate(candidate: RTCIceCandidateInit, successCallback: VoidFunction, failureCallback: RTCPeerConnectionErrorCallback): Promise<void>;
     addIceCandidate(candidate?: unknown, successCallback?: unknown, failureCallback?: unknown): Promise<void> {
-        this.iceConnectionState = "checking";
+        if (this.iceConnectionState !== "connected" && this.iceConnectionState !== "completed") {
+            this.iceConnectionState = "checking";
+        }
         this.oniceconnectionstatechange?.(new Event("iceconnectionstatechange"));
+        spyFunctions.addIceCandidateSpy?.(candidate as RTCIceCandidateInit);
         return Promise.resolve();
     }
     addTrack(track: MediaStreamTrack, ...streams: MediaStream[]): RTCRtpSender {
@@ -221,6 +226,7 @@ export const mockRTCPeerConnection = (): [
     spyFunctions.setRemoteDescriptionSpy = jest.fn();
     spyFunctions.createAnswerSpy = jest.fn();
     spyFunctions.addTransceiverSpy = jest.fn();
+    spyFunctions.addIceCandidateSpy = jest.fn();
     global.RTCPeerConnection = MockRTCPeerConnectionImpl;
     global.RTCIceCandidate = MockRTCIceCandidateImpl;
     return [spyFunctions, triggerFunctions];
@@ -234,4 +240,5 @@ export const unmockRTCPeerConnection = () => {
     spyFunctions.setRemoteDescriptionSpy = null;
     spyFunctions.createAnswerSpy = null;
     spyFunctions.addTransceiverSpy = null;
+    spyFunctions.addIceCandidateSpy = null;
 };
