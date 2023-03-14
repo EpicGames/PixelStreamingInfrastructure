@@ -68,13 +68,16 @@ describe('PixelStreaming', () => {
     it('should disconnect from signalling server if disconnect is called', () => {
         const mockUrl = 'ws://localhost:24680/';
         const config = new Config({ initialSettings: {ss: mockUrl, AutoConnect: true}});
+        const disconnectedSpy = jest.fn();
 
         expect(webSocketSpyFunctions.constructorSpy).not.toHaveBeenCalled();
         const pixelStreaming = new PixelStreaming(config);
+        pixelStreaming.addEventListener("webRtcDisconnected", disconnectedSpy);
         expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockUrl);
         expect(webSocketSpyFunctions.closeSpy).not.toHaveBeenCalled();
         pixelStreaming.disconnect();
         expect(webSocketSpyFunctions.closeSpy).toHaveBeenCalled();
+        expect(disconnectedSpy).toHaveBeenCalled();
     });
 
     it('should connect immediately to signalling server if reconnect is called and connection is not up', () => {
@@ -91,8 +94,10 @@ describe('PixelStreaming', () => {
     it('should disconnect and reconnect to signalling server if reconnect is called and connection is up', () => {
         const mockUrl = 'ws://localhost:24680/';
         const config = new Config({ initialSettings: {ss: mockUrl, AutoConnect: true}});
+        const autoconnectedSpy = jest.fn();
 
         const pixelStreaming = new PixelStreaming(config);
+        pixelStreaming.addEventListener("webRtcAutoConnect", autoconnectedSpy);
         expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockUrl);
         expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledTimes(1);
         expect(webSocketSpyFunctions.closeSpy).not.toHaveBeenCalled();
@@ -103,5 +108,6 @@ describe('PixelStreaming', () => {
         jest.advanceTimersByTime(3000);
         expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockUrl);
         expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledTimes(2);
+        expect(autoconnectedSpy).toHaveBeenCalled();
     });
 });
