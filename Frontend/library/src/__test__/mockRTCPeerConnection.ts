@@ -175,10 +175,6 @@ export class MockRTCPeerConnectionImpl implements RTCPeerConnection {
         spyFunctions.closeSpy?.();
     }
 
-    // send(data: string | Blob | ArrayBufferView | ArrayBufferLike): void {
-    //     spyFunctions.sendSpy?.(data);
-    // }
-
     triggerIceConnectionStateChange(state: RTCIceConnectionState) {
         this.iceConnectionState = state;
         const event = new Event(state);
@@ -242,6 +238,10 @@ export class MockRTCDataChannelImpl implements RTCDataChannel {
     protocol: string;
     readyState: RTCDataChannelState;
 
+    constructor() {
+        this.readyState = "open";
+    }
+
     onbufferedamountlow: ((this: RTCDataChannel, ev: Event) => any) | null;
     onclose: ((this: RTCDataChannel, ev: Event) => any) | null;
     onclosing: ((this: RTCDataChannel, ev: Event) => any) | null;
@@ -281,10 +281,25 @@ export class MockRTCDataChannelEventImpl extends Event implements RTCDataChannel
     }
 }
 
+export class MockRTCTrackEventImpl extends Event implements RTCTrackEvent {
+    receiver: RTCRtpReceiver;
+    streams: readonly MediaStream[];
+    track: MediaStreamTrack;
+    transceiver: RTCRtpTransceiver;
+    constructor(name: string, data: RTCTrackEventInit) {
+        super(name, data);
+        this.receiver = data.receiver;
+        this.streams = data.streams || [];
+        this.track = data.track;
+        this.transceiver = data.transceiver;
+    }
+}
+
 const originalRTCPeerConnection = global.RTCPeerConnection;
 const originalRTCIceCandidate = global.RTCIceCandidate;
 const originalRTCDataChannel = global.RTCDataChannel;
 const originalRTCDataChannelEvent = global.RTCDataChannelEvent;
+const originalRTCTrackEvent = global.RTCTrackEvent;
 export const mockRTCPeerConnection = (): [
     MockRTCPeerConnectionSpyFunctions,
     MockRTCPeerConnectionTriggerFunctions
@@ -300,6 +315,7 @@ export const mockRTCPeerConnection = (): [
     global.RTCIceCandidate = MockRTCIceCandidateImpl;
     global.RTCDataChannel = MockRTCDataChannelImpl;
     global.RTCDataChannelEvent = MockRTCDataChannelEventImpl;
+    global.RTCTrackEvent = MockRTCTrackEventImpl;
     return [spyFunctions, triggerFunctions];
 };
 
@@ -308,6 +324,7 @@ export const unmockRTCPeerConnection = () => {
     global.RTCIceCandidate = originalRTCIceCandidate;
     global.RTCDataChannel = originalRTCDataChannel;
     global.RTCDataChannelEvent = originalRTCDataChannelEvent;
+    global.RTCTrackEvent = originalRTCTrackEvent;
     spyFunctions.constructorSpy = null;
     spyFunctions.closeSpy = null;
     spyFunctions.setRemoteDescriptionSpy = null;
