@@ -12,14 +12,14 @@ import { mockRTCPeerConnection, MockRTCPeerConnectionSpyFunctions, MockRTCPeerCo
 describe('PixelStreaming', () => {
     let webSocketSpyFunctions: MockWebSocketSpyFunctions;
     let webSocketTriggerFunctions: MockWebSocketTriggerFunctions;
-    let wrtcPeerConnectionSpyFunctions: MockRTCPeerConnectionSpyFunctions;
+    let rtcPeerConnectionSpyFunctions: MockRTCPeerConnectionSpyFunctions;
     let rtcPeerConnectionTriggerFunctions: MockRTCPeerConnectionTriggerFunctions;
     const mockSignallingUrl = 'ws://localhost:24680/';
 
     beforeEach(() => {
         mockRTCRtpReceiver();
         [webSocketSpyFunctions, webSocketTriggerFunctions] = mockWebSocket();
-        [wrtcPeerConnectionSpyFunctions, rtcPeerConnectionTriggerFunctions] = mockRTCPeerConnection();
+        [rtcPeerConnectionSpyFunctions, rtcPeerConnectionTriggerFunctions] = mockRTCPeerConnection();
         jest.useFakeTimers();
     });
 
@@ -127,12 +127,12 @@ describe('PixelStreaming', () => {
         pixelStreaming.addEventListener("webRtcConnected", connectedSpy);
 
         webSocketTriggerFunctions.triggerOnOpen?.();
-        expect(wrtcPeerConnectionSpyFunctions.constructorSpy).not.toHaveBeenCalled();
+        expect(rtcPeerConnectionSpyFunctions.constructorSpy).not.toHaveBeenCalled();
         webSocketTriggerFunctions.triggerOnMessage?.({
             type: MessageRecvTypes.CONFIG,
             peerConnectionOptions
         });
-        expect(wrtcPeerConnectionSpyFunctions.constructorSpy).toHaveBeenCalled();
+        expect(rtcPeerConnectionSpyFunctions.constructorSpy).toHaveBeenCalled();
         webSocketTriggerFunctions.triggerOnMessage?.({
             type: MessageRecvTypes.ICE_CANDIDATE,
             candidate
@@ -177,20 +177,20 @@ describe('PixelStreaming', () => {
         const pixelStreaming = new PixelStreaming(config);
 
         webSocketTriggerFunctions.triggerOnOpen?.();
-        expect(wrtcPeerConnectionSpyFunctions.constructorSpy).not.toHaveBeenCalled();
+        expect(rtcPeerConnectionSpyFunctions.constructorSpy).not.toHaveBeenCalled();
         webSocketTriggerFunctions.triggerOnMessage?.({
             type: MessageRecvTypes.CONFIG,
             peerConnectionOptions
         });
-        expect(wrtcPeerConnectionSpyFunctions.constructorSpy).toHaveBeenCalled();
+        expect(rtcPeerConnectionSpyFunctions.constructorSpy).toHaveBeenCalled();
         webSocketTriggerFunctions.triggerOnMessage?.({
             type: MessageRecvTypes.ICE_CANDIDATE,
             candidate
         });
         rtcPeerConnectionTriggerFunctions.triggerIceConnectionStateChange?.("connected");
-        expect(wrtcPeerConnectionSpyFunctions.closeSpy).not.toHaveBeenCalled();
+        expect(rtcPeerConnectionSpyFunctions.closeSpy).not.toHaveBeenCalled();
         pixelStreaming.disconnect();
-        expect(wrtcPeerConnectionSpyFunctions.closeSpy).toHaveBeenCalled();
+        expect(rtcPeerConnectionSpyFunctions.closeSpy).toHaveBeenCalled();
     });
 
 });
