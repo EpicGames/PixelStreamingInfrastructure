@@ -46,7 +46,7 @@ describe('PixelStreaming', () => {
     });
 
     it('should connect to signalling server when connect is called', () => {
-        const mockUrl = 'ws://localhost:24680';
+        const mockUrl = 'ws://localhost:24680/';
         const config = new Config({ initialSettings: {ss: mockUrl}});
 
         const pixelStreaming = new PixelStreaming(config);
@@ -55,4 +55,24 @@ describe('PixelStreaming', () => {
         expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockUrl);
     });
 
+    it('should autoconnect to signalling server if autoconnect setting is enabled', () => {
+        const mockUrl = 'ws://localhost:24680/';
+        const config = new Config({ initialSettings: {ss: mockUrl, AutoConnect: true}});
+
+        expect(webSocketSpyFunctions.constructorSpy).not.toHaveBeenCalled();
+        const pixelStreaming = new PixelStreaming(config);
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockUrl);
+    });
+
+    it('should disconnect from signalling server if disconnect is called', () => {
+        const mockUrl = 'ws://localhost:24680/';
+        const config = new Config({ initialSettings: {ss: mockUrl, AutoConnect: true}});
+
+        expect(webSocketSpyFunctions.constructorSpy).not.toHaveBeenCalled();
+        const pixelStreaming = new PixelStreaming(config);
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockUrl);
+        expect(webSocketSpyFunctions.closeSpy).not.toHaveBeenCalled();
+        pixelStreaming.disconnect();
+        expect(webSocketSpyFunctions.closeSpy).toHaveBeenCalled();
+    });
 });

@@ -17,27 +17,44 @@ const spyFunctions: MockWebSocketSpyFunctions = {
 };
 
 export class MockWebSocketImpl extends WebSocket {
-    constructor(url: string) {
-        super(url);
-        spyFunctions.constructorSpy?.(url);
+    _readyState: number;
+
+    constructor(url: string | URL, protocols?: string | string[]) {
+        super(url, protocols);
+        this._readyState = this.OPEN;
+        spyFunctions.constructorSpy?.(this.url);
+    }
+
+    get readyState() {
+        return this._readyState;
+    }
+
+    close(code?: number | undefined, reason?: string | undefined): void {
+        super.close(code, reason);
+        this._readyState = this.CLOSED;
+        this.triggerOnClose({ code, reason });
+    }
+
+    send(data: string | Blob | ArrayBufferView | ArrayBufferLike): void {
+        throw new Error('Method not implemented.');
     }
 
     triggerOnOpen() {
         const event = new Event('open');
-        super.onopen?.(event);
+        this.onopen?.(event);
         spyFunctions.openSpy?.(event);
     }
 
     triggerOnError() {
         const event = new Event('error');
-        super.onerror?.(event);
+        this.onerror?.(event);
         spyFunctions.errorSpy?.(event);
     }
 
     triggerOnClose(closeReason?: CloseEventInit) {
         const reason = closeReason ?? { code: 1, reason: 'mock reason' };
         const event = new CloseEvent('close', reason);
-        super.onclose?.(event);
+        this.onclose?.(event);
         spyFunctions.closeSpy?.(event);
     }
 
@@ -46,7 +63,7 @@ export class MockWebSocketImpl extends WebSocket {
             ? JSON.stringify(message)
             : JSON.stringify({ type: 'test' });
         const event = new MessageEvent('message', { data });
-        super.onmessage?.(event);
+        this.onmessage?.(event);
         spyFunctions.messageSpy?.(event);
     }
 
@@ -57,7 +74,7 @@ export class MockWebSocketImpl extends WebSocket {
                 type: 'application/json'
             });
         const event = new MessageEvent('messagebinary', { data });
-        super.onmessagebinary?.(event);
+        this.onmessagebinary?.(event);
         spyFunctions.messageBinarySpy?.(event);
     }
 }
