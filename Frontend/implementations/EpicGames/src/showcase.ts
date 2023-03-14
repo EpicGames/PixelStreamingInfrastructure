@@ -86,6 +86,10 @@ class Showcase {
 		this._pixelStreaming.emitUIInteraction({ Skin: skinIndex });
 	}
 
+	private _onResClicked(width : number, height : number) {
+		this._pixelStreaming.emitCommand({ Resolution: { Width: width, Height: height } });
+	}
+
 	private _createGettingStartedExample() {
 		this._infoElem.innerHTML = 
 		`
@@ -218,21 +222,28 @@ class Showcase {
 		// 720p
 		const res720pBtn = document.createElement("button");
 		res720pBtn.classList.add("btn-flat");
-		// todo: onclick=onConfigButton(1,0)
+		res720pBtn.onclick = () => { this._onResClicked(1280, 720); }
 		res720pBtn.innerText = "720p";
 		changeResBtnContainer.appendChild(res720pBtn);
 
 		// 1080p
 		const res1080pBtn = document.createElement("button");
 		res1080pBtn.classList.add("btn-flat");
-		// todo: onclick=onConfigButton(1,0)
+		res1080pBtn.onclick = () => { this._onResClicked(1920, 1080); }
 		res1080pBtn.innerText = "1080p";
 		changeResBtnContainer.appendChild(res1080pBtn);
+
+		// 1440p
+		const res1440pBtn = document.createElement("button");
+		res1440pBtn.classList.add("btn-flat");
+		res1440pBtn.onclick = () => { this._onResClicked(2560, 1440); }
+		res1440pBtn.innerText = "1440p";
+		changeResBtnContainer.appendChild(res1440pBtn);
 
 		// 4k
 		const res4kBtn = document.createElement("button");
 		res4kBtn.classList.add("btn-flat");
-		// todo: onclick=onConfigButton(1,0)
+		res4kBtn.onclick = () => { this._onResClicked(3840, 2160); }
 		res4kBtn.innerText = "4k";
 		changeResBtnContainer.appendChild(res4kBtn);
 	}
