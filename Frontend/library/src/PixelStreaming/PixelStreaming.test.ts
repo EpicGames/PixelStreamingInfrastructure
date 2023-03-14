@@ -1,4 +1,4 @@
-import { mockRTCRtpReceiver, unmockRTCRtpReceiver } from '../__test__/mockWebRtc';
+import { mockRTCRtpReceiver, unmockRTCRtpReceiver } from '../__test__/mockRTCRtpReceiver';
 import {
     Config,
     Flags,
