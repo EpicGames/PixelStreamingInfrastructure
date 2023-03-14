@@ -52,10 +52,15 @@ export class MockMediaStreamTrackImpl implements MediaStreamTrack {
     kind: string;
     label: string;
     muted: boolean;
+    readyState: MediaStreamTrackState;
+
+    constructor() {
+        this.kind = 'video';
+    }
+
     onended: ((this: MediaStreamTrack, ev: Event) => any) | null;
     onmute: ((this: MediaStreamTrack, ev: Event) => any) | null;
     onunmute: ((this: MediaStreamTrack, ev: Event) => any) | null;
-    readyState: MediaStreamTrackState;
     applyConstraints(constraints?: MediaTrackConstraints | undefined): Promise<void> {
         throw new Error("Method not implemented.");
     }
@@ -89,8 +94,11 @@ export class MockMediaStreamTrackImpl implements MediaStreamTrack {
     }
 }
 
+const mockHTMLMediaElementPlay = (success: boolean) => () => success ? Promise.resolve() : Promise.reject("mock cancel");
+
 const originalMediaStream = global.MediaStream;
 const originalMediaStreamTrack = global.MediaStreamTrack;
+const originalHTMLMediaElementPlay = global.HTMLMediaElement.prototype.play;
 export const mockMediaStream = () => {
     global.MediaStream = MockMediaStreamImpl;
     global.MediaStreamTrack = MockMediaStreamTrackImpl;
@@ -99,4 +107,12 @@ export const mockMediaStream = () => {
 export const unmockMediaStream = () => {
     global.MediaStream = originalMediaStream;
     global.MediaStreamTrack = originalMediaStreamTrack;
+}
+
+export const mockHTMLMediaElement = (ableToPlay: boolean) => {
+    global.HTMLMediaElement.prototype.play = mockHTMLMediaElementPlay(ableToPlay);
+}
+
+export const unmockHTMLMediaElement = () => {
+    global.HTMLMediaElement.prototype.play = originalHTMLMediaElementPlay;
 }
