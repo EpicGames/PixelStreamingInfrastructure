@@ -1,5 +1,6 @@
 export interface MockRTCPeerConnectionSpyFunctions {
     constructorSpy: null | ((config: RTCConfiguration) => void);
+    closeSpy: null | (() => void);
 }
 
 export interface MockRTCPeerConnectionTriggerFunctions {
@@ -11,6 +12,7 @@ export interface MockRTCPeerConnectionTriggerFunctions {
 
 const spyFunctions: MockRTCPeerConnectionSpyFunctions = {
     constructorSpy: null,
+    closeSpy: null,
 };
 
 const triggerFunctions: MockRTCPeerConnectionTriggerFunctions = {
@@ -137,6 +139,7 @@ export class MockRTCPeerConnectionImpl implements RTCPeerConnection {
         this.iceConnectionState = "closed";
         this.onconnectionstatechange?.(new Event(this.connectionState));
         this.oniceconnectionstatechange?.(new Event(this.iceConnectionState));
+        spyFunctions.closeSpy?.();
     }
 
     // send(data: string | Blob | ArrayBufferView | ArrayBufferLike): void {
@@ -201,6 +204,7 @@ export const mockRTCPeerConnection = (): [
     MockRTCPeerConnectionTriggerFunctions
 ] => {
     spyFunctions.constructorSpy = jest.fn();
+    spyFunctions.closeSpy = jest.fn();
     global.RTCPeerConnection = MockRTCPeerConnectionImpl;
     global.RTCIceCandidate = MockRTCIceCandidateImpl;
     return [spyFunctions, triggerFunctions];
@@ -210,4 +214,5 @@ export const unmockRTCPeerConnection = () => {
     global.RTCPeerConnection = originalRTCPeerConnection;
     global.RTCIceCandidate = originalRTCIceCandidate;
     spyFunctions.constructorSpy = null;
+    spyFunctions.closeSpy = null;
 };

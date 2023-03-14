@@ -119,12 +119,8 @@ describe('PixelStreaming', () => {
 
     it('should emit webRtcConnected event when ICE connection state is connected', () => {
         const config = new Config({ initialSettings: {ss: mockSignallingUrl, AutoConnect: true}});
-        const peerConnectionOptions: RTCConfiguration = {
-
-        };
-        const candidate: RTCIceCandidateInit = {
-
-        };
+        const peerConnectionOptions: RTCConfiguration = {};
+        const candidate: RTCIceCandidateInit = {};
         const connectedSpy = jest.fn();
 
         const pixelStreaming = new PixelStreaming(config);
@@ -150,8 +146,7 @@ describe('PixelStreaming', () => {
         const streamerId = "MOCK_PIXEL_STREAMING";
         const streamerIdList = [streamerId];
         const streamerListSpy = jest.fn();
-        const peerConnectionOptions: RTCConfiguration = {
-        };
+        const peerConnectionOptions: RTCConfiguration = {};
 
         const pixelStreaming = new PixelStreaming(config);
         pixelStreaming.addEventListener("streamerListMessage", streamerListSpy);
@@ -172,6 +167,30 @@ describe('PixelStreaming', () => {
             }),
             autoSelectedStreamerId: streamerId
         }));
+    });
+
+    it('should call RTCPeerConnection close when disconnect is called', () => {
+        const config = new Config({ initialSettings: {ss: mockSignallingUrl, AutoConnect: true}});
+        const peerConnectionOptions: RTCConfiguration = {};
+        const candidate: RTCIceCandidateInit = {};
+
+        const pixelStreaming = new PixelStreaming(config);
+
+        webSocketTriggerFunctions.triggerOnOpen?.();
+        expect(wrtcPeerConnectionSpyFunctions.constructorSpy).not.toHaveBeenCalled();
+        webSocketTriggerFunctions.triggerOnMessage?.({
+            type: MessageRecvTypes.CONFIG,
+            peerConnectionOptions
+        });
+        expect(wrtcPeerConnectionSpyFunctions.constructorSpy).toHaveBeenCalled();
+        webSocketTriggerFunctions.triggerOnMessage?.({
+            type: MessageRecvTypes.ICE_CANDIDATE,
+            candidate
+        });
+        rtcPeerConnectionTriggerFunctions.triggerIceConnectionStateChange?.("connected");
+        expect(wrtcPeerConnectionSpyFunctions.closeSpy).not.toHaveBeenCalled();
+        pixelStreaming.disconnect();
+        expect(wrtcPeerConnectionSpyFunctions.closeSpy).toHaveBeenCalled();
     });
 
 });
