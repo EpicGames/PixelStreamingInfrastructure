@@ -2,6 +2,7 @@ export interface MockRTCPeerConnectionSpyFunctions {
     constructorSpy: null | ((config: RTCConfiguration) => void);
     closeSpy: null | (() => void);
     setRemoteDescriptionSpy: null | ((description: RTCSessionDescriptionInit) => void);
+    setLocalDescriptionSpy: null | ((description: RTCLocalSessionDescriptionInit) => void);
     createAnswerSpy: null | (() => void);
     addTransceiverSpy: null | ((trackOrKind: string | MediaStreamTrack, init?: RTCRtpTransceiverInit | undefined) => void);
     addIceCandidateSpy: null | ((candidate: RTCIceCandidateInit) => void);
@@ -18,6 +19,7 @@ const spyFunctions: MockRTCPeerConnectionSpyFunctions = {
     constructorSpy: null,
     closeSpy: null,
     setRemoteDescriptionSpy: null,
+    setLocalDescriptionSpy: null,
     createAnswerSpy: null,
     addTransceiverSpy: null,
     addIceCandidateSpy: null,
@@ -110,7 +112,19 @@ export class MockRTCPeerConnectionImpl implements RTCPeerConnection {
         throw new Error("Method not implemented.");
     }
     getStats(selector?: MediaStreamTrack | null | undefined): Promise<RTCStatsReport> {
-        throw new Error("Method not implemented.");
+        const stats = {
+            forEach: function (callbackfn: (value: any) => void): void {
+                callbackfn({
+                    type: 'candidate-pair',
+                    bytesReceived: 123,
+                });
+                callbackfn({
+                    type: 'local-candidate',
+                    address: 'mock-address',
+                });
+            },
+        };
+        return Promise.resolve(stats as RTCStatsReport);
     }
     getTransceivers(): RTCRtpTransceiver[] {
         return [];
@@ -127,7 +141,8 @@ export class MockRTCPeerConnectionImpl implements RTCPeerConnection {
     setLocalDescription(description?: RTCLocalSessionDescriptionInit | undefined): Promise<void>;
     setLocalDescription(description: RTCLocalSessionDescriptionInit, successCallback: VoidFunction, failureCallback: RTCPeerConnectionErrorCallback): Promise<void>;
     setLocalDescription(description?: unknown, successCallback?: unknown, failureCallback?: unknown): Promise<void> {
-        throw new Error("Method not implemented.");
+        spyFunctions.setLocalDescriptionSpy?.(description as RTCLocalSessionDescriptionInit);
+        return Promise.resolve();
     }
     setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void>;
     setRemoteDescription(description: RTCSessionDescriptionInit, successCallback: VoidFunction, failureCallback: RTCPeerConnectionErrorCallback): Promise<void>;
@@ -224,6 +239,7 @@ export const mockRTCPeerConnection = (): [
     spyFunctions.constructorSpy = jest.fn();
     spyFunctions.closeSpy = jest.fn();
     spyFunctions.setRemoteDescriptionSpy = jest.fn();
+    spyFunctions.setLocalDescriptionSpy = jest.fn();
     spyFunctions.createAnswerSpy = jest.fn();
     spyFunctions.addTransceiverSpy = jest.fn();
     spyFunctions.addIceCandidateSpy = jest.fn();
@@ -238,6 +254,7 @@ export const unmockRTCPeerConnection = () => {
     spyFunctions.constructorSpy = null;
     spyFunctions.closeSpy = null;
     spyFunctions.setRemoteDescriptionSpy = null;
+    spyFunctions.setLocalDescriptionSpy = null;
     spyFunctions.createAnswerSpy = null;
     spyFunctions.addTransceiverSpy = null;
     spyFunctions.addIceCandidateSpy = null;
