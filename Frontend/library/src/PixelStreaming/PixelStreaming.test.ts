@@ -12,14 +12,19 @@ import {
 } from '../Config/Config';
 import { PixelStreaming } from './PixelStreaming';
 import { SettingsChangedEvent } from '../pixelstreamingfrontend';
+import { mockWebSocket, MockWebSocketSpyFunctions, unmockWebSocket } from '../__test__/mockWebSocket';
 
 describe('PixelStreaming', () => {
+    let webSocketSpyFunctions: MockWebSocketSpyFunctions;
+
     beforeEach(() => {
         mockRTCRtpReceiver();
+        webSocketSpyFunctions = mockWebSocket();
     });
 
     afterEach(() => {
         unmockRTCRtpReceiver();
+        unmockWebSocket();
         jest.resetAllMocks();
     });
 
@@ -38,6 +43,16 @@ describe('PixelStreaming', () => {
             type: 'number',
             value: 123,
         }));
+    });
+
+    it('should connect to signalling server when connect is called', () => {
+        const mockUrl = 'ws://localhost:24680';
+        const config = new Config({ initialSettings: {ss: mockUrl}});
+
+        const pixelStreaming = new PixelStreaming(config);
+        expect(webSocketSpyFunctions.constructorSpy).not.toHaveBeenCalled();
+        pixelStreaming.connect();
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockUrl);
     });
 
 });
