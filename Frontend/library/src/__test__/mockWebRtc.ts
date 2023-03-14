@@ -1,4 +1,4 @@
-export const MockRTCRtpReceiver = {
+export const mockRTCRtpReceiverImpl = {
     prototype: jest.fn(),
     getCapabilities: () => ({
         codecs: [
@@ -11,3 +11,12 @@ export const MockRTCRtpReceiver = {
         headerExtensions: [] as RTCRtpHeaderExtensionCapability[]
     })
 } as any as typeof global.RTCRtpReceiver;
+
+let originalRTCRtpReceiver = global.RTCRtpReceiver;
+export const mockRTCRtpReceiver = () => {
+    global.RTCRtpReceiver = mockRTCRtpReceiverImpl;
+}
+
+export const unmockRTCRtpReceiver = () => {
+    global.RTCRtpReceiver = originalRTCRtpReceiver;
+}

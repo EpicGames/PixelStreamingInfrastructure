@@ -1,7 +1,7 @@
 import { Config, Flags, NumericParameters } from '../Config/Config';
 import { PixelStreaming } from '../PixelStreaming/PixelStreaming';
 import { AfkTimedOutEvent, AfkWarningActivateEvent, AfkWarningUpdateEvent, AfkWarningDeactivateEvent } from '../Util/EventEmitter';
-import { MockRTCRtpReceiver } from '../__test__/mockWebRtc';
+import { mockRTCRtpReceiver, unmockRTCRtpReceiver } from '../__test__/mockWebRtc';
 import {
     AFKController
 } from './AFKController';
@@ -10,7 +10,7 @@ describe('AFKController', () => {
     let mockPixelStreaming: PixelStreaming;
 
     beforeEach(() => {
-        global.RTCRtpReceiver = MockRTCRtpReceiver;
+        mockRTCRtpReceiver();
         jest.useFakeTimers();
         mockPixelStreaming = {
             dispatchEvent: jest.fn()
@@ -18,6 +18,7 @@ describe('AFKController', () => {
     });
 
     afterEach(() => {
+        unmockRTCRtpReceiver();
         jest.resetAllMocks();
     });
 

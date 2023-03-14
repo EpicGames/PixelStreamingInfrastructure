@@ -1,4 +1,4 @@
-import { MockRTCRtpReceiver } from '../__test__/mockWebRtc';
+import { mockRTCRtpReceiver, unmockRTCRtpReceiver } from '../__test__/mockWebRtc';
 import {
     Config,
     Flags,
@@ -31,10 +31,11 @@ const allParameters = [
 
 describe('Config', () => {
     beforeEach(() => {
-        global.RTCRtpReceiver = MockRTCRtpReceiver;
+        mockRTCRtpReceiver();
     });
 
     afterEach(() => {
+        unmockRTCRtpReceiver();
         jest.resetAllMocks();
     });
 
