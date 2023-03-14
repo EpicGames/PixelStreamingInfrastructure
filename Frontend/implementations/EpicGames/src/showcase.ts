@@ -204,10 +204,11 @@ class Showcase {
 		<code>pixelstreaming.emitConsoleCommand(command: string)</code>
 		`;
 
+		// Add a new element for containing elements for res changing feature
 		const changeResElem = document.createElement("div");
 		this._exampleSettingsElem.appendChild(changeResElem);
 
-		// Make res change title title
+		// Make res change title
 		const changeResTitle = document.createElement("p");
 		changeResTitle.innerText = "Change resolution: ";
 		changeResElem.appendChild(changeResTitle);
@@ -246,6 +247,17 @@ class Showcase {
 		res4kBtn.onclick = () => { this._onResClicked(3840, 2160); }
 		res4kBtn.innerText = "4k";
 		changeResBtnContainer.appendChild(res4kBtn);
+
+		// Add a new element for containing elements for res changing feature
+		const consoleCommandElem = document.createElement("div");
+		this._exampleSettingsElem.appendChild(consoleCommandElem);
+
+		// Make console command title
+		const consoleCommandTitle = document.createElement("p");
+		consoleCommandTitle.innerText = "Send a console command: ";
+		consoleCommandElem.appendChild(consoleCommandTitle);
+
+		// todo: button for stat fps/ stat gpu
 	}
 
 }
