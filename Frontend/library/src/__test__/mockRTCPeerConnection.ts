@@ -1,6 +1,9 @@
 export interface MockRTCPeerConnectionSpyFunctions {
     constructorSpy: null | ((config: RTCConfiguration) => void);
     closeSpy: null | (() => void);
+    setRemoteDescriptionSpy: null | ((description: RTCSessionDescriptionInit) => void);
+    createAnswerSpy: null | (() => void);
+    addTransceiverSpy: null | ((trackOrKind: string | MediaStreamTrack, init?: RTCRtpTransceiverInit | undefined) => void);
 }
 
 export interface MockRTCPeerConnectionTriggerFunctions {
@@ -13,6 +16,9 @@ export interface MockRTCPeerConnectionTriggerFunctions {
 const spyFunctions: MockRTCPeerConnectionSpyFunctions = {
     constructorSpy: null,
     closeSpy: null,
+    setRemoteDescriptionSpy: null,
+    createAnswerSpy: null,
+    addTransceiverSpy: null,
 };
 
 const triggerFunctions: MockRTCPeerConnectionTriggerFunctions = {
@@ -68,12 +74,18 @@ export class MockRTCPeerConnectionImpl implements RTCPeerConnection {
         throw new Error("Method not implemented.");
     }
     addTransceiver(trackOrKind: string | MediaStreamTrack, init?: RTCRtpTransceiverInit | undefined): RTCRtpTransceiver {
-        throw new Error("Method not implemented.");
+        spyFunctions.addTransceiverSpy?.(trackOrKind, init);
+        return {} as RTCRtpTransceiver;
     }
     createAnswer(options?: RTCAnswerOptions | undefined): Promise<RTCSessionDescriptionInit>;
     createAnswer(successCallback: RTCSessionDescriptionCallback, failureCallback: RTCPeerConnectionErrorCallback): Promise<void>;
     createAnswer(successCallback?: unknown, failureCallback?: unknown): Promise<void> | Promise<RTCSessionDescriptionInit> {
-        throw new Error("Method not implemented.");
+        spyFunctions.createAnswerSpy?.();
+        const res: RTCSessionDescriptionInit = {
+            type: "answer",
+            sdp: "v=0\r\no=- 5791786663981007547 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0 1 2\r\na=extmap-allow-mixed\r\na=msid-semantic: WMS\r\nm=video 9 UDP/TLS/RTP/SAVPF 96 98\r\nc=IN IP4 0.0.0.0\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=ice-ufrag:z0li\r\na=ice-pwd:DkbG5Q3dFSIygDc47cms4TGA\r\na=ice-options:trickle\r\na=fingerprint:sha-256 F9:5B:3C:AB:89:88:0E:1B:2E:63:B3:D2:B8:92:59:E2:3A:46:B6:85:09:F4:50:0E:72:4F:9F:70:6D:5F:BD:1A\r\na=setup:active\r\na=mid:0\r\na=extmap:1 urn:ietf:params:rtp-hdrext:toffset\r\na=extmap:2 http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time\r\na=extmap:3 urn:3gpp:video-orientation\r\na=extmap:4 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=extmap:5 http://www.webrtc.org/experiments/rtp-hdrext/playout-delay\r\na=extmap:6 http://www.webrtc.org/experiments/rtp-hdrext/video-content-type\r\na=extmap:7 http://www.webrtc.org/experiments/rtp-hdrext/video-timing\r\na=extmap:8 http://www.webrtc.org/experiments/rtp-hdrext/color-space\r\na=extmap:9 urn:ietf:params:rtp-hdrext:sdes:mid\r\na=extmap:10 urn:ietf:params:rtp-hdrext:sdes:rtp-stream-id\r\na=extmap:11 urn:ietf:params:rtp-hdrext:sdes:repaired-rtp-stream-id\r\na=recvonly\r\na=rtcp-mux\r\na=rtcp-rsize\r\na=rtpmap:96 H264/90000\r\na=rtcp-fb:96 goog-remb\r\na=rtcp-fb:96 transport-cc\r\na=rtcp-fb:96 ccm fir\r\na=rtcp-fb:96 nack\r\na=rtcp-fb:96 nack pli\r\na=fmtp:96 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f\r\na=rtpmap:98 H264/90000\r\na=rtcp-fb:98 goog-remb\r\na=rtcp-fb:98 transport-cc\r\na=rtcp-fb:98 ccm fir\r\na=rtcp-fb:98 nack\r\na=rtcp-fb:98 nack pli\r\na=fmtp:98 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42001f\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111 63 110\r\nc=IN IP4 0.0.0.0\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=ice-ufrag:z0li\r\na=ice-pwd:DkbG5Q3dFSIygDc47cms4TGA\r\na=ice-options:trickle\r\na=fingerprint:sha-256 F9:5B:3C:AB:89:88:0E:1B:2E:63:B3:D2:B8:92:59:E2:3A:46:B6:85:09:F4:50:0E:72:4F:9F:70:6D:5F:BD:1A\r\na=setup:active\r\na=mid:1\r\na=extmap:14 urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\na=extmap:2 http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time\r\na=extmap:4 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=extmap:9 urn:ietf:params:rtp-hdrext:sdes:mid\r\na=recvonly\r\na=rtcp-mux\r\na=rtpmap:111 opus/48000/2\r\na=rtcp-fb:111 transport-cc\r\na=fmtp:111 minptime=10;useinbandfec=1\r\na=rtpmap:63 red/48000/2\r\na=fmtp:63 111/111\r\na=rtpmap:110 telephone-event/48000\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:z0li\r\na=ice-pwd:DkbG5Q3dFSIygDc47cms4TGA\r\na=ice-options:trickle\r\na=fingerprint:sha-256 F9:5B:3C:AB:89:88:0E:1B:2E:63:B3:D2:B8:92:59:E2:3A:46:B6:85:09:F4:50:0E:72:4F:9F:70:6D:5F:BD:1A\r\na=setup:active\r\na=mid:2\r\na=sctp-port:5000\r\na=max-message-size:262144\r\n"
+        };
+        return Promise.resolve(res);
     }
     createDataChannel(label: string, dataChannelDict?: RTCDataChannelInit | undefined): RTCDataChannel {
         throw new Error("Method not implemented.");
@@ -96,7 +108,7 @@ export class MockRTCPeerConnectionImpl implements RTCPeerConnection {
         throw new Error("Method not implemented.");
     }
     getTransceivers(): RTCRtpTransceiver[] {
-        throw new Error("Method not implemented.");
+        return [];
     }
     removeTrack(sender: RTCRtpSender): void {
         throw new Error("Method not implemented.");
@@ -115,7 +127,8 @@ export class MockRTCPeerConnectionImpl implements RTCPeerConnection {
     setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void>;
     setRemoteDescription(description: RTCSessionDescriptionInit, successCallback: VoidFunction, failureCallback: RTCPeerConnectionErrorCallback): Promise<void>;
     setRemoteDescription(description: unknown, successCallback?: unknown, failureCallback?: unknown): Promise<void> {
-        throw new Error("Method not implemented.");
+        spyFunctions.setRemoteDescriptionSpy?.(description as RTCSessionDescriptionInit);
+        return Promise.resolve();
     }
     addEventListener<K extends keyof RTCPeerConnectionEventMap>(type: K, listener: (this: RTCPeerConnection, ev: RTCPeerConnectionEventMap[K]) => any, options?: boolean | AddEventListenerOptions | undefined): void;
     addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions | undefined): void;
@@ -205,6 +218,9 @@ export const mockRTCPeerConnection = (): [
 ] => {
     spyFunctions.constructorSpy = jest.fn();
     spyFunctions.closeSpy = jest.fn();
+    spyFunctions.setRemoteDescriptionSpy = jest.fn();
+    spyFunctions.createAnswerSpy = jest.fn();
+    spyFunctions.addTransceiverSpy = jest.fn();
     global.RTCPeerConnection = MockRTCPeerConnectionImpl;
     global.RTCIceCandidate = MockRTCIceCandidateImpl;
     return [spyFunctions, triggerFunctions];
@@ -215,4 +231,7 @@ export const unmockRTCPeerConnection = () => {
     global.RTCIceCandidate = originalRTCIceCandidate;
     spyFunctions.constructorSpy = null;
     spyFunctions.closeSpy = null;
+    spyFunctions.setRemoteDescriptionSpy = null;
+    spyFunctions.createAnswerSpy = null;
+    spyFunctions.addTransceiverSpy = null;
 };
