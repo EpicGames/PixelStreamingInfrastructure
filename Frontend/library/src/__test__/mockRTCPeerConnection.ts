@@ -6,6 +6,7 @@ export interface MockRTCPeerConnectionSpyFunctions {
     createAnswerSpy: null | (() => void);
     addTransceiverSpy: null | ((trackOrKind: string | MediaStreamTrack, init?: RTCRtpTransceiverInit | undefined) => void);
     addIceCandidateSpy: null | ((candidate: RTCIceCandidateInit) => void);
+    sendDataSpy: null | ((data: ArrayBuffer) => void);
 }
 
 export interface MockRTCPeerConnectionTriggerFunctions {
@@ -23,6 +24,7 @@ const spyFunctions: MockRTCPeerConnectionSpyFunctions = {
     createAnswerSpy: null,
     addTransceiverSpy: null,
     addIceCandidateSpy: null,
+    sendDataSpy: null,
 };
 
 const triggerFunctions: MockRTCPeerConnectionTriggerFunctions = {
@@ -256,7 +258,7 @@ export class MockRTCDataChannelImpl implements RTCDataChannel {
     send(data: ArrayBuffer): void;
     send(data: ArrayBufferView): void;
     send(data: unknown): void {
-        throw new Error("Method not implemented.");
+        spyFunctions.sendDataSpy?.(data as ArrayBuffer);
     }
     addEventListener<K extends keyof RTCDataChannelEventMap>(type: K, listener: (this: RTCDataChannel, ev: RTCDataChannelEventMap[K]) => any, options?: boolean | AddEventListenerOptions | undefined): void;
     addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions | undefined): void;
@@ -311,6 +313,7 @@ export const mockRTCPeerConnection = (): [
     spyFunctions.createAnswerSpy = jest.fn();
     spyFunctions.addTransceiverSpy = jest.fn();
     spyFunctions.addIceCandidateSpy = jest.fn();
+    spyFunctions.sendDataSpy = jest.fn();
     global.RTCPeerConnection = MockRTCPeerConnectionImpl;
     global.RTCIceCandidate = MockRTCIceCandidateImpl;
     global.RTCDataChannel = MockRTCDataChannelImpl;
@@ -332,4 +335,5 @@ export const unmockRTCPeerConnection = () => {
     spyFunctions.createAnswerSpy = null;
     spyFunctions.addTransceiverSpy = null;
     spyFunctions.addIceCandidateSpy = null;
+    spyFunctions.sendDataSpy = null;
 };
