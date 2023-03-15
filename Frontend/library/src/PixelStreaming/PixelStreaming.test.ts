@@ -547,10 +547,11 @@ describe('PixelStreaming', () => {
         pixelStreaming.play();
 
         expect(rtcPeerConnectionSpyFunctions.sendDataSpy).not.toHaveBeenCalled();
-        pixelStreaming.emitCommand({
+        const commandSent = pixelStreaming.emitCommand({
             'Resolution.Width': 123,
             'Resolution.Height': 456
         });
+        expect(commandSent).toEqual(true);
         expect(rtcPeerConnectionSpyFunctions.sendDataSpy).toHaveBeenCalled();
     });
 
@@ -602,7 +603,8 @@ describe('PixelStreaming', () => {
         pixelStreaming.play();
 
         expect(rtcPeerConnectionSpyFunctions.sendDataSpy).not.toHaveBeenCalled();
-        pixelStreaming.emitConsoleCommand("console command");
+        const commandSent = pixelStreaming.emitConsoleCommand("console command");
+        expect(commandSent).toEqual(false);
         expect(rtcPeerConnectionSpyFunctions.sendDataSpy).not.toHaveBeenCalled();
     });
 
@@ -662,7 +664,8 @@ describe('PixelStreaming', () => {
         pixelStreaming._onInitialSettings(initialSettings);
         expect(initialSettingsSpy).toHaveBeenCalled();
 
-        pixelStreaming.emitConsoleCommand("console command");
+        const commandSent = pixelStreaming.emitConsoleCommand("console command");
+        expect(commandSent).toEqual(true);
         expect(rtcPeerConnectionSpyFunctions.sendDataSpy).toHaveBeenCalled();
     });
 
@@ -714,7 +717,8 @@ describe('PixelStreaming', () => {
         pixelStreaming.play();
 
         expect(rtcPeerConnectionSpyFunctions.sendDataSpy).not.toHaveBeenCalled();
-        pixelStreaming.emitUIInteraction({ custom: "descriptor" });
+        const commandSent = pixelStreaming.emitUIInteraction({ custom: "descriptor" });
+        expect(commandSent).toEqual(true);
         expect(rtcPeerConnectionSpyFunctions.sendDataSpy).toHaveBeenCalled();
     });
 
