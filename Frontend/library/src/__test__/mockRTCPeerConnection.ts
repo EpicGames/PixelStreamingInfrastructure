@@ -276,7 +276,10 @@ export class MockRTCDataChannelImpl implements RTCDataChannel {
         throw new Error("Method not implemented.");
     }
     dispatchEvent(event: Event): boolean {
-        throw new Error("Method not implemented.");
+        if (event.type === 'message') {
+            this.onmessage?.(event as MessageEvent);
+        }
+        return true;
     }
 }
 
