@@ -730,7 +730,7 @@ describe('PixelStreaming', () => {
         expect(rtcPeerConnectionSpyFunctions.sendDataSpy).toHaveBeenCalled();
     });
 
-    it('should call user-provided callback if receiving a data channel message from the streamer', () => {
+    it('should call user-provided callback if receiving a data channel Response message from the streamer', () => {
         mockHTMLMediaElement(true, 2);
         const config = new Config({ initialSettings: {ss: mockSignallingUrl}});
         const streamerId = "MOCK_PIXEL_STREAMING";
