@@ -95,20 +95,15 @@ export class MockMediaStreamTrackImpl implements MediaStreamTrack {
     }
 }
 
-const mockHTMLMediaElementPlay = (ableToPlay: boolean) => () => {
+const mockHTMLMediaElementPlay = (ableToPlay: boolean) => {
     if (ableToPlay) {
         return Promise.resolve();
     }
     return Promise.reject("mock cancel");
 };
 
-const mockHTMLMediaElementReadyState = (readyState: number) => () => {
-    
-};
-
 const originalMediaStream = global.MediaStream;
 const originalMediaStreamTrack = global.MediaStreamTrack;
-const originalHTMLMediaElementPlay = global.HTMLMediaElement.prototype.play;
 export const mockMediaStream = () => {
     global.MediaStream = MockMediaStreamImpl;
     global.MediaStreamTrack = MockMediaStreamTrackImpl;
@@ -120,12 +115,9 @@ export const unmockMediaStream = () => {
 }
 
 export const mockHTMLMediaElement = (ableToPlay: boolean, readyState?: number) => {
-    global.HTMLMediaElement.prototype.play = mockHTMLMediaElementPlay(ableToPlay);
+    jest.spyOn(HTMLMediaElement.prototype, 'play').mockReturnValue(mockHTMLMediaElementPlay(ableToPlay));
     if (readyState !== undefined) {
         jest.spyOn(HTMLMediaElement.prototype, 'readyState', 'get').mockReturnValue(readyState);
     }
 }
 
-export const unmockHTMLMediaElement = () => {
-    global.HTMLMediaElement.prototype.play = originalHTMLMediaElementPlay;
-}

@@ -4,11 +4,11 @@ import {
     NumericParameters,
 } from '../Config/Config';
 import { PixelStreaming } from './PixelStreaming';
-import { SettingsChangedEvent, StatsReceivedEvent, StreamerListMessageEvent, WebRtcConnectedEvent, WebRtcSdpEvent } from '../Util/EventEmitter';
+import { SettingsChangedEvent, StreamerListMessageEvent, WebRtcConnectedEvent, WebRtcSdpEvent } from '../Util/EventEmitter';
 import { mockWebSocket, MockWebSocketSpyFunctions, MockWebSocketTriggerFunctions, unmockWebSocket } from '../__test__/mockWebSocket';
 import { MessageRecvTypes } from '../WebSockets/MessageReceive';
 import { mockRTCPeerConnection, MockRTCPeerConnectionSpyFunctions, MockRTCPeerConnectionTriggerFunctions, unmockRTCPeerConnection } from '../__test__/mockRTCPeerConnection';
-import { mockHTMLMediaElement, mockMediaStream, unmockHTMLMediaElement, unmockMediaStream } from '../__test__/mockMediaStream';
+import { mockHTMLMediaElement, mockMediaStream, unmockMediaStream } from '../__test__/mockMediaStream';
 import { InitialSettings } from '../DataChannel/InitialSettings';
 
 const flushPromises = () => new Promise(jest.requireActual("timers").setImmediate);
@@ -34,7 +34,6 @@ describe('PixelStreaming', () => {
         unmockMediaStream();
         unmockWebSocket();
         unmockRTCPeerConnection();
-        unmockHTMLMediaElement();
         jest.resetAllMocks();
     });
 
