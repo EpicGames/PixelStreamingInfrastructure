@@ -6,26 +6,29 @@ You can make your Unreal Engine application emit custom events to all connected 
 
 To set this up:
 
-1.  In your Unreal Engine application, any time you want to emit an event to the player page, use the **Pixel Streaming > Send Pixel Streaming Response** node. Specify a custom string argument to the node to indicate to the player page what event has happened.  
+1.  In your Unreal Engine application, any time you want to emit an event to the player page, you need an actor with a **Pixel Streaming Input** component. This component has access to the **Send Pixel Streaming Response** node. Specify a custom string argument to the node to indicate to the player page what event has happened.
 
 
+[//]: # (TODO Confirm that this image is still accurate)
 <p align="center">
     <img src="Resources\Images\pixelstreaming-send-game-event.JPG" alt="Send game event">
 </p>
 
-2.  In the JavaScript of your player page, you'll need to write a custom event handler function that will be invoked each time the page receives a response event from the Unreal Engine application. It will be passed the original string argument that was sent by the **Send Pixel Streaming Response** node. For example:
+2. In your TypeScript frontend implementation these messages are consumed by an event listener. This event will be invoked every time the frontend receives a custom message from the Unreal Engine application. The original string argument given to the **Send Pixel Streaming Response** node will be passed to the function as the `response` argument. For example:
 
-        function myHandleResponseFunction(data) {
-            console.warn("Response received!");
-            switch (data) {
-                case "MyCustomEvent":
-                    ... // handle one type of event
-                case "AnotherEvent":
-                    ... // handle another event
-            }
-        }
+```typescript
+	public myHandleResponseFunction(response: string) => void {
+		Logger.Info(Logger.GetStackTrace(), "Response received!");
+		switch (response) {
+			case "MyCustomEvent":
+				... // handle one type of event
+			case "AnotherEvent":
+				... // handle another event
+		}
+	}
+```
 
-3.  Register your listener function by calling the `addResponseEventListener` function provided by `app.js`. You pass this function a unique name for your event listener, and your function. For example:
+3.  Register your listener function by using the `addResponseEventListener` function provided by the `PixelStreaming` object, found in PixelStreaming/PixelStreaming.ts. You pass this function a unique name for your event listener, and your function. For example:
 
         addResponseEventListener("handle_responses", myHandleResponseFunction);
 
@@ -34,11 +37,12 @@ To set this up:
         removeResponseEventListener("handle_responses");
 
 **_Tip:_**
-If you want to pass more complex data, you can format the string you pass to the **Send Pixel Streaming Response** node as JSON. For example:  
+If you want to pass more complex data, you can format the string you pass to the **Pixel Streaming Input -> Send Pixel Streaming Response** node as JSON. For example:
 
+[//]: # (TODO Confirm that this image is still accurate)
 <p align="center">
     <img src="Resources\Images\pixelstreaming-send-game-event-json.png" alt="Send Pixel Streaming response using JSON">
 </p>
 
-Then, in your JavaScript event handler function, use  `JSON.parse(data)` to decode the string back into a JavaScript object.
+Then, in your response event handler function, use  `JSON.parse(data)` to decode the string back into a TypeScript object.
 
