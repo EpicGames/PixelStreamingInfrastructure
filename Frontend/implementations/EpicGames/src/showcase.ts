@@ -64,13 +64,13 @@ class Showcase {
 
 		// create the relevant example based on the string passed in
 		switch(exampleName) {
-			case "Send UE Data":
+			case "Send Data to UE":
 				this._createSendUEDataExample();
 				break;
 			case "Getting Started":
 				this._createGettingStartedExample();
 				break;
-			case "Trigger UE Commands":
+			case "Send Commands to UE":
 				this._createUECommandExample();
 				break;
 			default:
@@ -120,6 +120,10 @@ class Showcase {
 
 		const characterSelectElem = document.createElement("div");
 		this._exampleSettingsElem.appendChild(characterSelectElem);
+
+		const sendDataTitle = document.createElement("h2");
+		sendDataTitle.innerText = "Send data: ";
+		characterSelectElem.appendChild(sendDataTitle);
 
 		const characterSelectTitle = document.createElement("p");
 		characterSelectTitle.innerText = "Select a character: ";
@@ -209,9 +213,14 @@ class Showcase {
 		this._exampleSettingsElem.appendChild(changeResElem);
 
 		// Make res change title
-		const changeResTitle = document.createElement("p");
-		changeResTitle.innerText = "Change resolution: ";
+		const changeResTitle = document.createElement("h2");
+		changeResTitle.innerText = "Send a custom command: ";
 		changeResElem.appendChild(changeResTitle);
+
+		// Make change resolution text
+		const changeResText = document.createElement("p");
+		changeResText.innerHTML = "Change resolution"
+		changeResElem.appendChild(changeResText);
 
 		// Make res change button container
 		const changeResBtnContainer = document.createElement("div");
@@ -253,11 +262,34 @@ class Showcase {
 		this._exampleSettingsElem.appendChild(consoleCommandElem);
 
 		// Make console command title
-		const consoleCommandTitle = document.createElement("p");
+		const consoleCommandTitle = document.createElement("h2");
 		consoleCommandTitle.innerText = "Send a console command: ";
 		consoleCommandElem.appendChild(consoleCommandTitle);
 
-		// todo: button for stat fps/ stat gpu
+		// Text informing using about -AllowPixelStreamingCommands
+		const informPSCommandsText = document.createElement("p");
+		informPSCommandsText.innerHTML = "(Requires UE side launched with <code>-AllowPixelStreamingCommands</code>)"
+		consoleCommandElem.appendChild(informPSCommandsText);
+
+		// Make buttons for stat fps/stat gpu
+		const consoleCmdBtnsContainer = document.createElement("div");
+		consoleCmdBtnsContainer.classList.add("spaced-row");
+		this._exampleSettingsElem.appendChild(consoleCmdBtnsContainer);
+
+		// stat fps
+		const statfpsBtn = document.createElement("button");
+		statfpsBtn.classList.add("btn-flat");
+		statfpsBtn.onclick = () => { this._pixelStreaming.emitConsoleCommand("stat fps"); }
+		statfpsBtn.innerText = "stat fps";
+		consoleCmdBtnsContainer.appendChild(statfpsBtn);
+
+		// stat pixelstreaming
+		const statgpuBtn = document.createElement("button");
+		statgpuBtn.classList.add("btn-flat");
+		statgpuBtn.onclick = () => { this._pixelStreaming.emitConsoleCommand("stat pixelstreaming"); }
+		statgpuBtn.innerText = "stat pixelstreaming";
+		consoleCmdBtnsContainer.appendChild(statgpuBtn);
+
 	}
 
 }
