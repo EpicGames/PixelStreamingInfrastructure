@@ -48,6 +48,7 @@ export class MockRTCPeerConnectionImpl implements RTCPeerConnection {
     remoteDescription: RTCSessionDescription | null;
     sctp: RTCSctpTransport | null;
     signalingState: RTCSignalingState;
+    _dataChannels: RTCDataChannel[] = [];
 
     constructor(config: RTCConfiguration) {
         this.connectionState = "new";
@@ -97,7 +98,9 @@ export class MockRTCPeerConnectionImpl implements RTCPeerConnection {
         return Promise.resolve(res);
     }
     createDataChannel(label: string, dataChannelDict?: RTCDataChannelInit | undefined): RTCDataChannel {
-        return new RTCDataChannel();
+        const dataChannel = new RTCDataChannel();
+        this._dataChannels.push(dataChannel);
+        return dataChannel;
     }
     createOffer(options?: RTCOfferOptions | undefined): Promise<RTCSessionDescriptionInit>;
     createOffer(successCallback: RTCSessionDescriptionCallback, failureCallback: RTCPeerConnectionErrorCallback, options?: RTCOfferOptions | undefined): Promise<void>;
@@ -174,6 +177,7 @@ export class MockRTCPeerConnectionImpl implements RTCPeerConnection {
         this.iceConnectionState = "closed";
         this.onconnectionstatechange?.(new Event(this.connectionState));
         this.oniceconnectionstatechange?.(new Event(this.iceConnectionState));
+        this._dataChannels.forEach((channel) => channel.close());
         spyFunctions.closeSpy?.();
     }
 
@@ -194,6 +198,7 @@ export class MockRTCPeerConnectionImpl implements RTCPeerConnection {
     }
 
     triggerOnDataChannel(data: RTCDataChannelEventInit) {
+        this._dataChannels.push(data.channel);
         const event = new RTCDataChannelEvent('datachannel', data);
         this.ondatachannel?.(event);
     }
@@ -251,7 +256,7 @@ export class MockRTCDataChannelImpl implements RTCDataChannel {
     onmessage: ((this: RTCDataChannel, ev: MessageEvent<any>) => any) | null;
     onopen: ((this: RTCDataChannel, ev: Event) => any) | null;
     close(): void {
-        throw new Error("Method not implemented.");
+        this.onclose?.(new Event('close'));
     }
     send(data: string): void;
     send(data: Blob): void;

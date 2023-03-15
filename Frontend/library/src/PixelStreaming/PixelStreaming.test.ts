@@ -285,9 +285,11 @@ describe('PixelStreaming', () => {
         const peerConnectionOptions: RTCConfiguration = {};
         const candidate: RTCIceCandidateInit = {};
         const disconnectedSpy = jest.fn();
+        const dataChannelSpy = jest.fn();
 
         const pixelStreaming = new PixelStreaming(config);
         pixelStreaming.addEventListener("webRtcDisconnected", disconnectedSpy);
+        pixelStreaming.addEventListener("dataChannelClose", dataChannelSpy);
         pixelStreaming.connect();
 
         webSocketTriggerFunctions.triggerOnOpen?.();
@@ -308,9 +310,15 @@ describe('PixelStreaming', () => {
             candidate
         });
         rtcPeerConnectionTriggerFunctions.triggerIceConnectionStateChange?.("connected");
+        const channel = new RTCDataChannel();
+        rtcPeerConnectionTriggerFunctions.triggerOnDataChannel?.({
+            channel
+        });
+        channel.onopen?.(new Event("open"));
         pixelStreaming.disconnect();
         expect(rtcPeerConnectionSpyFunctions.closeSpy).toHaveBeenCalled();
         expect(disconnectedSpy).toHaveBeenCalled();
+        expect(dataChannelSpy).toHaveBeenCalled();
     });
 
     it('should emit statistics when connected', async () => {
