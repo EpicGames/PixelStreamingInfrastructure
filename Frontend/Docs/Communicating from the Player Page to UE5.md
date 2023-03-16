@@ -47,7 +47,7 @@ or
 	const descriptor = {
 		LoadLevel: "/Game/Maps/Level_2",
 		PlayerCharacter: {
-			Name: "Shinbi",
+			Name: "Shinobi",
 			Skin: "Dynasty",
 		},
 	};

@@ -4,7 +4,7 @@ You can make your Unreal Engine application emit custom events to all connected 
 
 To set this up:
 
-1.  In your Unreal Engine application, any time you want to emit an event to the player page, you need an actor with a **Pixel Streaming Input** component. This component has access to the **Send Pixel Streaming Response** node. Specify a custom string argument to the node send a message to the web frontend.
+1.  In your Unreal Engine application, any time you want to emit an event to the player page, you need an actor with a **Pixel Streaming Input** component. This component has access to the **Send Pixel Streaming Response** node. Specify a custom string argument to the node to send a message to the web frontend.
 
 
 <p align="center">
