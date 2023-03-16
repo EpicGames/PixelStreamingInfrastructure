@@ -486,7 +486,13 @@ streamerServer.on('connection', function (ws, req) {
 			ws.close(1008, 'Unsupported message type');
 			return;
 		}
-		handler(streamer, msg);
+		try {
+			handler(streamer, msg);
+		} catch (err) {
+			console.error(`Bad call`);
+			ws.close(1008, 'Bad call');
+			return;
+		}
 	});
 	
 	ws.on('close', function(code, reason) {
@@ -588,7 +594,13 @@ sfuServer.on('connection', function (ws, req) {
 			ws.close(1008, 'Unsupported message type');
 			return;
 		}
-		handler(msg);
+		try {
+			handler(msg);
+		} catch (err) {
+			console.error(`Bad call`);
+			ws.close(1008, 'Bad call');
+			return;
+		}
 	});
 
 	ws.on('close', function(code, reason) {
@@ -729,7 +741,13 @@ playerServer.on('connection', function (ws, req) {
 			ws.close(1008, 'Unsupported message type');
 			return;
 		}
-		handler(player, msg);
+		try {
+			handler(player, msg);
+		} catch (err) {
+			console.error(`Bad call`);
+			ws.close(1008, 'Bad call');
+			return;
+		}
 	});
 
 	ws.on('close', function(code, reason) {
