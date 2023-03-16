@@ -1,4 +1,4 @@
-name: Run unit tests
+name: Run library unit tests
 
 on: 
   push:
