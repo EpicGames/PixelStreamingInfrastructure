@@ -514,7 +514,7 @@ describe('PixelStreaming', () => {
         let byteIdx = 1;
         for (let i = 0; i < testMessageContents.length; i++) {
             data.setUint16(byteIdx, testMessageContents.charCodeAt(i), true);
-            byteIdx += 2;
+            byteIdx += 1;
         }
         channel.dispatchEvent(new MessageEvent('message', { data: data.buffer }));
 
