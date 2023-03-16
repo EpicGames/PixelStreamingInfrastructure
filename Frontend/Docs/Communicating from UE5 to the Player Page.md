@@ -1,17 +1,14 @@
-**TO DO**: Update this information to match the new front end.
-
 ## Communicating from UE5 to the Player Page
 
 You can make your Unreal Engine application emit custom events to all connected player HTML pages, which you can respond to in the player's JavaScript environment. This lets you change your web page UI in response to gameplay events.
 
 To set this up:
 
-1.  In your Unreal Engine application, any time you want to emit an event to the player page, you need an actor with a **Pixel Streaming Input** component. This component has access to the **Send Pixel Streaming Response** node. Specify a custom string argument to the node to indicate to the player page what event has happened.
+1.  In your Unreal Engine application, any time you want to emit an event to the player page, you need an actor with a **Pixel Streaming Input** component. This component has access to the **Send Pixel Streaming Response** node. Specify a custom string argument to the node send a message to the web frontend.
 
 
-[//]: # (TODO Confirm that this image is still accurate)
 <p align="center">
-    <img src="Resources\Images\pixelstreaming-send-game-event.JPG" alt="Send game event">
+    <img src="Resources\Images\pixelstreaming-send-game-event.png" alt="Send game event">
 </p>
 
 2. In your TypeScript frontend implementation these messages are consumed by an event listener. This event will be invoked every time the frontend receives a custom message from the Unreal Engine application. The original string argument given to the **Send Pixel Streaming Response** node will be passed to the function as the `response` argument. For example:
@@ -39,7 +36,6 @@ To set this up:
 **_Tip:_**
 If you want to pass more complex data, you can format the string you pass to the **Pixel Streaming Input -> Send Pixel Streaming Response** node as JSON. For example:
 
-[//]: # (TODO Confirm that this image is still accurate)
 <p align="center">
     <img src="Resources\Images\pixelstreaming-send-game-event-json.png" alt="Send Pixel Streaming response using JSON">
 </p>

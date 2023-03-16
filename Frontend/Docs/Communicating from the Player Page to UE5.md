@@ -1,5 +1,3 @@
-**TO DO**: Update this information to match the new front end.
-
 ## Communicating from the Player Page to UE5
 
 The frontend provides three functions that you can call in your HTML player page to allow the user to pass events and commands from the browser to your Unreal Engine application:
