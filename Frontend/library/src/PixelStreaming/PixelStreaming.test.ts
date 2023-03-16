@@ -42,7 +42,7 @@ describe('PixelStreaming', () => {
             type: MessageRecvTypes.STREAMER_LIST,
             ids: streamerIdList
         });
-    const triggerSdpOffer = () =>
+    const triggerSdpOfferMessage = () =>
         webSocketTriggerFunctions.triggerOnMessage?.({
             type: MessageRecvTypes.OFFER,
             sdp
@@ -80,7 +80,7 @@ describe('PixelStreaming', () => {
         triggerWebSocketOpen();
         triggerConfigMessage();
         triggerStreamerListMessage(streamerIds);
-        triggerSdpOffer();
+        triggerSdpOfferMessage();
         triggerIceCandidateMessage();
         triggerIceConnectionState(iceConnectionState);
         const { stream, track } = triggerAddTrack();
@@ -266,7 +266,7 @@ describe('PixelStreaming', () => {
         
         expect(eventSpy).not.toHaveBeenCalled();
         
-        triggerSdpOffer();
+        triggerSdpOfferMessage();
         
         expect(rtcPeerConnectionSpyFunctions.setRemoteDescriptionSpy).toHaveBeenCalledWith(expect.objectContaining({
             sdp
@@ -281,7 +281,7 @@ describe('PixelStreaming', () => {
         triggerWebSocketOpen();
         triggerConfigMessage();
         triggerStreamerListMessage(streamerIdList);
-        triggerSdpOffer();
+        triggerSdpOfferMessage();
         triggerIceCandidateMessage();
 
         expect(rtcPeerConnectionSpyFunctions.addIceCandidateSpy).toHaveBeenCalledWith(iceCandidate)
