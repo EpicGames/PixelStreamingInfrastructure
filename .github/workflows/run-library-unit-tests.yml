@@ -3,8 +3,10 @@ name: Run unit tests
 on: 
   push:
     branches: ['master']
+    paths: ['Frontend/library/**']
   pull_request:
     branches: ['master']
+    paths: ['Frontend/library/**']
 
 jobs:
 
