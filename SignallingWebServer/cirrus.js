@@ -31,7 +31,8 @@ const defaultConfig = {
 	HttpsPort: 443,
 	StreamerPort: 8888,
 	SFUPort: 8889,
-	MaxPlayerCount: -1
+	MaxPlayerCount: -1,
+	DisableSSLCert: false
 };
 
 const argv = require('yargs').argv;
@@ -78,8 +79,10 @@ if (config.UseFrontend) {
 	var httpPort = 3000;
 	var httpsPort = 8000;
 
-	//Required for self signed certs otherwise just get an error back when sending request to frontend see https://stackoverflow.com/a/35633993
-	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+	if (config.DisableSSLCert) {
+		//Required for self signed certs otherwise just get an error back when sending request to frontend see https://stackoverflow.com/a/35633993
+		process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+	}
 
 	const httpsClient = require('./modules/httpsClient.js');
 	var webRequest = new httpsClient();
