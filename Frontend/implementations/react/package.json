@@ -1,8 +1,8 @@
 {
-  "name": "@epicgames-ps/reference-pixelstreamingfrontend-ue5.2",
+  "name": "@epicgames-ps/reference-pixelstreamingfrontend-react-ue5.2",
   "version": "0.0.1",
   "description": "",
-  "main": "./src/player.ts",
+  "main": "./src/index.tsx",
   "scripts": {
     "build": "npx webpack --config webpack.prod.js",
     "build-dev": "npx webpack --config webpack.dev.js",
