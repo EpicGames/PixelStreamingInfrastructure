@@ -1,3 +1,5 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
 import React from 'react';
 import { PixelStreamingWrapper } from './PixelStreamingWrapper';
 
