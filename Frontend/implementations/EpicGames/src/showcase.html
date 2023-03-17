@@ -32,20 +32,19 @@
 
         <!-- The details panels for the examples sidebar -->
         <div id="sidebar">
-            <div id="sidebar-header">Details</div>
-            <div id="sidebarContent"></div>
-        </div>
-
-        <div id="content">
             <div id="exampletitle">
-                <div id="psdemotext"> Pixel Streaming Demo</div>
-                <div id="sep"> - </div>
+                <p id="psdemotext"> Select an example:</p>
                 <select id="exampleSelect" onchange="onExampleChanged(event)" title="Select an example...">
                     <option>Getting Started</option>
                     <option>Send Data to UE</option>
                     <option>Send Commands to UE</option>
                 </select>
             </div>
+            <div id="sidebar-header">Details</div>
+            <div id="sidebarContent"></div>
+        </div>
+
+        <div id="content">
 
             <div id="playercontainer"></div>
 
