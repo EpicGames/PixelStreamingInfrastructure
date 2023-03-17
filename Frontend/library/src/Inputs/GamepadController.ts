@@ -54,9 +54,11 @@ export class GamePadController {
             );
         }
         this.controllers = [];
-        for (const gamepad of navigator.getGamepads()) {
-            if (gamepad) {
-                this.gamePadConnectHandler(new GamepadEvent('gamepadconnected', { gamepad }));
+        if (navigator.getGamepads) {
+            for (const gamepad of navigator.getGamepads()) {
+                if (gamepad) {
+                    this.gamePadConnectHandler(new GamepadEvent('gamepadconnected', { gamepad }));
+                }
             }
         }
     }
