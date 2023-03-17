@@ -56,12 +56,11 @@ or
 
 If you pass an object, the `emitUIInteraction` function converts it to a JSON string internally. It then passes the resulting string back to the Pixel Streaming Plugin in your Unreal Engine application, which raises an event on the input controller. In your application's gameplay logic, you bind your own custom event to handle these inputs, using the **Pixel Streaming Input > Bind Event to On Input Event** node. For example:
 
-[//]: # (This is still up to date as of the Typescript Frontend rewrite)
 <p align="center">
     <img src="Resources/Images/pixelstreaming-ui-interaction-event.png" alt="Bind Event to On Input Event">
 </p>
 
-You need to bind this event once, typically at the start of your game. Each time any player HTML page connected to an instance of your Unreal Engine application calls the `emitUIInteraction`function, your custom event is automatically invoked, regardless of the input passed to `emitUIInteraction`.
+You need to bind this event once, typically at the start of your game. Each time any player HTML page connected to an instance of your Unreal Engine application calls the `emitUIInteraction` function, your custom event is automatically invoked, regardless of the input passed to `emitUIInteraction`.
 
 The custom event you assign (for example, the **UI Interaction** node in the image above) has an output named **Descriptor**, which you can use to retrieve the string that was sent to your Unreal Engine application by the `emitUIInteraction` function. You can use that value to determine how your gameplay code needs to respond each time `emitUIInteraction` is called.
 
