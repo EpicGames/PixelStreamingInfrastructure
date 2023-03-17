@@ -52,7 +52,7 @@ This will produce `player.js` under the `SignallingWebServer/Public` directory -
 
 ### Making your own UI
 
-We recommend studying [/ui-library](/Frontend/ui-library) and [player.ts](/Frontend/implementations/EpicGames/src/player.ts)/[player.html](/Frontend/implementations/EpicGames/src/player.html), then once you have copied and modified the [package.json](/Frontend/implementations/EpicGames/package.json) and `.ts` into your own `implementation/your_implementation` directory, the process is similar:
+We recommend studying [/ui-library](/Frontend/ui-library) and [player.ts](/Frontend/implementations/EpicGames/src/player.ts)/[player.html](/Frontend/implementations/EpicGames/src/player.html), or alternatively the sample React implementation in [implementations/react](/Frontend/implementations/react), then once you have copied and modified the [package.json](/Frontend/implementations/EpicGames/package.json) and `.ts` into your own `implementation/your_implementation` directory, the process is similar:
 
 - `cd implementation/your_implementation`
 - `npm build-all`
