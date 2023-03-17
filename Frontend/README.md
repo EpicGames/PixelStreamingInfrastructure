@@ -57,6 +57,12 @@ We recommend studying [/ui-library](/Frontend/ui-library) and [player.ts](/Front
 - `cd implementation/your_implementation`
 - `npm build-all`
 
+## Unit tests
+
+The [/library](/Frontend/library) project has unit tests that test the Pixel Streaming functionality against a mocked connection. To run the tests manually, run:
+- `cd library`
+- `npm install`
+- `npm run test`
 
 ## Legal
 
