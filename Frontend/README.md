@@ -23,7 +23,7 @@ The frontend consists of two packages:
 - [Timing Out Inactive Connections](Docs/Timing%20Out%20Inactive%20Connections.md)
 
 ## Integrating the libraries into your project
-Tthe TypeScript libraries are provided as both an [NPM](https://www.npmjs.com/settings/epicgames-ps/packages) package and a [UMD](https://github.com/umdjs/umd) module (available via [unpkg](https://unpkg.com/)), making it easy to consume the libraries from either TypeScript code or plain JavaScript code using modern web development tools and workflows.
+The TypeScript libraries are provided as both an [NPM](https://www.npmjs.com/settings/epicgames-ps/packages) package and a [UMD](https://github.com/umdjs/umd) module (available via [unpkg](https://unpkg.com/)), making it easy to consume the libraries from either TypeScript code or plain JavaScript code using modern web development tools and workflows.
 
 ## Usage from source
 
