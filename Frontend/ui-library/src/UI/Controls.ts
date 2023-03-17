@@ -5,6 +5,21 @@ import { SettingsIcon } from './SettingsIcon';
 import { StatsIcon } from './StatsIcon';
 import { XRIcon } from './XRIcon';
 import { WebXRController } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import { UIElementType } from '../UI/UIConfigurationTypes'
+
+
+export type ControlsUIConfiguration = {
+    //[Property in keyof Controls as `${Property}Type`]? : UIElementType;
+    statsButtonType? : UIElementType,
+    fullscreenButtonType? : UIElementType,
+    settingsButtonType? : UIElementType,
+    xrIconType? : UIElementType
+}
+
+function shouldCreateButton(type : UIElementType | undefined) : boolean {
+    if (type == undefined) return true;
+    else return type === UIElementType.CreateElement;
+}
 
 /**
  * Element containing various controls like stats, settings, fullscreen.
@@ -20,11 +35,15 @@ export class Controls {
     /**
      * Construct the controls
      */
-    constructor() {
-        this.statsIcon = new StatsIcon();
-        this.settingsIcon = new SettingsIcon();
-        this.fullscreenIcon = new FullScreenIcon();
-        this.xrIcon = new XRIcon();
+    constructor(config? : ControlsUIConfiguration) {
+        if (!config || shouldCreateButton(config.statsButtonType))
+            this.statsIcon = new StatsIcon();
+        if (!config || shouldCreateButton(config.fullscreenButtonType))
+            this.settingsIcon = new SettingsIcon();
+        if (!config || shouldCreateButton(config.settingsButtonType))
+            this.fullscreenIcon = new FullScreenIcon();
+        if (!config || shouldCreateButton(config.xrIconType))
+            this.xrIcon = new XRIcon();
     }
 
     /**
@@ -34,10 +53,10 @@ export class Controls {
         if (!this._rootElement) {
             this._rootElement = document.createElement('div');
             this._rootElement.id = 'controls';
-            this._rootElement.appendChild(this.fullscreenIcon.rootElement);
-            this._rootElement.appendChild(this.settingsIcon.rootElement);
-            this._rootElement.appendChild(this.statsIcon.rootElement);
-            WebXRController.isSessionSupported('immersive-vr').then(
+            if (!!this.fullscreenIcon) this._rootElement.appendChild(this.fullscreenIcon.rootElement);
+            if (!!this.settingsIcon) this._rootElement.appendChild(this.settingsIcon.rootElement);
+            if (!!this.statsIcon) this._rootElement.appendChild(this.statsIcon.rootElement);
+            if (!!this.xrIcon) WebXRController.isSessionSupported('immersive-vr').then(
                 (supported: boolean) => {
                     if (supported) {
                         this._rootElement.appendChild(this.xrIcon.rootElement);
