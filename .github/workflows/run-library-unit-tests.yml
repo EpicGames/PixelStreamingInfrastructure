@@ -1,0 +1,36 @@
+name: Run library unit tests
+
+on: 
+  push:
+    branches: ['master']
+    paths: ['Frontend/library/**']
+  pull_request:
+    branches: ['master']
+    paths: ['Frontend/library/**']
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+
+    permissions:
+      contents: write
+    steps:
+    - name: "Checkout source code"
+      uses: actions/checkout@v3
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Install library deps
+      working-directory: ./Frontend/library
+      run: npm ci
+
+    - name: Run frontend lib tests
+      working-directory: ./Frontend/library
+      run: npm run test
