@@ -1,0 +1,32 @@
+{
+  "name": "@epicgames-ps/reference-pixelstreamingfrontend-react-ue5.2",
+  "version": "0.0.1",
+  "description": "",
+  "main": "./src/index.tsx",
+  "scripts": {
+    "build": "npx webpack --config webpack.prod.js",
+    "build-dev": "npx webpack --config webpack.dev.js",
+    "watch": "npx webpack --watch",
+    "serve": "webpack serve --config webpack.dev.js",
+    "serve-prod": "webpack serve --config webpack.prod.js",
+    "build-all": "npm link ../../library && cd ../../library && npm run build && cd ../implementations/react && npm run build",
+    "build-dev-all": "npm link ../../library && cd ../../library && npm run build-dev && cd ../implementations/react && npm run build-dev"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
+    "css-loader": "^6.7.3",
+    "html-loader": "^4.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "path": "^0.12.7",
+    "ts-loader": "^9.4.2",
+    "typescript": "^4.9.4",
+    "webpack": "^5.76.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.11.1"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
