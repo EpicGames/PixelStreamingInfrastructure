@@ -23,7 +23,7 @@ The frontend consists of two packages:
 - [Timing Out Inactive Connections](Docs/Timing%20Out%20Inactive%20Connections.md)
 
 ## Integrating the libraries into your project
-Tthe TypeScript libraries are provided as both an [NPM](https://www.npmjs.com/settings/epicgames-ps/packages) package and a [UMD](https://github.com/umdjs/umd) module (available via [unpkg](https://unpkg.com/)), making it easy to consume the libraries from either TypeScript code or plain JavaScript code using modern web development tools and workflows.
+The TypeScript libraries are provided as both an [NPM](https://www.npmjs.com/settings/epicgames-ps/packages) package and a [UMD](https://github.com/umdjs/umd) module (available via [unpkg](https://unpkg.com/)), making it easy to consume the libraries from either TypeScript code or plain JavaScript code using modern web development tools and workflows.
 
 ## Usage from source
 
@@ -52,11 +52,17 @@ This will produce `player.js` under the `SignallingWebServer/Public` directory -
 
 ### Making your own UI
 
-We recommend studying [/ui-library](/Frontend/ui-library) and [player.ts](/Frontend/implementations/EpicGames/src/player.ts)/[player.html](/Frontend/implementations/EpicGames/src/player.html), then once you have copied and modified the [package.json](/Frontend/implementations/EpicGames/package.json) and `.ts` into your own `implementation/your_implementation` directory, the process is similar:
+We recommend studying [/ui-library](/Frontend/ui-library) and [player.ts](/Frontend/implementations/EpicGames/src/player.ts)/[player.html](/Frontend/implementations/EpicGames/src/player.html), or alternatively the sample React implementation in [implementations/react](/Frontend/implementations/react), then once you have copied and modified the [package.json](/Frontend/implementations/EpicGames/package.json) and `.ts` into your own `implementation/your_implementation` directory, the process is similar:
 
 - `cd implementation/your_implementation`
 - `npm build-all`
 
+## Unit tests
+
+The [/library](/Frontend/library) project has unit tests that test the Pixel Streaming functionality against a mocked connection. To run the tests manually, run:
+- `cd library`
+- `npm install`
+- `npm run test`
 
 ## Legal
 
