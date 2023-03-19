@@ -32,7 +32,7 @@ const defaultConfig = {
 	StreamerPort: 8888,
 	SFUPort: 8889,
 	MaxPlayerCount: -1,
-	DisableSSLCert: false
+	DisableSSLCert: true
 };
 
 const argv = require('yargs').argv;
@@ -79,8 +79,9 @@ if (config.UseFrontend) {
 	var httpPort = 3000;
 	var httpsPort = 8000;
 
-	if (config.DisableSSLCert) {
+	if (config.UseHTTPS && config.DisableSSLCert) {
 		//Required for self signed certs otherwise just get an error back when sending request to frontend see https://stackoverflow.com/a/35633993
+		console.warn('WARNING: config.DisableSSLCert is true. Unauthorized SSL certificates will be allowed! This is convenient for local testing but please DO NOT SHIP THIS IN PRODUCTION. To remove this warning please set DisableSSLCert to false in your config.json.');
 		process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 	}
 
