@@ -30,6 +30,7 @@ export class InitialSettings {
 export class PixelStreamingSettings {
     AllowPixelStreamingCommands?: boolean;
     DisableLatencyTest?: boolean;
+	PlayerId?: number;
 }
 
 /**
