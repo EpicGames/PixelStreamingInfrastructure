@@ -378,7 +378,6 @@ function logForward(srcName, destName, msg) {
 
 let WebSocket = require('ws');
 
-let streamerMessageHandlers = new Map();
 let sfuMessageHandlers = new Map();
 let playerMessageHandlers = new Map();
 
@@ -462,6 +461,7 @@ function forwardStreamerMessageToPlayer(streamer, msg) {
 	}
 }
 
+let streamerMessageHandlers = new Map();
 streamerMessageHandlers.set('endpointId', onStreamerMessageId);
 streamerMessageHandlers.set('ping', onStreamerMessagePing);
 streamerMessageHandlers.set('offer', forwardStreamerMessageToPlayer);
@@ -488,7 +488,7 @@ streamerServer.on('connection', function (ws, req) {
 		}
 
 		let handler = streamerMessageHandlers.get(msg.type);
-		if (!handler) {
+		if (!handler || (typeof handler != 'function')) {
 			if (config.LogVerbose) {
 				console.logColor(logging.White, "\x1b[37m-> %s\x1b[34m: %s", streamer.id, msgRaw);
 			}
@@ -496,13 +496,7 @@ streamerServer.on('connection', function (ws, req) {
 			ws.close(1008, 'Unsupported message type');
 			return;
 		}
-		try {
-			handler(streamer, msg);
-		} catch (err) {
-			console.error(`Bad call`);
-			ws.close(1008, 'Bad call');
-			return;
-		}
+		handler(streamer, msg);
 	});
 	
 	ws.on('close', function(code, reason) {
@@ -596,7 +590,7 @@ sfuServer.on('connection', function (ws, req) {
 		}
 
 		let handler = sfuMessageHandlers.get(msg.type);
-		if (!handler) {
+		if (!handler || (typeof handler != 'function')) {
 			if (config.LogVerbose) {
 				console.logColor(logging.White, "\x1b[37m-> %s\x1b[34m: %s", SFUPlayerId, msgRaw);
 			}
@@ -604,13 +598,7 @@ sfuServer.on('connection', function (ws, req) {
 			ws.close(1008, 'Unsupported message type');
 			return;
 		}
-		try {
-			handler(msg);
-		} catch (err) {
-			console.error(`Bad call`);
-			ws.close(1008, 'Bad call');
-			return;
-		}
+		handler(msg);
 	});
 
 	ws.on('close', function(code, reason) {
@@ -743,7 +731,7 @@ playerServer.on('connection', function (ws, req) {
 		}
 
 		let handler = playerMessageHandlers.get(msg.type);
-		if (!handler) {
+		if (!handler || (typeof handler != 'function')) {
 			if (config.LogVerbose) {
 				console.logColor(logging.White, "\x1b[37m-> %s\x1b[34m: %s", playerId, msgRaw);
 			}
@@ -751,13 +739,7 @@ playerServer.on('connection', function (ws, req) {
 			ws.close(1008, 'Unsupported message type');
 			return;
 		}
-		try {
-			handler(player, msg);
-		} catch (err) {
-			console.error(`Bad call`);
-			ws.close(1008, 'Bad call');
-			return;
-		}
+		handler(player, msg);
 	});
 
 	ws.on('close', function(code, reason) {
