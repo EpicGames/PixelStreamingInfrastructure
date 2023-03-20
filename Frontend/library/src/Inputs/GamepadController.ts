@@ -68,6 +68,11 @@ export class GamePadController {
      */
     unregisterGamePadEvents() {
         this.gamePadEventListenerTracker.unregisterAll();
+        for(const controller of this.controllers) {
+            if(controller.id !== undefined) {
+                this.onGamepadDisconnected(controller.id);
+            }
+        }
         this.controllers = [];
         this.onGamepadConnected = () => { /* */ };
         this.onGamepadDisconnected = () => { /* */ };
