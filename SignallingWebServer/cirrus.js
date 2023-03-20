@@ -414,11 +414,12 @@ if (config.UseMatchmaker) {
 console.logColor(logging.Green, `WebSocket listening for Streamer connections on :${streamerPort}`)
 let streamerServer = new WebSocket.Server({ port: streamerPort, backlog: 1 });
 streamerServer.on('connection', function (ws, req) {
+	let streamer = { ws: ws };
+
 	console.logColor(logging.Green, `Streamer connected: ${req.connection.remoteAddress}`);
 	matchmaker?.setStreamerReadyState(streamer.readyState);
 	matchmaker?.sendStreamerConnected();
 
-	let streamer = { ws: ws };
 
 	ws.on('message', (msgRaw) => {
 		var msg;
