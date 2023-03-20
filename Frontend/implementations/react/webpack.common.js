@@ -12,7 +12,7 @@ const pages = fs.readdirSync('./src', { withFileTypes: true })
 
 module.exports = {
 	entry: pages.reduce((config, page) => {
-		config[page] = `./src/${page}.ts`;
+		config[page] = `./src/${page}.tsx`;
 		return config;
 	}, {}),
 
@@ -44,12 +44,12 @@ module.exports = {
           }
         },
         {
-          test: /\.(png|svg|jpg|jpeg|gif)$/i,
+          test: /\.(png|svg)$/i,
           type: 'asset/resource',
           generator: {
             filename: 'images/[name][ext]'
           }
-        }
+        },
       ],
     },
     resolve: {
@@ -57,7 +57,7 @@ module.exports = {
     },
     output: {
       filename: '[name].js',
-      library: 'epicgames-frontend',
+      library: 'epicgames-react-frontend',
       libraryTarget: 'umd',
       path: path.resolve(__dirname, '../../../SignallingWebServer/Public'),
       clean: true,
