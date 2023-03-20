@@ -8,7 +8,12 @@ assignees: ''
 ---
 
 **Component your feature request relates to**
-E.g. Signalling server, frontend library, frontend ui library, matchmaker, this repo
+- [ ] Signalling server
+- [ ] Frontend library
+- [ ] Frontend UI library
+- [ ] Matchmaker
+- [ ] SFU
+- [ ] This repo
 
 **Problem your feature solves? Please describe.**
 A clear and concise description of what the problem is. 
