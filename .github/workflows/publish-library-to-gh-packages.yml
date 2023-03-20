@@ -13,6 +13,7 @@ jobs:
       run:
         working-directory: Frontend/library
     steps:
+      # Based on: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages#publishing-packages-to-github-packages
       - uses: actions/checkout@v3
       # Setup .npmrc file to publish to GitHub Packages
       - uses: actions/setup-node@v3
