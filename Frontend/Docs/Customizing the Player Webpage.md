@@ -1,5 +1,8 @@
 **TO DO**: Update this information to match the new front end.
 
+[//]: # (You have to specify exactly what element the application gets attached to, this is done in your implementation setup by assigning to `document.body.onload`)
+[//]: # (The player application now automatically fills its parent element anyway)
+
 ## Customising the Player Webpage
 The Pixel Streaming Signaling and Web Server provides a sample player page that is already set up to stream in media from your Unreal Engine application and to send mouse, keyboard, and touch events back to the application. You can use this default player page as-is, if it meets your needs. 
 
