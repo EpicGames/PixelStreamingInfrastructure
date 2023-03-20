@@ -18,6 +18,8 @@ const defaultConfig = {
 	UseFrontend: false,
 	UseMatchmaker: false,
 	UseHTTPS: false,
+	HTTPSCertFile: './certificates/client-cert.pem',
+	HTTPSKeyFile: './certificates/client-key.pem',
 	UseAuthentication: false,
 	LogToFile: true,
 	LogVerbose: true,
@@ -51,8 +53,8 @@ var http = require('http').Server(app);
 if (config.UseHTTPS) {
 	//HTTPS certificate details
 	const options = {
-		key: fs.readFileSync(path.join(__dirname, './certificates/client-key.pem')),
-		cert: fs.readFileSync(path.join(__dirname, './certificates/client-cert.pem'))
+		key: fs.readFileSync(path.join(__dirname, config.HTTPSKeyFile)),
+		cert: fs.readFileSync(path.join(__dirname, config.HTTPSCertFile))
 	};
 
 	var https = require('https').Server(options, app);
