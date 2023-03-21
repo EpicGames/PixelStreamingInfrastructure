@@ -255,7 +255,7 @@ try {
 } catch (err) {
 	console.error(`reading config.AdditionalRoutes: ${err}`)
 }
-
+let homepageFile;
 if(config.EnableWebserver) {
 
 	// Request has been sent to site root, send the homepage file
@@ -326,17 +326,17 @@ function getPlayerIdFromMessage(msg) {
 }
 
 function registerStreamer(id, streamer) {
-	streamer.id = id;
-	streamers.set(streamer.id, streamer);
+	streamer.ws.id = id;
+	streamers.set(streamer.ws.id, streamer);
 }
 
 function onStreamerDisconnected(streamer) {
-	if (!streamer.id) {
+	if (!streamer.ws.id) {
 		return;
 	}
 
-	if (!streamers.has(streamer.id)) {
-		console.error(`Disconnecting streamer ${streamer.id} does not exist.`);
+	if (!streamers.has(streamer.ws.id)) {
+		console.error(`Disconnecting streamer ${streamer.ws.id} does not exist.`);
 	} else {
 		matchmaker?.sendStreamerDisconnected();
 		let sfuPlayer = getSFU();
@@ -346,13 +346,13 @@ function onStreamerDisconnected(streamer) {
 			sfuPlayer.sendTo(msg);
 			disconnectAllPlayers(sfuPlayer.id);
 		}
-		disconnectAllPlayers(streamer.id);
-		streamers.delete(streamer.id);
+		disconnectAllPlayers(streamer.ws.id);
+		streamers.delete(streamer.ws.id);
 	}
 }
 
 function onStreamerMessageId(streamer, msg) {
-	logger.logIncoming(streamer.id, msg);
+	logger.logIncoming(streamer.ws.id, msg);
 
 	let streamerId = msg.id;
 	registerStreamer(streamerId, streamer);
@@ -360,7 +360,7 @@ function onStreamerMessageId(streamer, msg) {
 	// subscribe any sfu to the latest connected streamer
 	const sfuPlayer = getSFU();
 	if (sfuPlayer) {
-		sfuPlayer.subscribe(streamers, streamer.id);
+		sfuPlayer.subscribe(streamers, streamer.ws.id);
 	}
 
 	// if any streamer id's assume the legacy streamer is not needed.
@@ -368,14 +368,14 @@ function onStreamerMessageId(streamer, msg) {
 }
 
 function onStreamerMessagePing(streamer, msg) {
-	logger.logIncoming(streamer.id, msg);
+	logger.logIncoming(streamer.ws.id, msg);
 
 	const pongMsg = JSON.stringify({ type: "pong", time: msg.time});
 	streamer.ws.send(pongMsg);
 }
 
 function onStreamerMessageDisconnectPlayer(streamer, msg) {
-	logger.logIncoming(streamer.id, msg);
+	logger.logIncoming(streamer.ws.id, msg);
 
 	const playerId = getPlayerIdFromMessage(msg);
 	const player = players.get(playerId);
@@ -414,12 +414,10 @@ if (config.UseMatchmaker) {
 console.logColor(logging.Green, `WebSocket listening for Streamer connections on :${streamerPort}`)
 let streamerServer = new WebSocket.Server({ port: streamerPort, backlog: 1 });
 streamerServer.on('connection', function (ws, req) {
-	let streamer = { ws: ws };
-
+	let streamer = { ws: ws};
 	console.logColor(logging.Green, `Streamer connected: ${req.connection.remoteAddress}`);
-	matchmaker?.setStreamerReadyState(streamer.readyState);
+	matchmaker?.setStreamerReadyState(streamer.ws.readyState);
 	matchmaker?.sendStreamerConnected();
-
 
 	ws.on('message', (msgRaw) => {
 		var msg;
@@ -427,43 +425,43 @@ streamerServer.on('connection', function (ws, req) {
 			msg = JSON.parse(msgRaw);
 		} catch(err) {
 			console.error(`Cannot parse Streamer message: ${msgRaw}\nError: ${err}`);
-			ws.close(1008, 'Cannot parse');
+			streamer.ws.close(1008, 'Cannot parse');
 			return;
 		}
 
 		let handler = streamerMessageHandlers.get(msg.type);
 		if (!handler || (typeof handler != 'function')) {
 			if (config.LogVerbose) {
-				console.logColor(logging.White, "\x1b[37m-> %s\x1b[34m: %s", streamer.id, msgRaw);
+				console.logColor(logging.White, "\x1b[37m-> %s\x1b[34m: %s", streamer.ws.id, msgRaw);
 			}
 			console.error(`unsupported Streamer message type: ${msg.type}`);
-			ws.close(1008, 'Unsupported message type');
+			streamer.ws.close(1008, 'Unsupported message type');
 			return;
 		}
 		handler(streamer, msg);
 	});
 	
 	ws.on('close', function(code, reason) {
-		console.error(`streamer ${streamer.id} disconnected: ${code} - ${reason}`);
+		console.error(`streamer ${streamer.ws.id} disconnected: ${code} - ${reason}`);
 		onStreamerDisconnected(streamer);
 	});
 
 	ws.on('error', function(error) {
-		console.error(`streamer ${streamer.id} connection error: ${error}`);
+		console.error(`streamer ${streamer.ws.id} connection error: ${error}`);
 		onStreamerDisconnected(streamer);
 		try {
-			ws.close(1006 /* abnormal closure */, error);
+			streamer.ws.close(1006 /* abnormal closure */, error);
 		} catch(err) {
 			console.error(`ERROR: ws.on error: ${err.message}`);
 		}
 	});
 
-	ws.send(JSON.stringify(clientConfig));
+	streamer.ws.send(JSON.stringify(clientConfig));
 
 	// request id
 	const msg = { type: "identify" };
 	logger.logOutgoing("unknown", msg);
-	ws.send(JSON.stringify(msg));
+	streamer.ws.send(JSON.stringify(msg));
 
 	registerStreamer(LegacyStreamerId, streamer);
 });
