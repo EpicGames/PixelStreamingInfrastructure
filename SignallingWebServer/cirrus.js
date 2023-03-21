@@ -18,6 +18,8 @@ const defaultConfig = {
 	UseFrontend: false,
 	UseMatchmaker: false,
 	UseHTTPS: false,
+	HTTPSCertFile: './certificates/client-cert.pem',
+	HTTPSKeyFile: './certificates/client-key.pem',
 	UseAuthentication: false,
 	LogToFile: true,
 	LogVerbose: true,
@@ -31,7 +33,8 @@ const defaultConfig = {
 	HttpsPort: 443,
 	StreamerPort: 8888,
 	SFUPort: 8889,
-	MaxPlayerCount: -1
+	MaxPlayerCount: -1,
+	DisableSSLCert: true
 };
 
 const argv = require('yargs').argv;
@@ -50,8 +53,8 @@ var http = require('http').Server(app);
 if (config.UseHTTPS) {
 	//HTTPS certificate details
 	const options = {
-		key: fs.readFileSync(path.join(__dirname, './certificates/client-key.pem')),
-		cert: fs.readFileSync(path.join(__dirname, './certificates/client-cert.pem'))
+		key: fs.readFileSync(path.join(__dirname, config.HTTPSKeyFile)),
+		cert: fs.readFileSync(path.join(__dirname, config.HTTPSCertFile))
 	};
 
 	var https = require('https').Server(options, app);
@@ -78,8 +81,11 @@ if (config.UseFrontend) {
 	var httpPort = 3000;
 	var httpsPort = 8000;
 
-	//Required for self signed certs otherwise just get an error back when sending request to frontend see https://stackoverflow.com/a/35633993
-	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+	if (config.UseHTTPS && config.DisableSSLCert) {
+		//Required for self signed certs otherwise just get an error back when sending request to frontend see https://stackoverflow.com/a/35633993
+		console.warn('WARNING: config.DisableSSLCert is true. Unauthorized SSL certificates will be allowed! This is convenient for local testing but please DO NOT SHIP THIS IN PRODUCTION. To remove this warning please set DisableSSLCert to false in your config.json.');
+		process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+	}
 
 	const httpsClient = require('./modules/httpsClient.js');
 	var webRequest = new httpsClient();
@@ -188,6 +194,16 @@ if (config.UseHTTPS) {
 }
 
 sendGameSessionData();
+
+// set up rate limiter: maximum of five requests per minute
+var RateLimit = require('express-rate-limit');
+var limiter = RateLimit({
+  windowMs: 1*60*1000, // 1 minute
+  max: 60
+});
+
+// apply rate limiter to all requests
+app.use(limiter);
 
 //Setup the login page if we are using authentication
 if(config.UseAuthentication){
@@ -365,7 +381,6 @@ function logForward(srcName, destName, msg) {
 
 let WebSocket = require('ws');
 
-let streamerMessageHandlers = new Map();
 let sfuMessageHandlers = new Map();
 let playerMessageHandlers = new Map();
 
@@ -449,6 +464,7 @@ function forwardStreamerMessageToPlayer(streamer, msg) {
 	}
 }
 
+let streamerMessageHandlers = new Map();
 streamerMessageHandlers.set('endpointId', onStreamerMessageId);
 streamerMessageHandlers.set('ping', onStreamerMessagePing);
 streamerMessageHandlers.set('offer', forwardStreamerMessageToPlayer);
@@ -475,7 +491,7 @@ streamerServer.on('connection', function (ws, req) {
 		}
 
 		let handler = streamerMessageHandlers.get(msg.type);
-		if (!handler) {
+		if (!handler || (typeof handler != 'function')) {
 			if (config.LogVerbose) {
 				console.logColor(logging.White, "\x1b[37m-> %s\x1b[34m: %s", streamer.id, msgRaw);
 			}
@@ -577,7 +593,7 @@ sfuServer.on('connection', function (ws, req) {
 		}
 
 		let handler = sfuMessageHandlers.get(msg.type);
-		if (!handler) {
+		if (!handler || (typeof handler != 'function')) {
 			if (config.LogVerbose) {
 				console.logColor(logging.White, "\x1b[37m-> %s\x1b[34m: %s", SFUPlayerId, msgRaw);
 			}
@@ -718,7 +734,7 @@ playerServer.on('connection', function (ws, req) {
 		}
 
 		let handler = playerMessageHandlers.get(msg.type);
-		if (!handler) {
+		if (!handler || (typeof handler != 'function')) {
 			if (config.LogVerbose) {
 				console.logColor(logging.White, "\x1b[37m-> %s\x1b[34m: %s", playerId, msgRaw);
 			}

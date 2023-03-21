@@ -84,11 +84,11 @@ export class PeerConnectionController {
 
         this.setupTransceiversAsync(useMic).finally(() => {
             this.peerConnection
-                .createOffer(offerOptions)
+                ?.createOffer(offerOptions)
                 .then((offer: RTCSessionDescriptionInit) => {
                     this.showTextOverlayConnecting();
                     offer.sdp = this.mungeSDP(offer.sdp, useMic);
-                    this.peerConnection.setLocalDescription(offer);
+                    this.peerConnection?.setLocalDescription(offer);
                     this.onSendWebRTCOffer(offer);
                 })
                 .catch(() => {
@@ -103,7 +103,7 @@ export class PeerConnectionController {
     async receiveOffer(offer: RTCSessionDescriptionInit, config: Config) {
         Logger.Log(Logger.GetStackTrace(), 'Receive Offer', 6);
 
-        this.peerConnection.setRemoteDescription(offer).then(() => {
+        this.peerConnection?.setRemoteDescription(offer).then(() => {
             const isLocalhostConnection =
                 location.hostname === 'localhost' ||
                 location.hostname === '127.0.0.1';
@@ -123,14 +123,14 @@ export class PeerConnectionController {
 
             this.setupTransceiversAsync(useMic).finally(() => {
                 this.peerConnection
-                    .createAnswer()
+                    ?.createAnswer()
                     .then((Answer: RTCSessionDescriptionInit) => {
                         Answer.sdp = this.mungeSDP(Answer.sdp, useMic);
-                        return this.peerConnection.setLocalDescription(Answer);
+                        return this.peerConnection?.setLocalDescription(Answer);
                     })
                     .then(() => {
                         this.onSendWebRTCAnswer(
-                            this.peerConnection.currentLocalDescription
+                            this.peerConnection?.currentLocalDescription
                         );
                     })
                     .catch(() => {
@@ -158,7 +158,7 @@ export class PeerConnectionController {
      * @param answer - RTC Session Descriptor from the Signaling Server
      */
     receiveAnswer(answer: RTCSessionDescriptionInit) {
-        this.peerConnection.setRemoteDescription(answer);
+        this.peerConnection?.setRemoteDescription(answer);
         // Ugly syntax, but this achieves the intersection of the browser supported list and the UE supported list
         this.config.setOptionSettingOptions(
             OptionParameters.PreferredCodec,
@@ -174,7 +174,7 @@ export class PeerConnectionController {
      * Generate Aggregated Stats and then fire a onVideo Stats event
      */
     generateStats() {
-        this.peerConnection.getStats(null).then((StatsData: RTCStatsReport) => {
+        this.peerConnection?.getStats(null).then((StatsData: RTCStatsReport) => {
             this.aggregatedStats.processStats(StatsData);
             this.onVideoStats(this.aggregatedStats);
 
@@ -257,7 +257,7 @@ export class PeerConnectionController {
             }
         }
 
-        this.peerConnection.addIceCandidate(iceCandidate);
+        this.peerConnection?.addIceCandidate(iceCandidate);
     }
 
     /**
@@ -363,14 +363,14 @@ export class PeerConnectionController {
      */
     async setupTransceiversAsync(useMic: boolean) {
         const hasTransceivers =
-            this.peerConnection.getTransceivers().length > 0;
+            this.peerConnection?.getTransceivers().length > 0;
 
         // Setup a transceiver for getting UE video
-        this.peerConnection.addTransceiver('video', { direction: 'recvonly' });
+        this.peerConnection?.addTransceiver('video', { direction: 'recvonly' });
 
         // We can only set preferrec codec on Chrome
         if (RTCRtpReceiver.getCapabilities && this.preferredCodec != '') {
-            for (const transceiver of this.peerConnection.getTransceivers()) {
+            for (const transceiver of this.peerConnection?.getTransceivers() ?? []) {
                 if (
                     transceiver &&
                     transceiver.receiver &&
@@ -421,7 +421,7 @@ export class PeerConnectionController {
 
         // Setup a transceiver for sending mic audio to UE and receiving audio from UE
         if (!useMic) {
-            this.peerConnection.addTransceiver('audio', {
+            this.peerConnection?.addTransceiver('audio', {
                 direction: 'recvonly'
             });
         } else {
@@ -451,7 +451,7 @@ export class PeerConnectionController {
             );
             if (stream) {
                 if (hasTransceivers) {
-                    for (const transceiver of this.peerConnection.getTransceivers()) {
+                    for (const transceiver of this.peerConnection?.getTransceivers() ?? []) {
                         if (
                             transceiver &&
                             transceiver.receiver &&
@@ -469,14 +469,14 @@ export class PeerConnectionController {
                 } else {
                     for (const track of stream.getTracks()) {
                         if (track.kind && track.kind == 'audio') {
-                            this.peerConnection.addTransceiver(track, {
+                            this.peerConnection?.addTransceiver(track, {
                                 direction: 'sendrecv'
                             });
                         }
                     }
                 }
             } else {
-                this.peerConnection.addTransceiver('audio', {
+                this.peerConnection?.addTransceiver('audio', {
                     direction: 'recvonly'
                 });
             }

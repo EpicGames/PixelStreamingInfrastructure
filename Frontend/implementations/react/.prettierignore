@@ -1,0 +1,11 @@
+dist/
+docs/
+node_modules/
+types/
+package-lock.json
+package.json
+.cspell.json
+tsconfig.json
+webpack.config.js
+.eslintrc.js
+.vscode

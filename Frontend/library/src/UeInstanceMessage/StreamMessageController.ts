@@ -176,6 +176,11 @@ export class StreamMessageController {
             structure: ['uint8', 'uint16', 'uint16', 'uint8', 'uint8', 'uint8']
         });
         // Gamepad Input Messages. Range = 90..99
+        this.toStreamerMessages.add('GamepadConnected', {
+            id: 93,
+            byteLength: 0,
+            structure: []
+        });
         this.toStreamerMessages.add('GamepadButtonPressed', {
             id: 90,
             byteLength: 3,
@@ -194,6 +199,12 @@ export class StreamMessageController {
             //            ctrlerId   button  analogValue
             structure: ['uint8', 'uint8', 'double']
         });
+        this.toStreamerMessages.add('GamepadDisconnected', {
+            id: 94,
+            byteLength: 1,
+            //          ctrlerId
+            structure: ['uint8']
+        });
 
         this.fromStreamerMessages.add('QualityControlOwnership', 0);
         this.fromStreamerMessages.add('Response', 1);
@@ -208,6 +219,7 @@ export class StreamMessageController {
         this.fromStreamerMessages.add('FileContents', 10);
         this.fromStreamerMessages.add('TestEcho', 11);
         this.fromStreamerMessages.add('InputControlOwnership', 12);
+        this.fromStreamerMessages.add('GamepadResponse', 13);
         this.fromStreamerMessages.add('Protocol', 255);
     }
 

@@ -16,7 +16,7 @@ Reference implementations for the various pieces needed to support a PixelStream
 - SignallingWebServer (Cirrus)
 - SFU (Selective Forwarding Unit)
 - Matchmaker
-- Frontend (the javascript frontend library for the WebRTC player and input)
+- Frontend (the JS/TS frontend library for the WebRTC player and input)
 
 
 ## Releases
