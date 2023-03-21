@@ -24,17 +24,14 @@ import { SettingsPanel } from '../UI/SettingsPanel';
 import { StatsPanel } from '../UI/StatsPanel';
 import { VideoQpIndicator } from '../UI/VideoQpIndicator';
 import { ConfigUI, LightMode } from '../Config/ConfigUI';
-import { UIElementType, PanelConfiguration, isPanelEnabled } from '../UI/UIConfigurationTypes'
+import { 
+    UIElementCreationMode, 
+    PanelConfiguration, 
+    isPanelEnabled,
+    UIElementConfig
+} from '../UI/UIConfigurationTypes'
 import { FullScreenIconBase, FullScreenIconExternal } from '../UI/FullscreenIcon';
 
-type VideoQpIndicatorConfiguration = {
-    // Is the indicator created internally, or should an external element be used?
-    indicatorType : UIElementType
-    /** If the indicatorType is UseExternalElement, this function will be called with the
-      * QP (quantization parameter) value. The lower the QP, the better the video quality.
-      * The range of the QP value varies per codec: 1 to 127 for VP8, 1 to 51 for H.264. */
-    externalIndicatorUpdateCallback? : (qp : number) => void
-}
 
 /**
  * UI Options can be provided when creating an Application, to configure it's internal
@@ -49,19 +46,14 @@ export interface UIOptions {
     /** By default, a stats panel and associate visibility toggle button will be made.
       * If needed, this behaviour can be configured. */
     statsPanelConfig?: PanelConfiguration;
-    /** By default, a video QP indicator element will be made.
-      * If needed, this behaviour can be configured. */
-    videoQpUiConfig? : VideoQpIndicatorConfiguration,
     /** If needed, the full screen button can be external or disabled. */
-    fullScreenButtonType? : UIElementType,
-    fullScreenExternalButton? : HTMLButtonElement
+    fullScreenControlsConfig? : UIElementConfig,
     /** If needed, XR button can be external or disabled. */
-    xrButtonType? : UIElementType,
-    xrExternalButton? : HTMLButtonElement
-}
-
-function shouldCreateVideoQpIndicator(config : VideoQpIndicatorConfiguration | undefined) {
-    return !config || (!!config && config.indicatorType === UIElementType.CreateElement);
+    xrControlsConfig? : UIElementConfig,
+    /** By default, a video QP indicator element will be made. If needed, this can be disabled.
+     *  For custom UI elements to react to the QP being changed, use a PixelStreaming object
+     *  and addEventListener('videoEncoderAvgQP', ...) or removeEventListener(...). */
+    disableInternalVideoQpIndicator? : boolean,
 }
 
 /**
@@ -121,7 +113,7 @@ export class Application {
             this.configureSettings();
         }
         
-        if (shouldCreateVideoQpIndicator(options.videoQpUiConfig)) {
+        if (! options.disableInternalVideoQpIndicator) {
             // Add the video stream QP indicator
             this.videoQpIndicator = new VideoQpIndicator();
             this.uiFeaturesElement.appendChild(this.videoQpIndicator.rootElement);
@@ -171,18 +163,14 @@ export class Application {
      */
     public createButtons() {
         const controlsUIConfig : ControlsUIConfiguration = {
-            statsButtonType : !!this._options.statsPanelConfig 
-                ? this._options.statsPanelConfig.visbilityToggleButtonType
-                : undefined,
-            fullscreenButtonType: !!this._options.fullScreenButtonType 
-                ? this._options.fullScreenButtonType
+            statsButtonType : !!this._options.statsPanelConfig
+                ? this._options.statsPanelConfig.visibilityButtonConfig
                 : undefined,
             settingsButtonType: !!this._options.settingsPanelConfig
-                ? this._options.settingsPanelConfig.visbilityToggleButtonType
+                ? this._options.settingsPanelConfig.visibilityButtonConfig
                 : undefined,
-            xrIconType: !!this._options.xrButtonType 
-                ? this._options.xrButtonType
-                : undefined,
+            fullscreenButtonType: this._options.fullScreenControlsConfig,
+            xrIconType: this._options.xrControlsConfig
         }
         // Setup controls
         const controls = new Controls(controlsUIConfig);
@@ -191,37 +179,40 @@ export class Application {
         // When we fullscreen we want this element to be the root
         const fullScreenButton : FullScreenIconBase | undefined = 
             // Depending on if we're creating an internal button, or using an external one
-            (!!this._options.fullScreenButtonType && this._options.fullScreenButtonType === UIElementType.UseExternalElement)
+            (!!this._options.fullScreenControlsConfig 
+                && this._options.fullScreenControlsConfig.creationMode === UIElementCreationMode.UseCustomElement)
             // Either create a fullscreen class based on the external button
-            ? new FullScreenIconExternal(this._options.fullScreenExternalButton)
+            ? new FullScreenIconExternal(this._options.fullScreenControlsConfig.customElement)
             // Or use the one created by the Controls initializer earlier
             : controls.fullscreenIcon;
         if (fullScreenButton) fullScreenButton.fullscreenElement = this.rootElement;
 
         // Add settings button to controls
-        const settingsButton : HTMLButtonElement | undefined = 
+        const settingsButton : HTMLElement | undefined = 
             !!controls.settingsIcon ? controls.settingsIcon.rootElement : 
-            this._options.settingsPanelConfig.externalButton;
+            this._options.settingsPanelConfig.visibilityButtonConfig.customElement;
         if (!!settingsButton) settingsButton.onclick = () =>
             this.settingsClicked();
         if (!!this.settingsPanel) this.settingsPanel.settingsCloseButton.onclick = () =>
             this.settingsClicked();
 
         // Add WebXR button to controls
-        const xrButton : HTMLButtonElement | undefined = 
+        const xrButton : HTMLElement | undefined = 
             !!controls.xrIcon ? controls.xrIcon.rootElement : 
-            this._options.xrButtonType === UIElementType.UseExternalElement ?
-            this._options.xrExternalButton : undefined;
+            this._options.xrControlsConfig.creationMode === UIElementCreationMode.UseCustomElement ?
+            this._options.xrControlsConfig.customElement : undefined;
         if (!!xrButton) xrButton.onclick = () =>
             this.stream.toggleXR();
 
         // setup the stats/info button
-        const statsButton : HTMLButtonElement | undefined = 
+        const statsButton : HTMLElement | undefined = 
             !!controls.statsIcon ? controls.statsIcon.rootElement : 
-            this._options.statsPanelConfig.externalButton;
+            this._options.statsPanelConfig.visibilityButtonConfig.customElement;
         if (!!statsButton) statsButton.onclick = () => this.statsClicked()
 
-        this.statsPanel.statsCloseButton.onclick = () => this.statsClicked();
+        if (!!this.statsPanel) {
+            this.statsPanel.statsCloseButton.onclick = () => this.statsClicked();
+        }
 
         // Add command buttons (if we have somewhere to add them to)
         if (!!this.settingsPanel) {
@@ -629,20 +620,9 @@ export class Application {
      * @param QP - the quality number of the stream
      */
     onVideoEncoderAvgQP(QP: number) {
-        // If no custom config was provided, we have an internal indicator
-        if (this._options.videoQpUiConfig == undefined) this.videoQpIndicator.updateQpTooltip(QP);
-
-        else switch(this._options.videoQpUiConfig.indicatorType) {
-            case (UIElementType.CreateElement) : {
-                this.videoQpIndicator.updateQpTooltip(QP);
-                break;
-            }
-            case (UIElementType.UseExternalElement) : {
-                let callback = this._options.videoQpUiConfig.externalIndicatorUpdateCallback;
-                if (!!callback) callback(QP);
-                break;
-            }
-            default : break;
+        // Update internal QP indicator if one is present
+        if (!!this.videoQpIndicator) {
+            this.videoQpIndicator.updateQpTooltip(QP);
         }
     }
 

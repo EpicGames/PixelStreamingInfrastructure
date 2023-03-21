@@ -25,15 +25,16 @@ declare global {
 }
 
 /**
- * Minimize and maximize icon that when clicked will toggle fullscreen of the given element.
+ * Base class for an element (i.e. button) that, when clicked, will toggle fullscreen of a given element.
+ * Can be initialized with any HTMLElement, if it is set as rootElement in the constructor.
  */
 export class FullScreenIconBase {
     isFullscreen = false;
     fullscreenElement: HTMLElement;
 
-    _rootElement: HTMLButtonElement;
+    _rootElement: HTMLElement;
 
-    public get rootElement(): HTMLButtonElement {
+    public get rootElement() {
         return this._rootElement;
     }
 
@@ -67,7 +68,7 @@ export class FullScreenIconBase {
     }
 
     /**
-     * Makes the document fullscreen
+     * Makes the document or fullscreenElement fullscreen.
      */
     toggleFullscreen() {
         // if already full screen; exit
@@ -123,11 +124,11 @@ export class FullScreenIconBase {
 
 /**
  * An implementation of FullScreenIconBase that uses an externally
- * provided HTMLButtonElement for toggling full screen.
+ * provided HTMLElement for toggling full screen.
  */
 export class FullScreenIconExternal extends FullScreenIconBase {
 
-    constructor(externalButton : HTMLButtonElement) {
+    constructor(externalButton : HTMLElement) {
         super();
         this.rootElement = externalButton;
     }
@@ -135,8 +136,7 @@ export class FullScreenIconExternal extends FullScreenIconBase {
 }
 
 /**
- * An implementation of FullScreenIconBase that a button and associated visuals
- * (svgs for each state) internally.
+ * The default fullscreen icon that contains a button and svgs for each state.
  */
 export class FullScreenIcon extends FullScreenIconBase {
     _maximizeIcon: SVGElement;
@@ -145,13 +145,16 @@ export class FullScreenIcon extends FullScreenIconBase {
 
     constructor() {
         super();
-        this.rootElement = document.createElement('button');
-        this._rootElement.type = 'button';
-        this._rootElement.classList.add('UiTool');
-        this._rootElement.id = 'fullscreen-btn';
-        this._rootElement.appendChild(this.maximizeIcon);
-        this._rootElement.appendChild(this.minimizeIcon);
-        this._rootElement.appendChild(this.tooltipText);
+        
+        const createdButton : HTMLButtonElement = document.createElement('button');
+        createdButton.type = 'button';
+        createdButton.classList.add('UiTool');
+        createdButton.id = 'fullscreen-btn';
+        createdButton.appendChild(this.maximizeIcon);
+        createdButton.appendChild(this.minimizeIcon);
+        createdButton.appendChild(this.tooltipText);
+
+        this.rootElement = createdButton;
     }
 
     public get tooltipText(): HTMLElement {
