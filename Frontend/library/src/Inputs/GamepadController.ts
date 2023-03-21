@@ -68,7 +68,14 @@ export class GamePadController {
      */
     unregisterGamePadEvents() {
         this.gamePadEventListenerTracker.unregisterAll();
+        for(const controller of this.controllers) {
+            if(controller.id !== undefined) {
+                this.onGamepadDisconnected(controller.id);
+            }
+        }
         this.controllers = [];
+        this.onGamepadConnected = () => { /* */ };
+        this.onGamepadDisconnected = () => { /* */ };
     }
 
     /**
@@ -81,7 +88,8 @@ export class GamePadController {
 
         const temp: Controller = {
             currentState: gamepad,
-            prevState: gamepad
+            prevState: gamepad,
+            id: undefined
         };
 
         this.controllers.push(temp);
@@ -92,7 +100,8 @@ export class GamePadController {
             'gamepad: ' + gamepad.id + ' connected',
             6
         );
-        this.requestAnimationFrame(() => this.updateStatus());
+        window.requestAnimationFrame(() => this.updateStatus());
+        this.onGamepadConnected();
     }
 
     /**
@@ -106,10 +115,12 @@ export class GamePadController {
             'gamepad: ' + gamePadEvent.gamepad.id + ' disconnected',
             6
         );
+        const deletedController = this.controllers[gamePadEvent.gamepad.index];
         delete this.controllers[gamePadEvent.gamepad.index];
         this.controllers = this.controllers.filter(
             (controller) => controller !== undefined
         );
+        this.onGamepadDisconnected(deletedController.id);
     }
 
     /**
@@ -138,7 +149,8 @@ export class GamePadController {
 
         // Iterate over multiple controllers in the case the multiple gamepads are connected
         for (const controller of this.controllers) {
-            const controllerIndex = this.controllers.indexOf(controller);
+            // If we haven't received an id (possible if using an older version of UE), return to original functionality
+            const controllerIndex = (controller.id === undefined) ? this.controllers.indexOf(controller) : controller.id;
             const currentState = controller.currentState;
             for (let i = 0; i < controller.currentState.buttons.length; i++) {
                 const currentButton = controller.currentState.buttons[i];
@@ -217,7 +229,33 @@ export class GamePadController {
             this.requestAnimationFrame(() => this.updateStatus());
         }
     }
+
+    onGamepadResponseReceived(gamepadId: number) {
+        for(const controller of this.controllers) {
+            if(controller.id === undefined) {
+                controller.id = gamepadId;
+                break;
+            }
+        }
+    }
+
+    /**
+     * Event to send the gamepadconnected message to the application
+     */
+    onGamepadConnected() {
+        // Default Functionality: Do Nothing
+    }
+
+    /**
+     * Event to send the gamepaddisconnected message to the application
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onGamepadDisconnected(controllerIdx: number) {
+        // Default Functionality: Do Nothing
+    }
 }
+
+
 
 /**
  * Additional types for Window and Navigator

@@ -11,6 +11,7 @@ const bcrypt = require('bcryptjs');
 const LocalStrategy = require('passport-local').Strategy;
 const path = require('path');
 const fs = require('fs');
+const csrf = require('lusca').csrf;
 var db = require('./db');
 
 function initPassport (app) {
@@ -32,6 +33,8 @@ function initPassport (app) {
 		let content = JSON.stringify(config);
 		fs.writeFileSync(configPath, content);
 	}
+
+	app.use(csrf());
 
 	// Setup session id settings
 	app.use(session({

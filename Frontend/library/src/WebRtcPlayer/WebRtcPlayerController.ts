@@ -386,6 +386,11 @@ export class WebRtcPlayerController {
         );
         this.streamMessageController.registerMessageHandler(
             MessageDirection.FromStreamer,
+            'GamepadResponse',
+            (data: ArrayBuffer) => this.onGamepadResponse(data)
+        );
+        this.streamMessageController.registerMessageHandler(
+            MessageDirection.FromStreamer,
             'Protocol',
             (data: ArrayBuffer) => this.onProtocolMessage(data)
         );
@@ -584,6 +589,14 @@ export class WebRtcPlayerController {
         );
         this.streamMessageController.registerMessageHandler(
             MessageDirection.ToStreamer,
+            'GamepadConnected',
+            () =>
+                this.sendMessageController.sendMessageToStreamer(
+                    'GamepadConnected'
+                )
+        );
+        this.streamMessageController.registerMessageHandler(
+            MessageDirection.ToStreamer,
             'GamepadButtonPressed',
             (data: Array<number>) =>
                 this.sendMessageController.sendMessageToStreamer(
@@ -606,6 +619,15 @@ export class WebRtcPlayerController {
             (data: Array<number>) =>
                 this.sendMessageController.sendMessageToStreamer(
                     'GamepadAnalog',
+                    data
+                )
+        );
+        this.streamMessageController.registerMessageHandler(
+            MessageDirection.ToStreamer,
+            'GamepadDisconnected',
+            (data: Array<number>) =>
+                this.sendMessageController.sendMessageToStreamer(
+                    'GamepadDisconnected',
                     data
                 )
         );
@@ -850,6 +872,16 @@ export class WebRtcPlayerController {
             `Received input controller message - will your input control the stream: ${inputControlOwnership}`
         );
         this.pixelStreaming._onInputControlOwnership(inputControlOwnership);
+    }
+
+    /**
+     * 
+     * @param message 
+     */
+    onGamepadResponse(message: ArrayBuffer) {
+        const responseString = new TextDecoder('utf-16').decode(message.slice(1));
+        const responseJSON = JSON.parse(responseString);
+        this.gamePadController.onGamepadResponseReceived(responseJSON.controllerId);
     }
 
     onAfkTriggered(): void {
@@ -1936,6 +1968,12 @@ export class WebRtcPlayerController {
         this.gamePadController?.unregisterGamePadEvents();
         if (isEnabled) {
             this.gamePadController = this.inputClassesFactory.registerGamePad();
+            this.gamePadController.onGamepadConnected = () => {
+                this.streamMessageController.toStreamerHandlers.get('GamepadConnected')();
+            }
+            this.gamePadController.onGamepadDisconnected = (controllerIdx: number) => {
+                this.streamMessageController.toStreamerHandlers.get('GamepadDisconnected')([controllerIdx]);
+            }
         }
     }
 
