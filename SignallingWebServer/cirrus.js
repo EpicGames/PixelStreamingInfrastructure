@@ -561,7 +561,7 @@ function onSFUDisconnected() {
 	disconnectAllPlayers(SFUPlayerId);
 	const sfuPlayer = getSFU();
 	if (sfuPlayer) {
-		sfuPlayer.subscribe();
+		sfuPlayer.unsubscribe();
 		sfuPlayer.ws.close(4000, "SFU Disconnected");
 	}
 	players.delete(SFUPlayerId);
