@@ -9,6 +9,8 @@ The git command mentioned above will pull the 5.2 branch of the infrastructure. 
 
 For more information about the Pixel Streaming front end and webserver changes, see [Pixel Streaming Infrastructure](https://docs.unrealengine.com/5.2/en-US/pixel-streaming-infrastructure/)
 
+We recommend starting with the [sample implementations](/Frontend/implementations/EpicGames/src) in order to judge how to put a new player page together and integrate it with your Unreal Engine application. Additionally, if you have cloned the Pixel Streaming Infrastructure repository and made upstream changes, you can fork the repo and make a pull request.
+
 
 ## Customising the Player Webpage
 The Pixel Streaming Signaling and Web Server provides a sample player page that is already set up to stream in media from your Unreal Engine application and to send mouse, keyboard, and touch events back to the application. You can use this default player page as-is, if it meets your needs.
