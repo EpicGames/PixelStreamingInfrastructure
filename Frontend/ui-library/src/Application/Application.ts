@@ -33,6 +33,17 @@ import {
 import { FullScreenIconBase, FullScreenIconExternal } from '../UI/FullscreenIcon';
 
 
+/** 
+ * Configuration of the internal video QP indicator element.
+ * By default, one will be made, but if needed this can be disabled.
+ * 
+ * Note: For custom UI elements to react to the QP being changed, use a PixelStreaming 
+ * object's addEventListener('videoEncoderAvgQP', ...) or removeEventListener(...).
+ */
+export type VideoQPIndicatorConfig = {
+    disableIndicator?: boolean
+}
+
 /**
  * UI Options can be provided when creating an Application, to configure it's internal
  * and external behaviour, enable/disable features, and connect to external UI.
@@ -50,10 +61,8 @@ export interface UIOptions {
     fullScreenControlsConfig? : UIElementConfig,
     /** If needed, XR button can be external or disabled. */
     xrControlsConfig? : UIElementConfig,
-    /** By default, a video QP indicator element will be made. If needed, this can be disabled.
-     *  For custom UI elements to react to the QP being changed, use a PixelStreaming object
-     *  and addEventListener('videoEncoderAvgQP', ...) or removeEventListener(...). */
-    disableInternalVideoQpIndicator? : boolean,
+    /** Configuration of the video QP indicator. */
+    videoQpIndicatorConfig? : VideoQPIndicatorConfig
 }
 
 /**
@@ -113,7 +122,7 @@ export class Application {
             this.configureSettings();
         }
         
-        if (! options.disableInternalVideoQpIndicator) {
+        if (!options.videoQpIndicatorConfig || !options.videoQpIndicatorConfig.disableIndicator) {
             // Add the video stream QP indicator
             this.videoQpIndicator = new VideoQpIndicator();
             this.uiFeaturesElement.appendChild(this.videoQpIndicator.rootElement);
