@@ -1,21 +1,15 @@
-**TO DO**: Update this information to match the new front end.
+## Recommended Reading
+We recommend starting with the [sample implementations](/Frontend/implementations/EpicGames/src) in order to judge how to put a new player page together and integrate it with your Unreal Engine application. Additionally, if you have cloned the Pixel Streaming Infrastructure repository and made upstream changes, you can fork the repo and make a pull request.
+
 
 ## Customising the Player Webpage
-The Pixel Streaming Signaling and Web Server provides a sample player page that is already set up to stream in media from your Unreal Engine application and to send mouse, keyboard, and touch events back to the application. You can use this default player page as-is, if it meets your needs. 
+The Pixel Streaming Signalling and Web Server provides a sample player page that is already set up to stream in media from your Unreal Engine application and to send mouse, keyboard, and touch events back to the application. You can use this default player page as-is, if it meets your needs.
 
-Recent changes to Pixel Streaming have moved the front end and web server elements of Pixel Streaming to an external repository. We refer to this as the Pixel Streaming Infrastructure.
+However, with a little creativity and some knowledge of web technologies like TypeScript, HTML, and CSS, you can take full control over the player page, creating your own custom UIs for interacting with your Unreal Engine content remotely. You can trigger and respond to gameplay events, issue console commands to control the Unreal Engine's behavior, and more.
 
-There are a few ways to access the Pixel Streaming infrastructure.
-1. Directly access the github repository as found here: [https://github.com/EpicGames/PixelStreamingInfrastructure](https://github.com/EpicGames/PixelStreamingInfrastructure)
-1. Use `git clone --branch UE5.1 https://github.com/EpicGames/PixelStreamingInfrastructure.git` in your preferred terminal (make sure you have git installed). 
-1. Navigate to `\Engine\Plugins\Media\PixelStreaming\Resources\WebServers` and run the `get_ps_servers` command (make sure to use the `.bat` script for Windows and `.sh` script for Linux accordingly). This will automatically pull the relevant branch of the Pixel Streaming infrastructure into that folder.
-The git command mentioned above will pull the 5.1 branch of the infrastructure. If you need a different branch, please modify the git command accordingly.
+The pixel streaming infrastructure comes with a few [example implementations](/Frontend/implementations/) already provided which can be used to reference how the player webpage itself is structured. Any required HTML is added to the page when the [`Application`](/Frontend/ui-library/src/Application/Application.ts) is attached. Your application should have a `rootElement` comprising the the required HTML elements to form the basis for your player page. This element then needs to be attached to the page, in the example implementations this is attached directly to the body itself.
 
-For more information about the Pixel Streaming front end and webserver changes, see [Pixel Streaming Infrastructure](https://docs.unrealengine.com/5.1/en-US/pixel-streaming-infrastructure/)
+Further customizations can also be done using [`Overlays`](/Frontend/ui-library/src/Overlay). As the name suggests these are overlaid onto the player page when certain conditions are met, such as the player being [absent](/Frontend/ui-library/src/AFKOverlay.ts) from the keyboard. Look through [`Application`](/Frontend/ui-library/src/Application/Application.ts) source to see what those conditions are as well as how new overlays can be added.
 
+For an overview on how to change the CSS style of the player and its component widgets, see [Customizing the Player Widget Style](/Frontend/Docs/Customizing%20the%20Player%20Widget%20Style.md).
 
-However, with a little creativity and some knowledge of web technologies like JavaScript and HTML, you can take full control over the player page, creating your own custom UIs for interacting with your Unreal Engine content remotely. You can trigger and respond to gameplay events, issue console commands to control the Unreal Engine's behavior, and more.
-
-We recommend using the default player page as a starting point for creating your own custom player page. You'll find this page at `PixelStreamingInfrastructure\SignallingWebServer\Public\player.html` under your Unreal Engine installation folder. Then, use the information on this page to learn how to extend your page and tie it in with your Project's gameplay logic.  
-
-Additionally, if you have cloned the Pixel Streaming Infrastructure repository and made upstream changes, you can fork the repo and make a pull request.

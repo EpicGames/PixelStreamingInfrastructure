@@ -1,33 +1,39 @@
-**TO DO**: Update this information to match the new front end.
-
 ## HTML Page Requirements
 
-Your custom HTML player page must follow a few minimal requirements.
+Most of the HTML that will end up on the final page will actually be introduced by the Pixel Streaming application itself. Several example HTML pages are provided in the [sample implementations](/Frontend/implementations/EpicGames/src) where you can see the base page is very minimal, only serving as a space for the application to attach to and fill. The only concrete requirements are for ensuring there's sufficient space taken up by the element being attached to for the viewport to be visible on screen. In the sample implementations this is simply a `<body>` tag set to fill the screen without scrolling.
 
-* You must include the `/scripts/webRtcPlayer.js` file. This file handles communication between the browser and the Unreal Engine application, receiving and showing the media stream from the server. Do not modify this JavaScript file unless absolutely necessary.  
+```html
+<!-- Copyright Epic Games, Inc. All Rights Reserved. -->
+<!DOCTYPE html>
+<html style="width: 100%; height: 100%">
 
-        <script type="text/javascript" src="scripts/webRtcPlayer.js"></script>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
 
-* We highly recommend that you also include the */scripts/app.js* file as well. This file sets up event listeners that process the keyboard, mouse, and touch events. It also contains several functions and hooks that you can take advantage of in your player page, described in the sections below on this page.  If you have some knowledge of JavaScript, you should feel free to dig into the code of this file and modify the default behavior to suit your needs. For example, if you want to disable keyboard inputs but leave mouse and touch events working, you will need to customize this file by finding and commenting out the code that handles keyboard events.  
+<!-- The Pixel Streaming player fills 100% of its parent element but body has a 0px height unless filled with content. As such, we explicitly force the body to be 100% of the viewport height -->
+<body style="width: 100vw; height: 100vh; min-height: -webkit-fill-available; font-family: 'Montserrat'; margin: 0px">
 
-        <script type="text/javascript" src="scripts/app.js"></script>
+</body>
 
-* The page must have a `div` element with the ID `player`. This element is replaced with the video frames streamed from the UE5 application.
+</html>
+```
 
-        <div id="player"></div>
+As can be seen in the [sample implementations](/Frontend/implementations/EpicGames/src/player.ts), you must specify which element on the page the Pixel Streaming viewport is to be appended to. In the sample implementations this is typically done in the `document.body.onload` event listener and in this case appended to the `document.body` element in the DOM, causing it to fill the whole page.
 
-* You must call the `load` function provided by the `app.js` file when your page loads. For example, you can do this by adding an `onload` handler to the `body` tag:
-
-        <body onload="load()">
-
+[//]: # (This has yet to be done)
 ### Player File Location and URL
 
 You have a few options for where you can place your custom HTML player page, and how client browsers can access it.
 
-*   You can make a folder called `custom_html` inside the root folder of your Signaling and Web Server, and place your custom HTML player page inside this folder. It will then be accessible by appending its filename to the IP address or hostname of the computer running the Signaling and Web Server.  
-    For example, a file named `custom_html/myplayerpage.html` would be accessible at `http://127.0.0.1/myplayerpage.html`.
-*   You can customize the `HomepageFile` parameter for the Signaling and Web Server, and set the path to the filename of your custom HTML player page relative to the root folder of the Signaling and Web Server. It will then be accessible when you access the IP address or hostname of the computer running the Signaling and Web Server.  
-    For example, if you save a file to `Engine/Source/Programs/PixelStreaming/WebServers/SignallingWebServer/myfolder/myplayerpage.html`, and you set the `HomepageFile` parameter to `myfolder/myplayerpage.html`, the page would be accessible without needing to provide a file name in the URL: `http://127.0.0.1/`.
+*	You can create a new implementation page and place it in [`/Frontend/implementations/EpicGames/src/`](/Frontend/implementations/EpicGames/src) alongside the sample implementations. This must consist of both a base `.html` page and the `.ts` source for your application's entrypoint. This will then be accessible by appending the name of the `html` file to IP address or hostname of the computer running the Signalling Server.
+	For example, the sample `stresstest` page can be accessed on a locally-running infrastructure at `http:/127.0.0.1/stresstest.html`.
+*   You can customize the `HomepageFile` parameter for the Signaling and Web Server, and set the path to the filename of your custom HTML player page relative to the [Frontend implementations source folder](/Frontend/implementations/src). It will then be accessible when you access the IP address or hostname of the computer running the Signaling and Web Server.
 *   You can also use the **AdditionalRoutes** parameter for the Signaling and Web Server to customize the mapping between URL paths and local folders on your computer.
 
-For additional details on these parameters, see also the [Pixel Streaming Reference](https://docs.unrealengine.com/5.1/en-US/unreal-engine-pixel-streaming-reference/).
+For additional details on these parameters, see also the [Pixel Streaming Reference](https://docs.unrealengine.com/5.2/en-US/unreal-engine-pixel-streaming-reference/).
+
+### Building the Frontend
+When starting the infrastructure Signalling Server, the Frontend should be built automatically. If not, you can run the [`setup script`](/SignallingWebServer/platform_scripts/) for your platform to do so. If you subsequently make any changes to your local copy of the frontend, you will need to run the script again, appending `--build` as an argument to force a rebuild.
+
