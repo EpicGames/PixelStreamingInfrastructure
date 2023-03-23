@@ -1,0 +1,28 @@
+name: Publish library package to Github Packages
+on:
+  push:
+    branches: ['gh-packages']
+    paths: ['Frontend/ui-library/package.json']
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    defaults:
+      run:
+        working-directory: Frontend/ui-library
+    steps:
+      # Based on: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages#publishing-packages-to-github-packages
+      - uses: actions/checkout@v3
+      # Setup .npmrc file to publish to GitHub Packages
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          registry-url: 'https://npm.pkg.github.com'
+          always-auth: 'true'
+      - run: npm ci
+      - run: npm run build
+      - run: npm publish --registry=https://npm.pkg.github.com/
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

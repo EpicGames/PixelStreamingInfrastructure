@@ -1,5 +1,5 @@
 {
-    "name": "@EpicGames/libpixelstreamingfrontend",
+    "name": "@epicgames/libpixelstreamingfrontend",
     "version": "0.3.0+UE5.2",
     "description": "Frontend library for Pixel Streaming.",
     "main": "dist/libpixelstreamingfrontend.js",

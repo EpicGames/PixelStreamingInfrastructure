@@ -21,7 +21,7 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js']
     },
     externals: {
-        '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2': '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2',
+        '@EpicGames/libpixelstreamingfrontend': '@EpicGames/libpixelstreamingfrontend',
         jss: 'jss',
         'jss-plugin-camel-case': 'jss-plugin-camel-case',
         'jss-plugin-global': 'jss-plugin-global'
