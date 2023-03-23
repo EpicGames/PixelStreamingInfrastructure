@@ -1,5 +1,5 @@
 # The official home for the Pixel Streaming servers and frontend!
-The front end and web server elements for Unreal Pixel Streaming (previously located in `Samples/PixelStreaming/WebServers`) are now in this repository, for all to contribute to. They are referred to this as the **Pixel Streaming Infrastructure**.
+The frontend and web server elements for Unreal Pixel Streaming (previously located in `Samples/PixelStreaming/WebServers`) are now in this repository, for all to contribute to. They are referred to as the **Pixel Streaming Infrastructure**.
 
 ## Goals
 
