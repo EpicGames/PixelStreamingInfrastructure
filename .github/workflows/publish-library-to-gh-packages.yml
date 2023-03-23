@@ -1,4 +1,4 @@
-name: Publish library package to npmjs
+name: Publish library package to Github Packages
 on:
   push:
     branches: ['gh-packages']
@@ -13,7 +13,6 @@ jobs:
       run:
         working-directory: Frontend/library
     steps:
-      # TODO: Update package.json name and semver
       # Based on: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages#publishing-packages-to-github-packages
       - uses: actions/checkout@v3
       # Setup .npmrc file to publish to GitHub Packages

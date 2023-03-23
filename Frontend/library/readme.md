@@ -2,7 +2,7 @@
 
 The core library for the browser/client side of Pixel Streaming experiences. **This library contains no UI.**
 
-See [lib-pixelstreamingfrontend-ui](/Frontend/implementations/EpicGames) for an example of how to build UI on top of this library.
+See our TypeScript [UI library](/Frontend/ui-library) for an example of how to build UI on top of this library.
 
 ### Key features
 - Create a websocket connection to communicate with the signalling server.

@@ -15,16 +15,16 @@ const prodCommon = {
 module.exports = [
   merge(common, prodCommon, {
     output: {
-      filename: 'lib-pixelstreamingfrontend.js',
+      filename: 'libpixelstreamingfrontend.js',
       library: {
-        name: 'lib-pixelstreamingfrontend', // exposed variable that will provide access to the library classes
+        name: 'libpixelstreamingfrontend', // exposed variable that will provide access to the library classes
         type: 'umd'
       },
     },
   }),
   merge(common, prodCommon, {
     output: {
-      filename: 'lib-pixelstreamingfrontend.esm.js',
+      filename: 'libpixelstreamingfrontend.esm.js',
       library: {
         type: 'module'
       },
