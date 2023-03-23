@@ -1,11 +1,8 @@
-**TO DO**: Update this information to match the new front end.
-
 ## Customizing the Player Widget Style
 
-In your custom HTML player page, you should have defined the Pixel Streaming player widget: a `div` element with `id="player"`. You can use standard HTML and CSS methods to add styling to this widget.
+CSS Styles for the frontend application are applied on page-load using [`PixelStreamingApplicationStyle`](/Frontend/ui-library/src/Styles/PixelStreamingApplicationStyles.ts) object, which is then applied to the page using the `PixelStreamingApplicationStyle.applyStyleSheet` method. This must be invoked in your implementation before the the application object is created and added to the page.
 
-However, the widget may occasionally need to reinitialize its size. This typically occurs when the browser window is resized (if the widget is set to automatically fill the available space), or when the resolution of the input video stream is updated. When this happens, the `style` attribute of the player element is overwritten with new values, which can potentially overwrite values that you have set in your own HTML or JavaScript.
+Rather than altering or extending the `PixelStreamingApplicationStyle` class, the constructor can be supplied with an object containing your desired CSS options as well as separate base color palettes (reused extensively by the default style) for light mode and dark mode. Further customizations to the base color palette can be made either by using the `setColorMode` method to select light mode or dark, or by invoking `applyPalette` with a custom `ColorPalette`.
 
-To avoid this, you can set your custom CSS values in a special global variable named `styleAdditional`. Whenever `app.js` needs to resize the player and clear its style, it will append the values you set in the `styleAdditional` variable to the end of the new style attributes it assigns to the player element. For example, the following value changes the mouse cursor to a hand when the user hovers the mouse over the player widget:
+This system will apply over any existing CSS in your implementation's HTML page and so it is recommended this method be used for the cleanest interoperability with the rest of the frontend infrastructure.
 
-    styleAdditional = 'cursor: grab; cursor: -moz-grab; cursor: -webkit-grab';
