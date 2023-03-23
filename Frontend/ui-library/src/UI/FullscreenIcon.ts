@@ -25,23 +25,25 @@ declare global {
 }
 
 /**
- * Minimize and maximize icon that when clicked will toggle fullscreen of the given element.
+ * Base class for an element (i.e. button) that, when clicked, will toggle fullscreen of a given element.
+ * Can be initialized with any HTMLElement, if it is set as rootElement in the constructor.
  */
-export class FullScreenIcon {
+export class FullScreenIconBase {
     isFullscreen = false;
     fullscreenElement: HTMLElement;
 
-    _rootElement: HTMLButtonElement;
-    _maximizeIcon: SVGElement;
-    _minimizeIcon: SVGElement;
-    _tooltipText: HTMLElement;
+    _rootElement: HTMLElement;
 
-    /**
-     * Construct a FullScreenIcon
-     */
-    constructor() {
-        this.rootElement.onclick = () => this.toggleFullscreen();
+    public get rootElement() {
+        return this._rootElement;
+    }
 
+    public set rootElement(element) {
+        element.onclick = () => this.toggleFullscreen();
+        this._rootElement = element;
+    }
+
+    constructor() {       
         // set up the full screen events
         document.addEventListener(
             'webkitfullscreenchange',
@@ -66,19 +68,93 @@ export class FullScreenIcon {
     }
 
     /**
-     * Get the the button containing minimize and maximize.
+     * Makes the document or fullscreenElement fullscreen.
      */
-    public get rootElement(): HTMLButtonElement {
-        if (!this._rootElement) {
-            this._rootElement = document.createElement('button');
-            this._rootElement.type = 'button';
-            this._rootElement.classList.add('UiTool');
-            this._rootElement.id = 'fullscreen-btn';
-            this._rootElement.appendChild(this.maximizeIcon);
-            this._rootElement.appendChild(this.minimizeIcon);
-            this._rootElement.appendChild(this.tooltipText);
+    toggleFullscreen() {
+        // if already full screen; exit
+        // else go fullscreen
+        if (
+            document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.mozFullScreenElement ||
+            document.msFullscreenElement
+        ) {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        } else {
+            const element = this.fullscreenElement;
+
+            if (!element) {
+                return;
+            }
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.mozRequestFullscreen) {
+                element.mozRequestFullscreen();
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+            } else if (element.webkitEnterFullscreen) {
+                element.webkitEnterFullscreen(); //for iphone this code worked
+            }
         }
-        return this._rootElement;
+        this.onFullscreenChange();
+    }
+
+    /**
+     * Handles the fullscreen button on change
+     */
+    onFullscreenChange() {
+        this.isFullscreen =
+            document.webkitIsFullScreen ||
+            document.mozFullScreen ||
+            (document.msFullscreenElement &&
+                document.msFullscreenElement !== null) ||
+            (document.fullscreenElement && document.fullscreenElement !== null);
+    }
+}
+
+/**
+ * An implementation of FullScreenIconBase that uses an externally
+ * provided HTMLElement for toggling full screen.
+ */
+export class FullScreenIconExternal extends FullScreenIconBase {
+
+    constructor(externalButton : HTMLElement) {
+        super();
+        this.rootElement = externalButton;
+    }
+
+}
+
+/**
+ * The default fullscreen icon that contains a button and svgs for each state.
+ */
+export class FullScreenIcon extends FullScreenIconBase {
+    _maximizeIcon: SVGElement;
+    _minimizeIcon: SVGElement;
+    _tooltipText: HTMLElement;
+
+    constructor() {
+        super();
+        
+        const createdButton : HTMLButtonElement = document.createElement('button');
+        createdButton.type = 'button';
+        createdButton.classList.add('UiTool');
+        createdButton.id = 'fullscreen-btn';
+        createdButton.appendChild(this.maximizeIcon);
+        createdButton.appendChild(this.minimizeIcon);
+        createdButton.appendChild(this.tooltipText);
+
+        this.rootElement = createdButton;
     }
 
     public get tooltipText(): HTMLElement {
@@ -234,58 +310,8 @@ export class FullScreenIcon {
         return this._minimizeIcon;
     }
 
-    /**
-     * Makes the document fullscreen
-     */
-    toggleFullscreen() {
-        // if already full screen; exit
-        // else go fullscreen
-        if (
-            document.fullscreenElement ||
-            document.webkitFullscreenElement ||
-            document.mozFullScreenElement ||
-            document.msFullscreenElement
-        ) {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            }
-        } else {
-            const element = this.fullscreenElement;
-
-            if (!element) {
-                return;
-            }
-            if (element.requestFullscreen) {
-                element.requestFullscreen();
-            } else if (element.mozRequestFullscreen) {
-                element.mozRequestFullscreen();
-            } else if (element.webkitRequestFullscreen) {
-                element.webkitRequestFullscreen();
-            } else if (element.msRequestFullscreen) {
-                element.msRequestFullscreen();
-            } else if (element.webkitEnterFullscreen) {
-                element.webkitEnterFullscreen(); //for iphone this code worked
-            }
-        }
-        this.onFullscreenChange();
-    }
-
-    /**
-     * Handles the fullscreen button on change
-     */
     onFullscreenChange() {
-        this.isFullscreen =
-            document.webkitIsFullScreen ||
-            document.mozFullScreen ||
-            (document.msFullscreenElement &&
-                document.msFullscreenElement !== null) ||
-            (document.fullscreenElement && document.fullscreenElement !== null);
+        super.onFullscreenChange();
 
         const minimize = this.minimizeIcon;
         const maximize = this.maximizeIcon;
@@ -302,4 +328,5 @@ export class FullScreenIcon {
             maximize.style.transform = 'translate(0, 0)';
         }
     }
+
 }
