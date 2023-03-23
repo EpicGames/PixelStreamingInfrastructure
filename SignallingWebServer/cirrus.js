@@ -284,7 +284,7 @@ if (config.UseHTTPS) {
 	});
 }
 
-console.logColor(logging.Cyan, `Running Cirrus - The Pixel Streaming reference implementation signalling server for Unreal Engine 5.1.`);
+console.logColor(logging.Cyan, `Running Cirrus - The Pixel Streaming reference implementation signalling server for Unreal Engine 5.2.`);
 
 let nextPlayerId = 1;
 
@@ -561,7 +561,7 @@ function onSFUDisconnected() {
 	disconnectAllPlayers(SFUPlayerId);
 	const sfuPlayer = getSFU();
 	if (sfuPlayer) {
-		sfuPlayer.subscribe();
+		sfuPlayer.unsubscribe();
 		sfuPlayer.ws.close(4000, "SFU Disconnected");
 	}
 	players.delete(SFUPlayerId);
