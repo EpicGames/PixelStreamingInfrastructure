@@ -17,7 +17,7 @@ import {
     SettingOption,
     Logger,
     SettingBase
-} from '@epicgames/libpixelstreamingfrontend';
+} from '@EpicGames/libpixelstreamingfrontend';
 import { SettingUIFlag } from './SettingUIFlag';
 import { SettingUINumber } from './SettingUINumber';
 import { SettingUIText } from './SettingUIText';

@@ -4,7 +4,7 @@ import { FullScreenIcon } from './FullscreenIcon';
 import { SettingsIcon } from './SettingsIcon';
 import { StatsIcon } from './StatsIcon';
 import { XRIcon } from './XRIcon';
-import { WebXRController } from '@epicgames/libpixelstreamingfrontend';
+import { WebXRController } from '@EpicGames/libpixelstreamingfrontend';
 
 /**
  * Element containing various controls like stats, settings, fullscreen.
