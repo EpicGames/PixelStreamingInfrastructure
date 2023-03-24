@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Config, PixelStreaming } from '@epicgames/libpixelstreamingfrontend';
-import { Application, PixelStreamingApplicationStyle } from '@epicgames/libpixelstreamingfrontend-ui';
+import { Config, PixelStreaming } from '@EpicGames/libpixelstreamingfrontend';
+import { Application, PixelStreamingApplicationStyle } from '@EpicGames/libpixelstreamingfrontend-ui';
 export const PixelStreamingApplicationStyles = new PixelStreamingApplicationStyle();
 PixelStreamingApplicationStyles.applyStyleSheet();
 

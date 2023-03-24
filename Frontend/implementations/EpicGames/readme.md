@@ -14,4 +14,7 @@ A plugin library that can be optionally applied on top of the core library to cr
 
 
 ### Adding it to your project
-`npm i @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2`
+
+`npm config set @EpicGames:registry https://npm.pkg.github.com/`
+
+`npm install @EpicGames/libpixelstreamingfrontend-ui`

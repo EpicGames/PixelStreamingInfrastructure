@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Config, PixelStreaming } from '@epicgames/libpixelstreamingfrontend';
-import { Application, PixelStreamingApplicationStyle } from '@epicgames/libpixelstreamingfrontend-ui';
+import { Config, PixelStreaming } from '@EpicGames/libpixelstreamingfrontend';
+import { Application, PixelStreamingApplicationStyle } from '@EpicGames/libpixelstreamingfrontend-ui';
 const PixelStreamingApplicationStyles =
     new PixelStreamingApplicationStyle();
 PixelStreamingApplicationStyles.applyStyleSheet();
@@ -16,7 +16,7 @@ document.body.onload = function() {
 	// Create a Native DOM delegate instance that implements the Delegate interface class
 	const stream = new PixelStreaming(config);
 	const application = new Application({
-		stream,
+		stream: stream,
 		onColorModeChanged: (isLightMode) => PixelStreamingApplicationStyles.setColorMode(isLightMode)
 	});
 	// document.getElementById("centrebox").appendChild(application.rootElement);

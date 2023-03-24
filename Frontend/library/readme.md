@@ -11,5 +11,8 @@ See our TypeScript [UI library](/Frontend/ui-library) for an example of how to b
 - Opens a datachannel connection sending and receiving custom data (in addition to input).
 
 ### Adding it to your project
-`npm i @epicgames-ps/lib-pixelstreamingfrontend-ue5.2`
+
+`npm config set @epicgames:registry https://npm.pkg.github.com/`
+
+`npm install @epicgames/libpixelstreamingfrontend`
 

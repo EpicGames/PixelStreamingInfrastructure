@@ -50,6 +50,12 @@ The default user interface is provided in [/ui-library](/Frontend/ui-library) di
 
 This will produce `player.js` under the `SignallingWebServer/Public` directory - this is the default UI.
 
+### Adding it to you project
+
+`npm config set @epicgames:registry https://npm.pkg.github.com/`
+
+`npm install @epicgames/libpixelstreamingfrontend-ui`
+
 ### Making your own UI
 
 We recommend studying [/ui-library](/Frontend/ui-library) and [player.ts](/Frontend/implementations/EpicGames/src/player.ts)/[player.html](/Frontend/implementations/EpicGames/src/player.html), or alternatively the sample React implementation in [implementations/react](/Frontend/implementations/react), then once you have copied and modified the [package.json](/Frontend/implementations/EpicGames/package.json) and `.ts` into your own `implementation/your_implementation` directory, the process is similar:

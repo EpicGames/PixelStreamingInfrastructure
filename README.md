@@ -42,10 +42,12 @@ The following are `unofficial` NPM packages (official ones coming soon):
 ### NPM getting started
 
 ```bash
-#frontend (core lib)
-npm i @epicgames-ps/lib-pixelstreamingfrontend-ue5.2
-#frontend ui
-npm i @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2
+# Add Github packages repo to your NPM for @epicgames
+npm config set @epicgames:registry https://npm.pkg.github.com/
+# Install the frontend (core lib)
+npm install @epicgames/libpixelstreamingfrontend
+# Install the TypeScript frontend ui
+npm install @epicgames/libpixelstreamingfrontend-ui
 ```
 
 ### Tagged source releases + built typescript frontend
