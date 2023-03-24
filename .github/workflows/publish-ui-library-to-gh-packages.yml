@@ -1,4 +1,4 @@
-name: Publish library package to Github Packages
+name: Publish UI library package to Github Packages
 on:
   push:
     branches: ['gh-packages']
@@ -21,6 +21,7 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://npm.pkg.github.com'
           always-auth: 'true'
+          scope: '@epicgames'
       - run: npm ci
       - run: npm run build
       - run: npm publish --registry=https://npm.pkg.github.com/
