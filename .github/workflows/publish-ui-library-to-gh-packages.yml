@@ -22,6 +22,7 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           always-auth: 'true'
           scope: '@epicgames'
+      - run: npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
       - run: npm ci
       - run: npm run build
       - run: npm publish --access public --registry=https://npm.pkg.github.com/
