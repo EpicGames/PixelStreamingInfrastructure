@@ -1,5 +1,5 @@
 # The official home for the Pixel Streaming servers and frontend!
-The Pixel Streaming servers and web frontend that was in `Samples/PixelStreaming/WebServers` is now here for all to contribute to. 
+The frontend and web server elements for Unreal Pixel Streaming (previously located in `Samples/PixelStreaming/WebServers`) are now in this repository, for all to contribute to. They are referred to as the **Pixel Streaming Infrastructure**.
 
 ## Goals
 
@@ -10,13 +10,17 @@ The goals of this repository are to:
 - Facilitate a more standard web release mechanism.
 - Grant a permissive license to distribute and modify this code wherever you see fit (MIT licensed).
 
-## Repository contents
+## Contents
 
-Reference implementations for the various pieces needed to support a PixelStreaming application:
-- SignallingWebServer (Cirrus)
-- SFU (Selective Forwarding Unit)
-- Matchmaker
-- Frontend (the JS/TS frontend library for the WebRTC player and input)
+The Pixel Streaming Infrastructure contains reference implementations for all the components needed to run a pixel streaming application. They are structured as separate projects, which work together, but designed to be modular and interoperable with other implementations which use WebRTC technology. These implementations include: 
+- A signalling web server, called Cirrus, found in [`SignallingWebServer/`](SignallingWebServer/).
+- An SFU (Selective Forwarding Unit), found in [`SFU/`](SFU/).
+- A matchmaker, found in [`Matchmaker/`](Matchmaker/).
+- Several frontend projects for the WebRTC player and input, found in [`Frontend/`](Frontend/):
+  - shared libraries for [communication](Frontend/library/) and [UI](Frontend/ui-library/) functionality
+  - separate [implementations](Frontend/implementations/) using different techologies such as TypeScript or React/JSX
+
+  For detailed information, see the [frontend readme](Frontend/README.md).
 
 
 ## Releases

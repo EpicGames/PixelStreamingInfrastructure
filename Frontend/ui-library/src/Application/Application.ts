@@ -18,20 +18,57 @@ import { PlayOverlay } from '../Overlay/PlayOverlay';
 import { InfoOverlay } from '../Overlay/InfoOverlay';
 import { ErrorOverlay } from '../Overlay/ErrorOverlay';
 import { AFKOverlay } from '../Overlay/AFKOverlay';
-import { Controls } from '../UI/Controls';
+import { Controls, ControlsUIConfiguration } from '../UI/Controls';
 import { LabelledButton } from '../UI/LabelledButton';
 import { SettingsPanel } from '../UI/SettingsPanel';
 import { StatsPanel } from '../UI/StatsPanel';
 import { VideoQpIndicator } from '../UI/VideoQpIndicator';
 import { ConfigUI, LightMode } from '../Config/ConfigUI';
+import { 
+    UIElementCreationMode, 
+    PanelConfiguration, 
+    isPanelEnabled,
+    UIElementConfig
+} from '../UI/UIConfigurationTypes'
+import { FullScreenIconBase, FullScreenIconExternal } from '../UI/FullscreenIcon';
 
-export interface UIOptions {
-    stream: PixelStreaming;
-    onColorModeChanged?: (isLightMode: boolean) => void;
+
+/** 
+ * Configuration of the internal video QP indicator element.
+ * By default, one will be made, but if needed this can be disabled.
+ * 
+ * Note: For custom UI elements to react to the QP being changed, use a PixelStreaming 
+ * object's addEventListener('videoEncoderAvgQP', ...) or removeEventListener(...).
+ */
+export type VideoQPIndicatorConfig = {
+    disableIndicator?: boolean
 }
 
 /**
- * Provides common base functionality for applications that extend this application
+ * UI Options can be provided when creating an Application, to configure it's internal
+ * and external behaviour, enable/disable features, and connect to external UI.
+ */
+export interface UIOptions {
+    stream: PixelStreaming;
+    onColorModeChanged?: (isLightMode: boolean) => void;
+    /** By default, a settings panel and associate visibility toggle button will be made.
+      * If needed, this behaviour can be configured. */
+    settingsPanelConfig?: PanelConfiguration;
+    /** By default, a stats panel and associate visibility toggle button will be made.
+      * If needed, this behaviour can be configured. */
+    statsPanelConfig?: PanelConfiguration;
+    /** If needed, the full screen button can be external or disabled. */
+    fullScreenControlsConfig? : UIElementConfig,
+    /** If needed, XR button can be external or disabled. */
+    xrControlsConfig? : UIElementConfig,
+    /** Configuration of the video QP indicator. */
+    videoQpIndicatorConfig? : VideoQPIndicatorConfig
+}
+
+/**
+ * An Application is a combination of UI elements to display and manage a WebRTC Pixel Streaming
+ * connection. It includes features for controlling a stream with mouse and keyboard, 
+ * managing connection endpoints, as well as displaying stats and other information about it.
  */
 export class Application {
     stream: PixelStreaming;
@@ -58,29 +95,38 @@ export class Application {
 
     onColorModeChanged: UIOptions["onColorModeChanged"];
 
+    protected _options : UIOptions;
+
     /**
      * @param options - Initialization options
      */
     constructor(options: UIOptions) {
+        this._options = options;
+        
         this.stream = options.stream;
         this.onColorModeChanged = options.onColorModeChanged;
         this.configUI = new ConfigUI(this.stream.config);
 
         this.createOverlays();
 
-        // Add stats panel
-        this.statsPanel = new StatsPanel();
-        this.uiFeaturesElement.appendChild(this.statsPanel.rootElement);
-
-        // Add settings panel
-        this.settingsPanel = new SettingsPanel();
-        this.uiFeaturesElement.appendChild(this.settingsPanel.rootElement);
-
-        // Add the video stream QP indicator
-        this.videoQpIndicator = new VideoQpIndicator();
-        this.uiFeaturesElement.appendChild(this.videoQpIndicator.rootElement);
-
-        this.configureSettings();
+        if (isPanelEnabled(options.statsPanelConfig)) {
+            // Add stats panel
+            this.statsPanel = new StatsPanel();
+            this.uiFeaturesElement.appendChild(this.statsPanel.rootElement);
+        }
+        
+        if (isPanelEnabled(options.settingsPanelConfig)) {
+            // Add settings panel
+            this.settingsPanel = new SettingsPanel();
+            this.uiFeaturesElement.appendChild(this.settingsPanel.rootElement);
+            this.configureSettings();
+        }
+        
+        if (!options.videoQpIndicatorConfig || !options.videoQpIndicatorConfig.disableIndicator) {
+            // Add the video stream QP indicator
+            this.videoQpIndicator = new VideoQpIndicator();
+            this.uiFeaturesElement.appendChild(this.videoQpIndicator.rootElement);
+        }
 
         this.createButtons();
 
@@ -125,59 +171,92 @@ export class Application {
      * Set up button click functions and button functionality
      */
     public createButtons() {
+        const controlsUIConfig : ControlsUIConfiguration = {
+            statsButtonType : !!this._options.statsPanelConfig
+                ? this._options.statsPanelConfig.visibilityButtonConfig
+                : undefined,
+            settingsButtonType: !!this._options.settingsPanelConfig
+                ? this._options.settingsPanelConfig.visibilityButtonConfig
+                : undefined,
+            fullscreenButtonType: this._options.fullScreenControlsConfig,
+            xrIconType: this._options.xrControlsConfig
+        }
         // Setup controls
-        const controls = new Controls();
-
-        // When we fullscreen we want this element to be the root
-        controls.fullscreenIcon.fullscreenElement = this.rootElement;
+        const controls = new Controls(controlsUIConfig);
         this.uiFeaturesElement.appendChild(controls.rootElement);
 
+        // When we fullscreen we want this element to be the root
+        const fullScreenButton : FullScreenIconBase | undefined = 
+            // Depending on if we're creating an internal button, or using an external one
+            (!!this._options.fullScreenControlsConfig 
+                && this._options.fullScreenControlsConfig.creationMode === UIElementCreationMode.UseCustomElement)
+            // Either create a fullscreen class based on the external button
+            ? new FullScreenIconExternal(this._options.fullScreenControlsConfig.customElement)
+            // Or use the one created by the Controls initializer earlier
+            : controls.fullscreenIcon;
+        if (fullScreenButton) fullScreenButton.fullscreenElement = this.rootElement;
+
         // Add settings button to controls
-        controls.settingsIcon.rootElement.onclick = () =>
+        const settingsButton : HTMLElement | undefined = 
+            !!controls.settingsIcon ? controls.settingsIcon.rootElement : 
+            this._options.settingsPanelConfig.visibilityButtonConfig.customElement;
+        if (!!settingsButton) settingsButton.onclick = () =>
             this.settingsClicked();
-        this.settingsPanel.settingsCloseButton.onclick = () =>
+        if (!!this.settingsPanel) this.settingsPanel.settingsCloseButton.onclick = () =>
             this.settingsClicked();
 
         // Add WebXR button to controls
-        controls.xrIcon.rootElement.onclick = () =>
+        const xrButton : HTMLElement | undefined = 
+            !!controls.xrIcon ? controls.xrIcon.rootElement : 
+            this._options.xrControlsConfig.creationMode === UIElementCreationMode.UseCustomElement ?
+            this._options.xrControlsConfig.customElement : undefined;
+        if (!!xrButton) xrButton.onclick = () =>
             this.stream.toggleXR();
 
         // setup the stats/info button
-        controls.statsIcon.rootElement.onclick = () => this.statsClicked();
+        const statsButton : HTMLElement | undefined = 
+            !!controls.statsIcon ? controls.statsIcon.rootElement : 
+            this._options.statsPanelConfig.visibilityButtonConfig.customElement;
+        if (!!statsButton) statsButton.onclick = () => this.statsClicked()
 
-        this.statsPanel.statsCloseButton.onclick = () => this.statsClicked();
+        if (!!this.statsPanel) {
+            this.statsPanel.statsCloseButton.onclick = () => this.statsClicked();
+        }
 
-        // Add button for toggle fps
-        const showFPSButton = new LabelledButton('Show FPS', 'Toggle');
-        showFPSButton.addOnClickListener(() => {
-            this.stream.requestShowFps();
-        });
+        // Add command buttons (if we have somewhere to add them to)
+        if (!!this.settingsPanel) {
+            // Add button for toggle fps
+            const showFPSButton = new LabelledButton('Show FPS', 'Toggle');
+            showFPSButton.addOnClickListener(() => {
+                this.stream.requestShowFps();
+            });
 
-        // Add button for restart stream
-        const restartStreamButton = new LabelledButton(
-            'Restart Stream',
-            'Restart'
-        );
-        restartStreamButton.addOnClickListener(() => {
-            this.stream.reconnect();
-        });
+            // Add button for restart stream
+            const restartStreamButton = new LabelledButton(
+                'Restart Stream',
+                'Restart'
+            );
+            restartStreamButton.addOnClickListener(() => {
+                this.stream.reconnect();
+            });
 
-        // Add button for request keyframe
-        const requestKeyframeButton = new LabelledButton(
-            'Request keyframe',
-            'Request'
-        );
-        requestKeyframeButton.addOnClickListener(() => {
-            this.stream.requestIframe();
-        });
+            // Add button for request keyframe
+            const requestKeyframeButton = new LabelledButton(
+                'Request keyframe',
+                'Request'
+            );
+            requestKeyframeButton.addOnClickListener(() => {
+                this.stream.requestIframe();
+            });
 
-        const commandsSectionElem = this.configUI.buildSectionWithHeading(
-            this.settingsPanel.settingsContentElement,
-            'Commands'
-        );
-        commandsSectionElem.appendChild(showFPSButton.rootElement);
-        commandsSectionElem.appendChild(requestKeyframeButton.rootElement);
-        commandsSectionElem.appendChild(restartStreamButton.rootElement);
+            const commandsSectionElem = this.configUI.buildSectionWithHeading(
+                this.settingsPanel.settingsContentElement,
+                'Commands'
+            );
+            commandsSectionElem.appendChild(showFPSButton.rootElement);
+            commandsSectionElem.appendChild(requestKeyframeButton.rootElement);
+            commandsSectionElem.appendChild(restartStreamButton.rootElement);
+        }
     }
 
     /**
@@ -550,7 +629,10 @@ export class Application {
      * @param QP - the quality number of the stream
      */
     onVideoEncoderAvgQP(QP: number) {
-        this.videoQpIndicator.updateQpTooltip(QP);
+        // Update internal QP indicator if one is present
+        if (!!this.videoQpIndicator) {
+            this.videoQpIndicator.updateQpTooltip(QP);
+        }
     }
 
     onInitialSettings(settings: InitialSettings) {

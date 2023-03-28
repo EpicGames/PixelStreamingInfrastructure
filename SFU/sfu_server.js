@@ -44,7 +44,7 @@ async function onStreamerOffer(sdp) {
 }
 
 function getNextStreamerSCTPId() {
-	return streamer.transport._getNextSctpStreamId();
+    return streamer.transport._getNextSctpStreamId();
 }
 
 function onStreamerDisconnected() {
@@ -218,8 +218,17 @@ function disconnectAllPeers() {
   }
 }
 
+function onLayerPreference(msg) {
+  const peer = peers.get(`${msg.playerId}`);
+  if (peer != null) {
+    for (consumer of peer.consumers) {
+      consumer.setPreferredLayers({ spatialLayer: msg.spatialLayer, temporalLayer: msg.temporalLayer });
+    }
+  }
+}
+
 async function onSignallingMessage(message) {
-	//console.log(`Got MSG: ${message}`);
+    //console.log(`Got MSG: ${message}`);
   const msg = JSON.parse(message);
 
   if (msg.type == 'offer') {
@@ -243,9 +252,9 @@ async function onSignallingMessage(message) {
   else if (msg.type == 'peerDataChannelsReady') {
     setupStreamerDataChannelsForPeer(msg.playerId);
   }
-  // todo a new message type for force layer switch (for debugging)
-  // see: https://mediasoup.org/documentation/v3/mediasoup/api/#consumer-setPreferredLayers
-  // preferredLayers for debugging to select a particular simulcast layer, looks like { spatialLayer: 2, temporalLayer: 0 }
+  else if (msg.type == 'layerPreference') {
+    onLayerPreference(msg);
+  }
 }
 
 async function startMediasoup() {

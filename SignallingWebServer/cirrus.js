@@ -83,7 +83,7 @@ if (config.UseFrontend) {
 
 	if (config.UseHTTPS && config.DisableSSLCert) {
 		//Required for self signed certs otherwise just get an error back when sending request to frontend see https://stackoverflow.com/a/35633993
-		console.warn('WARNING: config.DisableSSLCert is true. Unauthorized SSL certificates will be allowed! This is convenient for local testing but please DO NOT SHIP THIS IN PRODUCTION. To remove this warning please set DisableSSLCert to false in your config.json.');
+		console.logColor(logging.Orange, 'WARNING: config.DisableSSLCert is true. Unauthorized SSL certificates will be allowed! This is convenient for local testing but please DO NOT SHIP THIS IN PRODUCTION. To remove this warning please set DisableSSLCert to false in your config.json.');
 		process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 	}
 
@@ -320,7 +320,13 @@ class Player {
 
 	sendFrom(message) {
 		if (!this.streamerId) {
-			return;
+			if(streamers.size > 0) {
+				this.streamerId = streamers.entries().next().value[0];
+				console.logColor(logging.Orange, `Player ${this.id} attempted to send an outgoing message without having subscribed first. Defaulting to ${this.streamerId}`);
+			} else {
+				console.logColor(logging.Orange, `Player ${this.id} attempted to send an outgoing message without having subscribed first. No streamer connected so this message isn't going anywhere!`)
+				return;
+			}
 		}
 
 		// normally we want to indicate what player this message came from
@@ -454,6 +460,14 @@ function onStreamerMessageDisconnectPlayer(streamer, msg) {
 	}
 }
 
+function onStreamerMessageLayerPreference(streamer, msg) {
+	let sfuPlayer = getSFU();
+	if (sfuPlayer) {
+		logOutgoing(sfuPlayer.id, msg);
+		sfuPlayer.sendTo(msg);
+	}
+}
+
 function forwardStreamerMessageToPlayer(streamer, msg) {
 	const playerId = getPlayerIdFromMessage(msg);
 	const player = players.get(playerId);
@@ -471,6 +485,7 @@ streamerMessageHandlers.set('offer', forwardStreamerMessageToPlayer);
 streamerMessageHandlers.set('answer', forwardStreamerMessageToPlayer);
 streamerMessageHandlers.set('iceCandidate', forwardStreamerMessageToPlayer);
 streamerMessageHandlers.set('disconnectPlayer', onStreamerMessageDisconnectPlayer);
+streamerMessageHandlers.set('layerPreference', onStreamerMessageLayerPreference);
 
 console.logColor(logging.Green, `WebSocket listening for Streamer connections on :${streamerPort}`)
 let streamerServer = new WebSocket.Server({ port: streamerPort, backlog: 1 });
@@ -561,7 +576,7 @@ function onSFUDisconnected() {
 	disconnectAllPlayers(SFUPlayerId);
 	const sfuPlayer = getSFU();
 	if (sfuPlayer) {
-		sfuPlayer.subscribe();
+		sfuPlayer.unsubscribe();
 		sfuPlayer.ws.close(4000, "SFU Disconnected");
 	}
 	players.delete(SFUPlayerId);
