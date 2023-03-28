@@ -200,7 +200,13 @@ export class WebRtcPlayerController {
             this.setVideoEncoderAvgQP(0);
         };
         this.webSocketController.onOpen.addEventListener('open', () => {
-            this.webSocketController.requestStreamerList();
+            const BrowserSendsOffer = this.config.isFlagEnabled(
+                Flags.BrowserSendOffer
+            );
+            if(!BrowserSendsOffer)
+            {
+                this.webSocketController.requestStreamerList();
+            }
         });
         this.webSocketController.onClose.addEventListener('close', () => {
             this.afkController.stopAfkWarningTimer();
@@ -1126,24 +1132,6 @@ export class WebRtcPlayerController {
         }
         this.resizePlayerStyle();
     }
-
-    // buildSignallingServerUrl() {
-    //     let signallingServerUrl = this.config.getTextSettingValue(
-    //         TextParameters.SignallingServerUrl
-    //     );
-
-    //     // If we are connecting to the SFU add a special url parameter to the url
-    //     if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
-    //         signallingServerUrl += '?' + Flags.BrowserSendOffer + '=true';
-    //     }
-
-    //     // This code is no longer needed, but is a good example for how subsequent config flags can be appended
-    //     // if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
-    //     //     signallingServerUrl += (signallingServerUrl.includes('?') ? '&' : '?') + Flags.BrowserSendOffer + '=true';
-    //     // }
-
-    //     return signallingServerUrl;
-    // }
 
     /**
      * Connect to the Signaling server

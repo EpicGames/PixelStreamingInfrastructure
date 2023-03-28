@@ -83,7 +83,7 @@ if (config.UseFrontend) {
 
 	if (config.UseHTTPS && config.DisableSSLCert) {
 		//Required for self signed certs otherwise just get an error back when sending request to frontend see https://stackoverflow.com/a/35633993
-		console.warn('WARNING: config.DisableSSLCert is true. Unauthorized SSL certificates will be allowed! This is convenient for local testing but please DO NOT SHIP THIS IN PRODUCTION. To remove this warning please set DisableSSLCert to false in your config.json.');
+		console.logColor(logging.Orange, 'WARNING: config.DisableSSLCert is true. Unauthorized SSL certificates will be allowed! This is convenient for local testing but please DO NOT SHIP THIS IN PRODUCTION. To remove this warning please set DisableSSLCert to false in your config.json.');
 		process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 	}
 
@@ -320,7 +320,13 @@ class Player {
 
 	sendFrom(message) {
 		if (!this.streamerId) {
-			return;
+			if(streamers.size > 0) {
+				this.streamerId = streamers.entries().next().value[0];
+				console.logColor(logging.Orange, `Player ${this.id} attempted to send an outgoing message without having subscribed first. Defaulting to ${this.streamerId}`);
+			} else {
+				console.logColor(logging.Orange, `Player ${this.id} attempted to send an outgoing message without having subscribed first. No streamer connected so this message isn't going anywhere!`)
+				return;
+			}
 		}
 
 		// normally we want to indicate what player this message came from

@@ -29,6 +29,7 @@ const Blue = '\x1b[34m';
 const Magenta = '\x1b[35m';
 const Cyan = '\x1b[36m';
 const White = '\x1b[37m';
+const Orange = '\x1b[38;5;215m';
 
 /**
  * Pad the start of the given number with zeros so it takes up the number of digits.
@@ -104,5 +105,6 @@ module.exports = {
 	Blue,
 	Magenta,
 	Cyan,
-	White
+	White,
+	Orange
 }
