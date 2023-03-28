@@ -454,6 +454,14 @@ function onStreamerMessageDisconnectPlayer(streamer, msg) {
 	}
 }
 
+function onStreamerMessageLayerPreference(streamer, msg) {
+	let sfuPlayer = getSFU();
+	if (sfuPlayer) {
+		logOutgoing(sfuPlayer.id, msg);
+		sfuPlayer.sendTo(msg);
+	}
+}
+
 function forwardStreamerMessageToPlayer(streamer, msg) {
 	const playerId = getPlayerIdFromMessage(msg);
 	const player = players.get(playerId);
@@ -471,6 +479,7 @@ streamerMessageHandlers.set('offer', forwardStreamerMessageToPlayer);
 streamerMessageHandlers.set('answer', forwardStreamerMessageToPlayer);
 streamerMessageHandlers.set('iceCandidate', forwardStreamerMessageToPlayer);
 streamerMessageHandlers.set('disconnectPlayer', onStreamerMessageDisconnectPlayer);
+streamerMessageHandlers.set('layerPreference', onStreamerMessageLayerPreference);
 
 console.logColor(logging.Green, `WebSocket listening for Streamer connections on :${streamerPort}`)
 let streamerServer = new WebSocket.Server({ port: streamerPort, backlog: 1 });
