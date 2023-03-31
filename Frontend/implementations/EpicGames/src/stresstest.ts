@@ -6,6 +6,16 @@ const PixelStreamingApplicationStyles =
     new PixelStreamingApplicationStyle();
 PixelStreamingApplicationStyles.applyStyleSheet();
 
+export class PixelStreamingFrame {
+	element: HTMLElement;
+	pixelStreamingApp: Application;
+
+	constructor(element: HTMLElement, pixelStreamingApp: Application) {
+		this.element = element;
+		this.pixelStreamingApp = pixelStreamingApp;
+	}
+}
+
 // This is the entrypoint to the stress test, all setup happens here
 export class StressTester {
 	play: boolean;
@@ -13,7 +23,7 @@ export class StressTester {
 	totalStreams: number;
 	streamCreationIntervalMs: number;
 	streamDeletionIntervalMs: number;
-	pixelStreamingFrames: Array<HTMLElement>;
+	pixelStreamingFrames: Array<PixelStreamingFrame>;
 	creationIntervalHandle: NodeJS.Timer;
 	deletionIntervalHandle: NodeJS.Timer;
 	streamsContainer: HTMLElement;
@@ -96,11 +106,11 @@ export class StressTester {
 				const nPeersToCreate = Math.ceil(Math.random() * maxPeersToCreate);
 
 				for(let i = 0; i < nPeersToCreate; i++) {
-					const frame = this.createPixelStreamingFrame();
+					const psFrame = this.createPixelStreamingFrame();
 					const n = this.pixelStreamingFrames.length;
-					frame.id = `PixelStreamingFrame_${n + 1}`;
-					this.streamsContainer.append(frame);
-					this.pixelStreamingFrames.push(frame);
+					psFrame.element.id = `PixelStreamingFrame_${n + 1}`;
+					this.streamsContainer.append(psFrame.element);
+					this.pixelStreamingFrames.push(psFrame);
 					this.totalStreams += 1;
 					this.updateTotalStreams();
 				}
@@ -121,8 +131,11 @@ export class StressTester {
 
 			const nPeersToDelete = Math.ceil(Math.random() * curNPeers);
 			for(let i = 0; i < nPeersToDelete; i++) {
-				const frame = this.pixelStreamingFrames.shift();
-				frame.parentNode.removeChild(frame);
+				const psFrame = this.pixelStreamingFrames.shift();
+				// Remove HTML element from DOM
+				psFrame.element.parentNode.removeChild(psFrame.element);
+				// Disconnect Pixel Streaming application so we don't have orphaned WebRTC/WebSocket/PeerConnections
+				psFrame.pixelStreamingApp.stream.disconnect();
 			}
 		}, this.streamDeletionIntervalMs);
 	}
@@ -137,7 +150,7 @@ export class StressTester {
 		}
 	}
 
-	private createPixelStreamingFrame() : HTMLElement {
+	private createPixelStreamingFrame() : PixelStreamingFrame {
 		const streamFrame = document.createElement("div");
 
 		const config = new Config();
@@ -149,10 +162,11 @@ export class StressTester {
 		const stream = new PixelStreaming(config);
 		const application = new Application({
 			stream,
-			onColorModeChanged: (isLightMode) => PixelStreamingApplicationStyles.setColorMode(isLightMode)
+			onColorModeChanged: (isLightMode : any) => PixelStreamingApplicationStyles.setColorMode(isLightMode)
 		});
 		streamFrame.appendChild(application.rootElement);
-		return streamFrame;
+
+		return new PixelStreamingFrame(streamFrame, application);
 	}
 
 	private updateTotalStreams() : void {
