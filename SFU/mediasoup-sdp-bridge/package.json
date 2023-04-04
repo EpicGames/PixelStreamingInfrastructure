@@ -1,5 +1,6 @@
 {
-  "name": "mediasoup-sdp-bridge",
+  "name": "@epicgames-ps/mediasoup-sdp-bridge",
+  "private": true,
   "version": "3.6.5",
   "description": "Node.js library to allow integration of SDP based clients with mediasoup",
   "contributors": [
