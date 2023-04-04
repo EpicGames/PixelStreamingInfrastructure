@@ -1,6 +1,7 @@
 {
-  "name": "cirrus-matchmaker",
+  "name": "@epicgames-ps/cirrus-matchmaker",
   "version": "0.0.1",
+  "private": true,
   "description": "Cirrus servers connect to the Matchmaker which redirects a browser to the next available Cirrus server",
   "dependencies": {
     "cors": "^2.8.5",

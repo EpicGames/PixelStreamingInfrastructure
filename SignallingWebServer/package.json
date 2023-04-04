@@ -1,7 +1,8 @@
 {
-  "name": "cirrus-webserver",
+  "name": "@epicgames-ps/cirrus-webserver",
   "version": "0.0.1",
   "description": "The reference signalling and web server for Pixel Streaming: Cirrus",
+  "private": true,
   "scripts": {
     "store_password": "run-script-os",
     "store_password:default": "./platform_scripts/bash/node/bin/node ./modules/authentication/db/store_password.js --usersFile=./modules/authentication/db/users.json",
