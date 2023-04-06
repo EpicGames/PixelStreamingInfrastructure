@@ -6,8 +6,6 @@ FROM node:latest
 # Copy the signalling server source code to the Docker build context
 COPY . /opt/SignallingWebServer
 
-COPY ../../../turnserver.conf /opt/SignallingWebServer
-
 # Install the dependencies for the signalling server
 WORKDIR /opt/SignallingWebServer
 RUN npm install .
