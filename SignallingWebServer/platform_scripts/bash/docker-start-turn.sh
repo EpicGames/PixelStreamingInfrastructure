@@ -20,7 +20,7 @@ turnusername="PixelStreamingUser"
 turnpassword="AnotherTURNintheroad"
 realm="PixelStreaming"
 process="turnserver"
-arguments="-c /turnconf/turnserver.conf -p ${turnport} -r $realm -X $publicip -E $localip -L $localip --no-cli --no-tls --no-dtls --pidfile /var/run/turnserver.pid -f -a -v -u ${turnusername}:${turnpassword}"
+arguments="-c /opt/SignallingWebServer/turnserver.conf -p ${turnport} -r $realm -X $publicip -E $localip -L $localip --no-cli --no-tls --no-dtls --pidfile /var/run/turnserver.pid -f -a -v -u ${turnusername}:${turnpassword}"
 
 # Add arguments passed to script to arguments for executable
 arguments+=" ${cirruscmd}"
@@ -36,7 +36,7 @@ docker pull coturn/coturn
 #docker run --name coturn_latest --network host --rm -a stdin -a stdout -a stderr --entrypoint "sudo mkdir -p /var/run" coturn/coturn ""
 #docker run --name coturn_latest --network host --rm -a stdin -a stdout -a stderr --entrypoint "/bin/ls" coturn/coturn "/var/"
 
-docker run --name coturn_latest --network host --rm -a stdin -a stdout -a stderr --entrypoint "${process}" coturn/coturn "${arguments}" -v ../../..:/turnconf
+docker run --name coturn_latest --network host --rm -a stdin -a stdout -a stderr --entrypoint "${process}" coturn/coturn "${arguments}"
 
 #docker run --name coturn_latest --network host --rm -a stdin -a stdout -a stderr --entrypoint "/bin/bash" coturn/coturn "ls -latr /var/run/"
 #docker run --name coturn_latest --network host --rm -a stdin -a stdout -a stderr --entrypoint "sudo chown ubuntu:ubuntu /var/run/turnserver.pid | sudo chmod +x /var/run/turnserver.pid | ${process}" coturn/coturn "${arguments}"
