@@ -24,7 +24,7 @@ $TurnUsername = "PixelStreamingUser"
 $TurnPassword = "AnotherTURNintheroad"
 $Realm = "PixelStreaming"
 $ProcessExe = ".\turnserver.exe"
-$Arguments = "-p $TurnPort -r $Realm -X $PublicIP -E $LocalIP -L $LocalIP --no-cli --no-tls --no-dtls --pidfile `"C:\coturn.pid`" -f -a -v -n -u $TurnUsername`:$TurnPassword"
+$Arguments = "-c ..\..\..\turnserver.conf -p $TurnPort -r $Realm -X $PublicIP -E $LocalIP -L $LocalIP --no-cli --no-tls --no-dtls --pidfile `"C:\coturn.pid`" -f -a -v -u $TurnUsername`:$TurnPassword"
 
 # Add arguments passed to script to Arguments for executable
 $Arguments += $args
