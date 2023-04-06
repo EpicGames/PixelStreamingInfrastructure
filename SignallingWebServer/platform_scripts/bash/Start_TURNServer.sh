@@ -26,7 +26,7 @@ echo ""
 # Hmm, plain text
 realm="PixelStreaming"
 process="turnserver"
-arguments="-c ..\..\..\turnserver.conf -p ${turnport} -r $realm -X $publicip -E $localip -L $localip --no-cli --no-tls --no-dtls --pidfile /var/run/turnserver.pid -f -a -v -u ${turnusername}:${turnpassword}"
+arguments="-c turnserver.conf -p ${turnport} -r $realm -X $publicip -E $localip -L $localip --no-cli --no-tls --no-dtls --pidfile /var/run/turnserver.pid -f -a -v -u ${turnusername}:${turnpassword}"
 
 # Add arguments passed to script to arguments for executable
 arguments+=" ${cirruscmd}"
