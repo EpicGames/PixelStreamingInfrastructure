@@ -26,7 +26,7 @@ This page will be updated with new features and commands as they become availabl
 | **Suppress browser keys** | Suppress or allow certain keys we use in UE, for example F5 to show shader complexity instead of refreshing the page. |
 | **AFK if Idle** | Timeout the connection if no input is detected for a period of time. |
 | **AFK timeout** | Allows you to specify the AFK timeout period. |
-
+| **Max Reconnects** | The maximum number of reconnects the application will attempt when a streamer disconnects. |
 
 ### UI
 | **Setting** | **Description** |
