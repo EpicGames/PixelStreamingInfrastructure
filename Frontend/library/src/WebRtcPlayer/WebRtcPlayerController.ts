@@ -19,7 +19,8 @@ import {
     Flags,
     ControlSchemeType,
     TextParameters,
-    OptionParameters
+    OptionParameters,
+    NumericParameters
 } from '../Config/Config';
 import {
     EncoderSettings,
@@ -101,6 +102,10 @@ export class WebRtcPlayerController {
     preferredCodec: string;
     peerConfig: RTCConfiguration;
     videoAvgQp: number;
+    shouldReconnect: boolean;
+    isReconnecting: boolean;
+    reconnectAttempt: number;
+    subscribedStream: string | null;
     signallingUrlBuilder: () => string;
 
     // if you override the disconnection message by calling the interface method setDisconnectMessageOverride
@@ -221,6 +226,11 @@ export class WebRtcPlayerController {
             this.setMouseInputEnabled(false);
             this.setKeyboardInputEnabled(false);
             this.setGamePadInputEnabled(false);
+
+            if(this.shouldReconnect) {
+                this.isReconnecting = true;
+                this.restartStreamAutomatically();
+            }
         });
 
         // set up the final webRtc player controller methods from within our application so a connection can be activated
@@ -247,16 +257,24 @@ export class WebRtcPlayerController {
         this.isUsingSFU = false;
         this.isQualityController = false;
         this.preferredCodec = '';
+        this.shouldReconnect = true;
+        this.isReconnecting = false;
+        this.reconnectAttempt = 0;
 
         this.config._addOnOptionSettingChangedListener(
             OptionParameters.StreamerId,
             (streamerid) => {
+                if(streamerid === "") {
+                    return;
+                }
+
                 // close the current peer connection and create a new one
                 this.peerConnectionController.peerConnection.close();
                 this.peerConnectionController.createPeerConnection(
                     this.peerConfig,
                     this.preferredCodec
                 );
+                this.subscribedStream = streamerid;
                 this.webSocketController.sendSubscribe(streamerid);
             }
         );
@@ -1304,45 +1322,75 @@ export class WebRtcPlayerController {
             6
         );
 
-        const settingOptions = [...messageStreamerList.ids]; // copy the original messageStreamerList.ids
-        settingOptions.unshift(''); // add an empty option at the top
-        this.config.setOptionSettingOptions(
-            OptionParameters.StreamerId,
-            settingOptions
-        );
-
-        const urlParams = new URLSearchParams(window.location.search);
-        let autoSelectedStreamerId: string | null = null;
-        if (messageStreamerList.ids.length == 1) {
-            // If there's only a single streamer, subscribe to it regardless of what is in the URL
-            autoSelectedStreamerId = messageStreamerList.ids[0];
-        } else if (
-            this.config.isFlagEnabled(Flags.PreferSFU) &&
-            messageStreamerList.ids.includes('SFU')
-        ) {
-            // If the SFU toggle is on and there's an SFU connected, subscribe to it regardless of what is in the URL
-            autoSelectedStreamerId = 'SFU';
-        } else if (
-            urlParams.has(OptionParameters.StreamerId) &&
-            messageStreamerList.ids.includes(
-                urlParams.get(OptionParameters.StreamerId)
-            )
-        ) {
-            // If there's a streamer ID in the URL and a streamer with this ID is connected, set it as the selected streamer
-            autoSelectedStreamerId = urlParams.get(OptionParameters.StreamerId);
-        }
-        if (autoSelectedStreamerId !== null) {
-            this.config.setOptionSettingValue(
+        if(this.isReconnecting) {
+            if(messageStreamerList.ids.includes(this.subscribedStream)) {
+                // If we're reconnecting and the previously subscribed stream has come back, resubscribe to it
+                this.isReconnecting = false;
+                this.reconnectAttempt = 0;
+                this.webSocketController.sendSubscribe(this.subscribedStream);
+            } else if(this.reconnectAttempt < this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts)) {
+                // Our previous stream hasn't come back, wait 2 seconds and request an updated stream list
+                this.reconnectAttempt++;
+                setTimeout(() => {
+                    this.webSocketController.requestStreamerList();
+                }, 2000)
+            } else {
+                // We've exhausted our reconnect attempts, return to main screen
+                this.reconnectAttempt = 0;
+                this.isReconnecting = false;
+                this.shouldReconnect = false;
+                this.webSocketController.close();
+                
+                this.config.setOptionSettingValue(
+                    OptionParameters.StreamerId,
+                    ""
+                );
+                this.config.setOptionSettingOptions(
+                    OptionParameters.StreamerId,
+                    []
+                );
+            }
+        } else {
+            const settingOptions = [...messageStreamerList.ids]; // copy the original messageStreamerList.ids
+            settingOptions.unshift(''); // add an empty option at the top
+            this.config.setOptionSettingOptions(
                 OptionParameters.StreamerId,
-                autoSelectedStreamerId
+                settingOptions
+            );
+
+            const urlParams = new URLSearchParams(window.location.search);
+            let autoSelectedStreamerId: string | null = null;
+            if (messageStreamerList.ids.length == 1) {
+                // If there's only a single streamer, subscribe to it regardless of what is in the URL
+                autoSelectedStreamerId = messageStreamerList.ids[0];
+            } else if (
+                this.config.isFlagEnabled(Flags.PreferSFU) &&
+                messageStreamerList.ids.includes('SFU')
+            ) {
+                // If the SFU toggle is on and there's an SFU connected, subscribe to it regardless of what is in the URL
+                autoSelectedStreamerId = 'SFU';
+            } else if (
+                urlParams.has(OptionParameters.StreamerId) &&
+                messageStreamerList.ids.includes(
+                    urlParams.get(OptionParameters.StreamerId)
+                )
+            ) {
+                // If there's a streamer ID in the URL and a streamer with this ID is connected, set it as the selected streamer
+                autoSelectedStreamerId = urlParams.get(OptionParameters.StreamerId);
+            }
+            if (autoSelectedStreamerId !== null) {
+                this.config.setOptionSettingValue(
+                    OptionParameters.StreamerId,
+                    autoSelectedStreamerId
+                );
+            }
+            this.pixelStreaming.dispatchEvent(
+                new StreamerListMessageEvent({
+                    messageStreamerList,
+                    autoSelectedStreamerId
+                })
             );
         }
-        this.pixelStreaming.dispatchEvent(
-            new StreamerListMessageEvent({
-                messageStreamerList,
-                autoSelectedStreamerId
-            })
-        );
     }
 
     /**
