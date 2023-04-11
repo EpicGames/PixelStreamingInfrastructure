@@ -227,8 +227,9 @@ export class WebRtcPlayerController {
             this.setKeyboardInputEnabled(false);
             this.setGamePadInputEnabled(false);
 
-            if(this.shouldReconnect) {
+            if(this.shouldReconnect && this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts) > 0) {
                 this.isReconnecting = true;
+                this.reconnectAttempt++;
                 this.restartStreamAutomatically();
             }
         });
