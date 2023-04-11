@@ -202,7 +202,7 @@ export class ConfigUI {
             psSettingsSection,
             this.numericParametersUi.get(NumericParameters.AFKTimeoutSecs)
         );
-		this.addSettingNumeric(
+        this.addSettingNumeric(
             psSettingsSection,
             this.numericParametersUi.get(NumericParameters.MaxReconnectAttempts)
         );
