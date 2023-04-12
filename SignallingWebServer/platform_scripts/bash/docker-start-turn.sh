@@ -20,7 +20,7 @@ turnusername="PixelStreamingUser"
 turnpassword="AnotherTURNintheroad"
 realm="PixelStreaming"
 process="turnserver"
-arguments="-c /turnconfig/turnserver.conf -p ${turnport} -r $realm -X $publicip -E $localip -L $localip --no-cli --no-tls --no-dtls --pidfile /var/run/turnserver.pid -f -a -v -u ${turnusername}:${turnpassword}"
+arguments="-c /turnconfig/turnserver.conf --allowed-peer-ip=$localip -p ${turnport} -r $realm -X $publicip -E $localip -L $localip --no-cli --no-tls --no-dtls --pidfile /var/run/turnserver.pid -f -a -v -u ${turnusername}:${turnpassword}"
 
 # Add arguments passed to script to arguments for executable
 arguments+=" ${cirruscmd}"
