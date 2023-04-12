@@ -176,7 +176,8 @@ describe('PixelStreaming', () => {
     });
 
     it('should disconnect and reconnect to signalling server if reconnect is called and connection is up', () => {
-        const config = new Config({ initialSettings: {ss: mockSignallingUrl, AutoConnect: true}});
+        // We explicitly set the max reconnect attempts to 0 to stop the auto-reconnect flow as that is tested separate
+        const config = new Config({ initialSettings: {ss: mockSignallingUrl, AutoConnect: true, MaxReconnectAttempts: 0}});
         const autoconnectedSpy = jest.fn();
         const pixelStreaming = new PixelStreaming(config);
         pixelStreaming.addEventListener("webRtcAutoConnect", autoconnectedSpy);
@@ -195,6 +196,56 @@ describe('PixelStreaming', () => {
         expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockSignallingUrl);
         expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledTimes(2);
         expect(autoconnectedSpy).toHaveBeenCalled();
+    });
+
+    it('should automatically reconnect and request streamer list N times on websocket close', () => {
+        const config = new Config({ initialSettings: {ss: mockSignallingUrl, AutoConnect: true, MaxReconnectAttempts: 3}});
+        const autoconnectedSpy = jest.fn();
+
+        const pixelStreaming = new PixelStreaming(config);
+        pixelStreaming.addEventListener("webRtcAutoConnect", autoconnectedSpy);
+
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockSignallingUrl);
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledTimes(1);
+        expect(webSocketSpyFunctions.closeSpy).not.toHaveBeenCalled();
+
+        pixelStreaming.disconnect();
+
+        expect(webSocketSpyFunctions.closeSpy).toHaveBeenCalled();
+
+        // wait 2 seconds
+        jest.advanceTimersByTime(2000);
+
+        // we should have attempted a reconnection
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockSignallingUrl);
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledTimes(2);
+        // Reconnect triggers the first list streamer message
+        triggerWebSocketOpen();
+        expect(webSocketSpyFunctions.sendSpy).toHaveBeenCalledWith(
+            expect.stringMatching(/"type":"listStreamers"/)
+        );
+        // We don't have a signalling server to respond with data so lets just fake a response with no streamers
+        triggerStreamerListMessage([]);
+        // Wait 2 seconds. This delay waits for the WebRtcPlayerController to realise the previously received list doesn't contain
+        // the streamer is was preiously subscribed to, so it'll request the list again
+        jest.advanceTimersByTime(2000);
+
+        // Same as above but repeated for the second call
+        expect(webSocketSpyFunctions.sendSpy).toHaveBeenCalledWith(
+            expect.stringMatching(/"type":"listStreamers"/)
+        );
+        triggerStreamerListMessage([]);
+        jest.advanceTimersByTime(2000);
+
+        // Expect the third call
+        expect(webSocketSpyFunctions.sendSpy).toHaveBeenCalledWith(
+            expect.stringMatching(/"type":"listStreamers"/)
+        );
+        triggerStreamerListMessage([]);
+        jest.advanceTimersByTime(2000);
+
+        // We should expect only 3 calls based on our config
+        expect(webSocketSpyFunctions.sendSpy).toHaveBeenCalledTimes(3);
     });
 
     it('should request streamer list when connected to the signalling server', () => {
