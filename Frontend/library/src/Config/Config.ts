@@ -53,6 +53,7 @@ export class NumericParameters {
     static WebRTCFPS = 'WebRTCFPS' as const;
     static WebRTCMinBitrate = 'WebRTCMinBitrate' as const;
     static WebRTCMaxBitrate = 'WebRTCMaxBitrate' as const;
+    static MaxReconnectAttempts = 'MaxReconnectAttempts' as const;
 }
 
 export type NumericParametersKeys = Exclude<
@@ -240,7 +241,7 @@ export class Config {
                 })(),
                 useUrlParams
             )
-        );
+        );	
 
         /**
          * Boolean parameters
@@ -386,7 +387,7 @@ export class Config {
                 'Either locked mouse, where the pointer is consumed by the video and locked to it, or hovering mouse, where the mouse is not consumed.',
                 false,
                 useUrlParams,
-				(isHoveringMouse: boolean, setting: SettingBase) => {
+                (isHoveringMouse: boolean, setting: SettingBase) => {
                     setting.label = `Control Scheme: ${isHoveringMouse ? 'Hovering' : 'Locked'} Mouse`;
                 }
             )
@@ -471,6 +472,19 @@ export class Config {
                 0 /*min*/,
                 600 /*max*/,
                 120 /*value*/,
+                useUrlParams
+            )
+        );
+
+        this.numericParameters.set(
+            NumericParameters.MaxReconnectAttempts,
+            new SettingNumber(
+                NumericParameters.MaxReconnectAttempts,
+                'Max Reconnects',
+                'Maximum number of reconnects the application will attempt when a streamer disconnects.',
+                0 /*min*/,
+                999 /*max*/,
+                3 /*value*/,
                 useUrlParams
             )
         );

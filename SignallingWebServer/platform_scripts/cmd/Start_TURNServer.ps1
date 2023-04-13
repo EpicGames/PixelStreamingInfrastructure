@@ -8,7 +8,7 @@ print_parameters
 #$LocalIp = Invoke-WebRequest -Uri "http://169.254.169.254/latest/meta-data/local-ipv4"
 $LocalIP = (Test-Connection -ComputerName (hostname) -Count 1  | Select IPV4Address).IPV4Address.IPAddressToString
 
-Write-Output "Private IP: $LocalIp"
+Write-Output "Private IP: $LocalIP"
 
 $TurnPort="19303"
 $Pos = $global:TurnServer.LastIndexOf(":")
@@ -24,7 +24,7 @@ $TurnUsername = "PixelStreamingUser"
 $TurnPassword = "AnotherTURNintheroad"
 $Realm = "PixelStreaming"
 $ProcessExe = ".\turnserver.exe"
-$Arguments = "-p $TurnPort -r $Realm -X $PublicIP -E $LocalIP -L $LocalIP --no-cli --no-tls --no-dtls --pidfile `"C:\coturn.pid`" -f -a -v -n -u $TurnUsername`:$TurnPassword"
+$Arguments = "-c ..\..\..\turnserver.conf --allowed-peer-ip=$LocalIP -p $TurnPort -r $Realm -X $PublicIP -E $LocalIP -L $LocalIP --no-cli --no-tls --no-dtls --pidfile `"C:\coturn.pid`" -f -a -v -u $TurnUsername`:$TurnPassword"
 
 # Add arguments passed to script to Arguments for executable
 $Arguments += $args
