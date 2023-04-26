@@ -42,8 +42,8 @@ export interface PixelStreamingOverrides {
  * this will likely be the core of your Pixel Streaming experience in terms of functionality.
  */
 export class PixelStreaming {
-    private _webRtcController: WebRtcPlayerController;
-    private _webXrController: WebXRController;
+    protected _webRtcController: WebRtcPlayerController;
+    protected _webXrController: WebXRController;
     /**
      * Configuration object. You can read or modify config through this object. Whenever
      * the configuration is changed, the library will emit a `settingsChanged` event.
