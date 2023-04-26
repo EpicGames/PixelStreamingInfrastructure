@@ -4,7 +4,7 @@ In its current state, the microphone feature in Pixel Streaming is designed to p
 
 ## Enabling microphone input for Pixel Streaming in UE projects
 
-Once you’ve enabled the Pixel Streaming plugin in your project, you’ll need to add the Pixel Streaming Audio component to your scene. It can be attached to any actor or asset in the scene, following these steps:
+Once you’ve enabled the Pixel Streaming plugin in your project, you’ll need to add the `Pixel Streaming Audio` component to your scene. It can be attached to any actor or asset in the scene, following these steps:
 
 - Select any enabled actor or asset in your scene;
 - Click the *Add* button, located in its details panel;
