@@ -4,6 +4,7 @@ const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 
 const devCommon = {
+  watch: true,
   mode: 'development',
   devtool: 'inline-source-map',
   devServer: {
