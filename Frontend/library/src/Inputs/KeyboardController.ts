@@ -153,12 +153,16 @@ export class KeyboardController {
         const keyDownHandler = (ev: KeyboardEvent) => this.handleOnKeyDown(ev);
         const keyUpHandler = (ev: KeyboardEvent) => this.handleOnKeyUp(ev);
         const keyPressHandler = (ev: KeyboardEvent) => this.handleOnKeyPress(ev);
+        const handleOnBlur = () => this.handleOnBlur();
 
+        
         document.addEventListener("keydown", keyDownHandler);
         document.addEventListener("keyup", keyUpHandler);
-
+        
         //This has been deprecated as at Jun 13 2021
         document.addEventListener("keypress", keyPressHandler);
+        
+        window.addEventListener("blur", handleOnBlur)
 
         this.keyboardEventListenerTracker.addUnregisterCallback(
             () => document.removeEventListener("keydown", keyDownHandler)
@@ -169,6 +173,9 @@ export class KeyboardController {
         this.keyboardEventListenerTracker.addUnregisterCallback(
             () => document.removeEventListener("keypress", keyPressHandler)
         );
+        this.keyboardEventListenerTracker.addUnregisterCallback(
+            () => document.removeEventListener("blur", handleOnBlur)
+        );
     }
 
     /**
@@ -178,6 +185,24 @@ export class KeyboardController {
         this.keyboardEventListenerTracker.unregisterAll();
     }
 
+    /**
+     * Unregisters activeKeys on current document is out of focus (switch between tabs etc)
+    */
+    handleOnBlur() {
+        const activeKeys = this.activeKeysProvider.getActiveKeys();
+
+        activeKeys.forEach(keyCode => {
+            Logger.Log(Logger.GetStackTrace(), `Unregister key ${keyCode}`, 6);
+              
+            const toStreamerHandlers =
+                this.toStreamerMessagesProvider.toStreamerHandlers;
+            toStreamerHandlers.get('KeyUp')([
+                keyCode,
+                0
+            ]);
+        })
+    }
+    
     /**
      * Handles When a key is down
      * @param keyboardEvent - Keyboard event
