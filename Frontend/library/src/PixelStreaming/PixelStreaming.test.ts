@@ -209,7 +209,7 @@ describe('PixelStreaming', () => {
         expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledTimes(1);
         expect(webSocketSpyFunctions.closeSpy).not.toHaveBeenCalled();
 
-        pixelStreaming.disconnect();
+        pixelStreaming.webSocketController.close();
 
         expect(webSocketSpyFunctions.closeSpy).toHaveBeenCalled();
 
