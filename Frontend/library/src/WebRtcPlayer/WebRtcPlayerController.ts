@@ -1589,6 +1589,8 @@ export class WebRtcPlayerController {
      * Close the Connection to the signaling server
      */
     closeSignalingServer() {
+        // We explicitly called close, therefore we don't want to trigger auto reconnect
+        this.shouldReconnect = false;
         this.webSocketController?.close();
     }
 
