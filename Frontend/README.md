@@ -9,6 +9,7 @@ The frontend consists of two packages:
 
 
 ## Docs
+- [The Settings Panel](Docs/Settings%20Panel.md)
 - [Customizing the Player Webpage](Docs/Customizing%20the%20Player%20Webpage.md)
 - [HTML Page Requirements](Docs/HTML%20Page%20Requirements.md)
   - [Player File Location and URL](Docs/HTML%20Page%20Requirements.md)
