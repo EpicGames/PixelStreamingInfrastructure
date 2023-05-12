@@ -4,7 +4,7 @@ How to use files in this directory:
 
 - Run a local instance of the Cirrus server by using the .\run_local.ps1 script
 
-- Use the following scripts to run locally or in your cloud instance:
+- Use the following scripts to run locally or in your cloud instance (note that TURN server is not expected to work locally due to the nature of its application):
  - Start_SignallingServer.ps1 - Start only the Signalling (STUN) server
  - Start_TURNServer.ps1 - Start only the TURN server
  - Start_WithTURN_SignallingServer.ps1 - Start a TURN server and the Cirrus server together
