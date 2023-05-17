@@ -76,6 +76,8 @@ export class AggregatedStats {
                     break;
                 case 'media-source':
                     break;
+                case 'media-playout':
+                    break;
                 case 'outbound-rtp':
                     break;
                 case 'peer-connection':
