@@ -4,7 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
     Config,
     AllSettings,
-    PixelStreaming
+    PixelStreaming,
+    DataChannelOpenEvent
 } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
 
 export interface PixelStreamingWrapperProps {
@@ -48,6 +49,26 @@ export const PixelStreamingWrapper = ({
             };
         }
     }, []);
+
+    useEffect(() => {
+        if (!pixelStreaming) return;
+        pixelStreaming.addEventListener('dataChannelOpen', (ev) => {
+            console.log(`data channel open, added listener: ${ev.data.label}`);
+
+            // setTimeout(() => {
+                console.log('EMIT ui interaction');
+                pixelStreaming.emitUIInteraction({
+                    type: 'authDataReceived',
+                    value: {
+                        token: 'stringData',
+                        userId: 'userId',
+                        room: 'roomId'
+                    },
+                });
+            // }, 500);
+            
+        });
+    }, [pixelStreaming]);
 
     return (
         <div
