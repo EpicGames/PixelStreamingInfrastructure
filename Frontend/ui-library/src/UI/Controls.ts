@@ -43,10 +43,10 @@ export class Controls {
         if (!config || shouldCreateButton(config.statsButtonType)) {
             this.statsIcon = new StatsIcon();
         }
-        if (!config || shouldCreateButton(config.fullscreenButtonType)){
+        if (!config || shouldCreateButton(config.settingsButtonType)){
             this.settingsIcon = new SettingsIcon();
         }
-        if (!config || shouldCreateButton(config.settingsButtonType)) {
+        if (!config || shouldCreateButton(config.fullscreenButtonType)) {
             this.fullscreenIcon = new FullScreenIcon();
         }
         if (!config || shouldCreateButton(config.xrIconType)){
