@@ -210,7 +210,7 @@ export class VideoPlayer {
         }
 
         const now = new Date().getTime();
-        if (now - this.lastTimeResized > 1000) {
+        if (now - this.lastTimeResized > 300) {
             const videoElementParent = this.getVideoParentElement();
             if (!videoElementParent) {
                 return;
@@ -230,8 +230,8 @@ export class VideoPlayer {
             );
             clearTimeout(this.resizeTimeoutHandle);
             this.resizeTimeoutHandle = window.setTimeout(
-                () => this.updateVideoStreamSize,
-                1000
+                () => this.updateVideoStreamSize(),
+                100
             );
         }
     }
