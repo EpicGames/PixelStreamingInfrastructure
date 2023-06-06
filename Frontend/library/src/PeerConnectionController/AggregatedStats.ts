@@ -19,7 +19,7 @@ import { Logger } from '../Logger/Logger';
  * The Aggregated Stats that is generated from the RTC Stats Report
  */
 
-type RTCStatsTypePS = RTCStatsType | 'stream';
+type RTCStatsTypePS = RTCStatsType | 'stream' | 'media-playout';
 export class AggregatedStats {
     inboundVideoStats: InboundVideoStats;
     inboundAudioStats: InboundAudioStats;
@@ -75,6 +75,8 @@ export class AggregatedStats {
                     this.handleLocalCandidate(stat);
                     break;
                 case 'media-source':
+                    break;
+                case 'media-playout':
                     break;
                 case 'outbound-rtp':
                     break;
