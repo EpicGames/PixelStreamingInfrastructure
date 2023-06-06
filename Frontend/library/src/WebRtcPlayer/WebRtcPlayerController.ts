@@ -1857,10 +1857,10 @@ export class WebRtcPlayerController {
                 parsedInitialSettings.PixelStreaming;
         }
 
-        if (parsedInitialSettings.ConfigOptions) {
+        if (parsedInitialSettings.ConfigOptions && !!parsedInitialSettings.ConfigOptions.DefaultToHover) {
             this.config.setFlagEnabled(
                 Flags.HoveringMouseMode,
-                !!parsedInitialSettings.ConfigOptions.DefaultToHover
+                true
             );
         }
 
