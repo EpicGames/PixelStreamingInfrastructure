@@ -820,7 +820,7 @@ if (config.UseMatchmaker) {
 		message = {
 			type: 'connect',
 			address: typeof serverPublicIp === 'undefined' ? '127.0.0.1' : serverPublicIp,
-			port: httpPort,
+			port: config.UseHTTPS ? httpsPort : httpPort,
 			ready: streamers.size > 0,
 			playerConnected: playerConnected
 		};
