@@ -70,10 +70,11 @@ This repository contains the following in branches that track Unreal Engine vers
 | Branch | Status |
 |--------|--------|
 |[Master](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/master)| Dev |
-|[UE5.2](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.2)| Pre-release |
-|[UE5.1](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.1)| Current |
-|[UE5.0](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.0)| Supported |
-|[UE4.27](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.27)| End of life |
+|[UE5.3](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.3)| Pre-release |
+|[UE5.2](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.2)| Current |
+|[UE5.1](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.1)| Supported |
+|[UE5.0](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.0)| End of life |
+|[UE4.27](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.27)| Unsupported |
 |[UE4.26](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.26)| Unsupported |
 
 | Legend | Meaning |
