@@ -34,7 +34,8 @@ We release a number of different things under this repository, currently they ar
 
 The following container images are built from this repository:
 
-- [ghcr.io/epicgames/pixel-streaming-signalling-server](https://github.com/orgs/EpicGames/packages/container/package/pixel-streaming-signalling-server) (since Unreal Engine 5.1)
+- [ghcr.io/epicgames/pixel-streaming-signalling-server](https://github.com/orgs/EpicGames/packages/container/package/pixel-streaming-signalling-server) (since Unreal Engine 5.1)  
+( This link requires you to join Epic's Github org )
 
 ### NPM Packages
 The following are `unofficial` NPM packages (official ones coming soon):
