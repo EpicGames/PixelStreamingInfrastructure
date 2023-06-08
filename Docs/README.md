@@ -1,6 +1,5 @@
 # General Documentation and Information
-This page is designed to be the first point of reference for any documentation that covers general, non-specific Pixel Streaming information.
-It will also serve as a Table of Contents, allowing you to access any other documentation in this repository.
+Welcome to the general documentation page for Pixel Streaming. This page serves as the central hub for accessing various documentation related to Pixel Streaming. It also functions as a Table of Contents, providing easy navigation to different sections of this repository.
 
 ## Documentation
 Use these links to navigate to other documentation in the infrastructure.
