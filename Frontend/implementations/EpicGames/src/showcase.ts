@@ -290,6 +290,13 @@ class Showcase {
 		statgpuBtn.innerText = "stat pixelstreaming";
 		consoleCmdBtnsContainer.appendChild(statgpuBtn);
 
+		//stat pixelStreamingGraphs
+		const statGraphBtn = document.createElement("button");
+		statGraphBtn.classList.add("btn-flat");
+		statGraphBtn.onclick = () => { this._pixelStreaming.emitConsoleCommand("stat pixelstreaminggraphs"); }
+		statGraphBtn.innerText = "stat pixelstreaminggraphs";
+		consoleCmdBtnsContainer.appendChild(statGraphBtn);
+
 	}
 
 }

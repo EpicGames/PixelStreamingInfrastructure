@@ -1857,7 +1857,7 @@ export class WebRtcPlayerController {
                 parsedInitialSettings.PixelStreaming;
         }
 
-        if (parsedInitialSettings.ConfigOptions) {
+        if (parsedInitialSettings.ConfigOptions && parsedInitialSettings.ConfigOptions.DefaultToHover !== undefined) {
             this.config.setFlagEnabled(
                 Flags.HoveringMouseMode,
                 !!parsedInitialSettings.ConfigOptions.DefaultToHover
