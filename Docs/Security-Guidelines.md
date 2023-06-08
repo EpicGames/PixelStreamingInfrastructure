@@ -1,6 +1,6 @@
 # Security Guidelines
 
-To enhance the security of your Pixel Streaming deployments, it is essential to implement additional measures for protection. This documentation page aims to provide you with valuable recommendations and suggestions to bolster the security of your deployments. By following these guidelines, you can significantly enhance the overall security posture and safeguard your Pixel Streaming environment effectively.
+To enhance the security of your Pixel Streaming deployments, it is wise to implement additional measures for protection. This documentation page aims to provide you with valuable recommendations and suggestions to bolster the security of your deployments. By following these guidelines, you can significantly enhance the overall security posture and safeguard your Pixel Streaming environment effectively.
 
 ## Tips to Improve Security
 Please note that implementing the following suggestions may introduce additional setup complexity and could result in increased latency.
