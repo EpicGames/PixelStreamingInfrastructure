@@ -3,7 +3,7 @@
 import type {
     SettingText,
     TextParametersIds
-} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
 import { SettingUIBase } from './SettingUIBase';
 
 export class SettingUIText<
