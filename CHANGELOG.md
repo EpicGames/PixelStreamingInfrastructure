@@ -8,7 +8,6 @@ As a reminder each UE-X branch/tag in this repository corresponds to a version o
 Coming soon...
 
 ## [UE 5.2 (Current)](https://github.com/EpicGames/PixelStreamingInfrastructure/commits/UE5.2)
-### Bug fixes
 
 ### Features
 - Added minimal sample React implementation by @hmuurine in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/159
