@@ -2,7 +2,7 @@ name: Releases
 
 on: 
   push:
-    branches: ['UE5.2']
+    branches: ['UE5.3']
     paths: ['RELEASE_VERSION']
 
 jobs:
