@@ -30,7 +30,7 @@ declare global {
  */
 export class FullScreenIconBase {
     isFullscreen = false;
-    fullscreenElement: HTMLElement;
+    fullscreenElement: HTMLElement | HTMLVideoElement;
 
     _rootElement: HTMLElement;
 
