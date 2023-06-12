@@ -14,4 +14,4 @@ A plugin library that can be optionally applied on top of the core library to cr
 
 
 ### Adding it to your project
-`npm i @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2`
+`npm i @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.3`

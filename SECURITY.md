@@ -6,10 +6,10 @@ These versions are currently being supported with security updates.
 
 | Version | Supported          |
 | ------- | ------------------ |
+| 5.3     | :white_check_mark: |
 | 5.2     | :white_check_mark: |
 | 5.1     | :white_check_mark: |
 | 5.0     | :white_check_mark: |
-| 4.27    | :white_check_mark: |
 
 ## Reporting a Vulnerability
 
