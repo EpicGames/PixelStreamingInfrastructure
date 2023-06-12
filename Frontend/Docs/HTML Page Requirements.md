@@ -32,8 +32,6 @@ You have a few options for where you can place your custom HTML player page, an
 *   You can customize the `HomepageFile` parameter for the Signaling and Web Server, and set the path to the filename of your custom HTML player page relative to the [Frontend implementations source folder](/Frontend/implementations/src). It will then be accessible when you access the IP address or hostname of the computer running the Signaling and Web Server.
 *   You can also use the **AdditionalRoutes** parameter for the Signaling and Web Server to customize the mapping between URL paths and local folders on your computer.
 
-For additional details on these parameters, see also the [Pixel Streaming Reference](https://docs.unrealengine.com/5.2/en-US/unreal-engine-pixel-streaming-reference/).
-
 ### Building the Frontend
-When starting the infrastructure Signalling Server, the Frontend should be built automatically. If not, you can run the [`setup script`](/SignallingWebServer/platform_scripts/) for your platform to do so. If you subsequently make any changes to your local copy of the frontend, you will need to run the script again, appending `--build` as an argument to force a rebuild.
+When starting the infrastructure Signalling Server, the Frontend should be built automatically. If not, you can run the [`setup_frontend`](/SignallingWebServer/platform_scripts/) script for your platform to do so. If you subsequently make any changes to your local copy of the frontend, you will need to run the script again, appending `--build` as an argument to force a rebuild.
 
