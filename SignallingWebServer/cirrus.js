@@ -284,7 +284,7 @@ if (config.UseHTTPS) {
 	});
 }
 
-console.logColor(logging.Cyan, `Running Cirrus - The Pixel Streaming reference implementation signalling server for Unreal Engine 5.2.`);
+console.logColor(logging.Cyan, `Running Cirrus - The Pixel Streaming reference implementation signalling server for Unreal Engine 5.3.`);
 
 let nextPlayerId = 1;
 
@@ -380,9 +380,9 @@ function logOutgoing(destName, msg) {
 
 function logForward(srcName, destName, msg) {
 	if (config.LogVerbose)
-		console.logColor(logging.Green, "\x1b[37m%s -> %s\x1b[32m %s", srcName, destName, JSON.stringify(msg));
+		console.logColor(logging.Cyan, "\x1b[37m%s -> %s\x1b[36m %s", srcName, destName, JSON.stringify(msg));
 	else
-		console.logColor(logging.Green, "\x1b[37m%s -> %s\x1b[32m %s", srcName, destName, msg.type);
+		console.logColor(logging.Cyan, "\x1b[37m%s -> %s\x1b[36m %s", srcName, destName, msg.type);
 }
 
 let WebSocket = require('ws');
@@ -475,6 +475,8 @@ function forwardStreamerMessageToPlayer(streamer, msg) {
 		delete msg.playerId;
 		logForward(streamer.id, playerId, msg);
 		player.sendTo(msg);
+	} else {
+		console.warning("No playerId specified, cannot forward message: %s", msg);
 	}
 }
 
