@@ -1,4 +1,4 @@
-name: Publish the Signalling Server container image
+name: Publish Cirrus container
 
 on:
   push:
