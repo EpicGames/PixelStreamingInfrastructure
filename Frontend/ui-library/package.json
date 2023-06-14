@@ -1,6 +1,6 @@
 {
     "name": "@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "description": "Reference frontend UI library for Pixel Streaming - gives the stock look and feel. ",
     "main": "dist/lib-pixelstreamingfrontend-ui.js",
     "module": "dist/lib-pixelstreamingfrontend-ui.esm.js",
