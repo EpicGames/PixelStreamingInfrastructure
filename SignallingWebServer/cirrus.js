@@ -9,11 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const querystring = require('querystring');
 const bodyParser = require('body-parser');
-const WebSocket = require('ws');
 const logging = require('./modules/logging.js');
-const Logger = require('./modules/logger.js');
-const Matchmaker = require('./modules/matchmaker.js');
-const Player = require('./modules/player.js');
 logging.RegisterConsoleLogger();
 
 // Command line argument --configFile needs to be checked before loading the config, all other command line arguments are dealt with through the config object
@@ -45,7 +41,6 @@ const argv = require('yargs').argv;
 var configFile = (typeof argv.configFile != 'undefined') ? argv.configFile.toString() : path.join(__dirname, 'config.json');
 console.log(`configFile ${configFile}`);
 const config = require('./modules/config.js').init(configFile, defaultConfig);
-const logger = new Logger(config)
 
 if (config.LogToFile) {
 	logging.RegisterFileLogger('./logs/');
@@ -79,13 +74,12 @@ if (config.UseAuthentication && config.UseHTTPS) {
 
 const helmet = require('helmet');
 var hsts = require('hsts');
+var net = require('net');
 
 var FRONTEND_WEBSERVER = 'https://localhost';
-var httpPort, httpsPort;
-
 if (config.UseFrontend) {
-	httpPort = 3000;
-	httpsPort = 8000;
+	var httpPort = 3000;
+	var httpsPort = 8000;
 
 	if (config.UseHTTPS && config.DisableSSLCert) {
 		//Required for self signed certs otherwise just get an error back when sending request to frontend see https://stackoverflow.com/a/35633993
@@ -96,14 +90,13 @@ if (config.UseFrontend) {
 	const httpsClient = require('./modules/httpsClient.js');
 	var webRequest = new httpsClient();
 } else {
-	httpPort = config.HttpPort;
-	httpsPort = config.HttpsPort;
+	var httpPort = config.HttpPort;
+	var httpsPort = config.HttpsPort;
 }
 
 var streamerPort = config.StreamerPort; // port to listen to Streamer connections
 var sfuPort = config.SFUPort;
 
-var matchmaker;
 var matchmakerAddress = '127.0.0.1';
 var matchmakerPort = 9999;
 var matchmakerRetryInterval = 5;
@@ -295,19 +288,104 @@ console.logColor(logging.Cyan, `Running Cirrus - The Pixel Streaming reference i
 
 let nextPlayerId = 1;
 
+const PlayerType = { Regular: 0, SFU: 1 };
+
+class Player {
+	constructor(id, ws, type, browserSendOffer) {
+		this.id = id;
+		this.ws = ws;
+		this.type = type;
+		this.browserSendOffer = browserSendOffer;
+	}
+
+	subscribe(streamerId) {
+		if (!streamers.has(streamerId)) {
+			console.error(`subscribe: Player ${this.id} tried to subscribe to a non-existent streamer ${streamerId}`);
+			return;
+		}
+		this.streamerId = streamerId;
+		const msg = { type: 'playerConnected', playerId: this.id, dataChannel: true, sfu: this.type == PlayerType.SFU, sendOffer: !this.browserSendOffer };
+		logOutgoing(this.streamerId, msg);
+		this.sendFrom(msg);
+	}
+
+	unsubscribe() {
+		if (this.streamerId && streamers.has(this.streamerId)) {
+			const msg = { type: 'playerDisconnected', playerId: this.id };
+			logOutgoing(this.streamerId, msg);
+			this.sendFrom(msg);
+		}
+		this.streamerId = null;
+	}
+
+	sendFrom(message) {
+		if (!this.streamerId) {
+			if(streamers.size > 0) {
+				this.streamerId = streamers.entries().next().value[0];
+				console.logColor(logging.Orange, `Player ${this.id} attempted to send an outgoing message without having subscribed first. Defaulting to ${this.streamerId}`);
+			} else {
+				console.logColor(logging.Orange, `Player ${this.id} attempted to send an outgoing message without having subscribed first. No streamer connected so this message isn't going anywhere!`)
+				return;
+			}
+		}
+
+		// normally we want to indicate what player this message came from
+		// but in some instances we might already have set this (streamerDataChannels) due to poor choices
+		if (!message.playerId) {
+			message.playerId = this.id;
+		}
+		const msgString = JSON.stringify(message);
+
+		let streamer = streamers.get(this.streamerId);
+		if (!streamer) {
+			console.error(`sendFrom: Player ${this.id} subscribed to non-existent streamer: ${this.streamerId}`);
+		} else {
+			streamer.ws.send(msgString);
+		}
+	}
+
+	sendTo(message) {
+		const msgString = JSON.stringify(message);
+		this.ws.send(msgString);
+	}
+};
+
 let streamers = new Map();		// streamerId <-> streamer socket
 let players = new Map(); 		// playerId <-> player, where player is either a web-browser or a native webrtc player
 const SFUPlayerId = "SFU";
 const LegacyStreamerId = "__LEGACY__"; // old streamers that dont know how to ID will be assigned this id.
 
 function sfuIsConnected() {
-	const sfuPlayer = getSFU();
+	const sfuPlayer = players.get(SFUPlayerId);
 	return sfuPlayer && sfuPlayer.ws && sfuPlayer.ws.readyState == 1;
 }
 
 function getSFU() {
 	return players.get(SFUPlayerId);
 }
+
+function logIncoming(sourceName, msg) {
+	if (config.LogVerbose)
+		console.logColor(logging.Blue, "\x1b[37m%s ->\x1b[34m %s", sourceName, JSON.stringify(msg));
+	else
+		console.logColor(logging.Blue, "\x1b[37m%s ->\x1b[34m %s", sourceName, msg.type);
+}
+
+function logOutgoing(destName, msg) {
+	if (config.LogVerbose)
+		console.logColor(logging.Green, "\x1b[37m%s <-\x1b[32m %s", destName, JSON.stringify(msg));
+	else
+		console.logColor(logging.Green, "\x1b[37m%s <-\x1b[32m %s", destName, msg.type);
+}
+
+function logForward(srcName, destName, msg) {
+	if (config.LogVerbose)
+		console.logColor(logging.Cyan, "\x1b[37m%s -> %s\x1b[36m %s", srcName, destName, JSON.stringify(msg));
+	else
+		console.logColor(logging.Cyan, "\x1b[37m%s -> %s\x1b[36m %s", srcName, destName, msg.type);
+}
+
+let WebSocket = require('ws');
 
 let sfuMessageHandlers = new Map();
 let playerMessageHandlers = new Map();
@@ -336,21 +414,21 @@ function onStreamerDisconnected(streamer) {
 	if (!streamers.has(streamer.id)) {
 		console.error(`Disconnecting streamer ${streamer.id} does not exist.`);
 	} else {
+		sendStreamerDisconnectedToMatchmaker();
 		let sfuPlayer = getSFU();
 		if (sfuPlayer) {
 			const msg = { type: "streamerDisconnected" };
-			logger.logOutgoing(sfuPlayer.id, msg);
+			logOutgoing(sfuPlayer.id, msg);
 			sfuPlayer.sendTo(msg);
 			disconnectAllPlayers(sfuPlayer.id);
 		}
-		matchmaker?.sendStreamerDisconnected();
 		disconnectAllPlayers(streamer.id);
 		streamers.delete(streamer.id);
 	}
 }
 
 function onStreamerMessageId(streamer, msg) {
-	logger.logIncoming(streamer.id, msg);
+	logIncoming(streamer.id, msg);
 
 	let streamerId = msg.id;
 	registerStreamer(streamerId, streamer);
@@ -366,14 +444,14 @@ function onStreamerMessageId(streamer, msg) {
 }
 
 function onStreamerMessagePing(streamer, msg) {
-	logger.logIncoming(streamer.id, msg);
+	logIncoming(streamer.id, msg);
 
 	const pongMsg = JSON.stringify({ type: "pong", time: msg.time});
 	streamer.ws.send(pongMsg);
 }
 
 function onStreamerMessageDisconnectPlayer(streamer, msg) {
-	logger.logIncoming(streamer.id, msg);
+	logIncoming(streamer.id, msg);
 
 	const playerId = getPlayerIdFromMessage(msg);
 	const player = players.get(playerId);
@@ -385,7 +463,7 @@ function onStreamerMessageDisconnectPlayer(streamer, msg) {
 function onStreamerMessageLayerPreference(streamer, msg) {
 	let sfuPlayer = getSFU();
 	if (sfuPlayer) {
-		logger.logOutgoing(sfuPlayer.id, msg);
+		logOutgoing(sfuPlayer.id, msg);
 		sfuPlayer.sendTo(msg);
 	}
 }
@@ -395,7 +473,7 @@ function forwardStreamerMessageToPlayer(streamer, msg) {
 	const player = players.get(playerId);
 	if (player) {
 		delete msg.playerId;
-		logger.logForward(streamer.id, playerId, msg);
+		logForward(streamer.id, playerId, msg);
 		player.sendTo(msg);
 	} else {
 		console.warning("No playerId specified, cannot forward message: %s", msg);
@@ -415,11 +493,9 @@ console.logColor(logging.Green, `WebSocket listening for Streamer connections on
 let streamerServer = new WebSocket.Server({ port: streamerPort, backlog: 1 });
 streamerServer.on('connection', function (ws, req) {
 	console.logColor(logging.Green, `Streamer connected: ${req.connection.remoteAddress}`);
+	sendStreamerConnectedToMatchmaker();
 
 	let streamer = { ws: ws };
-
-	matchmaker?.setStreamerReadyState(streamer.readyState);
-	matchmaker?.sendStreamerConnected();
 
 	ws.on('message', (msgRaw) => {
 		var msg;
@@ -462,7 +538,7 @@ streamerServer.on('connection', function (ws, req) {
 
 	// request id
 	const msg = { type: "identify" };
-	logger.logOutgoing("unknown", msg);
+	logOutgoing("unknown", msg);
 	ws.send(JSON.stringify(msg));
 
 	registerStreamer(LegacyStreamerId, streamer);
@@ -472,7 +548,7 @@ function forwardSFUMessageToPlayer(msg) {
 	const playerId = getPlayerIdFromMessage(msg);
 	const player = players.get(playerId);
 	if (player) {
-		logger.logForward(SFUPlayerId, playerId, msg);
+		logForward(SFUPlayerId, playerId, msg);
 		player.sendTo(msg);
 	}
 }
@@ -480,7 +556,7 @@ function forwardSFUMessageToPlayer(msg) {
 function forwardSFUMessageToStreamer(msg) {
 	const sfuPlayer = getSFU();
 	if (sfuPlayer) {
-		logger.logForward(SFUPlayerId, sfuPlayer.streamerId, msg);
+		logForward(SFUPlayerId, sfuPlayer.streamerId, msg);
 		msg.sfuId = SFUPlayerId;
 		sfuPlayer.sendFrom(msg);
 	}
@@ -491,7 +567,7 @@ function onPeerDataChannelsSFUMessage(msg) {
 	const playerId = getPlayerIdFromMessage(msg);
 	const player = players.get(playerId);
 	if (player) {
-		logger.logForward(SFUPlayerId, playerId, msg);
+		logForward(SFUPlayerId, playerId, msg);
 		player.sendTo(msg);
 		player.datachannel = true;
 	}
@@ -560,7 +636,7 @@ sfuServer.on('connection', function (ws, req) {
 		}
 	});
 
-	let sfuPlayer = new Player(SFUPlayerId, ws, Player.Type.SFU, false, streamers, logger);
+	let sfuPlayer = new Player(SFUPlayerId, ws, PlayerType.SFU, false);
 	players.set(SFUPlayerId, sfuPlayer);
 	console.logColor(logging.Green, `SFU (${req.connection.remoteAddress}) connected `);
 
@@ -578,19 +654,19 @@ let playerCount = 0;
 
 function sendPlayersCount() {
 	const msg = { type: 'playerCount', count: players.size };
-	logger.logOutgoing("[players]", msg);
+	logOutgoing("[players]", msg);
 	for (let player of players.values()) {
 		player.sendTo(msg);
 	}
 }
 
 function onPlayerMessageSubscribe(player, msg) {
-	logger.logIncoming(player.id, msg);
+	logIncoming(player.id, msg);
 	player.subscribe(msg.streamerId);
 }
 
 function onPlayerMessageUnsubscribe(player, msg) {
-	logger.logIncoming(player.id, msg);
+	logIncoming(player.id, msg);
 	player.unsubscribe();
 }
 
@@ -599,19 +675,19 @@ function onPlayerMessageStats(player, msg) {
 }
 
 function onPlayerMessageListStreamers(player, msg) {
-	logger.logIncoming(player.id, msg);
+	logIncoming(player.id, msg);
 
 	let reply = { type: 'streamerList', ids: [] };
 	for (let [streamerId, streamer] of streamers) {
 		reply.ids.push(streamerId);
 	}
 
-	logger.logOutgoing(player.id, reply);
+	logOutgoing(player.id, reply);
 	player.sendTo(reply);
 }
 
 function forwardPlayerMessage(player, msg) {
-	logger.logForward(player.id, player.streamerId, msg);
+	logForward(player.id, player.streamerId, msg);
 	player.sendFrom(msg);
 }
 
@@ -622,7 +698,7 @@ function onPlayerDisconnected(playerId) {
 	--playerCount;
 	sendPlayersCount();
 	sendPlayerDisconnectedToFrontend();
-	matchmaker?.sendPlayerDisconnected();
+	sendPlayerDisconnectedToMatchmaker();
 }
 
 playerMessageHandlers.set('subscribe', onPlayerMessageSubscribe);
@@ -654,9 +730,8 @@ playerServer.on('connection', function (ws, req) {
 	++playerCount;
 	let playerId = sanitizePlayerId(nextPlayerId++);
 	console.logColor(logging.Green, `player ${playerId} (${req.connection.remoteAddress}) connected`);
-	let player = new Player(playerId, ws, Player.Type.Regular, browserSendOffer, streamers, logger);
+	let player = new Player(playerId, ws, PlayerType.Regular, browserSendOffer);
 	players.set(playerId, player);
-	matchmaker?.setPlayers(players);
 
 	ws.on('message', (msgRaw) =>{
 		var msg;
@@ -702,7 +777,7 @@ playerServer.on('connection', function (ws, req) {
 	});
 
 	sendPlayerConnectedToFrontend();
-	matchmaker?.sendPlayerConnected();
+	sendPlayerConnectedToMatchmaker();
 	player.ws.send(JSON.stringify(clientConfig));
 	sendPlayersCount();
 });
@@ -728,9 +803,74 @@ function disconnectAllPlayers(streamerId) {
  */
 
 if (config.UseMatchmaker) {
-	matchmaker = new Matchmaker(matchmakerPort, matchmakerAddress, matchmakerRetryInterval, serverPublicIp, config.UseHTTPS ? httpsPort : httpPort);
-	matchmaker.connect();
-	matchmaker.registerKeepAlive(matchmakerKeepAliveInterval);
+	var matchmaker = new net.Socket();
+
+	matchmaker.on('connect', function() {
+		console.log(`Cirrus connected to Matchmaker ${matchmakerAddress}:${matchmakerPort}`);
+
+		// message.playerConnected is a new variable sent from the SS to help track whether or not a player 
+		// is already connected when a 'connect' message is sent (i.e., reconnect). This happens when the MM
+		// and the SS get disconnected unexpectedly (was happening often at scale for some reason).
+		var playerConnected = false;
+
+		// Set the playerConnected flag to tell the MM if there is already a player active (i.e., don't send a new one here)
+		if( players && players.size > 0) {
+			playerConnected = true;
+		}
+
+		// Add the new playerConnected flag to the message body to the MM
+		message = {
+			type: 'connect',
+			address: typeof serverPublicIp === 'undefined' ? '127.0.0.1' : serverPublicIp,
+			port: config.UseHTTPS ? httpsPort : httpPort,
+			ready: streamers.size > 0,
+			playerConnected: playerConnected
+		};
+
+		matchmaker.write(JSON.stringify(message));
+	});
+
+	matchmaker.on('error', (err) => {
+		console.log(`Matchmaker connection error ${JSON.stringify(err)}`);
+	});
+
+	matchmaker.on('end', () => {
+		console.log('Matchmaker connection ended');
+	});
+
+	matchmaker.on('close', (hadError) => {
+		console.logColor(logging.Blue, 'Setting Keep Alive to true');
+        matchmaker.setKeepAlive(true, 60000); // Keeps it alive for 60 seconds
+		
+		console.log(`Matchmaker connection closed (hadError=${hadError})`);
+
+		reconnect();
+	});
+
+	// Attempt to connect to the Matchmaker
+	function connect() {
+		matchmaker.connect(matchmakerPort, matchmakerAddress);
+	}
+
+	// Try to reconnect to the Matchmaker after a given period of time
+	function reconnect() {
+		console.log(`Try reconnect to Matchmaker in ${matchmakerRetryInterval} seconds`)
+		setTimeout(function() {
+			connect();
+		}, matchmakerRetryInterval * 1000);
+	}
+
+	function registerMMKeepAlive() {
+		setInterval(function() {
+			message = {
+				type: 'ping'
+			};
+			matchmaker.write(JSON.stringify(message));
+		}, matchmakerKeepAliveInterval * 1000);
+	}
+
+	connect();
+	registerMMKeepAlive();
 }
 
 //Keep trying to send gameSessionId in case the server isn't ready yet
@@ -879,5 +1019,61 @@ function sendPlayerDisconnectedToFrontend() {
 			});
 	} catch(err) {
 		console.logColor(logging.Red, `ERROR::: sendPlayerDisconnectedToFrontend error: ${err.message}`);
+	}
+}
+
+function sendStreamerConnectedToMatchmaker() {
+	if (!config.UseMatchmaker)
+		return;
+	try {
+		message = {
+			type: 'streamerConnected'
+		};
+		matchmaker.write(JSON.stringify(message));
+	} catch (err) {
+		console.logColor(logging.Red, `ERROR sending streamerConnected: ${err.message}`);
+	}
+}
+
+function sendStreamerDisconnectedToMatchmaker() {
+	if (!config.UseMatchmaker)
+		return;
+	try {
+		message = {
+			type: 'streamerDisconnected'
+		};
+		matchmaker.write(JSON.stringify(message));	
+	} catch (err) {
+		console.logColor(logging.Red, `ERROR sending streamerDisconnected: ${err.message}`);
+	}
+}
+
+// The Matchmaker will not re-direct clients to this Cirrus server if any client
+// is connected.
+function sendPlayerConnectedToMatchmaker() {
+	if (!config.UseMatchmaker)
+		return;
+	try {
+		message = {
+			type: 'clientConnected'
+		};
+		matchmaker.write(JSON.stringify(message));
+	} catch (err) {
+		console.logColor(logging.Red, `ERROR sending clientConnected: ${err.message}`);
+	}
+}
+
+// The Matchmaker is interested when nobody is connected to a Cirrus server
+// because then it can re-direct clients to this re-cycled Cirrus server.
+function sendPlayerDisconnectedToMatchmaker() {
+	if (!config.UseMatchmaker)
+		return;
+	try {
+		message = {
+			type: 'clientDisconnected'
+		};
+		matchmaker.write(JSON.stringify(message));
+	} catch (err) {
+		console.logColor(logging.Red, `ERROR sending clientDisconnected: ${err.message}`);
 	}
 }
