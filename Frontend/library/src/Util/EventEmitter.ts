@@ -222,7 +222,7 @@ export class StreamLoadingEvent extends Event {
 /**
  * An event that is emitted when video stream loading has finished.
  */
-export class StreamConnectEvent extends Event {
+export class StreamPreConnectEvent extends Event {
     readonly type: 'streamConnect';
     constructor() {
         super('streamConnect');
@@ -232,7 +232,7 @@ export class StreamConnectEvent extends Event {
 /**
  * An event that is emitted when video stream has stopped.
  */
-export class StreamDisconnectEvent extends Event {
+export class StreamPreDisconnectEvent extends Event {
     readonly type: 'streamDisconnect';
     constructor() {
         super('streamDisconnect');
@@ -487,9 +487,9 @@ export type PixelStreamingEvent =
     | DataChannelErrorEvent
     | VideoInitializedEvent
     | StreamLoadingEvent
-    | StreamConnectEvent
+    | StreamPreConnectEvent
     | StreamReconnectEvent
-    | StreamDisconnectEvent
+    | StreamPreDisconnectEvent
     | PlayStreamErrorEvent
     | PlayStreamEvent
     | PlayStreamRejectedEvent
