@@ -572,4 +572,52 @@ describe('PixelStreaming', () => {
         expect(responseListenerSpy).toHaveBeenCalledWith(testMessageContents);
     });
 
+    it('should emit StreamConnectEvent when streamer connects', () => {
+        const config = new Config({ initialSettings: {ss: mockSignallingUrl}});
+        const streamConnectSpy = jest.fn();
+        const pixelStreaming = new PixelStreaming(config);
+        pixelStreaming.addEventListener("streamConnect", streamConnectSpy);
+        pixelStreaming.connect();
+
+        establishMockedPixelStreamingConnection();
+
+        expect(streamConnectSpy).toHaveBeenCalled();
+    });
+
+    it('should emit StreamDisconnectEvent when streamer disconnects', () => {
+        const config = new Config({ initialSettings: {ss: mockSignallingUrl}});
+        const streamDisconnectSpy = jest.fn();
+        const pixelStreaming = new PixelStreaming(config);
+        pixelStreaming.addEventListener("streamDisconnect", streamDisconnectSpy);
+        pixelStreaming.connect();
+
+        establishMockedPixelStreamingConnection();
+
+        expect(streamDisconnectSpy).not.toHaveBeenCalled();
+
+        pixelStreaming.disconnect();
+
+        expect(streamDisconnectSpy).toHaveBeenCalled();
+    });
+
+    it('should emit StreamReconnectEvent when streamer reconnects', () => {
+        const config = new Config({ initialSettings: {ss: mockSignallingUrl}});
+        const streamReconnectSpy = jest.fn();
+        const pixelStreaming = new PixelStreaming(config);
+        pixelStreaming.addEventListener("streamReconnect", streamReconnectSpy);
+        pixelStreaming.connect();
+        
+        establishMockedPixelStreamingConnection();
+
+        expect(streamReconnectSpy).not.toHaveBeenCalled();
+
+        pixelStreaming.disconnect();
+        pixelStreaming.connect();
+
+        expect(streamReconnectSpy).toHaveBeenCalled();
+
+        pixelStreaming.disconnect();
+
+        expect(streamReconnectSpy).toHaveBeenCalledTimes(1);
+    });
 });
