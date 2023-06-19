@@ -228,7 +228,7 @@ The following is a complete reference to the current signalling server messaging
 
 ### endpointId<a name="streamer-endpointid"></a>
 
->Message is consumed by the [Signalling Server](#term-signallingserver). Specifies an id for the [Streamer](#term-streamer).
+>Message is consumed by the [Signalling Server](#term-signallingserver). Specifies an id for the [Streamer](#term-streamer). This is used to uniquely identify multiple streamers connected to the same Signalling Server.
 
 | Param Name | Type | Description |
 |-|-|-|
@@ -245,7 +245,7 @@ The following is a complete reference to the current signalling server messaging
 
 ### layerPreference<a name="streamer-layerpreference"></a>
 
->Message is forwarded to a connected [SFU](#term-sfu). Sends a preferred layer index to a connected SFU for a specified [Player](#term-player).
+>Message is forwarded to a connected [SFU](#term-sfu). Sends a preferred layer index to a connected SFU for a specified [Player](#term-player). Useful for switching between SFU quality layers to force a certain resolution/quality option either as part of UX or testing.
 
 | Param Name | Type | Description |
 |-|-|-|
