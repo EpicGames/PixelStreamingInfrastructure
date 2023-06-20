@@ -217,7 +217,7 @@ end
 
 ### identify<a name="signalling-identify"></a>
 
-> Message is used to request an identity from a connecting [Streamer](#term-streamer). The Streamer should reply with an [endpointId](#streamer-endpointId) message.
+> Message is used to request an identity from a connecting [Streamer](#term-streamer). The Streamer should reply with an [endpointId](#streamer-endpointId) message. See note in [endpointId](#streamer-endpointid) about legacy Streamers and temporary ids.
 
 | Param Name | Type | Description |
 |-|-|-|
@@ -294,7 +294,7 @@ end
 
 ### endpointId<a name="streamer-endpointid"></a>
 
->Message is consumed by the [Signalling Server](#term-signallingserver). Specifies an id for the [Streamer](#term-streamer). This is used to uniquely identify multiple streamers connected to the same Signalling Server.
+>Message is consumed by the [Signalling Server](#term-signallingserver). Specifies an id for the [Streamer](#term-streamer). This is used to uniquely identify multiple streamers connected to the same Signalling Server. Note: to preserve backward compatibility when Streamer ids were optional, when a Streamer first connects it is assigned a temporary ID (\_\_LEGACY\_\_) which allows use of older Streamers if needed.
 
 | Param Name | Type | Description |
 |-|-|-|
