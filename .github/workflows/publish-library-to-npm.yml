@@ -1,4 +1,4 @@
-name: Publish library package to npmjs
+name: Publish frontend lib
 on:
   push:
     branches: ['UE5.3']

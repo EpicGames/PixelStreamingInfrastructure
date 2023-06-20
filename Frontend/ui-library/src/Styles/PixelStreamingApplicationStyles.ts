@@ -240,12 +240,12 @@ export class PixelStreamingApplicationStyle {
             right: '0',
             height: '100%',
             minWidth: '20vw',
-            maxWidth: '100vw',
+            maxWidth: '90vw',
             transform: 'translateX(100%)',
             transition: '.3s ease-out',
             pointerEvents: 'all',
             backdropFilter: 'blur(10px)',
-            webkitBackdropFilter: 'blur(10px)',
+            '-webkit-backdrop-filter': 'blur(10px)',
             overflowY: 'auto',
             overflowX: 'hidden',
             backgroundColor: 'var(--color0)'
@@ -371,7 +371,7 @@ export class PixelStreamingApplicationStyle {
         },
         '.tgl, .tgl:after, .tgl:before, .tgl *, .tgl *:after, .tgl *:before, .tgl+.tgl-slider':
             {
-                webkitBoxSizing: 'border-box',
+                '-webkit-box-sizing': 'border-box',
                 boxSizing: 'border-box'
             },
         '.tgl::-moz-selection, .tgl:after::-moz-selection, .tgl:before::-moz-selection, .tgl *::-moz-selection, .tgl *:after::-moz-selection, .tgl *:before::-moz-selection, .tgl+.tgl-slider::-moz-selection':
@@ -407,14 +407,14 @@ export class PixelStreamingApplicationStyle {
         },
         '.tgl-flat+.tgl-slider': {
             padding: '2px',
-            webkitTransition: 'all .2s ease',
+            '-webkit-transition': 'all .2s ease',
             transition: 'all .2s ease',
             background: 'var(--color6)',
             border: '3px solid var(--color7)',
             borderRadius: '2em'
         },
         '.tgl-flat+.tgl-slider:after': {
-            webkitTransition: 'all .2s ease',
+            '-webkit-transition': 'all .2s ease',
             transition: 'all .2s ease',
             background: 'var(--color7)',
             content: '""',
