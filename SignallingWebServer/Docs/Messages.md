@@ -4,6 +4,7 @@ The following is a complete reference to the current signalling server messaging
 
 ## Table of Contents
 - [Terms](#terms)
+- [Example Streaming Message Sequence](#example-message-sequence)
 - [Player Sent Messages](#source-player)
 	- [answer](#player-answer)
 	- [dataChannelRequest](#player-datachannelrequest)
@@ -20,9 +21,13 @@ The following is a complete reference to the current signalling server messaging
 	- [peerDataChannels](#sfu-peerdatachannels)
 	- [streamerDataChannels](#sfu-streamerdatachannels)
 - [Signalling Server Sent Messages](#source-signalling)
+	- [config](#signalling-config)
+	- [identify](#signalling-identify)
 	- [playerConnected](#signalling-playerconnected)
+	- [playerCount](#signalling-playercount)
 	- [playerDisconnected](#signalling-playerdisconnected)
 	- [pong](#signalling-pong)
+	- [streamerDisconnected](#signalling-streamerDisconnected)
 	- [streamerList](#signalling-streamerlist)
 - [Streamer Sent Message](#source-streamer)
 	- [answer](#streamer-answer)
@@ -59,6 +64,37 @@ The following is a complete reference to the current signalling server messaging
 ### ICE Candidate<a name="term-icecandidate"></a>
 
 > Interactive Connectivity Establishment. Describes protocols and routing needed for WebRTC to be able to communicate with a remote device. Further details can be read [here](https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate)
+
+## Example Streaming Message Sequence<a name="example-message-sequence"></a>
+
+```mermaid
+sequenceDiagram
+Streamer->>Signalling: Open Connection
+Signalling->>Streamer: config
+Signalling->>Streamer: identify
+Streamer->>Signalling: endpointId
+Player->>Signalling: Open Connection
+Signalling->>Player: config
+Signalling->>Player: playerCount
+Player->>Signalling: listStreamers
+Signalling->>Player: streamerList
+Player->>Signalling: subscribe
+Signalling->>Streamer: playerConnected
+Streamer->>Signalling: offer
+Signalling->>Player: offer
+Player->>Signalling: answer
+Signalling->>Streamer: answer
+Streamer->Player: WebRTC negotiation
+Note over Streamer, Player: Streaming Session
+opt Player Disconnect
+	Player->>Signalling: Close Connection
+	Signalling->>Streamer: playerDisconnected
+end
+opt Streamer Disconnect
+	Streamer->>Signalling: Close Connection
+	Signalling->>Player: streamerDisconnected
+end
+```
 
 ## Player Sent Messages<a name="source-player"></a>
 
@@ -171,6 +207,21 @@ The following is a complete reference to the current signalling server messaging
 
 ## Signalling Server Sent Messages<a name="source-signalling"></a>
 
+### config<a name="signalling-config"></a>
+
+> Message is used to send the peer connection options such as stun and turn servers to a connecting [Streamer](#term-streamer)
+
+| Param Name | Type | Description |
+|-|-|-|
+| peerConnectionOptions | object | The object describing the peer connection options for this server. |
+
+### identify<a name="signalling-identify"></a>
+
+> Message is used to request an identity from a connecting [Streamer](#term-streamer). The Streamer should reply with an [endpointId](#streamer-endpointId) message.
+
+| Param Name | Type | Description |
+|-|-|-|
+
 ### playerConnected<a name="signalling-playerconnected"></a>
 
 > Message is used to notify a [Streamer](#term-streamer) that a new [Player](#term-player) has subscribed to the stream.
@@ -181,6 +232,14 @@ The following is a complete reference to the current signalling server messaging
 | dataChannel | boolean | Indicates whether the player wants a datachannel or not. |
 | sfu | boolean | Indicates if the player is an SFU or not. |
 | sendOffer | boolean | Indicates if the new player want's an offer or not. |
+
+### playerCount
+
+> Message is sent to Players to indicate how many currently connected players there are on this signalling server. (Note: This is mostly old behaviour and is not influenced by multi streamers or who is subscribed to what Streamer. It just reports the number of players it knows about.)
+
+| Param Name | Type | Description |
+|-|-|-|
+| count | number | The number of players currently connected to this signalling server. |
 
 ### playerDisconnected<a name="signalling-playerdisconnected"></a>
 
@@ -197,6 +256,13 @@ The following is a complete reference to the current signalling server messaging
 | Param Name | Description |
 |-|-|
 | time | The timestamp of the ping message. Will be returned in the pong message |
+
+### streamerDisconnected<a name="signalling-streamerdisconnected"></a>
+
+> Message is used to notify players when a [Streamer](#term-streamer) disconnects from the [Signalling Server](#term-signallingserver).
+
+| Param Name | Type | Description |
+|-|-|-|
 
 ### streamerList<a name="signalling-streamerlist"></a>
 
