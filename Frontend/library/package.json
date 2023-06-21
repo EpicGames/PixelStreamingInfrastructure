@@ -1,6 +1,6 @@
 {
     "name": "@epicgames-ps/lib-pixelstreamingfrontend-ue5.2",
-    "version": "0.5.2",
+    "version": "0.5.3",
     "description": "Frontend library for Pixel Streaming",
     "main": "dist/lib-pixelstreamingfrontend.js",
     "module": "dist/lib-pixelstreamingfrontend.esm.js",
