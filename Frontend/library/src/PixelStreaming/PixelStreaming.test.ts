@@ -611,8 +611,7 @@ describe('PixelStreaming', () => {
 
         expect(streamReconnectSpy).not.toHaveBeenCalled();
 
-        pixelStreaming.disconnect();
-        pixelStreaming.connect();
+        pixelStreaming.reconnect();
 
         expect(streamReconnectSpy).toHaveBeenCalled();
 
