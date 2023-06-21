@@ -15,6 +15,9 @@ import {
     PixelStreamingEvent,
     StatsReceivedEvent,
     StreamLoadingEvent,
+    StreamPreConnectEvent,
+    StreamReconnectEvent,
+    StreamPreDisconnectEvent,
     VideoEncoderAvgQPEvent,
     VideoInitializedEvent,
     WebRtcAutoConnectEvent,
@@ -325,6 +328,7 @@ export class PixelStreaming {
      * Connect to signaling server.
      */
     public connect() {
+        this._eventEmitter.dispatchEvent(new StreamPreConnectEvent());
         this._webRtcController.connectToSignallingServer();
     }
 
@@ -333,6 +337,7 @@ export class PixelStreaming {
      * before establishing a new connection
      */
     public reconnect() {
+        this._eventEmitter.dispatchEvent(new StreamReconnectEvent());
         this._webRtcController.restartStreamAutomatically();
     }
 
@@ -340,6 +345,7 @@ export class PixelStreaming {
      * Disconnect from the signaling server and close open peer connections.
      */
     public disconnect() {
+        this._eventEmitter.dispatchEvent(new StreamPreDisconnectEvent());
         this._webRtcController.close();
     }
 
