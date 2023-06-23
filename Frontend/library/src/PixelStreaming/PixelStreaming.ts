@@ -9,6 +9,7 @@ import { Logger } from '../Logger/Logger';
 import { InitialSettings } from '../DataChannel/InitialSettings';
 import { OnScreenKeyboard } from '../UI/OnScreenKeyboard';
 import {
+    DataChannelLatencyTestResponseEvent, DataChannelLatencyTestResultEvent,
     EventEmitter,
     InitialSettingsEvent,
     LatencyTestResultEvent,
@@ -26,6 +27,14 @@ import {
 } from '../Util/EventEmitter';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
+import {
+    DataChannelLatencyTestConfig,
+    DataChannelLatencyTestController, DataChannelLatencyTestResultCallback
+} from "../DataChannel/DataChannelLatencyTestController";
+import {
+    DataChannelLatencyTestResponse,
+    DataChannelLatencyTestResult
+} from "../DataChannel/DataChannelLatencyTestResults";
 
 export interface PixelStreamingOverrides {
     /** The DOM elment where Pixel Streaming video and user input event handlers are attached to.
@@ -44,6 +53,7 @@ export interface PixelStreamingOverrides {
 export class PixelStreaming {
     protected _webRtcController: WebRtcPlayerController;
     protected _webXrController: WebXRController;
+    protected _dataChannelLatencyTestController: DataChannelLatencyTestController;
     /**
      * Configuration object. You can read or modify config through this object. Whenever
      * the configuration is changed, the library will emit a `settingsChanged` event.
@@ -453,6 +463,12 @@ export class PixelStreaming {
         );
     }
 
+    _onDataChannelLatencyTestResponse(response: DataChannelLatencyTestResponse) {
+        this._eventEmitter.dispatchEvent(
+            new DataChannelLatencyTestResponseEvent({ response })
+        );
+    }
+
     /**
      * Set up functionality to happen when receiving video statistics
      * @param videoStats - video statistics as a aggregate stats object
@@ -566,6 +582,33 @@ export class PixelStreaming {
         }
         this._webRtcController.sendLatencyTest();
         return true;
+    }
+
+    /**
+     * Request a data channel latency test.
+     * NOTE: There are plans to refactor all request* functions. Expect changes if you use this!
+     * @returns
+     */
+    public requestDataChannelLatencyTest(config: DataChannelLatencyTestConfig) {
+        if (!this._webRtcController.videoPlayer.isVideoReady()) {
+            return false;
+        }
+        if (!this._dataChannelLatencyTestController) {
+            let that = this;
+            this._dataChannelLatencyTestController = new DataChannelLatencyTestController(
+                this._webRtcController.sendDataChannelLatencyTest.bind(this._webRtcController),
+                (result: DataChannelLatencyTestResult) => {
+                    console.log(that);
+                    that._eventEmitter.dispatchEvent(new DataChannelLatencyTestResultEvent( { result }))
+                });
+            this.addEventListener(
+                "dataChannelLatencyTestResponse",
+                ({data: {response} }) => {
+                    that._dataChannelLatencyTestController.receive(response);
+                }
+            )
+        }
+        return this._dataChannelLatencyTestController.start(config);
     }
 
     /**
