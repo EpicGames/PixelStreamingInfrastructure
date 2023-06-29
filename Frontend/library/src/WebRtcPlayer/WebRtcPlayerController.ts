@@ -953,7 +953,6 @@ export class WebRtcPlayerController {
                 'A websocket connection has not been made yet so we will start the stream'
             );
             this.pixelStreaming._onWebRtcAutoConnect();
-            console.log("1 DOING A CONNECT N SHIT");
             this.connectToSignallingServer();
         } else {
             // set the replay status so we get a text overlay over an action overlay
@@ -968,7 +967,6 @@ export class WebRtcPlayerController {
             // wait for the connection to close and restart the connection
             const autoConnectTimeout = setTimeout(() => {
                 this.pixelStreaming._onWebRtcAutoConnect();
-                console.log("2 DOING A CONNECT N SHIT");
                 this.connectToSignallingServer();
                 clearTimeout(autoConnectTimeout);
             }, 3000);
