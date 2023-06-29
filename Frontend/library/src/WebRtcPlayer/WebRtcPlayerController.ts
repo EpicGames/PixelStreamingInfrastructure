@@ -213,7 +213,7 @@ export class WebRtcPlayerController {
                 this.webSocketController.requestStreamerList();
             }
         });
-        this.webSocketController.onClose.addEventListener('close', () => {
+        this.webSocketController.onClose.addEventListener('close', (event : CustomEvent) => {
             this.afkController.stopAfkWarningTimer();
 
             // stop sending stats on interval if we have closed our connection
@@ -227,7 +227,12 @@ export class WebRtcPlayerController {
             this.setKeyboardInputEnabled(false);
             this.setGamePadInputEnabled(false);
 
-            if(this.shouldReconnect && this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts) > 0) {
+            // when we refresh the page during a stream we get the going away code.
+            // in that case we don't want to reconnect since we're navigating away.
+            // https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
+            // lists all the codes. 
+            const CODE_GOING_AWAY = 1001;
+            if(this.shouldReconnect && event.detail.code != CODE_GOING_AWAY && this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts) > 0) {
                 this.isReconnecting = true;
                 this.reconnectAttempt++;
                 this.restartStreamAutomatically();

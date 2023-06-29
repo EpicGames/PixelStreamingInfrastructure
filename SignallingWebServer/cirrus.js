@@ -476,7 +476,7 @@ function forwardStreamerMessageToPlayer(streamer, msg) {
 		logForward(streamer.id, playerId, msg);
 		player.sendTo(msg);
 	} else {
-		console.warning("No playerId specified, cannot forward message: %s", msg);
+		console.warn("No playerId specified, cannot forward message: %s", msg);
 	}
 }
 
