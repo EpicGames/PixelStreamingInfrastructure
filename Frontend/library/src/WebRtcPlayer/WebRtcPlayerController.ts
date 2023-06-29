@@ -213,7 +213,7 @@ export class WebRtcPlayerController {
                 this.webSocketController.requestStreamerList();
             }
         });
-        this.webSocketController.onClose.addEventListener('close', () => {
+        this.webSocketController.onClose.addEventListener('close', (event : CustomEvent) => {
             this.afkController.stopAfkWarningTimer();
 
             // stop sending stats on interval if we have closed our connection
@@ -227,7 +227,7 @@ export class WebRtcPlayerController {
             this.setKeyboardInputEnabled(false);
             this.setGamePadInputEnabled(false);
 
-            if(this.shouldReconnect && this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts) > 0) {
+            if(this.shouldReconnect && event.detail.code != 1001 && this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts) > 0) {
                 this.isReconnecting = true;
                 this.reconnectAttempt++;
                 this.restartStreamAutomatically();
@@ -953,6 +953,7 @@ export class WebRtcPlayerController {
                 'A websocket connection has not been made yet so we will start the stream'
             );
             this.pixelStreaming._onWebRtcAutoConnect();
+            console.log("1 DOING A CONNECT N SHIT");
             this.connectToSignallingServer();
         } else {
             // set the replay status so we get a text overlay over an action overlay
@@ -967,6 +968,7 @@ export class WebRtcPlayerController {
             // wait for the connection to close and restart the connection
             const autoConnectTimeout = setTimeout(() => {
                 this.pixelStreaming._onWebRtcAutoConnect();
+                console.log("2 DOING A CONNECT N SHIT");
                 this.connectToSignallingServer();
                 clearTimeout(autoConnectTimeout);
             }, 3000);
