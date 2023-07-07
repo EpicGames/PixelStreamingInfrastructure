@@ -111,7 +111,7 @@ end
 
 | Param Name | Type | Description |
 |-|-|-|
-| Sdp | string | The WebRTC SDP package in string format |
+| sdp | string | The WebRTC SDP package in string format |
 
 ### dataChannelRequest<a name="player-datachannelrequest"></a>
 
@@ -126,7 +126,7 @@ end
 
 | Param Name | Type | Description |
 |-|-|-|
-| candidate | string | The JSON string describing the ICE candidate |
+| candidate | Object | The JSON object describing the ICE candidate |
 
 ### listStreamers<a name="player-liststreamers"></a>
 
@@ -141,7 +141,7 @@ end
 
 | Param Name | Type | Description |
 |-|-|-|
-| Sdp | string | The WebRTC SDP package in string format |
+| sdp | string | The WebRTC SDP package in string format |
 
 ### peerDataChannelsReady<a name="player-peerdatachannelsready"></a>
 
@@ -181,7 +181,7 @@ end
 
 | Param Name | Type | Description |
 |-|-|-|
-| Sdp | string | The WebRTC SDP package in string format |
+| sdp | string | The WebRTC SDP package in string format |
 
 ### offer<a name="sfu-offer"></a>
 
@@ -190,7 +190,7 @@ end
 | Param Name | Type | Description |
 |-|-|-|
 | playerId | string | The id of the player to send the offer to. |
-| Sdp | string | The WebRTC SDP package in string format |
+| sdp | string | The WebRTC SDP package in string format |
 
 ### peerDataChannels<a name="sfu-peerdatachannels"></a>
 
@@ -220,7 +220,7 @@ end
 
 | Param Name | Type | Description |
 |-|-|-|
-| peerConnectionOptions | object | The object describing the peer connection options for this server. |
+| peerConnectionOptions | Object | The object describing the peer connection options for this server. |
 
 ### identify<a name="signalling-identify"></a>
 
@@ -288,7 +288,7 @@ end
 | Param Name | Type | Description |
 |-|-|-|
 | playerId | string | The id of the player to send the answer to. |
-| Sdp | string | The WebRTC SDP package in string format |
+| sdp | string | The WebRTC SDP package in string format |
 
 ### disconnectPlayer<a name="streamer-disconnectplayer"></a>
 
@@ -314,7 +314,7 @@ end
 | Param Name | Type | Description |
 |-|-|-|
 | playerId | string | The id of the player to send the ICE candidate to. |
-| candidate | string | The JSON string describing the ICE candidate |
+| candidate | Object | The JSON string describing the ICE candidate |
 
 ### layerPreference<a name="streamer-layerpreference"></a>
 
@@ -333,7 +333,7 @@ end
 | Param Name | Type | Description |
 |-|-|-|
 | playerId | string | The id of the player to send the offer to. |
-| Sdp | string | The WebRTC SDP package in string format |
+| sdp | string | The WebRTC SDP package in string format |
 
 ### ping<a name="streamer-ping"></a>
 
