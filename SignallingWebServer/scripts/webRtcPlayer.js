@@ -360,6 +360,9 @@ function webRtcPlayer(parOptions) {
                     newStat.bytesReceived = stat.bytesReceived;
                     newStat.framesDecoded = stat.framesDecoded;
                     newStat.packetsLost = stat.packetsLost;
+                    newStat.frameHeight = stat.frameHeight;
+                    newStat.frameWidth = stat.frameWidth;
+                    newStat.framesDropped = stat.framesDropped;
                     newStat.bytesReceivedStart = self.aggregatedStats && self.aggregatedStats.bytesReceivedStart ? self.aggregatedStats.bytesReceivedStart : stat.bytesReceived;
                     newStat.framesDecodedStart = self.aggregatedStats && self.aggregatedStats.framesDecodedStart ? self.aggregatedStats.framesDecodedStart : stat.framesDecoded;
                     newStat.timestampStart = self.aggregatedStats && self.aggregatedStats.timestampStart ? self.aggregatedStats.timestampStart : stat.timestamp;
