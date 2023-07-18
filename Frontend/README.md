@@ -5,7 +5,7 @@ The **frontend** refers to the HTML, CSS, images, and JavaScript/TypeScript code
 The frontend consists of two packages:
 
 1. [lib-pixelstreamingfrontend](/Frontend/library/): the core Pixel Streaming frontend for WebRTC, settings, input, and general functionality.
-2. [lib-pixelstreamingfrontend-ui](/Frontend/implementations/EpicGames): the reference UI that users can either optionally apply on top of the core library or build on top of.
+2. [lib-pixelstreamingfrontend-ui](/Frontend/implementations/typescript): the reference UI that users can either optionally apply on top of the core library or build on top of.
 
 
 ## Docs
@@ -29,7 +29,7 @@ The TypeScript libraries are provided as both an [NPM](https://www.npmjs.com/set
 ## Usage from source
 
 When developing your own Pixel Streaming experience the intent is you will start with this library and extend it through the use of 
-its public API. We have provided an example of this workflow in our [implementations/EpicGames](/Frontend/implementations/EpicGames), which is an implementation of this library.
+its public API. We have provided an example of this workflow in our [implementations/typescript](/Frontend/implementations/typescript), which is an implementation of this library.
 
 ## Contributing
 
@@ -53,7 +53,7 @@ This will produce `player.js` under the `SignallingWebServer/Public` directory -
 
 ### Making your own UI
 
-We recommend studying [/ui-library](/Frontend/ui-library) and [player.ts](/Frontend/implementations/EpicGames/src/player.ts)/[player.html](/Frontend/implementations/EpicGames/src/player.html), or alternatively the sample React implementation in [implementations/react](/Frontend/implementations/react), then once you have copied and modified the [package.json](/Frontend/implementations/EpicGames/package.json) and `.ts` into your own `implementation/your_implementation` directory, the process is similar:
+We recommend studying [/ui-library](/Frontend/ui-library) and [player.ts](/Frontend/implementations/typescript/src/player.ts)/[player.html](/Frontend/implementations/typescript/src/player.html), or alternatively the sample React implementation in [implementations/react](/Frontend/implementations/react), then once you have copied and modified the [package.json](/Frontend/implementations/typescript/package.json) and `.ts` into your own `implementation/your_implementation` directory, the process is similar:
 
 - `cd implementation/your_implementation`
 - `npm build-all`

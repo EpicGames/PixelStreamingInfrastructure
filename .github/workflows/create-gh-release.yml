@@ -48,16 +48,16 @@ jobs:
       working-directory: ./Frontend/ui-library
       run: npm run build-all
 
-    - name: Install implementations/EpicGames deps
-      working-directory: ./Frontend/implementations/EpicGames
+    - name: Install implementations/typescript deps
+      working-directory: ./Frontend/implementations/typescript
       run: npm ci
 
-    - name: NPM link frontend and ui-library into implementations/EpicGames
-      working-directory: ./Frontend/implementations/EpicGames
+    - name: NPM link frontend and ui-library into implementations/typescript
+      working-directory: ./Frontend/implementations/typescript
       run: npm link ../../library ../../ui-library
 
-    - name: Build implementations/EpicGames
-      working-directory: ./Frontend/implementations/EpicGames
+    - name: Build implementations/typescript
+      working-directory: ./Frontend/implementations/typescript
       run: npm run build-all
 
     - name: Move all content into output directory for archiving
@@ -70,7 +70,7 @@ jobs:
         path: 'PixelStreamingInfrastructure-${{ github.ref_name }}-${{ steps.getversion.outputs.version }}'
         type: 'tar'
         filename: '${{ github.ref_name }}-${{ steps.getversion.outputs.version }}.tar.gz'
-        exclusions: '.git .github output Frontend/Docs Frontend/library/dist Frontend/library/types Frontend/library/node_modules Frontend/ui-library/dist Frontend/ui-library/types Frontend/ui-library/node_modules Frontend/implementations/EpicGames/node_modules'
+        exclusions: '.git .github output Frontend/Docs Frontend/library/dist Frontend/library/types Frontend/library/node_modules Frontend/ui-library/dist Frontend/ui-library/types Frontend/ui-library/node_modules Frontend/implementations/typescript/node_modules'
 
     - name: Archive Release .zip
       uses: thedoctor0/zip-release@0.7.1

@@ -373,6 +373,11 @@ export class Application {
             'settingsChanged',
             (event) => this.configUI.onSettingsChanged(event)
         );
+        this.stream.addEventListener(
+            'playerCount', 
+            ({ data: { count }}) => 
+                this.onPlayerCount(count)
+        );
     }
 
     /**
@@ -656,6 +661,10 @@ export class Application {
 
     onDataChannelLatencyTestResults(result: DataChannelLatencyTestResult) {
         this.statsPanel.dataChannelLatencyTest.handleTestResult(result);
+    }
+
+    onPlayerCount(playerCount: number) {
+        this.statsPanel.handlePlayerCount(playerCount);
     }
 
     handleStreamerListMessage(messageStreamingList: MessageStreamerList, autoSelectedStreamerId: string | null) {

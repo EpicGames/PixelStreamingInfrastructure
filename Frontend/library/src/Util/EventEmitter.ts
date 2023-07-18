@@ -505,6 +505,21 @@ export class XrFrameEvent extends Event {
     }
 }
 
+/**
+ * An event that is emitted when receiving a player count from the signalling server
+ */
+export class PlayerCountEvent extends Event {
+    readonly type: 'playerCount';
+    readonly data: {
+        /** count object */
+        count: number
+    };
+    constructor(data: PlayerCountEvent['data']) {
+        super('playerCount');
+        this.data = data;
+    }
+}
+
 export type PixelStreamingEvent =
     | AfkWarningActivateEvent
     | AfkWarningUpdateEvent
@@ -539,7 +554,8 @@ export type PixelStreamingEvent =
     | SettingsChangedEvent
     | XrSessionStartedEvent
     | XrSessionEndedEvent
-    | XrFrameEvent;
+    | XrFrameEvent
+    | PlayerCountEvent;
 
 export class EventEmitter extends EventTarget {
     /**

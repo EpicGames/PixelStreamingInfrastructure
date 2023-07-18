@@ -27,7 +27,8 @@ import {
     WebRtcFailedEvent,
     WebRtcSdpEvent,
     DataChannelLatencyTestResponseEvent,
-    DataChannelLatencyTestResultEvent
+    DataChannelLatencyTestResultEvent,
+    PlayerCountEvent
 } from '../Util/EventEmitter';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
@@ -575,6 +576,12 @@ export class PixelStreaming {
         this.config.setFlagEnabled(
             Flags.IsQualityController,
             hasQualityOwnership
+        );
+    }
+
+    _onPlayerCount(playerCount: number) {
+        this._eventEmitter.dispatchEvent(
+            new PlayerCountEvent({ count: playerCount })
         );
     }
 
