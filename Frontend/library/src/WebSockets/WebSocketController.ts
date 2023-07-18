@@ -142,7 +142,7 @@ export class WebSocketController {
                 ' - ' +
                 event.reason
         );
-        this.onClose.dispatchEvent(new Event('close'));
+        this.onClose.dispatchEvent(new CustomEvent('close', { 'detail': event }));
     }
 
     requestStreamerList() {
