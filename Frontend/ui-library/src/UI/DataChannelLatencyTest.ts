@@ -1,6 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { LatencyTestResults } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
 import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
 import {
     DataChannelLatencyTestResult
@@ -71,19 +70,27 @@ export class DataChannelLatencyTest {
      * @param result The latency test results.
      */
     public handleTestResult(result: DataChannelLatencyTestResult) {
-        console.dir(result);
-        Logger.Log(Logger.GetStackTrace(), result.toString(), 6);
+        Logger.Log(
+            Logger.GetStackTrace(),
+            result.toString(),
+            6
+        );
         let latencyStatsInnerHTML = '';
         latencyStatsInnerHTML +=
             '<div>Data channel RTT (ms): ' +
             result.dataChannelRtt +
             '</div>';
-        latencyStatsInnerHTML +=
-            '<div>Player to Streamer path (ms): ' + result.playerToStreamerTime + '</div>';
-        latencyStatsInnerHTML +=
-            '<div>Streamer to Player path (ms): ' +
-            result.streamerToPlayerTime +
-            '</div>';
+        /**
+         * Separate path time discovery works only when UE and Player clocks have been synchronized.
+         */
+        if (result.playerToStreamerTime >= 0 && result.streamerToPlayerTime >= 0) {
+            latencyStatsInnerHTML +=
+                '<div>Player to Streamer path (ms): ' + result.playerToStreamerTime + '</div>';
+            latencyStatsInnerHTML +=
+                '<div>Streamer to Player path (ms): ' +
+                result.streamerToPlayerTime +
+                '</div>';
+        }
         this.latencyTestResultsElement.innerHTML = latencyStatsInnerHTML;
         //setup button to download the detailed results
         let downloadButton: HTMLInputElement = document.createElement('input');
@@ -111,4 +118,5 @@ export class DataChannelLatencyTest {
         this.latencyTestResultsElement.innerHTML =
             '<div>Test in progress</div>';
     }
+
 }

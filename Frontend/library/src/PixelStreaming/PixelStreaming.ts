@@ -9,7 +9,6 @@ import { Logger } from '../Logger/Logger';
 import { InitialSettings } from '../DataChannel/InitialSettings';
 import { OnScreenKeyboard } from '../UI/OnScreenKeyboard';
 import {
-    DataChannelLatencyTestResponseEvent, DataChannelLatencyTestResultEvent,
     EventEmitter,
     InitialSettingsEvent,
     LatencyTestResultEvent,
@@ -26,13 +25,15 @@ import {
     WebRtcConnectingEvent,
     WebRtcDisconnectedEvent,
     WebRtcFailedEvent,
-    WebRtcSdpEvent
+    WebRtcSdpEvent,
+    DataChannelLatencyTestResponseEvent,
+    DataChannelLatencyTestResultEvent
 } from '../Util/EventEmitter';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
 import {
     DataChannelLatencyTestConfig,
-    DataChannelLatencyTestController, DataChannelLatencyTestResultCallback
+    DataChannelLatencyTestController
 } from "../DataChannel/DataChannelLatencyTestController";
 import {
     DataChannelLatencyTestResponse,
@@ -593,24 +594,21 @@ export class PixelStreaming {
     /**
      * Request a data channel latency test.
      * NOTE: There are plans to refactor all request* functions. Expect changes if you use this!
-     * @returns
      */
     public requestDataChannelLatencyTest(config: DataChannelLatencyTestConfig) {
         if (!this._webRtcController.videoPlayer.isVideoReady()) {
             return false;
         }
         if (!this._dataChannelLatencyTestController) {
-            let that = this;
             this._dataChannelLatencyTestController = new DataChannelLatencyTestController(
                 this._webRtcController.sendDataChannelLatencyTest.bind(this._webRtcController),
                 (result: DataChannelLatencyTestResult) => {
-                    console.log(that);
-                    that._eventEmitter.dispatchEvent(new DataChannelLatencyTestResultEvent( { result }))
+                    this._eventEmitter.dispatchEvent(new DataChannelLatencyTestResultEvent( { result }))
                 });
             this.addEventListener(
                 "dataChannelLatencyTestResponse",
                 ({data: {response} }) => {
-                    that._dataChannelLatencyTestController.receive(response);
+                    this._dataChannelLatencyTestController.receive(response);
                 }
             )
         }

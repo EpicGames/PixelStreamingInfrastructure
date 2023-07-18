@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Config, Flags, TextParameters, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
+import { Config, Flags, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
 import { Application, PixelStreamingApplicationStyle } from '@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.3';
 const PixelStreamingApplicationStyles =
     new PixelStreamingApplicationStyle();
@@ -157,7 +157,6 @@ export class StressTester {
 		config.setFlagEnabled(Flags.AutoConnect, true);
 		config.setFlagEnabled(Flags.AutoPlayVideo, true);
 		config.setFlagEnabled(Flags.StartVideoMuted, true);
-		config.setTextSetting(TextParameters.SignallingServerUrl, "ws://127.0.0.1:80/")
 
 		// Create a Native DOM delegate instance that implements the Delegate interface class
 		const stream = new PixelStreaming(config);

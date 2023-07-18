@@ -142,12 +142,15 @@ export class StatsPanel {
             stream.requestLatencyTest();
         };
         this.dataChannelLatencyTest.latencyTestButton.onclick = () => {
-            stream.requestDataChannelLatencyTest({
-                duration: 10000,
-                rps: 100,
+            let started = stream.requestDataChannelLatencyTest({
+                duration: 1000,
+                rps: 10,
                 requestSize: 200,
                 responseSize: 200
             });
+            if (started) {
+                this.dataChannelLatencyTest.handleTestStart();
+            }
         };
     }
 

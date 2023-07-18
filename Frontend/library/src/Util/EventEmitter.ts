@@ -371,7 +371,8 @@ export class LatencyTestResultEvent extends Event {
 }
 
 /**
- * An event that is emitted when receiving data channel latency test results.
+ * An event that is emitted when receiving data channel latency test response from server.
+ * This event is handled by DataChannelLatencyTestController
  */
 export class DataChannelLatencyTestResponseEvent extends Event {
     readonly type: 'dataChannelLatencyTestResponse';
@@ -386,7 +387,7 @@ export class DataChannelLatencyTestResponseEvent extends Event {
 }
 
 /**
- * An event that is emitted when receiving data channel latency test results.
+ * An event that is emitted when data channel latency test results are ready.
  */
 export class DataChannelLatencyTestResultEvent extends Event {
     readonly type: 'dataChannelLatencyTestResult';
