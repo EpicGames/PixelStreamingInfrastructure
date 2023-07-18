@@ -21,7 +21,7 @@ jobs:
 
         stale-pr-message: 'PRs go stale after 30 days of inactivity. Please comment or re-open the PR if you are still working on this PR otherwise this issue will be closed in 5 days.'
         stale-pr-label: 'stale'
-        exempt-issue-labels: 'awaiting-approval'
+        exempt-pr-labels: 'awaiting-approval'
         
         days-before-stale: 30
         days-before-close: 0
