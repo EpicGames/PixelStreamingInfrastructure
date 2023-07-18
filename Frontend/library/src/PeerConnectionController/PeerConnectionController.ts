@@ -372,10 +372,12 @@ export class PeerConnectionController {
         if (RTCRtpReceiver.getCapabilities && this.preferredCodec != '') {
             for (const transceiver of this.peerConnection?.getTransceivers() ?? []) {
                 if (
-                    transceiver &&
+                    transceiver &&  
                     transceiver.receiver &&
                     transceiver.receiver.track &&
-                    transceiver.receiver.track.kind === 'video'
+                    transceiver.receiver.track.kind === 'video' &&
+                    // As of 06/2023, FireFox has added RTCRtpReceiver.getCapabilities, but hasn't added the ability to set codec preferences
+                    transceiver.setCodecPreferences
                 ) {
                     const preferredRTPCodec = this.preferredCodec.split(' ');
                     const codecs = [

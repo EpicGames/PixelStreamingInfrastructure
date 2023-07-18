@@ -103,11 +103,22 @@ export class SettingOption<
     public set selected(value: string) {
         // A user may not specify the full possible value so we instead use the closest match.
         // eg ?xxx=H264 would select 'H264 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42001f'
-        const filteredList = this.options.filter(
+        let filteredList = this.options.filter(
             (option: string) => option.indexOf(value) !== -1
         );
         if (filteredList.length) {
             this.value = filteredList[0];
+            return;
+        } 
+
+        // A user has specified a codec with a fmtp string but this codec + fmtp line isn't available.
+        // in that case, just use the codec
+        filteredList = this.options.filter(
+            (option: string) => option.indexOf(value.split(' ')[0]) !== -1
+        );
+        if (filteredList.length) {
+            this.value = filteredList[0];
+            return;
         }
     }
 }
