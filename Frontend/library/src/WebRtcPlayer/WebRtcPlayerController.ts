@@ -204,6 +204,9 @@ export class WebRtcPlayerController {
             );
             this.setVideoEncoderAvgQP(0);
         };
+        this.webSocketController.onPlayerCount = (playerCount: MessageReceive.MessagePlayerCount) => { 
+            this.pixelStreaming._onPlayerCount(playerCount.count); 
+        };
         this.webSocketController.onOpen.addEventListener('open', () => {
             const BrowserSendsOffer = this.config.isFlagEnabled(
                 Flags.BrowserSendOffer

@@ -108,6 +108,7 @@ export class SignallingProtocol {
                     'Player Count: ' + playerCount.count,
                     6
                 );
+                websocketController.onPlayerCount(playerCount)
             }
         );
 
