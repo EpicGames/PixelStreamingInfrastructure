@@ -147,6 +147,14 @@ export class StatsPanel {
         }
     }
 
+    public handlePlayerCount(playerCount: number) {
+        this.addOrUpdateStat(
+            'PlayerCountStat',
+            'Players',
+            playerCount.toString()
+        );
+    }
+
     /**
      * Handle stats coming in from browser/UE
      * @param stats the stats structure
