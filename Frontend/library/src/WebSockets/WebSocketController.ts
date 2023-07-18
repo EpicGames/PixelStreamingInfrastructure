@@ -142,7 +142,7 @@ export class WebSocketController {
                 ' - ' +
                 event.reason
         );
-        this.onClose.dispatchEvent(new Event('close'));
+        this.onClose.dispatchEvent(new CustomEvent('close', { 'detail': event }));
     }
 
     requestStreamerList() {
@@ -247,7 +247,12 @@ export class WebSocketController {
      * @param messageDataChannels - The data channels details
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-    onWebRtcPeerDataChannels(
-        messageDataChannels: MessageReceive.MessagePeerDataChannels
-    ) {}
+    onWebRtcPeerDataChannels(messageDataChannels: MessageReceive.MessagePeerDataChannels) {}
+
+    /**
+     * Event is fired when the websocket receives the an updated player count from cirrus
+     * @param MessagePlayerCount - The new player count
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+    onPlayerCount(playerCount: MessageReceive.MessagePlayerCount) {}
 }

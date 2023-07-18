@@ -1,7 +1,7 @@
 {
-    "name": "@epicgames-ps/lib-pixelstreamingfrontend-ue5.2",
-    "version": "0.5.0",
-    "description": "Frontend library for Pixel Streaming",
+    "name": "@epicgames-ps/lib-pixelstreamingfrontend-ue5.3",
+    "version": "0.0.1",
+    "description": "Frontend library for Unreal Engine 5.3 Pixel Streaming",
     "main": "dist/lib-pixelstreamingfrontend.js",
     "module": "dist/lib-pixelstreamingfrontend.esm.js",
     "types": "types/pixelstreamingfrontend.d.ts",

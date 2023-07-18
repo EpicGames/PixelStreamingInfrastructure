@@ -106,7 +106,7 @@ function setup_frontend() {
 		../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-dev
 		popd
 
-		pushd ${BASH_LOCATION}/../../../Frontend/implementations/EpicGames > /dev/null
+		pushd ${BASH_LOCATION}/../../../Frontend/implementations/typescript > /dev/null
 		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
 		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm link ../../library ../../ui-library
 		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-dev

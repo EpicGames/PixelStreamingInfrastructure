@@ -1,8 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { LatencyTest } from './LatencyTest';
-import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
-import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
+import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
 import { MathUtils } from '../Util/MathUtils';
 
 /**
@@ -145,6 +145,14 @@ export class StatsPanel {
         if (this.rootElement.classList.contains('panel-wrap-visible')) {
             this.rootElement.classList.remove('panel-wrap-visible');
         }
+    }
+
+    public handlePlayerCount(playerCount: number) {
+        this.addOrUpdateStat(
+            'PlayerCountStat',
+            'Players',
+            playerCount.toString()
+        );
     }
 
     /**

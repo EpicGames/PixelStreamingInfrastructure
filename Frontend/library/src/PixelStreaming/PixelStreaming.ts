@@ -15,6 +15,9 @@ import {
     PixelStreamingEvent,
     StatsReceivedEvent,
     StreamLoadingEvent,
+    StreamPreConnectEvent,
+    StreamReconnectEvent,
+    StreamPreDisconnectEvent,
     VideoEncoderAvgQPEvent,
     VideoInitializedEvent,
     WebRtcAutoConnectEvent,
@@ -22,7 +25,8 @@ import {
     WebRtcConnectingEvent,
     WebRtcDisconnectedEvent,
     WebRtcFailedEvent,
-    WebRtcSdpEvent
+    WebRtcSdpEvent,
+    PlayerCountEvent
 } from '../Util/EventEmitter';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
@@ -42,8 +46,8 @@ export interface PixelStreamingOverrides {
  * this will likely be the core of your Pixel Streaming experience in terms of functionality.
  */
 export class PixelStreaming {
-    private _webRtcController: WebRtcPlayerController;
-    private _webXrController: WebXRController;
+    protected _webRtcController: WebRtcPlayerController;
+    protected _webXrController: WebXRController;
     /**
      * Configuration object. You can read or modify config through this object. Whenever
      * the configuration is changed, the library will emit a `settingsChanged` event.
@@ -325,6 +329,7 @@ export class PixelStreaming {
      * Connect to signaling server.
      */
     public connect() {
+        this._eventEmitter.dispatchEvent(new StreamPreConnectEvent());
         this._webRtcController.connectToSignallingServer();
     }
 
@@ -333,6 +338,7 @@ export class PixelStreaming {
      * before establishing a new connection
      */
     public reconnect() {
+        this._eventEmitter.dispatchEvent(new StreamReconnectEvent());
         this._webRtcController.restartStreamAutomatically();
     }
 
@@ -340,6 +346,7 @@ export class PixelStreaming {
      * Disconnect from the signaling server and close open peer connections.
      */
     public disconnect() {
+        this._eventEmitter.dispatchEvent(new StreamPreDisconnectEvent());
         this._webRtcController.close();
     }
 
@@ -552,6 +559,12 @@ export class PixelStreaming {
         this.config.setFlagEnabled(
             Flags.IsQualityController,
             hasQualityOwnership
+        );
+    }
+
+    _onPlayerCount(playerCount: number) {
+        this._eventEmitter.dispatchEvent(
+            new PlayerCountEvent({ count: playerCount })
         );
     }
 

@@ -4,7 +4,7 @@ import { FullScreenIcon } from './FullscreenIcon';
 import { SettingsIcon } from './SettingsIcon';
 import { StatsIcon } from './StatsIcon';
 import { XRIcon } from './XRIcon';
-import { WebXRController } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+import { WebXRController } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
 import { UIElementConfig, UIElementCreationMode } from '../UI/UIConfigurationTypes'
 
 /**
@@ -43,10 +43,10 @@ export class Controls {
         if (!config || shouldCreateButton(config.statsButtonType)) {
             this.statsIcon = new StatsIcon();
         }
-        if (!config || shouldCreateButton(config.fullscreenButtonType)){
+        if (!config || shouldCreateButton(config.settingsButtonType)){
             this.settingsIcon = new SettingsIcon();
         }
-        if (!config || shouldCreateButton(config.settingsButtonType)) {
+        if (!config || shouldCreateButton(config.fullscreenButtonType)) {
             this.fullscreenIcon = new FullScreenIcon();
         }
         if (!config || shouldCreateButton(config.xrIconType)){

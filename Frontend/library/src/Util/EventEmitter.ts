@@ -220,6 +220,36 @@ export class StreamLoadingEvent extends Event {
 }
 
 /**
+ * An event that is emitted when video stream loading has finished.
+ */
+export class StreamPreConnectEvent extends Event {
+    readonly type: 'streamConnect';
+    constructor() {
+        super('streamConnect');
+    }
+}
+
+/**
+ * An event that is emitted when video stream has stopped.
+ */
+export class StreamPreDisconnectEvent extends Event {
+    readonly type: 'streamDisconnect';
+    constructor() {
+        super('streamDisconnect');
+    }
+}
+
+/**
+ * An event that is emitted when video stream is reconnecting.
+ */
+export class StreamReconnectEvent extends Event {
+    readonly type: 'streamReconnect';
+    constructor() {
+        super('streamReconnect');
+    }
+}
+
+/**
  * An event that is emitted if there are errors loading the video stream.
  */
 export class PlayStreamErrorEvent extends Event {
@@ -440,6 +470,21 @@ export class XrFrameEvent extends Event {
     }
 }
 
+/**
+ * An event that is emitted when receiving a player count from the signalling server
+ */
+export class PlayerCountEvent extends Event {
+    readonly type: 'playerCount';
+    readonly data: {
+        /** count object */
+        count: number
+    };
+    constructor(data: PlayerCountEvent['data']) {
+        super('playerCount');
+        this.data = data;
+    }
+}
+
 export type PixelStreamingEvent =
     | AfkWarningActivateEvent
     | AfkWarningUpdateEvent
@@ -457,6 +502,9 @@ export type PixelStreamingEvent =
     | DataChannelErrorEvent
     | VideoInitializedEvent
     | StreamLoadingEvent
+    | StreamPreConnectEvent
+    | StreamReconnectEvent
+    | StreamPreDisconnectEvent
     | PlayStreamErrorEvent
     | PlayStreamEvent
     | PlayStreamRejectedEvent
@@ -469,7 +517,8 @@ export type PixelStreamingEvent =
     | SettingsChangedEvent
     | XrSessionStartedEvent
     | XrSessionEndedEvent
-    | XrFrameEvent;
+    | XrFrameEvent
+    | PlayerCountEvent;
 
 export class EventEmitter extends EventTarget {
     /**

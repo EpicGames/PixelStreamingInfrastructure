@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Config, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
-import { Application, PixelStreamingApplicationStyle } from '@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2';
+import { Config, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
+import { Application, PixelStreamingApplicationStyle } from '@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.3';
 export const PixelStreamingApplicationStyles = new PixelStreamingApplicationStyle();
 PixelStreamingApplicationStyles.applyStyleSheet();
 
@@ -289,6 +289,13 @@ class Showcase {
 		statgpuBtn.onclick = () => { this._pixelStreaming.emitConsoleCommand("stat pixelstreaming"); }
 		statgpuBtn.innerText = "stat pixelstreaming";
 		consoleCmdBtnsContainer.appendChild(statgpuBtn);
+
+		//stat pixelStreamingGraphs
+		const statGraphBtn = document.createElement("button");
+		statGraphBtn.classList.add("btn-flat");
+		statGraphBtn.onclick = () => { this._pixelStreaming.emitConsoleCommand("stat pixelstreaminggraphs"); }
+		statGraphBtn.innerText = "stat pixelstreaminggraphs";
+		consoleCmdBtnsContainer.appendChild(statGraphBtn);
 
 	}
 

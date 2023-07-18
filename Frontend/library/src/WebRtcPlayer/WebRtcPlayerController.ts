@@ -204,6 +204,9 @@ export class WebRtcPlayerController {
             );
             this.setVideoEncoderAvgQP(0);
         };
+        this.webSocketController.onPlayerCount = (playerCount: MessageReceive.MessagePlayerCount) => { 
+            this.pixelStreaming._onPlayerCount(playerCount.count); 
+        };
         this.webSocketController.onOpen.addEventListener('open', () => {
             const BrowserSendsOffer = this.config.isFlagEnabled(
                 Flags.BrowserSendOffer
@@ -213,7 +216,7 @@ export class WebRtcPlayerController {
                 this.webSocketController.requestStreamerList();
             }
         });
-        this.webSocketController.onClose.addEventListener('close', () => {
+        this.webSocketController.onClose.addEventListener('close', (event : CustomEvent) => {
             this.afkController.stopAfkWarningTimer();
 
             // stop sending stats on interval if we have closed our connection
@@ -227,7 +230,12 @@ export class WebRtcPlayerController {
             this.setKeyboardInputEnabled(false);
             this.setGamePadInputEnabled(false);
 
-            if(this.shouldReconnect && this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts) > 0) {
+            // when we refresh the page during a stream we get the going away code.
+            // in that case we don't want to reconnect since we're navigating away.
+            // https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
+            // lists all the codes. 
+            const CODE_GOING_AWAY = 1001;
+            if(this.shouldReconnect && event.detail.code != CODE_GOING_AWAY && this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts) > 0) {
                 this.isReconnecting = true;
                 this.reconnectAttempt++;
                 this.restartStreamAutomatically();
@@ -1589,6 +1597,8 @@ export class WebRtcPlayerController {
      * Close the Connection to the signaling server
      */
     closeSignalingServer() {
+        // We explicitly called close, therefore we don't want to trigger auto reconnect
+        this.shouldReconnect = false;
         this.webSocketController?.close();
     }
 
@@ -1855,7 +1865,7 @@ export class WebRtcPlayerController {
                 parsedInitialSettings.PixelStreaming;
         }
 
-        if (parsedInitialSettings.ConfigOptions) {
+        if (parsedInitialSettings.ConfigOptions && parsedInitialSettings.ConfigOptions.DefaultToHover !== undefined) {
             this.config.setFlagEnabled(
                 Flags.HoveringMouseMode,
                 !!parsedInitialSettings.ConfigOptions.DefaultToHover
