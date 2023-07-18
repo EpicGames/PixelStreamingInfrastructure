@@ -62,10 +62,10 @@
   popd
   echo End of build PS frontend lib step.
 
-  @Rem Do npm install in the Frontend\implementations\EpicGames directory (note we use start because that loads PATH)
+  @Rem Do npm install in the Frontend\implementations\typescript directory (note we use start because that loads PATH)
   echo ----------------------------
   echo Building Epic Games reference frontend...
-  pushd %CD%\Frontend\implementations\EpicGames
+  pushd %CD%\Frontend\implementations\typescript
   call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
   call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm link ../../library ../../ui-library
   call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm run build-dev
