@@ -75,6 +75,13 @@ export class DataChannelLatencyTest {
             result.toString(),
             6
         );
+        /**
+         * Check we have results, NaN would mean that UE version we talk to doesn't support our test
+         */
+        if (isNaN(result.dataChannelRtt)) {
+            this.latencyTestResultsElement.innerHTML = '<div>Not supported</div>';
+            return;
+        }
         let latencyStatsInnerHTML = '';
         latencyStatsInnerHTML +=
             '<div>Data channel RTT (ms): ' +
