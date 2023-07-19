@@ -82,6 +82,11 @@ export class StreamMessageController {
             byteLength: 0,
             structure: []
         });
+        this.toStreamerMessages.add('DataChannelLatencyTest', {
+            id: 9,
+            byteLength: 0,
+            structure: []
+        });
         /*
          * Input Messages. Range = 50..89.
          */
@@ -220,6 +225,7 @@ export class StreamMessageController {
         this.fromStreamerMessages.add('TestEcho', 11);
         this.fromStreamerMessages.add('InputControlOwnership', 12);
         this.fromStreamerMessages.add('GamepadResponse', 13);
+        this.fromStreamerMessages.add('DataChannelLatencyTest', 14);
         this.fromStreamerMessages.add('Protocol', 255);
     }
 

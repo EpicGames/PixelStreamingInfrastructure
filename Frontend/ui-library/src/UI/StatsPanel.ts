@@ -1,9 +1,11 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { LatencyTest } from './LatencyTest';
-import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
+import {InitialSettings, Logger, PixelStreaming} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
 import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
 import { MathUtils } from '../Util/MathUtils';
+import {DataChannelLatencyTest} from "./DataChannelLatencyTest";
+import {PixelStreamingSettings} from "@epicgames-ps/lib-pixelstreamingfrontend-ue5.3/types/DataChannel/InitialSettings";
 
 /**
  * A stat structure, an id, the stat string, and the element where it is rendered.
@@ -26,12 +28,14 @@ export class StatsPanel {
     _statsResult: HTMLElement;
 
     latencyTest: LatencyTest;
+    dataChannelLatencyTest: DataChannelLatencyTest;
 
     /* A map stats we are storing/rendering */
     statsMap = new Map<string, Stat>();
 
     constructor() {
         this.latencyTest = new LatencyTest();
+        this.dataChannelLatencyTest = new DataChannelLatencyTest();
     }
 
     /**
@@ -91,6 +95,7 @@ export class StatsPanel {
             statistics.appendChild(this.statisticsContainer);
 
             controlStats.appendChild(this.latencyTest.rootElement);
+            controlStats.appendChild(this.dataChannelLatencyTest.rootElement);
         }
         return this._statsContentElement;
     }
@@ -120,6 +125,48 @@ export class StatsPanel {
             this._statsCloseButton.id = 'statsClose';
         }
         return this._statsCloseButton;
+    }
+
+    public onDisconnect(): void {
+        this.latencyTest.latencyTestButton.onclick = () => {
+            // do nothing
+        }
+        this.dataChannelLatencyTest.latencyTestButton.onclick = () => {
+            //do nothing
+        }
+    }
+
+    public onVideoInitialized(stream: PixelStreaming): void {
+        // starting a latency check
+        this.latencyTest.latencyTestButton.onclick = () => {
+            stream.requestLatencyTest();
+        };
+        this.dataChannelLatencyTest.latencyTestButton.onclick = () => {
+            let started = stream.requestDataChannelLatencyTest({
+                duration: 1000,
+                rps: 10,
+                requestSize: 200,
+                responseSize: 200
+            });
+            if (started) {
+                this.dataChannelLatencyTest.handleTestStart();
+            }
+        };
+    }
+
+    public configure(settings: PixelStreamingSettings): void {
+        if (settings.DisableLatencyTest) {
+            this.latencyTest.latencyTestButton.disabled = true;
+            this.latencyTest.latencyTestButton.title =
+                'Disabled by -PixelStreamingDisableLatencyTester=true';
+            this.dataChannelLatencyTest.latencyTestButton.disabled = true;
+            this.dataChannelLatencyTest.latencyTestButton.title =
+                'Disabled by -PixelStreamingDisableLatencyTester=true';
+            Logger.Info(
+                Logger.GetStackTrace(),
+                '-PixelStreamingDisableLatencyTester=true, requesting latency report from the the browser to UE is disabled.'
+            );
+        }
     }
 
     /**

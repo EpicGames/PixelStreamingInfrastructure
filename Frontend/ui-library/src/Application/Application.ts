@@ -31,6 +31,9 @@ import {
     UIElementConfig
 } from '../UI/UIConfigurationTypes'
 import { FullScreenIconBase, FullScreenIconExternal } from '../UI/FullscreenIcon';
+import {
+    DataChannelLatencyTestResult
+} from "@epicgames-ps/lib-pixelstreamingfrontend-ue5.3/types/DataChannel/DataChannelLatencyTestResults";
 
 
 /** 
@@ -357,6 +360,11 @@ export class Application {
                 this.onLatencyTestResults(latencyTimings)
         );
         this.stream.addEventListener(
+            'dataChannelLatencyTestResult',
+            ({data: { result } }) =>
+                this.onDataChannelLatencyTestResults(result)
+        )
+        this.stream.addEventListener(
             'streamerListMessage',
             ({ data: { messageStreamerList, autoSelectedStreamerId } }) =>
                 this.handleStreamerListMessage(messageStreamerList, autoSelectedStreamerId)
@@ -574,10 +582,8 @@ export class Application {
                 `Disconnected: ${eventString}  <div class="clickableState">Click To Restart</div>`
             );
         }
-        // disable starting a latency check
-        this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
-            // do nothing
-        };
+        // disable starting a latency checks
+        this.statsPanel.onDisconnect();
     }
 
     /**
@@ -624,11 +630,7 @@ export class Application {
         if (!this.stream.config.isFlagEnabled(Flags.AutoPlayVideo)) {
             this.showPlayOverlay();
         }
-
-        // starting a latency check
-        this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
-            this.stream.requestLatencyTest();
-        };
+        this.statsPanel.onVideoInitialized(this.stream);
     }
 
     /**
@@ -644,17 +646,7 @@ export class Application {
 
     onInitialSettings(settings: InitialSettings) {
         if (settings.PixelStreamingSettings) {
-            const disableLatencyTest =
-                settings.PixelStreamingSettings.DisableLatencyTest;
-            if (disableLatencyTest) {
-                this.statsPanel.latencyTest.latencyTestButton.disabled = true;
-                this.statsPanel.latencyTest.latencyTestButton.title =
-                    'Disabled by -PixelStreamingDisableLatencyTester=true';
-                Logger.Info(
-                    Logger.GetStackTrace(),
-                    '-PixelStreamingDisableLatencyTester=true, requesting latency report from the the browser to UE is disabled.'
-                );
-            }
+            this.statsPanel.configure(settings.PixelStreamingSettings);
         }
     }
 
@@ -665,6 +657,10 @@ export class Application {
 
     onLatencyTestResults(latencyTimings: LatencyTestResults) {
         this.statsPanel.latencyTest.handleTestResult(latencyTimings);
+    }
+
+    onDataChannelLatencyTestResults(result: DataChannelLatencyTestResult) {
+        this.statsPanel.dataChannelLatencyTest.handleTestResult(result);
     }
 
     onPlayerCount(playerCount: number) {

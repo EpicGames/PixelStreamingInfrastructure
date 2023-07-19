@@ -3,6 +3,7 @@
 import { DataChannelSender } from '../DataChannel/DataChannelSender';
 import { Logger } from '../Logger/Logger';
 import { StreamMessageController } from './StreamMessageController';
+import {DataChannelLatencyTestRequest} from "../DataChannel/DataChannelLatencyTestResults";
 
 export class SendDescriptorController {
     toStreamerMessagesMapProvider: StreamMessageController;
@@ -22,6 +23,14 @@ export class SendDescriptorController {
      */
     sendLatencyTest(descriptor: object) {
         this.sendDescriptor('LatencyTest', descriptor);
+    }
+
+    /**
+     * Send a Data Channel Latency Test to the UE Instance
+     * @param descriptor - the descriptor for a latency test
+     */
+    sendDataChannelLatencyTest(descriptor: DataChannelLatencyTestRequest) {
+        this.sendDescriptor('DataChannelLatencyTest', descriptor);
     }
 
     /**
