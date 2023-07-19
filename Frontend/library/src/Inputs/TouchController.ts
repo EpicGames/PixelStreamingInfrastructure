@@ -152,16 +152,15 @@ export class TouchController implements ITouchController {
         if (!this.videoElementProvider.isVideoReady()) {
             return;
         }
-        const videoElementParent =
-            this.videoElementProvider.getVideoParentElement();
+        const offset = this.videoElementProvider.getVideoParentElement().getBoundingClientRect();
         const toStreamerHandlers =
             this.toStreamerMessagesProvider.toStreamerHandlers;
 
         for (let t = 0; t < touches.length; t++) {
             const numTouches = 1; // the number of touches to be sent this message
             const touch = touches[t];
-            const x = touch.clientX - videoElementParent.offsetLeft;
-            const y = touch.clientY - videoElementParent.offsetTop;
+            const x = touch.clientX - offset.left;
+            const y = touch.clientY - offset.top;
             Logger.Log(
                 Logger.GetStackTrace(),
                 `F${this.fingerIds.get(touch.identifier)}=(${x}, ${y})`,
