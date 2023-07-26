@@ -213,7 +213,7 @@ export class PeerConnectionController {
         );
 
         // set max bitrate to highest bitrate Opus supports
-        let audioSDP += 'maxaveragebitrate=510000;';
+        let audioSDP = 'maxaveragebitrate=510000;';
 
         if (useMic) {
             // set the max capture rate to 48khz (so we can send high quality audio from mic)
