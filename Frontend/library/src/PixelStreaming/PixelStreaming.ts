@@ -734,7 +734,7 @@ export class PixelStreaming {
         return this._webXrController;
     }
 
-    public regiserMessageHandler(name: string, direction: MessageDirection, handler?: (data: ArrayBuffer) => void) {
+    public registerMessageHandler(name: string, direction: MessageDirection, handler?: (data: ArrayBuffer | Array<number | string>) => void) {
         if(direction === MessageDirection.ToStreamer && typeof handler === 'undefined') {
             this._webRtcController.streamMessageController.registerMessageHandler(
                 direction,
@@ -752,5 +752,9 @@ export class PixelStreaming {
                 (data: ArrayBuffer) => handler(data)
             );
         }
+    }
+
+    public get toStreamerHandlers() {
+        return this._webRtcController.streamMessageController.toStreamerHandlers;
     }
 }

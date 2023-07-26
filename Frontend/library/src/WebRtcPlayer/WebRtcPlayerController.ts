@@ -327,7 +327,7 @@ export class WebRtcPlayerController {
 
         //try {
         const messageType =
-            this.streamMessageController.fromStreamerMessages.getFromValue(
+            this.streamMessageController.fromStreamerMessages.get(
                 message[0]
             );
         this.streamMessageController.fromStreamerHandlers.get(messageType)(
@@ -813,7 +813,7 @@ export class WebRtcPlayerController {
                             )
                         ) {
                             // If we've registered a handler for this message type we can add it to our supported messages. ie registerMessageHandler(...)
-                            this.streamMessageController.toStreamerMessages.add(
+                            this.streamMessageController.toStreamerMessages.set(
                                 messageType,
                                 message
                             );
@@ -843,9 +843,9 @@ export class WebRtcPlayerController {
                             )
                         ) {
                             // If we've registered a handler for this message type. ie registerMessageHandler(...)
-                            this.streamMessageController.fromStreamerMessages.add(
-                                messageType,
-                                message.id
+                            this.streamMessageController.fromStreamerMessages.set(
+                                message.id,
+                                messageType
                             );
                         } else {
                             Logger.Error(
@@ -2048,5 +2048,26 @@ export class WebRtcPlayerController {
             this.pixelStreaming.dispatchEvent(
                 new DataChannelErrorEvent({ label, event })
             );
+    }
+
+    public registerMessageHandler(name: string, direction: MessageDirection, handler?: (data: ArrayBuffer | Array<number | string>) => void) {
+        if(direction === MessageDirection.FromStreamer && typeof handler === 'undefined') {
+            Logger.Warning(
+                Logger.GetStackTrace(),
+                `Unable to register handler for ${name} as no handler was passed`
+            );
+        }
+
+        
+        this.streamMessageController.registerMessageHandler(
+            direction,
+            name,
+            (data: Array<number | string>) => (typeof handler === 'undefined' && direction === MessageDirection.ToStreamer) ? 
+                this.sendMessageController.sendMessageToStreamer(
+                    name,
+                    data
+                ) :   
+                handler(data)
+        );
     }
 }

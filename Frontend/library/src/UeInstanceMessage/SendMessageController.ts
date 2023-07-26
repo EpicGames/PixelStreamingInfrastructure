@@ -33,11 +33,20 @@ export class SendMessageController {
 
         const toStreamerMessages =
             this.toStreamerMessagesMapProvider.toStreamerMessages;
-        const messageFormat = toStreamerMessages.getFromKey(messageType);
+        const messageFormat = toStreamerMessages.get(messageType);
         if (messageFormat === undefined) {
             Logger.Error(
                 Logger.GetStackTrace(),
                 `Attempted to send a message to the streamer with message type: ${messageType}, but the frontend hasn't been configured to send such a message. Check you've added the message type in your cpp`
+            );
+            return;
+        }
+
+        if(messageFormat.structure && messageData && messageFormat.structure.length !== messageData.length) {
+            const typeArr = messageData.map((element: number | string) => typeof element);
+            Logger.Error(
+                Logger.GetStackTrace(),
+                `Provided message data doesn't match expected layout. Expected [ ${messageFormat.structure.toString() } ] but received [ ${typeArr.toString()} ]`
             );
             return;
         }
