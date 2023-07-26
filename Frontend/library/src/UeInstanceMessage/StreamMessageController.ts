@@ -5,14 +5,13 @@ import { Logger } from '../Logger/Logger';
 
 export class ToStreamerMessage {
     id: number;
-    byteLength: number;
     structure?: Array<string>;
 }
 
 export class StreamMessageController {
     toStreamerHandlers: Map<
         string,
-        (messageData?: Array<number> | undefined) => void
+        (messageData?: Array<number | string> | undefined) => void
     >;
     fromStreamerHandlers: Map<
         string,
@@ -39,47 +38,38 @@ export class StreamMessageController {
          */
         this.toStreamerMessages.add('IFrameRequest', {
             id: 0,
-            byteLength: 0,
             structure: []
         });
         this.toStreamerMessages.add('RequestQualityControl', {
             id: 1,
-            byteLength: 0,
             structure: []
         });
         this.toStreamerMessages.add('FpsRequest', {
             id: 2,
-            byteLength: 0,
             structure: []
         });
         this.toStreamerMessages.add('AverageBitrateRequest', {
             id: 3,
-            byteLength: 0,
             structure: []
         });
         this.toStreamerMessages.add('StartStreaming', {
             id: 4,
-            byteLength: 0,
             structure: []
         });
         this.toStreamerMessages.add('StopStreaming', {
             id: 5,
-            byteLength: 0,
             structure: []
         });
         this.toStreamerMessages.add('LatencyTest', {
             id: 6,
-            byteLength: 0,
             structure: []
         });
         this.toStreamerMessages.add('RequestInitialSettings', {
             id: 7,
-            byteLength: 0,
             structure: []
         });
         this.toStreamerMessages.add('TestEcho', {
             id: 8,
-            byteLength: 0,
             structure: []
         });
         /*
@@ -88,120 +78,100 @@ export class StreamMessageController {
         // Generic Input Messages. Range = 50..59.
         this.toStreamerMessages.add('UIInteraction', {
             id: 50,
-            byteLength: 0,
-            structure: []
+            structure: ['string']
         });
         this.toStreamerMessages.add('Command', {
             id: 51,
-            byteLength: 0,
-            structure: []
+            structure: ['string']
         });
         // Keyboard Input Message. Range = 60..69.
         this.toStreamerMessages.add('KeyDown', {
             id: 60,
-            byteLength: 2,
             //            keyCode  isRepeat
             structure: ['uint8', 'uint8']
         });
         this.toStreamerMessages.add('KeyUp', {
             id: 61,
-            byteLength: 1,
             //            keyCode
             structure: ['uint8']
         });
         this.toStreamerMessages.add('KeyPress', {
             id: 62,
-            byteLength: 2,
             //            charcode
             structure: ['uint16']
         });
         // Mouse Input Messages. Range = 70..79.
         this.toStreamerMessages.add('MouseEnter', {
             id: 70,
-            byteLength: 0,
             structure: []
         });
         this.toStreamerMessages.add('MouseLeave', {
             id: 71,
-            byteLength: 0,
             structure: []
         });
         this.toStreamerMessages.add('MouseDown', {
             id: 72,
-            byteLength: 5,
             //              button     x         y
             structure: ['uint8', 'uint16', 'uint16']
         });
         this.toStreamerMessages.add('MouseUp', {
             id: 73,
-            byteLength: 5,
             //              button     x         y
             structure: ['uint8', 'uint16', 'uint16']
         });
         this.toStreamerMessages.add('MouseMove', {
             id: 74,
-            byteLength: 8,
             //              x           y      deltaX    deltaY
             structure: ['uint16', 'uint16', 'int16', 'int16']
         });
         this.toStreamerMessages.add('MouseWheel', {
             id: 75,
-            byteLength: 6,
             //              delta       x        y
             structure: ['int16', 'uint16', 'uint16']
         });
         this.toStreamerMessages.add('MouseDouble', {
             id: 76,
-            byteLength: 5,
             //              button     x         y
             structure: ['uint8', 'uint16', 'uint16']
         });
         // Touch Input Messages. Range = 80..89.
         this.toStreamerMessages.add('TouchStart', {
             id: 80,
-            byteLength: 8,
             //          numtouches(1)   x       y        idx     force     valid
             structure: ['uint8', 'uint16', 'uint16', 'uint8', 'uint8', 'uint8']
         });
         this.toStreamerMessages.add('TouchEnd', {
             id: 81,
-            byteLength: 8,
             //          numtouches(1)   x       y        idx     force     valid
             structure: ['uint8', 'uint16', 'uint16', 'uint8', 'uint8', 'uint8']
         });
         this.toStreamerMessages.add('TouchMove', {
             id: 82,
-            byteLength: 8,
             //          numtouches(1)   x       y       idx      force     valid
             structure: ['uint8', 'uint16', 'uint16', 'uint8', 'uint8', 'uint8']
         });
         // Gamepad Input Messages. Range = 90..99
         this.toStreamerMessages.add('GamepadConnected', {
             id: 93,
-            byteLength: 0,
             structure: []
         });
         this.toStreamerMessages.add('GamepadButtonPressed', {
             id: 90,
-            byteLength: 3,
-            //            ctrlerId   button  isRepeat
+            //         ctrlerId   button  isRepeat
             structure: ['uint8', 'uint8', 'uint8']
         });
         this.toStreamerMessages.add('GamepadButtonReleased', {
             id: 91,
-            byteLength: 3,
-            //            ctrlerId   button  isRepeat(0)
+            //         ctrlerId   button  isRepeat(0)
             structure: ['uint8', 'uint8', 'uint8']
         });
         this.toStreamerMessages.add('GamepadAnalog', {
             id: 92,
-            byteLength: 10,
-            //            ctrlerId   button  analogValue
+            //         ctrlerId   button  analogValue
             structure: ['uint8', 'uint8', 'double']
         });
         this.toStreamerMessages.add('GamepadDisconnected', {
             id: 94,
-            byteLength: 1,
             //          ctrlerId
             structure: ['uint8']
         });

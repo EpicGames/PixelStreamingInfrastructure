@@ -30,6 +30,7 @@ import {
 } from '../Util/EventEmitter';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
+import { MessageDirection } from '../UeInstanceMessage/StreamMessageController';
 
 export interface PixelStreamingOverrides {
     /** The DOM elment where Pixel Streaming video and user input event handlers are attached to.
@@ -731,5 +732,25 @@ export class PixelStreaming {
      */
     public get webXrController() {
         return this._webXrController;
+    }
+
+    public regiserMessageHandler(name: string, direction: MessageDirection, handler?: (data: ArrayBuffer) => void) {
+        if(direction === MessageDirection.ToStreamer && typeof handler === 'undefined') {
+            this._webRtcController.streamMessageController.registerMessageHandler(
+                direction,
+                name,
+                (data: Array<number>) =>
+                this._webRtcController.sendMessageController.sendMessageToStreamer(
+                    name,
+                    data
+                )
+            );
+        } else {
+            this._webRtcController.streamMessageController.registerMessageHandler(
+                direction,
+                name,
+                (data: ArrayBuffer) => handler(data)
+            );
+        }
     }
 }
