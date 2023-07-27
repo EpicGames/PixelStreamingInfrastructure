@@ -473,8 +473,10 @@ export class WebRtcPlayerController {
         this.streamMessageController.registerMessageHandler(
             MessageDirection.ToStreamer,
             'LatencyTest',
-            () =>
-                this.sendMessageController.sendMessageToStreamer('LatencyTest')
+            (data: Array<number | string>) =>
+                this.sendMessageController.sendMessageToStreamer(
+                    'LatencyTest', data
+                )
         );
         this.streamMessageController.registerMessageHandler(
             MessageDirection.ToStreamer,
