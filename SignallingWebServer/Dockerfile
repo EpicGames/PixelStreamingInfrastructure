@@ -8,23 +8,24 @@ COPY /Frontend /Frontend
 # Install the dependencies for the signalling server and build the frontend
 RUN SignallingWebServer/platform_scripts/bash/setup.sh --build
 
-# Expose TCP port 80 for player WebSocket connections and web server HTTP access
+# Expose TCP ports 80 and 443 for player WebSocket connections and web server HTTP(S) access
 EXPOSE 80
+EXPOSE 443
 
 # Expose TCP port 8888 for streamer WebSocket connections
 EXPOSE 8888
 EXPOSE 8888/udp
 
-# Expose port for SFU connections
+# Expose TCP port 8889 for connections from the SFU
 EXPOSE 8889
 
-# Google stun
+# Expose TCP port 19302 for connections to Google's stun server
 EXPOSE 19302
 
-# Matchmaker
+# Expose TCP port 9999 for connections from the Matchmaker
 EXPOSE 9999
 
-# Turn coturn
+# Expose TCP port 19302 for connections from coturn
 EXPOSE 3478
 EXPOSE 3479
 
