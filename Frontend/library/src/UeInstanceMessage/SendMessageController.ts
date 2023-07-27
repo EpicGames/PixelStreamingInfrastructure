@@ -26,14 +26,14 @@ export class SendMessageController {
      * @param messageData - the message data we are sending over the data channel
      * @returns - nil
      */
-    sendMessageToStreamer(messageType: string, messageData?: Array<number>) {
+    sendMessageToStreamer(messageType: string, messageData?: Array<number | string>) {
         if (messageData === undefined) {
             messageData = [];
         }
 
         const toStreamerMessages =
             this.toStreamerMessagesMapProvider.toStreamerMessages;
-        const messageFormat = toStreamerMessages.getFromKey(messageType);
+        const messageFormat = toStreamerMessages.get(messageType);
         if (messageFormat === undefined) {
             Logger.Error(
                 Logger.GetStackTrace(),
@@ -42,38 +42,99 @@ export class SendMessageController {
             return;
         }
 
-        const data = new DataView(
-            new ArrayBuffer(messageFormat.byteLength + 1)
-        );
-        data.setUint8(0, messageFormat.id);
-        let byteOffset = 1;
+        if(messageFormat.structure && messageData && messageFormat.structure.length !== messageData.length) {
+            Logger.Error(
+                Logger.GetStackTrace(),
+                `Provided message data doesn't match expected layout. Expected [ ${messageFormat.structure.map((element: string) => {
+                    switch (element) {
+                        case 'uint8':
+                        case 'uint16':
+                        case 'int16':
+                        case 'float':
+                        case 'double':
+                            return 'number';
+                        case 'string':
+                            return 'string';
+                    }
+                }).toString() } ] but received [ ${messageData.map((element: number | string) => typeof element).toString()} ]`
+            );
+            return;
+        }
 
-        messageData.forEach((element: number, idx: number) => {
+        let byteLength = 0;
+        const textEncoder = new TextEncoder();
+        // One loop to calculate the length in bytes of all of the provided data
+        messageData.forEach((element: number | string, idx: number) => {
             const type = messageFormat.structure[idx];
             switch (type) {
                 case 'uint8':
-                    data.setUint8(byteOffset, element);
+                    byteLength += 1;
+                    break;
+
+                case 'uint16':
+                    byteLength += 2;
+                    break;
+
+                case 'int16':
+                    byteLength += 2;
+                    break;
+
+                case 'float':
+                    byteLength += 4;
+                    break;
+
+                case 'double':
+                    byteLength += 8;
+                    break;
+
+                case 'string':
+                    // 2 bytes for string length
+                    byteLength += 2;
+                    // 2 bytes per characters
+                    byteLength += 2 * textEncoder.encode(element as string).length;
+                    break;
+            }
+        });
+
+        const data = new DataView(new ArrayBuffer(byteLength + 1));
+        data.setUint8(0, messageFormat.id);
+        let byteOffset = 1;
+
+        messageData.forEach((element: number | string, idx: number) => {
+            const type = messageFormat.structure[idx];
+            switch (type) {
+                case 'uint8':
+                    data.setUint8(byteOffset, element as number);
                     byteOffset += 1;
                     break;
 
                 case 'uint16':
-                    data.setUint16(byteOffset, element, true);
+                    data.setUint16(byteOffset, element as number, true);
                     byteOffset += 2;
                     break;
 
                 case 'int16':
-                    data.setInt16(byteOffset, element, true);
+                    data.setInt16(byteOffset, element as number, true);
                     byteOffset += 2;
                     break;
 
                 case 'float':
-                    data.setFloat32(byteOffset, element, true);
+                    data.setFloat32(byteOffset, element as number, true);
                     byteOffset += 4;
                     break;
 
                 case 'double':
-                    data.setFloat64(byteOffset, element, true);
+                    data.setFloat64(byteOffset, element as number, true);
                     byteOffset += 8;
+                    break;
+
+                case 'string':
+                    data.setUint16(byteOffset, (element as string).length, true);
+                    byteOffset += 2;
+                    for (let i = 0; i < (element as string).length; i++) {
+                        data.setUint16(byteOffset, (element as string).charCodeAt(i), true);
+                        byteOffset += 2;
+                    }
                     break;
             }
         });
@@ -86,8 +147,8 @@ export class SendMessageController {
                 )}`
             );
             return;
-        } else {
-            this.dataChannelSender.sendData(data.buffer);
         }
+
+        this.dataChannelSender.sendData(data.buffer);
     }
 }

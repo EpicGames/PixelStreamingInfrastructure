@@ -33,6 +33,7 @@ export {
 export { AggregatedStats } from './PeerConnectionController/AggregatedStats';
 export { Logger } from './Logger/Logger';
 export { UnquantizedDenormalizedUnsignedCoord as UnquantizedAndDenormalizeUnsigned } from './Util/CoordinateConverter';
+export { MessageDirection } from './UeInstanceMessage/StreamMessageController';
 export { MessageSend } from './WebSockets/MessageSend';
 export { MessageRecv, MessageStreamerList } from './WebSockets/MessageReceive';
 export { WebSocketController } from './WebSockets/WebSocketController';

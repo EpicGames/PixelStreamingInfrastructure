@@ -232,10 +232,7 @@ export class KeyboardController {
         Logger.Log(Logger.GetStackTrace(), `key up ${keyCode}`, 6);
         const toStreamerHandlers =
             this.toStreamerMessagesProvider.toStreamerHandlers;
-        toStreamerHandlers.get('KeyUp')([
-            keyCode,
-            keyboardEvent.repeat ? 1 : 0
-        ]);
+        toStreamerHandlers.get('KeyUp')([ keyCode ]);
 
         if (
             this.config.isFlagEnabled(Flags.SuppressBrowserKeys) &&
