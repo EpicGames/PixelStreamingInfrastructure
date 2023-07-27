@@ -14,12 +14,20 @@ EXPOSE 443
 
 # Expose TCP port 8888 for streamer WebSocket connections
 EXPOSE 8888
+EXPOSE 8888/udp
 
 # Expose TCP port 8889 for connections from the SFU
 EXPOSE 8889
 
+# Expose TCP port 19302 for connections to Google's stun server
+EXPOSE 19302
+
 # Expose TCP port 9999 for connections from the Matchmaker
 EXPOSE 9999
+
+# Expose TCP port 19302 for connections from coturn
+EXPOSE 3478
+EXPOSE 3479
 
 # Set the signalling server as the container's entrypoint
 ENTRYPOINT ["/usr/local/bin/node", "/SignallingWebServer/cirrus.js"]
