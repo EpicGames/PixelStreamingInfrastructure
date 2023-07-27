@@ -43,10 +43,20 @@ export class SendMessageController {
         }
 
         if(messageFormat.structure && messageData && messageFormat.structure.length !== messageData.length) {
-            const typeArr = messageData.map((element: number | string) => typeof element);
             Logger.Error(
                 Logger.GetStackTrace(),
-                `Provided message data doesn't match expected layout. Expected [ ${messageFormat.structure.toString() } ] but received [ ${typeArr.toString()} ]`
+                `Provided message data doesn't match expected layout. Expected [ ${messageFormat.structure.map((element: string) => {
+                    switch (element) {
+                        case 'uint8':
+                        case 'uint16':
+                        case 'int16':
+                        case 'float':
+                        case 'double':
+                            return 'number';
+                        case 'string':
+                            return 'string';
+                    }
+                }).toString() } ] but received [ ${messageData.map((element: number | string) => typeof element).toString()} ]`
             );
             return;
         }

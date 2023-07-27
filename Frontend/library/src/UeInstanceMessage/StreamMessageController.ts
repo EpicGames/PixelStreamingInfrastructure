@@ -61,7 +61,7 @@ export class StreamMessageController {
         });
         this.toStreamerMessages.set('LatencyTest', {
             id: 6,
-            structure: []
+            structure: ['string']
         });
         this.toStreamerMessages.set('RequestInitialSettings', {
             id: 7,

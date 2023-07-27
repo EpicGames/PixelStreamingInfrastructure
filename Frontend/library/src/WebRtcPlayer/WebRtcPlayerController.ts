@@ -807,6 +807,11 @@ export class WebRtcPlayerController {
                             return;
                         }
 
+                        // UE5.1 and UE5.2 don't send a structure for these message types, but they actually do have a structure so ignore updating them
+                        if((messageType === "UIInteraction" || messageType === "Command" || messageType === "LatencyTest")) {
+                            return;
+                        }
+
                         if (
                             this.streamMessageController.toStreamerHandlers.get(
                                 messageType
