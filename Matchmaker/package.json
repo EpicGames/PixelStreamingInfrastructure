@@ -3,6 +3,14 @@
   "version": "0.0.1",
   "private": true,
   "description": "Cirrus servers connect to the Matchmaker which redirects a browser to the next available Cirrus server",
+  "scripts": {
+	"start-local": "run-script-os --",
+      "start-local:windows": ".\\platform_scripts\\cmd\\run.bat",
+      "start-local:default": "./platform_scripts/bash/run.sh",
+	"start": "run-script-os",
+	  "start:windows": "platform_scripts\\cmd\\node\\node.exe matchmaker.js",
+      "start:default": "if [ `id -u` -eq 0 ]\nthen\n export process=\"./platform_scripts/bash/node/bin/node matchmaker.js\"\nelse\n export process=\"sudo ./platform_scripts/bash/node/bin/node matchmaker.js\"\nfi\n$process "
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
