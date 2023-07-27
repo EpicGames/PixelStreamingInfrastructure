@@ -509,6 +509,14 @@ export class WebRtcPlayerController {
         );
         this.streamMessageController.registerMessageHandler(
             MessageDirection.ToStreamer,
+            'TextboxEntry',
+            (data: Array<number | string>) => 
+                this.sendMessageController.sendMessageToStreamer(
+                    'TextboxEntry', data
+                )
+        );
+        this.streamMessageController.registerMessageHandler(
+            MessageDirection.ToStreamer,
             'KeyDown',
             (data: Array<number | string>) =>
                 this.sendMessageController.sendMessageToStreamer(

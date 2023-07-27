@@ -735,6 +735,11 @@ export class PixelStreaming {
     }
 
     public registerMessageHandler(name: string, direction: MessageDirection, handler?: (data: ArrayBuffer | Array<number | string>) => void) {
+        if(direction === MessageDirection.FromStreamer && typeof handler === 'undefined') {
+            Logger.Warning(Logger.GetStackTrace(), `Unable to register an undefined handler for ${name}`)
+            return;
+        }
+
         if(direction === MessageDirection.ToStreamer && typeof handler === 'undefined') {
             this._webRtcController.streamMessageController.registerMessageHandler(
                 direction,

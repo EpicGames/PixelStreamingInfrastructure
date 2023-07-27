@@ -16,19 +16,6 @@ document.body.onload = function() {
 	// Create a Native DOM delegate instance that implements the Delegate interface class
 	const stream = new PixelStreaming(config);
 
-    stream.registerMessageHandler('TextboxEntry', MessageDirection.ToStreamer, (data: Array<number | string>) => {
-        console.warn('Tried to send TextboxEntry with the follow params');
-        data.forEach((element: number | string) => {
-            console.warn(element)
-        })
-    })
-
-    stream.addEventListener('playStream', () => {
-        const handlers = stream.toStreamerHandlers;
-        handlers.get('TextboxEnty')(['Hello', 'World'])
-    })
-
-
 	const application = new Application({
 		stream,
 		onColorModeChanged: (isLightMode) => PixelStreamingApplicationStyles.setColorMode(isLightMode)
