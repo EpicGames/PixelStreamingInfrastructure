@@ -8,18 +8,25 @@ COPY /Frontend /Frontend
 # Install the dependencies for the signalling server and build the frontend
 RUN SignallingWebServer/platform_scripts/bash/setup.sh --build
 
-# Expose TCP ports 80 and 443 for player WebSocket connections and web server HTTP(S) access
+# Expose TCP port 80 for player WebSocket connections and web server HTTP access
 EXPOSE 80
-EXPOSE 443
 
 # Expose TCP port 8888 for streamer WebSocket connections
 EXPOSE 8888
+EXPOSE 8888/udp
 
-# Expose TCP port 8889 for connections from the SFU
+# Expose port for SFU connections
 EXPOSE 8889
 
-# Expose TCP port 9999 for connections from the Matchmaker
+# Google stun
+EXPOSE 19302
+
+# Matchmaker
 EXPOSE 9999
+
+# Turn coturn
+EXPOSE 3478
+EXPOSE 3479
 
 # Set the signalling server as the container's entrypoint
 ENTRYPOINT ["/usr/local/bin/node", "/SignallingWebServer/cirrus.js"]
