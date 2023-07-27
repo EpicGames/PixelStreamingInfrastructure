@@ -744,7 +744,7 @@ export class PixelStreaming {
             this._webRtcController.streamMessageController.registerMessageHandler(
                 direction,
                 name,
-                (data: Array<number>) =>
+                (data: Array<number | string>) =>
                 this._webRtcController.sendMessageController.sendMessageToStreamer(
                     name,
                     data
