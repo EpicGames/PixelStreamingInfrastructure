@@ -17,7 +17,7 @@ If you have encountered a bug, have suggestions for our documentation or infrast
 2. If your issue doesn't exist, open a new issue [here](https://github.com/EpicGames/PixelStreamingInfrastructure/issues/new/choose) by selecting a bug or feature request.
 3. Make sure to fill in the template as much as possible - any information you can provide, such as repro steps, crash stacks, screenshots, etc. can help us triage and fix the problem as quickly as possible.
 4. Keep an eye on the status of your issue - our developers or other users might reach out with requests for more information. If this happens, issues that have not received response in over 30 days will be automatically closed.
-5. Be patient while waiting on a resolution - we prioritize the issues internally, and some less critical features (however much we'd love to implement them!) will take a backseat to more pressing priorities, so some issue can take a while to get implemented.
+5. Be patient while waiting on a resolution - we prioritize the issues internally, and some less critical features (however much we'd love to implement them!) will take a backseat to more pressing priorities, so some issues can take a while to get resolved.
 
 ### Creating pull requests (PR)
 
