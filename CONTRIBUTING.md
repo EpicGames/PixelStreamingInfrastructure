@@ -12,7 +12,7 @@ Please remain patient, courteous and professional at all times. Any form of spam
 
 ### Creating issues
 
-If you have encountered a bug, have suggestions for our documentation, or would ike to propose a feature that could achievably enhance Pixel Streaming in various use case scenarios, you can raise this with us by creating a new issue.
+If you have encountered a bug, have suggestions for our documentation or infrastructure, or would ike to propose a feature that could achievably enhance Pixel Streaming in various use case scenarios, you can raise this with us by creating a new issue.
 1. First, search all open and closed issues [here](https://github.com/EpicGames/PixelStreamingInfrastructure/issues?q=is%3Aissue+) - your issue may have already been discussed or addressed.
 2. If your issue doesn't exist, open a new issue [here](https://github.com/EpicGames/PixelStreamingInfrastructure/issues/new/choose) by selecting a bug or feature request.
 3. Make sure to fill in the template as much as possible - any information you can provide, such as repro steps, crash stacks, screenshots, etc. can help us triage and fix the problem as quickly as possible.
