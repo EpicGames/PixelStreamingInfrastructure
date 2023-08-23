@@ -22,8 +22,8 @@ If you have encountered a bug, have suggestions for our documentation or infrast
 ### Creating pull requests (PR)
 
 If you have a solution to a problem you've encountered or to any other open issue, you can create a pull request with your changes.
-1. Fork the repo.
-2. Branch off of the `main` branch in your fork.
+1. Fork the repo and branch off of the `main` branch in your fork
+2. Implement your changes in your branch.
 3. Do as much testing as you can, and when you are happy, commit the update.
 4. Create a [pull request](https://github.com/EpicGames/PixelStreamingInfrastructure/pulls) and don't forget to link it to an issue if there's an existing one. Add as much information as possible to your PR - describe the problem your change solves, mention any testing you have done and attach any relevant documents and screenshots.
 5. If your PR is good to go, we will merge it in. Woohoo! We thank you for your time and efforts!
