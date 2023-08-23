@@ -36,8 +36,21 @@ If you have a solution to a problem you've encountered or to any other open issu
 Keep an eye on our repo and stay active on existing issues and PRs - you can help by adding informative comments to the discussions, additional repro steps, repros in different environments, or any suggestions as to what could be causing the issue and how it could be solved.
 
 ## Coding style
+ - TypeScript should be used over JavaScript
+ - All TypeScript should adhere to following [linting rules](https://github.com/EpicGames/PixelStreamingInfrastructure/blob/master/Frontend/library/.eslintrc.js)
+ - Names should follow US English spelling
+ - All public functions/api should have comments
+ - Code formatting should adhere to the following [whitespace and indentation rules](https://github.com/EpicGames/PixelStreamingInfrastructure/blob/master/Frontend/library/.prettierrc.json)
+ - All new features should have accompanying unit tests/documentation when they are submitted
+ - Prefer early returns in `if` statements to decrease indentation
+ - Prefer functions to not exceed ~20 lines
+ - Prefer comments in longer functions
+ - Prefer verbosity over syntactic sugar
+ - Prefer exporting minimal public API surface for iteration and support reasons
+ - Try not to exceed three levels of nesting in a function
 
-Luke! Help!
+## Documentation style
+All documentation should be written in US English and follow correct grammar and spelling. Additionally documentation should be broken up into separate .md files per directory, ideally with a `readme.md` file in the root of each top level directory for a component to explain it. Where appropriate these documentation pages should be linked to a table of contents in the relevant part of the repository.
 
 ## Legal
 
