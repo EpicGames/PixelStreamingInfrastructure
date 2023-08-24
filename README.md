@@ -22,7 +22,7 @@ If you would like to contribute to our repository, please reference our [contrib
 
 ## Contents
 
-The Pixel Streaming Infrastructure contains reference implementations for all the components needed to run a pixel streaming application. They are structured as separate projects, which work together, but designed to be modular and interoperable with other implementations which use WebRTC technology. These implementations include: 
+The Pixel Streaming Infrastructure contains reference implementations for all the components needed to run a pixel streaming application. They are structured as separate projects, which work together, but are designed to be modular and interoperable with other implementations which use WebRTC technology. These implementations include: 
 - A signalling web server, called Cirrus, found in [`SignallingWebServer/`](SignallingWebServer/).
 - An SFU (Selective Forwarding Unit), found in [`SFU/`](SFU/).
 - A matchmaker, found in [`Matchmaker/`](Matchmaker/).
@@ -33,11 +33,11 @@ The Pixel Streaming Infrastructure contains reference implementations for all th
   For detailed information, see the [frontend readme](Frontend/README.md).
 
 ## Releases
-We release a number of different things under this repository, currently they are:
+We release a number of different components under this repository, specifically:
 
-- container images for the signalling server
-- npm packages for the frontend
-- source releases of this repo with the reference frontend built as a minified js bundle
+- Container images for the signalling server
+- NPM packages for the frontend
+- Source releases of this repo with the reference frontend built as a minified js bundle
 
 ### Container images
 
