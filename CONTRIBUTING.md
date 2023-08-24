@@ -59,7 +59,7 @@ If you have a solution to a problem you've encountered or to any other open issu
  - Try not to exceed three levels of nesting in a function.
 
 ## Documentation style
-All documentation should be written in US English and follow correct grammar and spelling. Endeavour to lay out the document in a logical fashion with headers, lists, and bullet points where appropriate.
+All documentation should be written in US English and follow correct grammar and spelling. Endeavour to lay out the document in a logical fashion with headings, lists, and bullet points where appropriate.
 
 Documentation should be broken up into separate `.md` files per directory, ideally with a `readme.md` file in the root of each top-level directory for a component to explain it. Where appropriate, these documentation pages should be linked to a table of contents in the relevant part of the repository.
 
