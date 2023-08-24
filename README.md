@@ -5,8 +5,7 @@
 | Master | [![Run library unit tests](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/run-library-unit-tests.yml/badge.svg?branch=master)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/run-library-unit-tests.yml) |
  
 # The official home for the Pixel Streaming servers and frontend!
-The frontend and web server elements for Unreal Pixel Streaming (previously located in `Samples/PixelStreaming/WebServers`) are now in this repository, for all to contribute to. They are referred to as the **Pixel Streaming Infrastructure**.</br>
-If you would like to contribute to our repository, please reference our [contribution guide](CONTRIBUTING.md). 
+The frontend and web server elements for Unreal Pixel Streaming (previously located in `Samples/PixelStreaming/WebServers`) are now in this repository, for all to contribute to. They are referred to as the **Pixel Streaming Infrastructure**.
 
 ## Goals
 
@@ -16,6 +15,10 @@ The goals of this repository are to:
 - Encourage easier contribution of these components by Unreal Engine licensees.
 - Facilitate a more standard web release mechanism.
 - Grant a permissive license to distribute and modify this code wherever you see fit (MIT licensed).
+
+## Contributing
+
+If you would like to contribute to our repository, please reference our [contribution guide](CONTRIBUTING.md).
 
 ## Contents
 
