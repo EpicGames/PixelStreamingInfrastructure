@@ -100,7 +100,7 @@ This repository contains the following in branches that track Unreal Engine vers
 | Current | Supported and this is the branch tracking the **latest released** version of UE. |
 | Supported | We will accept bugfixes/issues for this version. |
 | End of life | Once the next UE version is released we will not support this version anymore. |
-| Unsupported | We will not be supporting this versions with bugfixes. |
+| Unsupported | We will not be supporting this version with bugfixes. |
 
 ## Legal
 © 2004-2023, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere. 
