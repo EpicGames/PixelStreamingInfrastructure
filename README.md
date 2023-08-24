@@ -18,7 +18,7 @@ The goals of this repository are to:
 
 ## Contributing
 
-If you would like to contribute to our repository, please reference our [contribution guide](CONTRIBUTING.md).
+If you would like to contribute to our repository, please reference our [contribution guide](CONTRIBUTING.md). Thank you for your time and your efforts!
 
 ## Contents
 
