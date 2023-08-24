@@ -16,6 +16,10 @@ The goals of this repository are to:
 - Facilitate a more standard web release mechanism.
 - Grant a permissive license to distribute and modify this code wherever you see fit (MIT licensed).
 
+## Contributing
+
+If you would like to contribute to our repository, please reference our [contribution guide](CONTRIBUTING.md). Thank you for your time and your efforts!
+
 ## Contents
 
 The Pixel Streaming Infrastructure contains reference implementations for all the components needed to run a pixel streaming application. They are structured as separate projects, which work together, but designed to be modular and interoperable with other implementations which use WebRTC technology. These implementations include: 
