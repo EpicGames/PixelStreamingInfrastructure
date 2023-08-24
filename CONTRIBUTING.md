@@ -1,6 +1,8 @@
 # Welcome to Pixel Streaming contribution guide
 
-First and foremost, thank you for your time and contribution to Pixel Streaming!<br/> We are proud and excited to be a part of a passionate community that continuously helps us improve Pixel Streaming 🎉
+First and foremost, thank you for your time and contribution to Pixel Streaming!
+
+We are proud and excited to be a part of a passionate community that continuously helps us improve Pixel Streaming 🎉
 
 If you are not familiar with contributing on GitHub, have a look at the [official documentation](https://docs.github.com/get-started) to learn more about repositories structure, forks, branches, commits, issues, and PRs.
 
@@ -12,7 +14,7 @@ Please remain patient, courteous, and professional at all times. Any form of spa
 
 ### Creating issues
 
-If you have encountered a bug, have suggestions for our documentation or infrastructure, or would like to propose a feature that could achievably enhance Pixel Streaming in various use case scenarios, you can raise this with us by creating a new issue.
+If you have encountered a bug, have suggestions for our documentation or infrastructure, or would like to propose a feature that could enhance Pixel Streaming in various use case scenarios, you can raise this with us by creating a new issue.
 1. First, search all open and closed issues [here](https://github.com/EpicGames/PixelStreamingInfrastructure/issues?q=is%3Aissue+) - your issue may have already been discussed or addressed.
 2. If your issue doesn't exist, open a new issue [here](https://github.com/EpicGames/PixelStreamingInfrastructure/issues/new/choose) by selecting a bug or feature request.
 3. Make sure to fill in the template as much as possible; any information you can provide, such as repro steps, crash stacks, screenshots, etc., can help us triage and fix the problem as quickly as possible.
@@ -30,7 +32,7 @@ If you have a solution to a problem you've encountered or to any other open issu
 6. If your PR is good to go, we will merge it in. Woohoo! Thank you for your time and efforts! 🎉
 7. Keep a close eye on your PR - quite often, our developers will review your PR and leave comments; we might request some minor code changes and modifications, style unification, or leave any general comments and questions that are preventing us from merging the PR.
 8. If we do not hear from you after requesting more information within 30 days, the PR will auto-close. In this case, we might elect to open our own PR and re-use some of the changes that you proposed, supplemented with anything else that was required to be added in your original PR.
-9. If your PR fixes a problem in the previous **still-supported** UE branches, feel free to implement those changes and create additional PRs in those branches as well (make sure to branch off of each individual UE branch). Note that if a change to any of the previous branches is not trivial and requires a lot of testing and compatibility checks, we might elect to close it if we do not think that it brings enough value to the branch.
+9. If your PR fixes a problem in the previous [still-supported UE branches](https://github.com/EpicGames/PixelStreamingInfrastructure#versions), feel free to implement those changes and create additional PRs in those branches as well (make sure to branch off of each individual UE branch). Note that if a change to any of the previous branches is not trivial and requires a lot of testing and compatibility checks, we might elect to close it if we do not think that it brings enough value to the branch.
 
 ### Other ways to contribute
 
@@ -57,7 +59,8 @@ If you have a solution to a problem you've encountered or to any other open issu
  - Try not to exceed three levels of nesting in a function.
 
 ## Documentation style
-All documentation should be written in US English and follow correct grammar and spelling. Endeavour to lay out the document in a logical fashion with headers, lists, and bullet points where appropriate.<br/>
+All documentation should be written in US English and follow correct grammar and spelling. Endeavour to lay out the document in a logical fashion with headers, lists, and bullet points where appropriate.
+
 Documentation should be broken up into separate `.md` files per directory, ideally with a `readme.md` file in the root of each top-level directory for a component to explain it. Where appropriate, these documentation pages should be linked to a table of contents in the relevant part of the repository.
 
 ## Legal
