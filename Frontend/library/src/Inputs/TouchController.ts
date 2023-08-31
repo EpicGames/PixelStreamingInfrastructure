@@ -41,9 +41,9 @@ export class TouchController implements ITouchController {
             this.onTouchEnd(ev);
         const ontouchmove = (ev: TouchEvent) =>
             this.onTouchMove(ev);
-        this.videoElementParent.addEventListener('touchstart', ontouchstart, { passive: false });
-        this.videoElementParent.addEventListener('touchend', ontouchend, { passive: false });
-        this.videoElementParent.addEventListener('touchmove', ontouchmove, { passive: false });
+        this.videoElementParent.addEventListener('touchstart', ontouchstart);
+        this.videoElementParent.addEventListener('touchend', ontouchend);
+        this.videoElementParent.addEventListener('touchmove', ontouchmove);
         this.touchEventListenerTracker.addUnregisterCallback(
             () => this.videoElementParent.removeEventListener('touchstart', ontouchstart)
         );
@@ -59,7 +59,7 @@ export class TouchController implements ITouchController {
         const preventOnTouchMove = (event: TouchEvent) => {
             event.preventDefault();
         };
-        document.addEventListener('touchmove', preventOnTouchMove, { passive: false });
+        document.addEventListener('touchmove', preventOnTouchMove);
         this.touchEventListenerTracker.addUnregisterCallback(
             () => document.removeEventListener('touchmove', preventOnTouchMove)
         );
@@ -152,16 +152,15 @@ export class TouchController implements ITouchController {
         if (!this.videoElementProvider.isVideoReady()) {
             return;
         }
-        const videoElementParent =
-            this.videoElementProvider.getVideoParentElement();
+        const offset = this.videoElementProvider.getVideoParentElement().getBoundingClientRect();
         const toStreamerHandlers =
             this.toStreamerMessagesProvider.toStreamerHandlers;
 
         for (let t = 0; t < touches.length; t++) {
             const numTouches = 1; // the number of touches to be sent this message
             const touch = touches[t];
-            const x = touch.clientX - videoElementParent.offsetLeft;
-            const y = touch.clientY - videoElementParent.offsetTop;
+            const x = touch.clientX - offset.left;
+            const y = touch.clientY - offset.top;
             Logger.Log(
                 Logger.GetStackTrace(),
                 `F${this.fingerIds.get(touch.identifier)}=(${x}, ${y})`,

@@ -208,16 +208,13 @@ export class PeerConnectionController {
      * @returns A modified Session Descriptor
      */
     mungeSDP(sdp: string, useMic: boolean) {
-        const mungedSDP = sdp;
-        mungedSDP.replace(
+        let mungedSDP = sdp.replace(
             /(a=fmtp:\d+ .*level-asymmetry-allowed=.*)\r\n/gm,
             '$1;x-google-start-bitrate=10000;x-google-max-bitrate=100000\r\n'
         );
 
-        let audioSDP = '';
-
         // set max bitrate to highest bitrate Opus supports
-        audioSDP += 'maxaveragebitrate=510000;';
+        let audioSDP = 'maxaveragebitrate=510000;';
 
         if (useMic) {
             // set the max capture rate to 48khz (so we can send high quality audio from mic)
@@ -233,7 +230,7 @@ export class PeerConnectionController {
         audioSDP += 'useinbandfec=1';
 
         // We use the line 'useinbandfec=1' (which Opus uses) to set our Opus specific audio parameters.
-        mungedSDP.replace('useinbandfec=1', audioSDP);
+        mungedSDP = mungedSDP.replace('useinbandfec=1', audioSDP);
 
         return mungedSDP;
     }
@@ -372,7 +369,14 @@ export class PeerConnectionController {
         // We can only set preferrec codec on Chrome
         if (RTCRtpReceiver.getCapabilities && this.preferredCodec != '') {
             for (const transceiver of this.peerConnection?.getTransceivers() ?? []) {
-                if (RTCUtils.canTransceiverReceiveVideo(transceiver)) {
+                if (
+                    transceiver &&  
+                    transceiver.receiver &&
+                    transceiver.receiver.track &&
+                    transceiver.receiver.track.kind === 'video' &&
+                    // As of 06/2023, FireFox has added RTCRtpReceiver.getCapabilities, but hasn't added the ability to set codec preferences
+                    transceiver.setCodecPreferences
+                ) {
                     const preferredRTPCodec = this.preferredCodec.split(' ');
                     const codecs = [
                         {

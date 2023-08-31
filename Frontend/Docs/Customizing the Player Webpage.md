@@ -1,5 +1,5 @@
 ## Recommended Reading
-We recommend starting with the [sample implementations](/Frontend/implementations/EpicGames/src) in order to judge how to put a new player page together and integrate it with your Unreal Engine application. Additionally, if you have cloned the Pixel Streaming Infrastructure repository and made upstream changes, you can fork the repo and make a pull request.
+We recommend starting with the [sample implementations](/Frontend/implementations/typescript/src) in order to judge how to put a new player page together and integrate it with your Unreal Engine application. Additionally, if you have cloned the Pixel Streaming Infrastructure repository and made upstream changes, you can fork the repo and make a pull request.
 
 ## Using the default Player Webpage
 The Pixel Streaming Signalling and Web Server provides a sample player page that is already set up to stream in media from your Unreal Engine application and to send mouse, keyboard, and touch events back to the application. You can use this default player page as-is, if it meets your needs.

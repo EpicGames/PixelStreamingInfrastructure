@@ -15,6 +15,9 @@ import {
     PixelStreamingEvent,
     StatsReceivedEvent,
     StreamLoadingEvent,
+    StreamPreConnectEvent,
+    StreamReconnectEvent,
+    StreamPreDisconnectEvent,
     VideoEncoderAvgQPEvent,
     VideoInitializedEvent,
     WebRtcAutoConnectEvent,
@@ -22,11 +25,12 @@ import {
     WebRtcConnectingEvent,
     WebRtcDisconnectedEvent,
     WebRtcFailedEvent,
-    WebRtcSdpEvent
+    WebRtcSdpEvent,
+    PlayerCountEvent
 } from '../Util/EventEmitter';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
-import { RTCUtils } from '../Util/RTCUtils';
+import { MessageDirection } from '../UeInstanceMessage/StreamMessageController';
 
 export interface PixelStreamingOverrides {
     /** The DOM elment where Pixel Streaming video and user input event handlers are attached to.
@@ -43,8 +47,8 @@ export interface PixelStreamingOverrides {
  * this will likely be the core of your Pixel Streaming experience in terms of functionality.
  */
 export class PixelStreaming {
-    private _webRtcController: WebRtcPlayerController;
-    private _webXrController: WebXRController;
+    protected _webRtcController: WebRtcPlayerController;
+    protected _webXrController: WebXRController;
     /**
      * Configuration object. You can read or modify config through this object. Whenever
      * the configuration is changed, the library will emit a `settingsChanged` event.
@@ -326,6 +330,7 @@ export class PixelStreaming {
      * Connect to signaling server.
      */
     public connect() {
+        this._eventEmitter.dispatchEvent(new StreamPreConnectEvent());
         this._webRtcController.connectToSignallingServer();
     }
 
@@ -334,6 +339,7 @@ export class PixelStreaming {
      * before establishing a new connection
      */
     public reconnect() {
+        this._eventEmitter.dispatchEvent(new StreamReconnectEvent());
         this._webRtcController.restartStreamAutomatically();
     }
 
@@ -341,6 +347,7 @@ export class PixelStreaming {
      * Disconnect from the signaling server and close open peer connections.
      */
     public disconnect() {
+        this._eventEmitter.dispatchEvent(new StreamPreDisconnectEvent());
         this._webRtcController.close();
     }
 
@@ -607,6 +614,12 @@ export class PixelStreaming {
         );
     }
 
+    _onPlayerCount(playerCount: number) {
+        this._eventEmitter.dispatchEvent(
+            new PlayerCountEvent({ count: playerCount })
+        );
+    }
+
     /**
      * Request a connection latency test.
      * NOTE: There are plans to refactor all request* functions. Expect changes if you use this!
@@ -770,5 +783,34 @@ export class PixelStreaming {
      */
     public get webXrController() {
         return this._webXrController;
+    }
+
+    public registerMessageHandler(name: string, direction: MessageDirection, handler?: (data: ArrayBuffer | Array<number | string>) => void) {
+        if(direction === MessageDirection.FromStreamer && typeof handler === 'undefined') {
+            Logger.Warning(Logger.GetStackTrace(), `Unable to register an undefined handler for ${name}`)
+            return;
+        }
+
+        if(direction === MessageDirection.ToStreamer && typeof handler === 'undefined') {
+            this._webRtcController.streamMessageController.registerMessageHandler(
+                direction,
+                name,
+                (data: Array<number | string>) =>
+                this._webRtcController.sendMessageController.sendMessageToStreamer(
+                    name,
+                    data
+                )
+            );
+        } else {
+            this._webRtcController.streamMessageController.registerMessageHandler(
+                direction,
+                name,
+                (data: ArrayBuffer) => handler(data)
+            );
+        }
+    }
+
+    public get toStreamerHandlers() {
+        return this._webRtcController.streamMessageController.toStreamerHandlers;
     }
 }

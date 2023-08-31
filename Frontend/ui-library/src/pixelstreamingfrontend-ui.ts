@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-export { Application, UIOptions } from './Application/Application';
+export { Application, UIOptions, VideoQPIndicatorConfig } from './Application/Application';
 
 export { PixelStreamingApplicationStyle } from './Styles/PixelStreamingApplicationStyles';
 
@@ -19,3 +19,4 @@ export { SettingUIFlag } from './Config/SettingUIFlag';
 export { SettingUINumber } from './Config/SettingUINumber';
 export { SettingUIOption } from './Config/SettingUIOption';
 export { SettingUIText } from './Config/SettingUIText';
+export { PanelConfiguration, UIElementConfig, UIElementCreationMode } from './UI/UIConfigurationTypes'

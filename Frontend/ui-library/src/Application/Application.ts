@@ -8,7 +8,7 @@ import {
     LatencyTestResults,
     InitialSettings,
     MessageStreamerList
-} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
 import { OverlayBase } from '../Overlay/BaseOverlay';
 import { ActionOverlay } from '../Overlay/ActionOverlay';
 import { TextOverlay } from '../Overlay/TextOverlay';
@@ -194,7 +194,9 @@ export class Application {
             ? new FullScreenIconExternal(this._options.fullScreenControlsConfig.customElement)
             // Or use the one created by the Controls initializer earlier
             : controls.fullscreenIcon;
-        if (fullScreenButton) fullScreenButton.fullscreenElement = this.rootElement;
+        if (fullScreenButton) {
+            fullScreenButton.fullscreenElement = /iPhone|iPod/.test(navigator.userAgent) ? this.stream.videoElementParent.getElementsByTagName("video")[0] : this.rootElement;
+        }
 
         // Add settings button to controls
         const settingsButton : HTMLElement | undefined = 
@@ -362,6 +364,11 @@ export class Application {
         this.stream.addEventListener(
             'settingsChanged',
             (event) => this.configUI.onSettingsChanged(event)
+        );
+        this.stream.addEventListener(
+            'playerCount', 
+            ({ data: { count }}) => 
+                this.onPlayerCount(count)
         );
     }
 
@@ -658,6 +665,10 @@ export class Application {
 
     onLatencyTestResults(latencyTimings: LatencyTestResults) {
         this.statsPanel.latencyTest.handleTestResult(latencyTimings);
+    }
+
+    onPlayerCount(playerCount: number) {
+        this.statsPanel.handlePlayerCount(playerCount);
     }
 
     handleStreamerListMessage(messageStreamingList: MessageStreamerList, autoSelectedStreamerId: string | null) {
