@@ -1,33 +1,31 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { TwoWayMap } from './TwoWayMap';
 import { Logger } from '../Logger/Logger';
 
 export class ToStreamerMessage {
     id: number;
-    byteLength: number;
     structure?: Array<string>;
 }
 
 export class StreamMessageController {
     toStreamerHandlers: Map<
         string,
-        (messageData?: Array<number> | undefined) => void
+        (messageData?: Array<number | string> | undefined) => void
     >;
     fromStreamerHandlers: Map<
         string,
         (messageType: string, messageData?: ArrayBuffer | undefined) => void
     >;
-    //                              Type      Format
-    toStreamerMessages: TwoWayMap<string, ToStreamerMessage>;
-    //                              Type     ID
-    fromStreamerMessages: TwoWayMap<string, number>;
+    //                        Type      Format
+    toStreamerMessages: Map<string, ToStreamerMessage>;
+    //                         ID      Type
+    fromStreamerMessages: Map<number, string>;
 
     constructor() {
         this.toStreamerHandlers = new Map();
         this.fromStreamerHandlers = new Map();
-        this.toStreamerMessages = new TwoWayMap();
-        this.fromStreamerMessages = new TwoWayMap();
+        this.toStreamerMessages = new Map();
+        this.fromStreamerMessages = new Map();
     }
 
     /**
@@ -37,196 +35,166 @@ export class StreamMessageController {
         /*
          * Control Messages. Range = 0..49.
          */
-        this.toStreamerMessages.add('IFrameRequest', {
+        this.toStreamerMessages.set('IFrameRequest', {
             id: 0,
-            byteLength: 0,
             structure: []
         });
-        this.toStreamerMessages.add('RequestQualityControl', {
+        this.toStreamerMessages.set('RequestQualityControl', {
             id: 1,
-            byteLength: 0,
             structure: []
         });
-        this.toStreamerMessages.add('FpsRequest', {
+        this.toStreamerMessages.set('FpsRequest', {
             id: 2,
-            byteLength: 0,
             structure: []
         });
-        this.toStreamerMessages.add('AverageBitrateRequest', {
+        this.toStreamerMessages.set('AverageBitrateRequest', {
             id: 3,
-            byteLength: 0,
             structure: []
         });
-        this.toStreamerMessages.add('StartStreaming', {
+        this.toStreamerMessages.set('StartStreaming', {
             id: 4,
-            byteLength: 0,
             structure: []
         });
-        this.toStreamerMessages.add('StopStreaming', {
+        this.toStreamerMessages.set('StopStreaming', {
             id: 5,
-            byteLength: 0,
             structure: []
         });
-        this.toStreamerMessages.add('LatencyTest', {
+        this.toStreamerMessages.set('LatencyTest', {
             id: 6,
-            byteLength: 0,
-            structure: []
+            structure: ['string']
         });
-        this.toStreamerMessages.add('RequestInitialSettings', {
+        this.toStreamerMessages.set('RequestInitialSettings', {
             id: 7,
-            byteLength: 0,
             structure: []
         });
-        this.toStreamerMessages.add('TestEcho', {
+        this.toStreamerMessages.set('TestEcho', {
             id: 8,
-            byteLength: 0,
             structure: []
         });
-        this.toStreamerMessages.add('DataChannelLatencyTest', {
+        this.toStreamerMessages.set('DataChannelLatencyTest', {
             id: 9,
-            byteLength: 0,
             structure: []
         });
         /*
          * Input Messages. Range = 50..89.
          */
         // Generic Input Messages. Range = 50..59.
-        this.toStreamerMessages.add('UIInteraction', {
+        this.toStreamerMessages.set('UIInteraction', {
             id: 50,
-            byteLength: 0,
-            structure: []
+            structure: ['string']
         });
-        this.toStreamerMessages.add('Command', {
+        this.toStreamerMessages.set('Command', {
             id: 51,
-            byteLength: 0,
-            structure: []
+            structure: ['string']
         });
         // Keyboard Input Message. Range = 60..69.
-        this.toStreamerMessages.add('KeyDown', {
+        this.toStreamerMessages.set('KeyDown', {
             id: 60,
-            byteLength: 2,
             //            keyCode  isRepeat
             structure: ['uint8', 'uint8']
         });
-        this.toStreamerMessages.add('KeyUp', {
+        this.toStreamerMessages.set('KeyUp', {
             id: 61,
-            byteLength: 1,
             //            keyCode
             structure: ['uint8']
         });
-        this.toStreamerMessages.add('KeyPress', {
+        this.toStreamerMessages.set('KeyPress', {
             id: 62,
-            byteLength: 2,
             //            charcode
             structure: ['uint16']
         });
         // Mouse Input Messages. Range = 70..79.
-        this.toStreamerMessages.add('MouseEnter', {
+        this.toStreamerMessages.set('MouseEnter', {
             id: 70,
-            byteLength: 0,
             structure: []
         });
-        this.toStreamerMessages.add('MouseLeave', {
+        this.toStreamerMessages.set('MouseLeave', {
             id: 71,
-            byteLength: 0,
             structure: []
         });
-        this.toStreamerMessages.add('MouseDown', {
+        this.toStreamerMessages.set('MouseDown', {
             id: 72,
-            byteLength: 5,
             //              button     x         y
             structure: ['uint8', 'uint16', 'uint16']
         });
-        this.toStreamerMessages.add('MouseUp', {
+        this.toStreamerMessages.set('MouseUp', {
             id: 73,
-            byteLength: 5,
             //              button     x         y
             structure: ['uint8', 'uint16', 'uint16']
         });
-        this.toStreamerMessages.add('MouseMove', {
+        this.toStreamerMessages.set('MouseMove', {
             id: 74,
-            byteLength: 8,
             //              x           y      deltaX    deltaY
             structure: ['uint16', 'uint16', 'int16', 'int16']
         });
-        this.toStreamerMessages.add('MouseWheel', {
+        this.toStreamerMessages.set('MouseWheel', {
             id: 75,
-            byteLength: 6,
             //              delta       x        y
             structure: ['int16', 'uint16', 'uint16']
         });
-        this.toStreamerMessages.add('MouseDouble', {
+        this.toStreamerMessages.set('MouseDouble', {
             id: 76,
-            byteLength: 5,
             //              button     x         y
             structure: ['uint8', 'uint16', 'uint16']
         });
         // Touch Input Messages. Range = 80..89.
-        this.toStreamerMessages.add('TouchStart', {
+        this.toStreamerMessages.set('TouchStart', {
             id: 80,
-            byteLength: 8,
             //          numtouches(1)   x       y        idx     force     valid
             structure: ['uint8', 'uint16', 'uint16', 'uint8', 'uint8', 'uint8']
         });
-        this.toStreamerMessages.add('TouchEnd', {
+        this.toStreamerMessages.set('TouchEnd', {
             id: 81,
-            byteLength: 8,
             //          numtouches(1)   x       y        idx     force     valid
             structure: ['uint8', 'uint16', 'uint16', 'uint8', 'uint8', 'uint8']
         });
-        this.toStreamerMessages.add('TouchMove', {
+        this.toStreamerMessages.set('TouchMove', {
             id: 82,
-            byteLength: 8,
             //          numtouches(1)   x       y       idx      force     valid
             structure: ['uint8', 'uint16', 'uint16', 'uint8', 'uint8', 'uint8']
         });
         // Gamepad Input Messages. Range = 90..99
-        this.toStreamerMessages.add('GamepadConnected', {
+        this.toStreamerMessages.set('GamepadConnected', {
             id: 93,
-            byteLength: 0,
             structure: []
         });
-        this.toStreamerMessages.add('GamepadButtonPressed', {
+        this.toStreamerMessages.set('GamepadButtonPressed', {
             id: 90,
-            byteLength: 3,
-            //            ctrlerId   button  isRepeat
+            //         ctrlerId   button  isRepeat
             structure: ['uint8', 'uint8', 'uint8']
         });
-        this.toStreamerMessages.add('GamepadButtonReleased', {
+        this.toStreamerMessages.set('GamepadButtonReleased', {
             id: 91,
-            byteLength: 3,
-            //            ctrlerId   button  isRepeat(0)
+            //         ctrlerId   button  isRepeat(0)
             structure: ['uint8', 'uint8', 'uint8']
         });
-        this.toStreamerMessages.add('GamepadAnalog', {
+        this.toStreamerMessages.set('GamepadAnalog', {
             id: 92,
-            byteLength: 10,
-            //            ctrlerId   button  analogValue
+            //         ctrlerId   button  analogValue
             structure: ['uint8', 'uint8', 'double']
         });
-        this.toStreamerMessages.add('GamepadDisconnected', {
+        this.toStreamerMessages.set('GamepadDisconnected', {
             id: 94,
-            byteLength: 1,
             //          ctrlerId
             structure: ['uint8']
         });
 
-        this.fromStreamerMessages.add('QualityControlOwnership', 0);
-        this.fromStreamerMessages.add('Response', 1);
-        this.fromStreamerMessages.add('Command', 2);
-        this.fromStreamerMessages.add('FreezeFrame', 3);
-        this.fromStreamerMessages.add('UnfreezeFrame', 4);
-        this.fromStreamerMessages.add('VideoEncoderAvgQP', 5);
-        this.fromStreamerMessages.add('LatencyTest', 6);
-        this.fromStreamerMessages.add('InitialSettings', 7);
-        this.fromStreamerMessages.add('FileExtension', 8);
-        this.fromStreamerMessages.add('FileMimeType', 9);
-        this.fromStreamerMessages.add('FileContents', 10);
-        this.fromStreamerMessages.add('TestEcho', 11);
-        this.fromStreamerMessages.add('InputControlOwnership', 12);
-        this.fromStreamerMessages.add('GamepadResponse', 13);
-        this.fromStreamerMessages.add('DataChannelLatencyTest', 14);
-        this.fromStreamerMessages.add('Protocol', 255);
+        this.fromStreamerMessages.set(0, 'QualityControlOwnership');
+        this.fromStreamerMessages.set(1, 'Response');
+        this.fromStreamerMessages.set(2, 'Command');
+        this.fromStreamerMessages.set(3, 'FreezeFrame');
+        this.fromStreamerMessages.set(4, 'UnfreezeFrame');
+        this.fromStreamerMessages.set(5, 'VideoEncoderAvgQP');
+        this.fromStreamerMessages.set(6, 'LatencyTest');
+        this.fromStreamerMessages.set(7, 'InitialSettings');
+        this.fromStreamerMessages.set(8, 'FileExtension');
+        this.fromStreamerMessages.set(9, 'FileMimeType');
+        this.fromStreamerMessages.set(10, 'FileContents');
+        this.fromStreamerMessages.set(11, 'TestEcho');
+        this.fromStreamerMessages.set(12, 'InputControlOwnership');
+        this.fromStreamerMessages.set(13, 'GamepadResponse');
+        this.fromStreamerMessages.set(14, 'DataChannelLatencyTest');
+        this.fromStreamerMessages.set(255, 'Protocol');
     }
 
     /**
