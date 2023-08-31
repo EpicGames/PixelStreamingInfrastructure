@@ -10,7 +10,9 @@ const defaultConfig = {
 	MatchmakerPort: 9999,
 
 	// Log to file
-	LogToFile: true
+	LogToFile: true,
+	
+	EnableWebserver: true,
 };
 
 // Similar to the Signaling Server (SS) code, load in a config.json file for the MM parameters
@@ -86,21 +88,27 @@ if (config.UseHTTPS) {
 	});
 }
 
+let htmlDirectory = 'html/sample'
+if(config.EnableWebserver) {
+	// Setup folders
+
+	if (fs.existsSync('html/custom')) {
+		app.use(express.static(path.join(__dirname, '/html/custom')))
+		htmlDirectory = 'html/custom'
+	} else {
+		app.use(express.static(path.join(__dirname, '/html/sample')))
+	}
+}
+
 // No servers are available so send some simple JavaScript to the client to make
 // it retry after a short period of time.
 function sendRetryResponse(res) {
-	res.send(`All ${cirrusServers.size} Cirrus servers are in use. Retrying in <span id="countdown">3</span> seconds.
-	<script>
-		var countdown = document.getElementById("countdown").textContent;
-		setInterval(function() {
-			countdown--;
-			if (countdown == 0) {
-				window.location.reload(1);
-			} else {
-				document.getElementById("countdown").textContent = countdown;
-			}
-		}, 1000);
-	</script>`);
+	// find check if a custom template should be used or the sample one
+	let html = fs.readFileSync(`${htmlDirectory}/queue/queue.html`, { encoding: 'utf8' })
+	html = html.replace(/\$\{cirrusServers\.size\}/gm, cirrusServers.size)
+
+	res.setHeader('content-type', 'text/html')
+	res.send(html)
 }
 
 // Get a Cirrus server if there is one available which has no clients connected.
