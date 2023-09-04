@@ -86,6 +86,7 @@ export class HoveringMouseEvents implements IMouseEvents {
         if (!this.mouseController.videoElementProvider.isVideoReady()) {
             return;
         }
+        Logger.Log(Logger.GetStackTrace(), 'onMouse Up', 6);
         const coord =
             this.mouseController.coordinateConverter.normalizeAndQuantizeUnsigned(
                 mouseEvent.offsetX,
@@ -102,25 +103,13 @@ export class HoveringMouseEvents implements IMouseEvents {
     }
 
     /**
-     * Handle the mouse context menu event, sends the mouse data to the UE Instance
+     * Consumes the mouse context event. The UE instance has no equivalent and doesn't need to be informed.
      * @param mouseEvent - Mouse Event
      */
     handleContextMenu(mouseEvent: MouseEvent) {
         if (!this.mouseController.videoElementProvider.isVideoReady()) {
             return;
         }
-        const coord =
-            this.mouseController.coordinateConverter.normalizeAndQuantizeUnsigned(
-                mouseEvent.offsetX,
-                mouseEvent.offsetY
-            );
-        const toStreamerHandlers =
-            this.mouseController.toStreamerMessagesProvider.toStreamerHandlers;
-        toStreamerHandlers.get('MouseUp')([
-            mouseEvent.button,
-            coord.x,
-            coord.y
-        ]);
         mouseEvent.preventDefault();
     }
 
@@ -177,6 +166,7 @@ export class HoveringMouseEvents implements IMouseEvents {
         if (!this.mouseController.videoElementProvider.isVideoReady()) {
             return;
         }
+        Logger.Log(Logger.GetStackTrace(), 'onMouse press', 6);
         this.mouseController.pressMouseButtons(
             mouseEvent.buttons,
             mouseEvent.offsetX,
@@ -192,6 +182,7 @@ export class HoveringMouseEvents implements IMouseEvents {
         if (!this.mouseController.videoElementProvider.isVideoReady()) {
             return;
         }
+        Logger.Log(Logger.GetStackTrace(), 'onMouse release', 6);
         this.mouseController.releaseMouseButtons(
             mouseEvent.buttons,
             mouseEvent.offsetX,
