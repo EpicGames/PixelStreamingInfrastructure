@@ -13,7 +13,7 @@ jobs:
         working-directory: ./Testing
     steps:
     - uses: actions/checkout@v3
-      ref: 'stream_test'
+      with: { ref: 'stream_test' }
     - uses: actions/setup-node@v3
       with:
         node-version: 18
