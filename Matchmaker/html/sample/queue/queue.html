@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Looking for a streaming host...</title>
+		<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+		<link rel="icon" type="image/png" sizes="96x96" href="/images/favicon-96x96.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="queue/styles.css">
+	</head>
+	<body>
+		<main>
+			<section>
+				<img id="logo" src="images/ue-logo.png" alt="Unreal Engine">
+				<h1>All Streaming Hosts Busy</h1>
+				<p>Please wait,</p>
+				<p>checking all ${cirrusServers.size} hosts again in <span id="countdown">3</span> seconds.</p>
+			</section>
+		</main>
+		
+		<script type="text/javascript">
+			var countdown = document.getElementById("countdown").textContent;
+			setInterval(function() {
+				countdown--;
+				if (countdown == 0) {
+					window.location.reload(1);
+				} else {
+					document.getElementById("countdown").textContent = countdown;
+				}
+			}, 1000);
+		</script>
+	</body>
+</html>
