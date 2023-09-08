@@ -39,6 +39,10 @@ If part of the library is not exposed and you wish to extend it, please do so in
 
 ⚠️ Only NodeJS LTS 18.17.0 is officially supported, some newer versions on NodeJS **WILL BREAK YOUR BUILD** ⚠️
 
+### Prerequisites
+- Install NodeJS LTS 18.17.0 on your system.
+- Install npm globally using: `npm install npm -g` (yes this is required)
+
 Changes to the library occur in the [/library](/Frontend/library) directory and require you to have NodeJS installed as part of your development environment.
 Once you have NodeJS installed: 
 
