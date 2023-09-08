@@ -762,4 +762,8 @@ export class PixelStreaming {
     public get toStreamerHandlers() {
         return this._webRtcController.streamMessageController.toStreamerHandlers;
     }
+
+    public setAutoJoinNewStreamer(autoJoin: boolean) {
+        this._webRtcController.setAutoJoinNewStreamer(autoJoin);
+    }
 }

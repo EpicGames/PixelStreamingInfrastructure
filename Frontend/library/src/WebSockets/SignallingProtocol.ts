@@ -6,6 +6,7 @@ import {
     MessageRecvTypes,
     MessageConfig,
     MessageStreamerList,
+    MessageStreamerConnected,
     MessagePlayerCount,
     MessageAnswer,
     MessageOffer,
@@ -89,6 +90,21 @@ export class SignallingProtocol {
                 const streamerList: MessageStreamerList =
                     JSON.parse(listPayload);
                 websocketController.onStreamerList(streamerList);
+            }
+        );
+
+        // STREAMER_CONNECTED
+        websocketController.signallingProtocol.addMessageHandler(
+            MessageRecvTypes.STREAMER_CONNECTED,
+            (idPayload: string) => {
+                Logger.Log(
+                    Logger.GetStackTrace(),
+                    MessageRecvTypes.STREAMER_CONNECTED,
+                    6
+                );
+                const streamerConnected: MessageStreamerConnected =
+                    JSON.parse(idPayload);
+                websocketController.onStreamerConnected(streamerConnected);
             }
         );
 

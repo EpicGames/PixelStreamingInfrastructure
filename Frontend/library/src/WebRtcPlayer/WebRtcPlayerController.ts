@@ -6,7 +6,8 @@ import {
     MessageAnswer,
     MessageOffer,
     MessageConfig,
-    MessageStreamerList
+    MessageStreamerList,
+    MessageStreamerConnected
 } from '../WebSockets/MessageReceive';
 import { FreezeFrameController } from '../FreezeFrame/FreezeFrameController';
 import { AFKController } from '../AFK/AFKController';
@@ -110,6 +111,9 @@ export class WebRtcPlayerController {
     // it will use this property to store the override message string
     disconnectMessageOverride: string;
 
+    // indicates that we would like to auto join a new streamer
+    autoJoinNewStreamer = false;
+
     /**
      *
      * @param config - the frontend config object
@@ -196,6 +200,9 @@ export class WebRtcPlayerController {
         this.webSocketController.onStreamerList = (
             messageList: MessageReceive.MessageStreamerList
         ) => this.handleStreamerListMessage(messageList);
+        this.webSocketController.onStreamerConnected = (
+            messageConnected: MessageReceive.MessageStreamerConnected
+        ) => this.handleStreamerConnectedMessage(messageConnected);
         this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => {
             this.pixelStreaming._onDisconnect(
                 `Websocket disconnect (${event.code}) ${
@@ -1397,6 +1404,25 @@ export class WebRtcPlayerController {
                 })
             );
         }
+    }
+
+    /**
+     * Handles when a new streamer connects to the signalling server
+     */
+    handleStreamerConnectedMessage(messageStreamerConnected: MessageStreamerConnected) {
+        Logger.Log(
+            Logger.GetStackTrace(),
+            `Got new streamer ${messageStreamerConnected.id}`,
+            6
+        );
+        if (this.autoJoinNewStreamer) {
+            this.restartStreamAutomatically();
+            this.autoJoinNewStreamer = false;
+        }
+    }
+
+    public setAutoJoinNewStreamer(autoJoin: boolean) {
+        this.autoJoinNewStreamer = autoJoin;
     }
 
     /**
