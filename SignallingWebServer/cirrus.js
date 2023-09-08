@@ -441,8 +441,6 @@ function onStreamerMessageId(streamer, msg) {
 
 	// if any streamer id's assume the legacy streamer is not needed.
 	streamers.delete(LegacyStreamerId);
-
-	notifyPlayersNewStreamer(streamer.id);
 }
 
 function onStreamerMessagePing(streamer, msg) {
@@ -701,14 +699,6 @@ function onPlayerDisconnected(playerId) {
 	sendPlayersCount();
 	sendPlayerDisconnectedToFrontend();
 	sendPlayerDisconnectedToMatchmaker();
-}
-
-function notifyPlayersNewStreamer(streamerId) {
-	const msg = { type: 'streamerConnected', streamerId: streamerId };
-	logOutgoing("[players]", msg);
-	for (let player of players.values()) {
-		player.sendTo(msg);
-	}
 }
 
 playerMessageHandlers.set('subscribe', onPlayerMessageSubscribe);

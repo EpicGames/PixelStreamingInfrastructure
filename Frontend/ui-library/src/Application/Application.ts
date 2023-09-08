@@ -677,7 +677,6 @@ export class Application {
                 this.showDisconnectOverlay(
                     'No streamers connected. <div class="clickableState">Click To Restart</div>'
                 );
-                this.stream.setAutoJoinNewStreamer(true);
             } else {
                 this.showTextOverlay(
                     'Multiple streamers detected. Use the dropdown in the settings menu to select the streamer'

@@ -6,7 +6,6 @@
 export enum MessageRecvTypes {
     CONFIG = 'config',
     STREAMER_LIST = 'streamerList',
-    STREAMER_CONNECTED = 'streamerConnected',
     PLAYER_COUNT = 'playerCount',
     OFFER = 'offer',
     ANSWER = 'answer',
@@ -41,13 +40,6 @@ export class MessageConfig extends MessageRecv {
  */
 export class MessageStreamerList extends MessageRecv {
     ids: string[];
-}
-
-/**
- * Streamer connected Message Wrapper
- */
-export class MessageStreamerConnected extends MessageRecv {
-    id: string;
 }
 
 /**
