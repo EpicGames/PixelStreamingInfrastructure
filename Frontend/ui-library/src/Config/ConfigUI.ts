@@ -210,6 +210,10 @@ export class ConfigUI {
             psSettingsSection,
             this.numericParametersUi.get(NumericParameters.MaxReconnectAttempts)
         );
+        this.addSettingNumeric(
+            psSettingsSection,
+            this.numericParametersUi.get(NumericParameters.WaitRetryDelay)
+        );
 
         /* Setup all view/ui related settings under this section */
         const viewSettingsSection = this.buildSectionWithHeading(
