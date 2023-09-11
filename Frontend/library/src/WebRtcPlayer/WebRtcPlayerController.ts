@@ -1408,7 +1408,7 @@ export class WebRtcPlayerController {
 
     startAutoJoinTimer() {
         clearTimeout(this.autoJoinTimer);
-        this.autoJoinTimer = setTimeout(() => this.tryAutoJoin(), this.config.getNumericSettingValue(NumericParameters.WaitRetryDelay));
+        this.autoJoinTimer = setTimeout(() => this.tryAutoJoin(), this.config.getNumericSettingValue(NumericParameters.StreamerAutoJoinInterval));
     }
 
     tryAutoJoin() {

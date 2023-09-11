@@ -212,7 +212,7 @@ export class ConfigUI {
         );
         this.addSettingNumeric(
             psSettingsSection,
-            this.numericParametersUi.get(NumericParameters.WaitRetryDelay)
+            this.numericParametersUi.get(NumericParameters.StreamerAutoJoinInterval)
         );
 
         /* Setup all view/ui related settings under this section */

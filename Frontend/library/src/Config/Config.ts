@@ -55,7 +55,7 @@ export class NumericParameters {
     static WebRTCMinBitrate = 'WebRTCMinBitrate' as const;
     static WebRTCMaxBitrate = 'WebRTCMaxBitrate' as const;
     static MaxReconnectAttempts = 'MaxReconnectAttempts' as const;
-    static WaitRetryDelay = 'WaitRetryDelay' as const;
+    static StreamerAutoJoinInterval = 'StreamerAutoJoinInterval' as const;
 }
 
 export type NumericParametersKeys = Exclude<
@@ -568,10 +568,10 @@ export class Config {
         );
 
         this.numericParameters.set(
-            NumericParameters.WaitRetryDelay,
+            NumericParameters.StreamerAutoJoinInterval,
             new SettingNumber(
-                NumericParameters.WaitRetryDelay,
-                'Wait Retry Delay',
+                NumericParameters.StreamerAutoJoinInterval,
+                'Streamer Auto Join Interval (ms)',
                 'Delay between retries when waiting for an available streamer.',
                 500 /*min*/,
                 900000 /*max*/,
