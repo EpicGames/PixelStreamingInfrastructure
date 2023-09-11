@@ -32,6 +32,7 @@ export class Flags {
     static TouchInput = 'TouchInput' as const;
     static GamepadInput = 'GamepadInput' as const;
     static XRControllerInput = 'XRControllerInput' as const;
+    static WaitForStreamer = "WaitForStreamer" as const;
 }
 
 export type FlagsKeys = Exclude<keyof typeof Flags, 'prototype'>;
@@ -454,6 +455,17 @@ export class Config {
                 Flags.XRControllerInput,
                 'XR controller input',
                 'If enabled, send XR controller events to streamer',
+                true,
+                useUrlParams
+            )
+        );
+
+        this.flags.set(
+            Flags.WaitForStreamer,
+            new SettingFlag(
+                Flags.WaitForStreamer,
+                'Wait for streamer',
+                'Will continue trying to connect to the first streamer available.',
                 true,
                 useUrlParams
             )

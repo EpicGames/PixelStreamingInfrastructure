@@ -17,7 +17,8 @@ export const App = () => {
                     AutoConnect: true,
                     ss: 'ws://localhost:80',
                     StartVideoMuted: true,
-                    HoveringMouse: true
+                    HoveringMouse: true,
+                    WaitForStreamer: true
                 }}
             />
         </div>

@@ -110,6 +110,8 @@ export class WebRtcPlayerController {
     // it will use this property to store the override message string
     disconnectMessageOverride: string;
 
+    autoJoinTimer: ReturnType<typeof setTimeout> = undefined;
+
     /**
      *
      * @param config - the frontend config object
@@ -1389,6 +1391,11 @@ export class WebRtcPlayerController {
                     OptionParameters.StreamerId,
                     autoSelectedStreamerId
                 );
+            } else {
+                // no auto selected streamer
+                if (this.config.isFlagEnabled(Flags.WaitForStreamer)) {
+                    this.startAutoJoinTimer()
+                }
             }
             this.pixelStreaming.dispatchEvent(
                 new StreamerListMessageEvent({
@@ -1397,6 +1404,15 @@ export class WebRtcPlayerController {
                 })
             );
         }
+    }
+
+    startAutoJoinTimer() {
+        clearTimeout(this.autoJoinTimer);
+        this.autoJoinTimer = setTimeout(() => this.tryAutoJoin(), 3000);
+    }
+
+    tryAutoJoin() {
+        this.connectToSignallingServer();
     }
 
     /**
