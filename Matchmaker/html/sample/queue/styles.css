@@ -1,0 +1,33 @@
+* { box-sizing: border-box; }
+
+body {
+    background-color: black;
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+}
+
+main {
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+section {
+    text-align: center;
+}
+
+h1 {
+    font-size: 1.8em;
+    text-transform: uppercase;
+}
+
+p {
+    text-align: center;
+}
+
+#logo {
+    display: inline-block;
+    height: 20vh;
+}
