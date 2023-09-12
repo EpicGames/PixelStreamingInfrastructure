@@ -41,9 +41,9 @@ export class TouchController implements ITouchController {
             this.onTouchEnd(ev);
         const ontouchmove = (ev: TouchEvent) =>
             this.onTouchMove(ev);
-        this.videoElementParent.addEventListener('touchstart', ontouchstart, { passive: false });
-        this.videoElementParent.addEventListener('touchend', ontouchend, { passive: false });
-        this.videoElementParent.addEventListener('touchmove', ontouchmove, { passive: false });
+        this.videoElementParent.addEventListener('touchstart', ontouchstart);
+        this.videoElementParent.addEventListener('touchend', ontouchend);
+        this.videoElementParent.addEventListener('touchmove', ontouchmove);
         this.touchEventListenerTracker.addUnregisterCallback(
             () => this.videoElementParent.removeEventListener('touchstart', ontouchstart)
         );
@@ -59,7 +59,7 @@ export class TouchController implements ITouchController {
         const preventOnTouchMove = (event: TouchEvent) => {
             event.preventDefault();
         };
-        document.addEventListener('touchmove', preventOnTouchMove, { passive: false });
+        document.addEventListener('touchmove', preventOnTouchMove);
         this.touchEventListenerTracker.addUnregisterCallback(
             () => document.removeEventListener('touchmove', preventOnTouchMove)
         );

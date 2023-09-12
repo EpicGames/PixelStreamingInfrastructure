@@ -1,3 +1,9 @@
+| Branch |  |  |  |  |
+| -------|--|--|--|--|
+| UE5.4  | [![Publish frontend lib](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/publish-library-to-npm.yml/badge.svg?branch=UE5.4)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/publish-library-to-npm.yml) | [![Publish ui-lib](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/publish-ui-library-to-npm.yml/badge.svg?branch=UE5.4)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/publish-ui-library-to-npm.yml) | [![Publish cirrus container](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/container-images.yml/badge.svg?branch=UE5.4)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/container-images.yml) | [![Releases](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml/badge.svg?branch=UE5.4)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml) |
+| UE5.3  | [![Publish frontend lib](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/publish-library-to-npm.yml/badge.svg?branch=UE5.3)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/publish-library-to-npm.yml) | [![Publish ui-lib](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/publish-ui-library-to-npm.yml/badge.svg?branch=UE5.3)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/publish-ui-library-to-npm.yml) | [![Publish cirrus container](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/container-images.yml/badge.svg?branch=UE5.3)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/container-images.yml) | [![Releases](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml/badge.svg?branch=UE5.3)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml) |
+| Master | [![Run library unit tests](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/run-library-unit-tests.yml/badge.svg?branch=master)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/run-library-unit-tests.yml) |
+ 
 # The official home for the Pixel Streaming servers and frontend!
 The frontend and web server elements for Unreal Pixel Streaming (previously located in `Samples/PixelStreaming/WebServers`) are now in this repository, for all to contribute to. They are referred to as the **Pixel Streaming Infrastructure**.
 
@@ -10,9 +16,13 @@ The goals of this repository are to:
 - Facilitate a more standard web release mechanism.
 - Grant a permissive license to distribute and modify this code wherever you see fit (MIT licensed).
 
+## Contributing
+
+If you would like to contribute to our repository, please reference our [contribution guide](CONTRIBUTING.md). Thank you for your time and your efforts!
+
 ## Contents
 
-The Pixel Streaming Infrastructure contains reference implementations for all the components needed to run a pixel streaming application. They are structured as separate projects, which work together, but designed to be modular and interoperable with other implementations which use WebRTC technology. These implementations include: 
+The Pixel Streaming Infrastructure contains reference implementations for all the components needed to run a pixel streaming application. They are structured as separate projects, which work together, but are designed to be modular and interoperable with other implementations which use WebRTC technology. These implementations include: 
 - A signalling web server, called Cirrus, found in [`SignallingWebServer/`](SignallingWebServer/).
 - An SFU (Selective Forwarding Unit), found in [`SFU/`](SFU/).
 - A matchmaker, found in [`Matchmaker/`](Matchmaker/).
@@ -23,11 +33,11 @@ The Pixel Streaming Infrastructure contains reference implementations for all th
   For detailed information, see the [frontend readme](Frontend/README.md).
 
 ## Releases
-We release a number of different things under this repository, currently they are:
+We release a number of different components under this repository, specifically:
 
-- container images for the signalling server
-- npm packages for the frontend
-- source releases of this repo with the reference frontend built as a minified js bundle
+- Container images for the signalling server
+- NPM packages for the frontend
+- Source releases of this repo with the reference frontend built as a minified js bundle
 
 ### Container images
 
@@ -41,15 +51,15 @@ The following are `unofficial` NPM packages (official ones coming soon):
 
 | Branch | Frontend library | Frontend reference ui |
 |--------|------------------|-----------------------|
-| UE5.2  |[lib-pixelstreamingfrontend-ue5.2](https://www.npmjs.com/package/@epicgames-ps/lib-pixelstreamingfrontend-ue5.2)|[lib-pixelstreamingfrontend-ui-ue5.2](https://www.npmjs.com/package/@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2)|
+| UE5.3  |[lib-pixelstreamingfrontend-ue5.3](https://www.npmjs.com/package/@epicgames-ps/lib-pixelstreamingfrontend-ue5.3)|[lib-pixelstreamingfrontend-ui-ue5.3](https://www.npmjs.com/package/@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.3)|
 
 ### NPM getting started
 
 ```bash
 #frontend (core lib)
-npm i @epicgames-ps/lib-pixelstreamingfrontend-ue5.2
+npm i @epicgames-ps/lib-pixelstreamingfrontend-ue5.3
 #frontend ui
-npm i @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2
+npm i @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.3
 ```
 
 ## Documentation 
@@ -76,10 +86,11 @@ This repository contains the following in branches that track Unreal Engine vers
 | Branch | Status |
 |--------|--------|
 |[Master](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/master)| Dev |
-|[UE5.3](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.3)| Pre-release |
-|[UE5.2](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.2)| Current |
-|[UE5.1](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.1)| Supported |
-|[UE5.0](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.0)| End of life |
+|[UE5.4](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.4)| Pre-release |
+|[UE5.3](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.3)| Current |
+|[UE5.2](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.2)| Supported |
+|[UE5.1](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.1)| End of life |
+|[UE5.0](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.0)| Unsupported |
 |[UE4.27](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.27)| Unsupported |
 |[UE4.26](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE4.26)| Unsupported |
 
@@ -90,7 +101,7 @@ This repository contains the following in branches that track Unreal Engine vers
 | Current | Supported and this is the branch tracking the **latest released** version of UE. |
 | Supported | We will accept bugfixes/issues for this version. |
 | End of life | Once the next UE version is released we will not support this version anymore. |
-| Unsupported | We will not be supporting this versions with bugfixes. |
+| Unsupported | We will not be supporting this version with bugfixes. |
 
 ## Legal
 © 2004-2023, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere. 
