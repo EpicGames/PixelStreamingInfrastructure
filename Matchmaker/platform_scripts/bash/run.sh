@@ -9,7 +9,7 @@ source common_utils.sh
 use_args "$@"
 call_setup_sh
 
-process="${BASH_LOCATION}/node/bin/node matchmaker.js"
+process="${BASH_LOCATION}/node/lib/node_modules/npm/bin/npm-cli.js run start:default --"
 
 pushd ../.. > /dev/null
 

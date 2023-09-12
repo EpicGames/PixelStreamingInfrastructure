@@ -5,7 +5,7 @@ The **frontend** refers to the HTML, CSS, images, and JavaScript/TypeScript code
 The frontend consists of two packages:
 
 1. [lib-pixelstreamingfrontend](/Frontend/library/): the core Pixel Streaming frontend for WebRTC, settings, input, and general functionality.
-2. [lib-pixelstreamingfrontend-ui](/Frontend/implementations/EpicGames): the reference UI that users can either optionally apply on top of the core library or build on top of.
+2. [lib-pixelstreamingfrontend-ui](/Frontend/implementations/typescript): the reference UI that users can either optionally apply on top of the core library or build on top of.
 
 
 ## Docs
@@ -29,13 +29,15 @@ The TypeScript libraries are provided as both an [NPM](https://www.npmjs.com/set
 ## Usage from source
 
 When developing your own Pixel Streaming experience the intent is you will start with this library and extend it through the use of 
-its public API. We have provided an example of this workflow in our [implementations/EpicGames](/Frontend/implementations/EpicGames), which is an implementation of this library.
+its public API. We have provided an example of this workflow in our [implementations/typescript](/Frontend/implementations/typescript), which is an implementation of this library.
 
 ## Contributing
 
 If part of the library is not exposed and you wish to extend it, please do so in your own branch and open a pull request with your change for our consideration.
 
 ## Developing
+
+⚠️ Only NodeJS LTS 18.17.0 is officially supported, some newer versions on NodeJS **WILL BREAK YOUR BUILD** ⚠️
 
 Changes to the library occur in the [/library](/Frontend/library) directory and require you to have NodeJS installed as part of your development environment.
 Once you have NodeJS installed: 
@@ -44,16 +46,24 @@ Once you have NodeJS installed:
 - `npm install`
 - `npm run build`
 
-The default user interface is provided in [/ui-library](/Frontend/ui-library) directory. You can either use it or provide your own user interface. To build the default UI, run:
+The user interface library is provided in [/ui-library](/Frontend/ui-library) directory. You can either use it or provide your own user interface. To build run:
+- Follow the steps to build the library first
 - `cd ui-library`
 - `npm install`
-- `npm run build`
+- `npm run build-all`
 
-This will produce `player.js` under the `SignallingWebServer/Public` directory - this is the default UI.
+The default user interface is provided under [/implementations/typescript](/Frontend/implementations/typescript). To build run:
+
+- Follow the steps to build the libary and ui-library first
+- `cd implementations/typescript`
+- `npm install`
+- `npm run build-all`
+
+This will produce `player.html` and `player.js` under the `SignallingWebServer/Public` directory - this is the default UI.
 
 ### Making your own UI
 
-We recommend studying [/ui-library](/Frontend/ui-library) and [player.ts](/Frontend/implementations/EpicGames/src/player.ts)/[player.html](/Frontend/implementations/EpicGames/src/player.html), or alternatively the sample React implementation in [implementations/react](/Frontend/implementations/react), then once you have copied and modified the [package.json](/Frontend/implementations/EpicGames/package.json) and `.ts` into your own `implementation/your_implementation` directory, the process is similar:
+We recommend studying [/ui-library](/Frontend/ui-library) and [player.ts](/Frontend/implementations/typescript/src/player.ts)/[player.html](/Frontend/implementations/typescript/src/player.html), or alternatively the sample React implementation in [implementations/react](/Frontend/implementations/react), then once you have copied and modified the [package.json](/Frontend/implementations/typescript/package.json) and `.ts` into your own `implementation/your_implementation` directory, the process is similar:
 
 - `cd implementation/your_implementation`
 - `npm build-all`

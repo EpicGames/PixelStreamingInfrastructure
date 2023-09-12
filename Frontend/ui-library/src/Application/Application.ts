@@ -8,7 +8,7 @@ import {
     LatencyTestResults,
     InitialSettings,
     MessageStreamerList
-} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.2';
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
 import { OverlayBase } from '../Overlay/BaseOverlay';
 import { ActionOverlay } from '../Overlay/ActionOverlay';
 import { TextOverlay } from '../Overlay/TextOverlay';

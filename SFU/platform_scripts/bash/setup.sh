@@ -99,7 +99,7 @@ node_version=""
 if [[ -f "${BASH_LOCATION}/node/bin/node" ]]; then
 	node_version=$("${BASH_LOCATION}/node/bin/node" --version)
 fi
-check_and_install "node" "$node_version" "v16.4.2" "curl https://nodejs.org/dist/v16.14.2/node-v16.14.2-linux-x64.tar.gz --output node.tar.xz 
+check_and_install "node" "$node_version" "v18.17.0" "curl https://nodejs.org/dist/v18.17.0/node-v18.17.0-linux-x64.tar.gz --output node.tar.xz 
 													&& tar -xf node.tar.xz 
 													&& rm node.tar.xz 
 													&& mv node-v*-linux-x64 \"${BASH_LOCATION}/node\""

@@ -1,6 +1,6 @@
 ## HTML Page Requirements
 
-Most of the HTML that will end up on the final page will actually be introduced by the Pixel Streaming application itself. Several example HTML pages are provided in the [sample implementations](/Frontend/implementations/EpicGames/src) where you can see the base page is very minimal, only serving as a space for the application to attach to and fill. The only concrete requirements are for ensuring there's sufficient space taken up by the element being attached to for the viewport to be visible on screen. In the sample implementations this is simply a `<body>` tag set to fill the screen without scrolling.
+Most of the HTML that will end up on the final page will actually be introduced by the Pixel Streaming application itself. Several example HTML pages are provided in the [sample implementations](/Frontend/implementations/typescript/src) where you can see the base page is very minimal, only serving as a space for the application to attach to and fill. The only concrete requirements are for ensuring there's sufficient space taken up by the element being attached to for the viewport to be visible on screen. In the sample implementations this is simply a `<body>` tag set to fill the screen without scrolling.
 
 ```html
 <!-- Copyright Epic Games, Inc. All Rights Reserved. -->
@@ -20,20 +20,18 @@ Most of the HTML that will end up on the final page will actually be introduced 
 </html>
 ```
 
-As can be seen in the [sample implementations](/Frontend/implementations/EpicGames/src/player.ts), you must specify which element on the page the Pixel Streaming viewport is to be appended to. In the sample implementations this is typically done in the `document.body.onload` event listener and in this case appended to the `document.body` element in the DOM, causing it to fill the whole page.
+As can be seen in the [sample implementations](/Frontend/implementations/typescript/src/player.ts), you must specify which element on the page the Pixel Streaming viewport is to be appended to. In the sample implementations this is typically done in the `document.body.onload` event listener and in this case appended to the `document.body` element in the DOM, causing it to fill the whole page.
 
 [//]: # (This has yet to be done)
 ### Player File Location and URL
 
 You have a few options for where you can place your custom HTML player page, and how client browsers can access it.
 
-*	You can create a new implementation page and place it in [`/Frontend/implementations/EpicGames/src/`](/Frontend/implementations/EpicGames/src) alongside the sample implementations. This must consist of both a base `.html` page and the `.ts` source for your application's entrypoint. This will then be accessible by appending the name of the `html` file to IP address or hostname of the computer running the Signalling Server.
+*	You can create a new implementation page and place it in [`/Frontend/implementations/typescript/src/`](/Frontend/implementations/typescript/src) alongside the sample implementations. This must consist of both a base `.html` page and the `.ts` source for your application's entrypoint. This will then be accessible by appending the name of the `html` file to IP address or hostname of the computer running the Signalling Server.
 	For example, the sample `stresstest` page can be accessed on a locally-running infrastructure at `http:/127.0.0.1/stresstest.html`.
 *   You can customize the `HomepageFile` parameter for the Signaling and Web Server, and set the path to the filename of your custom HTML player page relative to the [Frontend implementations source folder](/Frontend/implementations/src). It will then be accessible when you access the IP address or hostname of the computer running the Signaling and Web Server.
 *   You can also use the **AdditionalRoutes** parameter for the Signaling and Web Server to customize the mapping between URL paths and local folders on your computer.
 
-For additional details on these parameters, see also the [Pixel Streaming Reference](https://docs.unrealengine.com/5.2/en-US/unreal-engine-pixel-streaming-reference/).
-
 ### Building the Frontend
-When starting the infrastructure Signalling Server, the Frontend should be built automatically. If not, you can run the [`setup script`](/SignallingWebServer/platform_scripts/) for your platform to do so. If you subsequently make any changes to your local copy of the frontend, you will need to run the script again, appending `--build` as an argument to force a rebuild.
+When starting the infrastructure Signalling Server, the Frontend should be built automatically. If not, you can run the [`setup_frontend`](/SignallingWebServer/platform_scripts/) script for your platform to do so. If you subsequently make any changes to your local copy of the frontend, you will need to run the script again, appending `--build` as an argument to force a rebuild.
 
