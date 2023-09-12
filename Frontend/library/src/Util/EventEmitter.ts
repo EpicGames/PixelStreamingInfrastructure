@@ -12,6 +12,10 @@ import { SettingFlag } from '../Config/SettingFlag';
 import { SettingNumber } from '../Config/SettingNumber';
 import { SettingText } from '../Config/SettingText';
 import { SettingOption } from '../Config/SettingOption';
+import {
+    DataChannelLatencyTestResponse,
+    DataChannelLatencyTestResult
+} from "../DataChannel/DataChannelLatencyTestResults";
 
 /**
  * An event that is emitted when AFK disconnect is about to happen.
@@ -367,6 +371,37 @@ export class LatencyTestResultEvent extends Event {
 }
 
 /**
+ * An event that is emitted when receiving data channel latency test response from server.
+ * This event is handled by DataChannelLatencyTestController
+ */
+export class DataChannelLatencyTestResponseEvent extends Event {
+    readonly type: 'dataChannelLatencyTestResponse';
+    readonly data: {
+        /** Latency test result object */
+        response: DataChannelLatencyTestResponse
+    };
+    constructor(data: DataChannelLatencyTestResponseEvent['data']) {
+        super('dataChannelLatencyTestResponse');
+        this.data = data;
+    }
+}
+
+/**
+ * An event that is emitted when data channel latency test results are ready.
+ */
+export class DataChannelLatencyTestResultEvent extends Event {
+    readonly type: 'dataChannelLatencyTestResult';
+    readonly data: {
+        /** Latency test result object */
+        result: DataChannelLatencyTestResult
+    };
+    constructor(data: DataChannelLatencyTestResultEvent['data']) {
+        super('dataChannelLatencyTestResult');
+        this.data = data;
+    }
+}
+
+/**
  * An event that is emitted when receiving initial settings from UE.
  */
 export class InitialSettingsEvent extends Event {
@@ -513,6 +548,8 @@ export type PixelStreamingEvent =
     | StatsReceivedEvent
     | StreamerListMessageEvent
     | LatencyTestResultEvent
+    | DataChannelLatencyTestResponseEvent
+    | DataChannelLatencyTestResultEvent
     | InitialSettingsEvent
     | SettingsChangedEvent
     | XrSessionStartedEvent
