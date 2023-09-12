@@ -670,9 +670,11 @@ export class Application {
     handleStreamerListMessage(messageStreamingList: MessageStreamerList, autoSelectedStreamerId: string | null) {
         if (autoSelectedStreamerId === null) {
             if(messageStreamingList.ids.length === 0) {
-                this.showDisconnectOverlay(
-                    'No streamers connected. <div class="clickableState">Click To Restart</div>'
-                );
+                var message = 'No streamers connected. ' +
+                (this.stream.config.isFlagEnabled(Flags.WaitForStreamer)
+                ? 'Waiting for streamer...'
+                : '<div style="clickableState">Click To Restart</div>');
+                this.showDisconnectOverlay(message);
             } else {
                 this.showTextOverlay(
                     'Multiple streamers detected. Use the dropdown in the settings menu to select the streamer'

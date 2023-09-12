@@ -4,6 +4,7 @@ import { Logger } from '../Logger/Logger';
 import { Config, OptionParameters, Flags } from '../Config/Config';
 import { AggregatedStats } from './AggregatedStats';
 import { parseRtpParameters, splitSections } from 'sdp';
+import { RTCUtils } from '../Util/RTCUtils';
 
 /**
  * Handles the Peer Connection
@@ -425,18 +426,16 @@ export class PeerConnectionController {
             });
         } else {
             // set the audio options based on mic usage
-            const audioOptions = useMic
-                ? {
-                      autoGainControl: false,
-                      channelCount: 1,
-                      echoCancellation: false,
-                      latency: 0,
-                      noiseSuppression: false,
-                      sampleRate: 48000,
-                      sampleSize: 16,
-                      volume: 1.0
-                  }
-                : false;
+            const audioOptions = {
+                autoGainControl: false,
+                channelCount: 1,
+                echoCancellation: false,
+                latency: 0,
+                noiseSuppression: false,
+                sampleRate: 48000,
+                sampleSize: 16,
+                volume: 1.0
+            }
 
             // set the media send options
             const mediaSendOptions: MediaStreamConstraints = {
@@ -451,12 +450,7 @@ export class PeerConnectionController {
             if (stream) {
                 if (hasTransceivers) {
                     for (const transceiver of this.peerConnection?.getTransceivers() ?? []) {
-                        if (
-                            transceiver &&
-                            transceiver.receiver &&
-                            transceiver.receiver.track &&
-                            transceiver.receiver.track.kind === 'audio'
-                        ) {
+                        if (RTCUtils.canTransceiverReceiveAudio(transceiver)) {
                             for (const track of stream.getTracks()) {
                                 if (track.kind && track.kind == 'audio') {
                                     transceiver.sender.replaceTrack(track);

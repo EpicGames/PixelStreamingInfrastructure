@@ -4,10 +4,46 @@ The changelog is a summary of commits between releases of Unreal Engine.
 
 As a reminder each UE-X branch/tag in this repository corresponds to a version of Unreal Engine.
 
-## [UE 5.3 (Coming soon)](https://github.com/EpicGames/PixelStreamingInfrastructure/commits/UE5.3)
-Coming soon...
+## [UE 5.3 (Current)](https://github.com/EpicGames/PixelStreamingInfrastructure/commits/UE5.3)
 
-## [UE 5.2 (Current)](https://github.com/EpicGames/PixelStreamingInfrastructure/commits/UE5.2)
+### Features
+- Protocol structures can now contain strings by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/336
+- Added the ability for the frontend peer to auto connect when a new streamer is available by @mcottontensor in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/358
+
+### Enhancements
+- Upgrade 5.2 to 5.3 in libraries, docs, log messages, build pipelines by @lukehb in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/262
+- Include create, reconnect, and update events (with associated tests) by @jibranabsarulislam in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/273
+- Add github action for PR and Issue management by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/304
+- Update stale.yml by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/305
+- Update stale workflow to also auto close stale issues and PRs by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/306
+- Show player count in stats panel by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/303
+- Change implementations/EpicGames to implementations/typescript #166 by @gunsha in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/177
+- Refactor SignallingWebServer to a single docker file by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/337
+- Update LatencyTest handler to accept input data by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/340
+- Add contribution guideline `CONTRIBUTING.md` by @DenisTensorWorks in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/352
+- New matchmaker queue screen with easy customization by @kasp1 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/211
+- Updated CONTRIBUTING.md with backport rules by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/357
+
+### Documentation
+- Signaling message reference doc by @mcottontensor in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/271
+- Update SignallingProtocol.md by @mcottontensor in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/288
+
+### Bug fixes
+- Fixed auto reconnect to not reconnect when the page is refreshed. by @mcottontensor in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/285
+- Fixed iOS touch when settings panel is open by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/274
+- Fixed Firefox console errors `TypeError: this.preferredCodec.split is not a function` by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/310
+- Fixed ensuring touch is relative to absolute location of parent rect by @StomyPX in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/316
+- Fixed injecting new params into SDP to get stereo back on Chrome by @StomyPX in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/332
+- Fixed matchmaker asking for OS authentication instead of erroring out with EACCESS by @StomyPX in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/333
+- Fixed consuming the context menu event instead of sending a mouse up by @StomyPX in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/354
+
+### Security
+- Bump tough-cookie from 4.1.2 to 4.1.3 in /Frontend/library by @dependabot in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/290
+- Bump word-wrap from 1.2.3 to 1.2.4 in /Frontend/library by @dependabot in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/320
+- Bump word-wrap from 1.2.3 to 1.2.5 in /Frontend/ui-library by @dependabot in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/327
+- Bump Node.js to latest LTS by @StomyPX in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/321
+
+## [UE 5.2](https://github.com/EpicGames/PixelStreamingInfrastructure/commits/UE5.2)
 
 ### Features
 - Added minimal sample React implementation by @hmuurine in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/159
@@ -18,6 +54,12 @@ Coming soon...
 - Added experimental support for WebXR based experiences by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/85
 
 ### Docs
+- New general docs page/ToC + new security page. by @MWillWallT in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/254
+- Update README to mention container images require being part of Epic's Github org by @mcottontensor in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/248
+- Update platform_scripts readme.md to explain the different scripts by @lukehb in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/224
+- Improve signalling Server readme @DenisTensorWorks in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/223
+- Adding microphone feature documentation for UE5.2 by @DenisTensorWorks in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/228
+- Adding microphone feature documentation by @DenisTensorWorks in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/208
 - Added new general docs page/ToC + new security page. by @MWillWallT in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/254
 - Settings Panel Documentation by @MWillWallT in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/135
 - Customised Pixel Streaming Player Page by @MWillWallT in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/90
@@ -29,6 +71,14 @@ Coming soon...
 - Update Docs to remove broken links by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/122
 
 ### Enhancements
+- Add repository health status in the form of Github badges table on readme.md by @lukehb in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/265
+- Re-enable iOS and iPadOS fullscreen by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/266
+- Changed forwarded logs to Cyan, added warning for missing playerId by @StomyPX in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/253
+- Added "media-playout" to prevent spam in Aggregated Stats by @chasse20 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/232
+- Added 'stat PixelStreamingGraphs' to showcase frontend #229 by @devrajgadhvi in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/238
+- Bump socket.io-parser from 4.2.2 to 4.2.4 in /Matchmaker by @dependabot in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/244
+- Bump engine.io from 6.4.0 to 6.4.2 in /Matchmaker by @mcottontensor in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/220
+- Allow inheritance of webrtcPlayerController and webXrController by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/209
 - Pass command line args when calling run_local.bat by @lukehb in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/109
 - Customize frontend styles through UI API by @hmuurine in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/133
 - Force URL param settings when receiving initial application settings by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/134
@@ -57,6 +107,10 @@ Coming soon...
 - Replaced hardcoded log path with given parameter path by @Mirmidion in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/39
 
 ### Bug fixes
+- Fixed viewport resizing not always working due to improperly calling timer. by @mcottontensor in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/247
+- Fixed hovering mouse mode set in URL being overridden on refresh. by @mcottontensor in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/246
+- Fixed matchmaker directing users to http when the signalling server is using https by @mcottontensor in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/245
+- Fixed reconnects will be attempted even when a disconnect is triggered by afk timeout by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/215
 - Fixed datachannels not working when using the SFU by @mcottontensor in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/137
 - Fixed SFU having clashing datachannel/stream ids, now using mediasoup's internal stream ids for SCTP by @StomyPX in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/129
 - Fixed controller indices from multiple peers would clash by @Belchy06 in https://github.com/EpicGames/PixelStreamingInfrastructure/pull/165
