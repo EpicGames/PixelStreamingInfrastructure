@@ -61,6 +61,10 @@ import {
     PlayStreamRejectedEvent,
     StreamerListMessageEvent
 } from '../Util/EventEmitter';
+import {
+    DataChannelLatencyTestRequest,
+    DataChannelLatencyTestResponse
+} from "../DataChannel/DataChannelLatencyTestResults";
 /**
  * Entry point for the WebRTC Player
  */
@@ -109,6 +113,8 @@ export class WebRtcPlayerController {
     // if you override the disconnection message by calling the interface method setDisconnectMessageOverride
     // it will use this property to store the override message string
     disconnectMessageOverride: string;
+
+    autoJoinTimer: ReturnType<typeof setTimeout> = undefined;
 
     /**
      *
@@ -381,6 +387,11 @@ export class WebRtcPlayerController {
             'LatencyTest',
             (data: ArrayBuffer) => this.handleLatencyTestResult(data)
         );
+        this.streamMessageController.registerMessageHandler(
+            MessageDirection.FromStreamer,
+            'DataChannelLatencyTest',
+            (data: ArrayBuffer) => this.handleDataChannelLatencyTestResponse(data)
+        )
         this.streamMessageController.registerMessageHandler(
             MessageDirection.FromStreamer,
             'InitialSettings',
@@ -1389,6 +1400,11 @@ export class WebRtcPlayerController {
                     OptionParameters.StreamerId,
                     autoSelectedStreamerId
                 );
+            } else {
+                // no auto selected streamer
+                if (this.config.isFlagEnabled(Flags.WaitForStreamer)) {
+                    this.startAutoJoinTimer()
+                }
             }
             this.pixelStreaming.dispatchEvent(
                 new StreamerListMessageEvent({
@@ -1397,6 +1413,15 @@ export class WebRtcPlayerController {
                 })
             );
         }
+    }
+
+    startAutoJoinTimer() {
+        clearTimeout(this.autoJoinTimer);
+        this.autoJoinTimer = setTimeout(() => this.tryAutoJoin(), this.config.getNumericSettingValue(NumericParameters.StreamerAutoJoinInterval));
+    }
+
+    tryAutoJoin() {
+        this.connectToSignallingServer();
     }
 
     /**
@@ -1635,6 +1660,15 @@ export class WebRtcPlayerController {
     }
 
     /**
+     * Send a Data Channel Latency Test Request to the UE Instance
+     */
+    sendDataChannelLatencyTest(descriptor: DataChannelLatencyTestRequest) {
+        this.streamMessageController.toStreamerHandlers.get(
+            'DataChannelLatencyTest'
+        )([JSON.stringify(descriptor)]);
+    }
+
+    /**
      * Send the MinQP encoder setting to the UE Instance.
      * @param minQP - The lower bound for QP when encoding
      * valid values are (1-51) where:
@@ -1859,6 +1893,23 @@ export class WebRtcPlayerController {
                 +latencyTestResults.CaptureToSendMs);
         }
         this.pixelStreaming._onLatencyTestResult(latencyTestResults);
+    }
+
+    /**
+     * Handles when a Data Channel Latency Test Response is received from the UE Instance
+     * @param message - Data Channel Latency Test Response
+     */
+    handleDataChannelLatencyTestResponse(message: ArrayBuffer) {
+        Logger.Log(
+            Logger.GetStackTrace(),
+            'DataChannelReceiveMessageType.dataChannelLatencyResponse',
+            6
+        );
+        const responseAsString = new TextDecoder('utf-16').decode(
+            message.slice(1)
+        );
+        const latencyTestResponse: DataChannelLatencyTestResponse = JSON.parse(responseAsString);
+        this.pixelStreaming._onDataChannelLatencyTestResponse(latencyTestResponse);
     }
 
     /**
