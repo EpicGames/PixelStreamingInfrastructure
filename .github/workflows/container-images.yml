@@ -2,6 +2,7 @@ name: Publish Cirrus container
 
 on:
   push:
+    workflow_dispatch:
     branches: ['UE5.4']
     paths: ['SignallingWebServer/**']
 
