@@ -5,7 +5,7 @@ import {
     Config,
     AllSettings,
     PixelStreaming
-} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
 
 export interface PixelStreamingWrapperProps {
     initialSettings?: Partial<AllSettings>;
