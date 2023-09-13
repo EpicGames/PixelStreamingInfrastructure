@@ -3,7 +3,7 @@
 import type {
     OptionParametersIds,
     SettingOption
-} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
 import { SettingUIBase } from './SettingUIBase';
 
 export class SettingUIOption<

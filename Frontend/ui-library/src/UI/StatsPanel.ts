@@ -1,8 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { LatencyTest } from './LatencyTest';
-import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
-import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
+import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
 import { MathUtils } from '../Util/MathUtils';
 
 /**
