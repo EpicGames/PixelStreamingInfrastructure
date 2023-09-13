@@ -1,8 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { LatencyTest } from './LatencyTest';
-import {InitialSettings, Logger, PixelStreaming} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
-import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
+import { InitialSettings, Logger, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
+import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
 import { MathUtils } from '../Util/MathUtils';
 import {DataChannelLatencyTest} from "./DataChannelLatencyTest";
 import {PixelStreamingSettings} from "@epicgames-ps/lib-pixelstreamingfrontend-ue5.3/types/DataChannel/InitialSettings";
