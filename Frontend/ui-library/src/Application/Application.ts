@@ -33,7 +33,7 @@ import {
 import { FullScreenIconBase, FullScreenIconExternal } from '../UI/FullscreenIcon';
 import {
     DataChannelLatencyTestResult
-} from "@epicgames-ps/lib-pixelstreamingfrontend-ue5.3/types/DataChannel/DataChannelLatencyTestResults";
+} from "@epicgames-ps/lib-pixelstreamingfrontend-ue5.4/types/DataChannel/DataChannelLatencyTestResults";
 
 
 /** 
