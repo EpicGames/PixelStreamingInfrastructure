@@ -39,6 +39,12 @@ If part of the library is not exposed and you wish to extend it, please do so in
 
 ⚠️ Only NodeJS LTS 18.17.0 is officially supported, some newer versions on NodeJS **WILL BREAK YOUR BUILD** ⚠️
 
+### Prerequisites
+- Install NodeJS LTS 18.17.0 on your system.
+- Install npm globally using: `npm install npm -g` (yes this is required)
+
+### Building the Library
+
 Changes to the library occur in the [/library](/Frontend/library) directory and require you to have NodeJS installed as part of your development environment.
 Once you have NodeJS installed: 
 
@@ -46,11 +52,15 @@ Once you have NodeJS installed:
 - `npm install`
 - `npm run build`
 
+### Building the UI-Library
+
 The user interface library is provided in [/ui-library](/Frontend/ui-library) directory. You can either use it or provide your own user interface. To build run:
 - Follow the steps to build the library first
 - `cd ui-library`
 - `npm install`
 - `npm run build-all`
+
+### Building the default UI
 
 The default user interface is provided under [/implementations/typescript](/Frontend/implementations/typescript). To build run:
 

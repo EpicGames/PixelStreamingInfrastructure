@@ -26,11 +26,23 @@ import {
     WebRtcDisconnectedEvent,
     WebRtcFailedEvent,
     WebRtcSdpEvent,
+    DataChannelLatencyTestResponseEvent,
+    DataChannelLatencyTestResultEvent,
     PlayerCountEvent
 } from '../Util/EventEmitter';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
 import { MessageDirection } from '../UeInstanceMessage/StreamMessageController';
+import {
+    DataChannelLatencyTestConfig,
+    DataChannelLatencyTestController
+} from "../DataChannel/DataChannelLatencyTestController";
+import {
+    DataChannelLatencyTestResponse,
+    DataChannelLatencyTestResult
+} from "../DataChannel/DataChannelLatencyTestResults";
+import { RTCUtils } from '../Util/RTCUtils';
+
 
 export interface PixelStreamingOverrides {
     /** The DOM elment where Pixel Streaming video and user input event handlers are attached to.
@@ -49,6 +61,7 @@ export interface PixelStreamingOverrides {
 export class PixelStreaming {
     protected _webRtcController: WebRtcPlayerController;
     protected _webXrController: WebXRController;
+    protected _dataChannelLatencyTestController: DataChannelLatencyTestController;
     /**
      * Configuration object. You can read or modify config through this object. Whenever
      * the configuration is changed, the library will emit a `settingsChanged` event.
@@ -371,6 +384,57 @@ export class PixelStreaming {
         }
     }
 
+    /** 
+     * Will unmute the microphone track which is sent to Unreal Engine.
+     * By default, will only unmute an existing mic track.
+     * 
+     * @param forceEnable Can be used for cases when this object wasn't initialized with a mic track.
+     * If this parameter is true, the connection will be restarted with a microphone.
+     * Warning: this takes some time, as a full renegotiation and reconnection will happen.
+     */
+    public unmuteMicrophone(forceEnable = false) : void {
+        // If there's an existing mic track, we just set muted state
+        if (this.config.isFlagEnabled('UseMic')) {
+            this.setMicrophoneMuted(false);
+            return;
+        }
+        
+        // If there's no pre-existing mic track, and caller is ok with full reset, we enable and reset
+        if (forceEnable) {
+            this.config.setFlagEnabled("UseMic", true);
+            this.reconnect();
+            return;
+        }
+          
+        // If we prefer not to force a reconnection, just warn the user that this operation didn't happen
+        Logger.Warning(
+            Logger.GetStackTrace(),
+            'Trying to unmute mic, but PixelStreaming was initialized with no microphone track. Call with forceEnable == true to re-connect with a mic track.'
+        );
+    }
+
+    public muteMicrophone() : void {
+        if (this.config.isFlagEnabled('UseMic')) {
+            this.setMicrophoneMuted(true);
+            return;
+        }
+
+        // If there wasn't a mic track, just let user know there's nothing to mute
+        Logger.Info(
+            Logger.GetStackTrace(),
+            'Trying to mute mic, but PixelStreaming has no microphone track, so sending sound is already disabled.'
+        );
+    }
+
+    private setMicrophoneMuted(mute: boolean) : void
+    {
+        for (const transceiver of this._webRtcController?.peerConnectionController?.peerConnection?.getTransceivers() ?? []) {
+            if (RTCUtils.canTransceiverSendAudio(transceiver)) {
+                transceiver.sender.track.enabled = !mute;
+            }
+        }
+    }
+
     /**
      * Emit an event on auto connecting
      */
@@ -458,6 +522,12 @@ export class PixelStreaming {
     _onLatencyTestResult(latencyTimings: LatencyTestResults) {
         this._eventEmitter.dispatchEvent(
             new LatencyTestResultEvent({ latencyTimings })
+        );
+    }
+
+    _onDataChannelLatencyTestResponse(response: DataChannelLatencyTestResponse) {
+        this._eventEmitter.dispatchEvent(
+            new DataChannelLatencyTestResponseEvent({ response })
         );
     }
 
@@ -580,6 +650,30 @@ export class PixelStreaming {
         }
         this._webRtcController.sendLatencyTest();
         return true;
+    }
+
+    /**
+     * Request a data channel latency test.
+     * NOTE: There are plans to refactor all request* functions. Expect changes if you use this!
+     */
+    public requestDataChannelLatencyTest(config: DataChannelLatencyTestConfig) {
+        if (!this._webRtcController.videoPlayer.isVideoReady()) {
+            return false;
+        }
+        if (!this._dataChannelLatencyTestController) {
+            this._dataChannelLatencyTestController = new DataChannelLatencyTestController(
+                this._webRtcController.sendDataChannelLatencyTest.bind(this._webRtcController),
+                (result: DataChannelLatencyTestResult) => {
+                    this._eventEmitter.dispatchEvent(new DataChannelLatencyTestResultEvent( { result }))
+                });
+            this.addEventListener(
+                "dataChannelLatencyTestResponse",
+                ({data: {response} }) => {
+                    this._dataChannelLatencyTestController.receive(response);
+                }
+            )
+        }
+        return this._dataChannelLatencyTestController.start(config);
     }
 
     /**

@@ -13,6 +13,7 @@ document.body.onload = function() {
 			AutoConnect: true,
 			ss: "ws://localhost:80",
 			StartVideoMuted: true,
+			WaitForStreamer: true,
 		}
 	});
 
