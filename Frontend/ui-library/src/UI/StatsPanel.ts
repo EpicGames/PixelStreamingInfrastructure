@@ -5,7 +5,7 @@ import { InitialSettings, Logger, PixelStreaming } from '@epicgames-ps/lib-pixel
 import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
 import { MathUtils } from '../Util/MathUtils';
 import {DataChannelLatencyTest} from "./DataChannelLatencyTest";
-import {PixelStreamingSettings} from "@epicgames-ps/lib-pixelstreamingfrontend-ue5.3/types/DataChannel/InitialSettings";
+import {PixelStreamingSettings} from "@epicgames-ps/lib-pixelstreamingfrontend-ue5.4/types/DataChannel/InitialSettings";
 
 /**
  * A stat structure, an id, the stat string, and the element where it is rendered.
