@@ -603,13 +603,13 @@ export class PixelStreaming {
             this.config.setNumericSetting(
                 NumericParameters.WebRTCMinBitrate,
                 (useUrlParams && urlParams.has(NumericParameters.WebRTCMinBitrate)) 
-                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCMinBitrate)) / 1000 /* bps to kbps */
+                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCMinBitrate))
                     : settings.WebRTCSettings.MinBitrate / 1000 /* bps to kbps */
             );
             this.config.setNumericSetting(
                 NumericParameters.WebRTCMaxBitrate,
                 (useUrlParams && urlParams.has(NumericParameters.WebRTCMaxBitrate)) 
-                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCMaxBitrate)) / 1000 /* bps to kbps */
+                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCMaxBitrate))
                     : settings.WebRTCSettings.MaxBitrate / 1000 /* bps to kbps */
                 
             );
