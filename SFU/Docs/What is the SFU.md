@@ -32,8 +32,8 @@ Adding the above to your level blueprint lets you use the assigned key as a conn
 **Note:** The SFU is designed to automatically switch peers between layers based on their connection, so using this blueprint isn’t required for actual deployments.
 
 
-![Layer1](images/Layer1.png) Layer 1 
+![Layer1](images/Layer1.PNG) Layer 1 
 
-![Layer2](images/Layer2.png) Layer 2 
+![Layer2](images/Layer2.PNG) Layer 2 
 
-![Layer3](images/Layer3.png) Layer 3 
+![Layer3](images/Layer3.PNG) Layer 3 
