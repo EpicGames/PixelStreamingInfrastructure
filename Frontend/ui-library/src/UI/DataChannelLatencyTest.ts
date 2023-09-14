@@ -1,9 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.3';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
 import {
     DataChannelLatencyTestResult
-} from "@epicgames-ps/lib-pixelstreamingfrontend-ue5.3/types/DataChannel/DataChannelLatencyTestResults";
+} from "@epicgames-ps/lib-pixelstreamingfrontend-ue5.4/types/DataChannel/DataChannelLatencyTestResults";
 
 /**
  * DataChannel Latency test UI elements and results handling.
