@@ -1802,7 +1802,7 @@ export class WebRtcPlayerController {
         );
 
         this.streamMessageController.toStreamerHandlers.get(
-            'Command'
+            'UIInteraction'
         )([JSON.stringify(descriptor)]);
     }
 
