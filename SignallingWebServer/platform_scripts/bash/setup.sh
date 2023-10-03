@@ -1,6 +1,7 @@
 #!/bin/bash
 # Copyright Epic Games, Inc. All Rights Reserved.
 BASH_LOCATION=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+NODE_VERSION=v18.17.0
 
 pushd "${BASH_LOCATION}" > /dev/null
 
@@ -128,10 +129,29 @@ node_version=""
 if [[ -f "${BASH_LOCATION}/node/bin/node" ]]; then
 	node_version=$("${BASH_LOCATION}/node/bin/node" --version)
 fi
-check_and_install "node" "$node_version" "v18.17.0" "curl https://nodejs.org/dist/v18.17.0/node-v18.17.0-linux-x64.tar.gz --output node.tar.xz
+
+node_url=""
+if [ "$(uname)" == "Darwin" ]; then
+	arch=$(uname -m)
+	if [[ $arch == x86_64* ]]; then
+		node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-x64.tar.gz"
+	elif  [[ $arch == arm* ]]; then
+	    node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-arm64.tar.gz"
+	else
+		echo 'Incompatible architecture. Only x86_64, AMD64, and ARM64 are supported'
+		exit -1
+	fi
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    # Do something under GNU/Linux platform
+	node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
+else
+	echo 'Incorrect host OS for use with setup.sh'
+	exit -1
+fi
+check_and_install "node" "$node_version" "$NODE_VERSION" "curl $node_url --output node.tar.xz
 													&& tar -xf node.tar.xz
 													&& rm node.tar.xz
-													&& mv node-v*-linux-x64 \"${BASH_LOCATION}/node\""
+													&& mv node-v*-*-* \"${BASH_LOCATION}/node\""
 
 PATH="${BASH_LOCATION}/node/bin:$PATH"
 "${BASH_LOCATION}/node/lib/node_modules/npm/bin/npm-cli.js" install
@@ -144,20 +164,33 @@ setup_frontend
 
 popd > /dev/null # BASH_SOURCE
 
-#command #dep_name #get_version_string #version_min #install command
-coturn_version=$(if command -v turnserver &> /dev/null; then echo 1; else echo 0; fi)
-if [ $coturn_version -eq 0 ]; then
-	if ! command -v apt-get &> /dev/null; then
-		echo "Setup for the scripts is designed for use with distros that use the apt-get package manager" \
-			 "if you are seeing this message you will have to update \"${BASH_LOCATION}/setup.sh\" with\n" \
-			 "a package manger and the equivalent packages for your distribution. Please follow the\n" \
-			 "instructions found at https://pkgs.org/search/?q=coturn to install Coturn for your specific distribution"
-		exit 1
+if [ "$(uname)" == "Darwin" ]; then
+	if [ -d "${BASH_LOCATION}/coturn" ]; then
+		echo 'CoTURN directory found...skipping install.'
 	else
-		if [ `id -u` -eq 0 ]; then
-			check_and_install "coturn" "$coturn_version" "1" "apt-get install -y coturn"
+		echo 'CoTURN directory not found...beginning CoTURN download for Mac.'	
+		curl -L -o ./turnserver.zip "https://github.com/belchy06/coturn/releases/download/v4.6.2-mac/turnserver.zip"
+		mkdir "${BASH_LOCATION}/coturn" 
+		tar -xf turnserver.zip -C "${BASH_LOCATION}/coturn"
+		rm turnserver.zip
+	fi
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    #command #dep_name #get_version_string #version_min #install command
+	coturn_version=$(if command -v turnserver &> /dev/null; then echo 1; else echo 0; fi)
+	if [ $coturn_version -eq 0 ]; then
+		if ! command -v apt-get &> /dev/null; then
+			echo "Setup for the scripts is designed for use with distros that use the apt-get package manager" \
+				 "if you are seeing this message you will have to update \"${BASH_LOCATION}/setup.sh\" with\n" \
+				 "a package manger and the equivalent packages for your distribution. Please follow the\n" \
+				 "instructions found at https://pkgs.org/search/?q=coturn to install Coturn for your specific distribution"
+			exit 1
 		else
-			check_and_install "coturn" "$coturn_version" "1" "sudo apt-get install -y coturn"
+			if [ `id -u` -eq 0 ]; then
+				check_and_install "coturn" "$coturn_version" "1" "apt-get install -y coturn"
+			else
+				check_and_install "coturn" "$coturn_version" "1" "sudo apt-get install -y coturn"
+			fi
 		fi
 	fi
 fi
+
