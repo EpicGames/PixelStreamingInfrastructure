@@ -168,7 +168,13 @@ if [ "$(uname)" == "Darwin" ]; then
 		echo 'CoTURN directory found...skipping install.'
 	else
 		echo 'CoTURN directory not found...beginning CoTURN download for Mac.'	
-		curl -L -o ./turnserver.zip "https://github.com/belchy06/coturn/releases/download/v4.6.2-mac/turnserver.zip"
+		coturn_url=""
+		if [[ $arch == x86_64* ]]; then
+			coturn_url="https://github.com/Belchy06/coturn/releases/download/v4.6.2-mac-x84_64/turnserver.zip"
+		elif  [[ $arch == arm* ]]; then
+	    	coturn_url="https://github.com/Belchy06/coturn/releases/download/v4.6.2-mac-arm64/turnserver.zip"
+		fi
+		curl -L -o ./turnserver.zip "$coturn_url"
 		mkdir "${BASH_LOCATION}/coturn" 
 		tar -xf turnserver.zip -C "${BASH_LOCATION}/coturn"
 		rm turnserver.zip
