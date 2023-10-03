@@ -138,14 +138,13 @@ if [ "$(uname)" == "Darwin" ]; then
 	elif  [[ $arch == arm* ]]; then
 	    node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-arm64.tar.gz"
 	else
-		echo 'Incompatible architecture. Only x86_64, AMD64, and ARM64 are supported'
+		echo 'Incompatible architecture. Only x86_64 and ARM64 are supported'
 		exit -1
 	fi
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    # Do something under GNU/Linux platform
 	node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
 else
-	echo 'Incorrect host OS for use with setup.sh'
+	echo 'Incorrect OS for use with setup.sh'
 	exit -1
 fi
 check_and_install "node" "$node_version" "$NODE_VERSION" "curl $node_url --output node.tar.xz
