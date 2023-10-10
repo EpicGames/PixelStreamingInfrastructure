@@ -1109,26 +1109,30 @@ export class WebRtcPlayerController {
         this.pixelStreaming.dispatchEvent(new PlayStreamEvent());
 
         if (this.streamController.audioElement.srcObject) {
-            this.streamController.audioElement.muted =
-                this.config.isFlagEnabled(Flags.StartVideoMuted);
+            const startMuted = this.config.isFlagEnabled(Flags.StartVideoMuted)
+            this.streamController.audioElement.muted = startMuted;
 
-            this.streamController.audioElement
-                .play()
-                .then(() => {
-                    this.playVideo();
-                })
-                .catch((onRejectedReason) => {
-                    Logger.Log(Logger.GetStackTrace(), onRejectedReason);
-                    Logger.Log(
-                        Logger.GetStackTrace(),
-                        'Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.'
-                    );
-                    this.pixelStreaming.dispatchEvent(
-                        new PlayStreamRejectedEvent({
-                            reason: onRejectedReason
-                        })
-                    );
-                });
+            if (startMuted) {
+              this.playVideo();
+            } else {
+                this.streamController.audioElement
+                    .play()
+                    .then(() => {
+                        this.playVideo();
+                    })
+                    .catch((onRejectedReason) => {
+                        Logger.Log(Logger.GetStackTrace(), onRejectedReason);
+                        Logger.Log(
+                            Logger.GetStackTrace(),
+                            'Browser does not support autoplaying video without interaction - to resolve this we are going to show the play button overlay.'
+                        );
+                        this.pixelStreaming.dispatchEvent(
+                            new PlayStreamRejectedEvent({
+                                reason: onRejectedReason
+                            })
+                        );
+                    });
+            }
         } else {
             this.playVideo();
         }
