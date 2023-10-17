@@ -487,7 +487,7 @@ export class Application {
      * Shows or hides the settings panel if clicked
      */
     settingsClicked() {
-        this.statsPanel.hide();
+        this.statsPanel?.hide();
         this.settingsPanel.toggleVisibility();
     }
 
@@ -495,7 +495,7 @@ export class Application {
      * Shows or hides the stats panel if clicked
      */
     statsClicked() {
-        this.settingsPanel.hide();
+        this.settingsPanel?.hide();
         this.statsPanel.toggleVisibility();
     }
 
@@ -583,7 +583,7 @@ export class Application {
             );
         }
         // disable starting a latency checks
-        this.statsPanel.onDisconnect();
+        this.statsPanel?.onDisconnect();
     }
 
     /**
@@ -630,7 +630,7 @@ export class Application {
         if (!this.stream.config.isFlagEnabled(Flags.AutoPlayVideo)) {
             this.showPlayOverlay();
         }
-        this.statsPanel.onVideoInitialized(this.stream);
+        this.statsPanel?.onVideoInitialized(this.stream);
     }
 
     /**
@@ -646,25 +646,25 @@ export class Application {
 
     onInitialSettings(settings: InitialSettings) {
         if (settings.PixelStreamingSettings) {
-            this.statsPanel.configure(settings.PixelStreamingSettings);
+            this.statsPanel?.configure(settings.PixelStreamingSettings);
         }
     }
 
     onStatsReceived(aggregatedStats: AggregatedStats) {
         // Grab all stats we can off the aggregated stats
-        this.statsPanel.handleStats(aggregatedStats);
+        this.statsPanel?.handleStats(aggregatedStats);
     }
 
     onLatencyTestResults(latencyTimings: LatencyTestResults) {
-        this.statsPanel.latencyTest.handleTestResult(latencyTimings);
+        this.statsPanel?.latencyTest.handleTestResult(latencyTimings);
     }
 
     onDataChannelLatencyTestResults(result: DataChannelLatencyTestResult) {
-        this.statsPanel.dataChannelLatencyTest.handleTestResult(result);
+        this.statsPanel?.dataChannelLatencyTest.handleTestResult(result);
     }
 
     onPlayerCount(playerCount: number) {
-        this.statsPanel.handlePlayerCount(playerCount);
+        this.statsPanel?.handlePlayerCount(playerCount);
     }
 
     handleStreamerListMessage(messageStreamingList: MessageStreamerList, autoSelectedStreamerId: string | null) {
