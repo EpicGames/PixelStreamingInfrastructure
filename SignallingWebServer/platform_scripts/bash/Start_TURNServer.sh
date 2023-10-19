@@ -28,11 +28,8 @@ realm="PixelStreaming"
 process=""
 if [ "$(uname)" == "Darwin" ]; then
 	process="${BASH_LOCATION}/coturn/bin/turnserver"
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-	process="turnserver"
 else
-	echo 'Incorrect host OS for use with Start_TURNServer.sh'
-	exit -1
+	process="turnserver"
 fi
 arguments="-c turnserver.conf --allowed-peer-ip=$localip -p ${turnport} -r $realm -X $publicip -E $localip -L $localip --no-cli --no-tls --no-dtls --pidfile /var/run/turnserver.pid -f -a -v -u ${turnusername}:${turnpassword}"
 

@@ -141,16 +141,13 @@ if [ "$(uname)" == "Darwin" ]; then
 		echo 'Incompatible architecture. Only x86_64 and ARM64 are supported'
 		exit -1
 	fi
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-	node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
 else
-	echo 'Incorrect OS for use with setup.sh'
-	exit -1
+	node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
 fi
 check_and_install "node" "$node_version" "$NODE_VERSION" "curl $node_url --output node.tar.xz
-													&& tar -xf node.tar.xz
-													&& rm node.tar.xz
-													&& mv node-v*-*-* \"${BASH_LOCATION}/node\""
+															&& tar -xf node.tar.xz
+															&& rm node.tar.xz
+															&& mv node-v*-*-* \"${BASH_LOCATION}/node\""
 
 PATH="${BASH_LOCATION}/node/bin:$PATH"
 "${BASH_LOCATION}/node/lib/node_modules/npm/bin/npm-cli.js" install
@@ -167,19 +164,19 @@ if [ "$(uname)" == "Darwin" ]; then
 	if [ -d "${BASH_LOCATION}/coturn" ]; then
 		echo 'CoTURN directory found...skipping install.'
 	else
-		echo 'CoTURN directory not found...beginning CoTURN download for Mac.'	
+		echo 'CoTURN directory not found...beginning CoTURN download for Mac.'
 		coturn_url=""
 		if [[ $arch == x86_64* ]]; then
-			coturn_url="https://github.com/Belchy06/coturn/releases/download/v4.6.2-mac-x84_64/turnserver.zip"
+			coturn_url="https://github.com/EpicGames/PixelStreamingInfrastructure/releases/download/v4.6.2-coturn-mac-x86_64/turnserver.zip"
 		elif  [[ $arch == arm* ]]; then
-	    	coturn_url="https://github.com/Belchy06/coturn/releases/download/v4.6.2-mac-arm64/turnserver.zip"
+	    	coturn_url="https://github.com/EpicGames/PixelStreamingInfrastructure/releases/download/v4.6.2-coturn-mac-arm64/turnserver.zip"
 		fi
 		curl -L -o ./turnserver.zip "$coturn_url"
 		mkdir "${BASH_LOCATION}/coturn" 
 		tar -xf turnserver.zip -C "${BASH_LOCATION}/coturn"
 		rm turnserver.zip
 	fi
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+else
     #command #dep_name #get_version_string #version_min #install command
 	coturn_version=$(if command -v turnserver &> /dev/null; then echo 1; else echo 0; fi)
 	if [ $coturn_version -eq 0 ]; then
@@ -198,4 +195,3 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 		fi
 	fi
 fi
-
