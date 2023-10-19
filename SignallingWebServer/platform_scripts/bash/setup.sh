@@ -167,9 +167,9 @@ if [ "$(uname)" == "Darwin" ]; then
 		echo 'CoTURN directory not found...beginning CoTURN download for Mac.'
 		coturn_url=""
 		if [[ $arch == x86_64* ]]; then
-			coturn_url="https://github.com/Belchy06/coturn/releases/download/v4.6.2-mac-x84_64/turnserver.zip"
+			coturn_url="https://github.com/EpicGames/PixelStreamingInfrastructure/releases/download/v4.6.2-coturn-mac-x86_64/turnserver.zip"
 		elif  [[ $arch == arm* ]]; then
-	    	coturn_url="https://github.com/Belchy06/coturn/releases/download/v4.6.2-mac-arm64/turnserver.zip"
+	    	coturn_url="https://github.com/EpicGames/PixelStreamingInfrastructure/releases/download/v4.6.2-coturn-mac-arm64/turnserver.zip"
 		fi
 		curl -L -o ./turnserver.zip "$coturn_url"
 		mkdir "${BASH_LOCATION}/coturn" 
