@@ -141,11 +141,8 @@ if [ "$(uname)" == "Darwin" ]; then
 		echo 'Incompatible architecture. Only x86_64 and ARM64 are supported'
 		exit -1
 	fi
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-	node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
 else
-	echo 'Incorrect OS for use with setup.sh'
-	exit -1
+	node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
 fi
 check_and_install "node" "$node_version" "$NODE_VERSION" "curl $node_url --output node.tar.xz
 															&& tar -xf node.tar.xz
@@ -179,7 +176,7 @@ if [ "$(uname)" == "Darwin" ]; then
 		tar -xf turnserver.zip -C "${BASH_LOCATION}/coturn"
 		rm turnserver.zip
 	fi
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+else
     #command #dep_name #get_version_string #version_min #install command
 	coturn_version=$(if command -v turnserver &> /dev/null; then echo 1; else echo 0; fi)
 	if [ $coturn_version -eq 0 ]; then
