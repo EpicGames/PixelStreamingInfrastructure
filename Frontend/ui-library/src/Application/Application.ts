@@ -24,9 +24,9 @@ import { SettingsPanel } from '../UI/SettingsPanel';
 import { StatsPanel } from '../UI/StatsPanel';
 import { VideoQpIndicator } from '../UI/VideoQpIndicator';
 import { ConfigUI, LightMode } from '../Config/ConfigUI';
-import { 
-    UIElementCreationMode, 
-    PanelConfiguration, 
+import {
+    UIElementCreationMode,
+    PanelConfiguration,
     isPanelEnabled,
     UIElementConfig
 } from '../UI/UIConfigurationTypes'
@@ -58,11 +58,11 @@ export interface UIOptions {
       * If needed, this behaviour can be configured. */
     statsPanelConfig?: PanelConfiguration;
     /** If needed, the full screen button can be external or disabled. */
-    fullScreenControlsConfig? : UIElementConfig,
+    fullScreenControlsConfig?: UIElementConfig,
     /** If needed, XR button can be external or disabled. */
-    xrControlsConfig? : UIElementConfig,
+    xrControlsConfig?: UIElementConfig,
     /** Configuration of the video QP indicator. */
-    videoQpIndicatorConfig? : VideoQPIndicatorConfig
+    videoQpIndicatorConfig?: VideoQPIndicatorConfig
 }
 
 /**
@@ -95,14 +95,14 @@ export class Application {
 
     onColorModeChanged: UIOptions["onColorModeChanged"];
 
-    protected _options : UIOptions;
+    protected _options: UIOptions;
 
     /**
      * @param options - Initialization options
      */
     constructor(options: UIOptions) {
         this._options = options;
-        
+
         this.stream = options.stream;
         this.onColorModeChanged = options.onColorModeChanged;
         this.configUI = new ConfigUI(this.stream.config);
@@ -114,14 +114,14 @@ export class Application {
             this.statsPanel = new StatsPanel();
             this.uiFeaturesElement.appendChild(this.statsPanel.rootElement);
         }
-        
+
         if (isPanelEnabled(options.settingsPanelConfig)) {
             // Add settings panel
             this.settingsPanel = new SettingsPanel();
             this.uiFeaturesElement.appendChild(this.settingsPanel.rootElement);
             this.configureSettings();
         }
-        
+
         if (!options.videoQpIndicatorConfig || !options.videoQpIndicatorConfig.disableIndicator) {
             // Add the video stream QP indicator
             this.videoQpIndicator = new VideoQpIndicator();
@@ -171,8 +171,8 @@ export class Application {
      * Set up button click functions and button functionality
      */
     public createButtons() {
-        const controlsUIConfig : ControlsUIConfiguration = {
-            statsButtonType : !!this._options.statsPanelConfig
+        const controlsUIConfig: ControlsUIConfiguration = {
+            statsButtonType: !!this._options.statsPanelConfig
                 ? this._options.statsPanelConfig.visibilityButtonConfig
                 : undefined,
             settingsButtonType: !!this._options.settingsPanelConfig
@@ -186,39 +186,39 @@ export class Application {
         this.uiFeaturesElement.appendChild(controls.rootElement);
 
         // When we fullscreen we want this element to be the root
-        const fullScreenButton : FullScreenIconBase | undefined = 
+        const fullScreenButton: FullScreenIconBase | undefined =
             // Depending on if we're creating an internal button, or using an external one
-            (!!this._options.fullScreenControlsConfig 
+            (!!this._options.fullScreenControlsConfig
                 && this._options.fullScreenControlsConfig.creationMode === UIElementCreationMode.UseCustomElement)
-            // Either create a fullscreen class based on the external button
-            ? new FullScreenIconExternal(this._options.fullScreenControlsConfig.customElement)
-            // Or use the one created by the Controls initializer earlier
-            : controls.fullscreenIcon;
+                // Either create a fullscreen class based on the external button
+                ? new FullScreenIconExternal(this._options.fullScreenControlsConfig.customElement)
+                // Or use the one created by the Controls initializer earlier
+                : controls.fullscreenIcon;
         if (fullScreenButton) {
             fullScreenButton.fullscreenElement = /iPad|iPhone|iPod/.test(navigator.userAgent) ? this.stream.videoElementParent.getElementsByTagName("video")[0] : this.rootElement;
         }
 
         // Add settings button to controls
-        const settingsButton : HTMLElement | undefined = 
-            !!controls.settingsIcon ? controls.settingsIcon.rootElement : 
-            this._options.settingsPanelConfig.visibilityButtonConfig.customElement;
+        const settingsButton: HTMLElement | undefined =
+            !!controls.settingsIcon ? controls.settingsIcon.rootElement :
+                this._options.settingsPanelConfig.visibilityButtonConfig.customElement;
         if (!!settingsButton) settingsButton.onclick = () =>
             this.settingsClicked();
         if (!!this.settingsPanel) this.settingsPanel.settingsCloseButton.onclick = () =>
             this.settingsClicked();
 
         // Add WebXR button to controls
-        const xrButton : HTMLElement | undefined = 
-            !!controls.xrIcon ? controls.xrIcon.rootElement : 
-            this._options.xrControlsConfig.creationMode === UIElementCreationMode.UseCustomElement ?
-            this._options.xrControlsConfig.customElement : undefined;
+        const xrButton: HTMLElement | undefined =
+            !!controls.xrIcon ? controls.xrIcon.rootElement :
+                this._options.xrControlsConfig.creationMode === UIElementCreationMode.UseCustomElement ?
+                    this._options.xrControlsConfig.customElement : undefined;
         if (!!xrButton) xrButton.onclick = () =>
             this.stream.toggleXR();
 
         // setup the stats/info button
-        const statsButton : HTMLElement | undefined = 
-            !!controls.statsIcon ? controls.statsIcon.rootElement : 
-            this._options.statsPanelConfig.visibilityButtonConfig.customElement;
+        const statsButton: HTMLElement | undefined =
+            !!controls.statsIcon ? controls.statsIcon.rootElement :
+                this._options.statsPanelConfig.visibilityButtonConfig.customElement;
         if (!!statsButton) statsButton.onclick = () => this.statsClicked()
 
         if (!!this.statsPanel) {
@@ -366,8 +366,8 @@ export class Application {
             (event) => this.configUI.onSettingsChanged(event)
         );
         this.stream.addEventListener(
-            'playerCount', 
-            ({ data: { count }}) => 
+            'playerCount',
+            ({ data: { count } }) =>
                 this.onPlayerCount(count)
         );
     }
@@ -479,7 +479,7 @@ export class Application {
      * Shows or hides the settings panel if clicked
      */
     settingsClicked() {
-        this.statsPanel.hide();
+        this.statsPanel?.hide();
         this.settingsPanel.toggleVisibility();
     }
 
@@ -487,7 +487,7 @@ export class Application {
      * Shows or hides the stats panel if clicked
      */
     statsClicked() {
-        this.settingsPanel.hide();
+        this.settingsPanel?.hide();
         this.statsPanel.toggleVisibility();
     }
 
@@ -643,7 +643,7 @@ export class Application {
     }
 
     onInitialSettings(settings: InitialSettings) {
-        if (settings.PixelStreamingSettings) {
+        if (settings.PixelStreamingSettings && !!this.statsPanel) {
             const disableLatencyTest =
                 settings.PixelStreamingSettings.DisableLatencyTest;
             if (disableLatencyTest) {
@@ -660,20 +660,20 @@ export class Application {
 
     onStatsReceived(aggregatedStats: AggregatedStats) {
         // Grab all stats we can off the aggregated stats
-        this.statsPanel.handleStats(aggregatedStats);
+        this.statsPanel?.handleStats(aggregatedStats);
     }
 
     onLatencyTestResults(latencyTimings: LatencyTestResults) {
-        this.statsPanel.latencyTest.handleTestResult(latencyTimings);
+        this.statsPanel?.latencyTest.handleTestResult(latencyTimings);
     }
 
     onPlayerCount(playerCount: number) {
-        this.statsPanel.handlePlayerCount(playerCount);
+        this.statsPanel?.handlePlayerCount(playerCount);
     }
 
     handleStreamerListMessage(messageStreamingList: MessageStreamerList, autoSelectedStreamerId: string | null) {
         if (autoSelectedStreamerId === null) {
-            if(messageStreamingList.ids.length === 0) {
+            if (messageStreamingList.ids.length === 0) {
                 this.showDisconnectOverlay(
                     'No streamers connected. <div class="clickableState">Click To Restart</div>'
                 );
