@@ -526,14 +526,16 @@ export class PixelStreamingApplicationStyle {
         customStyles?: Partial<Styles>;
         lightModePalette?: ColorPalette;
         darkModePalette?: ColorPalette;
+        jssInsertionPoint?: string | HTMLElement;
     }) {
-        const { customStyles, lightModePalette, darkModePalette } =
+        const { customStyles, lightModePalette, darkModePalette, jssInsertionPoint } =
             options ?? {};
         // One time setup with default plugins and settings.
         const jssOptions = {
             // JSS has many interesting plugins we may wish to turn on
             //plugins: [functions(), template(), global(), extend(), nested(), compose(), camelCase(), defaultUnit(options.defaultUnit), expand(), vendorPrefixer(), propsSort()]
-            plugins: [global(), camelCase()]
+            plugins: [global(), camelCase()],
+            insertionPoint: jssInsertionPoint
         };
 
         jss.setup(jssOptions);
