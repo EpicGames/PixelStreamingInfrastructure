@@ -180,7 +180,7 @@ export class PeerConnectionController {
             this.onVideoStats(this.aggregatedStats);
 
             // Update the preferred codec selection based on what was actually negotiated
-            if (this.updateCodecSelection) {
+            if (this.updateCodecSelection && !!this.aggregatedStats.inboundVideoStats.codecId) {
                 this.config.setOptionSettingValue(
                     OptionParameters.PreferredCodec,
                     this.aggregatedStats.codecs.get(
@@ -370,7 +370,7 @@ export class PeerConnectionController {
         if (RTCRtpReceiver.getCapabilities && this.preferredCodec != '') {
             for (const transceiver of this.peerConnection?.getTransceivers() ?? []) {
                 if (
-                    transceiver &&  
+                    transceiver &&
                     transceiver.receiver &&
                     transceiver.receiver.track &&
                     transceiver.receiver.track.kind === 'video' &&
