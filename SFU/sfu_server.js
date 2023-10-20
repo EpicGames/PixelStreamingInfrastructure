@@ -1,6 +1,6 @@
 const config = require('./config');
 const WebSocket = require('ws');
-const mediasoup = require('mediasoup_prebuilt');
+const mediasoup = require('mediasoup');
 const mediasoupSdp = require('mediasoup-sdp-bridge');
 
 let signalServer = null;
@@ -14,13 +14,13 @@ function connectSignalling(server) {
   signalServer.addEventListener("open", _ => { console.log(`Connected to signalling server`); });
   signalServer.addEventListener("error", result => { console.log(`Error: ${result.message}`); });
   signalServer.addEventListener("message", result => onSignallingMessage(result.data));
-  signalServer.addEventListener("close", result => { 
+  signalServer.addEventListener("close", result => {
     onStreamerDisconnected();
     console.log(`Disconnected from signalling server: ${result.code} ${result.reason}`);
     console.log("Attempting reconnect to signalling server...");
-    setTimeout(()=> { 
+    setTimeout(() => {
       connectSignalling(server);
-    }, 2000); 
+    }, 2000);
   });
 }
 
@@ -44,7 +44,7 @@ async function onStreamerOffer(sdp) {
 }
 
 function getNextStreamerSCTPId() {
-    return streamer.transport._getNextSctpStreamId();
+  return streamer.transport._getNextSctpStreamId();
 }
 
 function onStreamerDisconnected() {
@@ -69,7 +69,7 @@ async function onPeerConnected(peerId) {
   }
 
   const transport = await createWebRtcTransport("Peer " + peerId);
-  const sdpEndpoint = mediasoupSdp.createSdpEndpoint( transport, mediasoupRouter.rtpCapabilities );
+  const sdpEndpoint = mediasoupSdp.createSdpEndpoint(transport, mediasoupRouter.rtpCapabilities);
   sdpEndpoint.addConsumeData(); // adds the sctp 'application' section to the offer
 
   // media consumers
@@ -77,11 +77,11 @@ async function onPeerConnected(peerId) {
   try {
     for (const mediaProducer of streamer.producers) {
       const consumer = await transport.consume({ producerId: mediaProducer.id, rtpCapabilities: mediasoupRouter.rtpCapabilities });
-      consumer.observer.on("layerschange", function() { console.log("layer changed!", consumer.currentLayers); });
+      consumer.observer.on("layerschange", function () { console.log("layer changed!", consumer.currentLayers); });
       sdpEndpoint.addConsumer(consumer);
       consumers.push(consumer);
     }
-  } catch(err) {
+  } catch (err) {
     console.error("transport.consume() failed:", err);
     return;
   }
@@ -120,12 +120,12 @@ async function setupPeerDataChannels(peerId) {
   console.log(`Attempting streamer SCTP id=${nextStreamerSCTPStreamId}`);
 
   // streamer data producer (produces data for the peer)
-  peer.streamerDataProducer = await streamer.transport.produceData({label: 'send-datachannel', sctpStreamParameters: {streamId: nextStreamerSCTPStreamId, ordered: true}});
+  peer.streamerDataProducer = await streamer.transport.produceData({ label: 'send-datachannel', sctpStreamParameters: { streamId: nextStreamerSCTPStreamId, ordered: true } });
 
   console.log(`Attempting peer SCTP id=${nextPeerSCTPStreamId}`);
 
   // peer data producer (produces data for the streamer)
-  peer.peerDataProducer = await peer.transport.produceData({label: 'send-datachannel', sctpStreamParameters: {streamId: nextPeerSCTPStreamId, ordered: true}});
+  peer.peerDataProducer = await peer.transport.produceData({ label: 'send-datachannel', sctpStreamParameters: { streamId: nextPeerSCTPStreamId, ordered: true } });
 
   // peer data consumer (consumes streamer data)
   peer.peerDataConsumer = await peer.transport.consumeData({ dataProducerId: peer.streamerDataProducer.id });
@@ -156,7 +156,7 @@ async function setupStreamerDataChannelsForPeer(peerId) {
     return;
   }
 
-  if(!peer.streamerDataProducer || !peer.streamerDataConsumer){
+  if (!peer.streamerDataProducer || !peer.streamerDataConsumer) {
     console.error(`There was no streamer data producer/consumer setup for peer=${peerId}. Did you make sure to send "dataChannelRequest" first?`);
     return;
   }
@@ -176,10 +176,10 @@ async function onPeerAnswer(peerId, sdp) {
   console.log("Got answer from player %s", peerId);
 
   const consumer = peers.get(peerId);
-  if (!consumer){
+  if (!consumer) {
     console.error(`Unable to find player ${peerId}`);
   }
-  else{
+  else {
     consumer.sdpEndpoint.processAnswer(sdp);
   }
 }
@@ -195,9 +195,9 @@ function onPeerDisconnected(peerId) {
       peer.peerDataConsumer.close();
       peer.peerDataProducer.close();
     }
-    if(peer.streamerDataConsumer){
+    if (peer.streamerDataConsumer) {
       // Set the streamer sctp id we generated back to zero indicating it can be reused.
-      if(streamer && streamer.transport && streamer.transport._sctpStreamIds){
+      if (streamer && streamer.transport && streamer.transport._sctpStreamIds) {
         const allocatedStreamId = peer.streamerDataProducer.sctpStreamParameters.streamId;
         const allocatedPeerStreamId = peer.peerDataProducer.sctpStreamParameters.streamId;
         streamer.transport._sctpStreamIds[allocatedStreamId] = 0;
@@ -228,7 +228,7 @@ function onLayerPreference(msg) {
 }
 
 async function onSignallingMessage(message) {
-    //console.log(`Got MSG: ${message}`);
+  //console.log(`Got MSG: ${message}`);
   const msg = JSON.parse(message);
 
   if (msg.type == 'offer') {

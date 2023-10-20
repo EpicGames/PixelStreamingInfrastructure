@@ -1,6 +1,7 @@
 #!/bin/bash
 # Copyright Epic Games, Inc. All Rights Reserved.
 BASH_LOCATION=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+NODE_VERSION=v18.17.0
 
 pushd "${BASH_LOCATION}" > /dev/null
 
@@ -99,10 +100,25 @@ node_version=""
 if [[ -f "${BASH_LOCATION}/node/bin/node" ]]; then
 	node_version=$("${BASH_LOCATION}/node/bin/node" --version)
 fi
-check_and_install "node" "$node_version" "v18.17.0" "curl https://nodejs.org/dist/v18.17.0/node-v18.17.0-linux-x64.tar.gz --output node.tar.xz 
-													&& tar -xf node.tar.xz 
-													&& rm node.tar.xz 
-													&& mv node-v*-linux-x64 \"${BASH_LOCATION}/node\""
+
+node_url=""
+if [ "$(uname)" == "Darwin" ]; then
+	arch=$(uname -m)
+	if [[ $arch == x86_64* ]]; then
+		node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-x64.tar.gz"
+	elif  [[ $arch == arm* ]]; then
+	    node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-arm64.tar.gz"
+	else
+		echo 'Incompatible architecture. Only x86_64 and ARM64 are supported'
+		exit -1
+	fi
+else
+	node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
+fi
+check_and_install "node" "$node_version" "$NODE_VERSION" "curl $node_url --output node.tar.xz
+															&& tar -xf node.tar.xz
+															&& rm node.tar.xz
+															&& mv node-v*-*-* \"${BASH_LOCATION}/node\""
 
 PATH="${BASH_LOCATION}/node/bin:$PATH"
 "${BASH_LOCATION}/node/lib/node_modules/npm/bin/npm-cli.js" install
