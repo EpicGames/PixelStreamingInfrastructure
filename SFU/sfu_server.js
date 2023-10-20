@@ -44,7 +44,7 @@ async function onStreamerOffer(sdp) {
 }
 
 function getNextStreamerSCTPId() {
-  return streamer.transport._getNextSctpStreamId();
+  return streamer.transport.getNextSctpStreamId();
 }
 
 function onStreamerDisconnected() {
@@ -133,9 +133,6 @@ async function setupPeerDataChannels(peerId) {
   // streamer data consumer (consumes peer data)
   peer.streamerDataConsumer = await streamer.transport.consumeData({ dataProducerId: peer.peerDataProducer.id });
 
-  streamer.transport._sctpStreamIds[nextStreamerSCTPStreamId] = 1;
-  streamer.transport._sctpStreamIds[nextPeerSCTPStreamId] = 1;
-
   const peerSignal = {
     type: 'peerDataChannels',
     playerId: peerId,
@@ -196,13 +193,6 @@ function onPeerDisconnected(peerId) {
       peer.peerDataProducer.close();
     }
     if (peer.streamerDataConsumer) {
-      // Set the streamer sctp id we generated back to zero indicating it can be reused.
-      if (streamer && streamer.transport && streamer.transport._sctpStreamIds) {
-        const allocatedStreamId = peer.streamerDataProducer.sctpStreamParameters.streamId;
-        const allocatedPeerStreamId = peer.peerDataProducer.sctpStreamParameters.streamId;
-        streamer.transport._sctpStreamIds[allocatedStreamId] = 0;
-        streamer.transport._sctpStreamIds[allocatedPeerStreamId] = 0;
-      }
       peer.streamerDataConsumer.close();
       peer.streamerDataProducer.close();
     }
