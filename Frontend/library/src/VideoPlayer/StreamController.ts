@@ -18,6 +18,7 @@ export class StreamController {
     constructor(videoElementProvider: VideoPlayer) {
         this.videoElementProvider = videoElementProvider;
         this.audioElement = document.createElement('Audio') as HTMLAudioElement;
+        this.videoElementProvider.setAudioElement(this.audioElement);
     }
 
     /**
