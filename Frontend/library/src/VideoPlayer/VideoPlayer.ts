@@ -18,6 +18,7 @@ declare global {
 export class VideoPlayer {
     private config: Config;
     private videoElement: HTMLVideoElement;
+    private audioElement?: HTMLAudioElement;
     private orientationChangeTimeout: number;
     private lastTimeResized = new Date().getTime();
 
@@ -52,8 +53,11 @@ export class VideoPlayer {
             );
         };
 
-        // set play for video
+        // set play for video (and audio)
         this.videoElement.onclick = () => {
+            if (this.audioElement != undefined && this.audioElement.paused) {
+                this.audioElement.play();
+            }
             if (this.videoElement.paused) {
                 this.videoElement.play();
             }
@@ -68,6 +72,10 @@ export class VideoPlayer {
         window.addEventListener('orientationchange', () =>
             this.onOrientationChange()
         );
+    }
+
+    public setAudioElement(audioElement: HTMLAudioElement) : void {
+        this.audioElement = audioElement;
     }
 
     /**
