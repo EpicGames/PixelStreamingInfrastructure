@@ -18,6 +18,7 @@ echo "Starting Matchmaker use ctrl-c to exit"
 echo "-----------------------------------------"
 echo ""
 
+PATH="${BASH_LOCATION}/node/bin:$PATH"
 start_process $process
 
 popd > /dev/null # ../..
