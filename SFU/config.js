@@ -12,6 +12,9 @@ for(let arg of process.argv){
 
 const config = {
   signallingURL: "ws://localhost:8889",
+  SFUId: "SFU",
+  subscribeStreamerId: "DefaultStreamer",
+  retrySubscribeDelaySecs: 10,
 
   mediasoup: {
     worker: {

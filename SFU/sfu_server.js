@@ -3,6 +3,10 @@ const WebSocket = require('ws');
 const mediasoup = require('mediasoup_prebuilt');
 const mediasoupSdp = require('mediasoup-sdp-bridge');
 
+if (!config.retrySubscribeDelaySecs) {
+  config.retrySubscribeDelaySecs = 10;
+}
+
 let signalServer = null;
 let mediasoupRouter;
 let streamer = null;
@@ -11,7 +15,7 @@ let peers = new Map();
 function connectSignalling(server) {
   console.log("Connecting to Signalling Server at %s", server);
   signalServer = new WebSocket(server);
-  signalServer.addEventListener("open", _ => { console.log(`Connected to signalling server`); });
+  signalServer.addEventListener("open", _ => onSignallingConnected());
   signalServer.addEventListener("error", result => { console.log(`Error: ${result.message}`); });
   signalServer.addEventListener("message", result => onSignallingMessage(result.data));
   signalServer.addEventListener("close", result => { 
@@ -22,6 +26,42 @@ function connectSignalling(server) {
       connectSignalling(server);
     }, 2000); 
   });
+}
+
+async function onSignallingConnected() {
+  console.log(`Connected to signalling server`);
+  //signalServer.send(JSON.stringify({type: 'listStreamers'}));
+}
+
+async function onStreamerList(msg) {
+  let success = false;
+
+  // subscribe to either the configured streamer, or if not configured, just grab the first id
+  if (msg.ids.length > 0) {
+    if (!!config.subscribeStreamerId) {
+      if (msg.ids.includes(config.subscribeStreamerId)) {
+        signalServer.send(JSON.stringify({type: 'subscribe', streamerId: config.subscribeStreamerId}));
+        success = true;
+      }
+    } else {
+      signalServer.send(JSON.stringify({type: 'subscribe', streamerId: msg.ids[0]}));
+      success = true;
+    }
+  }
+
+  if (!success) {
+    // did not subscribe to anything
+    console.log(`No subscribe (${config.retrySubscribeDelaySecs}`)
+    setTimeout(function() {
+      signalServer.send(JSON.stringify({type: 'listStreamers'}));
+    }, config.retrySubscribeDelaySecs * 1000);
+  }
+}
+
+async function onIdentify(msg) {
+  console.log(JSON.stringify({type: 'endpointId', id: config.SFUId}));
+  signalServer.send(JSON.stringify({type: 'endpointId', id: config.SFUId}));
+  signalServer.send(JSON.stringify({type: 'listStreamers'}));
 }
 
 async function onStreamerOffer(sdp) {
@@ -228,7 +268,7 @@ function onLayerPreference(msg) {
 }
 
 async function onSignallingMessage(message) {
-    //console.log(`Got MSG: ${message}`);
+  console.log(`Got MSG: ${message}`);
   const msg = JSON.parse(message);
 
   if (msg.type == 'offer') {
@@ -255,6 +295,14 @@ async function onSignallingMessage(message) {
   else if (msg.type == 'layerPreference') {
     onLayerPreference(msg);
   }
+  else if (msg.type == 'streamerList') {
+    console.log('WA WA WEE WOO ----------------------------------------------------------------------');
+    onStreamerList(msg);
+  }
+  else if (msg.type == 'identify') {
+    console.log('identifying...');
+    onIdentify(msg);
+  }
 }
 
 async function startMediasoup() {
@@ -276,6 +324,14 @@ async function startMediasoup() {
   return mediasoupRouter;
 }
 
+async function onICEStateChange(identifier, iceState) {
+  console.log("%s ICE state changed to %s", identifier, iceState);
+
+  if (identifier == 'Streamer' && iceState == 'completed') {
+    signalServer.send(JSON.stringify({type: 'startStreaming'}));
+  }
+}
+
 async function createWebRtcTransport(identifier) {
   const {
     listenIps,
@@ -291,7 +347,7 @@ async function createWebRtcTransport(identifier) {
     initialAvailableOutgoingBitrate: initialAvailableOutgoingBitrate
   });
 
-  transport.on("icestatechange", (iceState) => { console.log("%s ICE state changed to %s", identifier, iceState); });
+  transport.on("icestatechange", (iceState) => onICEStateChange(identifier, iceState));
   transport.on("iceselectedtuplechange", (iceTuple) => { console.log("%s ICE selected tuple %s", identifier, JSON.stringify(iceTuple)); });
   transport.on("sctpstatechange", (sctpState) => { console.log("%s SCTP state changed to %s", identifier, sctpState); });
 
