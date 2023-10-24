@@ -353,7 +353,8 @@ class Player {
 let streamers = new Map();		// streamerId <-> streamer socket
 let players = new Map(); 		// playerId <-> player, where player is either a web-browser or a native webrtc player
 const SFUPlayerId = "SFU";
-const LegacyStreamerId = "__LEGACY__"; // old streamers that dont know how to ID will be assigned this id.
+const LegacyStreamerPrefix = "__LEGACY_STREAMER__"; // old streamers that dont know how to ID will be assigned this id prefix.
+const streamerIdTimeoutSecs = 5;
 
 function sfuIsConnected() {
 	const sfuPlayer = players.get(SFUPlayerId);
@@ -401,30 +402,65 @@ function getPlayerIdFromMessage(msg) {
 	return sanitizePlayerId(msg.playerId);
 }
 
+function getUniqueLegacyId() {
+	for (let i = 0; i < 99; ++i) {
+		const testId = LegacyStreamerPrefix + i;
+		if (!streamers.has(testId)) {
+			return testId;
+		}
+	}
+	return ""; // no available id
+}
+
+function requestStreamerId(streamer) {
+	// first we ask the streamer to id itself.
+	// if it doesnt reply within a time limit we assume it's an older streamer
+	// and assign it an id.
+
+	// request id
+	const msg = { type: "identify" };
+	logOutgoing(streamer.id, msg);
+	streamer.ws.send(JSON.stringify(msg));
+
+	streamer.idTimer = setTimeout(function() {
+		// streamer did not respond in time. give it a legacy id.
+		const newLegacyId = getUniqueLegacyId();
+		if (newLegacyId.length == 0) {
+			const error = `Ran out of legacy ids.`;
+			console.error(error);
+			streamer.ws.close(1008, error);
+		} else {
+			registerStreamer(newLegacyId, streamer);
+		}
+
+	}, streamerIdTimeoutSecs * 1000);
+}
+
 function registerStreamer(id, streamer) {
 	streamer.id = id;
 	streamers.set(streamer.id, streamer);
+	if (!!streamer.idTimer) {
+		clearTimeout(streamer.idTimer);
+		delete streamer.idTimer;
+	}
+	console.logColor(logging.Green, `Registered new streamer: ${streamer.id}`);
 }
 
 function onStreamerDisconnected(streamer) {
-	if (!streamer.id) {
+	if (!streamer.id || !streamers.has(streamer.id)) {
 		return;
 	}
 
-	if (!streamers.has(streamer.id)) {
-		console.error(`Disconnecting streamer ${streamer.id} does not exist.`);
-	} else {
-		sendStreamerDisconnectedToMatchmaker();
-		let sfuPlayer = getSFU();
-		if (sfuPlayer) {
-			const msg = { type: "streamerDisconnected" };
-			logOutgoing(sfuPlayer.id, msg);
-			sfuPlayer.sendTo(msg);
-			disconnectAllPlayers(sfuPlayer.id);
-		}
-		disconnectAllPlayers(streamer.id);
-		streamers.delete(streamer.id);
+	sendStreamerDisconnectedToMatchmaker();
+	let sfuPlayer = getSFU();
+	if (sfuPlayer) {
+		const msg = { type: "streamerDisconnected" };
+		logOutgoing(sfuPlayer.id, msg);
+		sfuPlayer.sendTo(msg);
+		disconnectAllPlayers(sfuPlayer.id);
 	}
+	disconnectAllPlayers(streamer.id);
+	streamers.delete(streamer.id);
 }
 
 function onStreamerMessageId(streamer, msg) {
@@ -438,9 +474,6 @@ function onStreamerMessageId(streamer, msg) {
 	if (sfuPlayer) {
 		sfuPlayer.subscribe(streamer.id);
 	}
-
-	// if any streamer id's assume the legacy streamer is not needed.
-	streamers.delete(LegacyStreamerId);
 }
 
 function onStreamerMessagePing(streamer, msg) {
@@ -495,7 +528,7 @@ streamerServer.on('connection', function (ws, req) {
 	console.logColor(logging.Green, `Streamer connected: ${req.connection.remoteAddress}`);
 	sendStreamerConnectedToMatchmaker();
 
-	let streamer = { ws: ws };
+	let streamer = { id: req.connection.remoteAddress, ws: ws };
 
 	ws.on('message', (msgRaw) => {
 		var msg;
@@ -535,13 +568,7 @@ streamerServer.on('connection', function (ws, req) {
 	});
 
 	ws.send(JSON.stringify(clientConfig));
-
-	// request id
-	const msg = { type: "identify" };
-	logOutgoing("unknown", msg);
-	ws.send(JSON.stringify(msg));
-
-	registerStreamer(LegacyStreamerId, streamer);
+	requestStreamerId(streamer);
 });
 
 function forwardSFUMessageToPlayer(msg) {
