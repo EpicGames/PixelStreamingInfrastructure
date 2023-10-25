@@ -30,7 +30,6 @@ function connectSignalling(server) {
 
 async function onSignallingConnected() {
   console.log(`Connected to signalling server`);
-  //signalServer.send(JSON.stringify({type: 'listStreamers'}));
 }
 
 async function onStreamerList(msg) {
@@ -38,7 +37,7 @@ async function onStreamerList(msg) {
 
   // subscribe to either the configured streamer, or if not configured, just grab the first id
   if (msg.ids.length > 0) {
-    if (!!config.subscribeStreamerId) {
+    if (!!config.subscribeStreamerId && config.subscribeStreamerId.length != 0) {
       if (msg.ids.includes(config.subscribeStreamerId)) {
         signalServer.send(JSON.stringify({type: 'subscribe', streamerId: config.subscribeStreamerId}));
         success = true;
@@ -51,7 +50,6 @@ async function onStreamerList(msg) {
 
   if (!success) {
     // did not subscribe to anything
-    console.log(`No subscribe (${config.retrySubscribeDelaySecs}`)
     setTimeout(function() {
       signalServer.send(JSON.stringify({type: 'listStreamers'}));
     }, config.retrySubscribeDelaySecs * 1000);
@@ -59,7 +57,6 @@ async function onStreamerList(msg) {
 }
 
 async function onIdentify(msg) {
-  console.log(JSON.stringify({type: 'endpointId', id: config.SFUId}));
   signalServer.send(JSON.stringify({type: 'endpointId', id: config.SFUId}));
   signalServer.send(JSON.stringify({type: 'listStreamers'}));
 }
@@ -97,6 +94,11 @@ function onStreamerDisconnected() {
     }
     streamer.transport.close();
     streamer = null;
+    signalServer.send(JSON.stringify({type: 'stopStreaming'}));
+
+    setTimeout(function() {
+      signalServer.send(JSON.stringify({type: 'listStreamers'}));
+    }, config.retrySubscribeDelaySecs * 1000);
   }
 }
 
@@ -268,7 +270,7 @@ function onLayerPreference(msg) {
 }
 
 async function onSignallingMessage(message) {
-  console.log(`Got MSG: ${message}`);
+  //console.log(`Got MSG: ${message}`);
   const msg = JSON.parse(message);
 
   if (msg.type == 'offer') {
@@ -296,11 +298,9 @@ async function onSignallingMessage(message) {
     onLayerPreference(msg);
   }
   else if (msg.type == 'streamerList') {
-    console.log('WA WA WEE WOO ----------------------------------------------------------------------');
     onStreamerList(msg);
   }
   else if (msg.type == 'identify') {
-    console.log('identifying...');
     onIdentify(msg);
   }
 }

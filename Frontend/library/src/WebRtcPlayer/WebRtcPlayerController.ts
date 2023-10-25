@@ -1398,6 +1398,10 @@ export class WebRtcPlayerController {
             ) {
                 // If there's a streamer ID in the URL and a streamer with this ID is connected, set it as the selected streamer
                 autoSelectedStreamerId = urlParams.get(OptionParameters.StreamerId);
+            } else if (messageStreamerList.ids.length > 0 && this.config.isFlagEnabled(Flags.WaitForStreamer)) {
+                // we're waiting for a streamer and there are multiple connected but none were auto selected
+                // select the first
+                autoSelectedStreamerId = messageStreamerList.ids[0];
             }
             if (autoSelectedStreamerId !== null) {
                 this.config.setOptionSettingValue(
@@ -1407,7 +1411,8 @@ export class WebRtcPlayerController {
             } else {
                 // no auto selected streamer
                 if (this.config.isFlagEnabled(Flags.WaitForStreamer)) {
-                    this.startAutoJoinTimer()
+                    this.closeSignalingServer();
+                    this.startAutoJoinTimer();
                 }
             }
             this.pixelStreaming.dispatchEvent(

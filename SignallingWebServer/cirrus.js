@@ -658,6 +658,7 @@ function onSFUMessageId(sfuPlayer, msg) {
 }
 
 function onSFUMessageStartStreaming(sfuPlayer, msg) {
+	logIncoming(sfuPlayer.streamer.id, msg);
 	if (streamers.has(sfuPlayer.streamer.id)) {
 		console.error(`SFU ${sfuPlayer.streamer.id} is already registered as a streamer and streaming.`)
 		return;
@@ -667,6 +668,7 @@ function onSFUMessageStartStreaming(sfuPlayer, msg) {
 }
 
 function onSFUMessageStopStreaming(sfuPlayer, msg) {
+	logIncoming(sfuPlayer.streamer.id, msg);
 if (!streamers.has(sfuPlayer.streamer.id)) {
 		console.error(`SFU ${sfuPlayer.streamer.id} is not registered as a streamer or streaming.`)
 		return;
@@ -678,6 +680,7 @@ if (!streamers.has(sfuPlayer.streamer.id)) {
 function onSFUDisconnected(sfuPlayer) {
 	console.log("disconnecting SFU from streamer");
 	disconnectAllPlayers(sfuPlayer.id);
+	onStreamerDisconnected(sfuPlayer.streamer);
 	sfuPlayer.unsubscribe();
 	sfuPlayer.ws.close(4000, "SFU Disconnected");
 	players.delete(sfuPlayer.id);
@@ -891,7 +894,7 @@ function disconnectAllPlayers(streamerId) {
 		 if (player.streamerId == streamerId) {
 		 	// disconnect players but just unsubscribe the SFU
 		 	const sfuPlayer = getSFUForStreamer(streamerId);
-		 	if (player.id == sfuPlayer.id) {
+		 	if (sfuPlayer && player.id == sfuPlayer.id) {
 				sfuPlayer.unsubscribe();
 			} else {
 				player.ws.close();
