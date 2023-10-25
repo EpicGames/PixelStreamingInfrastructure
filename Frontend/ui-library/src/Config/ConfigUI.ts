@@ -176,10 +176,6 @@ export class ConfigUI {
         );
         this.addSettingFlag(
             psSettingsSection,
-            this.flagsUi.get(Flags.PreferSFU)
-        );
-        this.addSettingFlag(
-            psSettingsSection,
             this.flagsUi.get(Flags.IsQualityController)
         );
         this.addSettingFlag(
