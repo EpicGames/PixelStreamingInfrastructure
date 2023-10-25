@@ -15,7 +15,7 @@ let peers = new Map();
 function connectSignalling(server) {
   console.log("Connecting to Signalling Server at %s", server);
   signalServer = new WebSocket(server);
-  signalServer.addEventListener("open", _ => onSignallingConnected());
+  signalServer.addEventListener("open", _ => { console.log(`Connected to signalling server`); });
   signalServer.addEventListener("error", result => { console.log(`Error: ${result.message}`); });
   signalServer.addEventListener("message", result => onSignallingMessage(result.data));
   signalServer.addEventListener("close", result => { 
@@ -26,10 +26,6 @@ function connectSignalling(server) {
       connectSignalling(server);
     }, 2000); 
   });
-}
-
-async function onSignallingConnected() {
-  console.log(`Connected to signalling server`);
 }
 
 async function onStreamerList(msg) {
