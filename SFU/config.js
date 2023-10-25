@@ -11,9 +11,16 @@ for(let arg of process.argv){
 }
 
 const config = {
+  // The URL of the signalling server to connect to
   signallingURL: "ws://localhost:8889",
+
+  // The ID for this SFU to use. This will show up as a streamer ID on the signalling server
   SFUId: "SFU",
+
+  // The ID of the streamer to subscribe to. If you leave this blank it will subscribe to the first streamer it sees.
   subscribeStreamerId: "DefaultStreamer",
+
+  // Delay between list requests when looking for a specifc streamer.
   retrySubscribeDelaySecs: 10,
 
   mediasoup: {
