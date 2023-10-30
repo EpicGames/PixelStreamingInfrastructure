@@ -19,7 +19,6 @@ This page will be updated with new features and commands as they become availabl
 | **Browser send offer** | The browser will start the WebRTC handshake instead of the Unreal Engine application. This is an advanced setting for users customising the frontend. Primarily for backwards compatibility for 4.x versions of the engine. |
 | **Use microphone** | Will start receiving audio input from your microphone and transmit it to the Unreal Engine. |
 | **Start video muted** | Muted audio when the stream starts. |
-| **Prefer SFU** | Will attempt to use the Selective Forwarding Unit (SFU), if you have one running. |
 | **Is quality controller?** | Makes the encoder of the Pixel Streaming Plugin use the current browser connection to determine the bandwidth available, and therefore the quality of the stream encoding. **See notes below** |
 | **Force mono audio** | Force the browser to request mono audio in the SDP. |
 | **Force TURN** | Will attempt to connect exclusively via the TURN server. Will not work without an active TURN server. |
