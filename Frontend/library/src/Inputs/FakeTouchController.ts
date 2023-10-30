@@ -72,7 +72,7 @@ export class FakeTouchController implements ITouchController {
      * @param touch - the activating touch event
      */
     onTouchStart(touch: TouchEvent): void {
-        if (!this.videoElementProvider.isVideoReady()) {
+        if (!this.videoElementProvider.isVideoReady() || touch.target !== this.videoElementProvider.getVideoElement()) {
             return;
         }
         if (this.fakeTouchFinger == null) {
@@ -108,7 +108,7 @@ export class FakeTouchController implements ITouchController {
      * @param touchEvent - the activating touch event
      */
     onTouchEnd(touchEvent: TouchEvent): void {
-        if (!this.videoElementProvider.isVideoReady()) {
+        if (!this.videoElementProvider.isVideoReady() || this.fakeTouchFinger == null) {
             return;
         }
         const videoElementParent =
@@ -144,7 +144,7 @@ export class FakeTouchController implements ITouchController {
      * @param touchEvent - the activating touch event
      */
     onTouchMove(touchEvent: TouchEvent): void {
-        if (!this.videoElementProvider.isVideoReady()) {
+        if (!this.videoElementProvider.isVideoReady() || this.fakeTouchFinger == null) {
             return;
         }
         const toStreamerHandlers =
