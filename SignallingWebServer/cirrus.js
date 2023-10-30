@@ -546,7 +546,8 @@ function sanitizeStreamerId(id) {
 	for (let [streamerId, streamer] of streamers) {
 		const idMatchRegex = /^(.*?)(\d*)$/;
 		const [, baseId, postfix] = streamerId.match(idMatchRegex);
-		if (baseId != id) {
+		// if the id is numeric then base id will be empty and we need to compare with the postfix
+		if ((baseId != '' && baseId != id) || (baseId == '' && postfix != id)) {
 			continue;
 		}
 		const numPostfix = Number(postfix);
