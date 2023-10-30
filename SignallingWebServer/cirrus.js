@@ -450,6 +450,7 @@ class Player {
 let streamers = new Map();		// streamerId <-> streamer
 let players = new Map(); 		// playerId <-> player/peer/viewer
 const LegacyStreamerPrefix = "__LEGACY_STREAMER__"; // old streamers that dont know how to ID will be assigned this id prefix.
+const LegacySFUPrefix = "__LEGACY_SFU__"; 					// same as streamer version but for SFUs
 const streamerIdTimeoutSecs = 5;
 
 // gets the SFU subscribed to this streamer if any.
@@ -502,33 +503,18 @@ function getPlayerIdFromMessage(msg) {
 	return sanitizePlayerId(msg.playerId);
 }
 
-function getUniqueLegacyId() {
-	for (let i = 0; i < 99; ++i) {
-		const testId = LegacyStreamerPrefix + i;
-		if (!streamers.has(testId)) {
-			return testId;
-		}
-	}
-	return ""; // no available id
+let uniqueLegacyStreamerPostfix = 0;
+function getUniqueLegacyStreamerId() {
+	const finalId = LegacyStreamerPrefix + uniqueLegacyStreamerPostfix;
+	++uniqueLegacyStreamerPostfix;
+	return finalId;
 }
 
-function getUniqueSFUId() {
-	for (let i = 0; i < 99; ++i) {
-		const testId = SFUStreamerPrefix + i;
-		let available = true;
-		for (let player of players) {
-			if (player.type == PlayerType.SFU) {
-				if (player.streamer.id == testId) {
-					available = false;
-					break;
-				}
-			}
-		}
-		if (available) {
-			return testId;
-		}
-	}
-	return ""; // no available id
+let uniqueLegacySFUPostfix = 0;
+function getUniqueLegacySFUId() {
+	const finalId = LegacySFUPrefix + uniqueLegacySFUPostfix;
+	++uniqueLegacySFUPostfix;
+	return finalId;
 }
 
 function requestStreamerId(streamer) {
