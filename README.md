@@ -30,7 +30,7 @@ The Pixel Streaming Infrastructure contains reference implementations for all th
   - shared libraries for [communication](Frontend/library/) and [UI](Frontend/ui-library/) functionality
   - separate [implementations](Frontend/implementations/) using different techologies such as TypeScript or React/JSX
 
-  For detailed information, see the [frontend readme](Frontend/README.md).
+  For detailed information, see the [/frontend](/Frontend/).
 
 ## Releases
 We release a number of different components under this repository, specifically:
