@@ -460,7 +460,7 @@ function getSFUForStreamer(streamerId) {
 	}
 	const streamer = streamers.get(streamerId);
 	const sfuPlayerId = streamer.getSFUPlayerId();
-	if (!!sfuPlayerId) {
+	if (!sfuPlayerId) {
 		return null;
 	}
 	return players.get(sfuPlayerId);
@@ -661,7 +661,6 @@ streamerServer.on('connection', function (ws, req) {
 			ws.close(1008, 'Cannot parse');
 			return;
 		}
-		console.log(msgRaw);
 
 		let handler = streamerMessageHandlers.get(msg.type);
 		if (!handler || (typeof handler != 'function')) {
