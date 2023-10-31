@@ -23,7 +23,6 @@ export class Flags {
     static FakeMouseWithTouches = 'FakeMouseWithTouches' as const;
     static IsQualityController = 'ControlsQuality' as const;
     static MatchViewportResolution = 'MatchViewportRes' as const;
-    static PreferSFU = 'preferSFU' as const;
     static StartVideoMuted = 'StartVideoMuted' as const;
     static SuppressBrowserKeys = 'SuppressBrowserKeys' as const;
     static UseMic = 'UseMic' as const;
@@ -311,17 +310,6 @@ export class Config {
                 'Suppress browser keys',
                 'Suppress certain browser keys that we use in UE, for example F5 to show shader complexity instead of refresh the page.',
                 true,
-                useUrlParams
-            )
-        );
-
-        this.flags.set(
-            Flags.PreferSFU,
-            new SettingFlag(
-                Flags.PreferSFU,
-                'Prefer SFU',
-                'Try to connect to the SFU instead of P2P.',
-                false,
                 useUrlParams
             )
         );
