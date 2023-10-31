@@ -43,10 +43,10 @@
   @Rem Save our current directory (the NodeJS dir) in a variable
   set "NodeDir=%CD%\SignallingWebServer\platform_scripts\cmd\node"
 
-  @Rem Prepend NodeDir to PATH temporarily using a custom tool called SetEnv
-  call SignallingWebServer\platform_scripts\cmd\setenv\SetEnv.exe -uap PATH %%%%"%NodeDir%"
-  @Rem Refresh the cmd session with new PATH
-  call %~dp0\refreshenv.cmd
+  @rem Save the old path variable
+  set OLDPATH=%PATH%
+  @Rem Prepend NodeDir to PATH temporarily
+  set PATH=%PATH%;%NodeDir%
 
   @Rem Do npm install in the Frontend\lib directory (note we use start because that loads PATH)
   echo ----------------------------
@@ -73,7 +73,7 @@
   echo End of build reference frontend step.
   echo ----------------------------
 
-  @Rem Remove our NodeJS from the PATH
-  call SignallingWebServer\platform_scripts\cmd\setenv\SetEnv.exe -ud PATH %%%%"%NodeDir%"
+  @Rem Restore path
+  set PATH=%OLDPATH%
 
   goto :eof
