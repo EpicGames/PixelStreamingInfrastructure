@@ -20,7 +20,6 @@ const defaultConfig = {
 	UseHTTPS: false,
 	HTTPSCertFile: './certificates/client-cert.pem',
 	HTTPSKeyFile: './certificates/client-key.pem',
-	UseAuthentication: false,
 	LogToFile: true,
 	LogVerbose: true,
 	HomepageFile: 'player.html',
@@ -58,18 +57,6 @@ if (config.UseHTTPS) {
 	};
 
 	var https = require('https').Server(options, app);
-}
-
-//If not using authetication then just move on to the next function/middleware
-var isAuthenticated = redirectUrl => function (req, res, next) { return next(); }
-
-if (config.UseAuthentication && config.UseHTTPS) {
-	var passport = require('passport');
-	require('./modules/authentication').init(app);
-	// Replace the isAuthenticated with the one setup on passport module
-	isAuthenticated = passport.authenticationMiddleware ? passport.authenticationMiddleware : isAuthenticated
-} else if (config.UseAuthentication && !config.UseHTTPS) {
-	console.error('Trying to use authentication without using HTTPS, this is not allowed and so authentication will NOT be turned on, please turn on HTTPS to turn on authentication');
 }
 
 const helmet = require('helmet');
@@ -205,44 +192,19 @@ var limiter = RateLimit({
 // apply rate limiter to all requests
 app.use(limiter);
 
-//Setup the login page if we are using authentication
-if(config.UseAuthentication){
-	if(config.EnableWebserver) {
-		app.get('/login', function(req, res){
-			res.sendFile(path.join(__dirname, '/Public', '/login.html'));
-		});
-	}
-
-	// create application/x-www-form-urlencoded parser
-	var urlencodedParser = bodyParser.urlencoded({ extended: false })
-
-	//login page form data is posted here
-	app.post('/login', 
-		urlencodedParser, 
-		passport.authenticate('local', { failureRedirect: '/login' }), 
-		function(req, res){
-			//On success try to redirect to the page that they originally tired to get to, default to '/' if no redirect was found
-			var redirectTo = req.session.redirectTo ? req.session.redirectTo : '/';
-			delete req.session.redirectTo;
-			console.log(`Redirecting to: '${redirectTo}'`);
-			res.redirect(redirectTo);
-		}
-	);
-}
-
 if(config.EnableWebserver) {
 	//Setup folders
 	app.use(express.static(path.join(__dirname, '/Public')))
 	app.use('/images', express.static(path.join(__dirname, './images')))
-	app.use('/scripts', [isAuthenticated('/login'),express.static(path.join(__dirname, '/scripts'))]);
-	app.use('/', [isAuthenticated('/login'), express.static(path.join(__dirname, '/custom_html'))])
+	app.use('/scripts', express.static(path.join(__dirname, '/scripts')));
+	app.use('/', express.static(path.join(__dirname, '/custom_html')))
 }
 
 try {
 	for (var property in config.AdditionalRoutes) {
 		if (config.AdditionalRoutes.hasOwnProperty(property)) {
 			console.log(`Adding additional routes "${property}" -> "${config.AdditionalRoutes[property]}"`)
-			app.use(property, [isAuthenticated('/login'), express.static(path.join(__dirname, config.AdditionalRoutes[property]))]);
+			app.use(property, express.static(path.join(__dirname, config.AdditionalRoutes[property])));
 		}
 	}
 } catch (err) {
@@ -252,7 +214,7 @@ try {
 if(config.EnableWebserver) {
 
 	// Request has been sent to site root, send the homepage file
-	app.get('/', isAuthenticated('/login'), function (req, res) {
+	app.get('/', function (req, res) {
 		homepageFile = (typeof config.HomepageFile != 'undefined' && config.HomepageFile != '') ? config.HomepageFile.toString() : defaultConfig.HomepageFile;
 		
 		let pathsToTry = [ path.join(__dirname, homepageFile), path.join(__dirname, '/Public', homepageFile), path.join(__dirname, '/custom_html', homepageFile), homepageFile ];
