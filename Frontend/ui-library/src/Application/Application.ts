@@ -324,8 +324,8 @@ export class Application {
         );
         this.stream.addEventListener(
             'webRtcDisconnected',
-            ({ data: { eventString, showActionOrErrorOnDisconnect } }) =>
-                this.onDisconnect(eventString, showActionOrErrorOnDisconnect)
+            ({ data: { eventString, allowClickToReconnect } }) =>
+                this.onDisconnect(eventString, allowClickToReconnect)
         );
         this.stream.addEventListener('videoInitialized', () =>
             this.onVideoInitialized()
@@ -366,8 +366,8 @@ export class Application {
         )
         this.stream.addEventListener(
             'streamerListMessage',
-            ({ data: { messageStreamerList, autoSelectedStreamerId } }) =>
-                this.handleStreamerListMessage(messageStreamerList, autoSelectedStreamerId)
+            ({ data: { messageStreamerList, autoSelectedStreamerId, wantedStreamerId } }) =>
+                this.handleStreamerListMessage(messageStreamerList, autoSelectedStreamerId, wantedStreamerId)
         );
         this.stream.addEventListener(
             'settingsChanged',
@@ -573,14 +573,14 @@ export class Application {
     /**
      * Event fired when the video is disconnected - displays the error overlay and resets the buttons stream tools upon disconnect
      * @param eventString - the event text that will be shown in the overlay
+     * @param allowClickToReconnect - true if we want to allow the user to click to reconnect. Otherwise it's just a message.
      */
-    onDisconnect(eventString: string, showActionOrErrorOnDisconnect: boolean) {
-        if (showActionOrErrorOnDisconnect == false) {
-            this.showErrorOverlay(`Disconnected: ${eventString}`);
+    onDisconnect(eventString: string, allowClickToReconnect: boolean) {
+        const overlayMessage = 'Disconnected' + (eventString ? `: ${eventString}` : '');
+        if (allowClickToReconnect) {
+            this.showDisconnectOverlay(`${overlayMessage} Click To Restart.`);
         } else {
-            this.showDisconnectOverlay(
-                `Disconnected: ${eventString}  <div class="clickableState">Click To Restart</div>`
-            );
+            this.showErrorOverlay(overlayMessage);
         }
         // disable starting a latency checks
         this.statsPanel?.onDisconnect();
@@ -667,18 +667,41 @@ export class Application {
         this.statsPanel?.handlePlayerCount(playerCount);
     }
 
-    handleStreamerListMessage(messageStreamingList: MessageStreamerList, autoSelectedStreamerId: string | null) {
-        if (autoSelectedStreamerId === null) {
-            if(messageStreamingList.ids.length === 0) {
-                var message = 'No streamers connected. ' +
-                (this.stream.config.isFlagEnabled(Flags.WaitForStreamer)
-                ? 'Waiting for streamer...'
-                : '<div style="clickableState">Click To Restart</div>');
+    handleStreamerListMessage(messageStreamingList: MessageStreamerList, autoSelectedStreamerId: string, wantedStreamerId: string) {
+        const waitForStreamer = this.stream.config.isFlagEnabled(Flags.WaitForStreamer);
+        const isReconnecting = this.stream.isReconnecting();
+        let message: string = null;
+        let allowRestart: boolean = true;
+
+        if (!autoSelectedStreamerId) {
+            if (waitForStreamer && wantedStreamerId) {
+                if (isReconnecting) {
+                    message = `Waiting for ${wantedStreamerId} to become available.`;
+                    allowRestart = false;
+                } else {
+                    message = `Gave up waiting for ${wantedStreamerId} to become available. Click to try again`;
+                    if (messageStreamingList.ids.length > 0) {
+                        message += ` or select a streamer from the settings menu.`;
+                    }
+                    allowRestart = true;
+                }
+            } else if (messageStreamingList.ids.length == 0) {
+                if (isReconnecting) {
+                    message = `Waiting for a streamer to become available.`;
+                    allowRestart = false;
+                } else {
+                    message = `No streamers available. Click to try again.`;
+                    allowRestart = true;
+                }
+            } else {
+                message = `Multiple streamers available. Select from the settings menu.`;
+                allowRestart = false;
+            }
+
+            if (allowRestart) {
                 this.showDisconnectOverlay(message);
             } else {
-                this.showTextOverlay(
-                    'Multiple streamers detected. Use the dropdown in the settings menu to select the streamer'
-                );
+                this.showTextOverlay(message);
             }
         }
     }
