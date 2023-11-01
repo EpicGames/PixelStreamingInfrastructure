@@ -352,7 +352,7 @@ export class PixelStreaming {
      */
     public reconnect() {
         this._eventEmitter.dispatchEvent(new StreamReconnectEvent());
-        this._webRtcController.tryReconnect("");
+        this._webRtcController.tryReconnect("Reconnecting...");
     }
 
     /**

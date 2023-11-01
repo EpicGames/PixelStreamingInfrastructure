@@ -229,6 +229,7 @@ export class WebRtcPlayerController {
                 window.clearInterval(this.statsTimerHandle);
             }
 
+            // reset the stream quality icon.
             this.setVideoEncoderAvgQP(0);
 
             // unregister all input device event handlers on disconnect

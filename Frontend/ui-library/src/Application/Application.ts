@@ -694,7 +694,7 @@ export class Application {
                     allowRestart = true;
                 }
             } else {
-                message = `Multiple streamers available. Select from the settings menu.`;
+                message = `Multiple streamers available. Select one from the settings menu.`;
                 allowRestart = false;
             }
 
