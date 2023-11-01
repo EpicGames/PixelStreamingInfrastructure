@@ -1385,12 +1385,6 @@ export class WebRtcPlayerController {
                 // If there's only a single streamer, subscribe to it regardless of what is in the URL
                 autoSelectedStreamerId = messageStreamerList.ids[0];
             } else if (
-                this.config.isFlagEnabled(Flags.PreferSFU) &&
-                messageStreamerList.ids.includes('SFU')
-            ) {
-                // If the SFU toggle is on and there's an SFU connected, subscribe to it regardless of what is in the URL
-                autoSelectedStreamerId = 'SFU';
-            } else if (
                 urlParams.has(OptionParameters.StreamerId) &&
                 messageStreamerList.ids.includes(
                     urlParams.get(OptionParameters.StreamerId)
@@ -1406,8 +1400,9 @@ export class WebRtcPlayerController {
                 );
             } else {
                 // no auto selected streamer
-                if (this.config.isFlagEnabled(Flags.WaitForStreamer)) {
-                    this.startAutoJoinTimer()
+                if (messageStreamerList.ids.length == 0 && this.config.isFlagEnabled(Flags.WaitForStreamer)) {
+                    this.closeSignalingServer();
+                    this.startAutoJoinTimer();
                 }
             }
             this.pixelStreaming.dispatchEvent(

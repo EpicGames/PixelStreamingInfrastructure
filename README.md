@@ -30,7 +30,7 @@ The Pixel Streaming Infrastructure contains reference implementations for all th
   - shared libraries for [communication](Frontend/library/) and [UI](Frontend/ui-library/) functionality
   - separate [implementations](Frontend/implementations/) using different techologies such as TypeScript or React/JSX
 
-  For detailed information, see the [frontend readme](Frontend/README.md).
+  For detailed information, see the [/frontend](/Frontend/).
 
 ## Releases
 We release a number of different components under this repository, specifically:
@@ -64,7 +64,7 @@ npm i @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.3
 
 ## Documentation 
 * [General Docs](/Docs/README.md)
-* [Frontend Docs](/Frontend/Docs/README.md)
+* [Frontend Docs](/Frontend/)
 * Signalling Server Docs [TO DO](https://github.com/EpicGames/PixelStreamingInfrastructure/issues/255)
 * Matchmaker Docs [TO DO](https://github.com/EpicGames/PixelStreamingInfrastructure/issues/256)
 * SFU Docs [TO DO](https://github.com/EpicGames/PixelStreamingInfrastructure/issues/257)
