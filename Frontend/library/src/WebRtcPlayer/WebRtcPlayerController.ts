@@ -108,8 +108,8 @@ export class WebRtcPlayerController {
     shouldReconnect: boolean;
     isReconnecting: boolean;
     reconnectAttempt: number;
-    disconnectMessageOverride: string;
-    subscribedStream: string | null;
+    disconnectMessage: string;
+    subscribedStream: string;
     signallingUrlBuilder: () => string;
     autoJoinTimer: ReturnType<typeof setTimeout> = undefined;
 
@@ -219,7 +219,7 @@ export class WebRtcPlayerController {
                && event.detail.code != CODE_GOING_AWAY
                && this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts) > 0
 
-            const disconnectMessage = this.disconnectMessageOverride ? this.disconnectMessageOverride : event.detail.reason;
+            const disconnectMessage = this.disconnectMessage ? this.disconnectMessage : event.detail.reason;
             this.pixelStreaming._onDisconnect(disconnectMessage, !willTryReconnect && !this.isReconnecting);
 
             this.afkController.stopAfkWarningTimer();
@@ -1155,7 +1155,7 @@ export class WebRtcPlayerController {
     connectToSignallingServer() {
         this.locallyClosed = false;
         this.shouldReconnect = true;
-        this.disconnectMessageOverride = null;
+        this.disconnectMessage = null;
         const signallingUrl = this.signallingUrlBuilder();
         this.webSocketController.connect(signallingUrl);
     }
@@ -1589,7 +1589,7 @@ export class WebRtcPlayerController {
         // We explicitly called close, therefore we don't want to trigger auto reconnect
         this.locallyClosed = true;
         this.shouldReconnect = false;
-        this.disconnectMessageOverride = message;
+        this.disconnectMessage = message;
         this.webSocketController?.close();
     }
 
