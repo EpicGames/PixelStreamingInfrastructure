@@ -144,7 +144,7 @@ export class WebRtcDisconnectedEvent extends Event {
         /** Message describing the disconnect reason */
         eventString: string;
         /** true if the user is able to reconnect, false if disconnected because of unrecoverable reasons like not able to connect to the signaling server */
-        showActionOrErrorOnDisconnect: boolean;
+        allowClickToReconnect: boolean;
     };
     constructor(data: WebRtcDisconnectedEvent['data']) {
         super('webRtcDisconnected');
@@ -347,7 +347,9 @@ export class StreamerListMessageEvent extends Event {
         /** Streamer list message containing an array of streamer ids */
         messageStreamerList: MessageStreamerList;
         /** Auto-selected streamer from the list, or null if unable to auto-select and user should be prompted to select */
-        autoSelectedStreamerId: string | null;
+        autoSelectedStreamerId: string;
+        /** Wanted streamer id from various configurations. */
+        wantedStreamerId: string;
     };
     constructor(data: StreamerListMessageEvent['data']) {
         super('streamerListMessage');
