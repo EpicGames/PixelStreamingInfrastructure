@@ -70,7 +70,6 @@ export class PixelStreaming {
 
     private _videoElementParent: HTMLElement;
 
-    _showActionOrErrorOnDisconnect = true;
     private allowConsoleCommands = false;
 
     private onScreenKeyboardHelper: OnScreenKeyboard;
@@ -353,7 +352,7 @@ export class PixelStreaming {
      */
     public reconnect() {
         this._eventEmitter.dispatchEvent(new StreamReconnectEvent());
-        this._webRtcController.restartStreamAutomatically();
+        this._webRtcController.tryReconnect("Reconnecting...");
     }
 
     /**
@@ -440,7 +439,6 @@ export class PixelStreaming {
      */
     _onWebRtcAutoConnect() {
         this._eventEmitter.dispatchEvent(new WebRtcAutoConnectEvent());
-        this._showActionOrErrorOnDisconnect = true;
     }
 
     /**
@@ -460,30 +458,16 @@ export class PixelStreaming {
     /**
      * Event fired when the video is disconnected - emits given eventString or an override
      * message from webRtcController if one has been set
-     * @param eventString - the event text that will be emitted
+     * @param eventString - a string describing why the connection closed
+     * @param allowClickToReconnect - true if we want to allow the user to retry the connection with a click
      */
-    _onDisconnect(eventString: string) {
-        // if we have overridden the default disconnection message, assign the new value here
-        if (
-            this._webRtcController.getDisconnectMessageOverride() != '' &&
-            this._webRtcController.getDisconnectMessageOverride() !==
-                undefined &&
-            this._webRtcController.getDisconnectMessageOverride() != null
-        ) {
-            eventString = this._webRtcController.getDisconnectMessageOverride();
-            this._webRtcController.setDisconnectMessageOverride('');
-        }
-
+    _onDisconnect(eventString: string, allowClickToReconnect: boolean) {
         this._eventEmitter.dispatchEvent(
             new WebRtcDisconnectedEvent({
-                eventString,
-                showActionOrErrorOnDisconnect:
-                    this._showActionOrErrorOnDisconnect
+                eventString: eventString,
+                allowClickToReconnect: allowClickToReconnect
             })
         );
-        if (this._showActionOrErrorOnDisconnect == false) {
-            this._showActionOrErrorOnDisconnect = true;
-        }
     }
 
     /**
@@ -855,5 +839,9 @@ export class PixelStreaming {
 
     public get toStreamerHandlers() {
         return this._webRtcController.streamMessageController.toStreamerHandlers;
+    }
+
+    public isReconnecting() {
+        return this._webRtcController.isReconnecting;
     }
 }

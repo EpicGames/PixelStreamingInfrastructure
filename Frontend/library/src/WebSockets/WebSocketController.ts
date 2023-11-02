@@ -134,7 +134,6 @@ export class WebSocketController {
      * @param event - Close Event
      */
     handleOnClose(event: CloseEvent) {
-        this.onWebSocketOncloseOverlayMessage(event);
         Logger.Log(
             Logger.GetStackTrace(),
             'Disconnected to the signalling server via WebSocket: ' +
@@ -203,10 +202,6 @@ export class WebSocketController {
     close() {
         this.webSocket?.close();
     }
-
-    /** Event used for Displaying websocket closed messages */
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-    onWebSocketOncloseOverlayMessage(event: CloseEvent) {}
 
     /**
      * The Message Contains the payload of the peer connection options used for the RTC Peer hand shake
