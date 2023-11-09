@@ -571,7 +571,7 @@ export class PixelStreaming {
                 NumericParameters.MinQP,
                 // If a setting is set in the URL, make sure we respect that value as opposed to what the application sends us
                 (useUrlParams && urlParams.has(NumericParameters.MinQP)) 
-                    ? Number.parseInt(urlParams.get(NumericParameters.MinQP)) 
+                    ? Number.parseFloat(urlParams.get(NumericParameters.MinQP)) 
                     : settings.EncoderSettings.MinQP
             );
 
@@ -579,7 +579,7 @@ export class PixelStreaming {
             this.config.setNumericSetting(
                 NumericParameters.MaxQP,
                 (useUrlParams && urlParams.has(NumericParameters.MaxQP)) 
-                    ? Number.parseInt(urlParams.get(NumericParameters.MaxQP)) 
+                    ? Number.parseFloat(urlParams.get(NumericParameters.MaxQP)) 
                     : settings.EncoderSettings.MaxQP
             );
         }
@@ -587,20 +587,20 @@ export class PixelStreaming {
             this.config.setNumericSetting(
                 NumericParameters.WebRTCMinBitrate,
                 (useUrlParams && urlParams.has(NumericParameters.WebRTCMinBitrate)) 
-                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCMinBitrate))
-                    : settings.WebRTCSettings.MinBitrate / 1000 /* bps to kbps */
+                    ? Number.parseFloat(urlParams.get(NumericParameters.WebRTCMinBitrate))
+                    : (settings.WebRTCSettings.MinBitrate / 1000) /* bps to kbps */
             );
             this.config.setNumericSetting(
                 NumericParameters.WebRTCMaxBitrate,
                 (useUrlParams && urlParams.has(NumericParameters.WebRTCMaxBitrate)) 
-                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCMaxBitrate))
-                    : settings.WebRTCSettings.MaxBitrate / 1000 /* bps to kbps */
+                    ? Number.parseFloat(urlParams.get(NumericParameters.WebRTCMaxBitrate))
+                    : (settings.WebRTCSettings.MaxBitrate / 1000) /* bps to kbps */
                 
             );
             this.config.setNumericSetting(
                 NumericParameters.WebRTCFPS,
                 (useUrlParams && urlParams.has(NumericParameters.WebRTCFPS)) 
-                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCFPS))
+                    ? Number.parseFloat(urlParams.get(NumericParameters.WebRTCFPS))
                     : settings.WebRTCSettings.FPS
             );
         }

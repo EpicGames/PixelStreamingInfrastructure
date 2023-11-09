@@ -1551,7 +1551,11 @@ export class WebRtcPlayerController {
             'Sending the offer to the Server',
             6
         );
-        this.webSocketController.sendWebRtcOffer(offer);
+        
+        const minBitrate = 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate);
+        const maxBitrate = 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate);
+
+        this.webSocketController.sendWebRtcOffer(offer, minBitrate, maxBitrate);
     }
 
     /**
@@ -1564,7 +1568,11 @@ export class WebRtcPlayerController {
             'Sending the answer to the Server',
             6
         );
-        this.webSocketController.sendWebRtcAnswer(answer);
+
+        const minBitrate = 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate);
+        const maxBitrate = 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate);
+
+        this.webSocketController.sendWebRtcAnswer(answer, minBitrate, maxBitrate);
 
         if (this.isUsingSFU) {
             this.webSocketController.sendWebRtcDatachannelRequest();

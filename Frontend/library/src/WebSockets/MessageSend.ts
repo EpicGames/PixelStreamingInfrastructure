@@ -25,16 +25,25 @@ export class MessageSend implements Send {
     peerConnectionOptions: object;
 
     /**
+     * A filter for controlling what parameters to actually send.
+     * Good for excluding default values or hidden internals.
+     * Return undefined to exclude the property completely.
+     */
+    sendFilter(key: string, value: any) {
+        return value;
+    }
+
+    /**
      * Turns the wrapper into a JSON String
      * @returns - JSON String of the Message to send
      */
     payload() {
         Logger.Log(
             Logger.GetStackTrace(),
-            'Sending => \n' + JSON.stringify(this, undefined, 4),
+            'Sending => \n' + JSON.stringify(this, this.sendFilter, 4),
             6
         );
-        return JSON.stringify(this);
+        return JSON.stringify(this, this.sendFilter);
     }
 }
 
@@ -88,18 +97,29 @@ export class MessagePong extends MessageSend {
  */
 export class MessageWebRTCOffer extends MessageSend {
     sdp: string;
+    minBitrate: number;
+    maxBitrate: number;
 
     /**
      * @param offer - Generated Web RTC Offer
      */
-    constructor(offer?: RTCSessionDescriptionInit) {
+    constructor(offer: RTCSessionDescriptionInit, minBitrate: number, maxBitrate: number) {
         super();
         this.type = MessageSendTypes.OFFER;
+        this.minBitrate = 0;
+        this.maxBitrate = 0;
 
         if (offer) {
             this.type = offer.type as MessageSendTypes;
             this.sdp = offer.sdp;
+            this.minBitrate = minBitrate;
+            this.maxBitrate = maxBitrate;
         }
+    }
+
+    sendFilter(key: string, value: any) {
+        if ((key == "minBitrate" || key == "maxBitrate") && value <= 0) return undefined;
+        return value;
     }
 }
 
@@ -108,18 +128,29 @@ export class MessageWebRTCOffer extends MessageSend {
  */
 export class MessageWebRTCAnswer extends MessageSend {
     sdp: string;
+    minBitrate: number;
+    maxBitrate: number;
 
     /**
      * @param answer - Generated Web RTC Offer
      */
-    constructor(answer?: RTCSessionDescriptionInit) {
+    constructor(answer: RTCSessionDescriptionInit, minBitrate: number, maxBitrate: number) {
         super();
         this.type = MessageSendTypes.ANSWER;
+        this.minBitrate = 0;
+        this.maxBitrate = 0;
 
         if (answer) {
             this.type = answer.type as MessageSendTypes;
             this.sdp = answer.sdp;
+            this.minBitrate = minBitrate;
+            this.maxBitrate = maxBitrate;
         }
+    }
+
+    sendFilter(key: string, value: any) {
+        if ((key == "minBitrate" || key == "maxBitrate") && value <= 0) return undefined;
+        return value;
     }
 }
 
