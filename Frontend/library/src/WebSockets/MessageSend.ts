@@ -97,6 +97,11 @@ export class MessagePong extends MessageSend {
     }
 }
 
+export type ExtraOfferParameters = {
+    minBitrateBps: number;
+    maxBitrateBps: number;
+}
+
 /**
  *  Web RTC Offer message wrapper
  */
@@ -108,7 +113,7 @@ export class MessageWebRTCOffer extends MessageSend {
     /**
      * @param offer - Generated Web RTC Offer
      */
-    constructor(offer: RTCSessionDescriptionInit, minBitrate: number, maxBitrate: number) {
+    constructor(offer: RTCSessionDescriptionInit, extraParams: ExtraOfferParameters) {
         super();
         this.type = MessageSendTypes.OFFER;
         this.minBitrate = 0;
@@ -117,8 +122,8 @@ export class MessageWebRTCOffer extends MessageSend {
         if (offer) {
             this.type = offer.type as MessageSendTypes;
             this.sdp = offer.sdp;
-            this.minBitrate = minBitrate;
-            this.maxBitrate = maxBitrate;
+            this.minBitrate = extraParams.minBitrateBps;
+            this.maxBitrate = extraParams.maxBitrateBps;
         }
     }
 
@@ -126,6 +131,11 @@ export class MessageWebRTCOffer extends MessageSend {
         if ((key == "minBitrate" || key == "maxBitrate") && value <= 0) return undefined;
         return value;
     }
+}
+
+export type ExtraAnswerParameters = {
+    minBitrateBps: number;
+    maxBitrateBps: number;
 }
 
 /**
@@ -139,7 +149,7 @@ export class MessageWebRTCAnswer extends MessageSend {
     /**
      * @param answer - Generated Web RTC Offer
      */
-    constructor(answer: RTCSessionDescriptionInit, minBitrate: number, maxBitrate: number) {
+    constructor(answer: RTCSessionDescriptionInit, extraParams: ExtraOfferParameters) {
         super();
         this.type = MessageSendTypes.ANSWER;
         this.minBitrate = 0;
@@ -148,8 +158,8 @@ export class MessageWebRTCAnswer extends MessageSend {
         if (answer) {
             this.type = answer.type as MessageSendTypes;
             this.sdp = answer.sdp;
-            this.minBitrate = minBitrate;
-            this.maxBitrate = maxBitrate;
+            this.minBitrate = extraParams.minBitrateBps;
+            this.maxBitrate = extraParams.maxBitrateBps;
         }
     }
 

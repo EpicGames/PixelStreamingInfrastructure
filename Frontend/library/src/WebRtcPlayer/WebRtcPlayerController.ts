@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { WebSocketController, ExtraOfferParameters, ExtraAnswerParameters } from '../WebSockets/WebSocketController';
+import { WebSocketController } from '../WebSockets/WebSocketController';
+import { ExtraOfferParameters, ExtraAnswerParameters } from '../WebSockets/MessageSend';
 import { StreamController } from '../VideoPlayer/StreamController';
 import {
     MessageAnswer,
