@@ -12,6 +12,16 @@ declare global {
     }
 }
 
+export type ExtraOfferParameters = {
+    minBitrateBps: number;
+    maxBitrateBps: number;
+}
+
+export type ExtraAnswerParameters = {
+    minBitrateBps: number;
+    maxBitrateBps: number;
+}
+
 /**
  * The controller for the WebSocket and all associated methods
  */
@@ -159,13 +169,13 @@ export class WebSocketController {
         this.webSocket.send(payload.payload());
     }
 
-    sendWebRtcOffer(offer: RTCSessionDescriptionInit, minBitrate: number, maxBitrate: number) {
-        const payload = new MessageSend.MessageWebRTCOffer(offer, minBitrate, maxBitrate);
+    sendWebRtcOffer(offer: RTCSessionDescriptionInit, extraParams: ExtraOfferParameters) {
+        const payload = new MessageSend.MessageWebRTCOffer(offer, extraParams.minBitrateBps, extraParams.maxBitrateBps);
         this.webSocket.send(payload.payload());
     }
 
-    sendWebRtcAnswer(answer: RTCSessionDescriptionInit, minBitrate: number, maxBitrate: number) {
-        const payload = new MessageSend.MessageWebRTCAnswer(answer, minBitrate, maxBitrate);
+    sendWebRtcAnswer(answer: RTCSessionDescriptionInit, extraParams: ExtraAnswerParameters) {
+        const payload = new MessageSend.MessageWebRTCAnswer(answer, extraParams.minBitrateBps, extraParams.maxBitrateBps);
         this.webSocket.send(payload.payload());
     }
 

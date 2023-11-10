@@ -27,6 +27,11 @@ export class MessageSend implements Send {
     /**
      * A filter for controlling what parameters to actually send.
      * Good for excluding default values or hidden internals.
+     * Example for including everything but zero bitrate fields...
+     * sendFilter(key: string, value: any) {
+     *   if ((key == "minBitrate" || key == "maxBitrate") && value <= 0) return undefined;
+     *   return value;
+     * }
      * Return undefined to exclude the property completely.
      */
     sendFilter(key: string, value: any) {

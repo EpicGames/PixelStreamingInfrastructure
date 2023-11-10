@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { WebSocketController } from '../WebSockets/WebSocketController';
+import { WebSocketController, ExtraOfferParameters, ExtraAnswerParameters } from '../WebSockets/WebSocketController';
 import { StreamController } from '../VideoPlayer/StreamController';
 import {
     MessageAnswer,
@@ -1551,11 +1551,13 @@ export class WebRtcPlayerController {
             'Sending the offer to the Server',
             6
         );
-        
-        const minBitrate = 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate);
-        const maxBitrate = 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate);
 
-        this.webSocketController.sendWebRtcOffer(offer, minBitrate, maxBitrate);
+        const extraParams: ExtraOfferParameters = {
+            minBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate),
+            maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
+        };
+
+        this.webSocketController.sendWebRtcOffer(offer, extraParams);
     }
 
     /**
@@ -1569,10 +1571,12 @@ export class WebRtcPlayerController {
             6
         );
 
-        const minBitrate = 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate);
-        const maxBitrate = 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate);
+        const extraParams: ExtraAnswerParameters = {
+            minBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate),
+            maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
+        };
 
-        this.webSocketController.sendWebRtcAnswer(answer, minBitrate, maxBitrate);
+        this.webSocketController.sendWebRtcAnswer(answer, extraParams);
 
         if (this.isUsingSFU) {
             this.webSocketController.sendWebRtcDatachannelRequest();
