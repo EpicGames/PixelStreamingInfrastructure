@@ -149,7 +149,7 @@ export class MessageWebRTCAnswer extends MessageSend {
     /**
      * @param answer - Generated Web RTC Offer
      */
-    constructor(answer: RTCSessionDescriptionInit, extraParams: ExtraOfferParameters) {
+    constructor(answer: RTCSessionDescriptionInit, extraParams: ExtraAnswerParameters) {
         super();
         this.type = MessageSendTypes.ANSWER;
         this.minBitrate = 0;
