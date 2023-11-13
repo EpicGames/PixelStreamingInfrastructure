@@ -159,13 +159,13 @@ export class WebSocketController {
         this.webSocket.send(payload.payload());
     }
 
-    sendWebRtcOffer(offer: RTCSessionDescriptionInit) {
-        const payload = new MessageSend.MessageWebRTCOffer(offer);
+    sendWebRtcOffer(offer: RTCSessionDescriptionInit, extraParams: MessageSend.ExtraOfferParameters) {
+        const payload = new MessageSend.MessageWebRTCOffer(offer, extraParams);
         this.webSocket.send(payload.payload());
     }
 
-    sendWebRtcAnswer(answer: RTCSessionDescriptionInit) {
-        const payload = new MessageSend.MessageWebRTCAnswer(answer);
+    sendWebRtcAnswer(answer: RTCSessionDescriptionInit, extraParams: MessageSend.ExtraAnswerParameters) {
+        const payload = new MessageSend.MessageWebRTCAnswer(answer, extraParams);
         this.webSocket.send(payload.payload());
     }
 

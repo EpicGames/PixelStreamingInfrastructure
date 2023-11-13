@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { WebSocketController } from '../WebSockets/WebSocketController';
+import { ExtraOfferParameters, ExtraAnswerParameters } from '../WebSockets/MessageSend';
 import { StreamController } from '../VideoPlayer/StreamController';
 import {
     MessageAnswer,
@@ -1551,7 +1552,13 @@ export class WebRtcPlayerController {
             'Sending the offer to the Server',
             6
         );
-        this.webSocketController.sendWebRtcOffer(offer);
+
+        const extraParams: ExtraOfferParameters = {
+            minBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate),
+            maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
+        };
+
+        this.webSocketController.sendWebRtcOffer(offer, extraParams);
     }
 
     /**
@@ -1564,7 +1571,13 @@ export class WebRtcPlayerController {
             'Sending the answer to the Server',
             6
         );
-        this.webSocketController.sendWebRtcAnswer(answer);
+
+        const extraParams: ExtraAnswerParameters = {
+            minBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate),
+            maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
+        };
+
+        this.webSocketController.sendWebRtcAnswer(answer, extraParams);
 
         if (this.isUsingSFU) {
             this.webSocketController.sendWebRtcDatachannelRequest();
