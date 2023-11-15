@@ -491,7 +491,7 @@ function requestStreamerId(streamer) {
 
 	streamer.idTimer = setTimeout(function() {
 		// streamer did not respond in time. give it a legacy id.
-		const newLegacyId = getUniqueLegacyId();
+		const newLegacyId = getUniqueLegacyStreamerId();
 		if (newLegacyId.length == 0) {
 			const error = `Ran out of legacy ids.`;
 			console.error(error);
