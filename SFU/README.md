@@ -47,3 +47,13 @@ Configuration is handled through the single config.js file.
 ## Running
 
 Several scripts are supplied for Windows and Linux in the [platform_scripts](platform_scripts/) folder. These are the easiest way to get the server running under common situations. They can also be used as a reference for new situations.
+
+## Streaming from UE
+
+The best way to fully utilize the SFU is to have a single streamer streaming simulcast to the SFU and then have peers subscribe to the SFU stream.
+
+Launch the streaming app with the following arguments
+`-SimulcastParameters="1.0,5000000,20000000,2.0,1000000,5000000,4.0,50000,1000000"`
+This tells the pixel streaming plugin to stream simulcast with 3 streams, each one scaling down by 2. The sequence of values is as follows, `scale_down_factor,min_bitrate,max_bitrate,...repeating for each stream`
+
+When this streams to the SFU the SFU will detect these 3 streams and then selectively stream these out to connected peers based on their connection quality.
