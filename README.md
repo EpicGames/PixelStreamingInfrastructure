@@ -66,8 +66,8 @@ npm i @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.3
 * [General Docs](/Docs/README.md)
 * [Frontend Docs](/Frontend/README.md)
 * [Signalling Server Docs](/SignallingWebServer/README.md)
-* Matchmaker Docs [TO DO](https://github.com/EpicGames/PixelStreamingInfrastructure/issues/256)
-* SFU Docs [TO DO](https://github.com/EpicGames/PixelStreamingInfrastructure/issues/257)
+* [Matchmaker Docs](/Matchmaker/README.md)
+* [SFU Docs](/SFU/README.md)
 
 ### Tagged source releases + built typescript frontend
 
