@@ -7,8 +7,8 @@ pushd "${BASH_LOCATION}" > /dev/null
 source common_utils.sh
 
 set_start_default_values "n" "n" # No server specific defaults
-use_args "$@"
-call_setup_sh
+use_args "$*"
+call_setup_sh $*
 print_parameters
 
 process="${BASH_LOCATION}/node/lib/node_modules/npm/bin/npm-cli.js run start:default --"
@@ -34,3 +34,4 @@ start_process $process $arguments
 popd > /dev/null # ../..
 
 popd > /dev/null # BASH_SOURCE
+

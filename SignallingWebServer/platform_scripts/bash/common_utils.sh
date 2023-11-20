@@ -75,7 +75,7 @@ function use_args() {
 }
 
 function call_setup_sh() {
- bash "setup.sh"
+ bash "setup.sh" $*
 }
 
 function start_process() {

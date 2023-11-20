@@ -6,9 +6,8 @@ COPY /SFU /SFU
 RUN SFU/platform_scripts/bash/setup.sh
 
 ENV SIGNALLING_URL ws://localhost:8889
-ENV PUBLIC_IP 127.0.0.1
 
 EXPOSE 40000-49999/tcp
 EXPOSE 40000-49999/udp
 
-CMD node /SFU/sfu_server.js --signallingURL=${SIGNALLING_URL} --PublicIP=${PUBLIC_IP}
+CMD node /SFU/sfu_server.js --signallingURL=${SIGNALLING_URL} 
