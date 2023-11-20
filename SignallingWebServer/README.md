@@ -1,10 +1,10 @@
 # Pixel Streaming Signalling Server
 
-The signalling server is a small middle-man application that sits between streamers and other peers. It handles the initial connection negotiations and some other small ongoing control messages between peers as well as acting as a simple web server for serving the [Frontend](/Frontend/README.md) web application.
+The signalling server is a small intermediary application that sits between streamers and other peers. It handles the initial connection negotiations and some other small ongoing control messages between peers as well as acting as a simple web server for serving the [Frontend](/Frontend/README.md) web application.
 
 ## Configuration
 
-Configuration of the signalling server is handled via the config.js file in the SignallingWebServer directory. The following are supported options.
+Configuration of the signalling server is handled via the config.js file in the SignallingWebServer directory. The following are its supported options.
 | Name | Type | Default | Description |
 |-|-|-|-|
 | UseFrontend | Boolean | false | Enables or disables the use of the Frontend. |
@@ -17,9 +17,9 @@ Configuration of the signalling server is handled via the config.js file in the 
 | HomepageFile | String | 'player.html' | The root file of the frontend web application. |
 | AdditionalRoutes | Map | | Additional routes for the web application. |
 | EnableWebserver | Boolean | true | Enables or disables the serving of the frontend through the internal web server. Disbable this if you are serving your own frontend. |
-| MatchmakerAddress | String | | The IP/hostname of the match maker application. |
-| MatchmakerPort | Number | 9999 | The port the match maker is listening on. |
-| PublicIp | String | "localhost" | The public IP/hostname of the host that the signalling server is listening on. This is used by the match maker. |
+| MatchmakerAddress | String | | The IP/hostname of the matchmaker application. |
+| MatchmakerPort | Number | 9999 | The port the matchmaker is listening on. |
+| PublicIp | String | "localhost" | The public IP/hostname of the host that the signalling server is listening on. This is used by the matchmaker. |
 | HttpPort | Number | 80 | The port for the internal webserver to listen on. |
 | HttpsPort | Number | 443 | The port for the internal webserver to listen on when HTTPS is enabled. |
 | StreamerPort | Number | 8888 | The port to listen on for new streamer connections. |
