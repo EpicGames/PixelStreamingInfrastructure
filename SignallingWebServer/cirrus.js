@@ -524,6 +524,10 @@ function sanitizeStreamerId(id) {
 }
 
 function registerStreamer(id, streamer) {
+	// remove any existing streamer id
+	if (!!streamer.id) {
+		streamers.delete(streamer.id);
+	}
 	// make sure the id is unique
 	const uniqueId = sanitizeStreamerId(id);
 	streamer.commitId(uniqueId);
