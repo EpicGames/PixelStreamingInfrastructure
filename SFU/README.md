@@ -57,3 +57,11 @@ Launch the streaming app with the following arguments
 This tells the Pixel Streaming plugin to stream simulcast with 3 streams, each one scaling video resolution by half. The sequence of values is as follows, `scale_down_factor,min_bitrate,max_bitrate,...repeating for each stream`
 
 When this streams to the SFU, the SFU will detect these 3 streams and then selectively stream these out to connected peers based on their connection quality.
+
+## Running the Docker image
+
+The Docker image needs to know where the signalling server to connect to is. You will need to set the `SIGNALLING_URL` environment variable to the URL for your signalling server. This URL needs to point to the configured SFU port (default 8889).
+You will also need to use the `host` network driver on docker because of the way the SFU collects and reports its available ports.
+An example for running might be as follows.
+
+```docker run -e SIGNALLING_URL=ws://192.168.1.10:8889 --network="host" ghcr.io/epicgames/pixel-streaming-sfu:5.4```
