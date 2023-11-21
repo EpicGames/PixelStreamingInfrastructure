@@ -1399,9 +1399,37 @@ export class WebRtcPlayerController {
     }
 
     handleStreamerIDChangedMessage(streamerIDChangedMessage: MessageStreamerIDChanged) {
+        const newID = streamerIDChangedMessage.newID;
+
+        // need to edit the selected streamer in the settings list
+        var streamerListOptions = this.config.getSettingOption(OptionParameters.StreamerId);
+
+        // temporarily prevent onChange from firing (it would try to subscribe to the streamer again)
+        var oldOnChange = streamerListOptions.onChange;
+        streamerListOptions.onChange = ()=>{};
+
+        // change the selected entry.
+        var streamerList = streamerListOptions.options;
+        for (var i = 0; i < streamerList.length; ++i) {
+            if (streamerList[i] == this.subscribedStream) {
+                streamerList[i] = newID;
+                break;
+            }
+        }
+
+        // update the list
+        streamerListOptions.options = streamerList;
+
+        // update the selected entry
+        streamerListOptions.selected = newID;
+
+        // restore the old change notifier.
+        streamerListOptions.onChange = oldOnChange;
+
+        // remember which stream we're subscribe to
         this.subscribedStream = streamerIDChangedMessage.newID;
 
-        const newID = streamerIDChangedMessage.newID;
+        // notify any listeners
         this.pixelStreaming.dispatchEvent(
             new StreamerIDChangedMessageEvent({
                 newID
