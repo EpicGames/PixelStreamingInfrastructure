@@ -7,7 +7,7 @@ pushd "${BASH_LOCATION}" > /dev/null
 
 source common_utils.sh
 
-use_args $@
+use_args $*
 # Azure specific fix to allow installing NodeJS from NodeSource
 if test -f "/etc/apt/sources.list.d/azure-cli.list"; then
 	sudo touch /etc/apt/sources.list.d/nodesource.list
