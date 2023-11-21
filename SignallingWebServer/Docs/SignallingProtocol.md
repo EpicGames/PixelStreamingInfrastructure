@@ -3,7 +3,7 @@
 The following is a complete reference to the current signalling server messaging protocol. These messages are sent as stringified JSON packets. Some parameters are JSON strings themselves and require escape sequences to be contained in the string parameter.
 
 ## Version
-1.0.0 - Current
+1.1.0 - Current
 
 Major version number - breaking protocol change such as a required new message or field or deleting an existing message.  
 Minor version number - independent new message.  
