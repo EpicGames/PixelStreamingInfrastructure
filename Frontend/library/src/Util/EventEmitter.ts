@@ -358,6 +358,21 @@ export class StreamerListMessageEvent extends Event {
 }
 
 /**
+ * An event that is emitted when a subscribed to streamer's id changes.
+ */
+export class StreamerIDChangedMessageEvent extends Event {
+    readonly type: 'streamerIDChangedMessage';
+    readonly data: {
+        /** The new ID of the streamer. */
+        newID: string;
+    };
+    constructor(data: StreamerIDChangedMessageEvent['data']) {
+        super('StreamerIDChangedMessage');
+        this.data = data;
+    }
+}
+
+/**
  * An event that is emitted when receiving latency test results.
  */
 export class LatencyTestResultEvent extends Event {
@@ -549,6 +564,7 @@ export type PixelStreamingEvent =
     | HideFreezeFrameEvent
     | StatsReceivedEvent
     | StreamerListMessageEvent
+    | StreamerIDChangedMessageEvent
     | LatencyTestResultEvent
     | DataChannelLatencyTestResponseEvent
     | DataChannelLatencyTestResultEvent

@@ -7,7 +7,8 @@ import {
     MessageAnswer,
     MessageOffer,
     MessageConfig,
-    MessageStreamerList
+    MessageStreamerList,
+    MessageStreamerIDChanged
 } from '../WebSockets/MessageReceive';
 import { FreezeFrameController } from '../FreezeFrame/FreezeFrameController';
 import { AFKController } from '../AFK/AFKController';
@@ -60,7 +61,8 @@ import {
     PlayStreamErrorEvent,
     PlayStreamEvent,
     PlayStreamRejectedEvent,
-    StreamerListMessageEvent
+    StreamerListMessageEvent,
+    StreamerIDChangedMessageEvent
 } from '../Util/EventEmitter';
 import {
     DataChannelLatencyTestRequest,
@@ -197,6 +199,9 @@ export class WebRtcPlayerController {
         this.webSocketController.onStreamerList = (
             messageList: MessageReceive.MessageStreamerList
         ) => this.handleStreamerListMessage(messageList);
+        this.webSocketController.onStreamerIDChanged = (
+            message: MessageReceive.MessageStreamerIDChanged
+        ) => this.handleStreamerIDChangedMessage(message);
         this.webSocketController.onPlayerCount = (playerCount: MessageReceive.MessagePlayerCount) => { 
             this.pixelStreaming._onPlayerCount(playerCount.count); 
         };
@@ -1389,6 +1394,17 @@ export class WebRtcPlayerController {
                 messageStreamerList,
                 autoSelectedStreamerId,
                 wantedStreamerId
+            })
+        );
+    }
+
+    handleStreamerIDChangedMessage(streamerIDChangedMessage: MessageStreamerIDChanged) {
+        this.subscribedStream = streamerIDChangedMessage.newID;
+
+        const newID = streamerIDChangedMessage.newID;
+        this.pixelStreaming.dispatchEvent(
+            new StreamerIDChangedMessageEvent({
+                newID
             })
         );
     }
