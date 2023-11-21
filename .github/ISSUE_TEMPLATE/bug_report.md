@@ -7,10 +7,10 @@ assignees: ''
 
 ---
 
-**UE Version: **
+**UE Version:**
 E.g. UE 5.1.1
 
-**Frontend Version: **
+**Frontend Version:**
 E.g. UE5.3-0.3.0
 
 **Problem component**
