@@ -30,6 +30,7 @@ Hotfix version - a non-breaking new field in an existing message type.
 - [Signalling Server Sent Messages](#source-signalling)
 	- [config](#signalling-config)
 	- [identify](#signalling-identify)
+	- [streamerIDChanged](#signalling-streameridchanged)
 	- [playerConnected](#signalling-playerconnected)
 	- [playerCount](#signalling-playercount)
 	- [playerDisconnected](#signalling-playerdisconnected)
@@ -228,6 +229,14 @@ end
 
 | Param Name | Type | Description |
 |-|-|-|
+
+### streamerIDChanged<a name="signalling-streameridchanged"></a>
+
+> Message is used to communicate to [Player](#term-player)s that the [Streamer](#term-streamer) it is currently subscribed to is changing it's ID. This allows Players to keep track of it's currently subscribed Streamer and allow auto reconnects to the correct Streamer.
+
+| Param Name | Type | Description |
+|-|-|-|
+| newID | string | The new ID of the subscribed to Streamer |
 
 ### playerConnected<a name="signalling-playerconnected"></a>
 
