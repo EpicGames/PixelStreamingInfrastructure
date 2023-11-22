@@ -566,6 +566,10 @@ export class PixelStreaming {
 
         const useUrlParams = this.config.useUrlParams;
         const urlParams = new URLSearchParams(window.location.search);
+        Logger.Info(
+            Logger.GetStackTrace(),
+            `using URL parameters ${useUrlParams}`
+        );
         if (settings.EncoderSettings) {
             this.config.setNumericSetting(
                 NumericParameters.MinQP,
