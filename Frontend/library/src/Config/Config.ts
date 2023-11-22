@@ -742,7 +742,13 @@ export class Config {
                 `Cannot set text setting called ${id} - it does not exist in the Config.enumParameters map.`
             );
         } else {
-            this.optionParameters.get(id).selected = settingValue;
+            const optionSetting = this.optionParameters.get(id);
+            const existingOptions = optionSetting.options;
+            if (!existingOptions.includes(settingValue)) {
+                existingOptions.push(settingValue);
+                optionSetting.options = existingOptions;
+            }
+            optionSetting.selected = settingValue;
         }
     }
 
