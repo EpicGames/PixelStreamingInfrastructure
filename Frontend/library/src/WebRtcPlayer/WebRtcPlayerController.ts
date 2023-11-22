@@ -1327,6 +1327,16 @@ export class WebRtcPlayerController {
             6
         );
 
+        let wantedStreamerId: string = null;
+
+        // get the current selected streamer id option
+        var streamerIDOption = this.config.getSettingOption(OptionParameters.StreamerId);
+        const existingSelection = streamerIDOption.selected.toString().trim();
+        if (!!existingSelection) {
+            // default to selected option if it exists
+            wantedStreamerId = streamerIDOption.selected;
+        }
+
         // add the streamers to the UI
         const settingOptions = [...messageStreamerList.ids]; // copy the original messageStreamerList.ids
         settingOptions.unshift(''); // add an empty option at the top
@@ -1335,15 +1345,15 @@ export class WebRtcPlayerController {
             settingOptions
         );
 
-        let wantedStreamerId: string = null;
         let autoSelectedStreamerId: string  = null;
         const waitForStreamer = this.config.isFlagEnabled(Flags.WaitForStreamer);
         const reconnectLimit = this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts);
         const reconnectDelay = this.config.getNumericSettingValue(NumericParameters.StreamerAutoJoinInterval);
 
         // first we figure out a wanted streamer id through various means
+        const useUrlParams = this.config.useUrlParams;
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has(OptionParameters.StreamerId)) {
+        if (useUrlParams && urlParams.has(OptionParameters.StreamerId)) {
             // if we've set the streamer id on the url we only want that streamer id
             wantedStreamerId = urlParams.get(OptionParameters.StreamerId);
         } else if (this.subscribedStream) {
