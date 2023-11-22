@@ -232,7 +232,7 @@ end
 
 ### streamerIDChanged<a name="signalling-streameridchanged"></a>
 
-> Message is used to communicate to [Player](#term-player)s that the [Streamer](#term-streamer) it is currently subscribed to is changing it's ID. This allows Players to keep track of it's currently subscribed Streamer and allow auto reconnects to the correct Streamer. This happens if a Streamer sends an [endpointID](#streamer-endpointid) message after it already has an ID assigned. (Can happen if it is late to respond to the [identify](#signalling-identify) message and is auto assigned a legacy ID.)
+> Message is used to communicate to [Player](#term-player)s that the [Streamer](#term-streamer) it is currently subscribed to is changing its ID. This allows Players to keep track of its currently subscribed Streamer and allow auto reconnects to the correct Streamer. This happens if a Streamer sends an [endpointID](#streamer-endpointid) message after it already has an ID assigned. (Can happen if it is late to respond to the [identify](#signalling-identify) message and is auto assigned a legacy ID.)
 
 | Param Name | Type | Description |
 |-|-|-|
