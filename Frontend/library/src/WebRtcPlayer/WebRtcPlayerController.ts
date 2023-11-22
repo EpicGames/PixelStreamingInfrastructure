@@ -1322,9 +1322,15 @@ export class WebRtcPlayerController {
             6
         );
 
+        let wantedStreamerId: string = null;
+
         // get the current selected streamer id option
         var streamerIDOption = this.config.getSettingOption(OptionParameters.StreamerId);
-        const currentSelectedStreamerID = streamerIDOption.selected;
+        const existingSelection = streamerIDOption.selected.toString().trim();
+        if (!!existingSelection) {
+            // default to selected option if it exists
+            wantedStreamerId = streamerIDOption.selected;
+        }
 
         // add the streamers to the UI
         const settingOptions = [...messageStreamerList.ids]; // copy the original messageStreamerList.ids
@@ -1334,7 +1340,6 @@ export class WebRtcPlayerController {
             settingOptions
         );
 
-        let wantedStreamerId: string = currentSelectedStreamerID; // default to previously selected
         let autoSelectedStreamerId: string  = null;
         const waitForStreamer = this.config.isFlagEnabled(Flags.WaitForStreamer);
         const reconnectLimit = this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts);
