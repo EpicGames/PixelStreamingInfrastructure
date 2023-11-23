@@ -524,6 +524,20 @@ function sanitizeStreamerId(id) {
 }
 
 function registerStreamer(id, streamer) {
+	// remove any existing streamer id
+	if (!!streamer.id) {
+		// notify any connected peers of rename
+		const renameMessage = { type: "streamerIDChanged", newID: id };
+		let clone = new Map(players);
+		for (let player of clone.values()) {
+			if (player.streamerId == streamer.id) {
+				logOutgoing(player.id, renameMessage);
+			 	player.sendTo(renameMessage);
+			 	player.streamerId = id; // reassign the subscription
+			}
+		}
+		streamers.delete(streamer.id);
+	}
 	// make sure the id is unique
 	const uniqueId = sanitizeStreamerId(id);
 	streamer.commitId(uniqueId);
@@ -954,7 +968,7 @@ function disconnectAllPlayers(streamerId) {
 	console.log(`unsubscribing all players on ${streamerId}`);
 	let clone = new Map(players);
 	for (let player of clone.values()) {
-		 if (player.streamerId == streamerId) {
+		if (player.streamerId == streamerId) {
 		 	// disconnect players but just unsubscribe the SFU
 		 	const sfuPlayer = getSFUForStreamer(streamerId);
 		 	if (sfuPlayer && player.id == sfuPlayer.id) {
