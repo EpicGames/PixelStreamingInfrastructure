@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { UnquantizedDenormalizedUnsignedCoord } from '../Util/CoordinateConverter';
+import { DeviceUtils } from '../Util/DeviceUtils';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 
 /**
@@ -51,7 +52,9 @@ export class OnScreenKeyboard {
         if (!this.hiddenInput) {
             this.hiddenInput = document.createElement('input');
             this.hiddenInput.id = 'hiddenInput';
-            this.hiddenInput.maxLength = 0;
+            if (!DeviceUtils.isMobile()) this.hiddenInput.maxLength = 0;
+	        this.hiddenInput.spellcheck = false;
+	        this.hiddenInput.autocomplete = 'off';
             videoElementParent.appendChild(this.hiddenInput);
         }
 
@@ -77,21 +80,31 @@ export class OnScreenKeyboard {
      * @param command the command received via the data channel containing keyboard positions
      */
     showOnScreenKeyboard(command: MessageOnScreenKeyboard) {
-        if (command.showOnScreenKeyboard) {
-            // Show the 'edit text' button.
-            this.editTextButton.classList.remove('hiddenState');
-            // Place the 'edit text' button near the UE input widget.
-            const pos = this.unquantizeAndDenormalizeUnsigned(
-                command.x,
-                command.y
-            );
-            this.editTextButton.style.top = pos.y.toString() + 'px';
-            this.editTextButton.style.left = (pos.x - 40).toString() + 'px';
+        if (DeviceUtils.isAndroid()) {
+            if (command.showOnScreenKeyboard) {
+                this.hiddenInput.focus();
+            } else {
+                this.hiddenInput.blur();
+            }
         } else {
-            // Hide the 'edit text' button.
-            this.editTextButton.classList.add('hiddenState');
-            // Hide the on-screen keyboard.
-            this.hiddenInput.blur();
+            if (this.editTextButton) {
+                if (command.showOnScreenKeyboard) {
+                    // Show the 'edit text' button.
+                    this.editTextButton.classList.remove('hiddenState');
+                    // Place the 'edit text' button near the UE input widget.
+                    const pos = this.unquantizeAndDenormalizeUnsigned(
+                        command.x,
+                        command.y
+                    );
+                    this.editTextButton.style.top = pos.y.toString() + 'px';
+                    this.editTextButton.style.left = (pos.x - 40).toString() + 'px';
+                } else {
+                    // Hide the 'edit text' button.
+                    this.editTextButton.classList.add('hiddenState');
+            	    // Hide the on-screen keyboard.
+                    this.hiddenInput.blur();
+                }
+            }
         }
     }
 }

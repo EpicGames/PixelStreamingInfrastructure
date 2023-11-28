@@ -1,12 +1,12 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { SpecialKeyCodes } from './SpecialKeyCodes';
-import { Logger } from '../Logger/Logger';
-import { ActiveKeys } from './InputClassesFactory';
-import { StreamMessageController } from '../UeInstanceMessage/StreamMessageController';
 import { Config, Flags } from '../Config/Config';
+import { Logger } from '../Logger/Logger';
+import { StreamMessageController } from '../UeInstanceMessage/StreamMessageController';
+import { DeviceUtils } from '../Util/DeviceUtils';
 import { EventListenerTracker } from '../Util/EventListenerTracker';
-
+import { ActiveKeys } from './InputClassesFactory';
+import { SpecialKeyCodes } from './SpecialKeyCodes';
 interface ICodeToKeyCode {
     [key: string]: number;
 }
@@ -152,22 +152,39 @@ export class KeyboardController {
     registerKeyBoardEvents() {
         const keyDownHandler = (ev: KeyboardEvent) => this.handleOnKeyDown(ev);
         const keyUpHandler = (ev: KeyboardEvent) => this.handleOnKeyUp(ev);
-        const keyPressHandler = (ev: KeyboardEvent) => this.handleOnKeyPress(ev);
+        const keyPressHandler = (ev: KeyboardEvent) =>
+            this.handleOnKeyPress(ev);
+        const inputHandler = (iv: InputEvent) => this.handleOnInput(iv);
+        const compositionEndHandler = (cv: CompositionEvent) =>
+            this.handleOnCompositionEnd(cv);
 
-        document.addEventListener("keydown", keyDownHandler);
-        document.addEventListener("keyup", keyUpHandler);
+        if (DeviceUtils.isMobile()) {
+            document.addEventListener('input', inputHandler);
+            this.keyboardEventListenerTracker.addUnregisterCallback(() =>
+                document.removeEventListener('input', inputHandler)
+            );
+        } else {
+            // //This has been deprecated as at Jun 13 2021
+            document.addEventListener('keypress', keyPressHandler);
+            this.keyboardEventListenerTracker.addUnregisterCallback(() =>
+                document.removeEventListener('keypress', keyPressHandler)
+            );
+        }
+        document.addEventListener('compositionend', compositionEndHandler);
+        document.addEventListener('keydown', keyDownHandler);
+        document.addEventListener('keyup', keyUpHandler);
 
-        //This has been deprecated as at Jun 13 2021
-        document.addEventListener("keypress", keyPressHandler);
-
-        this.keyboardEventListenerTracker.addUnregisterCallback(
-            () => document.removeEventListener("keydown", keyDownHandler)
+        this.keyboardEventListenerTracker.addUnregisterCallback(() =>
+            document.removeEventListener(
+                'compositionend',
+                compositionEndHandler
+            )
         );
-        this.keyboardEventListenerTracker.addUnregisterCallback(
-            () => document.removeEventListener("keyup", keyUpHandler)
+        this.keyboardEventListenerTracker.addUnregisterCallback(() =>
+            document.removeEventListener('keydown', keyDownHandler)
         );
-        this.keyboardEventListenerTracker.addUnregisterCallback(
-            () => document.removeEventListener("keypress", keyPressHandler)
+        this.keyboardEventListenerTracker.addUnregisterCallback(() =>
+            document.removeEventListener('keyup', keyUpHandler)
         );
     }
 
@@ -179,12 +196,43 @@ export class KeyboardController {
     }
 
     /**
+     * Handles When a key input (mobile keyboards)
+     * @param inputEvent - Input event
+     */
+    handleOnInput(inputEvent: InputEvent) {
+        if (!inputEvent.isComposing) {
+            this.sendStringAsKeypress(inputEvent.data);
+        }
+    }
+
+    /**
+     * Handles When a key input (mobile Chinese/Japanese)
+     * @param compositionEvent - Composition event
+     */
+    handleOnCompositionEnd(compositionEvent: CompositionEvent) {
+        this.sendStringAsKeypress(compositionEvent.data);
+    }
+
+    private sendStringAsKeypress(data: string) {
+        if (data && data.length) {
+            data.split('').forEach((char) => {
+                this.handleOnKeyPress(
+                    new KeyboardEvent('keypress', {
+                        keyCode: char.toUpperCase().charCodeAt(0),
+                        charCode: char.charCodeAt(0)
+                    })
+                );
+            });
+        }
+    }
+
+    /**
      * Handles When a key is down
      * @param keyboardEvent - Keyboard event
      */
     handleOnKeyDown(keyboardEvent: KeyboardEvent) {
         const keyCode = this.getKeycode(keyboardEvent);
-        if (!keyCode) {
+        if (!keyCode || keyCode === 229) {
             return;
         }
 
@@ -193,22 +241,13 @@ export class KeyboardController {
             `key down ${keyCode}, repeat = ${keyboardEvent.repeat}`,
             6
         );
-        const toStreamerHandlers =
-            this.toStreamerMessagesProvider.toStreamerHandlers;
-        toStreamerHandlers.get('KeyDown')([
-            this.getKeycode(keyboardEvent),
-            keyboardEvent.repeat ? 1 : 0
-        ]);
+        this.sendToStreamer('KeyDown', [keyCode, keyboardEvent.repeat ? 1 : 0]);
         const activeKeys = this.activeKeysProvider.getActiveKeys();
         activeKeys.push(keyCode);
         // Backspace is not considered a keypress in JavaScript but we need it
         // to be so characters may be deleted in a UE text entry field.
         if (keyCode === SpecialKeyCodes.backSpace) {
-            document.dispatchEvent(
-                new KeyboardEvent('keypress', {
-                    charCode: SpecialKeyCodes.backSpace
-                })
-            );
+            this.sendToStreamer('KeyPress', [SpecialKeyCodes.backSpace]);
         }
 
         if (
@@ -225,14 +264,12 @@ export class KeyboardController {
      */
     handleOnKeyUp(keyboardEvent: KeyboardEvent) {
         const keyCode = this.getKeycode(keyboardEvent);
-        if (!keyCode) {
+        if (!keyCode || keyCode === 229) {
             return;
         }
 
         Logger.Log(Logger.GetStackTrace(), `key up ${keyCode}`, 6);
-        const toStreamerHandlers =
-            this.toStreamerMessagesProvider.toStreamerHandlers;
-        toStreamerHandlers.get('KeyUp')([ keyCode ]);
+        this.sendToStreamer('KeyUp', [keyCode]);
 
         if (
             this.config.isFlagEnabled(Flags.SuppressBrowserKeys) &&
@@ -258,9 +295,13 @@ export class KeyboardController {
         const charCode = keyboard.charCode;
         Logger.Log(Logger.GetStackTrace(), `key press ${charCode}`, 6);
 
+        this.sendToStreamer('KeyPress', [charCode]);
+    }
+
+    sendToStreamer(event: string, data: any) {
         const toStreamerHandlers =
             this.toStreamerMessagesProvider.toStreamerHandlers;
-        toStreamerHandlers.get('KeyPress')([charCode]);
+        toStreamerHandlers.get(event)(data);
     }
 
     /**
