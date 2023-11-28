@@ -659,7 +659,7 @@ streamerServer.on('connection', function (ws, req) {
 		console.error(`streamer ${streamer.id} connection error: ${error}`);
 		onStreamerDisconnected(streamer);
 		try {
-			ws.close(1006 /* abnormal closure */, error);
+			ws.close(1006 /* abnormal closure */, `streamer ${streamer.id} connection error: ${error}`);
 		} catch(err) {
 			console.error(`ERROR: ws.on error: ${err.message}`);
 		}
@@ -823,7 +823,7 @@ sfuServer.on('connection', function (ws, req) {
 		console.error(`SFU connection error: ${error}`);
 		onSFUDisconnected(playerComponent);
 		try {
-			ws.close(1006 /* abnormal closure */, error);
+			ws.close(1006 /* abnormal closure */, `SFU connection error: ${error}`);
 		} catch(err) {
 			console.error(`ERROR: ws.on error: ${err.message}`);
 		}
@@ -951,7 +951,7 @@ playerServer.on('connection', function (ws, req) {
 
 	ws.on('error', function(error) {
 		console.error(`player ${playerId} connection error: ${error}`);
-		ws.close(1006 /* abnormal closure */, error);
+		ws.close(1006 /* abnormal closure */, `player ${playerId} connection error: ${error}`);
 		onPlayerDisconnected(playerId);
 
 		console.logColor(logging.Red, `Trying to reconnect...`);
