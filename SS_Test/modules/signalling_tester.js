@@ -46,8 +46,8 @@ class SignallingConnection {
         this.ws = new WebSocket(url);
         this.ws.addEventListener("open", event => this.onConnectionOpen(event));
         this.ws.addEventListener("error", event => this.onConnectionError(event));
-        this.ws.addEventListener("close", closeEvent => this.onConnectionClose(closeEvent));
-        this.ws.addEventListener("message", messageEvent => this.onMessage(messageEvent));
+        this.ws.addEventListener("close", event => this.onConnectionClose(event));
+        this.ws.addEventListener("message", event => this.onMessage(event));
     }
 
     /**
@@ -91,7 +91,7 @@ class SignallingConnection {
      *   connection - This connection.
      *   errors - An array of strings representing error messages that happened this stage.
      *   unsatisfiedExpects - An array of strings listing the type of messages we expected but never received.
-     *   unhandledMessages - An array of parsed JSON message objects.
+     *   unhandledEvents - An array of unhandled events of the form { type: 'eventType', data: 'eventData'}.
      *
      * @param callback The callback function.
      */
@@ -110,6 +110,22 @@ class SignallingConnection {
     }
 
     /**
+     * Adds an expected socket event and its handler to the current list.
+     * The handler has the signature...
+     * 
+     * function handler(event)
+     * 
+     * where
+     *   event - The websocket event object associated with the matched event.
+     * 
+     * @param eventType The message type we expect.
+     * @param handler The handler to call when we read the given message type.
+     */
+    addExpectEvent(eventType, handler) {
+        this.expectingList.push({type: 'socketEvent', match: eventType, handler: handler});
+    }
+
+    /**
      * Adds an expected message and its handler to the current list.
      * The handler has the signature...
      * 
@@ -122,7 +138,7 @@ class SignallingConnection {
      * @param handler The handler to call when we read the given message type.
      */
     addExpect(messageType, handler) {
-        this.expectingList.push({type: messageType, handler: handler});
+        this.expectingList.push({type: 'message', match: messageType, handler: handler});
     }
 
     /**
@@ -155,10 +171,20 @@ class SignallingConnection {
                         for (var ei = 0; ei < expectingList.length; ++ei) {
                             const message = eventQueue[qi].data;
                             const expected = expectingList[ei];
-                            if (expected.type == message.type) {
+                            if (expected.type == 'message' && expected.match == message.type) {
                                 eventsToRemove.push(qi);
                                 expectingToRemove.push(ei);
                                 expected.handler(message);
+                            }
+                        }
+                    }
+                    else if (isSocketEvent(eventQueue[qi].type)) {
+                        for (var ei = 0; ei < expectingList.length; ++ei) {
+                            const expected = expectingList[ei];
+                            if (expected.type == 'socketEvent' && expected.match == eventQueue[qi].type) {
+                                eventsToRemove.push(qi);
+                                expectingToRemove.push(ei);
+                                expected.handler(eventQueue[qi].data);
                             }
                         }
                     }
@@ -193,10 +219,10 @@ class SignallingConnection {
                 var success = true;
 
                 if (this.errors.length > 0 || this.expectingList.length > 0 || this.eventQueue.length > 0) {
-                    const unsatisfiedExpects = this.expectingList.map((expect) => expect.type);
-                    const unhandledMessages = this.eventQueue.filter((event) => event.type == 'message').map((event) => event.data);
+                    const unsatisfiedExpects = this.expectingList.map((expect) => { return { type: expect.type, match: expect.match }; });
+                    const unhandledEvents = this.eventQueue;
                     const errors = this.errors;
-                    this.failedCallback(this, errors, unsatisfiedExpects, unhandledMessages);
+                    this.failedCallback(this, errors, unsatisfiedExpects, unhandledEvents);
                     success = false;
                 } else {
                     this.successCallback(this);
@@ -210,6 +236,15 @@ class SignallingConnection {
         return pollingPromise;
     }
 
+    /**
+     * Close the connection.
+     * @param code The code to send with the close.
+     * @param message The message to send with the close.
+     */
+    close(code, message) {
+        this.ws.close(code, message);
+    }
+
     // internal
     addError(error) {
         this.errors.push(error);
@@ -218,22 +253,25 @@ class SignallingConnection {
     // intenal
     onConnectionOpen(event) {
         this.logCallback(this, `Connected to signalling server`);
+        this.eventQueue.push({type: 'socketOpen', data: event});
     }
 
     // internal
     onConnectionError(event) {
-        this.logCallback(this, `Signalling connection error: ${event.message}`);
+        this.logCallback(this, `Signalling connection error`);
+        this.eventQueue.push({type: 'socketError', data: event});
     }
 
     // internal
-    onConnectionClose(closeEvent) {
-        this.logCallback(this, `Disconnected from signalling server`);
+    onConnectionClose(event) {
+        this.logCallback(this, `Disconnected from signalling server: ${event.reason} (${event.code})`);
+        this.eventQueue.push({type: 'socketClose', data: event});
     }
 
     // internal
-    onMessage(messageEvent) {
-        const messageString = messageEvent.data;
-        this.logCallback(this, `Got message: ${JSON.stringify(messageEvent.data)}`);
+    onMessage(event) {
+        const messageString = event.data;
+        this.logCallback(this, `Got message: ${JSON.stringify(event.data)}`);
 
         var parsedMessage;
         try {
@@ -252,6 +290,12 @@ class SignallingConnection {
             this.eventQueue.push({type: 'message', data: parsedMessage});
         }
     }
+}
+
+function isSocketEvent(eventType) {
+    return eventType == 'socketOpen'
+        || eventType == 'socketError'
+        || eventType == 'socketClose';
 }
 
 module.exports = SignallingConnection;

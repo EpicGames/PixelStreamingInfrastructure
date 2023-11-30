@@ -1,5 +1,8 @@
 const config = require('./config');
 const SignallingConnection = require('./modules/signalling_tester.js');
+const assert = require('node:assert/strict');
+
+var failed = false;
 
 function logFunction(connection, message) {
     console.log(`${connection.name}: ${message}`);
@@ -9,7 +12,7 @@ function processSuccess(connection) {
     console.log(`${connection.name}: Successful stage.`);
 }
 
-function processFailed(connection, errors, unsatisfiedExpects, unhandledMessages) {
+function processFailed(connection, errors, unsatisfiedExpects, unhandledEvents) {
     console.log(`${connection.name}: Failed stage.`);
 
     if (errors.length > 0) {
@@ -20,20 +23,40 @@ function processFailed(connection, errors, unsatisfiedExpects, unhandledMessages
     }
 
     if (unsatisfiedExpects.length > 0) {
-        console.log(`    Failed to receive expected messages:`);
-        for (const expected of unsatisfiedExpects) {
-            console.log(`        ${expected}`);
+        const unsatisfiedMessages = unsatisfiedExpects.filter((expect) => expect.type == 'message');
+        const unsatisfiedSocketEvents = unsatisfiedExpects.filter((expect) => expect.type == 'socketEvent');
+        if (unsatisfiedMessages.length > 0) {
+            console.log(`    Failed to receive expected messages:`);
+            for (const expected of unsatisfiedMessages) {
+                console.log(`        ${expected.match}`);
+            }
+        }
+        if (unsatisfiedSocketEvents.length > 0) {
+            console.log(`    Failed to receive expected socket events:`);
+            for (const expected of unsatisfiedSocketEvents) {
+                console.log(`        ${expected.match}`);
+            }
         }
     }
 
-    if (unhandledMessages.length > 0) {
-        console.log(`    Messages not handled:`);
-        for (const message of unhandledMessages) {
-            console.log(`        ${message.type}`);
+    if (unhandledEvents.length > 0) {
+        const unhandledMessages = unhandledEvents.filter((event) => event.type == 'message');
+        const unhandledSocketEvents = unhandledEvents.filter((event) => event.type != 'message');
+        if (unhandledMessages.length > 0) {
+            console.log(`    Messages not handled:`);
+            for (const message of unhandledMessages) {
+                console.log(`        ${message.data.type}`);
+            }
+        }
+        if (unhandledSocketEvents.length > 0) {
+            console.log(`    Events not handled:`);
+            for (const message of unhandledSocketEvents) {
+                console.log(`        ${message.type}`);
+            }
         }
     }
 
-    process.exit(1);
+    failed = true;
 }
 
 function newConnection(name, url) {
@@ -46,8 +69,10 @@ function newConnection(name, url) {
 
 async function main() {
 
+    // test initial connections
     const streamer = newConnection('Streamer', config.streamerURL);
     
+    streamer.addExpectEvent('socketOpen', (event) => {});
     streamer.addExpect('config', (msg) => {});
     streamer.addExpect('identify', (msg) => {
         const replyMessage = {
@@ -57,15 +82,22 @@ async function main() {
         streamer.sendMessage(replyMessage);
     });
 
-    const player = newConnection('Player', config.playerURL);
+    var playerId = null;
+    var player = newConnection('Player', config.playerURL);
 
+    player.addExpectEvent('socketOpen', (event) => {});
     player.addExpect('config', (msg) => {});
     player.addExpect('playerCount', (msg) => {});
 
     var streamerPhase = streamer.processMessages(3000);
     var playerPhase = player.processMessages(3000);
-
     await Promise.all([streamerPhase, playerPhase]);
+
+    if (failed) {
+        process.exit(0);
+    }
+
+    // test subscribing
 
     player.sendMessage({type: 'listStreamers'});
 
@@ -78,6 +110,7 @@ async function main() {
     });
 
     streamer.addExpect('playerConnected', (msg) => {
+        playerId = msg.playerId;
         streamer.sendMessage({type: 'offer', sdp: 'mock sdp', playerId: msg.playerId});
     });
 
@@ -93,9 +126,51 @@ async function main() {
         if (msg.sdp != 'mock answer') {
             console.log('got a bad answer payload');
         } else {
-
+            streamer.sendMessage({type: 'iceCandidate', playerId: msg.playerId, candidate: 'mock ice candidate'});
         }
     });
+
+    player.addExpect('iceCandidate', (msg) => {
+        assert(msg.candidate == 'mock ice candidate');
+    })
+
+    streamerPhase = streamer.processMessages(3000);
+    playerPhase = player.processMessages(3000);
+    await Promise.all([streamerPhase, playerPhase]);
+
+    if (failed) {
+        process.exit(0);
+    }
+
+    // test force disconnect player
+
+    streamer.sendMessage({type: 'disconnectPlayer', playerId: playerId});
+    player.addExpectEvent('socketClose', (event) => {});
+    streamer.addExpect('playerDisconnected', (msg) => {});
+
+    streamerPhase = streamer.processMessages(3000);
+    playerPhase = player.processMessages(3000);
+    await Promise.all([streamerPhase, playerPhase]);
+
+    // reconnect and test disconnect player
+
+    player = newConnection('Player', config.playerURL);
+    player.addExpectEvent('socketOpen', (event) => {});
+    player.addExpect('config', (msg) => {});
+    player.addExpect('playerCount', (msg) => {
+        player.sendMessage({type: 'listStreamers'});
+    });
+    player.addExpect('streamerList', (msg) => {
+        player.sendMessage({type:'subscribe', streamerId: config.streamerId});
+    });
+    streamer.addExpect('playerConnected', (msg) => {
+        playerId = msg.playerId;
+        streamer.sendMessage({type: 'offer', sdp: 'mock sdp', playerId: msg.playerId});
+    });
+    player.addExpect('offer', (msg) => {
+        player.close(1000, "Done");
+    });
+    streamer.addExpect('playerDisconnected', (msg) => {});
 
     streamerPhase = streamer.processMessages(3000);
     playerPhase = player.processMessages(3000);
