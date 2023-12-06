@@ -1,15 +1,12 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { WebSocketController } from '../WebSockets/WebSocketController';
-import { ExtraOfferParameters, ExtraAnswerParameters } from '../WebSockets/MessageSend';
-import { StreamController } from '../VideoPlayer/StreamController';
 import {
-    MessageAnswer,
-    MessageOffer,
-    MessageConfig,
-    MessageStreamerList,
-    MessageStreamerIDChanged
-} from '../WebSockets/MessageReceive';
+    MessageSend,
+    MessageReceive,
+    WebSocketController,
+    Logger,
+} from '@epicgames-ps/lib-pixelstreamingcommon-ue5.4';
+import { StreamController } from '../VideoPlayer/StreamController';
 import { FreezeFrameController } from '../FreezeFrame/FreezeFrameController';
 import { AFKController } from '../AFK/AFKController';
 import { DataChannelController } from '../DataChannel/DataChannelController';
@@ -30,7 +27,6 @@ import {
     WebRTCSettings
 } from '../DataChannel/InitialSettings';
 import { LatencyTestResults } from '../DataChannel/LatencyTestResults';
-import { Logger } from '../Logger/Logger';
 import { FileTemplate, FileUtil } from '../Util/FileUtil';
 import { InputClassesFactory } from '../Inputs/InputClassesFactory';
 import { VideoPlayer } from '../VideoPlayer/VideoPlayer';
@@ -39,8 +35,6 @@ import {
     MessageDirection
 } from '../UeInstanceMessage/StreamMessageController';
 import { ResponseController } from '../UeInstanceMessage/ResponseController';
-import * as MessageReceive from '../WebSockets/MessageReceive';
-import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { SendMessageController } from '../UeInstanceMessage/SendMessageController';
 import { ToStreamerMessagesController } from '../UeInstanceMessage/ToStreamerMessagesController';
 import { MouseController } from '../Inputs/MouseController';
@@ -776,7 +770,7 @@ export class WebRtcPlayerController {
             'Data Channel Command: ' + commandAsString,
             6
         );
-        const command: MessageOnScreenKeyboard = JSON.parse(commandAsString);
+        const command: MessageReceive.MessageOnScreenKeyboard = JSON.parse(commandAsString);
         if (command.command === 'onScreenKeyboard') {
             this.pixelStreaming._activateOnScreenKeyboard(command);
         }
@@ -1294,7 +1288,7 @@ export class WebRtcPlayerController {
      * Handles when a Config Message is received contains the Peer Connection Options required (STUN and TURN Server Info)
      * @param messageConfig - Config Message received from the signaling server
      */
-    handleOnConfigMessage(messageConfig: MessageConfig) {
+    handleOnConfigMessage(messageConfig: MessageReceive.MessageConfig) {
         this.resizePlayerStyle();
 
         // Tell the WebRtcController to start a session with the peer options sent from the signaling server
@@ -1320,7 +1314,7 @@ export class WebRtcPlayerController {
     /**
      * Handles when the signalling server gives us the list of streamer ids.
      */
-    handleStreamerListMessage(messageStreamerList: MessageStreamerList) {
+    handleStreamerListMessage(messageStreamerList: MessageReceive.MessageStreamerList) {
         Logger.Log(
             Logger.GetStackTrace(),
             `Got streamer list ${messageStreamerList.ids}`,
@@ -1408,7 +1402,7 @@ export class WebRtcPlayerController {
         );
     }
 
-    handleStreamerIDChangedMessage(streamerIDChangedMessage: MessageStreamerIDChanged) {
+    handleStreamerIDChangedMessage(streamerIDChangedMessage: MessageReceive.MessageStreamerIDChanged) {
         const newID = streamerIDChangedMessage.newID;
 
         // need to edit the selected streamer in the settings list
@@ -1451,7 +1445,7 @@ export class WebRtcPlayerController {
      * Handle the RTC Answer from the signaling server
      * @param Answer - Answer SDP from the peer.
      */
-    handleWebRtcAnswer(Answer: MessageAnswer) {
+    handleWebRtcAnswer(Answer: MessageReceive.MessageAnswer) {
         Logger.Log(Logger.GetStackTrace(), `Got answer sdp ${Answer.sdp}`, 6);
 
         const sdpAnswer: RTCSessionDescriptionInit = {
@@ -1467,7 +1461,7 @@ export class WebRtcPlayerController {
      * Handle the RTC offer from a WebRTC peer (received through the signalling server).
      * @param Offer - Offer SDP from the peer.
      */
-    handleWebRtcOffer(Offer: MessageOffer) {
+    handleWebRtcOffer(Offer: MessageReceive.MessageOffer) {
         Logger.Log(Logger.GetStackTrace(), `Got offer sdp ${Offer.sdp}`, 6);
 
         this.isUsingSFU = Offer.sfu ? Offer.sfu : false;
@@ -1607,7 +1601,7 @@ export class WebRtcPlayerController {
             6
         );
 
-        const extraParams: ExtraOfferParameters = {
+        const extraParams: MessageSend.ExtraOfferParameters = {
             minBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate),
             maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
         };
@@ -1626,7 +1620,7 @@ export class WebRtcPlayerController {
             6
         );
 
-        const extraParams: ExtraAnswerParameters = {
+        const extraParams: MessageSend.ExtraAnswerParameters = {
             minBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate),
             maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
         };

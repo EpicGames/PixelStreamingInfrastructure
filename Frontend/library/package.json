@@ -8,13 +8,14 @@
     "sideEffects": false,
     "scripts": {
         "compile": "tsc --build --clean && tsc",
-        "build": "npx webpack --config webpack.prod.js",
+        "build": "cd ../../common && npm run build && cd ../Frontend/library && npm link ../../common && npx webpack --config webpack.prod.js",
         "build-dev": "npx webpack --config webpack.dev.js",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "test": "jest --detectOpenHandles --coverage=true",
         "spellcheck": "cspell \"{README.md,.github/*.md,src/**/*.ts}\""
     },
     "devDependencies": {
+        "@epicgames-ps/lib-pixelstreamingcommon-ue5.4": "^0.0.1",
         "@types/jest": "27.5.1",
         "@types/webxr": "^0.5.1",
         "@typescript-eslint/eslint-plugin": "^5.16.0",
@@ -33,6 +34,9 @@
     },
     "dependencies": {
         "sdp": "^3.1.0"
+    },
+    "peerDependencies": {
+        "@epicgames-ps/lib-pixelstreamingcommon-ue5.4": "^0.0.1"
     },
     "repository": {
         "type": "git",

@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { DataChannelSender } from '../DataChannel/DataChannelSender';
-import { Logger } from '../Logger/Logger';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.4';
 import { StreamMessageController } from './StreamMessageController';
 
 export class SendMessageController {

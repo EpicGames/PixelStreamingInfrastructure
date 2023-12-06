@@ -36,18 +36,18 @@ type SuccessCallback = (connection: SignallingConnection) => void;
 type FailedCallback = (connection: SignallingConnection, unsatisfiedExpects: Expected[], unhandledEvents: Event[]) => void;
 
 /**
- * A signalling connection object. This is the main workhorse of the testing framework.
- * Once you tell it where to connect it will start buffering received messages and
- * allow you to send messages.
- * The idea is you can set up a bunch of expected messages for this current time using
- * addExpect and then when ready call processMessages.
- * The system will then try to resolve messages received with expected entries and call
- * the handler for each matched message.
- * If the expected list empties the stage will call the success callback and clear its
- * expects and be ready to setup again.
- * If the timeout is hit and there are still messages in the queue, unhandled expects
- * or current errors, the failed callback will be called with relevant information and
- * the system will be ready to setup again.
+ * A signalling connection object.
+ * This is the main workhorse of the testing framework. Once you tell it where
+ * to connect it will start buffering received messages and allow you to send
+ * messages. The idea is you can set up a bunch of expected messages for this
+ * current time using addExpect and then when ready call processMessages. The
+ * system will then try to resolve messages received with expected entries and
+ * call the handler for each matched message.
+ * If the expected list empties the stage will call the success callback and
+ * clear its expects and be ready to setup again.
+ * If the timeout is hit and there are still messages in the queue, unhandled
+ * expects or current errors, the failed callback will be called with relevant
+ * information and the system will be ready to setup again.
  * 
  * A stage test might look something like this...
  * 

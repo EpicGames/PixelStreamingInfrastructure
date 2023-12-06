@@ -1,4 +1,12 @@
-import { SignallingConnection, Expected, ExpectedMessage, ExpectedEvent, Event, MessageEvent, SocketEvent, ErrorEvent } from './signalling_tester';
+import {
+    SignallingConnection,
+    Expected,
+    ExpectedMessage,
+    ExpectedEvent,
+    Event,
+    MessageEvent,
+    SocketEvent,
+    ErrorEvent } from './signalling_tester';
 import config from './config';
 import assert from 'assert';
 
@@ -163,7 +171,7 @@ async function main(): Promise<void> {
     player.addExpect('playerCount', (msg: any) => {
         player.sendMessage({ type: 'listStreamers' });
     });
-    player.addExpect('streamerList', (msg: any) => {
+    player.addExpect('streamerList', (msg: msg) => {
         player.sendMessage({ type: 'subscribe', streamerId: config.streamerId });
     });
     streamer.addExpect('playerConnected', (msg: any) => {

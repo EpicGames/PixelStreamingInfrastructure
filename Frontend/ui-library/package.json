@@ -10,8 +10,8 @@
         "compile": "tsc --build --clean && tsc",
         "build": "npx webpack --config webpack.prod.js",
         "build-dev": "npx webpack --config webpack.dev.js",
-        "build-all": "cd ../library && npm run build && cd ../ui-library && npm link ../library && npx webpack --config webpack.prod.js",
-        "build-dev-all": "cd ../library && npm run build-dev && cd ../ui-library && npm link ../library & npx webpack --config webpack.dev.js",
+        "build-all": "cd ../../common && npm run build && cd ../Frontend/ui-library && npm link ../../common && cd ../library && npm run build && cd ../ui-library && npm link ../library && npx webpack --config webpack.prod.js",
+        "build-dev-all": "cd ../../common && npm run compile && cd ../Frontend/ui-library && cd ../library && npm run build-dev && cd ../ui-library && npm link ../library & npx webpack --config webpack.dev.js",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "spellcheck": "cspell \"{README.md,.github/*.md,src/**/*.ts}\""
     },
@@ -34,6 +34,7 @@
         "jss-plugin-global": "^10.9.2"
     },
     "peerDependencies": {
+        "@epicgames-ps/lib-pixelstreamingcommon-ue5.4": "^0.0.1",
         "@epicgames-ps/lib-pixelstreamingfrontend-ue5.4": "^0.0.1"
     },
     "repository": {
