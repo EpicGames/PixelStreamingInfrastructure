@@ -550,6 +550,10 @@ function registerStreamer(id, streamer) {
 }
 
 function onStreamerDisconnected(streamer) {
+	if (!!streamer.idTimer) {
+		clearTimeout(streamer.idTimer);
+	}
+
 	if (!streamer.id || !streamers.has(streamer.id)) {
 		return;
 	}
@@ -665,7 +669,10 @@ streamerServer.on('connection', function (ws, req) {
 		}
 	});
 
-	ws.send(JSON.stringify(clientConfig));
+	const configStr = JSON.stringify(clientConfig);
+	logOutgoing(streamer.id, configStr)
+	ws.send(configStr);
+
 	requestStreamerId(streamer);
 });
 
@@ -960,7 +967,11 @@ playerServer.on('connection', function (ws, req) {
 
 	sendPlayerConnectedToFrontend();
 	sendPlayerConnectedToMatchmaker();
-	player.ws.send(JSON.stringify(clientConfig));
+
+	const configStr = JSON.stringify(clientConfig);
+	logOutgoing(player.id, configStr)
+	player.ws.send(configStr);
+
 	sendPlayersCount();
 });
 
