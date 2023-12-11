@@ -15,7 +15,6 @@
         "spellcheck": "cspell \"{README.md,.github/*.md,src/**/*.ts}\""
     },
     "devDependencies": {
-        "@epicgames-ps/lib-pixelstreamingcommon-ue5.4": "^0.0.1",
         "@types/jest": "27.5.1",
         "@types/webxr": "^0.5.1",
         "@typescript-eslint/eslint-plugin": "^5.16.0",
@@ -34,9 +33,6 @@
     },
     "dependencies": {
         "sdp": "^3.1.0"
-    },
-    "peerDependencies": {
-        "@epicgames-ps/lib-pixelstreamingcommon-ue5.4": "^0.0.1"
     },
     "repository": {
         "type": "git",

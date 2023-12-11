@@ -43,3 +43,4 @@ export {
 } from './PeerConnectionController/InboundRTPStats';
 export { OutBoundVideoStats } from './PeerConnectionController/OutBoundRTPStats';
 export * from './Util/EventEmitter';
+export * from '@epicgames-ps/lib-pixelstreamingcommon-ue5.4';

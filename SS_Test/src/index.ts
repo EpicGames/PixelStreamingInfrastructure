@@ -171,7 +171,7 @@ async function main(): Promise<void> {
     player.addExpect('playerCount', (msg: any) => {
         player.sendMessage({ type: 'listStreamers' });
     });
-    player.addExpect('streamerList', (msg: msg) => {
+    player.addExpect('streamerList', (msg: any) => {
         player.sendMessage({ type: 'subscribe', streamerId: config.streamerId });
     });
     streamer.addExpect('playerConnected', (msg: any) => {
