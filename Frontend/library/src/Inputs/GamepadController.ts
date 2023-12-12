@@ -28,6 +28,11 @@ export class GamePadController {
             window.requestAnimationFrame
         ).bind(window);
         const browserWindow = window as Window;
+
+        const onBeforeUnload = (ev: Event) =>
+                this.onBeforeUnload(ev);
+        window.addEventListener('beforeunload', onBeforeUnload);
+
         if ('GamepadEvent' in browserWindow) {
             const onGamePadConnected = (ev: GamepadEvent) =>
                 this.gamePadConnectHandler(ev);
@@ -252,6 +257,14 @@ export class GamePadController {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onGamepadDisconnected(controllerIdx: number) {
         // Default Functionality: Do Nothing
+    }
+
+    onBeforeUnload(ev: Event) {
+        // When a user navigates away from the page, we need to inform UE of all the disconnecting
+        // controllers
+        for(const controller of this.controllers) {
+            this.onGamepadDisconnected(controller.id);
+        }
     }
 }
 
