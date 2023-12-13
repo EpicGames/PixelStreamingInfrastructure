@@ -29,20 +29,22 @@ import {
     PanelConfiguration,
     isPanelEnabled,
     UIElementConfig
-} from '../UI/UIConfigurationTypes'
-import { FullScreenIconBase, FullScreenIconExternal } from '../UI/FullscreenIcon';
+} from '../UI/UIConfigurationTypes';
+import {
+    FullScreenIconBase,
+    FullScreenIconExternal
+} from '../UI/FullscreenIcon';
 
-
-/** 
+/**
  * Configuration of the internal video QP indicator element.
  * By default, one will be made, but if needed this can be disabled.
- * 
- * Note: For custom UI elements to react to the QP being changed, use a PixelStreaming 
+ *
+ * Note: For custom UI elements to react to the QP being changed, use a PixelStreaming
  * object's addEventListener('videoEncoderAvgQP', ...) or removeEventListener(...).
  */
 export type VideoQPIndicatorConfig = {
-    disableIndicator?: boolean
-}
+    disableIndicator?: boolean;
+};
 
 /**
  * UI Options can be provided when creating an Application, to configure it's internal
@@ -52,22 +54,22 @@ export interface UIOptions {
     stream: PixelStreaming;
     onColorModeChanged?: (isLightMode: boolean) => void;
     /** By default, a settings panel and associate visibility toggle button will be made.
-      * If needed, this behaviour can be configured. */
+     * If needed, this behaviour can be configured. */
     settingsPanelConfig?: PanelConfiguration;
     /** By default, a stats panel and associate visibility toggle button will be made.
-      * If needed, this behaviour can be configured. */
+     * If needed, this behaviour can be configured. */
     statsPanelConfig?: PanelConfiguration;
     /** If needed, the full screen button can be external or disabled. */
-    fullScreenControlsConfig?: UIElementConfig,
+    fullScreenControlsConfig?: UIElementConfig;
     /** If needed, XR button can be external or disabled. */
-    xrControlsConfig?: UIElementConfig,
+    xrControlsConfig?: UIElementConfig;
     /** Configuration of the video QP indicator. */
-    videoQpIndicatorConfig?: VideoQPIndicatorConfig
+    videoQpIndicatorConfig?: VideoQPIndicatorConfig;
 }
 
 /**
  * An Application is a combination of UI elements to display and manage a WebRTC Pixel Streaming
- * connection. It includes features for controlling a stream with mouse and keyboard, 
+ * connection. It includes features for controlling a stream with mouse and keyboard,
  * managing connection endpoints, as well as displaying stats and other information about it.
  */
 export class Application {
@@ -93,7 +95,7 @@ export class Application {
 
     configUI: ConfigUI;
 
-    onColorModeChanged: UIOptions["onColorModeChanged"];
+    onColorModeChanged: UIOptions['onColorModeChanged'];
 
     protected _options: UIOptions;
 
@@ -112,7 +114,9 @@ export class Application {
         if (isPanelEnabled(options.statsPanelConfig)) {
             // Add stats panel
             this.statsPanel = new StatsPanel();
-            this.uiFeaturesElement.appendChild(this.statsPanel.rootElement);
+            if (this.statsPanel) {
+                this.uiFeaturesElement.appendChild(this.statsPanel.rootElement);
+            }
         }
 
         if (isPanelEnabled(options.settingsPanelConfig)) {
@@ -122,10 +126,15 @@ export class Application {
             this.configureSettings();
         }
 
-        if (!options.videoQpIndicatorConfig || !options.videoQpIndicatorConfig.disableIndicator) {
+        if (
+            !options.videoQpIndicatorConfig ||
+            !options.videoQpIndicatorConfig.disableIndicator
+        ) {
             // Add the video stream QP indicator
             this.videoQpIndicator = new VideoQpIndicator();
-            this.uiFeaturesElement.appendChild(this.videoQpIndicator.rootElement);
+            this.uiFeaturesElement.appendChild(
+                this.videoQpIndicator.rootElement
+            );
         }
 
         this.createButtons();
@@ -145,18 +154,10 @@ export class Application {
         this.connectOverlay = new ConnectOverlay(
             this.stream.videoElementParent
         );
-        this.playOverlay = new PlayOverlay(
-            this.stream.videoElementParent
-        );
-        this.infoOverlay = new InfoOverlay(
-            this.stream.videoElementParent
-        );
-        this.errorOverlay = new ErrorOverlay(
-            this.stream.videoElementParent
-        );
-        this.afkOverlay = new AFKOverlay(
-            this.stream.videoElementParent
-        );
+        this.playOverlay = new PlayOverlay(this.stream.videoElementParent);
+        this.infoOverlay = new InfoOverlay(this.stream.videoElementParent);
+        this.errorOverlay = new ErrorOverlay(this.stream.videoElementParent);
+        this.afkOverlay = new AFKOverlay(this.stream.videoElementParent);
 
         this.disconnectOverlay.onAction(() => this.stream.reconnect());
 
@@ -180,7 +181,7 @@ export class Application {
                 : undefined,
             fullscreenButtonType: this._options.fullScreenControlsConfig,
             xrIconType: this._options.xrControlsConfig
-        }
+        };
         // Setup controls
         const controls = new Controls(controlsUIConfig);
         this.uiFeaturesElement.appendChild(controls.rootElement);
@@ -188,41 +189,55 @@ export class Application {
         // When we fullscreen we want this element to be the root
         const fullScreenButton: FullScreenIconBase | undefined =
             // Depending on if we're creating an internal button, or using an external one
-            (!!this._options.fullScreenControlsConfig
-                && this._options.fullScreenControlsConfig.creationMode === UIElementCreationMode.UseCustomElement)
-                // Either create a fullscreen class based on the external button
-                ? new FullScreenIconExternal(this._options.fullScreenControlsConfig.customElement)
-                // Or use the one created by the Controls initializer earlier
-                : controls.fullscreenIcon;
+            !!this._options.fullScreenControlsConfig &&
+            this._options.fullScreenControlsConfig.creationMode ===
+                UIElementCreationMode.UseCustomElement
+                ? // Either create a fullscreen class based on the external button
+                  new FullScreenIconExternal(
+                      this._options.fullScreenControlsConfig.customElement
+                  )
+                : // Or use the one created by the Controls initializer earlier
+                  controls.fullscreenIcon;
         if (fullScreenButton) {
-            fullScreenButton.fullscreenElement = /iPad|iPhone|iPod/.test(navigator.userAgent) ? this.stream.videoElementParent.getElementsByTagName("video")[0] : this.rootElement;
+            fullScreenButton.fullscreenElement = /iPad|iPhone|iPod/.test(
+                navigator.userAgent
+            )
+                ? this.stream.videoElementParent.getElementsByTagName(
+                      'video'
+                  )[0]
+                : this.rootElement;
         }
 
         // Add settings button to controls
-        const settingsButton: HTMLElement | undefined =
-            !!controls.settingsIcon ? controls.settingsIcon.rootElement :
-                this._options.settingsPanelConfig.visibilityButtonConfig.customElement;
-        if (!!settingsButton) settingsButton.onclick = () =>
-            this.settingsClicked();
-        if (!!this.settingsPanel) this.settingsPanel.settingsCloseButton.onclick = () =>
-            this.settingsClicked();
+        const settingsButton: HTMLElement | undefined = !!controls.settingsIcon
+            ? controls.settingsIcon.rootElement
+            : this._options.settingsPanelConfig.visibilityButtonConfig
+                  .customElement;
+        if (!!settingsButton)
+            settingsButton.onclick = () => this.settingsClicked();
+        if (!!this.settingsPanel)
+            this.settingsPanel.settingsCloseButton.onclick = () =>
+                this.settingsClicked();
 
         // Add WebXR button to controls
-        const xrButton: HTMLElement | undefined =
-            !!controls.xrIcon ? controls.xrIcon.rootElement :
-                this._options.xrControlsConfig.creationMode === UIElementCreationMode.UseCustomElement ?
-                    this._options.xrControlsConfig.customElement : undefined;
-        if (!!xrButton) xrButton.onclick = () =>
-            this.stream.toggleXR();
+        const xrButton: HTMLElement | undefined = !!controls.xrIcon
+            ? controls.xrIcon.rootElement
+            : this._options.xrControlsConfig.creationMode ===
+              UIElementCreationMode.UseCustomElement
+            ? this._options.xrControlsConfig.customElement
+            : undefined;
+        if (!!xrButton) xrButton.onclick = () => this.stream.toggleXR();
 
         // setup the stats/info button
-        const statsButton: HTMLElement | undefined =
-            !!controls.statsIcon ? controls.statsIcon.rootElement :
-                this._options.statsPanelConfig.visibilityButtonConfig.customElement;
-        if (!!statsButton) statsButton.onclick = () => this.statsClicked()
+        const statsButton: HTMLElement | undefined = !!controls.statsIcon
+            ? controls.statsIcon.rootElement
+            : this._options.statsPanelConfig.visibilityButtonConfig
+                  .customElement;
+        if (!!statsButton) statsButton.onclick = () => this.statsClicked();
 
         if (!!this.statsPanel) {
-            this.statsPanel.statsCloseButton.onclick = () => this.statsClicked();
+            this.statsPanel.statsCloseButton.onclick = () =>
+                this.statsClicked();
         }
 
         // Add command buttons (if we have somewhere to add them to)
@@ -293,9 +308,8 @@ export class Application {
             ({ data: { countDown } }) =>
                 this.afkOverlay.updateCountdown(countDown)
         );
-        this.stream.addEventListener(
-            'afkWarningDeactivate',
-            () => this.afkOverlay.hide()
+        this.stream.addEventListener('afkWarningDeactivate', () =>
+            this.afkOverlay.hide()
         );
         this.stream.addEventListener('afkTimedOut', () =>
             this.afkOverlay.hide()
@@ -304,9 +318,7 @@ export class Application {
             'videoEncoderAvgQP',
             ({ data: { avgQP } }) => this.onVideoEncoderAvgQP(avgQP)
         );
-        this.stream.addEventListener('webRtcSdp', () =>
-            this.onWebRtcSdp()
-        );
+        this.stream.addEventListener('webRtcSdp', () => this.onWebRtcSdp());
         this.stream.addEventListener('webRtcAutoConnect', () =>
             this.onWebRtcAutoConnect()
         );
@@ -334,9 +346,7 @@ export class Application {
             'playStreamError',
             ({ data: { message } }) => this.onPlayStreamError(message)
         );
-        this.stream.addEventListener('playStream', () =>
-            this.onPlayStream()
-        );
+        this.stream.addEventListener('playStream', () => this.onPlayStream());
         this.stream.addEventListener(
             'playStreamRejected',
             ({ data: { reason } }) => this.onPlayStreamRejected(reason)
@@ -359,16 +369,16 @@ export class Application {
         this.stream.addEventListener(
             'streamerListMessage',
             ({ data: { messageStreamerList, autoSelectedStreamerId } }) =>
-                this.handleStreamerListMessage(messageStreamerList, autoSelectedStreamerId)
+                this.handleStreamerListMessage(
+                    messageStreamerList,
+                    autoSelectedStreamerId
+                )
         );
-        this.stream.addEventListener(
-            'settingsChanged',
-            (event) => this.configUI.onSettingsChanged(event)
+        this.stream.addEventListener('settingsChanged', (event) =>
+            this.configUI.onSettingsChanged(event)
         );
-        this.stream.addEventListener(
-            'playerCount',
-            ({ data: { count } }) =>
-                this.onPlayerCount(count)
+        this.stream.addEventListener('playerCount', ({ data: { count } }) =>
+            this.onPlayerCount(count)
         );
     }
 
@@ -380,9 +390,7 @@ export class Application {
             this._rootElement = document.createElement('div');
             this._rootElement.id = 'playerUI';
             this._rootElement.classList.add('noselect');
-            this._rootElement.appendChild(
-                this.stream.videoElementParent
-            );
+            this._rootElement.appendChild(this.stream.videoElementParent);
             this._rootElement.appendChild(this.uiFeaturesElement);
         }
         return this._rootElement;
@@ -488,7 +496,7 @@ export class Application {
      */
     statsClicked() {
         this.settingsPanel?.hide();
-        this.statsPanel.toggleVisibility();
+        this.statsPanel?.toggleVisibility();
     }
 
     /**
@@ -574,10 +582,12 @@ export class Application {
                 `Disconnected: ${eventString}  <div class="clickableState">Click To Restart</div>`
             );
         }
-        // disable starting a latency check
-        this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
-            // do nothing
-        };
+        if (this.statsPanel) {
+            // disable starting a latency check
+            this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
+                // do nothing
+            };
+        }
     }
 
     /**
@@ -624,11 +634,12 @@ export class Application {
         if (!this.stream.config.isFlagEnabled(Flags.AutoPlayVideo)) {
             this.showPlayOverlay();
         }
-
-        // starting a latency check
-        this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
-            this.stream.requestLatencyTest();
-        };
+        if (this.statsPanel) {
+            // starting a latency check
+            this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
+                this.stream.requestLatencyTest();
+            };
+        }
     }
 
     /**
@@ -646,7 +657,7 @@ export class Application {
         if (settings.PixelStreamingSettings && !!this.statsPanel) {
             const disableLatencyTest =
                 settings.PixelStreamingSettings.DisableLatencyTest;
-            if (disableLatencyTest) {
+            if (disableLatencyTest && this.statsPanel) {
                 this.statsPanel.latencyTest.latencyTestButton.disabled = true;
                 this.statsPanel.latencyTest.latencyTestButton.title =
                     'Disabled by -PixelStreamingDisableLatencyTester=true';
@@ -671,7 +682,10 @@ export class Application {
         this.statsPanel?.handlePlayerCount(playerCount);
     }
 
-    handleStreamerListMessage(messageStreamingList: MessageStreamerList, autoSelectedStreamerId: string | null) {
+    handleStreamerListMessage(
+        messageStreamingList: MessageStreamerList,
+        autoSelectedStreamerId: string | null
+    ) {
         if (autoSelectedStreamerId === null) {
             if (messageStreamingList.ids.length === 0) {
                 this.showDisconnectOverlay(
