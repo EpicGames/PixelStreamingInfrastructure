@@ -805,8 +805,8 @@ export class PixelStreaming {
      * Public getter for the websocket controller. Access to this property allows you to send
      * custom websocket messages.
      */
-    public get webSocketController() {
-        return this._webRtcController.webSocketController;
+    public get signallingProtocol() {
+        return this._webRtcController.protocol;
     }
 
     /**
