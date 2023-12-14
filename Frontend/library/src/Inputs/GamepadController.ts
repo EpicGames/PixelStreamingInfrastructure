@@ -202,7 +202,8 @@ export class GamePadController {
                     } else {
                         toStreamerHandlers.get('GamepadButtonReleased')([
                             controllerIndex,
-                            i
+                            i,
+                            0
                         ]);
                     }
                 }
