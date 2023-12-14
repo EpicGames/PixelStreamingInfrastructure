@@ -8,7 +8,7 @@
     "sideEffects": false,
     "scripts": {
         "compile": "tsc --build --clean && tsc",
-        "build": "cd ../../common && npm run build && cd ../Frontend/library && npm link ../../common && npx webpack --config webpack.prod.js",
+        "build": "cd ../../Common && npm run build && cd ../Frontend/library && npm link ../../Common && npx webpack --config webpack.prod.js",
         "build-dev": "npx webpack --config webpack.dev.js",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "test": "jest --detectOpenHandles --coverage=true",
