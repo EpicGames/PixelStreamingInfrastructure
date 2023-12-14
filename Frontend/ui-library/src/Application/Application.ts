@@ -575,9 +575,11 @@ export class Application {
             );
         }
         // disable starting a latency check
-        this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
-            // do nothing
-        };
+        if (!!this.statsPanel) {
+            this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
+                // do nothing
+            };
+        }
     }
 
     /**
@@ -626,9 +628,11 @@ export class Application {
         }
 
         // starting a latency check
-        this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
-            this.stream.requestLatencyTest();
-        };
+        if (!!this.statsPanel) {
+            this.statsPanel.latencyTest.latencyTestButton.onclick = () => {
+                this.stream.requestLatencyTest();
+            };
+        }
     }
 
     /**
