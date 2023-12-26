@@ -23,7 +23,9 @@ To build and run the Angular application, run:
   "build-dev-all": "npm link ../../library && cd ../../library && npm run build-dev && cd ../implementations/angular && npm run build-dev"
   ```
   ( Alternative: Or you can add it directly in angular project: `npm install --save @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.2`)
+
 - In `tsconfig.json`'s compilerOptions, the option `"skipLibCheck": true` has been added to fix any typescript errors of type TS2416 ("Property 'X' in type 'X' is not assignable to the same property in base type 'X'") to be able to link external library `@epicgames-ps/lib-pixelstreamingfrontend-ue5.2` from parent folder `../../library`.
+
 - In `angular.json`'s `architect > serve`, the option below has been added to be able to use host `http://localhost` instead of default host and port `http://localhost:4200`
 
   ```json
@@ -32,7 +34,12 @@ To build and run the Angular application, run:
     "host": "localhost"
   },
   ```
-  - In `angular > src > app > pixel-streaming-wrapper`'s folder, a new component `PixelStreamingWrapperComponent` with an input data attribute `InitialSettings` has been generated to be able to implement PixelStreaming element.
+
+- In `angular/src/app/pixel-streaming-wrapper`'s folder, a new component `PixelStreamingWrapperComponent` with an input data attribute `InitialSettings` has been generated to be able to implement PixelStreaming element. See new content of `app.component.html` below:
   ```html
-  <app-pixel-streaming-wrapper [initialSettings]='initialSettings' />
+  <div style="height: 100% ; width: 100%">
+    <app-pixel-streaming-wrapper [initialSettings]='initialSettings' />
+  </div>
   ```
+  
+- In `angular/src/app/app.component.spec.ts`, assertion test `it(should have as title 'angular')` has been removed to fix error TS2339: Property 'title' does not exist on type 'AppComponent'.
