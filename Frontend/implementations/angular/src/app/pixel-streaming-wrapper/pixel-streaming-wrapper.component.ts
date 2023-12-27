@@ -22,7 +22,7 @@ export class PixelStreamingWrapperComponent implements OnInit {
   pixelStreaming: PixelStreaming | undefined = undefined;
   config: Config | undefined = undefined;
   // A boolean state variable that determines if the Click to play overlay is shown:
-  clickToPlayVisible: boolean = false;
+  clickToPlayVisible: boolean = true;
 
   constructor(
     private elementRef: ElementRef,
