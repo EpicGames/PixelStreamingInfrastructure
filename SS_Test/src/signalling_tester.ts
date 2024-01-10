@@ -35,6 +35,67 @@ type LogCallback = (connection: SignallingConnection, message: string) => void;
 type SuccessCallback = (connection: SignallingConnection) => void;
 type FailedCallback = (connection: SignallingConnection, unsatisfiedExpects: Expected[], unhandledEvents: Event[]) => void;
 
+export class TestContext {
+    private logCallback: LogCallback;
+    private _errors: string[];
+
+    constructor(logCallback: LogCallback) {
+        this.logCallback = logCallback;
+        this._errors = [];
+    }
+
+    newConnection(name: string, url: string) {
+        const connection = new SignallingConnection(name, url);
+        connection.setLogCallback(this.logCallback);
+        connection.setFailedCallback((connection: SignallingConnection, unsatisfiedExpects: Expected[], unhandledEvents: Event[]) => {
+            this.processFailed(connection, unsatisfiedExpects, unhandledEvents);
+        });
+        return connection;
+    }
+
+    async validatePhases<T>(phases: Promise<any>[]): Promise<boolean> {
+        this._errors = [];
+        await Promise.all(phases);
+        return this._errors.length == 0;
+    }
+
+    get errors(): string[] {
+        return this._errors;
+    }
+
+    private processFailed(
+        connection: SignallingConnection,
+        unsatisfiedExpects: Expected[],
+        unhandledEvents: Event[]
+    ): void {
+        const unsatisfiedMessages = unsatisfiedExpects.filter((expect) => expect.type == 'message') as ExpectedMessage[];
+        const unsatisfiedSocketEvents = unsatisfiedExpects.filter((expect) => expect.type == 'socket') as ExpectedEvent[];
+        const unhandledMessages = unhandledEvents.filter((event) => event.type == 'message') as MessageEvent[];
+        const unhandledSocketEvents = unhandledEvents.filter((event) => event.type == 'socket') as SocketEvent[];
+        const errors = unhandledEvents.filter((event) => event.type == 'error') as ErrorEvent[];
+
+        for (const expected of unsatisfiedMessages) {
+            this._errors.push(`Failed to receive expected message: ${expected.messageType}`);
+        }
+
+        for (const expected of unsatisfiedSocketEvents) {
+            this._errors.push(`Failed to receive expected socket event: ${expected.eventType}`);
+        }
+
+        for (const message of unhandledMessages) {
+            this._errors.push(`Got message that was not expected/handled:: ${message.message.type}`);
+        }
+
+        for (const message of unhandledSocketEvents) {
+            this._errors.push(`Event not handled:: ${message.eventType}`);
+        }
+
+        for (const error of errors) {
+            this._errors.push(error.message);
+        }
+    }
+}
+
 /**
  * A signalling connection object.
  * This is the main workhorse of the testing framework. Once you tell it where

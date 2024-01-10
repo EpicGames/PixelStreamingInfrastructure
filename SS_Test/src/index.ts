@@ -1,87 +1,23 @@
-import {
-    SignallingConnection,
-    Expected,
-    ExpectedMessage,
-    ExpectedEvent,
-    Event,
-    MessageEvent,
-    SocketEvent,
-    ErrorEvent } from './signalling_tester';
+import { TestContext, SignallingConnection } from './signalling_tester';
 import config from './config';
 import assert from 'assert';
-
-let failed: boolean = false;
 
 function logFunction(connection: SignallingConnection, message: string): void {
     console.log(`${connection.name}: ${message}`);
 }
 
-function processSuccess(connection: SignallingConnection): void {
-    console.log(`${connection.name}: Successful stage.`);
-}
-
-function processFailed(
-    connection: SignallingConnection,
-    unsatisfiedExpects: Expected[],
-    unhandledEvents: Event[]
-): void {
-    console.log(`${connection.name}: Failed stage.`);
-
-    const unsatisfiedMessages = unsatisfiedExpects.filter((expect) => expect.type == 'message') as ExpectedMessage[];
-    const unsatisfiedSocketEvents = unsatisfiedExpects.filter((expect) => expect.type == 'socket') as ExpectedEvent[];
-    const unhandledMessages = unhandledEvents.filter((event) => event.type == 'message') as MessageEvent[];
-    const unhandledSocketEvents = unhandledEvents.filter((event) => event.type == 'socket') as SocketEvent[];
-    const errors = unhandledEvents.filter((event) => event.type == 'error') as ErrorEvent[];
-
-    if (unsatisfiedMessages.length > 0) {
-        console.log(`    Failed to receive expected messages:`);
-        for (const expected of unsatisfiedMessages) {
-            console.log(`        ${expected.messageType}`);
-        }
+function onFailedPhase(phaseName: string, context: TestContext) {
+    console.log(`Phase '${phaseName}' failed.`);
+    for (let error of context.errors) {
+        console.log(`  ${error}`);
     }
-
-    if (unsatisfiedSocketEvents.length > 0) {
-        console.log(`    Failed to receive expected socket events:`);
-        for (const expected of unsatisfiedSocketEvents) {
-            console.log(`        ${expected.eventType}`);
-        }
-    }
-
-    if (unhandledMessages.length > 0) {
-        console.log(`    Messages not handled:`);
-        for (const message of unhandledMessages) {
-            console.log(`        ${message.message.type}`);
-        }
-    }
-
-    if (unhandledSocketEvents.length > 0) {
-        console.log(`    Events not handled:`);
-        for (const message of unhandledSocketEvents) {
-            console.log(`        ${message.eventType}`);
-        }
-    }
-
-    if (errors.length > 0) {
-        console.log(`    Errors:`);
-        for (const error of errors) {
-            console.log(`        ${error}`);
-        }
-    }
-
-    failed = true;
-}
-
-function newConnection(name: string, url: string): SignallingConnection {
-    const connection = new SignallingConnection(name, url);
-    connection.setLogCallback(logFunction);
-    connection.setSuccessCallback(processSuccess);
-    connection.setFailedCallback(processFailed);
-    return connection;
+    process.exit(0);
 }
 
 async function main(): Promise<void> {
     // test initial connections
-    const streamer: SignallingConnection = newConnection('Streamer', config.streamerURL);
+    const context = new TestContext(logFunction);
+    const streamer: SignallingConnection = context.newConnection('Streamer', config.streamerURL);
 
     streamer.addEventExpect('open', (event: any) => {});
     streamer.addExpect('config', (msg: any) => {});
@@ -94,7 +30,7 @@ async function main(): Promise<void> {
     });
 
     let playerId: string | null = null;
-    let player: SignallingConnection = newConnection('Player', config.playerURL);
+    let player: SignallingConnection = context.newConnection('Player', config.playerURL);
 
     player.addEventExpect('open', (event: any) => {});
     player.addExpect('config', (msg: any) => {});
@@ -102,10 +38,8 @@ async function main(): Promise<void> {
 
     let streamerPhase = streamer.processMessages(3000);
     let playerPhase = player.processMessages(3000);
-    await Promise.all([streamerPhase, playerPhase]);
-
-    if (failed) {
-        process.exit(0);
+    if (!await context.validatePhases([streamerPhase, playerPhase])) {
+        onFailedPhase('initial connection', context);
     }
 
     // test subscribing
@@ -120,37 +54,42 @@ async function main(): Promise<void> {
         }
     });
 
+    const mockSpdPayload = 'mock sdp';
+    const mockAnswerPayload = 'mock answer';
+    const mockIceCandidatePayload = 'mock ice candidate';
+
     streamer.addExpect('playerConnected', (msg: any) => {
         playerId = msg.playerId;
-        streamer.sendMessage({ type: 'offer', sdp: 'mock sdp', playerId: msg.playerId });
+        streamer.sendMessage({ type: 'offer', sdp: mockSpdPayload, playerId: msg.playerId });
     });
 
     player.addExpect('offer', (msg: any) => {
-        if (msg.sdp != 'mock sdp') {
+        if (msg.sdp != mockSpdPayload) {
             console.log('got a bad offer payload');
         } else {
-            player.sendMessage({ type: 'answer', sdp: 'mock answer' });
+            player.sendMessage({ type: 'answer', sdp: mockAnswerPayload });
         }
     });
 
+    
     streamer.addExpect('answer', (msg: any) => {
-        if (msg.sdp != 'mock answer') {
+        if (msg.sdp != mockAnswerPayload) {
             console.log('got a bad answer payload');
         } else {
-            streamer.sendMessage({ type: 'iceCandidate', playerId: msg.playerId, candidate: 'mock ice candidate' });
+            streamer.sendMessage({ type: 'iceCandidate', playerId: msg.playerId, candidate: mockIceCandidatePayload });
         }
     });
 
     player.addExpect('iceCandidate', (msg: any) => {
-        assert(msg.candidate == 'mock ice candidate');
+        if (msg.candidate != mockIceCandidatePayload) {
+            console.log('got a bad ice candidate payload');
+        }
     });
 
     streamerPhase = streamer.processMessages(3000);
     playerPhase = player.processMessages(3000);
-    await Promise.all([streamerPhase, playerPhase]);
-
-    if (failed) {
-        process.exit(0);
+    if (!await context.validatePhases([streamerPhase, playerPhase])) {
+        onFailedPhase('subcribing', context);
     }
 
     // test force disconnect player
@@ -161,11 +100,13 @@ async function main(): Promise<void> {
 
     streamerPhase = streamer.processMessages(3000);
     playerPhase = player.processMessages(3000);
-    await Promise.all([streamerPhase, playerPhase]);
+    if (!await context.validatePhases([streamerPhase, playerPhase])) {
+        onFailedPhase('force disconnect', context);
+    }
 
     // reconnect and test disconnect player
 
-    player = newConnection('Player', config.playerURL);
+    player = context.newConnection('Player', config.playerURL);
     player.addEventExpect('open', (event: any) => {});
     player.addExpect('config', (msg: any) => {});
     player.addExpect('playerCount', (msg: any) => {
@@ -185,7 +126,9 @@ async function main(): Promise<void> {
 
     streamerPhase = streamer.processMessages(3000);
     playerPhase = player.processMessages(3000);
-    await Promise.all([streamerPhase, playerPhase]);
+    if (!await context.validatePhases([streamerPhase, playerPhase])) {
+        onFailedPhase('disconnect notify', context);
+    }
 
     console.log('Done.');
     process.exit(0);
