@@ -1,4 +1,6 @@
 import WebSocket from 'ws';
+import * as MessageHelpers from './message_helpers';
+import { MessageType } from './typeRegistry';
 
 export interface ExpectedMessage {
     type: 'message';
@@ -14,7 +16,7 @@ export interface ExpectedEvent {
 
 export interface MessageEvent {
     type: 'message';
-    message: any;
+    message: MessageHelpers.BaseMessage;
 }
 
 export interface SocketEvent {
@@ -323,22 +325,12 @@ export class SignallingConnection {
         const messageString = event.data as string;
         this.logCallback(this, `Got message: ${JSON.stringify(event.data)}`);
 
-        var parsedMessage;
-        try {
-            parsedMessage = JSON.parse(messageString);
-        } catch (e) {
-            this.eventQueue.push({type: 'error', message: `Malformed JSON message. (${messageString})`});
-            return;
+        let protoMessage = MessageHelpers.getProtoMessage(messageString);
+        if (!protoMessage) {
+            this.eventQueue.push({type: 'error', message: `Could not parse message. (${messageString})`});
         }
-
-        if (!parsedMessage.type) {
-            this.eventQueue.push({type: 'error', message: `Message has no type. (${messageString})`});
-            return;
-        }
-
-        if (parsedMessage) {
-            this.eventQueue.push({type: 'message', message: parsedMessage});
-        }
+        this.logCallback(this, `Parsed message: ${protoMessage}`);
+        this.eventQueue.push({type: 'message', message: protoMessage!});
     }
 
     private async poll(resolve: () => void) {

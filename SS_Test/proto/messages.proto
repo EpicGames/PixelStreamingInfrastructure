@@ -109,7 +109,7 @@ message streamerDisconnected {
 
 message streamerList {
   string type = 1;
-  string ids = 2; // CHECK
+  repeated string ids = 2; // CHECK
 }
 
 message subscribe {

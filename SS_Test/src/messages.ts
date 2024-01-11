@@ -136,7 +136,7 @@ export interface streamerList {
   $type: "streamerList";
   type: string;
   /** CHECK */
-  ids: string;
+  ids: string[];
 }
 
 export interface subscribe {
@@ -1806,7 +1806,7 @@ export const streamerDisconnected = {
 messageTypeRegistry.set(streamerDisconnected.$type, streamerDisconnected);
 
 function createBasestreamerList(): streamerList {
-  return { $type: "streamerList", type: "", ids: "" };
+  return { $type: "streamerList", type: "", ids: [] };
 }
 
 export const streamerList = {
@@ -1816,8 +1816,8 @@ export const streamerList = {
     if (message.type !== "") {
       writer.uint32(10).string(message.type);
     }
-    if (message.ids !== "") {
-      writer.uint32(18).string(message.ids);
+    for (const v of message.ids) {
+      writer.uint32(18).string(v!);
     }
     return writer;
   },
@@ -1841,7 +1841,7 @@ export const streamerList = {
             break;
           }
 
-          message.ids = reader.string();
+          message.ids.push(reader.string());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1856,7 +1856,7 @@ export const streamerList = {
     return {
       $type: streamerList.$type,
       type: isSet(object.type) ? globalThis.String(object.type) : "",
-      ids: isSet(object.ids) ? globalThis.String(object.ids) : "",
+      ids: globalThis.Array.isArray(object?.ids) ? object.ids.map((e: any) => globalThis.String(e)) : [],
     };
   },
 
@@ -1865,7 +1865,7 @@ export const streamerList = {
     if (message.type !== "") {
       obj.type = message.type;
     }
-    if (message.ids !== "") {
+    if (message.ids?.length) {
       obj.ids = message.ids;
     }
     return obj;
@@ -1877,7 +1877,7 @@ export const streamerList = {
   fromPartial<I extends Exact<DeepPartial<streamerList>, I>>(object: I): streamerList {
     const message = createBasestreamerList();
     message.type = object.type ?? "";
-    message.ids = object.ids ?? "";
+    message.ids = object.ids?.map((e) => e) || [];
     return message;
   },
 };
