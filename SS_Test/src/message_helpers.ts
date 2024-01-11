@@ -9,16 +9,26 @@ export interface BaseMessage extends MessageType {
     type: string;
 }
 
-export function getProtoMessage<T extends BaseMessage>(jsonString: string): T | null {
+export function getProtoMessageFromString<T extends BaseMessage>(jsonString: string): T | null {
 	let parsed = JSON.parse(jsonString);
 	if (!parsed.type) {
 		return null;
 	}
+	return getProtoMessage(parsed);
+}
 
-	let messageType = messageTypeRegistry.get(parsed.type);
+export function getProtoMessage<T extends BaseMessage>(msg: any): T | null {
+	let messageType = messageTypeRegistry.get(msg.type);
 	if (!messageType) {
 		return null;
 	}
+	return messageType.fromJSON(msg) as T;
+}
 
-	return messageType.fromJSON(parsed) as T;
+export function protoToJSON(msg: any): unknown {
+	let messageType = messageTypeRegistry.get(msg.type);
+	if (!messageType) {
+		return null;
+	}
+	return messageType.toJSON(msg);
 }

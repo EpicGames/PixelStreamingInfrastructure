@@ -217,7 +217,11 @@ export class SignallingConnection {
      * @param message - The JSON object to send. It is stringified and sent on the connection.
      */
     sendMessage(message: any) {
-        const str = JSON.stringify(message);
+        let proto = MessageHelpers.protoToJSON(message);
+        if (!proto) {
+            return;
+        }
+        const str = JSON.stringify(proto);
         this.logCallback(this, `Sending: ${str}`);
         this.ws.send(str);
     }
@@ -325,11 +329,11 @@ export class SignallingConnection {
         const messageString = event.data as string;
         this.logCallback(this, `Got message: ${JSON.stringify(event.data)}`);
 
-        let protoMessage = MessageHelpers.getProtoMessage(messageString);
+        let protoMessage = MessageHelpers.getProtoMessageFromString(messageString);
         if (!protoMessage) {
             this.eventQueue.push({type: 'error', message: `Could not parse message. (${messageString})`});
         }
-        this.logCallback(this, `Parsed message: ${protoMessage}`);
+        console.log(JSON.stringify(protoMessage));
         this.eventQueue.push({type: 'message', message: protoMessage!});
     }
 
