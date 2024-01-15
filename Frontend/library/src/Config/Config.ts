@@ -156,10 +156,7 @@ export class Config {
     constructor(config: ConfigParams = {}) {
         const { initialSettings, useUrlParams } = config;
         this._useUrlParams = !!useUrlParams;
-        this.populateDefaultSettings(this._useUrlParams);
-        if (initialSettings) {
-            this.setSettings(initialSettings);
-        }
+        this.populateDefaultSettings(this._useUrlParams, initialSettings);
     }
 
     /**
@@ -173,7 +170,7 @@ export class Config {
     /**
      * Populate the default settings for a Pixel Streaming application
      */
-    private populateDefaultSettings(useUrlParams: boolean): void {
+    private populateDefaultSettings(useUrlParams: boolean, settings: Partial<AllSettings>): void {
         /**
          * Text Parameters
          */
@@ -184,13 +181,15 @@ export class Config {
                 TextParameters.SignallingServerUrl,
                 'Signalling url',
                 'Url of the signalling server',
-                (location.protocol === 'https:' ? 'wss://' : 'ws://') +
-                    window.location.hostname +
-                    // for readability, we omit the port if it's 80
-                    (window.location.port === '80' ||
-                    window.location.port === ''
-                        ? ''
-                        : `:${window.location.port}`),
+                settings && settings.hasOwnProperty(TextParameters.SignallingServerUrl) ? 
+                    settings[TextParameters.SignallingServerUrl] :
+                    (location.protocol === 'https:' ? 'wss://' : 'ws://') +
+                        window.location.hostname +
+                        // for readability, we omit the port if it's 80
+                        (window.location.port === '80' ||
+                        window.location.port === ''
+                            ? ''
+                            : `:${window.location.port}`),
                 useUrlParams
             )
         );
@@ -201,7 +200,9 @@ export class Config {
                 OptionParameters.StreamerId,
                 'Streamer ID',
                 'The ID of the streamer to stream.',
-                '',
+                settings && settings.hasOwnProperty(OptionParameters.StreamerId) ?
+                    settings[OptionParameters.StreamerId] :
+                    '',
                 [],
                 useUrlParams
             )
@@ -217,29 +218,31 @@ export class Config {
                 'Preferred Codec',
                 'The preferred codec to be used during codec negotiation',
                 'H264 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f',
-                (function (): Array<string> {
-                    const browserSupportedCodecs: Array<string> = [];
-                    // Try get the info needed from the RTCRtpReceiver. This is only available on chrome
-                    if (!RTCRtpReceiver.getCapabilities) {
-                        browserSupportedCodecs.push('Only available on Chrome');
-                        return browserSupportedCodecs;
-                    }
-
-                    const matcher = /(VP\d|H26\d|AV1).*/;
-                    const codecs =
-                        RTCRtpReceiver.getCapabilities('video').codecs;
-                    codecs.forEach((codec) => {
-                        const str =
-                            codec.mimeType.split('/')[1] +
-                            ' ' +
-                            (codec.sdpFmtpLine || '');
-                        const match = matcher.exec(str);
-                        if (match !== null) {
-                            browserSupportedCodecs.push(str);
+                settings && settings.hasOwnProperty(OptionParameters.PreferredCodec) ?
+                    [settings[OptionParameters.PreferredCodec]] :
+                    (function (): Array<string> {
+                        const browserSupportedCodecs: Array<string> = [];
+                        // Try get the info needed from the RTCRtpReceiver. This is only available on chrome
+                        if (!RTCRtpReceiver.getCapabilities) {
+                            browserSupportedCodecs.push('Only available on Chrome');
+                            return browserSupportedCodecs;
                         }
-                    });
-                    return browserSupportedCodecs;
-                })(),
+
+                        const matcher = /(VP\d|H26\d|AV1).*/;
+                        const codecs =
+                            RTCRtpReceiver.getCapabilities('video').codecs;
+                        codecs.forEach((codec) => {
+                            const str =
+                                codec.mimeType.split('/')[1] +
+                                ' ' +
+                                (codec.sdpFmtpLine || '');
+                            const match = matcher.exec(str);
+                            if (match !== null) {
+                                browserSupportedCodecs.push(str);
+                            }
+                        });
+                        return browserSupportedCodecs;
+                    })(),
                 useUrlParams
             )
         );	
@@ -254,7 +257,9 @@ export class Config {
                 Flags.AutoConnect,
                 'Auto connect to stream',
                 'Whether we should attempt to auto connect to the signalling server or show a click to start prompt.',
-                false,
+                settings && settings.hasOwnProperty(Flags.AutoConnect) ?
+                    settings[Flags.AutoConnect] :
+                    false,
                 useUrlParams
             )
         );
@@ -265,7 +270,9 @@ export class Config {
                 Flags.AutoPlayVideo,
                 'Auto play video',
                 'When video is ready automatically start playing it as opposed to showing a play button.',
-                true,
+                settings && settings.hasOwnProperty(Flags.AutoPlayVideo) ?
+                    settings[Flags.AutoPlayVideo] :
+                    true,
                 useUrlParams
             )
         );
@@ -276,7 +283,9 @@ export class Config {
                 Flags.BrowserSendOffer,
                 'Browser send offer',
                 'Browser will initiate the WebRTC handshake by sending the offer to the streamer',
-                false,
+                settings && settings.hasOwnProperty(Flags.BrowserSendOffer) ?
+                    settings[Flags.BrowserSendOffer] :
+                    false,
                 useUrlParams
             )
         );
@@ -287,7 +296,9 @@ export class Config {
                 Flags.UseMic,
                 'Use microphone',
                 'Make browser request microphone access and open an input audio track.',
-                false,
+                settings && settings.hasOwnProperty(Flags.UseMic) ?
+                    settings[Flags.UseMic] :
+                    false,
                 useUrlParams
             )
         );
@@ -298,7 +309,9 @@ export class Config {
                 Flags.StartVideoMuted,
                 'Start video muted',
                 'Video will start muted if true.',
-                false,
+                settings && settings.hasOwnProperty(Flags.StartVideoMuted) ?
+                    settings[Flags.StartVideoMuted] :
+                    false,
                 useUrlParams
             )
         );
@@ -309,7 +322,9 @@ export class Config {
                 Flags.SuppressBrowserKeys,
                 'Suppress browser keys',
                 'Suppress certain browser keys that we use in UE, for example F5 to show shader complexity instead of refresh the page.',
-                true,
+                settings && settings.hasOwnProperty(Flags.SuppressBrowserKeys) ?
+                    settings[Flags.SuppressBrowserKeys] :
+                    true,
                 useUrlParams
             )
         );
@@ -320,7 +335,9 @@ export class Config {
                 Flags.IsQualityController,
                 'Is quality controller?',
                 'True if this peer controls stream quality',
-                true,
+                settings && settings.hasOwnProperty(Flags.IsQualityController) ?
+                    settings[Flags.IsQualityController] :
+                    true,
                 useUrlParams
             )
         );
@@ -331,7 +348,9 @@ export class Config {
                 Flags.ForceMonoAudio,
                 'Force mono audio',
                 'Force browser to request mono audio in the SDP',
-                false,
+                settings && settings.hasOwnProperty(Flags.ForceMonoAudio) ?
+                    settings[Flags.ForceMonoAudio] :
+                    false,
                 useUrlParams
             )
         );
@@ -342,7 +361,9 @@ export class Config {
                 Flags.ForceTURN,
                 'Force TURN',
                 'Only generate TURN/Relayed ICE candidates.',
-                false,
+                settings && settings.hasOwnProperty(Flags.ForceTURN) ?
+                    settings[Flags.ForceTURN] :
+                    false,
                 useUrlParams
             )
         );
@@ -353,7 +374,9 @@ export class Config {
                 Flags.AFKDetection,
                 'AFK if idle',
                 'Timeout the experience if user is AFK for a period.',
-                false,
+                settings && settings.hasOwnProperty(Flags.AFKDetection) ?
+                    settings[Flags.AFKDetection] :
+                    false,
                 useUrlParams
             )
         );
@@ -364,7 +387,9 @@ export class Config {
                 Flags.MatchViewportResolution,
                 'Match viewport resolution',
                 'Pixel Streaming will be instructed to dynamically resize the video stream to match the size of the video element.',
-                false,
+                settings && settings.hasOwnProperty(Flags.MatchViewportResolution) ?
+                    settings[Flags.MatchViewportResolution] :
+                    false,
                 useUrlParams
             )
         );
@@ -375,7 +400,9 @@ export class Config {
                 Flags.HoveringMouseMode,
                 'Control Scheme: Locked Mouse',
                 'Either locked mouse, where the pointer is consumed by the video and locked to it, or hovering mouse, where the mouse is not consumed.',
-                false,
+                settings && settings.hasOwnProperty(Flags.HoveringMouseMode) ?
+                    settings[Flags.HoveringMouseMode] :
+                    false,
                 useUrlParams,
                 (isHoveringMouse: boolean, setting: SettingBase) => {
                     setting.label = `Control Scheme: ${isHoveringMouse ? 'Hovering' : 'Locked'} Mouse`;
@@ -389,7 +416,9 @@ export class Config {
                 Flags.FakeMouseWithTouches,
                 'Fake mouse with touches',
                 'A single finger touch is converted into a mouse event. This allows a non-touch application to be controlled partially via a touch device.',
-                false,
+                settings && settings.hasOwnProperty(Flags.FakeMouseWithTouches) ?
+                    settings[Flags.FakeMouseWithTouches] :
+                    true,
                 useUrlParams
             )
         );
@@ -400,7 +429,9 @@ export class Config {
                 Flags.KeyboardInput,
                 'Keyboard input',
                 'If enabled, send keyboard events to streamer',
-                true,
+                settings && settings.hasOwnProperty(Flags.KeyboardInput) ?
+                    settings[Flags.KeyboardInput] :
+                    true,
                 useUrlParams
             )
         );
@@ -411,7 +442,9 @@ export class Config {
                 Flags.MouseInput,
                 'Mouse input',
                 'If enabled, send mouse events to streamer',
-                true,
+                settings && settings.hasOwnProperty(Flags.MouseInput) ?
+                    settings[Flags.MouseInput] :
+                    true,
                 useUrlParams
             )
         );
@@ -422,7 +455,9 @@ export class Config {
                 Flags.TouchInput,
                 'Touch input',
                 'If enabled, send touch events to streamer',
-                true,
+                settings && settings.hasOwnProperty(Flags.TouchInput) ?
+                    settings[Flags.TouchInput] :
+                    true,
                 useUrlParams
             )
         );
@@ -433,7 +468,9 @@ export class Config {
                 Flags.GamepadInput,
                 'Gamepad input',
                 'If enabled, send gamepad events to streamer',
-                true,
+                settings && settings.hasOwnProperty(Flags.GamepadInput) ?
+                    settings[Flags.GamepadInput] :
+                    true,
                 useUrlParams
             )
         );
@@ -444,7 +481,9 @@ export class Config {
                 Flags.XRControllerInput,
                 'XR controller input',
                 'If enabled, send XR controller events to streamer',
-                true,
+                settings && settings.hasOwnProperty(Flags.XRControllerInput) ?
+                    settings[Flags.XRControllerInput] :
+                    true,
                 useUrlParams
             )
         );
@@ -455,7 +494,9 @@ export class Config {
                 Flags.WaitForStreamer,
                 'Wait for streamer',
                 'Will continue trying to connect to the first streamer available.',
-                true,
+                settings && settings.hasOwnProperty(Flags.WaitForStreamer) ?
+                    settings[Flags.WaitForStreamer] :
+                    true,
                 useUrlParams
             )
         );
@@ -472,7 +513,9 @@ export class Config {
                 'The time (in seconds) it takes for the application to time out if AFK timeout is enabled.',
                 0 /*min*/,
                 600 /*max*/,
-                120 /*value*/,
+                settings && settings.hasOwnProperty(NumericParameters.AFKTimeoutSecs) ?
+                    settings[NumericParameters.AFKTimeoutSecs] :
+                    120, /*value*/
                 useUrlParams
             )
         );
@@ -485,7 +528,9 @@ export class Config {
                 'Maximum number of reconnects the application will attempt when a streamer disconnects.',
                 0 /*min*/,
                 999 /*max*/,
-                3 /*value*/,
+                settings && settings.hasOwnProperty(NumericParameters.MaxReconnectAttempts) ?
+                    settings[NumericParameters.MaxReconnectAttempts] :
+                    3, /*value*/
                 useUrlParams
             )
         );
@@ -498,7 +543,9 @@ export class Config {
                 'The lower bound for the quantization parameter (QP) of the encoder. 0 = Best quality, 51 = worst quality.',
                 0 /*min*/,
                 51 /*max*/,
-                0 /*value*/,
+                settings && settings.hasOwnProperty(NumericParameters.MinQP) ?
+                    settings[NumericParameters.MinQP] :
+                    0, /*value*/
                 useUrlParams
             )
         );
@@ -511,7 +558,9 @@ export class Config {
                 'The upper bound for the quantization parameter (QP) of the encoder. 0 = Best quality, 51 = worst quality.',
                 0 /*min*/,
                 51 /*max*/,
-                51 /*value*/,
+                settings && settings.hasOwnProperty(NumericParameters.MaxQP) ?
+                    settings[NumericParameters.MaxQP] :
+                    51, /*value*/
                 useUrlParams
             )
         );
@@ -524,7 +573,9 @@ export class Config {
                 'The maximum FPS that WebRTC will try to transmit frames at.',
                 1 /*min*/,
                 999 /*max*/,
-                60 /*value*/,
+                settings && settings.hasOwnProperty(NumericParameters.WebRTCFPS) ?
+                    settings[NumericParameters.WebRTCFPS] :
+                    60, /*value*/
                 useUrlParams
             )
         );
@@ -537,7 +588,9 @@ export class Config {
                 'The minimum bitrate that WebRTC should use.',
                 0 /*min*/,
                 500000 /*max*/,
-                0 /*value*/,
+                settings && settings.hasOwnProperty(NumericParameters.WebRTCMinBitrate) ?
+                    settings[NumericParameters.WebRTCMinBitrate] :
+                    0, /*value*/
                 useUrlParams
             )
         );
@@ -550,7 +603,9 @@ export class Config {
                 'The maximum bitrate that WebRTC should use.',
                 0 /*min*/,
                 500000 /*max*/,
-                0 /*value*/,
+                settings && settings.hasOwnProperty(NumericParameters.WebRTCMaxBitrate) ?
+                    settings[NumericParameters.WebRTCMaxBitrate] :
+                    0, /*value*/
                 useUrlParams
             )
         );
@@ -563,7 +618,9 @@ export class Config {
                 'Delay between retries when waiting for an available streamer.',
                 500 /*min*/,
                 900000 /*max*/,
-                3000 /*value*/,
+                settings && settings.hasOwnProperty(NumericParameters.StreamerAutoJoinInterval) ?
+                    settings[NumericParameters.StreamerAutoJoinInterval] :
+                    3000, /*value*/
                 useUrlParams
             )
         );
@@ -768,24 +825,24 @@ export class Config {
         }
     }
 
-    /**
-     * Set a subset of all settings in one function call.
-     *
-     * @param settings A (partial) list of settings to set
-     */
-    setSettings(settings: Partial<AllSettings>) {
-        for (const key of Object.keys(settings)) {
-            if (isFlagId(key)) {
-                this.setFlagEnabled(key, settings[key]);
-            } else if (isNumericId(key)) {
-                this.setNumericSetting(key, settings[key]);
-            } else if (isTextId(key)) {
-                this.setTextSetting(key, settings[key]);
-            } else if (isOptionId(key)) {
-                this.setOptionSettingValue(key, settings[key]);
+        /**
+         * Set a subset of all settings in one function call.
+         *
+         * @param settings A (partial) list of settings to set
+         */
+        setSettings(settings: Partial<AllSettings>) {
+            for (const key of Object.keys(settings)) {
+                if (isFlagId(key)) {
+                    this.setFlagEnabled(key, settings[key]);
+                } else if (isNumericId(key)) {
+                    this.setNumericSetting(key, settings[key]);
+                } else if (isTextId(key)) {
+                    this.setTextSetting(key, settings[key]);
+                } else if (isOptionId(key)) {
+                    this.setOptionSettingValue(key, settings[key]);
+                }
             }
         }
-    }
 
     /**
      * Get all settings
