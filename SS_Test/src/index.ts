@@ -15,6 +15,7 @@ function onFailedPhase(phaseName: string, context: TestContext) {
 }
 
 async function main(): Promise<void> {
+
     // test initial connections
     const context = new TestContext(logFunction);
     const streamer: SignallingConnection = context.newConnection('Streamer', config.streamerURL);
@@ -89,7 +90,7 @@ async function main(): Promise<void> {
     streamerPhase = streamer.processMessages(3000);
     playerPhase = player.processMessages(3000);
     if (!await context.validatePhases([streamerPhase, playerPhase])) {
-        onFailedPhase('subcribing', context);
+        onFailedPhase('subscribing', context);
     }
 
     // test force disconnect player

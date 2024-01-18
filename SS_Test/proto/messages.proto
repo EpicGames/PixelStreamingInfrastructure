@@ -11,9 +11,12 @@ message answer {
   optional string playerId = 3;
 }
 
+message peer_connection_options {
+}
+
 message config {
   string type = 1;
-  string peerConnectionOptions = 2;
+  peer_connection_options peerConnectionOptions = 2;
 }
 
 message dataChannelRequest {

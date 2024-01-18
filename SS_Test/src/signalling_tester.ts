@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
-import * as MessageHelpers from './message_helpers';
-import { MessageType } from './typeRegistry';
+import { IMessageType } from "@protobuf-ts/runtime";
+import { messageTypeRegistry } from './message_type_registry';
 
 export interface ExpectedMessage {
     type: 'message';
@@ -16,7 +16,7 @@ export interface ExpectedEvent {
 
 export interface MessageEvent {
     type: 'message';
-    message: MessageHelpers.BaseMessage;
+    message: any;
 }
 
 export interface SocketEvent {
@@ -217,13 +217,12 @@ export class SignallingConnection {
      * @param message - The JSON object to send. It is stringified and sent on the connection.
      */
     sendMessage(message: any) {
-        let proto = MessageHelpers.protoToJSON(message);
-        if (!proto) {
+        if (!this.validateProtoMessage(message)) {
             return;
         }
-        const str = JSON.stringify(proto);
-        this.logCallback(this, `Sending: ${str}`);
-        this.ws.send(str);
+        const validatedMessageString = JSON.stringify(message);
+        this.logCallback(this, `Sending: ${validatedMessageString}`);
+        this.ws.send(validatedMessageString);
     }
 
     /**
@@ -327,14 +326,23 @@ export class SignallingConnection {
 
     private onMessage(event: WebSocket.MessageEvent) {
         const messageString = event.data as string;
-        this.logCallback(this, `Got message: ${JSON.stringify(event.data)}`);
+        this.logCallback(this, `Got message: ${messageString}`);
 
-        let protoMessage = MessageHelpers.getProtoMessageFromString(messageString);
-        if (!protoMessage) {
-            this.eventQueue.push({type: 'error', message: `Could not parse message. (${messageString})`});
+        let parsedMessage;
+        try {
+            parsedMessage = JSON.parse(messageString);
+        } catch (e) {
+            this.addError(`Error parsing message string ${messageString}. ${e}`);
+            return;
         }
-        console.log(JSON.stringify(protoMessage));
-        this.eventQueue.push({type: 'message', message: protoMessage!});
+
+        const messageType = this.validateProtoMessage(parsedMessage);
+        if (!messageType) {
+            return;
+        }
+
+        const validatedMessage = messageType.create(parsedMessage);
+        this.eventQueue.push({type: 'message', message: validatedMessage!});
     }
 
     private async poll(resolve: () => void) {
@@ -342,9 +350,6 @@ export class SignallingConnection {
         var expectingToRemove = [];
         for (var qi = 0; qi < this.eventQueue.length; ++qi) {
             if (this.eventQueue[qi].type == 'error') {
-                const errorEvent = this.eventQueue[qi] as ErrorEvent;
-                this.addError(errorEvent.message);
-                eventsToRemove.push(qi);
             }
             else if (this.eventQueue[qi].type == 'message') {
                 const messageEvent = this.eventQueue[qi] as MessageEvent;
@@ -389,5 +394,41 @@ export class SignallingConnection {
             }
             resolve();
         }
+    }
+
+    private validateProtoMessage(msg: any): IMessageType<any> | null {
+        let valid: boolean = true;
+
+        if (!msg.type) {
+            this.addError(`Parsed message has no type. ${JSON.stringify(msg)}`);
+            return null;
+        }
+
+        const messageType = messageTypeRegistry[msg.type];
+        if (!messageType) {
+            this.addError(`Message is of an unknown type: ${messageType}`);
+            return null;
+        }
+
+        if (messageType.fields) {
+            for (let field of messageType.fields) {
+                if (!field.opt) {
+                    if (!msg.hasOwnProperty(field.name)) {
+                        this.addError(`Message "${msg.type}"" is missing required field "${field.name}"`);
+                        valid = false;
+                    }
+                }
+            }
+        }
+
+        for (const fieldName in msg) {
+            const found = messageType.fields.find(field => field.name === fieldName);
+            if (!found) {
+                this.addError(`Message "${msg.type}" contains unknown field "${fieldName}"`);
+                valid = false;
+            }
+        }
+
+        return valid ? messageType : null;
     }
 }
