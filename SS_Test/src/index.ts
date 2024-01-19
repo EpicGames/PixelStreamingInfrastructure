@@ -1,6 +1,7 @@
 import { TestContext, SignallingConnection } from './signalling_tester';
 import config from './config';
 import assert from 'assert';
+import * as Messages from './messages';
 
 function logFunction(connection: SignallingConnection, message: string): void {
     console.log(`${connection.name}: ${message}`);
@@ -21,37 +22,29 @@ async function main(): Promise<void> {
     const streamer: SignallingConnection = context.newConnection('Streamer', config.streamerURL);
 
     streamer.addEventExpect('open', (event: any) => {});
-    streamer.addExpect('config', (msg: any) => {});
-    streamer.addExpect('identify', (msg: any) => {
-        const replyMessage = {
-            type: 'endpointId',
-            id: config.streamerId
-        };
-        streamer.sendMessage(replyMessage);
-    });
+    streamer.addExpect(Messages.config, (msg: Messages.config) => {});
+    streamer.addExpect(Messages.identify, (msg: Messages.identify) => streamer.sendMessage(Messages.endpointId, { id: config.streamerId }));
 
     let playerId: string | null = null;
     let player: SignallingConnection = context.newConnection('Player', config.playerURL);
 
     player.addEventExpect('open', (event: any) => {});
-    player.addExpect('config', (msg: any) => {});
-    player.addExpect('playerCount', (msg: any) => {});
+    player.addExpect(Messages.config, (msg: Messages.config) => {});
+    player.addExpect(Messages.playerCount, (msg: Messages.playerCount) => {});
 
-    let streamerPhase = streamer.processMessages(3000);
-    let playerPhase = player.processMessages(3000);
-    if (!await context.validatePhases([streamerPhase, playerPhase])) {
+    if (!await context.validateStep(3000, [streamer, player])) {
         onFailedPhase('initial connection', context);
     }
 
     // test subscribing
 
-    player.sendMessage({ type: 'listStreamers' });
+    player.sendMessage(Messages.listStreamers);
 
-    player.addExpect('streamerList', (msg: any) => {
+    player.addExpect(Messages.streamerList, (msg: Messages.streamerList) => {
         if (!msg.ids.includes(config.streamerId)) {
             console.log(`Streamer id ${config.streamerId} isnt included in streamer list.`);
         } else {
-            player.sendMessage({ type: 'subscribe', streamerId: config.streamerId });
+            player.sendMessage(Messages.subscribe, { streamerId: config.streamerId });
         }
     });
 
@@ -59,49 +52,49 @@ async function main(): Promise<void> {
     const mockAnswerPayload = 'mock answer';
     const mockIceCandidatePayload = 'mock ice candidate';
 
-    streamer.addExpect('playerConnected', (msg: any) => {
-        playerId = msg.playerId;
-        streamer.sendMessage({ type: 'offer', sdp: mockSpdPayload, playerId: msg.playerId });
+    streamer.addExpect(Messages.playerConnected, (msg: Messages.playerConnected) => {
+        if (!msg.playerId) {
+            console.log('expected player id');
+        } else {
+            playerId = msg.playerId;
+            streamer.sendMessage(Messages.offer, { sdp: mockSpdPayload, playerId: msg.playerId });
+        }
     });
 
-    player.addExpect('offer', (msg: any) => {
+    player.addExpect(Messages.offer, (msg: Messages.offer) => {
         if (msg.sdp != mockSpdPayload) {
             console.log('got a bad offer payload');
         } else {
-            player.sendMessage({ type: 'answer', sdp: mockAnswerPayload });
+            player.sendMessage(Messages.answer, { sdp: mockAnswerPayload });
         }
     });
 
     
-    streamer.addExpect('answer', (msg: any) => {
+    streamer.addExpect(Messages.answer, (msg: Messages.answer) => {
         if (msg.sdp != mockAnswerPayload) {
             console.log('got a bad answer payload');
         } else {
-            streamer.sendMessage({ type: 'iceCandidate', playerId: msg.playerId, candidate: mockIceCandidatePayload });
+            streamer.sendMessage(Messages.iceCandidate, { playerId: msg.playerId, candidate: mockIceCandidatePayload });
         }
     });
 
-    player.addExpect('iceCandidate', (msg: any) => {
+    player.addExpect(Messages.iceCandidate, (msg: Messages.iceCandidate) => {
         if (msg.candidate != mockIceCandidatePayload) {
             console.log('got a bad ice candidate payload');
         }
     });
 
-    streamerPhase = streamer.processMessages(3000);
-    playerPhase = player.processMessages(3000);
-    if (!await context.validatePhases([streamerPhase, playerPhase])) {
+    if (!await context.validateStep(3000, [streamer, player])) {
         onFailedPhase('subscribing', context);
     }
 
     // test force disconnect player
 
-    streamer.sendMessage({ type: 'disconnectPlayer', playerId: playerId });
+    streamer.sendMessage(Messages.disconnectPlayer, { playerId: playerId });
     player.addEventExpect('close', (event: any) => {});
-    streamer.addExpect('playerDisconnected', (msg: any) => {});
+    streamer.addExpect(Messages.playerDisconnected, (msg: Messages.playerDisconnected) => {});
 
-    streamerPhase = streamer.processMessages(3000);
-    playerPhase = player.processMessages(3000);
-    if (!await context.validatePhases([streamerPhase, playerPhase])) {
+    if (!await context.validateStep(3000, [streamer, player])) {
         onFailedPhase('force disconnect', context);
     }
 
@@ -109,25 +102,21 @@ async function main(): Promise<void> {
 
     player = context.newConnection('Player', config.playerURL);
     player.addEventExpect('open', (event: any) => {});
-    player.addExpect('config', (msg: any) => {});
-    player.addExpect('playerCount', (msg: any) => {
-        player.sendMessage({ type: 'listStreamers' });
+    player.addExpect(Messages.config, (msg: Messages.config) => {});
+    player.addExpect(Messages.playerCount, (msg: Messages.playerCount) => player.sendMessage(Messages.listStreamers));
+    player.addExpect(Messages.streamerList, (msg: Messages.streamerList) => player.sendMessage(Messages.subscribe, { streamerId: config.streamerId }));
+    streamer.addExpect(Messages.playerConnected, (msg: Messages.playerConnected) => {
+        if (!msg.playerId) {
+            console.log('expected player id');
+        } else {
+            playerId = msg.playerId;
+            streamer.sendMessage(Messages.offer, { sdp: 'mock sdp', playerId: msg.playerId });
+        }
     });
-    player.addExpect('streamerList', (msg: any) => {
-        player.sendMessage({ type: 'subscribe', streamerId: config.streamerId });
-    });
-    streamer.addExpect('playerConnected', (msg: any) => {
-        playerId = msg.playerId;
-        streamer.sendMessage({ type: 'offer', sdp: 'mock sdp', playerId: msg.playerId });
-    });
-    player.addExpect('offer', (msg: any) => {
-        player.close(1000, 'Done');
-    });
-    streamer.addExpect('playerDisconnected', (msg: any) => {});
+    player.addExpect(Messages.offer, (msg: Messages.offer) => player.close(1000, 'Done'));
+    streamer.addExpect(Messages.playerDisconnected, (msg: Messages.playerDisconnected) => {});
 
-    streamerPhase = streamer.processMessages(3000);
-    playerPhase = player.processMessages(3000);
-    if (!await context.validatePhases([streamerPhase, playerPhase])) {
+    if (!await context.validateStep(3000, [streamer, player])) {
         onFailedPhase('disconnect notify', context);
     }
 

@@ -1,7 +1,11 @@
 import { IMessageType } from "@protobuf-ts/runtime";
 import * as Messages from './messages';
 
-export const messageTypeRegistry: Record<string, IMessageType<any>> = {
+export interface BaseMessage {
+    type: string;
+} 
+
+export const messageTypeRegistry: Record<string, IMessageType<BaseMessage>> = {
     'answer': Messages.answer,
     'config': Messages.config,
     'dataChannelRequest': Messages.dataChannelRequest,
@@ -24,4 +28,13 @@ export const messageTypeRegistry: Record<string, IMessageType<any>> = {
     'streamerList': Messages.streamerList,
     'subscribe': Messages.subscribe,
     'unsubscribe': Messages.unsubscribe,
+}
+
+export function createMessage(messageType: IMessageType<BaseMessage>, params?: any) {
+    const message = messageType.create();
+    message.type = messageType.typeName;
+    if (params) {
+        messageType.mergePartial(message, params);
+    }
+    return message;
 }

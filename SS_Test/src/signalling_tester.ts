@@ -1,10 +1,10 @@
 import WebSocket from 'ws';
 import { IMessageType } from "@protobuf-ts/runtime";
-import { messageTypeRegistry } from './message_type_registry';
+import { BaseMessage, messageTypeRegistry, createMessage } from './message_helpers';
 
 export interface ExpectedMessage {
     type: 'message';
-    messageType: string;
+    messageType: IMessageType<BaseMessage>;
     handler: (message: any) => void;
 }
 
@@ -55,9 +55,13 @@ export class TestContext {
         return connection;
     }
 
-    async validatePhases<T>(phases: Promise<any>[]): Promise<boolean> {
+    async validateStep(timeout: number, connections: SignallingConnection[]): Promise<boolean> {
         this._errors = [];
-        await Promise.all(phases);
+        const promises: Promise<any>[] = [];
+        for (const connection of connections) {
+            promises.push(connection.processMessages(timeout));
+        }
+        await Promise.all(promises);
         return this._errors.length == 0;
     }
 
@@ -77,7 +81,7 @@ export class TestContext {
         const errors = unhandledEvents.filter((event) => event.type == 'error') as ErrorEvent[];
 
         for (const expected of unsatisfiedMessages) {
-            this._errors.push(`Failed to receive expected message: ${expected.messageType}`);
+            this._errors.push(`Failed to receive expected message: ${expected.messageType.typeName}`);
         }
 
         for (const expected of unsatisfiedSocketEvents) {
@@ -214,9 +218,11 @@ export class SignallingConnection {
 
     /**
      * Sends the given message to the connection immediately.
-     * @param message - The JSON object to send. It is stringified and sent on the connection.
+     * @param messageType - The type of the message to send.
+     * @param params - Extra parameters to set on the message.
      */
-    sendMessage(message: any) {
+    sendMessage(messageType: IMessageType<BaseMessage>, params?: any) {
+        const message = createMessage(messageType, params);
         if (!this.validateProtoMessage(message)) {
             return;
         }
@@ -253,7 +259,7 @@ export class SignallingConnection {
      * @param messageType - The message type we expect.
      * @param handler - The handler to call when we read the given message type.
      */
-    addExpect(messageType: string, handler: (message: any) => void) {
+    addExpect(messageType: IMessageType<BaseMessage>, handler: (message: any) => void) {
         this.expectingList.push({type: 'message', messageType: messageType, handler: handler});
     }
 
@@ -356,7 +362,7 @@ export class SignallingConnection {
                 for (var ei = 0; ei < this.expectingList.length; ++ei) {
                     const message = messageEvent.message;
                     const expected = this.expectingList[ei];
-                    if (expected.type == 'message' && expected.messageType == message.type) {
+                    if (expected.type == 'message' && expected.messageType.typeName === message.type) {
                         eventsToRemove.push(qi);
                         expectingToRemove.push(ei);
                         expected.handler(message);
@@ -400,13 +406,13 @@ export class SignallingConnection {
         let valid: boolean = true;
 
         if (!msg.type) {
-            this.addError(`Parsed message has no type. ${JSON.stringify(msg)}`);
+            this.addError(`Parsed message has no type. Rejected. ${JSON.stringify(msg)}`);
             return null;
         }
 
         const messageType = messageTypeRegistry[msg.type];
         if (!messageType) {
-            this.addError(`Message is of an unknown type: ${messageType}`);
+            this.addError(`Message is of an unknown type: "${messageType}". Rejected.`);
             return null;
         }
 
@@ -414,7 +420,7 @@ export class SignallingConnection {
             for (let field of messageType.fields) {
                 if (!field.opt) {
                     if (!msg.hasOwnProperty(field.name)) {
-                        this.addError(`Message "${msg.type}"" is missing required field "${field.name}"`);
+                        this.addError(`Message "${msg.type}"" is missing required field "${field.name}". Rejected.`);
                         valid = false;
                     }
                 }
@@ -424,7 +430,7 @@ export class SignallingConnection {
         for (const fieldName in msg) {
             const found = messageType.fields.find(field => field.name === fieldName);
             if (!found) {
-                this.addError(`Message "${msg.type}" contains unknown field "${fieldName}"`);
+                this.addError(`Message "${msg.type}" contains unknown field "${fieldName}". Rejected.`);
                 valid = false;
             }
         }
