@@ -5,7 +5,7 @@ import { BaseMessage, messageTypeRegistry, createMessage } from './message_helpe
 export interface ExpectedMessage {
     type: 'message';
     messageType: IMessageType<BaseMessage>;
-    handler: (message: any) => void;
+    handler: (message: any) => string | void;
 }
 
 export interface ExpectedEvent {
@@ -22,7 +22,7 @@ export interface MessageEvent {
 export interface SocketEvent {
     type: 'socket';
     eventType: string;
-    event: any;
+    event: WebSocket.Event;
 }
 
 export interface ErrorEvent {
@@ -365,7 +365,10 @@ export class SignallingConnection {
                     if (expected.type == 'message' && expected.messageType.typeName === message.type) {
                         eventsToRemove.push(qi);
                         expectingToRemove.push(ei);
-                        expected.handler(message);
+                        const result = expected.handler(message);
+                        if (result) {
+                            this.addError(`Handler for ${expected.messageType.typeName} returned an error: ${result}`);
+                        }
                     }
                 }
             }
