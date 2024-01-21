@@ -1,5 +1,5 @@
 import { IMessageType } from "@protobuf-ts/runtime";
-import * as Messages from './messages';
+import * as Messages from './signalling_messages';
 
 export interface BaseMessage {
     type: string;

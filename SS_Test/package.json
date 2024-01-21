@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf ./build && tsc",
-    "start": "npx protoc --ts_out src --proto_path proto proto/messages.proto && npm run build && node ./build/index.js",
-    "build_proto": "npx protoc --ts_out src --proto_path proto proto/messages.proto"
+    "start": "npx protoc --ts_out src --proto_path ../Common/protobuf ../Common/protobuf/signalling_messages.proto && npm run build && node ./build/index.js",
+    "build_proto": "npx protoc --ts_out src --proto_path ../Common/protobuf ../Common/protobuf/signalling_messages.proto"
   },
   "author": "",
   "license": "ISC",

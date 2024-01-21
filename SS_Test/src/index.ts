@@ -1,7 +1,7 @@
 import { TestContext, SignallingConnection } from './signalling_tester';
 import config from './config';
 import assert from 'assert';
-import * as Messages from './messages';
+import * as Messages from './signalling_messages';
 import WebSocket from 'ws';
 
 function logFunction(connection: SignallingConnection, message: string): void {
