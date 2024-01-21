@@ -16,6 +16,16 @@ function onFailedPhase(phaseName: string, context: TestContext) {
     process.exit(0);
 }
 
+function areObjectsEqual(obj1: any, obj2: any) {
+  const entries1 = Object.entries(obj1);
+  const entries2 = Object.entries(obj2);
+
+  return (
+    entries1.length === entries2.length &&
+    entries1.every(([key, value]) => obj2.hasOwnProperty(key) && obj2[key] === value)
+  );
+}
+
 async function main(): Promise<void> {
 
     // test initial connections
@@ -51,7 +61,7 @@ async function main(): Promise<void> {
 
     const mockSpdPayload = 'mock sdp';
     const mockAnswerPayload = 'mock answer';
-    const mockIceCandidatePayload = 'mock ice candidate';
+    const mockIceCandidatePayload = { candidate: 'candidate1', sdpMid: 'spd mid', sdpMLineIndex: 0, usernameFragment: "frag1" };
 
     streamer.addExpect(Messages.playerConnected, (msg: Messages.playerConnected) => {
         playerId = msg.playerId!;
@@ -66,7 +76,6 @@ async function main(): Promise<void> {
         }
     });
 
-    
     streamer.addExpect(Messages.answer, (msg: Messages.answer) => {
         if (msg.sdp != mockAnswerPayload) {
             return 'Answer SDP payload did not match.';
@@ -76,7 +85,7 @@ async function main(): Promise<void> {
     });
 
     player.addExpect(Messages.iceCandidate, (msg: Messages.iceCandidate) => {
-        if (msg.candidate != mockIceCandidatePayload) {
+        if (!areObjectsEqual(msg.candidate, mockIceCandidatePayload)) {
             return 'ICE candidate payload did not match.';
         }
     });

@@ -34,9 +34,16 @@ message endpointId {
   string id = 2;
 }
 
+message ice_candidate_data {
+  string candidate = 1;
+  string sdpMid = 2;
+  int32 sdpMLineIndex = 3;
+  optional string usernameFragment = 4;
+}
+
 message iceCandidate {
   string type = 1;
-  string candidate = 2;
+  ice_candidate_data candidate = 2;
   optional string playerId = 3;
 }
 

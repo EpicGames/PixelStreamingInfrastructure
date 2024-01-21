@@ -96,6 +96,27 @@ export interface endpointId {
     id: string;
 }
 /**
+ * @generated from protobuf message ice_candidate_data
+ */
+export interface ice_candidate_data {
+    /**
+     * @generated from protobuf field: string candidate = 1;
+     */
+    candidate: string;
+    /**
+     * @generated from protobuf field: string sdpMid = 2;
+     */
+    sdpMid: string;
+    /**
+     * @generated from protobuf field: int32 sdpMLineIndex = 3;
+     */
+    sdpMLineIndex: number;
+    /**
+     * @generated from protobuf field: optional string usernameFragment = 4;
+     */
+    usernameFragment?: string;
+}
+/**
  * @generated from protobuf message iceCandidate
  */
 export interface iceCandidate {
@@ -104,9 +125,9 @@ export interface iceCandidate {
      */
     type: string;
     /**
-     * @generated from protobuf field: string candidate = 2;
+     * @generated from protobuf field: ice_candidate_data candidate = 2;
      */
-    candidate: string;
+    candidate?: ice_candidate_data;
     /**
      * @generated from protobuf field: optional string playerId = 3;
      */
@@ -689,18 +710,87 @@ class endpointId$Type extends MessageType<endpointId> {
  */
 export const endpointId = new endpointId$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class ice_candidate_data$Type extends MessageType<ice_candidate_data> {
+    constructor() {
+        super("ice_candidate_data", [
+            { no: 1, name: "candidate", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "sdpMid", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "sdpMLineIndex", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "usernameFragment", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<ice_candidate_data>): ice_candidate_data {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.candidate = "";
+        message.sdpMid = "";
+        message.sdpMLineIndex = 0;
+        if (value !== undefined)
+            reflectionMergePartial<ice_candidate_data>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ice_candidate_data): ice_candidate_data {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string candidate */ 1:
+                    message.candidate = reader.string();
+                    break;
+                case /* string sdpMid */ 2:
+                    message.sdpMid = reader.string();
+                    break;
+                case /* int32 sdpMLineIndex */ 3:
+                    message.sdpMLineIndex = reader.int32();
+                    break;
+                case /* optional string usernameFragment */ 4:
+                    message.usernameFragment = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: ice_candidate_data, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string candidate = 1; */
+        if (message.candidate !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.candidate);
+        /* string sdpMid = 2; */
+        if (message.sdpMid !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.sdpMid);
+        /* int32 sdpMLineIndex = 3; */
+        if (message.sdpMLineIndex !== 0)
+            writer.tag(3, WireType.Varint).int32(message.sdpMLineIndex);
+        /* optional string usernameFragment = 4; */
+        if (message.usernameFragment !== undefined)
+            writer.tag(4, WireType.LengthDelimited).string(message.usernameFragment);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message ice_candidate_data
+ */
+export const ice_candidate_data = new ice_candidate_data$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class iceCandidate$Type extends MessageType<iceCandidate> {
     constructor() {
         super("iceCandidate", [
             { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "candidate", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "candidate", kind: "message", T: () => ice_candidate_data },
             { no: 3, name: "playerId", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<iceCandidate>): iceCandidate {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.type = "";
-        message.candidate = "";
         if (value !== undefined)
             reflectionMergePartial<iceCandidate>(this, message, value);
         return message;
@@ -713,8 +803,8 @@ class iceCandidate$Type extends MessageType<iceCandidate> {
                 case /* string type */ 1:
                     message.type = reader.string();
                     break;
-                case /* string candidate */ 2:
-                    message.candidate = reader.string();
+                case /* ice_candidate_data candidate */ 2:
+                    message.candidate = ice_candidate_data.internalBinaryRead(reader, reader.uint32(), options, message.candidate);
                     break;
                 case /* optional string playerId */ 3:
                     message.playerId = reader.string();
@@ -734,9 +824,9 @@ class iceCandidate$Type extends MessageType<iceCandidate> {
         /* string type = 1; */
         if (message.type !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.type);
-        /* string candidate = 2; */
-        if (message.candidate !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.candidate);
+        /* ice_candidate_data candidate = 2; */
+        if (message.candidate)
+            ice_candidate_data.internalBinaryWrite(message.candidate, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         /* optional string playerId = 3; */
         if (message.playerId !== undefined)
             writer.tag(3, WireType.LengthDelimited).string(message.playerId);

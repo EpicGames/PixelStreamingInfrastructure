@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf ./build && tsc",
-    "start": "npm run build && node ./build/index.js",
+    "start": "npx protoc --ts_out src --proto_path proto proto/messages.proto && npm run build && node ./build/index.js",
     "build_proto": "npx protoc --ts_out src --proto_path proto proto/messages.proto"
   },
   "author": "",
