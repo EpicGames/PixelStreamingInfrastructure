@@ -18,10 +18,10 @@ declare global {
 export class WebSocketTransport implements ITransport {
     WS_OPEN_STATE = 1;
     webSocket: WebSocket;
-    socketEvents: EventTarget;
+    events: EventTarget;
 
     constructor() {
-        this.socketEvents = new EventTarget();
+        this.events = new EventTarget();
     }
 
     sendMessage(msg: MessageSend): void {
@@ -128,7 +128,7 @@ export class WebSocketTransport implements ITransport {
             'Connected to the signalling server via WebSocket',
             6
         );
-        this.socketEvents.dispatchEvent(new Event('open'));
+        this.events.dispatchEvent(new Event('open'));
     }
 
     /**
@@ -137,7 +137,7 @@ export class WebSocketTransport implements ITransport {
      */
     handleOnError() {
         Logger.Error(Logger.GetStackTrace(), 'WebSocket error');
-        this.socketEvents.dispatchEvent(new Event('error'));
+        this.events.dispatchEvent(new Event('error'));
     }
 
     /**
@@ -152,7 +152,7 @@ export class WebSocketTransport implements ITransport {
                 ' - ' +
                 event.reason
         );
-        this.socketEvents.dispatchEvent(new CustomEvent('close', { 'detail': event }));
+        this.events.dispatchEvent(new CustomEvent('close', { 'detail': event }));
     }
 
 

@@ -2,7 +2,7 @@ import { MessageSend } from '../WebSockets/MessageSend';
 import { MessageRecv } from '../WebSockets/MessageReceive';
 
 export interface ITransport {
-    socketEvents: EventTarget;
+    events: EventTarget;
     sendMessage(msg: MessageSend): void;
     onMessage: (msg: MessageRecv) => void;
     connect(url: string): boolean;

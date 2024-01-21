@@ -18,13 +18,13 @@ export class SignallingProtocol {
         this.transport = transport;
         this.messageHandlers = new Map<string, (msg: MessageReceive.MessageRecv) => void>();
 
-        transport.socketEvents.addEventListener('open', () => {
+        transport.events.addEventListener('open', () => {
             this.transportEvents.dispatchEvent(new Event('open'));
         });
-        transport.socketEvents.addEventListener('error', () => {
+        transport.events.addEventListener('error', () => {
             this.transportEvents.dispatchEvent(new Event('error'));
         });
-        transport.socketEvents.addEventListener('close', (event: CloseEvent) => {
+        transport.events.addEventListener('close', (event: CloseEvent) => {
             this.transportEvents.dispatchEvent(new CustomEvent('close', { detail: event }));
         });
         transport.onMessage = (msg: MessageReceive.MessageRecv) => {
