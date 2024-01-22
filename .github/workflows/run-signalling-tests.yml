@@ -28,4 +28,7 @@ jobs:
       uses: isbang/compose-action@v1.5.1
       with:
         compose-file: "SS_Test/docker-compose.yml"
-        up-flags: "--build"
+        up-flags:
+          - "--build"
+          - "--abort-on-container-exit"
+          - "--exit-code-from tester"
