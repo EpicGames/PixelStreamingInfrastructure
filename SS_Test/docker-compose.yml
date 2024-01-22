@@ -1,0 +1,19 @@
+---
+version: "3.4"
+services:
+  signalling:
+    build:
+      context: ../
+      dockerfile: ./SignallingWebServer/Dockerfile
+    image: signalling
+    init: true
+    network_mode: "host"
+
+  tester:
+    build:
+      context: ../
+      dockerfile: ./SS_Test/Dockerfile
+    image: signalling_tester
+    network_mode: "host"
+    depends_on:
+      - signalling

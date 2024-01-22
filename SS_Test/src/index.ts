@@ -13,7 +13,7 @@ function onFailedPhase(phaseName: string, context: TestContext) {
     for (let error of context.errors) {
         console.log(`  ${error}`);
     }
-    process.exit(0);
+    process.exit(1);
 }
 
 function areObjectsEqual(obj1: any, obj2: any) {
