@@ -7,18 +7,6 @@ var loggers=[];
 var logFunctions=[];
 var logColorFunctions=[];
 
-console.log = function(msg, ...args) {
-	logFunctions.forEach((logFunction) => {
-		logFunction(msg, ...args);
-	});
-}
-
-console.logColor = function(color, msg, ...args) {
-	logColorFunctions.forEach((logColorFunction) => {
-		logColorFunction(color, msg, ...args);
-	});
-}
-
 const AllAttributesOff = '\x1b[0m';
 const BoldOn = '\x1b[1m';
 const Black = '\x1b[30m';
@@ -30,6 +18,30 @@ const Magenta = '\x1b[35m';
 const Cyan = '\x1b[36m';
 const White = '\x1b[37m';
 const Orange = '\x1b[38;5;215m';
+
+console.log = function(msg, ...args) {
+	logFunctions.forEach((logFunction) => {
+		logFunction(msg, ...args);
+	});
+}
+
+console.warn = function(msg, ...args) {
+	logColorFunctions.forEach((logColorFunction) => {
+		logColorFunction(Yellow, msg, ...args);
+	});
+}
+
+console.error = function(msg, ...args) {
+	logColorFunctions.forEach((logColorFunction) => {
+		logColorFunction(Red, msg, ...args);
+	});
+}
+
+console.logColor = function(color, msg, ...args) {
+	logColorFunctions.forEach((logColorFunction) => {
+		logColorFunction(color, msg, ...args);
+	});
+}
 
 /**
  * Pad the start of the given number with zeros so it takes up the number of digits.

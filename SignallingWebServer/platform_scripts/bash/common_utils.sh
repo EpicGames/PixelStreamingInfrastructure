@@ -79,6 +79,7 @@ function call_setup_sh() {
 }
 
 function start_process() {
+  export NO_SUDO=$NO_SUDO
 	if [ ! -z $NO_SUDO ]; then
 		log_msg "running with sudo removed"
 		eval $(echo "$@" | sed 's/sudo//g')
