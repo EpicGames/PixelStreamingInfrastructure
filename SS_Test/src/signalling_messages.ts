@@ -39,9 +39,9 @@ export interface answer {
     playerId?: string;
 }
 /**
- * @generated from protobuf message peer_connection_options
+ * @generated from protobuf message peerConnectionOptions
  */
-export interface peer_connection_options {
+export interface peerConnectionOptions {
 }
 /**
  * @generated from protobuf message config
@@ -52,9 +52,9 @@ export interface config {
      */
     type: string;
     /**
-     * @generated from protobuf field: peer_connection_options peerConnectionOptions = 2;
+     * @generated from protobuf field: peerConnectionOptions peerConnectionOptions = 2;
      */
-    peerConnectionOptions?: peer_connection_options;
+    peerConnectionOptions?: peerConnectionOptions;
 }
 /**
  * @generated from protobuf message dataChannelRequest
@@ -96,9 +96,9 @@ export interface endpointId {
     id: string;
 }
 /**
- * @generated from protobuf message ice_candidate_data
+ * @generated from protobuf message iceCandidateData
  */
-export interface ice_candidate_data {
+export interface iceCandidateData {
     /**
      * @generated from protobuf field: string candidate = 1;
      */
@@ -125,9 +125,9 @@ export interface iceCandidate {
      */
     type: string;
     /**
-     * @generated from protobuf field: ice_candidate_data candidate = 2;
+     * @generated from protobuf field: iceCandidateData candidate = 2;
      */
-    candidate?: ice_candidate_data;
+    candidate?: iceCandidateData;
     /**
      * @generated from protobuf field: optional string playerId = 3;
      */
@@ -467,20 +467,20 @@ class answer$Type extends MessageType<answer> {
  */
 export const answer = new answer$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class peer_connection_options$Type extends MessageType<peer_connection_options> {
+class peerConnectionOptions$Type extends MessageType<peerConnectionOptions> {
     constructor() {
-        super("peer_connection_options", []);
+        super("peerConnectionOptions", []);
     }
-    create(value?: PartialMessage<peer_connection_options>): peer_connection_options {
+    create(value?: PartialMessage<peerConnectionOptions>): peerConnectionOptions {
         const message = globalThis.Object.create((this.messagePrototype!));
         if (value !== undefined)
-            reflectionMergePartial<peer_connection_options>(this, message, value);
+            reflectionMergePartial<peerConnectionOptions>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: peer_connection_options): peer_connection_options {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: peerConnectionOptions): peerConnectionOptions {
         return target ?? this.create();
     }
-    internalBinaryWrite(message: peer_connection_options, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+    internalBinaryWrite(message: peerConnectionOptions, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -488,15 +488,15 @@ class peer_connection_options$Type extends MessageType<peer_connection_options> 
     }
 }
 /**
- * @generated MessageType for protobuf message peer_connection_options
+ * @generated MessageType for protobuf message peerConnectionOptions
  */
-export const peer_connection_options = new peer_connection_options$Type();
+export const peerConnectionOptions = new peerConnectionOptions$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class config$Type extends MessageType<config> {
     constructor() {
         super("config", [
             { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "peerConnectionOptions", kind: "message", T: () => peer_connection_options }
+            { no: 2, name: "peerConnectionOptions", kind: "message", T: () => peerConnectionOptions }
         ]);
     }
     create(value?: PartialMessage<config>): config {
@@ -514,8 +514,8 @@ class config$Type extends MessageType<config> {
                 case /* string type */ 1:
                     message.type = reader.string();
                     break;
-                case /* peer_connection_options peerConnectionOptions */ 2:
-                    message.peerConnectionOptions = peer_connection_options.internalBinaryRead(reader, reader.uint32(), options, message.peerConnectionOptions);
+                case /* peerConnectionOptions peerConnectionOptions */ 2:
+                    message.peerConnectionOptions = peerConnectionOptions.internalBinaryRead(reader, reader.uint32(), options, message.peerConnectionOptions);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -532,9 +532,9 @@ class config$Type extends MessageType<config> {
         /* string type = 1; */
         if (message.type !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.type);
-        /* peer_connection_options peerConnectionOptions = 2; */
+        /* peerConnectionOptions peerConnectionOptions = 2; */
         if (message.peerConnectionOptions)
-            peer_connection_options.internalBinaryWrite(message.peerConnectionOptions, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+            peerConnectionOptions.internalBinaryWrite(message.peerConnectionOptions, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -710,25 +710,25 @@ class endpointId$Type extends MessageType<endpointId> {
  */
 export const endpointId = new endpointId$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class ice_candidate_data$Type extends MessageType<ice_candidate_data> {
+class iceCandidateData$Type extends MessageType<iceCandidateData> {
     constructor() {
-        super("ice_candidate_data", [
+        super("iceCandidateData", [
             { no: 1, name: "candidate", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "sdpMid", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "sdpMLineIndex", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 4, name: "usernameFragment", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
-    create(value?: PartialMessage<ice_candidate_data>): ice_candidate_data {
+    create(value?: PartialMessage<iceCandidateData>): iceCandidateData {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.candidate = "";
         message.sdpMid = "";
         message.sdpMLineIndex = 0;
         if (value !== undefined)
-            reflectionMergePartial<ice_candidate_data>(this, message, value);
+            reflectionMergePartial<iceCandidateData>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ice_candidate_data): ice_candidate_data {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: iceCandidateData): iceCandidateData {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
@@ -756,7 +756,7 @@ class ice_candidate_data$Type extends MessageType<ice_candidate_data> {
         }
         return message;
     }
-    internalBinaryWrite(message: ice_candidate_data, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+    internalBinaryWrite(message: iceCandidateData, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* string candidate = 1; */
         if (message.candidate !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.candidate);
@@ -776,15 +776,15 @@ class ice_candidate_data$Type extends MessageType<ice_candidate_data> {
     }
 }
 /**
- * @generated MessageType for protobuf message ice_candidate_data
+ * @generated MessageType for protobuf message iceCandidateData
  */
-export const ice_candidate_data = new ice_candidate_data$Type();
+export const iceCandidateData = new iceCandidateData$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class iceCandidate$Type extends MessageType<iceCandidate> {
     constructor() {
         super("iceCandidate", [
             { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "candidate", kind: "message", T: () => ice_candidate_data },
+            { no: 2, name: "candidate", kind: "message", T: () => iceCandidateData },
             { no: 3, name: "playerId", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
@@ -803,8 +803,8 @@ class iceCandidate$Type extends MessageType<iceCandidate> {
                 case /* string type */ 1:
                     message.type = reader.string();
                     break;
-                case /* ice_candidate_data candidate */ 2:
-                    message.candidate = ice_candidate_data.internalBinaryRead(reader, reader.uint32(), options, message.candidate);
+                case /* iceCandidateData candidate */ 2:
+                    message.candidate = iceCandidateData.internalBinaryRead(reader, reader.uint32(), options, message.candidate);
                     break;
                 case /* optional string playerId */ 3:
                     message.playerId = reader.string();
@@ -824,9 +824,9 @@ class iceCandidate$Type extends MessageType<iceCandidate> {
         /* string type = 1; */
         if (message.type !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.type);
-        /* ice_candidate_data candidate = 2; */
+        /* iceCandidateData candidate = 2; */
         if (message.candidate)
-            ice_candidate_data.internalBinaryWrite(message.candidate, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+            iceCandidateData.internalBinaryWrite(message.candidate, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         /* optional string playerId = 3; */
         if (message.playerId !== undefined)
             writer.tag(3, WireType.LengthDelimited).string(message.playerId);

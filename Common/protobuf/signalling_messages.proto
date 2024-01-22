@@ -11,12 +11,12 @@ message answer {
   optional string playerId = 3;
 }
 
-message peer_connection_options {
+message peerConnectionOptions {
 }
 
 message config {
   string type = 1;
-  peer_connection_options peerConnectionOptions = 2;
+  peerConnectionOptions peerConnectionOptions = 2;
 }
 
 message dataChannelRequest {
@@ -34,7 +34,7 @@ message endpointId {
   string id = 2;
 }
 
-message ice_candidate_data {
+message iceCandidateData {
   string candidate = 1;
   string sdpMid = 2;
   int32 sdpMLineIndex = 3;
@@ -43,7 +43,7 @@ message ice_candidate_data {
 
 message iceCandidate {
   string type = 1;
-  ice_candidate_data candidate = 2;
+  iceCandidateData candidate = 2;
   optional string playerId = 3;
 }
 
