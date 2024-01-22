@@ -150,16 +150,21 @@ export class KeyboardController {
      * Registers document keyboard events with the controller
      */
     registerKeyBoardEvents() {
+        const compositionEndHandler = (ev: CompositionEvent) => this.handleOnCompositionEnd(ev);
         const keyDownHandler = (ev: KeyboardEvent) => this.handleOnKeyDown(ev);
         const keyUpHandler = (ev: KeyboardEvent) => this.handleOnKeyUp(ev);
         const keyPressHandler = (ev: KeyboardEvent) => this.handleOnKeyPress(ev);
 
+        document.addEventListener("compositionend", compositionEndHandler);
         document.addEventListener("keydown", keyDownHandler);
         document.addEventListener("keyup", keyUpHandler);
 
         //This has been deprecated as at Jun 13 2021
         document.addEventListener("keypress", keyPressHandler);
 
+        this.keyboardEventListenerTracker.addUnregisterCallback(
+            () => document.removeEventListener("compositionend", compositionEndHandler)
+        );
         this.keyboardEventListenerTracker.addUnregisterCallback(
             () => document.removeEventListener("keydown", keyDownHandler)
         );
@@ -184,7 +189,7 @@ export class KeyboardController {
      */
     handleOnKeyDown(keyboardEvent: KeyboardEvent) {
         const keyCode = this.getKeycode(keyboardEvent);
-        if (!keyCode) {
+        if (!keyCode || keyCode === 229) {
             return;
         }
 
@@ -261,6 +266,37 @@ export class KeyboardController {
         const toStreamerHandlers =
             this.toStreamerMessagesProvider.toStreamerHandlers;
         toStreamerHandlers.get('KeyPress')([charCode]);
+    }
+
+    /**
+     * Handle whenever composition ends (eg chinese simplified)
+     * @param compositionEvent - the composition event
+     */
+    handleOnCompositionEnd(compositionEvent: CompositionEvent) {
+        if (compositionEvent.data && compositionEvent.data.length) {
+            compositionEvent.data.split('').forEach((char) => {
+                // This keydown, keypress, keyup flow is required to mimic the way characters are 
+                // normally triggered
+                this.handleOnKeyDown(
+                    new KeyboardEvent('keydown', {
+                        keyCode: char.toUpperCase().charCodeAt(0),
+                        charCode: char.charCodeAt(0)
+                    })
+                );
+                this.handleOnKeyPress(
+                    new KeyboardEvent('keypress', {
+                        keyCode: char.toUpperCase().charCodeAt(0),
+                        charCode: char.charCodeAt(0)
+                    })
+                );
+                this.handleOnKeyUp(
+                    new KeyboardEvent('keyup', {
+                        keyCode: char.toUpperCase().charCodeAt(0),
+                        charCode: char.charCodeAt(0)
+                    })
+                );
+            });
+        }
     }
 
     /**
