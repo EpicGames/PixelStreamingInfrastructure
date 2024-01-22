@@ -25,7 +25,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: "Docker compose"
-      uses: actions/compose-action@v1.5.1
+      uses: isbang/compose-action@v1.5.1
       with:
         compose-file: "SS_Test/docker-compose.yml"
         up-flags: "--build"
