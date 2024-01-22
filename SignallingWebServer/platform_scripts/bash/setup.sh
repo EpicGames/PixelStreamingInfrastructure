@@ -3,6 +3,8 @@
 BASH_LOCATION="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
 NODE_VERSION=v18.17.0
 
+set -e
+
 pushd "${BASH_LOCATION}" > /dev/null
 
 source common_utils.sh
