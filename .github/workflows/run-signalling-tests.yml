@@ -1,0 +1,41 @@
+name: Run signalling tests
+
+on: 
+  push:
+    branches: ['signalling_tester']
+    paths: ['SignallingWebServer/**']
+  pull_request:
+    branches: ['signalling_tester']
+    paths: ['SS_Test/**']
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: "Checkout source code"
+      uses: actions/checkout@v3
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Run signalling server
+      working-directory: ./SignallingWebServer
+      run: ./platform_scripts/bash/run_local.sh &
+
+    - name: Install library deps
+      working-directory: ./SS_Test
+      run: npm ci
+
+    - name: Run frontend lib tests
+      working-directory: ./SS_Test
+      run: npm run start
