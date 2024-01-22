@@ -29,6 +29,10 @@ jobs:
         node-version: '18.x'
         registry-url: 'https://registry.npmjs.org'
 
+    - name: Setup signalling server
+      working-directory: ./SignallingWebServer
+      run: ./platform_scripts/bash/setup.sh
+
     - name: Run signalling server
       working-directory: ./SignallingWebServer
       run: ./platform_scripts/bash/run_local.sh &
