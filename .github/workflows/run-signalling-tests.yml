@@ -1,11 +1,12 @@
 name: Run signalling tests
 
-on: 
+on:
+  workflow_dispatch:
   push:
-    branches: ['master']
+    branches: ['signalling_tester']
     paths: ['SignallingWebServer/**']
   pull_request:
-    branches: ['master']
+    branches: ['signalling_tester']
     paths: ['SS_Test/**']
 
 jobs:
