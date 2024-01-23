@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
   push:
     branches: ['signalling_tester']
-    paths: ['SignallingWebServer/**']
+    paths: ['Common/**', 'SignallingWebServer/**', 'SS_Test/**']
   pull_request:
     branches: ['signalling_tester']
-    paths: ['SS_Test/**']
+    paths: ['Common/**', 'SignallingWebServer/**', 'SS_Test/**']
 
 jobs:
 

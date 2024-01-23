@@ -8,6 +8,13 @@ services:
     image: signalling
     init: true
     network_mode: "host"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:80"]
+        interval: 10s
+        timeout: 5s
+        retries: 3
+        start_period: 30s
+        start_interval: 5s # only supported on docker engine 25+
 
   tester:
     build:
@@ -16,4 +23,7 @@ services:
     image: signalling_tester
     network_mode: "host"
     depends_on:
-      - signalling
+      signalling:
+        condition: service_healthy
+
+
