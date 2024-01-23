@@ -31,6 +31,10 @@ jobs:
       working-directory: ./Frontend/library
       run: npm ci
 
+    - name: Link common library
+      working-directory: ./Frontend/library
+      run: npm link ../../Common
+
     - name: Run frontend lib tests
       working-directory: ./Frontend/library
       run: npm run test
