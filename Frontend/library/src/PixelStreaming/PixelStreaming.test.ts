@@ -6,7 +6,7 @@ import {
 import { PixelStreaming } from './PixelStreaming';
 import { SettingsChangedEvent, StreamerListMessageEvent, WebRtcConnectedEvent, WebRtcSdpEvent } from '../Util/EventEmitter';
 import { mockWebSocket, MockWebSocketSpyFunctions, MockWebSocketTriggerFunctions, unmockWebSocket } from '../__test__/mockWebSocket';
-import { MessageRecvTypes } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.4';
+import { MessageReceive } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.4';
 import { mockRTCPeerConnection, MockRTCPeerConnectionSpyFunctions, MockRTCPeerConnectionTriggerFunctions, unmockRTCPeerConnection } from '../__test__/mockRTCPeerConnection';
 import { mockHTMLMediaElement, mockMediaStream, unmockMediaStream } from '../__test__/mockMediaStream';
 import { InitialSettings } from '../DataChannel/InitialSettings';
@@ -34,22 +34,22 @@ describe('PixelStreaming', () => {
         webSocketTriggerFunctions.triggerOnOpen?.();
     const triggerConfigMessage = () =>
         webSocketTriggerFunctions.triggerOnMessage?.({
-            type: MessageRecvTypes.CONFIG,
+            type: MessageReceive.MessageRecvTypes.CONFIG,
             peerConnectionOptions: {}
         });
     const triggerStreamerListMessage = (streamerIdList: string[]) =>
         webSocketTriggerFunctions.triggerOnMessage?.({
-            type: MessageRecvTypes.STREAMER_LIST,
+            type: MessageReceive.MessageRecvTypes.STREAMER_LIST,
             ids: streamerIdList
         });
     const triggerSdpOfferMessage = () =>
         webSocketTriggerFunctions.triggerOnMessage?.({
-            type: MessageRecvTypes.OFFER,
+            type: MessageReceive.MessageRecvTypes.OFFER,
             sdp
         });
     const triggerIceCandidateMessage = () =>
         webSocketTriggerFunctions.triggerOnMessage?.({
-            type: MessageRecvTypes.ICE_CANDIDATE,
+            type: MessageReceive.MessageRecvTypes.ICE_CANDIDATE,
             candidate: iceCandidate
         });
     const triggerIceConnectionState = (state: RTCIceConnectionState) =>
@@ -276,7 +276,7 @@ describe('PixelStreaming', () => {
         
         expect(streamerListSpy).toHaveBeenCalledWith(new StreamerListMessageEvent({
             messageStreamerList: expect.objectContaining({
-                type: MessageRecvTypes.STREAMER_LIST,
+                type: MessageReceive.MessageRecvTypes.STREAMER_LIST,
                 ids: streamerIdList
             }),
             autoSelectedStreamerId: streamerId,
@@ -301,7 +301,7 @@ describe('PixelStreaming', () => {
         
         expect(streamerListSpy).toHaveBeenCalledWith(new StreamerListMessageEvent({
             messageStreamerList: expect.objectContaining({
-                type: MessageRecvTypes.STREAMER_LIST,
+                type: MessageReceive.MessageRecvTypes.STREAMER_LIST,
                 ids: extendedStreamerIdList
             }),
             autoSelectedStreamerId: null,
