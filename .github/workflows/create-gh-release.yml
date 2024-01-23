@@ -28,9 +28,21 @@ jobs:
         node-version: '16.x'
         registry-url: 'https://registry.npmjs.org'
 
+    - name: Install common library deps
+      working-directory: ./Common
+      run: npm ci
+
+    - name: Build common library
+      working-directory: ./Common
+      run: npm run build
+
     - name: Install library deps
       working-directory: ./Frontend/library
       run: npm ci
+
+    - name: NPM link common lib into library
+      working-directory: ./Frontend/library
+      run: npm link ../../Common
 
     - name: Build frontend lib
       working-directory: ./Frontend/library
