@@ -106,4 +106,4 @@ This repository contains the following in branches that track Unreal Engine vers
 | Unsupported | We will not be supporting this version with bugfixes. |
 
 ## Legal
-© 2004-2023, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere. 
+© 2004-2024, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere. 
