@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: ['signalling_tester']
-    paths: ['SignallingWebServer/**']
+    paths: ['SS_Test/**']
   pull_request:
     branches: ['signalling_tester']
     paths: ['SS_Test/**']
