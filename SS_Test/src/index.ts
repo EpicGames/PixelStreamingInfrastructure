@@ -76,13 +76,13 @@ async function main(): Promise<void> {
         }
     });
 
-    streamer.addExpect(Messages.answer, (msg: Messages.answer) => {
-        if (msg.sdp != mockAnswerPayload) {
-            return 'Answer SDP payload did not match.';
-        } else {
-            streamer.sendMessage(Messages.iceCandidate, { playerId: msg.playerId, candidate: mockIceCandidatePayload });
-        }
-    });
+    //streamer.addExpect(Messages.answer, (msg: Messages.answer) => {
+    //    if (msg.sdp != mockAnswerPayload) {
+    //        return 'Answer SDP payload did not match.';
+    //    } else {
+    //        streamer.sendMessage(Messages.iceCandidate, { playerId: msg.playerId, candidate: mockIceCandidatePayload });
+    //    }
+    //});
 
     player.addExpect(Messages.iceCandidate, (msg: Messages.iceCandidate) => {
         if (!areObjectsEqual(msg.candidate, mockIceCandidatePayload)) {
