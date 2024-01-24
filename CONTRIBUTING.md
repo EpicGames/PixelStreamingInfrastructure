@@ -65,4 +65,4 @@ Documentation should be broken up into separate `.md` files per directory, ideal
 
 ## Legal
 
-© 2004-2023, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere.
+© 2004-2024, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere.
