@@ -17,6 +17,7 @@ message peerConnectionOptions {
 message config {
   string type = 1;
   peerConnectionOptions peerConnectionOptions = 2;
+  optional string protocolVersion = 3;
 }
 
 message dataChannelRequest {

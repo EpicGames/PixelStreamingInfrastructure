@@ -55,6 +55,10 @@ export interface config {
      * @generated from protobuf field: peerConnectionOptions peerConnectionOptions = 2;
      */
     peerConnectionOptions?: peerConnectionOptions;
+    /**
+     * @generated from protobuf field: optional string protocolVersion = 3;
+     */
+    protocolVersion?: string;
 }
 /**
  * @generated from protobuf message dataChannelRequest
@@ -496,7 +500,8 @@ class config$Type extends MessageType<config> {
     constructor() {
         super("config", [
             { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "peerConnectionOptions", kind: "message", T: () => peerConnectionOptions }
+            { no: 2, name: "peerConnectionOptions", kind: "message", T: () => peerConnectionOptions },
+            { no: 3, name: "protocolVersion", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<config>): config {
@@ -517,6 +522,9 @@ class config$Type extends MessageType<config> {
                 case /* peerConnectionOptions peerConnectionOptions */ 2:
                     message.peerConnectionOptions = peerConnectionOptions.internalBinaryRead(reader, reader.uint32(), options, message.peerConnectionOptions);
                     break;
+                case /* optional string protocolVersion */ 3:
+                    message.protocolVersion = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -535,6 +543,9 @@ class config$Type extends MessageType<config> {
         /* peerConnectionOptions peerConnectionOptions = 2; */
         if (message.peerConnectionOptions)
             peerConnectionOptions.internalBinaryWrite(message.peerConnectionOptions, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* optional string protocolVersion = 3; */
+        if (message.protocolVersion !== undefined)
+            writer.tag(3, WireType.LengthDelimited).string(message.protocolVersion);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
