@@ -33,6 +33,7 @@ message disconnectPlayer {
 message endpointId {
   string type = 1;
   string id = 2;
+  optional string protocolVersion = 3;
 }
 
 message iceCandidateData {

@@ -98,6 +98,10 @@ export interface endpointId {
      * @generated from protobuf field: string id = 2;
      */
     id: string;
+    /**
+     * @generated from protobuf field: optional string protocolVersion = 3;
+     */
+    protocolVersion?: string;
 }
 /**
  * @generated from protobuf message iceCandidateData
@@ -670,7 +674,8 @@ class endpointId$Type extends MessageType<endpointId> {
     constructor() {
         super("endpointId", [
             { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 2, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "protocolVersion", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<endpointId>): endpointId {
@@ -692,6 +697,9 @@ class endpointId$Type extends MessageType<endpointId> {
                 case /* string id */ 2:
                     message.id = reader.string();
                     break;
+                case /* optional string protocolVersion */ 3:
+                    message.protocolVersion = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -710,6 +718,9 @@ class endpointId$Type extends MessageType<endpointId> {
         /* string id = 2; */
         if (message.id !== "")
             writer.tag(2, WireType.LengthDelimited).string(message.id);
+        /* optional string protocolVersion = 3; */
+        if (message.protocolVersion !== undefined)
+            writer.tag(3, WireType.LengthDelimited).string(message.protocolVersion);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
