@@ -18,4 +18,4 @@ An `ITransport` implementation that sends signalling messages over a websocket. 
 This is the object where the user should send/receive messages. Currently there are specific functions for specific messages sent, but in the future this should change to be more generic. You can specify your own transport protocol by passing an implementation of `ITransport` to this class, allowing you to send and receive messages through any protocol you wish.
 
 ### Adding it to your project
-`npm i @epicgames-ps/lib-pixelstreamingcommon-ue5.4`
+`npm i @epicgames-ps/lib-pixelstreamingcommon-ue5.5`

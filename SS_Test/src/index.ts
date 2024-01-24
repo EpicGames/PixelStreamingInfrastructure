@@ -26,6 +26,10 @@ function areObjectsEqual(obj1: any, obj2: any) {
   );
 }
 
+// mocks a streamer and a player and checks some basic negotiations/interactions between them
+// validating the results as we go.
+// this happens in a series of "steps" that are validated by receiving a collection of expected
+// events.
 async function main(): Promise<void> {
 
     // test initial connections

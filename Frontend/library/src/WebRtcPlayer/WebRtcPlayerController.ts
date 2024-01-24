@@ -7,7 +7,7 @@ import {
     Logger,
     SignallingProtocol,
     ITransport
-} from '@epicgames-ps/lib-pixelstreamingcommon-ue5.4';
+} from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { StreamController } from '../VideoPlayer/StreamController';
 import { FreezeFrameController } from '../FreezeFrame/FreezeFrameController';
 import { AFKController } from '../AFK/AFKController';

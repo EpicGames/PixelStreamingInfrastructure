@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.4';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 
 export class ResponseController {
     responseEventListeners: Map<string, (response: string) => void> = new Map();

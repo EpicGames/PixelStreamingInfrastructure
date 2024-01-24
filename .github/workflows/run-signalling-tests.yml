@@ -3,10 +3,10 @@ name: Run signalling tests
 on:
   workflow_dispatch:
   push:
-    branches: ['master']
+    branches: ['UE5.5']
     paths: ['Common/**', 'SignallingWebServer/**', 'SS_Test/**']
   pull_request:
-    branches: ['master']
+    branches: ['UE5.5']
     paths: ['Common/**', 'SignallingWebServer/**', 'SS_Test/**']
 
 jobs:

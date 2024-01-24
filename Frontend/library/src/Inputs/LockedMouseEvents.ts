@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { MouseController } from './MouseController';
-import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.4';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { IMouseEvents } from './IMouseEvents';
 import { NormalizedQuantizedUnsignedCoord } from '../Util/CoordinateConverter';
 import { ActiveKeys } from './InputClassesFactory';

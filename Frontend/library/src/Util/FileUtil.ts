@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.4';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 
 /**
  * Utility function for populate file information from byte buffers.

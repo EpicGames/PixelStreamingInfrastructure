@@ -5,7 +5,7 @@ import { LatencyTestResults } from '../DataChannel/LatencyTestResults';
 import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
 import { WebRtcPlayerController } from '../WebRtcPlayer/WebRtcPlayerController';
 import { Flags, NumericParameters } from '../Config/Config';
-import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.4';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { InitialSettings } from '../DataChannel/InitialSettings';
 import { OnScreenKeyboard } from '../UI/OnScreenKeyboard';
 import {
@@ -30,7 +30,7 @@ import {
     DataChannelLatencyTestResultEvent,
     PlayerCountEvent
 } from '../Util/EventEmitter';
-import { MessageReceive } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.4';
+import { MessageReceive } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { WebXRController } from '../WebXR/WebXRController';
 import { MessageDirection } from '../UeInstanceMessage/StreamMessageController';
 import {

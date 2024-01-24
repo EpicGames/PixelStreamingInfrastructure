@@ -6,7 +6,7 @@ import { MouseController } from './MouseController';
 import { TouchController } from './TouchController';
 import { GamePadController } from './GamepadController';
 import { Config, ControlSchemeType } from '../Config/Config';
-import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.4';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { CoordinateConverter } from '../Util/CoordinateConverter';
 import { StreamMessageController } from '../UeInstanceMessage/StreamMessageController';
 import { VideoPlayer } from '../VideoPlayer/VideoPlayer';

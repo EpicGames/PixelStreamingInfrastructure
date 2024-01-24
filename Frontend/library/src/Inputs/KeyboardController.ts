@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { SpecialKeyCodes } from './SpecialKeyCodes';
-import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.4';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { ActiveKeys } from './InputClassesFactory';
 import { StreamMessageController } from '../UeInstanceMessage/StreamMessageController';
 import { Config, Flags } from '../Config/Config';

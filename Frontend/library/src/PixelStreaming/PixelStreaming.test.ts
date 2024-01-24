@@ -6,7 +6,7 @@ import {
 import { PixelStreaming } from './PixelStreaming';
 import { SettingsChangedEvent, StreamerListMessageEvent, WebRtcConnectedEvent, WebRtcSdpEvent } from '../Util/EventEmitter';
 import { mockWebSocket, MockWebSocketSpyFunctions, MockWebSocketTriggerFunctions, unmockWebSocket } from '../__test__/mockWebSocket';
-import { MessageReceive } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.4';
+import { MessageReceive } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { mockRTCPeerConnection, MockRTCPeerConnectionSpyFunctions, MockRTCPeerConnectionTriggerFunctions, unmockRTCPeerConnection } from '../__test__/mockRTCPeerConnection';
 import { mockHTMLMediaElement, mockMediaStream, unmockMediaStream } from '../__test__/mockMediaStream';
 import { InitialSettings } from '../DataChannel/InitialSettings';
