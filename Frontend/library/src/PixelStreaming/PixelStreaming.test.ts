@@ -209,20 +209,17 @@ describe('PixelStreaming', () => {
         expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledTimes(1);
         expect(webSocketSpyFunctions.closeSpy).not.toHaveBeenCalled();
 
-        // disable this for now
-        // we probably want to mock subscribe to a streamer and then disconnect it
-        // and test that we're getting listStreamers regularly.
-        
-        // pixelStreaming.webSocketController.close();
+    
+        webSocketTriggerFunctions.triggerRemoteClose();
 
-        // expect(webSocketSpyFunctions.closeSpy).toHaveBeenCalled();
+        expect(webSocketSpyFunctions.closeSpy).toHaveBeenCalled();
 
-        // // wait 2 seconds
-        // jest.advanceTimersByTime(2000);
+        // wait 2 seconds
+        jest.advanceTimersByTime(2000);
 
-        // // we should have attempted a reconnection
-        // expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockSignallingUrl);
-        // expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledTimes(2);
+        // we should have attempted a reconnection
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledWith(mockSignallingUrl);
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledTimes(2);
 
         // Reconnect triggers the first list streamer message
         triggerWebSocketOpen();
