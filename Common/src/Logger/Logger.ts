@@ -39,7 +39,7 @@ export class Logger {
             return;
         }
 
-        this.CommonLog("Log", stack, message);
+        this.CommonLog("Log", null, message);
     }
 
     /**
@@ -53,7 +53,7 @@ export class Logger {
             return;
         }
 
-        this.CommonLog("Info", stack, message);
+        this.CommonLog("Info", null, message);
     }
 
     /**
@@ -71,11 +71,14 @@ export class Logger {
      * @param message - the message to be logged
      */
     static Warning(stack: string, message: string) {
-        this.CommonLog("Warning", stack, message);
+        this.CommonLog("Warning", null, message);
     }
 
-    static CommonLog(level: string, stack: string, message: string) {
-        //console.log(`Level: ${level}\nMsg: ${message}\nCaller: ${stack}`);
-        console.log(`[${level}] - ${message}`);
+    static CommonLog(level: string, stack: null | string, message: string) {
+        if (stack) {
+            console.log(`[${level}] - ${message}\nCaller: ${stack}`);
+        } else {
+            console.log(`[${level}] - ${message}`);
+        }
     }
 }
