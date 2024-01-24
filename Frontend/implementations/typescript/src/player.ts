@@ -6,6 +6,11 @@ const PixelStreamingApplicationStyles =
     new PixelStreamingApplicationStyle();
 PixelStreamingApplicationStyles.applyStyleSheet();
 
+// expose the pixel streaming object for hooking into. tests etc.
+declare global {
+    interface Window { pixelStreaming: PixelStreaming; }
+}
+
 document.body.onload = function() {
 	// Example of how to set the logger level
 	// Logger.SetLoggerVerbosity(10);
@@ -22,4 +27,6 @@ document.body.onload = function() {
 	});
 	// document.getElementById("centrebox").appendChild(application.rootElement);
 	document.body.appendChild(application.rootElement);
+	
+	window.pixelStreaming = stream;
 }

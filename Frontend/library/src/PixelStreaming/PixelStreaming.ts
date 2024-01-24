@@ -70,7 +70,6 @@ export class PixelStreaming {
 
     private _videoElementParent: HTMLElement;
 
-    _showActionOrErrorOnDisconnect = true;
     private allowConsoleCommands = false;
 
     private onScreenKeyboardHelper: OnScreenKeyboard;
@@ -353,7 +352,7 @@ export class PixelStreaming {
      */
     public reconnect() {
         this._eventEmitter.dispatchEvent(new StreamReconnectEvent());
-        this._webRtcController.restartStreamAutomatically();
+        this._webRtcController.tryReconnect("Reconnecting...");
     }
 
     /**
@@ -440,7 +439,6 @@ export class PixelStreaming {
      */
     _onWebRtcAutoConnect() {
         this._eventEmitter.dispatchEvent(new WebRtcAutoConnectEvent());
-        this._showActionOrErrorOnDisconnect = true;
     }
 
     /**
@@ -460,30 +458,16 @@ export class PixelStreaming {
     /**
      * Event fired when the video is disconnected - emits given eventString or an override
      * message from webRtcController if one has been set
-     * @param eventString - the event text that will be emitted
+     * @param eventString - a string describing why the connection closed
+     * @param allowClickToReconnect - true if we want to allow the user to retry the connection with a click
      */
-    _onDisconnect(eventString: string) {
-        // if we have overridden the default disconnection message, assign the new value here
-        if (
-            this._webRtcController.getDisconnectMessageOverride() != '' &&
-            this._webRtcController.getDisconnectMessageOverride() !==
-                undefined &&
-            this._webRtcController.getDisconnectMessageOverride() != null
-        ) {
-            eventString = this._webRtcController.getDisconnectMessageOverride();
-            this._webRtcController.setDisconnectMessageOverride('');
-        }
-
+    _onDisconnect(eventString: string, allowClickToReconnect: boolean) {
         this._eventEmitter.dispatchEvent(
             new WebRtcDisconnectedEvent({
-                eventString,
-                showActionOrErrorOnDisconnect:
-                    this._showActionOrErrorOnDisconnect
+                eventString: eventString,
+                allowClickToReconnect: allowClickToReconnect
             })
         );
-        if (this._showActionOrErrorOnDisconnect == false) {
-            this._showActionOrErrorOnDisconnect = true;
-        }
     }
 
     /**
@@ -582,12 +566,16 @@ export class PixelStreaming {
 
         const useUrlParams = this.config.useUrlParams;
         const urlParams = new URLSearchParams(window.location.search);
+        Logger.Info(
+            Logger.GetStackTrace(),
+            `using URL parameters ${useUrlParams}`
+        );
         if (settings.EncoderSettings) {
             this.config.setNumericSetting(
                 NumericParameters.MinQP,
                 // If a setting is set in the URL, make sure we respect that value as opposed to what the application sends us
                 (useUrlParams && urlParams.has(NumericParameters.MinQP)) 
-                    ? Number.parseInt(urlParams.get(NumericParameters.MinQP)) 
+                    ? Number.parseFloat(urlParams.get(NumericParameters.MinQP)) 
                     : settings.EncoderSettings.MinQP
             );
 
@@ -595,7 +583,7 @@ export class PixelStreaming {
             this.config.setNumericSetting(
                 NumericParameters.MaxQP,
                 (useUrlParams && urlParams.has(NumericParameters.MaxQP)) 
-                    ? Number.parseInt(urlParams.get(NumericParameters.MaxQP)) 
+                    ? Number.parseFloat(urlParams.get(NumericParameters.MaxQP)) 
                     : settings.EncoderSettings.MaxQP
             );
         }
@@ -603,20 +591,20 @@ export class PixelStreaming {
             this.config.setNumericSetting(
                 NumericParameters.WebRTCMinBitrate,
                 (useUrlParams && urlParams.has(NumericParameters.WebRTCMinBitrate)) 
-                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCMinBitrate))
-                    : settings.WebRTCSettings.MinBitrate / 1000 /* bps to kbps */
+                    ? Number.parseFloat(urlParams.get(NumericParameters.WebRTCMinBitrate))
+                    : (settings.WebRTCSettings.MinBitrate / 1000) /* bps to kbps */
             );
             this.config.setNumericSetting(
                 NumericParameters.WebRTCMaxBitrate,
                 (useUrlParams && urlParams.has(NumericParameters.WebRTCMaxBitrate)) 
-                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCMaxBitrate))
-                    : settings.WebRTCSettings.MaxBitrate / 1000 /* bps to kbps */
+                    ? Number.parseFloat(urlParams.get(NumericParameters.WebRTCMaxBitrate))
+                    : (settings.WebRTCSettings.MaxBitrate / 1000) /* bps to kbps */
                 
             );
             this.config.setNumericSetting(
                 NumericParameters.WebRTCFPS,
                 (useUrlParams && urlParams.has(NumericParameters.WebRTCFPS)) 
-                    ? Number.parseInt(urlParams.get(NumericParameters.WebRTCFPS))
+                    ? Number.parseFloat(urlParams.get(NumericParameters.WebRTCFPS))
                     : settings.WebRTCSettings.FPS
             );
         }
@@ -855,5 +843,9 @@ export class PixelStreaming {
 
     public get toStreamerHandlers() {
         return this._webRtcController.streamMessageController.toStreamerHandlers;
+    }
+
+    public isReconnecting() {
+        return this._webRtcController.isReconnecting;
     }
 }

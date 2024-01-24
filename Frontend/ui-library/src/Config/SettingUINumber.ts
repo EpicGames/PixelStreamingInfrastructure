@@ -77,7 +77,7 @@ export class SettingUINumber<
             this.spinner.onchange = (event: Event) => {
                 const inputElem = event.target as HTMLInputElement;
 
-                const parsedValue = Number.parseInt(inputElem.value);
+                const parsedValue = Number.parseFloat(inputElem.value);
 
                 if (Number.isNaN(parsedValue)) {
                     Logger.Warning(

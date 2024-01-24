@@ -134,7 +134,6 @@ export class WebSocketController {
      * @param event - Close Event
      */
     handleOnClose(event: CloseEvent) {
-        this.onWebSocketOncloseOverlayMessage(event);
         Logger.Log(
             Logger.GetStackTrace(),
             'Disconnected to the signalling server via WebSocket: ' +
@@ -160,13 +159,13 @@ export class WebSocketController {
         this.webSocket.send(payload.payload());
     }
 
-    sendWebRtcOffer(offer: RTCSessionDescriptionInit) {
-        const payload = new MessageSend.MessageWebRTCOffer(offer);
+    sendWebRtcOffer(offer: RTCSessionDescriptionInit, extraParams: MessageSend.ExtraOfferParameters) {
+        const payload = new MessageSend.MessageWebRTCOffer(offer, extraParams);
         this.webSocket.send(payload.payload());
     }
 
-    sendWebRtcAnswer(answer: RTCSessionDescriptionInit) {
-        const payload = new MessageSend.MessageWebRTCAnswer(answer);
+    sendWebRtcAnswer(answer: RTCSessionDescriptionInit, extraParams: MessageSend.ExtraAnswerParameters) {
+        const payload = new MessageSend.MessageWebRTCAnswer(answer, extraParams);
         this.webSocket.send(payload.payload());
     }
 
@@ -204,10 +203,6 @@ export class WebSocketController {
         this.webSocket?.close();
     }
 
-    /** Event used for Displaying websocket closed messages */
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-    onWebSocketOncloseOverlayMessage(event: CloseEvent) {}
-
     /**
      * The Message Contains the payload of the peer connection options used for the RTC Peer hand shake
      * @param messageConfig - Config Message received from he signaling server
@@ -216,11 +211,18 @@ export class WebSocketController {
     onConfig(messageConfig: MessageReceive.MessageConfig) {}
 
     /**
-     * The Message Contains the payload of the peer connection options used for the RTC Peer hand shake
-     * @param messageConfig - Config Message received from he signaling server
+     * The Message contains all the ids of streamers available on the server.
+     * @param messageStreamerList - The message with the list of the available streamer ids.
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
     onStreamerList(messageStreamerList: MessageReceive.MessageStreamerList) {}
+
+    /**
+     * The Message contains the new id of a subscribed to streamer.
+     * @param message - Message conaining the new id of the streamer.
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+    onStreamerIDChanged(message: MessageReceive.MessageStreamerIDChanged) {}
 
     /**
      * @param iceCandidate - Ice Candidate sent from the Signaling server server's RTC hand shake

@@ -24,7 +24,7 @@ export class SettingOption<
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		defaultOnChangeListener: (changedValue: unknown, setting: SettingBase) => void = () => { /* Do nothing, to be overridden. */ }
     ) {
-        super(id, label, description, [defaultTextValue, defaultTextValue], defaultOnChangeListener);
+        super(id, label, description, [defaultTextValue], defaultOnChangeListener);
 
         this.options = options;
         const urlParams = new URLSearchParams(window.location.search);

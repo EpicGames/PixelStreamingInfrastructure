@@ -31,3 +31,12 @@ jobs:
           tags: 'ghcr.io/epicgames/pixel-streaming-signalling-server:5.4'
           push: true
           file: SignallingWebServer/Dockerfile
+      -
+        name: Build and push the SFU container image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          tags: 'ghcr.io/epicgames/pixel-streaming-sfu:5.4'
+          push: true
+          file: SFU/Dockerfile
+          

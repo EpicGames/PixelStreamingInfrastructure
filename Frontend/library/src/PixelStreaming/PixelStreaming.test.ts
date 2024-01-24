@@ -274,7 +274,8 @@ describe('PixelStreaming', () => {
                 type: MessageRecvTypes.STREAMER_LIST,
                 ids: streamerIdList
             }),
-            autoSelectedStreamerId: streamerId
+            autoSelectedStreamerId: streamerId,
+            wantedStreamerId: null
         }));
         expect(webSocketSpyFunctions.sendSpy).toHaveBeenCalledWith(
             expect.stringMatching(/"type":"subscribe".*MOCK_PIXEL_STREAMING/)
@@ -298,7 +299,8 @@ describe('PixelStreaming', () => {
                 type: MessageRecvTypes.STREAMER_LIST,
                 ids: extendedStreamerIdList
             }),
-            autoSelectedStreamerId: null
+            autoSelectedStreamerId: null,
+            wantedStreamerId: null
         }));
         expect(webSocketSpyFunctions.sendSpy).not.toHaveBeenCalledWith(
             expect.stringMatching(/"type":"subscribe"/)

@@ -1,12 +1,14 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { WebSocketController } from '../WebSockets/WebSocketController';
+import { ExtraOfferParameters, ExtraAnswerParameters } from '../WebSockets/MessageSend';
 import { StreamController } from '../VideoPlayer/StreamController';
 import {
     MessageAnswer,
     MessageOffer,
     MessageConfig,
-    MessageStreamerList
+    MessageStreamerList,
+    MessageStreamerIDChanged
 } from '../WebSockets/MessageReceive';
 import { FreezeFrameController } from '../FreezeFrame/FreezeFrameController';
 import { AFKController } from '../AFK/AFKController';
@@ -59,7 +61,8 @@ import {
     PlayStreamErrorEvent,
     PlayStreamEvent,
     PlayStreamRejectedEvent,
-    StreamerListMessageEvent
+    StreamerListMessageEvent,
+    StreamerIDChangedMessageEvent
 } from '../Util/EventEmitter';
 import {
     DataChannelLatencyTestRequest,
@@ -104,16 +107,13 @@ export class WebRtcPlayerController {
     preferredCodec: string;
     peerConfig: RTCConfiguration;
     videoAvgQp: number;
+    locallyClosed: boolean;
     shouldReconnect: boolean;
     isReconnecting: boolean;
     reconnectAttempt: number;
-    subscribedStream: string | null;
+    disconnectMessage: string;
+    subscribedStream: string;
     signallingUrlBuilder: () => string;
-
-    // if you override the disconnection message by calling the interface method setDisconnectMessageOverride
-    // it will use this property to store the override message string
-    disconnectMessageOverride: string;
-
     autoJoinTimer: ReturnType<typeof setTimeout> = undefined;
 
     /**
@@ -139,10 +139,7 @@ export class WebRtcPlayerController {
             this.onAfkTriggered.bind(this)
         );
         this.afkController.onAFKTimedOutCallback = () => {
-            this.setDisconnectMessageOverride(
-                'You have been disconnected due to inactivity'
-            );
-            this.closeSignalingServer();
+            this.closeSignalingServer('You have been disconnected due to inactivity');
         };
 
         this.freezeFrameController = new FreezeFrameController(
@@ -202,14 +199,9 @@ export class WebRtcPlayerController {
         this.webSocketController.onStreamerList = (
             messageList: MessageReceive.MessageStreamerList
         ) => this.handleStreamerListMessage(messageList);
-        this.webSocketController.onWebSocketOncloseOverlayMessage = (event) => {
-            this.pixelStreaming._onDisconnect(
-                `Websocket disconnect (${event.code}) ${
-                    event.reason != '' ? '- ' + event.reason : ''
-                }`
-            );
-            this.setVideoEncoderAvgQP(0);
-        };
+        this.webSocketController.onStreamerIDChanged = (
+            message: MessageReceive.MessageStreamerIDChanged
+        ) => this.handleStreamerIDChangedMessage(message);
         this.webSocketController.onPlayerCount = (playerCount: MessageReceive.MessagePlayerCount) => { 
             this.pixelStreaming._onPlayerCount(playerCount.count); 
         };
@@ -223,6 +215,19 @@ export class WebRtcPlayerController {
             }
         });
         this.webSocketController.onClose.addEventListener('close', (event : CustomEvent) => {
+            // when we refresh the page during a stream we get the going away code.
+            // in that case we don't want to reconnect since we're navigating away.
+            // https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
+            // lists all the codes. 
+            const CODE_GOING_AWAY = 1001;
+
+            const willTryReconnect = this.shouldReconnect
+               && event.detail.code != CODE_GOING_AWAY
+               && this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts) > 0
+
+            const disconnectMessage = this.disconnectMessage ? this.disconnectMessage : event.detail.reason;
+            this.pixelStreaming._onDisconnect(disconnectMessage, !willTryReconnect && !this.isReconnecting);
+
             this.afkController.stopAfkWarningTimer();
 
             // stop sending stats on interval if we have closed our connection
@@ -230,21 +235,22 @@ export class WebRtcPlayerController {
                 window.clearInterval(this.statsTimerHandle);
             }
 
+            // reset the stream quality icon.
+            this.setVideoEncoderAvgQP(0);
+
             // unregister all input device event handlers on disconnect
             this.setTouchInputEnabled(false);
             this.setMouseInputEnabled(false);
             this.setKeyboardInputEnabled(false);
             this.setGamePadInputEnabled(false);
 
-            // when we refresh the page during a stream we get the going away code.
-            // in that case we don't want to reconnect since we're navigating away.
-            // https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
-            // lists all the codes. 
-            const CODE_GOING_AWAY = 1001;
-            if(this.shouldReconnect && event.detail.code != CODE_GOING_AWAY && this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts) > 0) {
-                this.isReconnecting = true;
-                this.reconnectAttempt++;
-                this.restartStreamAutomatically();
+            if (willTryReconnect) {
+                // need a small delay here to prevent reconnect spamming
+                setTimeout(() => {
+                    this.isReconnecting = true;
+                    this.reconnectAttempt++;
+                    this.tryReconnect(event.detail.reason);
+                }, 2000);
             }
         });
 
@@ -947,9 +953,9 @@ export class WebRtcPlayerController {
     }
 
     /**
-     * Restart the stream automatically without refreshing the page
+     * Attempt a reconnection to the signalling server
      */
-    restartStreamAutomatically() {
+    tryReconnect(message: string) {
         // if there is no webSocketController return immediately or this will not work
         if (!this.webSocketController) {
             Logger.Log(
@@ -959,33 +965,16 @@ export class WebRtcPlayerController {
             return;
         }
 
-        // if a websocket object has not been created connect normally without closing
-        if (
-            !this.webSocketController.webSocket ||
-            this.webSocketController.webSocket.readyState === WebSocket.CLOSED
-        ) {
-            Logger.Log(
-                Logger.GetStackTrace(),
-                'A websocket connection has not been made yet so we will start the stream'
-            );
+        // if the connection is open, first close it. wait some time and try again.
+        this.isReconnecting = true;
+        if (this.webSocketController.webSocket && this.webSocketController.webSocket.readyState != WebSocket.CLOSED) {
+            this.closeSignalingServer(`${message} Restarting stream...`);
+            setTimeout(() => {
+                this.tryReconnect(message);
+            }, 3000);
+        } else {
             this.pixelStreaming._onWebRtcAutoConnect();
             this.connectToSignallingServer();
-        } else {
-            // set the replay status so we get a text overlay over an action overlay
-            this.pixelStreaming._showActionOrErrorOnDisconnect = false;
-
-            // set the disconnect message
-            this.setDisconnectMessageOverride('Restarting stream...');
-
-            // close the connection
-            this.closeSignalingServer();
-
-            // wait for the connection to close and restart the connection
-            const autoConnectTimeout = setTimeout(() => {
-                this.pixelStreaming._onWebRtcAutoConnect();
-                this.connectToSignallingServer();
-                clearTimeout(autoConnectTimeout);
-            }, 3000);
         }
     }
 
@@ -1087,13 +1076,8 @@ export class WebRtcPlayerController {
             );
             Logger.Error(Logger.GetStackTrace(), message);
 
-            // set the disconnect message
-            this.setDisconnectMessageOverride(
-                'Stream not initialized correctly'
-            );
-
             // close the connection
-            this.closeSignalingServer();
+            this.closeSignalingServer('Stream not initialized correctly');
             return;
         }
 
@@ -1176,6 +1160,9 @@ export class WebRtcPlayerController {
      * Connect to the Signaling server
      */
     connectToSignallingServer() {
+        this.locallyClosed = false;
+        this.shouldReconnect = true;
+        this.disconnectMessage = null;
         const signallingUrl = this.signallingUrlBuilder();
         this.webSocketController.connect(signallingUrl);
     }
@@ -1198,10 +1185,7 @@ export class WebRtcPlayerController {
                     Logger.GetStackTrace(),
                     'No turn server was found in the Peer Connection Options. TURN cannot be forced, closing connection. Please use STUN instead'
                 );
-                this.setDisconnectMessageOverride(
-                    'TURN cannot be forced, closing connection. Please use STUN instead.'
-                );
-                this.closeSignalingServer();
+                this.closeSignalingServer('TURN cannot be forced, closing connection. Please use STUN instead.');
                 return;
             }
         }
@@ -1343,84 +1327,124 @@ export class WebRtcPlayerController {
             6
         );
 
-        if(this.isReconnecting) {
-            if(messageStreamerList.ids.includes(this.subscribedStream)) {
-                // If we're reconnecting and the previously subscribed stream has come back, resubscribe to it
-                this.isReconnecting = false;
-                this.reconnectAttempt = 0;
-                this.webSocketController.sendSubscribe(this.subscribedStream);
-            } else if(this.reconnectAttempt < this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts)) {
-                // Our previous stream hasn't come back, wait 2 seconds and request an updated stream list
-                this.reconnectAttempt++;
-                setTimeout(() => {
-                    this.webSocketController.requestStreamerList();
-                }, 2000)
-            } else {
-                // We've exhausted our reconnect attempts, return to main screen
-                this.reconnectAttempt = 0;
-                this.isReconnecting = false;
-                this.shouldReconnect = false;
-                this.webSocketController.close();
-                
-                this.config.setOptionSettingValue(
-                    OptionParameters.StreamerId,
-                    ""
-                );
-                this.config.setOptionSettingOptions(
-                    OptionParameters.StreamerId,
-                    []
-                );
-            }
-        } else {
-            const settingOptions = [...messageStreamerList.ids]; // copy the original messageStreamerList.ids
-            settingOptions.unshift(''); // add an empty option at the top
-            this.config.setOptionSettingOptions(
-                OptionParameters.StreamerId,
-                settingOptions
-            );
+        let wantedStreamerId: string = null;
 
-            const urlParams = new URLSearchParams(window.location.search);
-            let autoSelectedStreamerId: string | null = null;
-            if (messageStreamerList.ids.length == 1) {
-                // If there's only a single streamer, subscribe to it regardless of what is in the URL
-                autoSelectedStreamerId = messageStreamerList.ids[0];
-            } else if (
-                urlParams.has(OptionParameters.StreamerId) &&
-                messageStreamerList.ids.includes(
-                    urlParams.get(OptionParameters.StreamerId)
-                )
-            ) {
-                // If there's a streamer ID in the URL and a streamer with this ID is connected, set it as the selected streamer
-                autoSelectedStreamerId = urlParams.get(OptionParameters.StreamerId);
-            }
-            if (autoSelectedStreamerId !== null) {
-                this.config.setOptionSettingValue(
-                    OptionParameters.StreamerId,
-                    autoSelectedStreamerId
-                );
-            } else {
-                // no auto selected streamer
-                if (messageStreamerList.ids.length == 0 && this.config.isFlagEnabled(Flags.WaitForStreamer)) {
-                    this.closeSignalingServer();
-                    this.startAutoJoinTimer();
+        // get the current selected streamer id option
+        var streamerIDOption = this.config.getSettingOption(OptionParameters.StreamerId);
+        const existingSelection = streamerIDOption.selected.toString().trim();
+        if (!!existingSelection) {
+            // default to selected option if it exists
+            wantedStreamerId = streamerIDOption.selected;
+        }
+
+        // add the streamers to the UI
+        const settingOptions = [...messageStreamerList.ids]; // copy the original messageStreamerList.ids
+        settingOptions.unshift(''); // add an empty option at the top
+        this.config.setOptionSettingOptions(
+            OptionParameters.StreamerId,
+            settingOptions
+        );
+
+        let autoSelectedStreamerId: string  = null;
+        const waitForStreamer = this.config.isFlagEnabled(Flags.WaitForStreamer);
+        const reconnectLimit = this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts);
+        const reconnectDelay = this.config.getNumericSettingValue(NumericParameters.StreamerAutoJoinInterval);
+
+        // first we figure out a wanted streamer id through various means
+        const useUrlParams = this.config.useUrlParams;
+        const urlParams = new URLSearchParams(window.location.search);
+        if (useUrlParams && urlParams.has(OptionParameters.StreamerId)) {
+            // if we've set the streamer id on the url we only want that streamer id
+            wantedStreamerId = urlParams.get(OptionParameters.StreamerId);
+        } else if (this.subscribedStream) {
+            // we were previously subscribed to a streamer, we want that
+            wantedStreamerId = this.subscribedStream;
+        }
+
+        // now lets see if we can pick it.
+        if (wantedStreamerId && messageStreamerList.ids.includes(wantedStreamerId)) {
+            // if the wanted stream is in the list. we pick that
+            autoSelectedStreamerId = wantedStreamerId;
+        } else if ((!wantedStreamerId || !waitForStreamer) && messageStreamerList.ids.length == 1) {
+            // otherwise, if we're not waiting for the wanted streamer and there's only one streamer, connect to it
+            autoSelectedStreamerId = messageStreamerList.ids[0];
+        }
+
+        // if we found a streamer id to auto select, select it
+        if (autoSelectedStreamerId) {
+            this.isReconnecting = false;
+            this.reconnectAttempt = 0;
+            this.config.setOptionSettingValue(
+                OptionParameters.StreamerId,
+                autoSelectedStreamerId
+            );
+        } else {
+            // no auto selected streamer.
+            // if we're waiting for a streamer then try reconnecting
+            if (waitForStreamer) {
+                if (this.reconnectAttempt < reconnectLimit) {
+                    // still reconnects available
+                    this.isReconnecting = true;
+                    this.reconnectAttempt++;
+                    setTimeout(() => {
+                        this.webSocketController.requestStreamerList();
+                    }, reconnectDelay);
+                } else {
+                    // We've exhausted our reconnect attempts, return to main screen
+                    this.reconnectAttempt = 0;
+                    this.isReconnecting = false;
+                    this.shouldReconnect = false;
                 }
             }
-            this.pixelStreaming.dispatchEvent(
-                new StreamerListMessageEvent({
-                    messageStreamerList,
-                    autoSelectedStreamerId
-                })
-            );
         }
+
+        // dispatch this event finally
+        this.pixelStreaming.dispatchEvent(
+            new StreamerListMessageEvent({
+                messageStreamerList,
+                autoSelectedStreamerId,
+                wantedStreamerId
+            })
+        );
     }
 
-    startAutoJoinTimer() {
-        clearTimeout(this.autoJoinTimer);
-        this.autoJoinTimer = setTimeout(() => this.tryAutoJoin(), this.config.getNumericSettingValue(NumericParameters.StreamerAutoJoinInterval));
-    }
+    handleStreamerIDChangedMessage(streamerIDChangedMessage: MessageStreamerIDChanged) {
+        const newID = streamerIDChangedMessage.newID;
 
-    tryAutoJoin() {
-        this.connectToSignallingServer();
+        // need to edit the selected streamer in the settings list
+        var streamerListOptions = this.config.getSettingOption(OptionParameters.StreamerId);
+
+        // temporarily prevent onChange from firing (it would try to subscribe to the streamer again)
+        var oldOnChange = streamerListOptions.onChange;
+        streamerListOptions.onChange = ()=>{};
+
+        // change the selected entry.
+        var streamerList = streamerListOptions.options;
+        for (var i = 0; i < streamerList.length; ++i) {
+            if (streamerList[i] == this.subscribedStream) {
+                streamerList[i] = newID;
+                break;
+            }
+        }
+
+        // update the list
+        streamerListOptions.options = streamerList;
+
+        // update the selected entry
+        streamerListOptions.selected = newID;
+
+        // restore the old change notifier.
+        streamerListOptions.onChange = oldOnChange;
+
+        // remember which stream we're subscribe to
+        this.subscribedStream = streamerIDChangedMessage.newID;
+
+        // notify any listeners
+        this.pixelStreaming.dispatchEvent(
+            new StreamerIDChangedMessageEvent({
+                newID
+            })
+        );
     }
 
     /**
@@ -1582,7 +1606,13 @@ export class WebRtcPlayerController {
             'Sending the offer to the Server',
             6
         );
-        this.webSocketController.sendWebRtcOffer(offer);
+
+        const extraParams: ExtraOfferParameters = {
+            minBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate),
+            maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
+        };
+
+        this.webSocketController.sendWebRtcOffer(offer, extraParams);
     }
 
     /**
@@ -1595,7 +1625,13 @@ export class WebRtcPlayerController {
             'Sending the answer to the Server',
             6
         );
-        this.webSocketController.sendWebRtcAnswer(answer);
+
+        const extraParams: ExtraAnswerParameters = {
+            minBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate),
+            maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
+        };
+
+        this.webSocketController.sendWebRtcAnswer(answer, extraParams);
 
         if (this.isUsingSFU) {
             this.webSocketController.sendWebRtcDatachannelRequest();
@@ -1617,9 +1653,11 @@ export class WebRtcPlayerController {
     /**
      * Close the Connection to the signaling server
      */
-    closeSignalingServer() {
+    closeSignalingServer(message: string) {
         // We explicitly called close, therefore we don't want to trigger auto reconnect
+        this.locallyClosed = true;
         this.shouldReconnect = false;
+        this.disconnectMessage = message;
         this.webSocketController?.close();
     }
 
@@ -1634,7 +1672,7 @@ export class WebRtcPlayerController {
      * Close all connections
      */
     close() {
-        this.closeSignalingServer();
+        this.closeSignalingServer('');
         this.closePeerConnection();
     }
 
@@ -2016,20 +2054,6 @@ export class WebRtcPlayerController {
      */
     resizePlayerStyle(): void {
         this.videoPlayer.resizePlayerStyle();
-    }
-
-    /**
-     * Get the overridden disconnect message
-     */
-    getDisconnectMessageOverride(): string {
-        return this.disconnectMessageOverride;
-    }
-
-    /**
-     * Set the override for the disconnect message
-     */
-    setDisconnectMessageOverride(message: string): void {
-        this.disconnectMessageOverride = message;
     }
 
     setPreferredCodec(codec: string) {

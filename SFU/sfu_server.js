@@ -2,6 +2,7 @@ const config = require('./config');
 const WebSocket = require('ws');
 const mediasoup = require('mediasoup_prebuilt');
 const mediasoupSdp = require('mediasoup-sdp-bridge');
+const minimist = require('minimist');
 
 if (!config.retrySubscribeDelaySecs) {
   config.retrySubscribeDelaySecs = 10;
@@ -351,6 +352,12 @@ async function createWebRtcTransport(identifier) {
 }
 
 async function main() {
+  var argv = minimist(process.argv.slice(2));
+
+  if ('signallingURL' in argv) {
+    config.signallingURL = argv['signallingURL'];
+  }
+
   console.log('Starting Mediasoup...');
   console.log("Config = ");
   console.log(config);

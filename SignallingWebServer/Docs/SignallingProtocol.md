@@ -3,7 +3,7 @@
 The following is a complete reference to the current signalling server messaging protocol. These messages are sent as stringified JSON packets. Some parameters are JSON strings themselves and require escape sequences to be contained in the string parameter.
 
 ## Version
-1.0.0 - Current
+1.1.0 - Current
 
 Major version number - breaking protocol change such as a required new message or field or deleting an existing message.  
 Minor version number - independent new message.  
@@ -30,6 +30,7 @@ Hotfix version - a non-breaking new field in an existing message type.
 - [Signalling Server Sent Messages](#source-signalling)
 	- [config](#signalling-config)
 	- [identify](#signalling-identify)
+	- [streamerIDChanged](#signalling-streameridchanged)
 	- [playerConnected](#signalling-playerconnected)
 	- [playerCount](#signalling-playercount)
 	- [playerDisconnected](#signalling-playerdisconnected)
@@ -228,6 +229,14 @@ end
 
 | Param Name | Type | Description |
 |-|-|-|
+
+### streamerIDChanged<a name="signalling-streameridchanged"></a>
+
+> Message is used to communicate to [Player](#term-player)s that the [Streamer](#term-streamer) it is currently subscribed to is changing its ID. This allows Players to keep track of its currently subscribed Streamer and allow auto reconnects to the correct Streamer. This happens if a Streamer sends an [endpointID](#streamer-endpointid) message after it already has an ID assigned. (Can happen if it is late to respond to the [identify](#signalling-identify) message and is auto assigned a legacy ID.)
+
+| Param Name | Type | Description |
+|-|-|-|
+| newID | string | The new ID of the subscribed to Streamer |
 
 ### playerConnected<a name="signalling-playerconnected"></a>
 

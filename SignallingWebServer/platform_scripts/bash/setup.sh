@@ -1,13 +1,13 @@
 #!/bin/bash
 # Copyright Epic Games, Inc. All Rights Reserved.
-BASH_LOCATION=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+BASH_LOCATION="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
 NODE_VERSION=v18.17.0
 
 pushd "${BASH_LOCATION}" > /dev/null
 
 source common_utils.sh
 
-use_args $@
+use_args $*
 # Azure specific fix to allow installing NodeJS from NodeSource
 if test -f "/etc/apt/sources.list.d/azure-cli.list"; then
 	sudo touch /etc/apt/sources.list.d/nodesource.list

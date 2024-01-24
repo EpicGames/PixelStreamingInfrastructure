@@ -37,7 +37,7 @@ export class SettingNumber<
         if (!useUrlParams || !urlParams.has(this.id)) {
             this.number = defaultNumber;
         } else {
-            const parsedValue = Number.parseInt(urlParams.get(this.id));
+            const parsedValue = Number.parseFloat(urlParams.get(this.id));
             this.number = Number.isNaN(parsedValue)
                 ? defaultNumber
                 : parsedValue;

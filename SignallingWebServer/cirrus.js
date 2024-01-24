@@ -20,7 +20,6 @@ const defaultConfig = {
 	UseHTTPS: false,
 	HTTPSCertFile: './certificates/client-cert.pem',
 	HTTPSKeyFile: './certificates/client-key.pem',
-	UseAuthentication: false,
 	LogToFile: true,
 	LogVerbose: true,
 	HomepageFile: 'player.html',
@@ -58,18 +57,6 @@ if (config.UseHTTPS) {
 	};
 
 	var https = require('https').Server(options, app);
-}
-
-//If not using authetication then just move on to the next function/middleware
-var isAuthenticated = redirectUrl => function (req, res, next) { return next(); }
-
-if (config.UseAuthentication && config.UseHTTPS) {
-	var passport = require('passport');
-	require('./modules/authentication').init(app);
-	// Replace the isAuthenticated with the one setup on passport module
-	isAuthenticated = passport.authenticationMiddleware ? passport.authenticationMiddleware : isAuthenticated
-} else if (config.UseAuthentication && !config.UseHTTPS) {
-	console.error('Trying to use authentication without using HTTPS, this is not allowed and so authentication will NOT be turned on, please turn on HTTPS to turn on authentication');
 }
 
 const helmet = require('helmet');
@@ -205,44 +192,19 @@ var limiter = RateLimit({
 // apply rate limiter to all requests
 app.use(limiter);
 
-//Setup the login page if we are using authentication
-if(config.UseAuthentication){
-	if(config.EnableWebserver) {
-		app.get('/login', function(req, res){
-			res.sendFile(path.join(__dirname, '/Public', '/login.html'));
-		});
-	}
-
-	// create application/x-www-form-urlencoded parser
-	var urlencodedParser = bodyParser.urlencoded({ extended: false })
-
-	//login page form data is posted here
-	app.post('/login', 
-		urlencodedParser, 
-		passport.authenticate('local', { failureRedirect: '/login' }), 
-		function(req, res){
-			//On success try to redirect to the page that they originally tired to get to, default to '/' if no redirect was found
-			var redirectTo = req.session.redirectTo ? req.session.redirectTo : '/';
-			delete req.session.redirectTo;
-			console.log(`Redirecting to: '${redirectTo}'`);
-			res.redirect(redirectTo);
-		}
-	);
-}
-
 if(config.EnableWebserver) {
 	//Setup folders
 	app.use(express.static(path.join(__dirname, '/Public')))
 	app.use('/images', express.static(path.join(__dirname, './images')))
-	app.use('/scripts', [isAuthenticated('/login'),express.static(path.join(__dirname, '/scripts'))]);
-	app.use('/', [isAuthenticated('/login'), express.static(path.join(__dirname, '/custom_html'))])
+	app.use('/scripts', express.static(path.join(__dirname, '/scripts')));
+	app.use('/', express.static(path.join(__dirname, '/custom_html')))
 }
 
 try {
 	for (var property in config.AdditionalRoutes) {
 		if (config.AdditionalRoutes.hasOwnProperty(property)) {
 			console.log(`Adding additional routes "${property}" -> "${config.AdditionalRoutes[property]}"`)
-			app.use(property, [isAuthenticated('/login'), express.static(path.join(__dirname, config.AdditionalRoutes[property]))]);
+			app.use(property, express.static(path.join(__dirname, config.AdditionalRoutes[property])));
 		}
 	}
 } catch (err) {
@@ -252,7 +214,7 @@ try {
 if(config.EnableWebserver) {
 
 	// Request has been sent to site root, send the homepage file
-	app.get('/', isAuthenticated('/login'), function (req, res) {
+	app.get('/', function (req, res) {
 		homepageFile = (typeof config.HomepageFile != 'undefined' && config.HomepageFile != '') ? config.HomepageFile.toString() : defaultConfig.HomepageFile;
 		
 		let pathsToTry = [ path.join(__dirname, homepageFile), path.join(__dirname, '/Public', homepageFile), path.join(__dirname, '/custom_html', homepageFile), homepageFile ];
@@ -529,7 +491,7 @@ function requestStreamerId(streamer) {
 
 	streamer.idTimer = setTimeout(function() {
 		// streamer did not respond in time. give it a legacy id.
-		const newLegacyId = getUniqueLegacyId();
+		const newLegacyId = getUniqueLegacyStreamerId();
 		if (newLegacyId.length == 0) {
 			const error = `Ran out of legacy ids.`;
 			console.error(error);
@@ -562,6 +524,20 @@ function sanitizeStreamerId(id) {
 }
 
 function registerStreamer(id, streamer) {
+	// remove any existing streamer id
+	if (!!streamer.id) {
+		// notify any connected peers of rename
+		const renameMessage = { type: "streamerIDChanged", newID: id };
+		let clone = new Map(players);
+		for (let player of clone.values()) {
+			if (player.streamerId == streamer.id) {
+				logOutgoing(player.id, renameMessage);
+			 	player.sendTo(renameMessage);
+			 	player.streamerId = id; // reassign the subscription
+			}
+		}
+		streamers.delete(streamer.id);
+	}
 	// make sure the id is unique
 	const uniqueId = sanitizeStreamerId(id);
 	streamer.commitId(uniqueId);
@@ -574,6 +550,10 @@ function registerStreamer(id, streamer) {
 }
 
 function onStreamerDisconnected(streamer) {
+	if (!!streamer.idTimer) {
+		clearTimeout(streamer.idTimer);
+	}
+
 	if (!streamer.id || !streamers.has(streamer.id)) {
 		return;
 	}
@@ -683,13 +663,16 @@ streamerServer.on('connection', function (ws, req) {
 		console.error(`streamer ${streamer.id} connection error: ${error}`);
 		onStreamerDisconnected(streamer);
 		try {
-			ws.close(1006 /* abnormal closure */, error);
+			ws.close(1006 /* abnormal closure */, `streamer ${streamer.id} connection error: ${error}`);
 		} catch(err) {
 			console.error(`ERROR: ws.on error: ${err.message}`);
 		}
 	});
 
-	ws.send(JSON.stringify(clientConfig));
+	const configStr = JSON.stringify(clientConfig);
+	logOutgoing(streamer.id, configStr)
+	ws.send(configStr);
+
 	requestStreamerId(streamer);
 });
 
@@ -847,7 +830,7 @@ sfuServer.on('connection', function (ws, req) {
 		console.error(`SFU connection error: ${error}`);
 		onSFUDisconnected(playerComponent);
 		try {
-			ws.close(1006 /* abnormal closure */, error);
+			ws.close(1006 /* abnormal closure */, `SFU connection error: ${error}`);
 		} catch(err) {
 			console.error(`ERROR: ws.on error: ${err.message}`);
 		}
@@ -975,7 +958,7 @@ playerServer.on('connection', function (ws, req) {
 
 	ws.on('error', function(error) {
 		console.error(`player ${playerId} connection error: ${error}`);
-		ws.close(1006 /* abnormal closure */, error);
+		ws.close(1006 /* abnormal closure */, `player ${playerId} connection error: ${error}`);
 		onPlayerDisconnected(playerId);
 
 		console.logColor(logging.Red, `Trying to reconnect...`);
@@ -984,7 +967,11 @@ playerServer.on('connection', function (ws, req) {
 
 	sendPlayerConnectedToFrontend();
 	sendPlayerConnectedToMatchmaker();
-	player.ws.send(JSON.stringify(clientConfig));
+
+	const configStr = JSON.stringify(clientConfig);
+	logOutgoing(player.id, configStr)
+	player.ws.send(configStr);
+
 	sendPlayersCount();
 });
 
@@ -992,7 +979,7 @@ function disconnectAllPlayers(streamerId) {
 	console.log(`unsubscribing all players on ${streamerId}`);
 	let clone = new Map(players);
 	for (let player of clone.values()) {
-		 if (player.streamerId == streamerId) {
+		if (player.streamerId == streamerId) {
 		 	// disconnect players but just unsubscribe the SFU
 		 	const sfuPlayer = getSFUForStreamer(streamerId);
 		 	if (sfuPlayer && player.id == sfuPlayer.id) {
