@@ -3,8 +3,8 @@
 import type {
     NumericParametersIds,
     SettingNumber
-} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
-import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.5';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.5';
 import { SettingUIBase } from './SettingUIBase';
 
 /**

@@ -1,11 +1,11 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { LatencyTest } from './LatencyTest';
-import { InitialSettings, Logger, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
-import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
+import { InitialSettings, Logger, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.5';
+import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.5';
 import { MathUtils } from '../Util/MathUtils';
 import {DataChannelLatencyTest} from "./DataChannelLatencyTest";
-import {PixelStreamingSettings} from "@epicgames-ps/lib-pixelstreamingfrontend-ue5.4/types/DataChannel/InitialSettings";
+import {PixelStreamingSettings} from "@epicgames-ps/lib-pixelstreamingfrontend-ue5.5/types/DataChannel/InitialSettings";
 
 /**
  * A stat structure, an id, the stat string, and the element where it is rendered.
