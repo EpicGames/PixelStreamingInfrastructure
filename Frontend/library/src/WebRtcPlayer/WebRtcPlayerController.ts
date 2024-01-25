@@ -191,41 +191,43 @@ export class WebRtcPlayerController {
         // set up websocket methods
         this.transport = new WebSocketTransport();
         this.protocol = new SignallingProtocol(this.transport);
-        this.protocol.addMessageHandler(MessageReceive.MessageRecvTypes.CONFIG, (msg: MessageReceive.MessageRecv) =>
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.CONFIG, (msg: MessageReceive.MessageRecv) =>
             this.handleOnConfigMessage(msg as MessageReceive.MessageConfig)
         );
-        this.protocol.addMessageHandler(MessageReceive.MessageRecvTypes.STREAMER_LIST, (msg: MessageReceive.MessageRecv) =>
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.STREAMER_LIST, (msg: MessageReceive.MessageRecv) =>
             this.handleStreamerListMessage(msg as MessageReceive.MessageStreamerList)
         );
-        this.protocol.addMessageHandler(MessageReceive.MessageRecvTypes.STREAMER_ID_CHANGED, (msg: MessageReceive.MessageRecv) =>
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.STREAMER_ID_CHANGED, (msg: MessageReceive.MessageRecv) =>
             this.handleStreamerIDChangedMessage(msg as MessageReceive.MessageStreamerIDChanged)
         );
-        this.protocol.addMessageHandler(MessageReceive.MessageRecvTypes.PLAYER_COUNT, (msg: MessageReceive.MessageRecv) => {
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.PLAYER_COUNT, (msg: MessageReceive.MessageRecv) => {
             const playerCountMessage = msg as MessageReceive.MessagePlayerCount;
-            this.pixelStreaming._onPlayerCount(playerCountMessage.count)
+            this.pixelStreaming._onPlayerCount(playerCountMessage.count);
         });
-        this.protocol.addMessageHandler(MessageReceive.MessageRecvTypes.ANSWER, (msg: MessageReceive.MessageRecv) => {
-            this.handleWebRtcAnswer(msg as MessageReceive.MessageAnswer);
-        });
-        this.protocol.addMessageHandler(MessageReceive.MessageRecvTypes.OFFER, (msg: MessageReceive.MessageRecv) => {
-            this.handleWebRtcOffer(msg as MessageReceive.MessageOffer);
-        });
-        this.protocol.addMessageHandler(MessageReceive.MessageRecvTypes.PEER_DATA_CHANNELS, (msg: MessageReceive.MessageRecv) => {
-            this.handleWebRtcSFUPeerDatachannels(msg as MessageReceive.MessagePeerDataChannels);
-        });
-        this.protocol.addMessageHandler(MessageReceive.MessageRecvTypes.ICE_CANDIDATE, (msg: MessageReceive.MessageRecv) => {
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.ANSWER, (msg: MessageReceive.MessageRecv) =>
+            this.handleWebRtcAnswer(msg as MessageReceive.MessageAnswer)
+        );
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.OFFER, (msg: MessageReceive.MessageRecv) =>
+            this.handleWebRtcOffer(msg as MessageReceive.MessageOffer)
+        );
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.PEER_DATA_CHANNELS, (msg: MessageReceive.MessageRecv) =>
+            this.handleWebRtcSFUPeerDatachannels(msg as MessageReceive.MessagePeerDataChannels)
+        );
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.ICE_CANDIDATE, (msg: MessageReceive.MessageRecv) => {
             const iceCandidateMessage = msg as MessageReceive.MessageIceCandidate;
             this.handleIceCandidate(iceCandidateMessage.candidate);
         });
-        this.protocol.transportEvents.addEventListener('open', () => {
-            const BrowserSendsOffer = this.config.isFlagEnabled(
-                Flags.BrowserSendOffer
-            );
+        this.protocol.transportEvents.addListener('open', () => {
+            const BrowserSendsOffer = this.config.isFlagEnabled(Flags.BrowserSendOffer);
             if (!BrowserSendsOffer) {
                 this.protocol.sendMessage(new MessageSend.MessageListStreamers());
             }
         });
-        this.protocol.transportEvents.addEventListener('close', (event: CustomEvent) => {
+        this.protocol.transportEvents.addListener('error', () => {
+            // dont really need to do anything here since the close event should follow.
+            Logger.Error(Logger.GetStackTrace(), `Got a transport error.`);
+        });
+        this.protocol.transportEvents.addListener('close', (event: CloseEvent) => {
             // when we refresh the page during a stream we get the going away code.
             // in that case we don't want to reconnect since we're navigating away.
             // https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
@@ -233,10 +235,10 @@ export class WebRtcPlayerController {
             const CODE_GOING_AWAY = 1001;
 
             const willTryReconnect = this.shouldReconnect
-                && event.detail.code != CODE_GOING_AWAY
+                && event.code != CODE_GOING_AWAY
                 && this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts) > 0
 
-            const disconnectMessage = this.disconnectMessage ? this.disconnectMessage : event.detail.reason;
+            const disconnectMessage = this.disconnectMessage ? this.disconnectMessage : event.reason;
             this.pixelStreaming._onDisconnect(disconnectMessage, !willTryReconnect && !this.isReconnecting);
 
             this.afkController.stopAfkWarningTimer();
@@ -260,7 +262,7 @@ export class WebRtcPlayerController {
                 setTimeout(() => {
                     this.isReconnecting = true;
                     this.reconnectAttempt++;
-                    this.tryReconnect(event.detail.reason);
+                    this.tryReconnect(event.reason);
                 }, 2000);
             }
         });

@@ -1,5 +1,6 @@
 import { MessageSend } from '../WebSockets/MessageSend';
 import { MessageRecv } from '../WebSockets/MessageReceive';
+import { EventEmitter } from 'events';
 
 /**
  * An interface to a transport protocol that is in charge of sending and receiving signalling messages.
@@ -10,7 +11,7 @@ export interface ITransport {
     /**
      * Dispatch open/error/close events on this to indicate transport events to the protocol.
      */
-    events: EventTarget;
+    events: EventEmitter;
 
     /**
      * Called when the protocol wants to send a message over the transport.

@@ -4,68 +4,74 @@ import { Logger } from '../Logger/Logger';
 import { ITransport } from '../Transport/ITransport';
 import * as MessageReceive from './MessageReceive';
 import * as MessageSend from './MessageSend';
+import { EventEmitter } from 'events';
 
 /**
  * Signalling protocol for handling messages from the signalling server.
  */
 export class SignallingProtocol {
     private transport: ITransport;
-    private messageHandlers: Map<string, (msg: MessageReceive.MessageRecv) => void>;
-    transportEvents: EventTarget;
+
+    /**
+     * Listen on this emitter for transport events, open, close, error.
+     */
+    transportEvents: EventEmitter;
+
+    /**
+     * Listen on this emitter for messages. Message type is the name of the event to listen for.
+     */
+    messageHandlers: EventEmitter;
 
     constructor(transport: ITransport) {
-        this.transportEvents = new EventTarget();
         this.transport = transport;
-        this.messageHandlers = new Map<string, (msg: MessageReceive.MessageRecv) => void>();
+        this.transportEvents = new EventEmitter();
+        this.messageHandlers = new EventEmitter();
 
-        transport.events.addEventListener('open', () => {
-            this.transportEvents.dispatchEvent(new Event('open'));
-        });
-        transport.events.addEventListener('error', () => {
-            this.transportEvents.dispatchEvent(new Event('error'));
-        });
-        transport.events.addEventListener('close', (event: CloseEvent) => {
-            this.transportEvents.dispatchEvent(new CustomEvent('close', { detail: event }));
-        });
+        transport.events.addListener('open', () => this.transportEvents.emit('open'));
+        transport.events.addListener('error', () => this.transportEvents.emit('error'));
+        transport.events.addListener('close', (event: CloseEvent) => this.transportEvents.emit('close', event));
+
         transport.onMessage = (msg: MessageReceive.MessageRecv) => {
             // auto handle ping messages
             if (msg.type == MessageReceive.MessageRecvTypes.PING) {
                 const pongMessage = new MessageSend.MessagePong(new Date().getTime());
                 transport.sendMessage(pongMessage);
-            } else {
-                // custom handlers
-                if (this.messageHandlers.has(msg.type)) {
-                    this.messageHandlers.get(msg.type)(msg);
-                } else {
-                    Logger.Error(
-                        Logger.GetStackTrace(),
-                        `Message type of ${msg.type} does not have a message handler registered on the frontend - ignoring message.`
-                    );
-                }
             }
+            // call the handlers
+            this.messageHandlers.emit(msg.type, msg);
         };
     }
 
+    /**
+     * Asks the transport to connect to the given URL.
+     */
     connect(url: string) {
         return this.transport.connect(url);
     }
 
+    /**
+     * Asks the transport to disconnect from any connection it might have.
+     */
     disconnect() {
         this.transport.disconnect();
     }
 
+    /**
+     * Returns true if the transport is connected and ready to send/receive messages.
+     */
     isConnected() {
         return this.transport.isConnected();
     }
 
+    /**
+     * Passes a message to the transport to send to the other end.
+     */
     sendMessage(msg: MessageSend.MessageSend) {
         this.transport.sendMessage(msg);
     }
 
-    addMessageHandler(messageId: string, messageHandler: (msg: MessageReceive.MessageRecv) => void) {
-        this.messageHandlers.set(messageId, messageHandler);
-    }
-
+    // the following are just wrappers for sendMessage and should be deprioritized.
+    
     requestStreamerList() {
         const payload = new MessageSend.MessageListStreamers();
         this.transport.sendMessage(payload);

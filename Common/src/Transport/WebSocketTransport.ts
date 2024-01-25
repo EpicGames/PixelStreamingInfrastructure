@@ -4,7 +4,8 @@ import { Logger } from '../Logger/Logger';
 import { MessageRecv } from '../WebSockets/MessageReceive';
 import { MessageSend } from '../WebSockets/MessageSend';
 import { ITransport } from './ITransport';
- 
+import { EventEmitter } from 'events';
+
 // declare the new method for the websocket interface
 declare global {
     interface WebSocket {
@@ -18,10 +19,10 @@ declare global {
 export class WebSocketTransport implements ITransport {
     WS_OPEN_STATE = 1;
     webSocket: WebSocket;
-    events: EventTarget;
+    events: EventEmitter;
 
     constructor() {
-        this.events = new EventTarget();
+        this.events = new EventEmitter();
     }
 
     sendMessage(msg: MessageSend): void {
@@ -43,8 +44,7 @@ export class WebSocketTransport implements ITransport {
             this.webSocket.onerror = (_: Event) => this.handleOnError();
             this.webSocket.onclose = (event: CloseEvent) => this.handleOnClose(event);
             this.webSocket.onmessage = (event: MessageEvent) => this.handleOnMessage(event);
-            this.webSocket.onmessagebinary = (event: MessageEvent) =>
-                this.handleOnMessageBinary(event);
+            this.webSocket.onmessagebinary = (event: MessageEvent) => this.handleOnMessageBinary(event);
             return true;
         } catch (error) {
             Logger.Error(error, error);
@@ -128,7 +128,7 @@ export class WebSocketTransport implements ITransport {
             'Connected to the signalling server via WebSocket',
             6
         );
-        this.events.dispatchEvent(new Event('open'));
+        this.events.emit('open');
     }
 
     /**
@@ -136,8 +136,8 @@ export class WebSocketTransport implements ITransport {
      * @param event - Error Payload
      */
     handleOnError() {
-        Logger.Error(Logger.GetStackTrace(), 'WebSocket error');
-        this.events.dispatchEvent(new Event('error'));
+        //Logger.Error(Logger.GetStackTrace(), 'WebSocket error');
+        this.events.emit('error');
     }
 
     /**
@@ -152,9 +152,8 @@ export class WebSocketTransport implements ITransport {
                 ' - ' +
                 event.reason
         );
-        this.events.dispatchEvent(new CustomEvent('close', { 'detail': event }));
+        this.events.emit('close', event);
     }
-
 
     /**
      * Closes the Websocket connection
