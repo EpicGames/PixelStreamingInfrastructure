@@ -2,13 +2,12 @@
 
 //-- Server side logic. Serves pixel streaming WebRTC-based page, proxies data back to Streamer --//
 
-var express = require('express');
-var app = express();
+const express = require('express');
+const app = express();
 
 const fs = require('fs');
 const path = require('path');
 const querystring = require('querystring');
-const bodyParser = require('body-parser');
 const logging = require('./modules/logging.js');
 logging.RegisterConsoleLogger();
 
@@ -25,9 +24,9 @@ const defaultConfig = {
 	HomepageFile: 'player.html',
 	AdditionalRoutes: new Map(),
 	EnableWebserver: true,
-	MatchmakerAddress: "",
+	MatchmakerAddress: '',
 	MatchmakerPort: 9999,
-	PublicIp: "localhost",
+	PublicIp: 'localhost',
 	HttpPort: 80,
 	HttpsPort: 443,
 	StreamerPort: 8888,
@@ -45,12 +44,12 @@ if (config.LogToFile) {
 	logging.RegisterFileLogger('./logs/');
 }
 
-console.log("Config: " + JSON.stringify(config, null, '\t'));
+console.log('Config: ' + JSON.stringify(config, null, '\t'));
 
 var http = require('http').Server(app);
 
 if (config.UseHTTPS) {
-	//HTTPS certificate details
+	// HTTPS certificate details
 	const options = {
 		key: fs.readFileSync(path.join(__dirname, config.HTTPSKeyFile)),
 		cert: fs.readFileSync(path.join(__dirname, config.HTTPSCertFile))
@@ -60,8 +59,8 @@ if (config.UseHTTPS) {
 }
 
 const helmet = require('helmet');
-var hsts = require('hsts');
-var net = require('net');
+const hsts = require('hsts');
+const net = require('net');
 
 var FRONTEND_WEBSERVER = 'https://localhost';
 if (config.UseFrontend) {
@@ -69,9 +68,9 @@ if (config.UseFrontend) {
 	var httpsPort = 8000;
 
 	if (config.UseHTTPS && config.DisableSSLCert) {
-		//Required for self signed certs otherwise just get an error back when sending request to frontend see https://stackoverflow.com/a/35633993
+		// Required for self signed certs otherwise just get an error back when sending request to frontend see https://stackoverflow.com/a/35633993
 		console.logColor(logging.Orange, 'WARNING: config.DisableSSLCert is true. Unauthorized SSL certificates will be allowed! This is convenient for local testing but please DO NOT SHIP THIS IN PRODUCTION. To remove this warning please set DisableSSLCert to false in your config.json.');
-		process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+		process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 	}
 
 	const httpsClient = require('./modules/httpsClient.js');
@@ -130,7 +129,7 @@ try {
 		clientConfig.peerConnectionOptions = JSON.parse(config.peerConnectionOptions);
 		console.log(`peerConnectionOptions = ${JSON.stringify(clientConfig.peerConnectionOptions)}`);
 	} else {
-		console.log("No peerConnectionConfig")
+		console.log('No peerConnectionConfig');
 	}
 
 	if (typeof config.MatchmakerAddress != 'undefined') {
@@ -160,12 +159,12 @@ if (config.UseHTTPS) {
 		maxAge: 15552000  // 180 days in seconds
 	}));
 
-	//Setup http -> https redirect
+	// Setup http -> https redirect
 	console.log('Redirecting http->https');
 	app.use(function (req, res, next) {
 		if (!req.secure) {
 			if (req.get('Host')) {
-				var hostAddressParts = req.get('Host').split(':');
+				const hostAddressParts = req.get('Host').split(':');
 				var hostAddress = hostAddressParts[0];
 				if (httpsPort != 443) {
 					hostAddress = `${hostAddress}:${httpsPort}`;
@@ -185,43 +184,42 @@ sendGameSessionData();
 // set up rate limiter: maximum of five requests per minute
 var RateLimit = require('express-rate-limit');
 var limiter = RateLimit({
-  windowMs: 1*60*1000, // 1 minute
-  max: 60
+	windowMs: 1 * 60 * 1000, // 1 minute
+	max: 60
 });
 
 // apply rate limiter to all requests
 app.use(limiter);
 
-if(config.EnableWebserver) {
+if (config.EnableWebserver) {
 	//Setup folders
-	app.use(express.static(path.join(__dirname, '/Public')))
-	app.use('/images', express.static(path.join(__dirname, './images')))
+	app.use(express.static(path.join(__dirname, '/Public')));
+	app.use('/images', express.static(path.join(__dirname, './images')));
 	app.use('/scripts', express.static(path.join(__dirname, '/scripts')));
-	app.use('/', express.static(path.join(__dirname, '/custom_html')))
+	app.use('/', express.static(path.join(__dirname, '/custom_html')));
 }
 
 try {
 	for (var property in config.AdditionalRoutes) {
 		if (config.AdditionalRoutes.hasOwnProperty(property)) {
-			console.log(`Adding additional routes "${property}" -> "${config.AdditionalRoutes[property]}"`)
+			console.log(`Adding additional routes '${property}' -> '${config.AdditionalRoutes[property]}'`);
 			app.use(property, express.static(path.join(__dirname, config.AdditionalRoutes[property])));
 		}
 	}
 } catch (err) {
-	console.error(`reading config.AdditionalRoutes: ${err}`)
+	console.error(`reading config.AdditionalRoutes: ${err}`);
 }
 
-if(config.EnableWebserver) {
-
+if (config.EnableWebserver) {
 	// Request has been sent to site root, send the homepage file
 	app.get('/', function (req, res) {
-		homepageFile = (typeof config.HomepageFile != 'undefined' && config.HomepageFile != '') ? config.HomepageFile.toString() : defaultConfig.HomepageFile;
-		
-		let pathsToTry = [ path.join(__dirname, homepageFile), path.join(__dirname, '/Public', homepageFile), path.join(__dirname, '/custom_html', homepageFile), homepageFile ];
+		const homepageFile = (typeof config.HomepageFile != 'undefined' && config.HomepageFile != '') ? config.HomepageFile.toString() : defaultConfig.HomepageFile;
+
+		let pathsToTry = [path.join(__dirname, homepageFile), path.join(__dirname, '/Public', homepageFile), path.join(__dirname, '/custom_html', homepageFile), homepageFile];
 
 		// Try a few paths, see if any resolve to a homepage file the user has set
-		for(let pathToTry of pathsToTry){
-			if(fs.existsSync(pathToTry)){
+		for (let pathToTry of pathsToTry) {
+			if (fs.existsSync(pathToTry)) {
 				// Send the file for browser to display it
 				res.sendFile(pathToTry);
 				return;
@@ -229,20 +227,20 @@ if(config.EnableWebserver) {
 		}
 
 		// Catch file doesn't exist, and send back 404 if not
-		console.error('Unable to locate file ' + homepageFile)
-		res.status(404).send('Unable to locate file ' + homepageFile);
+		console.error(`Unable to locate file ${homepageFile}`);
+		res.status(404).send(`Unable to locate file ${homepageFile}`);
 		return;
 	});
 }
 
-//Setup http and https servers
+// Setup http and https servers
 http.listen(httpPort, function () {
-	console.logColor(logging.Green, 'Http listening on *: ' + httpPort);
+	console.logColor(logging.Green, `Http listening on *: ${httpPort}`);
 });
 
 if (config.UseHTTPS) {
 	https.listen(httpsPort, function () {
-		console.logColor(logging.Green, 'Https listening on *: ' + httpsPort);
+		console.logColor(logging.Green, `Https listening on *: ${httpsPort}`);
 	});
 }
 
@@ -363,7 +361,7 @@ class Player {
 
 	sendFrom(message) {
 		if (!this.streamerId) {
-			if(streamers.size > 0) {
+			if (streamers.size > 0) {
 				this.streamerId = streamers.entries().next().value[0];
 				console.logColor(logging.Orange, `Player ${this.id} attempted to send an outgoing message without having subscribed first. Defaulting to ${this.streamerId}`);
 			} else {
@@ -411,8 +409,8 @@ class Player {
 
 let streamers = new Map();		// streamerId <-> streamer
 let players = new Map(); 		// playerId <-> player/peer/viewer
-const LegacyStreamerPrefix = "__LEGACY_STREAMER__"; // old streamers that dont know how to ID will be assigned this id prefix.
-const LegacySFUPrefix = "__LEGACY_SFU__"; 					// same as streamer version but for SFUs
+const LegacyStreamerPrefix = '__LEGACY_STREAMER__'; // old streamers that dont know how to ID will be assigned this id prefix.
+const LegacySFUPrefix = '__LEGACY_SFU__'; 					// same as streamer version but for SFUs
 const streamerIdTimeoutSecs = 5;
 
 // gets the SFU subscribed to this streamer if any.
@@ -430,23 +428,23 @@ function getSFUForStreamer(streamerId) {
 
 function logIncoming(sourceName, msg) {
 	if (config.LogVerbose)
-		console.logColor(logging.Blue, "\x1b[37m%s ->\x1b[34m %s", sourceName, JSON.stringify(msg));
+		console.logColor(logging.Blue, '\x1b[37m%s ->\x1b[34m %s', sourceName, JSON.stringify(msg));
 	else
-		console.logColor(logging.Blue, "\x1b[37m%s ->\x1b[34m %s", sourceName, msg.type);
+		console.logColor(logging.Blue, '\x1b[37m%s ->\x1b[34m %s', sourceName, msg.type);
 }
 
 function logOutgoing(destName, msg) {
 	if (config.LogVerbose)
-		console.logColor(logging.Green, "\x1b[37m%s <-\x1b[32m %s", destName, JSON.stringify(msg));
+		console.logColor(logging.Green, '\x1b[37m%s <-\x1b[32m %s', destName, JSON.stringify(msg));
 	else
-		console.logColor(logging.Green, "\x1b[37m%s <-\x1b[32m %s", destName, msg.type);
+		console.logColor(logging.Green, '\x1b[37m%s <-\x1b[32m %s', destName, msg.type);
 }
 
 function logForward(srcName, destName, msg) {
 	if (config.LogVerbose)
-		console.logColor(logging.Cyan, "\x1b[37m%s -> %s\x1b[36m %s", srcName, destName, JSON.stringify(msg));
+		console.logColor(logging.Cyan, '\x1b[37m%s -> %s\x1b[36m %s', srcName, destName, JSON.stringify(msg));
 	else
-		console.logColor(logging.Cyan, "\x1b[37m%s -> %s\x1b[36m %s", srcName, destName, msg.type);
+		console.logColor(logging.Cyan, '\x1b[37m%s -> %s\x1b[36m %s', srcName, destName, msg.type);
 }
 
 let WebSocket = require('ws');
@@ -485,11 +483,11 @@ function requestStreamerId(streamer) {
 	// and assign it an id.
 
 	// request id
-	const msg = { type: "identify" };
+	const msg = { type: 'identify' };
 	logOutgoing(streamer.id, msg);
 	streamer.ws.send(JSON.stringify(msg));
 
-	streamer.idTimer = setTimeout(function() {
+	streamer.idTimer = setTimeout(function () {
 		// streamer did not respond in time. give it a legacy id.
 		const newLegacyId = getUniqueLegacyStreamerId();
 		if (newLegacyId.length == 0) {
@@ -527,13 +525,13 @@ function registerStreamer(id, streamer) {
 	// remove any existing streamer id
 	if (!!streamer.id) {
 		// notify any connected peers of rename
-		const renameMessage = { type: "streamerIDChanged", newID: id };
+		const renameMessage = { type: 'streamerIDChanged', newID: id };
 		let clone = new Map(players);
 		for (let player of clone.values()) {
 			if (player.streamerId == streamer.id) {
 				logOutgoing(player.id, renameMessage);
-			 	player.sendTo(renameMessage);
-			 	player.streamerId = id; // reassign the subscription
+				player.sendTo(renameMessage);
+				player.streamerId = id; // reassign the subscription
 			}
 		}
 		streamers.delete(streamer.id);
@@ -561,7 +559,7 @@ function onStreamerDisconnected(streamer) {
 	sendStreamerDisconnectedToMatchmaker();
 	let sfuPlayer = getSFUForStreamer(streamer.id);
 	if (sfuPlayer) {
-		const msg = { type: "streamerDisconnected" };
+		const msg = { type: 'streamerDisconnected' };
 		logOutgoing(sfuPlayer.id, msg);
 		sfuPlayer.sendTo(msg);
 		disconnectAllPlayers(sfuPlayer.id);
@@ -580,7 +578,7 @@ function onStreamerMessageId(streamer, msg) {
 function onStreamerMessagePing(streamer, msg) {
 	logIncoming(streamer.id, msg);
 
-	const pongMsg = JSON.stringify({ type: "pong", time: msg.time});
+	const pongMsg = JSON.stringify({ type: 'pong', time: msg.time });
 	streamer.ws.send(pongMsg);
 }
 
@@ -610,7 +608,7 @@ function forwardStreamerMessageToPlayer(streamer, msg) {
 		logForward(streamer.id, playerId, msg);
 		player.sendTo(msg);
 	} else {
-		console.warn("No playerId specified, cannot forward message: %s", msg);
+		console.warn('No playerId specified, cannot forward message: %s', msg);
 	}
 }
 
@@ -623,7 +621,7 @@ streamerMessageHandlers.set('iceCandidate', forwardStreamerMessageToPlayer);
 streamerMessageHandlers.set('disconnectPlayer', onStreamerMessageDisconnectPlayer);
 streamerMessageHandlers.set('layerPreference', onStreamerMessageLayerPreference);
 
-console.logColor(logging.Green, `WebSocket listening for Streamer connections on :${streamerPort}`)
+console.logColor(logging.Green, `WebSocket listening for Streamer connections on :${streamerPort}`);
 let streamerServer = new WebSocket.Server({ port: streamerPort, backlog: 1 });
 streamerServer.on('connection', function (ws, req) {
 	console.logColor(logging.Green, `Streamer connected: ${req.connection.remoteAddress}`);
@@ -636,7 +634,7 @@ streamerServer.on('connection', function (ws, req) {
 		var msg;
 		try {
 			msg = JSON.parse(msgRaw);
-		} catch(err) {
+		} catch (err) {
 			console.error(`Cannot parse Streamer message: ${msgRaw}\nError: ${err}`);
 			ws.close(1008, 'Cannot parse');
 			return;
@@ -645,7 +643,7 @@ streamerServer.on('connection', function (ws, req) {
 		let handler = streamerMessageHandlers.get(msg.type);
 		if (!handler || (typeof handler != 'function')) {
 			if (config.LogVerbose) {
-				console.logColor(logging.White, "\x1b[37m-> %s\x1b[34m: %s", streamer.id, msgRaw);
+				console.logColor(logging.White, '\x1b[37m-> %s\x1b[34m: %s', streamer.id, msgRaw);
 			}
 			console.error(`unsupported Streamer message type: ${msg.type}`);
 			ws.close(1008, 'Unsupported message type');
@@ -653,18 +651,18 @@ streamerServer.on('connection', function (ws, req) {
 		}
 		handler(streamer, msg);
 	});
-	
-	ws.on('close', function(code, reason) {
+
+	ws.on('close', function (code, reason) {
 		console.error(`streamer ${streamer.id} disconnected: ${code} - ${reason}`);
 		onStreamerDisconnected(streamer);
 	});
 
-	ws.on('error', function(error) {
+	ws.on('error', function (error) {
 		console.error(`streamer ${streamer.id} connection error: ${error}`);
 		onStreamerDisconnected(streamer);
 		try {
 			ws.close(1006 /* abnormal closure */, `streamer ${streamer.id} connection error: ${error}`);
-		} catch(err) {
+		} catch (err) {
 			console.error(`ERROR: ws.on error: ${err.message}`);
 		}
 	});
@@ -672,7 +670,6 @@ streamerServer.on('connection', function (ws, req) {
 	const configStr = JSON.stringify(clientConfig);
 	logOutgoing(streamer.id, configStr)
 	ws.send(configStr);
-
 	requestStreamerId(streamer);
 });
 
@@ -705,12 +702,12 @@ function onPeerDataChannelsSFUMessage(sfuPlayer, msg) {
 // basically a duplicate of the streamer id request but this one does not register the streamer
 function requestSFUStreamerId(sfuPlayer) {
 	// request id
-	const msg = { type: "identify" };
+	const msg = { type: 'identify' };
 	const sfuStreamerComponent = sfuPlayer.getSFUStreamerComponent();
 	logOutgoing(sfuStreamerComponent.id, msg);
 	sfuStreamerComponent.ws.send(JSON.stringify(msg));
 
-	sfuStreamerComponent.idTimer = setTimeout(function() {
+	sfuStreamerComponent.idTimer = setTimeout(function () {
 		// streamer did not respond in time. give it a legacy id.
 		const newLegacyId = getUniqueSFUId();
 		if (newLegacyId.length == 0) {
@@ -748,7 +745,7 @@ function onSFUMessageStartStreaming(sfuPlayer, msg) {
 function onSFUMessageStopStreaming(sfuPlayer, msg) {
 	const sfuStreamerComponent = sfuPlayer.getSFUStreamerComponent();
 	logIncoming(sfuStreamerComponent.id, msg);
-if (!streamers.has(sfuStreamerComponent.id)) {
+	if (!streamers.has(sfuStreamerComponent.id)) {
 		console.error(`SFU ${sfuStreamerComponent.id} is not registered as a streamer or streaming.`)
 		return;
 	}
@@ -757,11 +754,11 @@ if (!streamers.has(sfuStreamerComponent.id)) {
 }
 
 function onSFUDisconnected(sfuPlayer) {
-	console.log("disconnecting SFU from streamer");
+	console.log('disconnecting SFU from streamer');
 	disconnectAllPlayers(sfuPlayer.id);
 	onStreamerDisconnected(sfuPlayer.getSFUStreamerComponent());
 	sfuPlayer.unsubscribe();
-	sfuPlayer.ws.close(4000, "SFU Disconnected");
+	sfuPlayer.ws.close(4000, 'SFU Disconnected');
 	players.delete(sfuPlayer.id);
 	streamers.delete(sfuPlayer.id);
 }
@@ -780,7 +777,6 @@ sfuMessageHandlers.set('stopStreaming', onSFUMessageStopStreaming);
 console.logColor(logging.Green, `WebSocket listening for SFU connections on :${sfuPort}`);
 let sfuServer = new WebSocket.Server({ port: sfuPort });
 sfuServer.on('connection', function (ws, req) {
-
 	let playerId = sanitizePlayerId(nextPlayerId++);
 	console.logColor(logging.Green, `SFU (${req.connection.remoteAddress}) connected `);
 
@@ -812,7 +808,7 @@ sfuServer.on('connection', function (ws, req) {
 		let handler = sfuMessageHandlers.get(msg.type);
 		if (!handler || (typeof handler != 'function')) {
 			if (config.LogVerbose) {
-				console.logColor(logging.White, "\x1b[37m-> %s\x1b[34m: %s", sfuPlayer.id, msgRaw);
+				console.logColor(logging.White, '\x1b[37m-> %s\x1b[34m: %s', sfuPlayer.id, msgRaw);
 			}
 			console.error(`unsupported SFU message type: ${msg.type}`);
 			ws.close(1008, 'Unsupported message type');
@@ -821,17 +817,17 @@ sfuServer.on('connection', function (ws, req) {
 		handler(sfuPlayer, msg);
 	});
 
-	ws.on('close', function(code, reason) {
+	ws.on('close', function (code, reason) {
 		console.error(`SFU disconnected: ${code} - ${reason}`);
 		onSFUDisconnected(playerComponent);
 	});
 
-	ws.on('error', function(error) {
+	ws.on('error', function (error) {
 		console.error(`SFU connection error: ${error}`);
 		onSFUDisconnected(playerComponent);
 		try {
 			ws.close(1006 /* abnormal closure */, `SFU connection error: ${error}`);
-		} catch(err) {
+		} catch (err) {
 			console.error(`ERROR: ws.on error: ${err.message}`);
 		}
 	});
@@ -843,7 +839,7 @@ let playerCount = 0;
 
 function sendPlayersCount() {
 	const msg = { type: 'playerCount', count: players.size };
-	logOutgoing("[players]", msg);
+	logOutgoing('[players]', msg);
 	for (let player of players.values()) {
 		player.sendTo(msg);
 	}
@@ -902,15 +898,14 @@ playerMessageHandlers.set('dataChannelRequest', forwardPlayerMessage);
 playerMessageHandlers.set('peerDataChannelsReady', forwardPlayerMessage);
 
 console.logColor(logging.Green, `WebSocket listening for Players connections on :${httpPort}`);
-let playerServer = new WebSocket.Server({ server: config.UseHTTPS ? https : http});
+let playerServer = new WebSocket.Server({ server: config.UseHTTPS ? https : http });
 playerServer.on('connection', function (ws, req) {
 	var url = require('url');
 	const parsedUrl = url.parse(req.url);
 	const urlParams = new URLSearchParams(parsedUrl.search);
 	const whoSendsOffer = urlParams.has('OfferToReceive') && urlParams.get('OfferToReceive') !== 'false' ? WhoSendsOffer.Browser : WhoSendsOffer.Streamer;
 
-	if (playerCount + 1 > maxPlayerCount && maxPlayerCount !== -1)
-	{
+	if (playerCount + 1 > maxPlayerCount && maxPlayerCount !== -1) {
 		console.logColor(logging.Red, `new connection would exceed number of allowed concurrent connections. Max: ${maxPlayerCount}, Current ${playerCount}`);
 		ws.close(1013, `too many connections. max: ${maxPlayerCount}, current: ${playerCount}`);
 		return;
@@ -922,7 +917,7 @@ playerServer.on('connection', function (ws, req) {
 	let player = new Player(playerId, ws, PlayerType.Regular, whoSendsOffer);
 	players.set(playerId, player);
 
-	ws.on('message', (msgRaw) =>{
+	ws.on('message', (msgRaw) => {
 		var msg;
 		try {
 			msg = JSON.parse(msgRaw);
@@ -942,7 +937,7 @@ playerServer.on('connection', function (ws, req) {
 		let handler = playerMessageHandlers.get(msg.type);
 		if (!handler || (typeof handler != 'function')) {
 			if (config.LogVerbose) {
-				console.logColor(logging.White, "\x1b[37m-> %s\x1b[34m: %s", playerId, msgRaw);
+				console.logColor(logging.White, '\x1b[37m-> %s\x1b[34m: %s', playerId, msgRaw);
 			}
 			console.error(`unsupported player message type: ${msg.type}`);
 			ws.close(1008, 'Unsupported message type');
@@ -951,12 +946,12 @@ playerServer.on('connection', function (ws, req) {
 		handler(player, msg);
 	});
 
-	ws.on('close', function(code, reason) {
+	ws.on('close', function (code, reason) {
 		console.logColor(logging.Yellow, `player ${playerId} connection closed: ${code} - ${reason}`);
 		onPlayerDisconnected(playerId);
 	});
 
-	ws.on('error', function(error) {
+	ws.on('error', function (error) {
 		console.error(`player ${playerId} connection error: ${error}`);
 		ws.close(1006 /* abnormal closure */, `player ${playerId} connection error: ${error}`);
 		onPlayerDisconnected(playerId);
@@ -971,7 +966,6 @@ playerServer.on('connection', function (ws, req) {
 	const configStr = JSON.stringify(clientConfig);
 	logOutgoing(player.id, configStr)
 	player.ws.send(configStr);
-
 	sendPlayersCount();
 });
 
@@ -980,9 +974,9 @@ function disconnectAllPlayers(streamerId) {
 	let clone = new Map(players);
 	for (let player of clone.values()) {
 		if (player.streamerId == streamerId) {
-		 	// disconnect players but just unsubscribe the SFU
-		 	const sfuPlayer = getSFUForStreamer(streamerId);
-		 	if (sfuPlayer && player.id == sfuPlayer.id) {
+			// disconnect players but just unsubscribe the SFU
+			const sfuPlayer = getSFUForStreamer(streamerId);
+			if (sfuPlayer && player.id == sfuPlayer.id) {
 				sfuPlayer.unsubscribe();
 			} else {
 				player.ws.close();
@@ -996,23 +990,23 @@ function disconnectAllPlayers(streamerId) {
  */
 
 if (config.UseMatchmaker) {
-	var matchmaker = new net.Socket();
+	let matchmaker = new net.Socket();
 
-	matchmaker.on('connect', function() {
+	matchmaker.on('connect', function () {
 		console.log(`Cirrus connected to Matchmaker ${matchmakerAddress}:${matchmakerPort}`);
 
 		// message.playerConnected is a new variable sent from the SS to help track whether or not a player 
 		// is already connected when a 'connect' message is sent (i.e., reconnect). This happens when the MM
 		// and the SS get disconnected unexpectedly (was happening often at scale for some reason).
-		var playerConnected = false;
+		let playerConnected = false;
 
 		// Set the playerConnected flag to tell the MM if there is already a player active (i.e., don't send a new one here)
-		if( players && players.size > 0) {
+		if (players && players.size > 0) {
 			playerConnected = true;
 		}
 
 		// Add the new playerConnected flag to the message body to the MM
-		message = {
+		const message = {
 			type: 'connect',
 			address: typeof serverPublicIp === 'undefined' ? '127.0.0.1' : serverPublicIp,
 			port: config.UseHTTPS ? httpsPort : httpPort,
@@ -1033,8 +1027,8 @@ if (config.UseMatchmaker) {
 
 	matchmaker.on('close', (hadError) => {
 		console.logColor(logging.Blue, 'Setting Keep Alive to true');
-        matchmaker.setKeepAlive(true, 60000); // Keeps it alive for 60 seconds
-		
+		matchmaker.setKeepAlive(true, 60000); // Keeps it alive for 60 seconds
+
 		console.log(`Matchmaker connection closed (hadError=${hadError})`);
 
 		reconnect();
@@ -1048,13 +1042,13 @@ if (config.UseMatchmaker) {
 	// Try to reconnect to the Matchmaker after a given period of time
 	function reconnect() {
 		console.log(`Try reconnect to Matchmaker in ${matchmakerRetryInterval} seconds`)
-		setTimeout(function() {
+		setTimeout(function () {
 			connect();
 		}, matchmakerRetryInterval * 1000);
 	}
 
 	function registerMMKeepAlive() {
-		setInterval(function() {
+		setInterval(function () {
 			message = {
 				type: 'ping'
 			};
@@ -1066,26 +1060,25 @@ if (config.UseMatchmaker) {
 	registerMMKeepAlive();
 }
 
-//Keep trying to send gameSessionId in case the server isn't ready yet
+// Keep trying to send gameSessionId in case the server isn't ready yet
 function sendGameSessionData() {
-	//If we are not using the frontend web server don't try and make requests to it
+	// If we are not using the frontend web server don't try and make requests to it
 	if (!config.UseFrontend)
 		return;
 	webRequest.get(`${FRONTEND_WEBSERVER}/server/requestSessionId`,
 		function (response, body) {
 			if (response.statusCode === 200) {
 				gameSessionId = body;
-				console.log('SessionId: ' + gameSessionId);
-			}
-			else {
-				console.error('Status code: ' + response.statusCode);
+				console.log(`SessionId: ${gameSessionId}`);
+			} else {
+				console.error(`Status code: ${response.statusCode}`);
 				console.error(body);
 			}
 		},
 		function (err) {
-			//Repeatedly try in cases where the connection timed out or never connected
-			if (err.code === "ECONNRESET") {
-				//timeout
+			// Repeatedly try in cases where the connection timed out or never connected
+			if (err.code === 'ECONNRESET') {
+				// timeout
 				sendGameSessionData();
 			} else if (err.code === 'ECONNREFUSED') {
 				console.error('Frontend server not running, unable to setup game session');
@@ -1096,7 +1089,7 @@ function sendGameSessionData() {
 }
 
 function sendUserSessionData(serverPort) {
-	//If we are not using the frontend web server don't try and make requests to it
+	// If we are not using the frontend web server don't try and make requests to it
 	if (!config.UseFrontend)
 		return;
 	webRequest.get(`${FRONTEND_WEBSERVER}/server/requestUserSessionId?gameSessionId=${gameSessionId}&serverPort=${serverPort}&appName=${querystring.escape(clientConfig.AppName)}&appDescription=${querystring.escape(clientConfig.AppDescription)}${(typeof serverPublicIp === 'undefined' ? '' : '&serverHost=' + serverPublicIp)}`,
@@ -1112,9 +1105,9 @@ function sendUserSessionData(serverPort) {
 			}
 		},
 		function (err) {
-			//Repeatedly try in cases where the connection timed out or never connected
-			if (err.code === "ECONNRESET") {
-				//timeout
+			// Repeatedly try in cases where the connection timed out or never connected
+			if (err.code === 'ECONNRESET') {
+				// timeout
 				sendUserSessionData(serverPort);
 			} else if (err.code === 'ECONNREFUSED') {
 				console.error('Frontend server not running, unable to setup user session');
@@ -1125,7 +1118,7 @@ function sendUserSessionData(serverPort) {
 }
 
 function sendServerDisconnect() {
-	//If we are not using the frontend web server don't try and make requests to it
+	// If we are not using the frontend web server don't try and make requests to it
 	if (!config.UseFrontend)
 		return;
 	try {
@@ -1139,8 +1132,8 @@ function sendServerDisconnect() {
 				}
 			},
 			function (err) {
-				//Repeatedly try in cases where the connection timed out or never connected
-				if (err.code === "ECONNRESET") {
+				// Repeatedly try in cases where the connection timed out or never connected
+				if (err.code === 'ECONNRESET') {
 					//timeout
 					sendServerDisconnect();
 				} else if (err.code === 'ECONNREFUSED') {
@@ -1149,13 +1142,13 @@ function sendServerDisconnect() {
 					console.error(err);
 				}
 			});
-	} catch(err) {
+	} catch (err) {
 		console.logColor(logging.Red, `ERROR::: sendServerDisconnect error: ${err.message}`);
 	}
 }
 
 function sendPlayerConnectedToFrontend() {
-	//If we are not using the frontend web server don't try and make requests to it
+	// If we are not using the frontend web server don't try and make requests to it
 	if (!config.UseFrontend)
 		return;
 	try {
@@ -1164,13 +1157,13 @@ function sendPlayerConnectedToFrontend() {
 				if (response.statusCode === 200) {
 					console.log('clientConnected acknowledged by Frontend');
 				} else {
-					console.error('Status code: ' + response.statusCode);
+					console.error(`Status code: ${response.statusCode}`);
 					console.error(body);
 				}
 			},
 			function (err) {
-				//Repeatedly try in cases where the connection timed out or never connected
-				if (err.code === "ECONNRESET") {
+				// Repeatedly try in cases where the connection timed out or never connected
+				if (err.code === 'ECONNRESET') {
 					//timeout
 					sendPlayerConnectedToFrontend();
 				} else if (err.code === 'ECONNREFUSED') {
@@ -1179,13 +1172,13 @@ function sendPlayerConnectedToFrontend() {
 					console.error(err);
 				}
 			});
-	} catch(err) {
+	} catch (err) {
 		console.logColor(logging.Red, `ERROR::: sendPlayerConnectedToFrontend error: ${err.message}`);
 	}
 }
 
 function sendPlayerDisconnectedToFrontend() {
-	//If we are not using the frontend web server don't try and make requests to it
+	// If we are not using the frontend web server don't try and make requests to it
 	if (!config.UseFrontend)
 		return;
 	try {
@@ -1193,16 +1186,15 @@ function sendPlayerDisconnectedToFrontend() {
 			function (response, body) {
 				if (response.statusCode === 200) {
 					console.log('clientDisconnected acknowledged by Frontend');
-				}
-				else {
-					console.error('Status code: ' + response.statusCode);
+				} else {
+					console.error(`Status code: ${response.statusCode}`);
 					console.error(body);
 				}
 			},
 			function (err) {
-				//Repeatedly try in cases where the connection timed out or never connected
-				if (err.code === "ECONNRESET") {
-					//timeout
+				// Repeatedly try in cases where the connection timed out or never connected
+				if (err.code === 'ECONNRESET') {
+					// timeout
 					sendPlayerDisconnectedToFrontend();
 				} else if (err.code === 'ECONNREFUSED') {
 					console.error('Frontend server not running, unable to setup game session');
@@ -1210,7 +1202,7 @@ function sendPlayerDisconnectedToFrontend() {
 					console.error(err);
 				}
 			});
-	} catch(err) {
+	} catch (err) {
 		console.logColor(logging.Red, `ERROR::: sendPlayerDisconnectedToFrontend error: ${err.message}`);
 	}
 }
@@ -1219,7 +1211,7 @@ function sendStreamerConnectedToMatchmaker() {
 	if (!config.UseMatchmaker)
 		return;
 	try {
-		message = {
+		const message = {
 			type: 'streamerConnected'
 		};
 		matchmaker.write(JSON.stringify(message));
@@ -1232,10 +1224,10 @@ function sendStreamerDisconnectedToMatchmaker() {
 	if (!config.UseMatchmaker)
 		return;
 	try {
-		message = {
+		const message = {
 			type: 'streamerDisconnected'
 		};
-		matchmaker.write(JSON.stringify(message));	
+		matchmaker.write(JSON.stringify(message));
 	} catch (err) {
 		console.logColor(logging.Red, `ERROR sending streamerDisconnected: ${err.message}`);
 	}
@@ -1247,7 +1239,7 @@ function sendPlayerConnectedToMatchmaker() {
 	if (!config.UseMatchmaker)
 		return;
 	try {
-		message = {
+		const message = {
 			type: 'clientConnected'
 		};
 		matchmaker.write(JSON.stringify(message));
@@ -1262,7 +1254,7 @@ function sendPlayerDisconnectedToMatchmaker() {
 	if (!config.UseMatchmaker)
 		return;
 	try {
-		message = {
+		const message = {
 			type: 'clientDisconnected'
 		};
 		matchmaker.write(JSON.stringify(message));
