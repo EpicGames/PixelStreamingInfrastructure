@@ -1,5 +1,6 @@
 ## Relevant components:
 - [ ] Signalling server
+- [ ] Common library
 - [ ] Frontend library
 - [ ] Frontend UI library
 - [ ] Matchmaker

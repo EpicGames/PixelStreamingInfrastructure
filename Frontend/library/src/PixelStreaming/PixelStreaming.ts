@@ -5,7 +5,7 @@ import { LatencyTestResults } from '../DataChannel/LatencyTestResults';
 import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
 import { WebRtcPlayerController } from '../WebRtcPlayer/WebRtcPlayerController';
 import { Flags, NumericParameters } from '../Config/Config';
-import { Logger } from '../Logger/Logger';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { InitialSettings } from '../DataChannel/InitialSettings';
 import { OnScreenKeyboard } from '../UI/OnScreenKeyboard';
 import {
@@ -30,7 +30,7 @@ import {
     DataChannelLatencyTestResultEvent,
     PlayerCountEvent
 } from '../Util/EventEmitter';
-import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
+import { MessageReceive } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { WebXRController } from '../WebXR/WebXRController';
 import { MessageDirection } from '../UeInstanceMessage/StreamMessageController';
 import {
@@ -112,7 +112,7 @@ export class PixelStreaming {
                 x,
                 y
             );
-        this._activateOnScreenKeyboard = (command: MessageOnScreenKeyboard) =>
+        this._activateOnScreenKeyboard = (command: MessageReceive.MessageOnScreenKeyboard) =>
             this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
 
         this._webXrController = new WebXRController(this._webRtcController);
@@ -307,7 +307,7 @@ export class PixelStreaming {
      * @param command - the keyboard command
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _activateOnScreenKeyboard(command: MessageOnScreenKeyboard): void {
+    _activateOnScreenKeyboard(command: MessageReceive.MessageOnScreenKeyboard): void {
         throw new Error('Method not implemented.');
     }
 
@@ -805,8 +805,8 @@ export class PixelStreaming {
      * Public getter for the websocket controller. Access to this property allows you to send
      * custom websocket messages.
      */
-    public get webSocketController() {
-        return this._webRtcController.webSocketController;
+    public get signallingProtocol() {
+        return this._webRtcController.protocol;
     }
 
     /**

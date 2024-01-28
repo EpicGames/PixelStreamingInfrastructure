@@ -1,0 +1,25 @@
+{
+  "name": "ss_test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rimraf ./build && tsc",
+    "start": "npx protoc --ts_out src --proto_path ../Common/protobuf ../Common/protobuf/signalling_messages.proto && npm run build && node ./build/index.js",
+    "build_proto": "npx protoc --ts_out src --proto_path ../Common/protobuf ../Common/protobuf/signalling_messages.proto"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@protobuf-ts/plugin": "^2.9.3",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "@types/assert": "^1.5.10",
+    "@types/node": "^20.10.1",
+    "@types/ws": "^8.5.10",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.2"
+  }
+}

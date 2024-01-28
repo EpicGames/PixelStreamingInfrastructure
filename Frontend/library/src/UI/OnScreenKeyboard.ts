@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { UnquantizedDenormalizedUnsignedCoord } from '../Util/CoordinateConverter';
-import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
+import { MessageReceive } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 
 /**
  * Class for handling on screen keyboard usage
@@ -76,7 +76,7 @@ export class OnScreenKeyboard {
      * Shows the on screen keyboard
      * @param command the command received via the data channel containing keyboard positions
      */
-    showOnScreenKeyboard(command: MessageOnScreenKeyboard) {
+    showOnScreenKeyboard(command: MessageReceive.MessageOnScreenKeyboard) {
         if (command.showOnScreenKeyboard) {
             // Show the 'edit text' button.
             this.editTextButton.classList.remove('hiddenState');

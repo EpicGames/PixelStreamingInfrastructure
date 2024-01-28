@@ -1,15 +1,14 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { WebSocketController } from '../WebSockets/WebSocketController';
-import { ExtraOfferParameters, ExtraAnswerParameters } from '../WebSockets/MessageSend';
-import { StreamController } from '../VideoPlayer/StreamController';
 import {
-    MessageAnswer,
-    MessageOffer,
-    MessageConfig,
-    MessageStreamerList,
-    MessageStreamerIDChanged
-} from '../WebSockets/MessageReceive';
+    MessageSend,
+    MessageReceive,
+    WebSocketTransport,
+    Logger,
+    SignallingProtocol,
+    ITransport
+} from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
+import { StreamController } from '../VideoPlayer/StreamController';
 import { FreezeFrameController } from '../FreezeFrame/FreezeFrameController';
 import { AFKController } from '../AFK/AFKController';
 import { DataChannelController } from '../DataChannel/DataChannelController';
@@ -30,7 +29,6 @@ import {
     WebRTCSettings
 } from '../DataChannel/InitialSettings';
 import { LatencyTestResults } from '../DataChannel/LatencyTestResults';
-import { Logger } from '../Logger/Logger';
 import { FileTemplate, FileUtil } from '../Util/FileUtil';
 import { InputClassesFactory } from '../Inputs/InputClassesFactory';
 import { VideoPlayer } from '../VideoPlayer/VideoPlayer';
@@ -39,8 +37,6 @@ import {
     MessageDirection
 } from '../UeInstanceMessage/StreamMessageController';
 import { ResponseController } from '../UeInstanceMessage/ResponseController';
-import * as MessageReceive from '../WebSockets/MessageReceive';
-import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { SendMessageController } from '../UeInstanceMessage/SendMessageController';
 import { ToStreamerMessagesController } from '../UeInstanceMessage/ToStreamerMessagesController';
 import { MouseController } from '../Inputs/MouseController';
@@ -75,7 +71,8 @@ export class WebRtcPlayerController {
     config: Config;
     responseController: ResponseController;
     sdpConstraints: RTCOfferOptions;
-    webSocketController: WebSocketController;
+    transport: ITransport;
+    protocol: SignallingProtocol;
     // The primary data channel. This is bidirectional when p2p and send only when using an SFU
     sendrecvDataChannelController: DataChannelController;
     // A recv only data channel required when using an SFU
@@ -192,29 +189,45 @@ export class WebRtcPlayerController {
         this.streamMessageController = new StreamMessageController();
 
         // set up websocket methods
-        this.webSocketController = new WebSocketController();
-        this.webSocketController.onConfig = (
-            messageConfig: MessageReceive.MessageConfig
-        ) => this.handleOnConfigMessage(messageConfig);
-        this.webSocketController.onStreamerList = (
-            messageList: MessageReceive.MessageStreamerList
-        ) => this.handleStreamerListMessage(messageList);
-        this.webSocketController.onStreamerIDChanged = (
-            message: MessageReceive.MessageStreamerIDChanged
-        ) => this.handleStreamerIDChangedMessage(message);
-        this.webSocketController.onPlayerCount = (playerCount: MessageReceive.MessagePlayerCount) => { 
-            this.pixelStreaming._onPlayerCount(playerCount.count); 
-        };
-        this.webSocketController.onOpen.addEventListener('open', () => {
-            const BrowserSendsOffer = this.config.isFlagEnabled(
-                Flags.BrowserSendOffer
-            );
-            if(!BrowserSendsOffer)
-            {
-                this.webSocketController.requestStreamerList();
+        this.transport = new WebSocketTransport();
+        this.protocol = new SignallingProtocol(this.transport);
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.CONFIG, (msg: MessageReceive.MessageRecv) =>
+            this.handleOnConfigMessage(msg as MessageReceive.MessageConfig)
+        );
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.STREAMER_LIST, (msg: MessageReceive.MessageRecv) =>
+            this.handleStreamerListMessage(msg as MessageReceive.MessageStreamerList)
+        );
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.STREAMER_ID_CHANGED, (msg: MessageReceive.MessageRecv) =>
+            this.handleStreamerIDChangedMessage(msg as MessageReceive.MessageStreamerIDChanged)
+        );
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.PLAYER_COUNT, (msg: MessageReceive.MessageRecv) => {
+            const playerCountMessage = msg as MessageReceive.MessagePlayerCount;
+            this.pixelStreaming._onPlayerCount(playerCountMessage.count);
+        });
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.ANSWER, (msg: MessageReceive.MessageRecv) =>
+            this.handleWebRtcAnswer(msg as MessageReceive.MessageAnswer)
+        );
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.OFFER, (msg: MessageReceive.MessageRecv) =>
+            this.handleWebRtcOffer(msg as MessageReceive.MessageOffer)
+        );
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.PEER_DATA_CHANNELS, (msg: MessageReceive.MessageRecv) =>
+            this.handleWebRtcSFUPeerDatachannels(msg as MessageReceive.MessagePeerDataChannels)
+        );
+        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.ICE_CANDIDATE, (msg: MessageReceive.MessageRecv) => {
+            const iceCandidateMessage = msg as MessageReceive.MessageIceCandidate;
+            this.handleIceCandidate(iceCandidateMessage.candidate);
+        });
+        this.protocol.transportEvents.addListener('open', () => {
+            const BrowserSendsOffer = this.config.isFlagEnabled(Flags.BrowserSendOffer);
+            if (!BrowserSendsOffer) {
+                this.protocol.sendMessage(new MessageSend.MessageListStreamers());
             }
         });
-        this.webSocketController.onClose.addEventListener('close', (event : CustomEvent) => {
+        this.protocol.transportEvents.addListener('error', () => {
+            // dont really need to do anything here since the close event should follow.
+            Logger.Error(Logger.GetStackTrace(), `Got a transport error.`);
+        });
+        this.protocol.transportEvents.addListener('close', (event: CloseEvent) => {
             // when we refresh the page during a stream we get the going away code.
             // in that case we don't want to reconnect since we're navigating away.
             // https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
@@ -222,10 +235,10 @@ export class WebRtcPlayerController {
             const CODE_GOING_AWAY = 1001;
 
             const willTryReconnect = this.shouldReconnect
-               && event.detail.code != CODE_GOING_AWAY
-               && this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts) > 0
+                && event.code != CODE_GOING_AWAY
+                && this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts) > 0
 
-            const disconnectMessage = this.disconnectMessage ? this.disconnectMessage : event.detail.reason;
+            const disconnectMessage = this.disconnectMessage ? this.disconnectMessage : event.reason;
             this.pixelStreaming._onDisconnect(disconnectMessage, !willTryReconnect && !this.isReconnecting);
 
             this.afkController.stopAfkWarningTimer();
@@ -249,7 +262,7 @@ export class WebRtcPlayerController {
                 setTimeout(() => {
                     this.isReconnecting = true;
                     this.reconnectAttempt++;
-                    this.tryReconnect(event.detail.reason);
+                    this.tryReconnect(event.reason);
                 }, 2000);
             }
         });
@@ -281,7 +294,7 @@ export class WebRtcPlayerController {
         this.config._addOnOptionSettingChangedListener(
             OptionParameters.StreamerId,
             (streamerid) => {
-                if(streamerid === "") {
+                if (streamerid === "") {
                     return;
                 }
 
@@ -292,27 +305,27 @@ export class WebRtcPlayerController {
                     this.preferredCodec
                 );
                 this.subscribedStream = streamerid;
-                this.webSocketController.sendSubscribe(streamerid);
+                this.protocol.sendMessage(new MessageSend.MessageSubscribe(streamerid));
             }
         );
 
         this.setVideoEncoderAvgQP(-1);
 
-        this.signallingUrlBuilder =  () => {
+        this.signallingUrlBuilder = () => {
             let signallingServerUrl = this.config.getTextSettingValue(
                 TextParameters.SignallingServerUrl
             );
-    
+
             // If we are connecting to the SFU add a special url parameter to the url
             if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
                 signallingServerUrl += '?' + Flags.BrowserSendOffer + '=true';
             }
-    
+
             // This code is no longer needed, but is a good example for how subsequent config flags can be appended
             // if (this.config.isFlagEnabled(Flags.BrowserSendOffer)) {
             //     signallingServerUrl += (signallingServerUrl.includes('?') ? '&' : '?') + Flags.BrowserSendOffer + '=true';
             // }
-    
+
             return signallingServerUrl;
         }
     }
@@ -521,7 +534,7 @@ export class WebRtcPlayerController {
         this.streamMessageController.registerMessageHandler(
             MessageDirection.ToStreamer,
             'Command',
-            (data: Array<number | string>) => 
+            (data: Array<number | string>) =>
                 this.sendMessageController.sendMessageToStreamer(
                     'Command', data
                 )
@@ -529,7 +542,7 @@ export class WebRtcPlayerController {
         this.streamMessageController.registerMessageHandler(
             MessageDirection.ToStreamer,
             'TextboxEntry',
-            (data: Array<number | string>) => 
+            (data: Array<number | string>) =>
                 this.sendMessageController.sendMessageToStreamer(
                     'TextboxEntry', data
                 )
@@ -776,7 +789,7 @@ export class WebRtcPlayerController {
             'Data Channel Command: ' + commandAsString,
             6
         );
-        const command: MessageOnScreenKeyboard = JSON.parse(commandAsString);
+        const command: MessageReceive.MessageOnScreenKeyboard = JSON.parse(commandAsString);
         if (command.command === 'onScreenKeyboard') {
             this.pixelStreaming._activateOnScreenKeyboard(command);
         }
@@ -804,10 +817,9 @@ export class WebRtcPlayerController {
             delete protocolJSON.Direction;
             Logger.Log(
                 Logger.GetStackTrace(),
-                `Received new ${
-                    direction == MessageDirection.FromStreamer
-                        ? 'FromStreamer'
-                        : 'ToStreamer'
+                `Received new ${direction == MessageDirection.FromStreamer
+                    ? 'FromStreamer'
+                    : 'ToStreamer'
                 } protocol. Updating existing protocol...`
             );
             Object.keys(protocolJSON).forEach((messageType) => {
@@ -825,17 +837,17 @@ export class WebRtcPlayerController {
                                 Logger.GetStackTrace(),
                                 `ToStreamer->${messageType} protocol definition was malformed as it didn't contain at least an id\n
                                            Definition was: ${JSON.stringify(
-                                               message,
-                                               null,
-                                               2
-                                           )}`
+                                    message,
+                                    null,
+                                    2
+                                )}`
                             );
                             // return in a forEach is equivalent to a continue in a normal for loop
                             return;
                         }
 
                         // UE5.1 and UE5.2 don't send a structure for these message types, but they actually do have a structure so ignore updating them
-                        if((messageType === "UIInteraction" || messageType === "Command" || messageType === "LatencyTest")) {
+                        if ((messageType === "UIInteraction" || messageType === "Command" || messageType === "LatencyTest")) {
                             return;
                         }
 
@@ -957,17 +969,17 @@ export class WebRtcPlayerController {
      */
     tryReconnect(message: string) {
         // if there is no webSocketController return immediately or this will not work
-        if (!this.webSocketController) {
+        if (!this.protocol) {
             Logger.Log(
                 Logger.GetStackTrace(),
-                'The Web Socket Controller does not exist so this will not work right now.'
+                'This player has no protocol connection.'
             );
             return;
         }
 
         // if the connection is open, first close it. wait some time and try again.
         this.isReconnecting = true;
-        if (this.webSocketController.webSocket && this.webSocketController.webSocket.readyState != WebSocket.CLOSED) {
+        if (this.protocol.isConnected()) {
             this.closeSignalingServer(`${message} Restarting stream...`);
             setTimeout(() => {
                 this.tryReconnect(message);
@@ -1097,7 +1109,7 @@ export class WebRtcPlayerController {
             this.streamController.audioElement.muted = startMuted;
 
             if (startMuted) {
-              this.playVideo();
+                this.playVideo();
             } else {
                 this.streamController.audioElement
                     .play()
@@ -1164,7 +1176,7 @@ export class WebRtcPlayerController {
         this.shouldReconnect = true;
         this.disconnectMessage = null;
         const signallingUrl = this.signallingUrlBuilder();
-        this.webSocketController.connect(signallingUrl);
+        this.protocol.connect(signallingUrl);
     }
 
     /**
@@ -1231,7 +1243,7 @@ export class WebRtcPlayerController {
             // Browsers emit "connected" when getting first connection and "completed" when finishing
             // candidate checking. However, sometimes browsers can skip "connected" and only emit "completed".
             // Therefore need to check both cases and emit onWebRtcConnected only once on the first hit.
-            if (!webRtcConnectedSent && 
+            if (!webRtcConnectedSent &&
                 ["connected", "completed"].includes(this.peerConnectionController.peerConnection.iceConnectionState)) {
                 this.pixelStreaming._onWebRtcConnected();
                 webRtcConnectedSent = true;
@@ -1294,33 +1306,17 @@ export class WebRtcPlayerController {
      * Handles when a Config Message is received contains the Peer Connection Options required (STUN and TURN Server Info)
      * @param messageConfig - Config Message received from the signaling server
      */
-    handleOnConfigMessage(messageConfig: MessageConfig) {
+    handleOnConfigMessage(messageConfig: MessageReceive.MessageConfig) {
         this.resizePlayerStyle();
 
         // Tell the WebRtcController to start a session with the peer options sent from the signaling server
         this.startSession(messageConfig.peerConnectionOptions);
-
-        // When the signaling server sends a WebRTC Answer over the websocket connection have the WebRtcController handle the message
-        this.webSocketController.onWebRtcAnswer = (
-            messageAnswer: MessageReceive.MessageAnswer
-        ) => this.handleWebRtcAnswer(messageAnswer);
-        this.webSocketController.onWebRtcOffer = (
-            messageOffer: MessageReceive.MessageOffer
-        ) => this.handleWebRtcOffer(messageOffer);
-        this.webSocketController.onWebRtcPeerDataChannels = (
-            messageDataChannels: MessageReceive.MessagePeerDataChannels
-        ) => this.handleWebRtcSFUPeerDatachannels(messageDataChannels);
-
-        // When the signaling server sends a IceCandidate over the websocket connection have the WebRtcController handle the message
-        this.webSocketController.onIceCandidate = (
-            iceCandidate: RTCIceCandidateInit
-        ) => this.handleIceCandidate(iceCandidate);
     }
 
     /**
      * Handles when the signalling server gives us the list of streamer ids.
      */
-    handleStreamerListMessage(messageStreamerList: MessageStreamerList) {
+    handleStreamerListMessage(messageStreamerList: MessageReceive.MessageStreamerList) {
         Logger.Log(
             Logger.GetStackTrace(),
             `Got streamer list ${messageStreamerList.ids}`,
@@ -1330,7 +1326,7 @@ export class WebRtcPlayerController {
         let wantedStreamerId: string = null;
 
         // get the current selected streamer id option
-        var streamerIDOption = this.config.getSettingOption(OptionParameters.StreamerId);
+        const streamerIDOption = this.config.getSettingOption(OptionParameters.StreamerId);
         const existingSelection = streamerIDOption.selected.toString().trim();
         if (!!existingSelection) {
             // default to selected option if it exists
@@ -1345,7 +1341,7 @@ export class WebRtcPlayerController {
             settingOptions
         );
 
-        let autoSelectedStreamerId: string  = null;
+        let autoSelectedStreamerId: string = null;
         const waitForStreamer = this.config.isFlagEnabled(Flags.WaitForStreamer);
         const reconnectLimit = this.config.getNumericSettingValue(NumericParameters.MaxReconnectAttempts);
         const reconnectDelay = this.config.getNumericSettingValue(NumericParameters.StreamerAutoJoinInterval);
@@ -1387,7 +1383,7 @@ export class WebRtcPlayerController {
                     this.isReconnecting = true;
                     this.reconnectAttempt++;
                     setTimeout(() => {
-                        this.webSocketController.requestStreamerList();
+                        this.protocol.requestStreamerList();
                     }, reconnectDelay);
                 } else {
                     // We've exhausted our reconnect attempts, return to main screen
@@ -1408,19 +1404,19 @@ export class WebRtcPlayerController {
         );
     }
 
-    handleStreamerIDChangedMessage(streamerIDChangedMessage: MessageStreamerIDChanged) {
+    handleStreamerIDChangedMessage(streamerIDChangedMessage: MessageReceive.MessageStreamerIDChanged) {
         const newID = streamerIDChangedMessage.newID;
 
         // need to edit the selected streamer in the settings list
-        var streamerListOptions = this.config.getSettingOption(OptionParameters.StreamerId);
+        const streamerListOptions = this.config.getSettingOption(OptionParameters.StreamerId);
 
         // temporarily prevent onChange from firing (it would try to subscribe to the streamer again)
-        var oldOnChange = streamerListOptions.onChange;
-        streamerListOptions.onChange = ()=>{};
+        const oldOnChange = streamerListOptions.onChange;
+        streamerListOptions.onChange = () => { };
 
         // change the selected entry.
-        var streamerList = streamerListOptions.options;
-        for (var i = 0; i < streamerList.length; ++i) {
+        const streamerList = streamerListOptions.options;
+        for (let i = 0; i < streamerList.length; ++i) {
             if (streamerList[i] == this.subscribedStream) {
                 streamerList[i] = newID;
                 break;
@@ -1451,7 +1447,7 @@ export class WebRtcPlayerController {
      * Handle the RTC Answer from the signaling server
      * @param Answer - Answer SDP from the peer.
      */
-    handleWebRtcAnswer(Answer: MessageAnswer) {
+    handleWebRtcAnswer(Answer: MessageReceive.MessageAnswer) {
         Logger.Log(Logger.GetStackTrace(), `Got answer sdp ${Answer.sdp}`, 6);
 
         const sdpAnswer: RTCSessionDescriptionInit = {
@@ -1467,7 +1463,7 @@ export class WebRtcPlayerController {
      * Handle the RTC offer from a WebRTC peer (received through the signalling server).
      * @param Offer - Offer SDP from the peer.
      */
-    handleWebRtcOffer(Offer: MessageOffer) {
+    handleWebRtcOffer(Offer: MessageReceive.MessageOffer) {
         Logger.Log(Logger.GetStackTrace(), `Got offer sdp ${Offer.sdp}`, 6);
 
         this.isUsingSFU = Offer.sfu ? Offer.sfu : false;
@@ -1520,7 +1516,7 @@ export class WebRtcPlayerController {
                 RecvOptions
             );
             this.recvDataChannelController.handleOnOpen = () =>
-                this.webSocketController.sendSFURecvDataChannelReady();
+                this.protocol.sendSFURecvDataChannelReady();
             // If we're uni-directional, only the recv data channel should handle incoming messages
             this.recvDataChannelController.handleOnMessage = (
                 ev: MessageEvent
@@ -1573,7 +1569,7 @@ export class WebRtcPlayerController {
     handleSendIceCandidate(iceEvent: RTCPeerConnectionIceEvent) {
         Logger.Log(Logger.GetStackTrace(), 'OnIceCandidate', 6);
         if (iceEvent.candidate && iceEvent.candidate.candidate) {
-            this.webSocketController.sendIceCandidate(iceEvent.candidate);
+            this.protocol.sendIceCandidate(iceEvent.candidate);
         }
     }
 
@@ -1607,12 +1603,12 @@ export class WebRtcPlayerController {
             6
         );
 
-        const extraParams: ExtraOfferParameters = {
+        const extraParams: MessageSend.ExtraOfferParameters = {
             minBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate),
             maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
         };
 
-        this.webSocketController.sendWebRtcOffer(offer, extraParams);
+        this.protocol.sendWebRtcOffer(offer, extraParams);
     }
 
     /**
@@ -1626,15 +1622,15 @@ export class WebRtcPlayerController {
             6
         );
 
-        const extraParams: ExtraAnswerParameters = {
+        const extraParams: MessageSend.ExtraAnswerParameters = {
             minBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate),
             maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
         };
 
-        this.webSocketController.sendWebRtcAnswer(answer, extraParams);
+        this.protocol.sendWebRtcAnswer(answer, extraParams);
 
         if (this.isUsingSFU) {
-            this.webSocketController.sendWebRtcDatachannelRequest();
+            this.protocol.sendWebRtcDatachannelRequest();
         }
     }
 
@@ -1658,7 +1654,7 @@ export class WebRtcPlayerController {
         this.locallyClosed = true;
         this.shouldReconnect = false;
         this.disconnectMessage = message;
-        this.webSocketController?.close();
+        this.protocol?.disconnect();
     }
 
     /**
@@ -1735,7 +1731,7 @@ export class WebRtcPlayerController {
      * By default the maxQP is 51 meaning the encoder is free
      * to drop quality as low as needed on the given network link.
      */
-     sendEncoderMaxQP(maxQP: number) {
+    sendEncoderMaxQP(maxQP: number) {
         Logger.Log(Logger.GetStackTrace(), `MaxQP=${maxQP}\n`, 6);
 
         if (maxQP != null) {
@@ -1770,7 +1766,7 @@ export class WebRtcPlayerController {
      * (note setting this too low could result in blocky video).
      * @param minBitrate - The minimum bitrate we would like WebRTC to not fall below.
      */
-     sendWebRTCMaxBitrate(maxBitrate: number) {
+    sendWebRTCMaxBitrate(maxBitrate: number) {
         Logger.Log(Logger.GetStackTrace(), `WebRTC Max Bitrate=${maxBitrate}`, 6);
         if (maxBitrate != null) {
             this.streamMessageController.toStreamerHandlers.get(
@@ -1787,17 +1783,17 @@ export class WebRtcPlayerController {
      * the maximum fps we would like WebRTC to stream at. 
      * @param fps - The maximum stream fps.
      */
-     sendWebRTCFps(fps: number) {
+    sendWebRTCFps(fps: number) {
         Logger.Log(Logger.GetStackTrace(), `WebRTC FPS=${fps}`, 6);
         if (fps != null) {
             this.streamMessageController.toStreamerHandlers.get(
                 'Command'
-            )([JSON.stringify({'WebRTC.Fps': fps})]);
+            )([JSON.stringify({ 'WebRTC.Fps': fps })]);
 
             /* TODO: Remove when UE 4.27 unsupported. */
             this.streamMessageController.toStreamerHandlers.get(
                 'Command'
-            )([JSON.stringify({'WebRTC.MaxFps': fps})]); 
+            )([JSON.stringify({ 'WebRTC.MaxFps': fps })]);
         }
     }
 
@@ -1852,7 +1848,7 @@ export class WebRtcPlayerController {
             '----   Sending custom Command message   ----',
             6
         );
-        
+
         this.streamMessageController.toStreamerHandlers.get(
             'Command'
         )([JSON.stringify(descriptor)]);
@@ -1927,7 +1923,7 @@ export class WebRtcPlayerController {
             latencyTestResults.endToEndLatency =
                 ~~(latencyTestResults.frameDisplayDeltaTimeMs +
                     latencyTestResults.networkLatency,
-                +latencyTestResults.CaptureToSendMs);
+                    +latencyTestResults.CaptureToSendMs);
         }
         this.pixelStreaming._onLatencyTestResult(latencyTestResults);
     }
@@ -2088,10 +2084,10 @@ export class WebRtcPlayerController {
         this.mouseController?.unregisterMouseEvents();
         if (isEnabled) {
             const mouseMode = this.config.isFlagEnabled(Flags.HoveringMouseMode)
-            ? ControlSchemeType.HoveringMouse
-            : ControlSchemeType.LockedMouse;
+                ? ControlSchemeType.HoveringMouse
+                : ControlSchemeType.LockedMouse;
             this.mouseController =
-            this.inputClassesFactory.registerMouse(mouseMode);
+                this.inputClassesFactory.registerMouse(mouseMode);
         }
     }
 
@@ -2140,22 +2136,22 @@ export class WebRtcPlayerController {
     }
 
     public registerMessageHandler(name: string, direction: MessageDirection, handler?: (data: ArrayBuffer | Array<number | string>) => void) {
-        if(direction === MessageDirection.FromStreamer && typeof handler === 'undefined') {
+        if (direction === MessageDirection.FromStreamer && typeof handler === 'undefined') {
             Logger.Warning(
                 Logger.GetStackTrace(),
                 `Unable to register handler for ${name} as no handler was passed`
             );
         }
 
-        
+
         this.streamMessageController.registerMessageHandler(
             direction,
             name,
-            (data: Array<number | string>) => (typeof handler === 'undefined' && direction === MessageDirection.ToStreamer) ? 
+            (data: Array<number | string>) => (typeof handler === 'undefined' && direction === MessageDirection.ToStreamer) ?
                 this.sendMessageController.sendMessageToStreamer(
                     name,
                     data
-                ) :   
+                ) :
                 handler(data)
         );
     }

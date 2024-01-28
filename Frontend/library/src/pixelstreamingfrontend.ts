@@ -31,13 +31,8 @@ export {
     WebRTCSettings
 } from './DataChannel/InitialSettings';
 export { AggregatedStats } from './PeerConnectionController/AggregatedStats';
-export { Logger } from './Logger/Logger';
 export { UnquantizedDenormalizedUnsignedCoord as UnquantizedAndDenormalizeUnsigned } from './Util/CoordinateConverter';
 export { MessageDirection } from './UeInstanceMessage/StreamMessageController';
-export { MessageSend } from './WebSockets/MessageSend';
-export { MessageRecv, MessageStreamerList } from './WebSockets/MessageReceive';
-export { WebSocketController } from './WebSockets/WebSocketController';
-export { SignallingProtocol } from './WebSockets/SignallingProtocol';
 
 export { CandidatePairStats } from './PeerConnectionController/CandidatePairStats';
 export { CandidateStat } from './PeerConnectionController/CandidateStat';
@@ -48,3 +43,4 @@ export {
 } from './PeerConnectionController/InboundRTPStats';
 export { OutBoundVideoStats } from './PeerConnectionController/OutBoundRTPStats';
 export * from './Util/EventEmitter';
+export * from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';

@@ -20,7 +20,7 @@ export enum MessageSendTypes {
 /**
  * A Wrapper for the message to send to the signaling server
  */
-export class MessageSend implements Send {
+export class MessageSend {
     type: string;
     peerConnectionOptions: object;
 
@@ -52,13 +52,6 @@ export class MessageSend implements Send {
     }
 }
 
-export interface Send {
-    /**
-     * Turns the wrapper into a JSON String
-     * @returns - JSON String of the Message to send
-     */
-    payload: () => string;
-}
 
 export class MessageListStreamers extends MessageSend {
     constructor() {
@@ -192,7 +185,7 @@ export class MessageSFURecvDataChannelReady extends MessageSend {
 /**
  * RTC Ice Candidate Wrapper
  */
-export class MessageIceCandidate implements Send {
+export class MessageIceCandidate extends MessageSend {
     candidate: RTCIceCandidate;
     type: MessageSendTypes;
 
@@ -200,20 +193,8 @@ export class MessageIceCandidate implements Send {
      * @param candidate - RTC Ice Candidate
      */
     constructor(candidate: RTCIceCandidate) {
+        super();
         this.type = MessageSendTypes.ICE_CANDIDATE;
         this.candidate = candidate;
-    }
-
-    /**
-     * Turns the wrapper into a JSON String
-     * @returns - JSON String of the Message to send
-     */
-    payload() {
-        Logger.Log(
-            Logger.GetStackTrace(),
-            'Sending => \n' + JSON.stringify(this, undefined, 4),
-            6
-        );
-        return JSON.stringify(this);
     }
 }

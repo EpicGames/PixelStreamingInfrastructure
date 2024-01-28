@@ -1,0 +1,31 @@
+name: Run signalling tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['UE5.5']
+    paths: ['Common/**', 'SignallingWebServer/**', 'SS_Test/**']
+  pull_request:
+    branches: ['UE5.5']
+    paths: ['Common/**', 'SignallingWebServer/**', 'SS_Test/**']
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: "Checkout source code"
+      uses: actions/checkout@v3
+
+    - name: "Docker compose"
+      uses: isbang/compose-action@v1.5.1
+      with:
+        compose-file: "SS_Test/docker-compose.yml"
+        up-flags: "--build --abort-on-container-exit --exit-code-from tester"

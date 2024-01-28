@@ -39,8 +39,7 @@ export class Logger {
             return;
         }
 
-        const returnString = `Level: Log\nMsg: ${message}\nCaller: ${stack}`;
-        console.log(returnString);
+        this.CommonLog("Log", null, message);
     }
 
     /**
@@ -54,8 +53,7 @@ export class Logger {
             return;
         }
 
-        const returnString = `Level: Info\nMsg: ${message}`;
-        console.info(returnString);
+        this.CommonLog("Info", null, message);
     }
 
     /**
@@ -64,8 +62,7 @@ export class Logger {
      * @param message - the message to be logged
      */
     static Error(stack: string, message: string) {
-        const returnString = `Level: Error\nMsg: ${message}\nCaller: ${stack}`;
-        console.error(returnString);
+        this.CommonLog("Error", stack, message);
     }
 
     /**
@@ -74,7 +71,14 @@ export class Logger {
      * @param message - the message to be logged
      */
     static Warning(stack: string, message: string) {
-        const returnString = `Level: Warning\nCaller: ${stack}\nMsg: ${message}`;
-        console.warn(returnString);
+        this.CommonLog("Warning", null, message);
+    }
+
+    static CommonLog(level: string, stack: null | string, message: string) {
+        if (stack) {
+            console.log(`[${level}] - ${message}\nCaller: ${stack}`);
+        } else {
+            console.log(`[${level}] - ${message}`);
+        }
     }
 }

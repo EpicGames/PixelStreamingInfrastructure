@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.5';
 
 import { OverlayBase } from './BaseOverlay';
 

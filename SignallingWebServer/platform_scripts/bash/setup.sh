@@ -90,6 +90,7 @@ function check_and_install() { #dep_name #get_version_string #version_min #insta
 }
 
 function setup_frontend() {
+	set -e
 	# navigate to root
 	pushd ${BASH_LOCATION}/../../.. > /dev/null
 	export PATH="../../SignallingWebServer/platform_scripts/bash/node/bin:$PATH"
@@ -97,8 +98,13 @@ function setup_frontend() {
 	if [ ! -f SignallingWebServer/Public/player.html ] || [ ! -z "$FORCE_BUILD" ] ; then
 		echo "Building Typescript Frontend."
 		# Using our bundled NodeJS, build the web frontend files
+		pushd ${BASH_LOCATION}/../../../Common > /dev/null
+		../SignallingWebServer/platform_scripts/bash/node/bin/npm install
+		../SignallingWebServer/platform_scripts/bash/node/bin/npm run build
+		popd
 		pushd ${BASH_LOCATION}/../../../Frontend/library > /dev/null
 		../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
+		../../SignallingWebServer/platform_scripts/bash/node/bin/npm link ../../Common
 		../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-dev
 		popd
 		pushd ${BASH_LOCATION}/../../../Frontend/ui-library > /dev/null
@@ -117,6 +123,7 @@ function setup_frontend() {
 	fi
 
 	popd > /dev/null # root
+	set +e
 }
 
 

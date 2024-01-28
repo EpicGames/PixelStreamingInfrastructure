@@ -14,6 +14,7 @@ export interface MockWebSocketTriggerFunctions {
     triggerOnClose: null | ((closeReason?: CloseEventInit) => void);
     triggerOnMessage: null | ((message?: object) => void);
     triggerOnMessageBinary: null | ((message?: Blob) => void);
+    triggerRemoteClose: null | ((code?: number, reason?: string) => void);
 }
 
 const spyFunctions: MockWebSocketSpyFunctions = {
@@ -31,7 +32,8 @@ const triggerFunctions: MockWebSocketTriggerFunctions = {
     triggerOnError: null,
     triggerOnClose: null,
     triggerOnMessage: null,
-    triggerOnMessageBinary: null
+    triggerOnMessageBinary: null,
+    triggerRemoteClose: null
 };
 
 export class MockWebSocketImpl extends WebSocket {
@@ -45,8 +47,8 @@ export class MockWebSocketImpl extends WebSocket {
         triggerFunctions.triggerOnError = this.triggerOnError.bind(this);
         triggerFunctions.triggerOnClose = this.triggerOnClose.bind(this);
         triggerFunctions.triggerOnMessage = this.triggerOnMessage.bind(this);
-        triggerFunctions.triggerOnMessageBinary =
-            this.triggerOnMessageBinary.bind(this);
+        triggerFunctions.triggerOnMessageBinary = this.triggerOnMessageBinary.bind(this);
+        triggerFunctions.triggerRemoteClose = this.triggerRemoteClose.bind(this);
     }
 
     get readyState() {
@@ -80,6 +82,10 @@ export class MockWebSocketImpl extends WebSocket {
         const event = new CloseEvent('close', reason);
         this.onclose?.(event);
         spyFunctions.closeSpy?.(event);
+    }
+
+    triggerRemoteClose(code?: number, reason?: string) {
+        this.close(code, reason);
     }
 
     triggerOnMessage(message?: object) {

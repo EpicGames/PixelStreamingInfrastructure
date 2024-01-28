@@ -7,7 +7,7 @@ import {
 import { LatencyTestResults } from '../DataChannel/LatencyTestResults';
 import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
 import { InitialSettings } from '../pixelstreamingfrontend';
-import { MessageStreamerList } from '../WebSockets/MessageReceive';
+import { MessageReceive } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { SettingFlag } from '../Config/SettingFlag';
 import { SettingNumber } from '../Config/SettingNumber';
 import { SettingText } from '../Config/SettingText';
@@ -345,7 +345,7 @@ export class StreamerListMessageEvent extends Event {
     readonly type: 'streamerListMessage';
     readonly data: {
         /** Streamer list message containing an array of streamer ids */
-        messageStreamerList: MessageStreamerList;
+        messageStreamerList: MessageReceive.MessageStreamerList;
         /** Auto-selected streamer from the list, or null if unable to auto-select and user should be prompted to select */
         autoSelectedStreamerId: string;
         /** Wanted streamer id from various configurations. */

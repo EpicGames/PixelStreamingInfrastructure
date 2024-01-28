@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Logger } from '../Logger/Logger';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { SettingFlag } from './SettingFlag';
 import { SettingNumber } from './SettingNumber';
 import { SettingText } from './SettingText';

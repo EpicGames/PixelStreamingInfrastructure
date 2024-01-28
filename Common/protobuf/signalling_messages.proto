@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+// intermediate message to determine message type
+message base_message {
+  string type = 1;
+}
+
+message answer {
+  string type = 1;
+  string sdp = 2;
+  optional string playerId = 3;
+}
+
+message peerConnectionOptions {
+}
+
+message config {
+  string type = 1;
+  peerConnectionOptions peerConnectionOptions = 2;
+  optional string protocolVersion = 3;
+}
+
+message dataChannelRequest {
+  string type = 1;
+}
+
+message disconnectPlayer {
+  string type = 1;
+  string playerId = 2;
+  optional string reason = 3;
+}
+
+message endpointId {
+  string type = 1;
+  string id = 2;
+  optional string protocolVersion = 3;
+}
+
+message iceCandidateData {
+  string candidate = 1;
+  string sdpMid = 2;
+  int32 sdpMLineIndex = 3;
+  optional string usernameFragment = 4;
+}
+
+message iceCandidate {
+  string type = 1;
+  iceCandidateData candidate = 2;
+  optional string playerId = 3;
+}
+
+message identify {
+  string type = 1;
+}
+
+message layerPreference {
+  string type = 1;
+  int32 spatialLayer = 2;
+  int32 temporalLayer = 3;
+  string playerId = 4;
+}
+
+message listStreamers {
+  string type = 1;
+}
+
+message offer {
+  string type = 1;
+  string sdp = 2;
+  optional string playerId = 3;
+}
+
+message peerDataChannelsReady {
+  string type = 1;
+}
+
+message ping {
+  string type = 1;
+  int32 time = 2;
+}
+
+message playerConnected {
+  string type = 1;
+  bool dataChannel = 2;
+  bool sfu = 3;
+  bool sendOffer = 4;
+  optional string playerId = 5;
+}
+
+message playerCount {
+  string type = 1;
+  int32 count = 2;
+}
+
+message playerDisconnected {
+  string type = 1;
+  string playerId = 2;
+}
+
+message pong {
+  string type = 1;
+  int32 time = 2;
+}
+
+message stats {
+  string type = 1;
+  string data = 2;
+}
+
+message streamerDataChannels {
+  string type = 1;
+  int32 sendStreamId = 2;
+  int32 recvStreamId = 3;
+  string playerId = 4;
+}
+
+message streamerDisconnected {
+  string type = 1;
+  string streamerId = 2; // NEW
+}
+
+message streamerList {
+  string type = 1;
+  repeated string ids = 2; // CHECK
+}
+
+message subscribe {
+  string type = 1;
+  string streamerId = 2;
+}
+
+message unsubscribe {
+  string type = 1;
+}

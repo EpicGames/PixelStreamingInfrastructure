@@ -50,9 +50,15 @@
 
   @Rem Do npm install in the Frontend\lib directory (note we use start because that loads PATH)
   echo ----------------------------
+  echo Building common library...
+  pushd %CD%\Common
+  call ..\SignallingWebServer\platform_scripts\cmd\node\npm install
+  call ..\SignallingWebServer\platform_scripts\cmd\node\npm run build
+  popd
   echo Building frontend library...
   pushd %CD%\Frontend\library
   call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
+  call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm link ../../Common
   call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm run build-dev
   popd
   pushd %CD%\Frontend\ui-library
