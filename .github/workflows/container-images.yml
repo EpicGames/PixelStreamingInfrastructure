@@ -3,7 +3,7 @@ name: Publish Cirrus container
 on:
   push:
     workflow_dispatch:
-    branches: ['UE5.4']
+    branches: ['UE5.5']
     paths: ['SignallingWebServer/**']
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          tags: 'ghcr.io/epicgames/pixel-streaming-signalling-server:5.4'
+          tags: 'ghcr.io/epicgames/pixel-streaming-signalling-server:5.5'
           push: true
           file: SignallingWebServer/Dockerfile
       -
@@ -36,7 +36,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          tags: 'ghcr.io/epicgames/pixel-streaming-sfu:5.4'
+          tags: 'ghcr.io/epicgames/pixel-streaming-sfu:5.5'
           push: true
           file: SFU/Dockerfile
           
