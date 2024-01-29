@@ -1,6 +1,6 @@
 {
     "name": "@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.5",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Reference frontend UI library for Unreal Engine 5.5 Pixel Streaming - gives the stock look and feel.",
     "main": "dist/lib-pixelstreamingfrontend-ui.js",
     "module": "dist/lib-pixelstreamingfrontend-ui.esm.js",
@@ -8,15 +8,16 @@
     "sideEffects": false,
     "scripts": {
         "compile": "tsc --build --clean && tsc",
-        "build": "npx webpack --config webpack.prod.js",
-        "build-dev": "npx webpack --config webpack.dev.js",
-        "build-all": "cd ../library && npm run build && cd ../ui-library && npm link ../library && npx webpack --config webpack.prod.js",
-        "build-dev-all": "cd ../library && npm run build-dev && cd ../ui-library && npm link ../library & npx webpack --config webpack.dev.js",
+        "build": "webpack --config webpack.prod.js",
+        "build-dev": "webpack --config webpack.dev.js",
+        "build-all": "cd ../library && npm run build && cd ../ui-library && npm link ../library && webpack --config webpack.prod.js",
+        "build-dev-all": "cd ../library && npm run build-dev && cd ../ui-library && npm link ../library & webpack --config webpack.dev.js",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "spellcheck": "cspell \"{README.md,.github/*.md,src/**/*.ts}\""
     },
     "devDependencies": {
-        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.5": "^0.0.3",
+        "@epicgames-ps/lib-pixelstreamingcommon-ue5.5": "^0.0.3",
+        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.5": "^0.0.5",
         "@typescript-eslint/eslint-plugin": "^5.16.0",
         "@typescript-eslint/parser": "^5.16.0",
         "cspell": "^4.1.0",
@@ -34,7 +35,7 @@
         "jss-plugin-global": "^10.9.2"
     },
     "peerDependencies": {
-        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.5": "^0.0.3"
+        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.5": "^0.0.5"
     },
     "repository": {
         "type": "git",
@@ -46,4 +47,3 @@
         "access": "public"
     }
 }
-
