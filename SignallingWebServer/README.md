@@ -30,3 +30,4 @@ Configuration of the signalling server is handled via the config.js file in the 
 ## Running
 
 Several scripts are supplied for Windows and Linux in the [platform_scripts](platform_scripts/) folder. These are the easiest way to get the server running under common situations. They can also be used as a reference for new situations.
+
