@@ -8,7 +8,7 @@
     "sideEffects": false,
     "scripts": {
         "build_proto": "npx protoc --ts_out src/Messages --proto_path protobuf protobuf/signalling_messages.proto",
-        "compile": "tsc --build --clean && tsc --project tsconfig.build.json --module es2015 --outDir build/es2015 && tsc --project tsconfig.build.json --module commonjs --outDir build/commonjs --declaration --declarationDir build/types",
+        "compile": "rimraf ./build && tsc --module es2015 --outDir build/es2015 && tsc --module commonjs --outDir build/commonjs --declaration --declarationDir build/types",
         "build": "npm run build_proto && npm run compile",
         "test": "echo \"Error: no test specified\" && exit 1",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
@@ -23,6 +23,7 @@
         "jest": "^27.5.1",
         "jest-environment-jsdom": "27.5.1",
         "prettier": "2.8.3",
+        "rimraf": "^5.0.5",
         "ts-jest": "27.1.5",
         "ts-loader": "^9.4.2",
         "typedoc": "^0.23.24",
