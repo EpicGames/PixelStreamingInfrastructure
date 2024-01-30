@@ -7,7 +7,7 @@ import {
     AggregatedStats,
     LatencyTestResults,
     InitialSettings,
-    MessageStreamerList
+    Messages
 } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.5';
 import { OverlayBase } from '../Overlay/BaseOverlay';
 import { ActionOverlay } from '../Overlay/ActionOverlay';
@@ -667,7 +667,7 @@ export class Application {
         this.statsPanel?.handlePlayerCount(playerCount);
     }
 
-    handleStreamerListMessage(messageStreamingList: MessageStreamerList, autoSelectedStreamerId: string, wantedStreamerId: string) {
+    handleStreamerListMessage(messageStreamingList: Messages.streamerList, autoSelectedStreamerId: string, wantedStreamerId: string) {
         const waitForStreamer = this.stream.config.isFlagEnabled(Flags.WaitForStreamer);
         const isReconnecting = this.stream.isReconnecting();
         let message: string = null;
