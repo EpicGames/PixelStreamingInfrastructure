@@ -30,7 +30,6 @@ import {
     DataChannelLatencyTestResultEvent,
     PlayerCountEvent
 } from '../Util/EventEmitter';
-import { MessageReceive } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { WebXRController } from '../WebXR/WebXRController';
 import { MessageDirection } from '../UeInstanceMessage/StreamMessageController';
 import {
@@ -112,7 +111,7 @@ export class PixelStreaming {
                 x,
                 y
             );
-        this._activateOnScreenKeyboard = (command: MessageReceive.MessageOnScreenKeyboard) =>
+        this._activateOnScreenKeyboard = (command: any) =>
             this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
 
         this._webXrController = new WebXRController(this._webRtcController);
@@ -307,7 +306,7 @@ export class PixelStreaming {
      * @param command - the keyboard command
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _activateOnScreenKeyboard(command: MessageReceive.MessageOnScreenKeyboard): void {
+    _activateOnScreenKeyboard(command: any): void {
         throw new Error('Method not implemented.');
     }
 

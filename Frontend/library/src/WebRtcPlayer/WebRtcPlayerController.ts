@@ -1,12 +1,13 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import {
-    MessageSend,
-    MessageReceive,
     WebSocketTransport,
     Logger,
     SignallingProtocol,
-    ITransport
+    ITransport,
+    Messages,
+    MessageHelpers,
+    BaseMessage
 } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { StreamController } from '../VideoPlayer/StreamController';
 import { FreezeFrameController } from '../FreezeFrame/FreezeFrameController';
@@ -191,36 +192,37 @@ export class WebRtcPlayerController {
         // set up websocket methods
         this.transport = new WebSocketTransport();
         this.protocol = new SignallingProtocol(this.transport);
-        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.CONFIG, (msg: MessageReceive.MessageRecv) =>
-            this.handleOnConfigMessage(msg as MessageReceive.MessageConfig)
+        this.protocol.messageHandlers.addListener(Messages.config.typeName, (msg: BaseMessage) =>
+            this.handleOnConfigMessage(msg as Messages.config)
         );
-        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.STREAMER_LIST, (msg: MessageReceive.MessageRecv) =>
-            this.handleStreamerListMessage(msg as MessageReceive.MessageStreamerList)
+        this.protocol.messageHandlers.addListener(Messages.streamerList.typeName, (msg: BaseMessage) =>
+            this.handleStreamerListMessage(msg as Messages.streamerList)
         );
-        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.STREAMER_ID_CHANGED, (msg: MessageReceive.MessageRecv) =>
-            this.handleStreamerIDChangedMessage(msg as MessageReceive.MessageStreamerIDChanged)
+        this.protocol.messageHandlers.addListener(Messages.streamerIdChanged.typeName, (msg: BaseMessage) =>
+            this.handleStreamerIDChangedMessage(msg as Messages.streamerIdChanged)
         );
-        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.PLAYER_COUNT, (msg: MessageReceive.MessageRecv) => {
-            const playerCountMessage = msg as MessageReceive.MessagePlayerCount;
+        this.protocol.messageHandlers.addListener(Messages.playerCount.typeName, (msg: BaseMessage) => {
+            const playerCountMessage = msg as Messages.playerCount;
             this.pixelStreaming._onPlayerCount(playerCountMessage.count);
         });
-        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.ANSWER, (msg: MessageReceive.MessageRecv) =>
-            this.handleWebRtcAnswer(msg as MessageReceive.MessageAnswer)
+        this.protocol.messageHandlers.addListener(Messages.answer.typeName, (msg: BaseMessage) =>
+            this.handleWebRtcAnswer(msg as Messages.answer)
         );
-        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.OFFER, (msg: MessageReceive.MessageRecv) =>
-            this.handleWebRtcOffer(msg as MessageReceive.MessageOffer)
+        this.protocol.messageHandlers.addListener(Messages.offer.typeName, (msg: BaseMessage) =>
+            this.handleWebRtcOffer(msg as Messages.offer)
         );
-        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.PEER_DATA_CHANNELS, (msg: MessageReceive.MessageRecv) =>
-            this.handleWebRtcSFUPeerDatachannels(msg as MessageReceive.MessagePeerDataChannels)
+        this.protocol.messageHandlers.addListener(Messages.streamerDataChannels.typeName, (msg: BaseMessage) =>
+            this.handleWebRtcSFUPeerDatachannels(msg as Messages.streamerDataChannels)
         );
-        this.protocol.messageHandlers.addListener(MessageReceive.MessageRecvTypes.ICE_CANDIDATE, (msg: MessageReceive.MessageRecv) => {
-            const iceCandidateMessage = msg as MessageReceive.MessageIceCandidate;
+        this.protocol.messageHandlers.addListener(Messages.iceCandidate.typeName, (msg: BaseMessage) => {
+            const iceCandidateMessage = msg as Messages.iceCandidate;
             this.handleIceCandidate(iceCandidateMessage.candidate);
         });
         this.protocol.transportEvents.addListener('open', () => {
             const BrowserSendsOffer = this.config.isFlagEnabled(Flags.BrowserSendOffer);
             if (!BrowserSendsOffer) {
-                this.protocol.sendMessage(new MessageSend.MessageListStreamers());
+                const message = MessageHelpers.createMessage(Messages.listStreamers);
+                this.protocol.sendMessage(message);
             }
         });
         this.protocol.transportEvents.addListener('error', () => {
@@ -305,7 +307,8 @@ export class WebRtcPlayerController {
                     this.preferredCodec
                 );
                 this.subscribedStream = streamerid;
-                this.protocol.sendMessage(new MessageSend.MessageSubscribe(streamerid));
+                const message = MessageHelpers.createMessage(Messages.subscribe, { streamerId: streamerid });
+                this.protocol.sendMessage(message);
             }
         );
 
@@ -789,7 +792,7 @@ export class WebRtcPlayerController {
             'Data Channel Command: ' + commandAsString,
             6
         );
-        const command: MessageReceive.MessageOnScreenKeyboard = JSON.parse(commandAsString);
+        const command = JSON.parse(commandAsString);
         if (command.command === 'onScreenKeyboard') {
             this.pixelStreaming._activateOnScreenKeyboard(command);
         }
@@ -1306,7 +1309,7 @@ export class WebRtcPlayerController {
      * Handles when a Config Message is received contains the Peer Connection Options required (STUN and TURN Server Info)
      * @param messageConfig - Config Message received from the signaling server
      */
-    handleOnConfigMessage(messageConfig: MessageReceive.MessageConfig) {
+    handleOnConfigMessage(messageConfig: Messages.config) {
         this.resizePlayerStyle();
 
         // Tell the WebRtcController to start a session with the peer options sent from the signaling server
@@ -1316,7 +1319,7 @@ export class WebRtcPlayerController {
     /**
      * Handles when the signalling server gives us the list of streamer ids.
      */
-    handleStreamerListMessage(messageStreamerList: MessageReceive.MessageStreamerList) {
+    handleStreamerListMessage(messageStreamerList: Messages.streamerList) {
         Logger.Log(
             Logger.GetStackTrace(),
             `Got streamer list ${messageStreamerList.ids}`,
@@ -1404,7 +1407,7 @@ export class WebRtcPlayerController {
         );
     }
 
-    handleStreamerIDChangedMessage(streamerIDChangedMessage: MessageReceive.MessageStreamerIDChanged) {
+    handleStreamerIDChangedMessage(streamerIDChangedMessage: Messages.streamerIdChanged) {
         const newID = streamerIDChangedMessage.newID;
 
         // need to edit the selected streamer in the settings list
@@ -1447,7 +1450,7 @@ export class WebRtcPlayerController {
      * Handle the RTC Answer from the signaling server
      * @param Answer - Answer SDP from the peer.
      */
-    handleWebRtcAnswer(Answer: MessageReceive.MessageAnswer) {
+    handleWebRtcAnswer(Answer: Messages.answer) {
         Logger.Log(Logger.GetStackTrace(), `Got answer sdp ${Answer.sdp}`, 6);
 
         const sdpAnswer: RTCSessionDescriptionInit = {
@@ -1463,7 +1466,7 @@ export class WebRtcPlayerController {
      * Handle the RTC offer from a WebRTC peer (received through the signalling server).
      * @param Offer - Offer SDP from the peer.
      */
-    handleWebRtcOffer(Offer: MessageReceive.MessageOffer) {
+    handleWebRtcOffer(Offer: Messages.offer) {
         Logger.Log(Logger.GetStackTrace(), `Got offer sdp ${Offer.sdp}`, 6);
 
         this.isUsingSFU = Offer.sfu ? Offer.sfu : false;
@@ -1485,9 +1488,7 @@ export class WebRtcPlayerController {
      * Handle when the SFU provides the peer with its data channels
      * @param DataChannels - The message from the SFU containing the data channels ids
      */
-    handleWebRtcSFUPeerDatachannels(
-        DataChannels: MessageReceive.MessagePeerDataChannels
-    ) {
+    handleWebRtcSFUPeerDatachannels(DataChannels: Messages.streamerDataChannels) {
         const SendOptions: RTCDataChannelInit = {
             ordered: true,
             negotiated: true,
@@ -1603,12 +1604,13 @@ export class WebRtcPlayerController {
             6
         );
 
-        const extraParams: MessageSend.ExtraOfferParameters = {
+        const extraParams = {
+            sdp: offer.sdp,
             minBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate),
             maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
         };
 
-        this.protocol.sendWebRtcOffer(offer, extraParams);
+        this.protocol.sendWebRtcOffer(MessageHelpers.createMessage(Messages.offer, extraParams));
     }
 
     /**
@@ -1622,12 +1624,13 @@ export class WebRtcPlayerController {
             6
         );
 
-        const extraParams: MessageSend.ExtraAnswerParameters = {
+        const extraParams = {
+            sdp: answer.sdp,
             minBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMinBitrate),
             maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
         };
 
-        this.protocol.sendWebRtcAnswer(answer, extraParams);
+        this.protocol.sendWebRtcOffer(MessageHelpers.createMessage(Messages.answer, extraParams));
 
         if (this.isUsingSFU) {
             this.protocol.sendWebRtcDatachannelRequest();
