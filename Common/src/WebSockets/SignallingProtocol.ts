@@ -2,9 +2,10 @@
 
 import { Logger } from '../Logger/Logger';
 import { ITransport } from '../Transport/ITransport';
-import * as MessageReceive from './MessageReceive';
-import * as MessageSend from './MessageSend';
 import { EventEmitter } from 'events';
+import { BaseMessage } from '../Messages/base_message';
+import * as Messages from '../Messages/signalling_messages';
+import * as MessageHelpers from '../Messages/message_helpers';
 
 /**
  * Signalling protocol for handling messages from the signalling server.
@@ -31,10 +32,10 @@ export class SignallingProtocol {
         transport.events.addListener('error', () => this.transportEvents.emit('error'));
         transport.events.addListener('close', (event: CloseEvent) => this.transportEvents.emit('close', event));
 
-        transport.onMessage = (msg: MessageReceive.MessageRecv) => {
+        transport.onMessage = (msg: BaseMessage) => {
             // auto handle ping messages
-            if (msg.type == MessageReceive.MessageRecvTypes.PING) {
-                const pongMessage = new MessageSend.MessagePong(new Date().getTime());
+            if (msg.type == Messages.ping.typeName) {
+                const pongMessage = MessageHelpers.createMessage(Messages.pong, { time: new Date().getTime() });
                 transport.sendMessage(pongMessage);
             }
             // call the handlers
@@ -66,49 +67,49 @@ export class SignallingProtocol {
     /**
      * Passes a message to the transport to send to the other end.
      */
-    sendMessage(msg: MessageSend.MessageSend) {
+    sendMessage(msg: BaseMessage) {
         this.transport.sendMessage(msg);
     }
 
     // the following are just wrappers for sendMessage and should be deprioritized.
     
     requestStreamerList() {
-        const payload = new MessageSend.MessageListStreamers();
+        const payload = MessageHelpers.createMessage(Messages.listStreamers);
         this.transport.sendMessage(payload);
     }
 
     sendSubscribe(streamerid: string) {
-        const payload = new MessageSend.MessageSubscribe(streamerid);
+        const payload = MessageHelpers.createMessage(Messages.subscribe, { streamerid: streamerid });
         this.transport.sendMessage(payload);
     }
 
     sendUnsubscribe() {
-        const payload = new MessageSend.MessageUnsubscribe();
+        const payload = MessageHelpers.createMessage(Messages.unsubscribe);
         this.transport.sendMessage(payload);
     }
 
-    sendWebRtcOffer(offer: RTCSessionDescriptionInit, extraParams: MessageSend.ExtraOfferParameters) {
-        const payload = new MessageSend.MessageWebRTCOffer(offer, extraParams);
+    sendWebRtcOffer(extraParams: any) {
+        const payload = MessageHelpers.createMessage(Messages.offer, extraParams);
         this.transport.sendMessage(payload);
     }
 
-    sendWebRtcAnswer(answer: RTCSessionDescriptionInit, extraParams: MessageSend.ExtraAnswerParameters) {
-        const payload = new MessageSend.MessageWebRTCAnswer(answer, extraParams);
+    sendWebRtcAnswer(extraParams: any) {
+        const payload = MessageHelpers.createMessage(Messages.answer, extraParams);
         this.transport.sendMessage(payload);
     }
 
     sendWebRtcDatachannelRequest() {
-        const payload = new MessageSend.MessageWebRTCDatachannelRequest();
+        const payload = MessageHelpers.createMessage(Messages.dataChannelRequest);
         this.transport.sendMessage(payload);
     }
 
     sendSFURecvDataChannelReady() {
-        const payload = new MessageSend.MessageSFURecvDataChannelReady();
+        const payload = MessageHelpers.createMessage(Messages.peerDataChannelsReady);
         this.transport.sendMessage(payload);
     }
 
     sendIceCandidate(candidate: RTCIceCandidate) {
-        const payload = new MessageSend.MessageIceCandidate(candidate);
+        const payload = MessageHelpers.createMessage(Messages.iceCandidate, { candidate: candidate });
         this.transport.sendMessage(payload);
     }
 }

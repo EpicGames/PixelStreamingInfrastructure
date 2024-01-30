@@ -1,5 +1,4 @@
-import { MessageSend } from '../WebSockets/MessageSend';
-import { MessageRecv } from '../WebSockets/MessageReceive';
+import { BaseMessage } from '../Messages/base_message';
 import { EventEmitter } from 'events';
 
 /**
@@ -16,12 +15,12 @@ export interface ITransport {
     /**
      * Called when the protocol wants to send a message over the transport.
      */
-    sendMessage(msg: MessageSend): void;
+    sendMessage(msg: BaseMessage): void;
 
     /**
      * Callback filled in by the SignallingProtocol and should be called by the transport when a new message arrives.
      */
-    onMessage: (msg: MessageRecv) => void;
+    onMessage: (msg: BaseMessage) => void;
 
     /**
      * Connect to a given URL.

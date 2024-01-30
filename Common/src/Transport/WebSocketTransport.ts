@@ -1,10 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { Logger } from '../Logger/Logger';
-import { MessageRecv } from '../WebSockets/MessageReceive';
-import { MessageSend } from '../WebSockets/MessageSend';
 import { ITransport } from './ITransport';
 import { EventEmitter } from 'events';
+import { BaseMessage } from '../Messages/base_message';
+import * as MessageHelpers from '../Messages/message_helpers';
 
 // declare the new method for the websocket interface
 declare global {
@@ -25,11 +25,11 @@ export class WebSocketTransport implements ITransport {
         this.events = new EventEmitter();
     }
 
-    sendMessage(msg: MessageSend): void {
-        this.webSocket.send(msg.payload());
+    sendMessage(msg: BaseMessage): void {
+        this.webSocket.send(JSON.stringify(msg));
     }
 
-    onMessage: (msg: MessageRecv) => void;
+    onMessage: (msg: BaseMessage) => void;
 
     /**
      * Connect to the signaling server
@@ -104,7 +104,6 @@ export class WebSocketTransport implements ITransport {
             return;
         }
 
-        const message: MessageRecv = JSON.parse(event.data);
         Logger.Log(
             Logger.GetStackTrace(),
             'received => \n' +
@@ -112,9 +111,15 @@ export class WebSocketTransport implements ITransport {
             6
         );
 
-        this.onMessage(message);
-        // Send to our signalling protocol to handle the incoming message
-        //this.signallingProtocol.handleMessage(message.type, event.data);
+        let parsedMessage;
+        try {
+            parsedMessage = JSON.parse(event.data);
+        } catch (e) {
+            Logger.Error(Logger.GetStackTrace(), `Error parsing message string ${event.data}.\n${e}`);
+            return;
+        }
+
+        this.onMessage(parsedMessage);
     }
 
     /**

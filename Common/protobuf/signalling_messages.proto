@@ -68,6 +68,7 @@ message offer {
   string type = 1;
   string sdp = 2;
   optional string playerId = 3;
+  optional bool sfu = 4;
 }
 
 message peerDataChannelsReady {
@@ -131,4 +132,9 @@ message subscribe {
 
 message unsubscribe {
   string type = 1;
+}
+
+message streamerIdChanged {
+  string type = 1;
+  string newID = 2;
 }

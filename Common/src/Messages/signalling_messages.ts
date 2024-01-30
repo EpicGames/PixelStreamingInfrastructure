@@ -196,6 +196,10 @@ export interface offer {
      * @generated from protobuf field: optional string playerId = 3;
      */
     playerId?: string;
+    /**
+     * @generated from protobuf field: optional bool sfu = 4;
+     */
+    sfu?: boolean;
 }
 /**
  * @generated from protobuf message peerDataChannelsReady
@@ -364,6 +368,19 @@ export interface unsubscribe {
      * @generated from protobuf field: string type = 1;
      */
     type: string;
+}
+/**
+ * @generated from protobuf message streamerIdChanged
+ */
+export interface streamerIdChanged {
+    /**
+     * @generated from protobuf field: string type = 1;
+     */
+    type: string;
+    /**
+     * @generated from protobuf field: string newID = 2;
+     */
+    newID: string;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class base_message$Type extends MessageType<base_message> {
@@ -1033,7 +1050,8 @@ class offer$Type extends MessageType<offer> {
         super("offer", [
             { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "sdp", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "playerId", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+            { no: 3, name: "playerId", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "sfu", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value?: PartialMessage<offer>): offer {
@@ -1058,6 +1076,9 @@ class offer$Type extends MessageType<offer> {
                 case /* optional string playerId */ 3:
                     message.playerId = reader.string();
                     break;
+                case /* optional bool sfu */ 4:
+                    message.sfu = reader.bool();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -1079,6 +1100,9 @@ class offer$Type extends MessageType<offer> {
         /* optional string playerId = 3; */
         if (message.playerId !== undefined)
             writer.tag(3, WireType.LengthDelimited).string(message.playerId);
+        /* optional bool sfu = 4; */
+        if (message.sfu !== undefined)
+            writer.tag(4, WireType.Varint).bool(message.sfu);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1772,3 +1796,58 @@ class unsubscribe$Type extends MessageType<unsubscribe> {
  * @generated MessageType for protobuf message unsubscribe
  */
 export const unsubscribe = new unsubscribe$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class streamerIdChanged$Type extends MessageType<streamerIdChanged> {
+    constructor() {
+        super("streamerIdChanged", [
+            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "newID", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<streamerIdChanged>): streamerIdChanged {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.type = "";
+        message.newID = "";
+        if (value !== undefined)
+            reflectionMergePartial<streamerIdChanged>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: streamerIdChanged): streamerIdChanged {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string type */ 1:
+                    message.type = reader.string();
+                    break;
+                case /* string newID */ 2:
+                    message.newID = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: streamerIdChanged, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string type = 1; */
+        if (message.type !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.type);
+        /* string newID = 2; */
+        if (message.newID !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.newID);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message streamerIdChanged
+ */
+export const streamerIdChanged = new streamerIdChanged$Type();
