@@ -1,8 +1,7 @@
 import { TestContext, SignallingConnection } from './signalling_tester';
-import config from './config';
-import assert from 'assert';
-import * as Messages from './signalling_messages';
 import WebSocket from 'ws';
+import { Messages } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
+import config from './config';
 
 function logFunction(connection: SignallingConnection, message: string): void {
     console.log(`${connection.name}: ${message}`);

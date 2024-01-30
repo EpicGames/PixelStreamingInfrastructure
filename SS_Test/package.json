@@ -1,6 +1,6 @@
 {
   "name": "ss_test",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "test.js",
   "scripts": {
@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@epicgames-ps/lib-pixelstreamingcommon-ue5.5": "^0.0.6",
     "@protobuf-ts/plugin": "^2.9.3",
     "ws": "^8.14.2"
   },

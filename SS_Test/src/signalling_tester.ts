@@ -1,6 +1,5 @@
 import WebSocket from 'ws';
-import { IMessageType } from "@protobuf-ts/runtime";
-import { BaseMessage, messageTypeRegistry, createMessage } from './message_helpers';
+import { IMessageType, BaseMessage, MessageRegistry, MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 
 export interface ExpectedMessage {
     type: 'message';
@@ -222,7 +221,7 @@ export class SignallingConnection {
      * @param params - Extra parameters to set on the message.
      */
     sendMessage(messageType: IMessageType<BaseMessage>, params?: any) {
-        const message = createMessage(messageType, params);
+        const message = MessageHelpers.createMessage(messageType, params);
         if (!this.validateProtoMessage(message)) {
             return;
         }
@@ -413,7 +412,7 @@ export class SignallingConnection {
             return null;
         }
 
-        const messageType = messageTypeRegistry[msg.type];
+        const messageType = MessageRegistry[msg.type];
         if (!messageType) {
             this.addError(`Message is of an unknown type: "${messageType}". Rejected.`);
             return null;
