@@ -6,8 +6,10 @@
     "types": "types/pixelstreamingcommon.d.ts",
     "sideEffects": false,
     "scripts": {
+        "build_proto": "npx protoc --ts_out src/Messages --proto_path protobuf protobuf/signalling_messages.proto",
         "compile": "tsc --build --clean && tsc",
         "build": "tsc --build --clean && tsc",
+        "build-all": "npm run build_proto && npm run build",
         "test": "echo \"Error: no test specified\" && exit 1",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
     },
@@ -30,5 +32,8 @@
     "license": "MIT",
     "publishConfig": {
         "access": "public"
+    },
+    "dependencies": {
+        "@protobuf-ts/plugin": "^2.9.3"
     }
 }
