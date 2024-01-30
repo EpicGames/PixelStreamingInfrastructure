@@ -1,15 +1,15 @@
 {
     "name": "@epicgames-ps/lib-pixelstreamingcommon-ue5.5",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "Common utilities library for Unreal Engine 5.5 Pixel Streaming",
-    "main": "types/pixelstreamingcommon.js",
-    "types": "types/pixelstreamingcommon.d.ts",
+    "main": "build/commonjs/pixelstreamingcommon.js",
+    "module": "build/es2015/pixelstreamingcommon.js",
+    "types": "build/types/pixelstreamingcommon.d.ts",
     "sideEffects": false,
     "scripts": {
         "build_proto": "npx protoc --ts_out src/Messages --proto_path protobuf protobuf/signalling_messages.proto",
-        "compile": "tsc --build --clean && tsc",
-        "build": "tsc --build --clean && tsc",
-        "build-all": "npm run build_proto && npm run build",
+        "compile": "tsc --build --clean && tsc --project tsconfig.build.json --module es2015 --outDir build/es2015 && tsc --project tsconfig.build.json --module commonjs --outDir build/commonjs --declaration --declarationDir build/types",
+        "build": "npm run build_proto && npm run compile",
         "test": "echo \"Error: no test specified\" && exit 1",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
     },
