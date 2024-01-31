@@ -35,6 +35,8 @@
         "access": "public"
     },
     "dependencies": {
-        "@protobuf-ts/plugin": "^2.9.3"
+        "@protobuf-ts/plugin": "^2.9.3",
+        "@types/ws": "^8.5.10",
+        "ws": "^8.16.0"
     }
 }
