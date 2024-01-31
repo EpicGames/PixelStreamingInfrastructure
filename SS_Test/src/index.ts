@@ -50,6 +50,13 @@ async function main(): Promise<void> {
         onFailedPhase('initial connection', context);
     }
 
+    streamer.sendMessage(Messages.ping);
+    streamer.addExpect(Messages.pong, (msg: Messages.pong) => {});
+
+    if (!await context.validateStep(3000, [streamer])) {
+        onFailedPhase('ping response', context);
+    }
+
     // test subscribing
 
     player.sendMessage(Messages.listStreamers);

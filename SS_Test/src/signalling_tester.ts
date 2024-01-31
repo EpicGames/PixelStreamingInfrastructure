@@ -1,5 +1,10 @@
+import { IMessageType,
+         BaseMessage,
+         MessageRegistry,
+         MessageHelpers,
+         SignallingProtocol } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
+import { WebSocketTransportCJS } from './WebSocketTransportCJS';
 import WebSocket from 'ws';
-import { IMessageType, BaseMessage, MessageRegistry, MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 
 export interface ExpectedMessage {
     type: 'message';
@@ -134,8 +139,9 @@ export class SignallingConnection {
     private logCallback: LogCallback;
     private successCallback: SuccessCallback;
     private failedCallback: FailedCallback;
-    private ws: WebSocket;
+    //private ws: WebSocket;
     private processTimer: ReturnType<typeof setTimeout> | null;
+    private protocol: SignallingProtocol;
 
     /**
      * Initialize a new connection and immediately try to connect.
@@ -151,12 +157,14 @@ export class SignallingConnection {
         this.failedCallback = (connection, unsatisfiedExpects, unhandledEvents) => {};
         this.processTimer = null;
 
+        this.protocol = new SignallingProtocol(new WebSocketTransportCJS());
+        this.protocol.transportEvents.addListener("open", event => this.onConnectionOpen(event));
+        this.protocol.transportEvents.addListener("error", event => this.onConnectionError(event));
+        this.protocol.transportEvents.addListener("close", event => this.onConnectionClose(event));
+        this.protocol.transportEvents.addListener("message", message => this.onMessage(message));
+
         this.logCallback(this, `Connecting to Signalling Server at ${url}`);
-        this.ws = new WebSocket(url);
-        this.ws.addEventListener("open", event => this.onConnectionOpen(event));
-        this.ws.addEventListener("error", event => this.onConnectionError(event));
-        this.ws.addEventListener("close", event => this.onConnectionClose(event));
-        this.ws.addEventListener("message", event => this.onMessage(event));
+        this.protocol.connect(url);
     }
 
     /**
@@ -227,7 +235,7 @@ export class SignallingConnection {
         }
         const validatedMessageString = JSON.stringify(message);
         this.logCallback(this, `Sending: ${validatedMessageString}`);
-        this.ws.send(validatedMessageString);
+        this.protocol.sendMessage(message);
     }
 
     /**
@@ -307,7 +315,7 @@ export class SignallingConnection {
      * @param message - The message to send with the close.
      */
     close(code: number, message: string) {
-        this.ws.close(code, message);
+        this.protocol.disconnect();
     }
 
     private addError(error: string) {
@@ -329,25 +337,15 @@ export class SignallingConnection {
         this.eventQueue.push({type: 'socket', eventType: 'close', event: event});
     }
 
-    private onMessage(event: WebSocket.MessageEvent) {
-        const messageString = event.data as string;
-        this.logCallback(this, `Got message: ${messageString}`);
+    private onMessage(message: BaseMessage) {
+        this.logCallback(this, `Got message: ${JSON.stringify(message)}`);
 
-        let parsedMessage;
-        try {
-            parsedMessage = JSON.parse(messageString);
-        } catch (e) {
-            this.addError(`Error parsing message string ${messageString}. ${e}`);
-            return;
-        }
-
-        const messageType = this.validateProtoMessage(parsedMessage);
+        const messageType = this.validateProtoMessage(message);
         if (!messageType) {
             return;
         }
 
-        const validatedMessage = messageType.create(parsedMessage);
-        this.eventQueue.push({type: 'message', message: validatedMessage!});
+        this.eventQueue.push({type: 'message', message: message!});
     }
 
     private async poll(resolve: () => void) {
