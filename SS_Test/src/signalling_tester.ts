@@ -2,8 +2,8 @@ import { IMessageType,
          BaseMessage,
          MessageRegistry,
          MessageHelpers,
+         WebSocketTransportNJS,
          SignallingProtocol } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { WebSocketTransportCJS } from './WebSocketTransportCJS';
 import WebSocket from 'ws';
 
 export interface ExpectedMessage {
@@ -157,7 +157,7 @@ export class SignallingConnection {
         this.failedCallback = (connection, unsatisfiedExpects, unhandledEvents) => {};
         this.processTimer = null;
 
-        this.protocol = new SignallingProtocol(new WebSocketTransportCJS());
+        this.protocol = new SignallingProtocol(new WebSocketTransportNJS());
         this.protocol.transportEvents.addListener("open", event => this.onConnectionOpen(event));
         this.protocol.transportEvents.addListener("error", event => this.onConnectionError(event));
         this.protocol.transportEvents.addListener("close", event => this.onConnectionClose(event));

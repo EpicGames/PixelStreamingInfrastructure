@@ -14,12 +14,31 @@ export class SignallingProtocol {
     private transport: ITransport;
 
     /**
-     * Listen on this emitter for transport events, open, close, error.
+     * Listen on this emitter for transport events.
+     * 
+     * Events emitted:
+     *   open:
+     *      Emitted when the transport connection opens and is ready to handle messages.
+     * 
+     *   error:
+     *      Emitted when there is an error on the transport has an error and must close.
+     * 
+     *   close:
+     *      Emitted when the transport connection closes and can no longer send or
+     *      receive messages. Will also be emitted after an error.
+     * 
+     *   message:
+     *      Emitted any time a message is received by the transport. Listen on this if
+     *      you wish to capture all messages, rather than specific messages on
+     *      'messageHandlers'.
      */
     transportEvents: EventEmitter;
 
     /**
      * Listen on this emitter for messages. Message type is the name of the event to listen for.
+     * 
+     * Example:
+     *      messageHandlers.addListener('config', (message: Messages.config) => console.log(`Got a config message: ${message}`)));
      */
     messageHandlers: EventEmitter;
 

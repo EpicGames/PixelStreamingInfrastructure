@@ -1,13 +1,17 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { ITransport, BaseMessage } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
+import { ITransport } from './ITransport';
+import { BaseMessage } from '../Messages/base_message';
 import WebSocket from 'ws';
 import { EventEmitter } from 'events';
 
 /**
- * An implementation of WebSocketTransport from pixelstreamingcommon that supports commonjs websockets
+ * An implementation of WebSocketTransport from pixelstreamingcommon that supports node.js websockets
+ * This is needed because of the slight differences between the 'ws' node.js package and the websockets
+ * supported in the browsers.
+ * If you are using this code in a browser use 'WebSocketTransport' instead.
  */
-export class WebSocketTransportCJS implements ITransport {
+export class WebSocketTransportNJS implements ITransport {
     WS_OPEN_STATE = 1;
     webSocket: WebSocket;
     events: EventEmitter;
