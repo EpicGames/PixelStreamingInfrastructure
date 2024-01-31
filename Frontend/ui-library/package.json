@@ -1,6 +1,6 @@
 {
     "name": "@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.5",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "Reference frontend UI library for Unreal Engine 5.5 Pixel Streaming - gives the stock look and feel.",
     "main": "dist/lib-pixelstreamingfrontend-ui.js",
     "module": "dist/lib-pixelstreamingfrontend-ui.esm.js",
@@ -35,7 +35,7 @@
         "jss-plugin-global": "^10.9.2"
     },
     "peerDependencies": {
-        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.5": "^0.0.5"
+        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.5": "^0.0.7"
     },
     "repository": {
         "type": "git",
