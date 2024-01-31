@@ -28,8 +28,8 @@ export class SignallingProtocol {
         this.transportEvents = new EventEmitter();
         this.messageHandlers = new EventEmitter();
 
-        transport.events.addListener('open', () => this.transportEvents.emit('open'));
-        transport.events.addListener('error', () => this.transportEvents.emit('error'));
+        transport.events.addListener('open', (event: Event) => this.transportEvents.emit('open', event));
+        transport.events.addListener('error', (event: Event) => this.transportEvents.emit('error', event));
         transport.events.addListener('close', (event: CloseEvent) => this.transportEvents.emit('close', event));
 
         transport.onMessage = (msg: BaseMessage) => {
@@ -38,8 +38,10 @@ export class SignallingProtocol {
                 const pongMessage = MessageHelpers.createMessage(Messages.pong, { time: new Date().getTime() });
                 transport.sendMessage(pongMessage);
             }
+            
             // call the handlers
-            this.messageHandlers.emit(msg.type, msg);
+            this.messageHandlers.emit(msg.type, msg);  // emit this for listeners listening for specific messages
+            this.transportEvents.emit('message', msg); // emit this for listeners listening to any message
         };
     }
 
