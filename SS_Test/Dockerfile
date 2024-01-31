@@ -2,8 +2,13 @@ FROM node:18.17.0 as builder
 
 WORKDIR /SignallingTester
 
-COPY Common/ .
-COPY SS_Test/ .
+COPY Common/ Common
+COPY SS_Test/ SS_Test
+
+WORKDIR /SignallingTester/Common
+
+RUN npm ci
+RUN npm run build
 
 WORKDIR /SignallingTester/SS_Test
 
