@@ -1,13 +1,13 @@
 {
   "name": "ss_test",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "test.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf ./build && tsc",
-    "start": "npx protoc --ts_out src --proto_path ../Common/protobuf ../Common/protobuf/signalling_messages.proto && npm run build && node ./build/index.js",
-    "build_proto": "npx protoc --ts_out src --proto_path ../Common/protobuf ../Common/protobuf/signalling_messages.proto"
+    "build-dev": "rimraf ./build && npm link ../Common && tsc",
+    "start": "npm run build && node ./build/index.js"
   },
   "author": "",
   "license": "ISC",
