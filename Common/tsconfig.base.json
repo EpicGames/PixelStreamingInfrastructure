@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "esModuleInterop": true,
+        "target": "ES6",
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "allowJs": true
+    },
+    "include": ["./src/*.ts"],
+}

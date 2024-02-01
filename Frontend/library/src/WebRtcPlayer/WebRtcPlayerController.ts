@@ -1610,7 +1610,7 @@ export class WebRtcPlayerController {
             maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
         };
 
-        this.protocol.sendWebRtcOffer(MessageHelpers.createMessage(Messages.offer, extraParams));
+        this.protocol.sendWebRtcOffer(extraParams);
     }
 
     /**
@@ -1630,7 +1630,7 @@ export class WebRtcPlayerController {
             maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
         };
 
-        this.protocol.sendWebRtcOffer(MessageHelpers.createMessage(Messages.answer, extraParams));
+        this.protocol.sendWebRtcAnswer(extraParams);
 
         if (this.isUsingSFU) {
             this.protocol.sendWebRtcDatachannelRequest();
