@@ -4,8 +4,24 @@
   "description": "A rewrite of the old cirrus signalling server",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node ./build/index.js",
+    "dev": "nodemon src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Matthew Cotton",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.13",
+    "@types/ws": "^8.5.10",
+    "nodemon": "^3.0.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "jsonc": "^2.0.0",
+    "ws": "^8.16.0"
+  }
 }

@@ -14,10 +14,17 @@ import { EventEmitter } from 'events';
 export class WebSocketTransportNJS implements ITransport {
     WS_OPEN_STATE = 1;
     webSocket: WebSocket;
+    webSocketServer: WebSocket.Server;
     events: EventEmitter;
 
-    constructor() {
+    constructor(existingSocket?: WebSocket) {
         this.events = new EventEmitter();
+
+        if (existingSocket) {
+            this.webSocket = existingSocket;
+            this.setupSocketHandlers();
+            this.events.emit('open');
+        }
     }
 
     sendMessage(msg: BaseMessage): void {
@@ -33,15 +40,12 @@ export class WebSocketTransportNJS implements ITransport {
      */
     connect(connectionURL: string): boolean {
         this.webSocket = new WebSocket(connectionURL);
-        this.webSocket.addEventListener("open", event => this.handleOnOpen(event));
-        this.webSocket.addEventListener("error", event => this.handleOnError(event));
-        this.webSocket.addEventListener("close", event => this.handleOnClose(event));
-        this.webSocket.addEventListener("message", event => this.handleOnMessage(event));
+        this.setupSocketHandlers();
         return true;
     }
 
-    disconnect(): void {
-        this.webSocket.close();
+    disconnect(code?: number, reason?: string): void {
+        this.webSocket.close(code, reason);
     }
 
     isConnected(): boolean {
@@ -93,5 +97,12 @@ export class WebSocketTransportNJS implements ITransport {
      */
     close() {
         this.webSocket?.close();
+    }
+
+    private setupSocketHandlers() {
+        this.webSocket.addEventListener("open", event => this.handleOnOpen(event));
+        this.webSocket.addEventListener("error", event => this.handleOnError(event));
+        this.webSocket.addEventListener("close", event => this.handleOnClose(event));
+        this.webSocket.addEventListener("message", event => this.handleOnMessage(event));
     }
 }

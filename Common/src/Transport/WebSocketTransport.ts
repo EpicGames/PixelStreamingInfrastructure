@@ -52,8 +52,8 @@ export class WebSocketTransport implements ITransport {
         }
     }
 
-    disconnect(): void {
-        this.webSocket.close();
+    disconnect(code?: number, reason?: string): void {
+        this.webSocket.close(code, reason);
     }
 
     isConnected(): boolean {

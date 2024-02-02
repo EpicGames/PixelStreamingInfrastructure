@@ -35,7 +35,7 @@ export class Logger {
      * @param verbosity - the verbosity level
      */
     static Log(stack: string, message: string, verbosity?: number) {
-        if (verbosity > this.verboseLogLevel) {
+        if (verbosity !== undefined && verbosity > this.verboseLogLevel) {
             return;
         }
 
@@ -49,7 +49,7 @@ export class Logger {
      * @param verbosity - the verbosity level
      */
     static Info(stack: string, message: string, verbosity?: number) {
-        if (verbosity > this.verboseLogLevel) {
+        if (verbosity !== undefined && verbosity > this.verboseLogLevel) {
             return;
         }
 

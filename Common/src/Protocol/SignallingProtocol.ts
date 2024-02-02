@@ -31,6 +31,10 @@ export class SignallingProtocol {
      *      Emitted any time a message is received by the transport. Listen on this if
      *      you wish to capture all messages, rather than specific messages on
      *      'messageHandlers'.
+     * 
+     *   out:
+     *      Emitted when sending a message out on the transport. Similar to 'message' but
+     *      only for when messages are sent from this endpoint. Useful for debugging.
      */
     transportEvents: EventEmitter;
 
@@ -74,8 +78,8 @@ export class SignallingProtocol {
     /**
      * Asks the transport to disconnect from any connection it might have.
      */
-    disconnect() {
-        this.transport.disconnect();
+    disconnect(code?: number, reason?: string) {
+        this.transport.disconnect(code, reason);
     }
 
     /**
@@ -90,6 +94,7 @@ export class SignallingProtocol {
      */
     sendMessage(msg: BaseMessage) {
         this.transport.sendMessage(msg);
+        this.transportEvents.emit('out', msg); // emit this for listeners listening to outgoing messages
     }
 
     // the following are just wrappers for sendMessage and should be deprioritized.

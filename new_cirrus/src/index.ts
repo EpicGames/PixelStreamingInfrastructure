@@ -1,0 +1,41 @@
+import express from 'express';
+import * as http from 'http';
+import * as WebSocket from 'ws';
+import { SignallingProtocol,
+		 WebSocketTransportNJS,
+		 BaseMessage,
+		 MessageHelpers,
+		 Messages } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
+import { StreamerType, StreamerConnection } from './streamer_connection';
+import { PlayerType, PlayerConnection } from './player_connection';
+import { Logger } from './logger';
+import { stringify } from './utils';
+import path from 'path';
+import fs from 'fs';
+
+const app = express();
+const server = http.createServer(app);
+
+const streamerPort = 8888;
+const playerPort = 80;
+const clientConfig = { peerConnectionOptions: {} };
+
+const streamerServer = new WebSocket.Server({ port: streamerPort, backlog: 1 });
+streamerServer.on('connection', (ws: WebSocket, reqest: any) => {
+	Logger.info(`New streamer connection...`);
+	const temporaryId = reqest.connection.remoteAddress;
+	const newServer = new StreamerConnection(temporaryId, ws, StreamerType.Regular, clientConfig);
+});
+
+const playerServer = new WebSocket.Server({ server: server });
+playerServer.on('connection', (ws: WebSocket, reqest: any) => {
+	Logger.info(`New player connection...`);
+	const newPlayer = new PlayerConnection(ws, PlayerType.Regular, clientConfig);
+});
+
+server.listen(80, function () {
+	Logger.info('Http listening on *: 80');
+});
+
+// Request has been sent to site root, send the homepage file
+app.use('/', express.static('Public'));

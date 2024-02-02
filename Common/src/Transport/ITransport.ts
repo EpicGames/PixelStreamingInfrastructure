@@ -30,7 +30,7 @@ export interface ITransport {
     /**
      * Disconnect this transport.
      */
-    disconnect(): void;
+    disconnect(code?: number, reason?: string): void;
 
     /**
      * Should return true when the transport is connected and ready to send/receive messages.
