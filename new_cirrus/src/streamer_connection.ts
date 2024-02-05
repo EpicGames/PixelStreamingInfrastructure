@@ -29,8 +29,8 @@ export class StreamerConnection {
 
 		this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`S:${this.id} <- ${stringify(message)}`));
 		this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`S:${this.id} -> ${stringify(message)}`));
-		this.protocol.transportEvents.addListener('error', () => this.onTransportError.bind(this));
-		this.protocol.transportEvents.addListener('close', () => this.onTransportClose.bind(this));
+		this.protocol.transportEvents.addListener('error', this.onTransportError.bind(this));
+		this.protocol.transportEvents.addListener('close', this.onTransportClose.bind(this));
 
 		this.protocol.messageHandlers.addListener(Messages.endpointId.typeName, this.onEndpointId.bind(this));
 		this.protocol.messageHandlers.addListener(Messages.ping.typeName, this.onPing.bind(this));

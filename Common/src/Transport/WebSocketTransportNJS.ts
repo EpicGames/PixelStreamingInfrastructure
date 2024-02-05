@@ -100,9 +100,9 @@ export class WebSocketTransportNJS implements ITransport {
     }
 
     private setupSocketHandlers() {
-        this.webSocket.addEventListener("open", event => this.handleOnOpen(event));
-        this.webSocket.addEventListener("error", event => this.handleOnError(event));
-        this.webSocket.addEventListener("close", event => this.handleOnClose(event));
-        this.webSocket.addEventListener("message", event => this.handleOnMessage(event));
+        this.webSocket.addEventListener("open", this.handleOnOpen.bind(this));
+        this.webSocket.addEventListener("error", this.handleOnError.bind(this));
+        this.webSocket.addEventListener("close", this.handleOnClose.bind(this));
+        this.webSocket.addEventListener("message", this.handleOnMessage.bind(this));
     }
 }

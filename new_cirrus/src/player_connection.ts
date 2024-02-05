@@ -23,7 +23,7 @@ export class PlayerConnection {
 		this.type = type;
 		this.streamerId = null;
 		this.protocol = new SignallingProtocol(new WebSocketTransportNJS(ws));
-		this.sendOffer = false;
+		this.sendOffer = true;
 
 		this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`P:${this.id} <- ${stringify(message)}`));
 		this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`P:${this.id} -> ${stringify(message)}`));
@@ -61,26 +61,21 @@ export class PlayerConnection {
 																						  dataChannel: true,
 																						  sfu: this.type == PlayerType.SFU,
 																						  sendOffer: this.sendOffer });
-		this.protocol.sendMessage(connectedMessage);
+		this.sendToStreamer(connectedMessage);
 	}
 
 	unsubscribe() {
-		if (this.streamerId && !Streamers.has(this.streamerId)) {
-			// if (this.type == PlayerType.SFU) {
-			// 	let streamer = streamers.get(this.streamerId);
-			// 	if (streamer.getSFUPlayerId() != this.id) {
-			// 		Logger.error(`Trying to unsibscribe SFU player ${this.id} from streamer ${streamer.id} but the current SFUId does not match (${streamer.getSFUPlayerId()}).`)
-			// 	} else {
-			// 		streamer.removeSFUPlayer();
-			// 	}
-			// }
+		if (this.streamerId && Streamers.has(this.streamerId)) {
 			const disconnectedMessage = MessageHelpers.createMessage(Messages.playerDisconnected, { playerId: this.id });
-			this.protocol.sendMessage(disconnectedMessage);
+			this.sendToStreamer(disconnectedMessage);
 		}
 		this.streamerId = null;
 	}
 
 	disconnect() {
+		if (this.id) {
+			Players.unregisterPlayer(this.id);
+		}
 		this.protocol.disconnect();
 	}
 
@@ -88,10 +83,8 @@ export class PlayerConnection {
 		Logger.error(`Player (${this.id}) transport error ${error}`);
 	}
 
-	private onTransportClose(): void {
-		if (this.id) {
-			Players.unregisterPlayer(this.id);
-		}
+	private onTransportClose(event: CloseEvent): void {
+		this.disconnect();
 	}
 
 	private onSubscribeMessage(message: Messages.subscribe): void {

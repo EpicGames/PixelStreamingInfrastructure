@@ -1,6 +1,7 @@
 import { Messages,
 		 MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { PlayerConnection, PlayerType } from './player_connection';
+import { Logger } from './logger';
 
 export class PlayerRegistry {
 	players: Map<string, PlayerConnection> = new Map();
@@ -19,6 +20,7 @@ export class PlayerRegistry {
 		player.id = newPlayerId;
 		this.players.set(player.id, player);
 		this.playerCount++;
+		Logger.info(`Registered new player: ${player.id}`);
 	}
 
 	unregisterPlayer(playerId: string): void {
@@ -28,6 +30,7 @@ export class PlayerRegistry {
 			this.players.delete(playerId);
 			this.playerCount--;
 		}
+		Logger.info(`Unregistered player: ${playerId}`);
 	}
 
 	has(playerId: string): boolean {

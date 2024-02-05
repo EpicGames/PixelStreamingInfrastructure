@@ -63,8 +63,8 @@ export class SignallingProtocol {
             }
             
             // call the handlers
-            this.messageHandlers.emit(msg.type, msg);  // emit this for listeners listening for specific messages
             this.transportEvents.emit('message', msg); // emit this for listeners listening to any message
+            this.messageHandlers.emit(msg.type, msg);  // emit this for listeners listening for specific messages
         };
     }
 

@@ -32,17 +32,9 @@ export class StreamerRegistry {
 			return;
 		}
 
-		// SFU stuff
-		// let sfuPlayer = getSFUForStreamer(streamer.id);
-		// if (sfuPlayer) {
-		// 	const msg = { type: "streamerDisconnected" };
-		// 	logOutgoing(sfuPlayer.id, msg);
-		// 	sfuPlayer.sendTo(msg);
-		// 	disconnectAllPlayers(sfuPlayer.id);
-		// }
-
 		Players.streamerDisconnected(id);
 		this.streamers.delete(id);
+		Logger.log(`Unregistered streamer: ${id}`);
 	}
 
 	getDefault(): StreamerConnection | undefined {
