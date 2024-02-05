@@ -1,9 +1,16 @@
 import { StreamerConnection } from './streamer_connection';
 import { Players } from './player_registry';
 import { Logger } from './logger';
+import { SignallingProtocol } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
+
+export interface IStreamer {
+	streamerId: string;
+	protocol: SignallingProtocol;
+	idCommitted: boolean;
+}
 
 export class StreamerRegistry {
-	streamers: Map<string, StreamerConnection>;
+	streamers: Map<string, IStreamer>;
 	uniqueLegacyStreamerPostfix: number;
 	LegacyStreamerPrefix: string = "__LEGACY_STREAMER__"; // old streamers that dont know how to ID will be assigned this id prefix.
 
@@ -12,19 +19,19 @@ export class StreamerRegistry {
 		this.uniqueLegacyStreamerPostfix = 0;
 	}
 
-	registerStreamer(id: string, streamer: StreamerConnection) {
+	registerStreamer(id: string, streamer: IStreamer) {
 		// remove any existing streamer id
-		if (!!streamer.id) {
-			Players.updateStreamerId(streamer.id, id);
-			this.streamers.delete(streamer.id);
+		if (!!streamer.streamerId) {
+			Players.onStreamerIdChanged(streamer.streamerId, id);
+			this.streamers.delete(streamer.streamerId);
 		}
 
 		// make sure the id is unique
-		streamer.id = this.sanitizeStreamerId(id);
+		streamer.streamerId = this.sanitizeStreamerId(id);
 		streamer.idCommitted = true;
 
-		this.streamers.set(streamer.id, streamer);
-		Logger.log(`Registered new streamer: ${streamer.id}`);
+		this.streamers.set(streamer.streamerId, streamer);
+		Logger.log(`Registered new streamer: ${streamer.streamerId}`);
 	}
 
 	unregisterStreamer(id: string) {
@@ -32,12 +39,12 @@ export class StreamerRegistry {
 			return;
 		}
 
-		Players.streamerDisconnected(id);
+		Players.onStreamerDisconnected(id);
 		this.streamers.delete(id);
 		Logger.log(`Unregistered streamer: ${id}`);
 	}
 
-	getDefault(): StreamerConnection | undefined {
+	getDefault(): IStreamer | undefined {
 		if (this.empty()) {
 			return;
 		}
@@ -52,7 +59,7 @@ export class StreamerRegistry {
 		return this.streamers.has(streamerId);
 	}
 
-	get(streamerId: string): StreamerConnection | undefined {
+	get(streamerId: string): IStreamer | undefined {
 		return this.streamers.get(streamerId);
 	}
 

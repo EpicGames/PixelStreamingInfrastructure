@@ -6,7 +6,7 @@ import { SignallingProtocol,
 import WebSocket from 'ws';
 import { Logger } from './logger';
 import { stringify } from './utils';
-import { StreamerRegistry, Streamers } from './streamer_registry';
+import { IStreamer, StreamerRegistry, Streamers } from './streamer_registry';
 import { Players } from './player_registry';
 
 export enum StreamerType {
@@ -14,21 +14,19 @@ export enum StreamerType {
 	SFU
 }
 
-export class StreamerConnection {
-	id: string;
+export class StreamerConnection implements IStreamer {
+	streamerId: string;
 	protocol: SignallingProtocol;
-	type: StreamerType;
 	idCommitted: boolean;
 	idTimer: null | any;
 
-	constructor(initialId: string, ws: WebSocket, type: StreamerType, config: any) {
-		this.id = initialId;
+	constructor(initialId: string, ws: WebSocket, config: any) {
+		this.streamerId = initialId;
 		this.protocol = new SignallingProtocol(new WebSocketTransportNJS(ws));
-		this.type = type;
 		this.idCommitted = false;
 
-		this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`S:${this.id} <- ${stringify(message)}`));
-		this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`S:${this.id} -> ${stringify(message)}`));
+		this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`S:${this.streamerId} <- ${stringify(message)}`));
+		this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`S:${this.streamerId} -> ${stringify(message)}`));
 		this.protocol.transportEvents.addListener('error', this.onTransportError.bind(this));
 		this.protocol.transportEvents.addListener('close', this.onTransportClose.bind(this));
 
@@ -80,9 +78,9 @@ export class StreamerConnection {
 
 	private onLayerPreference(message: Messages.layerPreference): void {
 		// sfu nonsense
-		// let sfuPlayer = getSFUForStreamer(streamer.id);
+		// let sfuPlayer = getSFUForStreamer(streamer.streamerId);
 		// if (sfuPlayer) {
-		// 	logOutgoing(sfuPlayer.id, msg);
+		// 	logOutgoing(sfuPlayer.streamerId, msg);
 		// 	sfuPlayer.sendTo(msg);
 		// }
 	}
@@ -100,13 +98,13 @@ export class StreamerConnection {
 	}
 
 	private onTransportError(error: ErrorEvent): void {
-		Logger.error(`Streamer (${this.id}) transport error ${error}`);
+		Logger.error(`Streamer (${this.streamerId}) transport error ${error}`);
 	}
 
 	private onTransportClose(): void {
 		if (this.idTimer !== undefined) {
 			clearTimeout(this.idTimer);
 		}
-		Streamers.unregisterStreamer(this.id);
+		Streamers.unregisterStreamer(this.streamerId);
 	}
 }

@@ -1,10 +1,20 @@
 import { Messages,
-		 MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
+		 MessageHelpers,
+		 SignallingProtocol } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { PlayerConnection, PlayerType } from './player_connection';
 import { Logger } from './logger';
 
+export interface IPlayer {
+	playerId: string | undefined;
+	subscribedToStreamerId: string | null;
+	protocol: SignallingProtocol;
+
+	onStreamerIdChanged(newId: string): void;
+	onStreamerDisconnected(): void;
+}
+
 export class PlayerRegistry {
-	players: Map<string, PlayerConnection> = new Map();
+	players: Map<string, IPlayer> = new Map();
 	playerCount: number;
 	nextPlayerId: number;
 
@@ -14,19 +24,18 @@ export class PlayerRegistry {
 		this.nextPlayerId = 0;
 	}
 
-	registerPlayer(player: PlayerConnection): void {
+	registerPlayer(player: IPlayer): void {
 		const newPlayerId = `Player${this.nextPlayerId}`;
 		this.nextPlayerId++;
-		player.id = newPlayerId;
-		this.players.set(player.id, player);
+		player.playerId = newPlayerId;
+		this.players.set(player.playerId, player);
 		this.playerCount++;
-		Logger.info(`Registered new player: ${player.id}`);
+		Logger.info(`Registered new player: ${player.playerId}`);
 	}
 
 	unregisterPlayer(playerId: string): void {
 		const player = this.players.get(playerId);
 		if (player) {
-			player.unsubscribe();
 			this.players.delete(playerId);
 			this.playerCount--;
 		}
@@ -37,32 +46,24 @@ export class PlayerRegistry {
 		return this.players.has(playerId);
 	}
 
-	get(playerId: string): PlayerConnection | undefined {
+	get(playerId: string): IPlayer | undefined {
 		return this.players.get(playerId);
 	}
 
-	updateStreamerId(oldId: string, newId: string) {
-		const renameMessage = MessageHelpers.createMessage(Messages.streamerIdChanged, { newID: newId });
+	onStreamerIdChanged(oldId: string, newId: string) {
 		const clonedMap = new Map(this.players); // work on a cloned map to avoid async issues
 		for (let player of clonedMap.values()) {
-			if (player.streamerId == oldId) {
-				player.protocol.sendMessage(renameMessage);
-			 	player.streamerId = newId;
+			if (player.subscribedToStreamerId == oldId) {
+				player.onStreamerIdChanged(newId);
 			}
 		}
 	}
 
-	streamerDisconnected(streamerId: string) {
+	onStreamerDisconnected(streamerId: string) {
 		const clonedMap = new Map(this.players);
 		for (let player of clonedMap.values()) {
-			if (player.streamerId == streamerId) {
-			 	if (player.type == PlayerType.SFU) {
-			 		// SFU just gets unsubscribed
-					player.unsubscribe();
-				} else {
-					// players get disconnected
-					player.disconnect();
-				}
+			if (player.subscribedToStreamerId == streamerId) {
+				player.onStreamerDisconnected();
 			}
 		}
 	}

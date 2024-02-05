@@ -1,6 +1,6 @@
 import { WebSocketTransportNJS, SignallingProtocol, MessageHelpers, Messages, BaseMessage } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { PlayerRegistry, Players } from './player_registry';
-import { Streamers } from './streamer_registry';
+import { IPlayer, PlayerRegistry, Players } from './player_registry';
+import { IStreamer, Streamers } from './streamer_registry';
 import { Logger } from './logger';
 import * as WebSocket from 'ws';
 import { stringify } from './utils';
@@ -11,22 +11,22 @@ export enum PlayerType {
 	SFU
 }
 
-export class PlayerConnection {
-	id: string | undefined;
+export class PlayerConnection implements IPlayer {
+	playerId: string | undefined;
 	type: PlayerType;
-	streamerId: string | null;
+	subscribedToStreamerId: string | null;
 	protocol: SignallingProtocol;
 	sendOffer: boolean;
 
 	constructor(ws: WebSocket, type: PlayerType, config: any) {
-		this.id = undefined;
+		this.playerId = undefined;
 		this.type = type;
-		this.streamerId = null;
+		this.subscribedToStreamerId = null;
 		this.protocol = new SignallingProtocol(new WebSocketTransportNJS(ws));
 		this.sendOffer = true;
 
-		this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`P:${this.id} <- ${stringify(message)}`));
-		this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`P:${this.id} -> ${stringify(message)}`));
+		this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`P:${this.playerId} <- ${stringify(message)}`));
+		this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`P:${this.playerId} -> ${stringify(message)}`));
 		this.protocol.transportEvents.addListener('error', this.onTransportError.bind(this));
 		this.protocol.transportEvents.addListener('close', this.onTransportClose.bind(this));
 
@@ -46,18 +46,18 @@ export class PlayerConnection {
 
 	subscribe(streamerId: string) {
 		if (!Streamers.has(streamerId)) {
-			Logger.error(`subscribe: Player ${this.id} tried to subscribe to a non-existent streamer ${streamerId}`);
+			Logger.error(`subscribe: Player ${this.playerId} tried to subscribe to a non-existent streamer ${streamerId}`);
 			return;
 		}
 
-		this.streamerId = streamerId;
+		this.subscribedToStreamerId = streamerId;
 
 		if (this.type == PlayerType.SFU) {
-			const streamer = Streamers.get(this.streamerId);
-			//streamer.addSFUPlayer(this.id);
+			const streamer = Streamers.get(this.subscribedToStreamerId);
+			//streamer.addSFUPlayer(this.playerId);
 		}
 
-		const connectedMessage = MessageHelpers.createMessage(Messages.playerConnected, { playerId: this.id,
+		const connectedMessage = MessageHelpers.createMessage(Messages.playerConnected, { playerId: this.playerId,
 																						  dataChannel: true,
 																						  sfu: this.type == PlayerType.SFU,
 																						  sendOffer: this.sendOffer });
@@ -65,22 +65,33 @@ export class PlayerConnection {
 	}
 
 	unsubscribe() {
-		if (this.streamerId && Streamers.has(this.streamerId)) {
-			const disconnectedMessage = MessageHelpers.createMessage(Messages.playerDisconnected, { playerId: this.id });
+		if (this.subscribedToStreamerId && Streamers.has(this.subscribedToStreamerId)) {
+			const disconnectedMessage = MessageHelpers.createMessage(Messages.playerDisconnected, { playerId: this.playerId });
 			this.sendToStreamer(disconnectedMessage);
 		}
-		this.streamerId = null;
+		this.subscribedToStreamerId = null;
 	}
 
 	disconnect() {
-		if (this.id) {
-			Players.unregisterPlayer(this.id);
+		if (this.playerId) {
+			Players.unregisterPlayer(this.playerId);
 		}
+		this.unsubscribe();
 		this.protocol.disconnect();
 	}
 
+	onStreamerIdChanged(newId: string): void {
+		const renameMessage = MessageHelpers.createMessage(Messages.streamerIdChanged, { newID: newId });
+		this.protocol.sendMessage(renameMessage);
+	 	this.subscribedToStreamerId = newId;
+	}
+
+	onStreamerDisconnected(): void {
+		this.disconnect();
+	}
+
 	private onTransportError(error: ErrorEvent): void {
-		Logger.error(`Player (${this.id}) transport error ${error}`);
+		Logger.error(`Player (${this.playerId}) transport error ${error}`);
 	}
 
 	private onTransportClose(event: CloseEvent): void {
@@ -101,19 +112,19 @@ export class PlayerConnection {
 	}
 
 	private sendToStreamer(message: BaseMessage): void {
-		let streamer: StreamerConnection | undefined;
-		if (!this.streamerId) {
+		let streamer: IStreamer | undefined;
+		if (!this.subscribedToStreamerId) {
 			streamer = Streamers.getDefault();
 			if (streamer) {
-				Logger.error(`P:${this.id} sending but isn't subscribed. Picking first streamer.`)
+				Logger.error(`P:${this.playerId} sending but isn't subscribed. Picking first streamer.`)
 			} else {
-				Logger.error(`P:${this.id} sending but there are no streamers.`);
+				Logger.error(`P:${this.playerId} sending but there are no streamers.`);
 				return;
 			}
 		} else {
-			streamer = Streamers.get(this.streamerId);
+			streamer = Streamers.get(this.subscribedToStreamerId);
 			if (!streamer) {
-				Logger.error(`P:${this.id} is subscribed to streamer that doesn't exist. ${this.streamerId}`);
+				Logger.error(`P:${this.playerId} is subscribed to streamer that doesn't exist. ${this.subscribedToStreamerId}`);
 				return;
 			}
 		}
@@ -121,7 +132,7 @@ export class PlayerConnection {
 		// normally we want to indicate what player this message came from
 		// but in some instances we might already have set this (streamerDataChannels) due to poor choices
 		if (!message.playerId) {
-			message.playerId = this.id;
+			message.playerId = this.playerId;
 		}
 
 		streamer.protocol.sendMessage(message);

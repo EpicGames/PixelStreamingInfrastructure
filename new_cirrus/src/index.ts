@@ -24,7 +24,7 @@ const streamerServer = new WebSocket.Server({ port: streamerPort, backlog: 1 });
 streamerServer.on('connection', (ws: WebSocket, reqest: any) => {
 	Logger.info(`New streamer connection...`);
 	const temporaryId = reqest.connection.remoteAddress;
-	const newServer = new StreamerConnection(temporaryId, ws, StreamerType.Regular, clientConfig);
+	const newServer = new StreamerConnection(temporaryId, ws, clientConfig);
 });
 
 const playerServer = new WebSocket.Server({ server: server });
