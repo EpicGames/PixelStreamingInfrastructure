@@ -1,16 +1,18 @@
 import { Messages,
 		 MessageHelpers,
 		 SignallingProtocol } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { PlayerConnection, PlayerType } from './player_connection';
+import { PlayerConnection } from './player_connection';
 import { Logger } from './logger';
 
 export interface IPlayer {
-	playerId: string | undefined;
+	playerId: string;
 	subscribedToStreamerId: string | null;
 	protocol: SignallingProtocol;
 
 	onStreamerIdChanged(newId: string): void;
 	onStreamerDisconnected(): void;
+
+	sendLayerPreference(message: Messages.layerPreference): void;
 }
 
 export class PlayerRegistry {
@@ -24,10 +26,13 @@ export class PlayerRegistry {
 		this.nextPlayerId = 0;
 	}
 
-	registerPlayer(player: IPlayer): void {
+	getUniquePlayerId(): string {
 		const newPlayerId = `Player${this.nextPlayerId}`;
 		this.nextPlayerId++;
-		player.playerId = newPlayerId;
+		return newPlayerId;
+	}
+
+	registerPlayer(player: IPlayer): void {
 		this.players.set(player.playerId, player);
 		this.playerCount++;
 		Logger.info(`Registered new player: ${player.playerId}`);
@@ -64,6 +69,15 @@ export class PlayerRegistry {
 		for (let player of clonedMap.values()) {
 			if (player.subscribedToStreamerId == streamerId) {
 				player.onStreamerDisconnected();
+			}
+		}
+	}
+
+	doForSubscribed(streamerId: string, callback: (player: IPlayer) => void): void {
+		const clonedMap = new Map(this.players);
+		for (let player of clonedMap.values()) {
+			if (player.subscribedToStreamerId == streamerId) {
+				callback(player);
 			}
 		}
 	}

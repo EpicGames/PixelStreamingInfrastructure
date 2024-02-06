@@ -20,10 +20,6 @@ message config {
   optional string protocolVersion = 3;
 }
 
-message dataChannelRequest {
-  string type = 1;
-}
-
 message disconnectPlayer {
   string type = 1;
   string playerId = 2;
@@ -53,13 +49,6 @@ message identify {
   string type = 1;
 }
 
-message layerPreference {
-  string type = 1;
-  int32 spatialLayer = 2;
-  int32 temporalLayer = 3;
-  string playerId = 4;
-}
-
 message listStreamers {
   string type = 1;
 }
@@ -69,10 +58,6 @@ message offer {
   string sdp = 2;
   optional string playerId = 3;
   optional bool sfu = 4;
-}
-
-message peerDataChannelsReady {
-  string type = 1;
 }
 
 message ping {
@@ -108,13 +93,6 @@ message stats {
   string data = 2;
 }
 
-message streamerDataChannels {
-  string type = 1;
-  int32 sendStreamId = 2;
-  int32 recvStreamId = 3;
-  string playerId = 4;
-}
-
 message streamerDisconnected {
   string type = 1;
   string streamerId = 2; // NEW
@@ -137,4 +115,41 @@ message unsubscribe {
 message streamerIdChanged {
   string type = 1;
   string newID = 2;
+}
+
+message layerPreference {
+  string type = 1;
+  int32 spatialLayer = 2;
+  int32 temporalLayer = 3;
+  string playerId = 4;
+}
+
+message dataChannelRequest {
+  string type = 1;
+}
+
+message peerDataChannels {
+  string type = 1;
+  string playerId = 2;
+  int32 sendStreamId = 3;
+  int32 recvStreamId = 4;
+}
+
+message peerDataChannelsReady {
+  string type = 1;
+}
+
+message streamerDataChannels {
+  string type = 1;
+  string sfuId = 2;
+  int32 sendStreamId = 3;
+  int32 recvStreamId = 4;
+}
+
+message startStreaming {
+  string type = 1;
+}
+
+message stopStreaming {
+  string type = 1;
 }

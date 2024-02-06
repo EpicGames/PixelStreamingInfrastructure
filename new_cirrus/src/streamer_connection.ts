@@ -7,7 +7,7 @@ import WebSocket from 'ws';
 import { Logger } from './logger';
 import { stringify } from './utils';
 import { IStreamer, StreamerRegistry, Streamers } from './streamer_registry';
-import { Players } from './player_registry';
+import { IPlayer, Players } from './player_registry';
 
 export enum StreamerType {
 	Regular,
@@ -30,13 +30,7 @@ export class StreamerConnection implements IStreamer {
 		this.protocol.transportEvents.addListener('error', this.onTransportError.bind(this));
 		this.protocol.transportEvents.addListener('close', this.onTransportClose.bind(this));
 
-		this.protocol.messageHandlers.addListener(Messages.endpointId.typeName, this.onEndpointId.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.ping.typeName, this.onPing.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.offer.typeName, this.forwardMessage.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.answer.typeName, this.forwardMessage.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.iceCandidate.typeName, this.forwardMessage.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.disconnectPlayer.typeName, this.onDisconnectPlayerRequest.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.layerPreference.typeName, this.onLayerPreference.bind(this));
+		this.registerMessageHandlers();
 
 		this.idTimer = setTimeout(() => {
 			// streamer did not respond in time. give it a legacy id.
@@ -53,6 +47,27 @@ export class StreamerConnection implements IStreamer {
 
 		this.protocol.sendMessage(MessageHelpers.createMessage(Messages.config, config));
 		this.protocol.sendMessage(MessageHelpers.createMessage(Messages.identify));
+	}
+
+	private registerMessageHandlers(): void {
+		this.protocol.messageHandlers.addListener(Messages.endpointId.typeName, this.onEndpointId.bind(this));
+		this.protocol.messageHandlers.addListener(Messages.ping.typeName, this.onPing.bind(this));
+		this.protocol.messageHandlers.addListener(Messages.offer.typeName, this.forwardMessage.bind(this));
+		this.protocol.messageHandlers.addListener(Messages.answer.typeName, this.forwardMessage.bind(this));
+		this.protocol.messageHandlers.addListener(Messages.iceCandidate.typeName, this.forwardMessage.bind(this));
+		this.protocol.messageHandlers.addListener(Messages.disconnectPlayer.typeName, this.onDisconnectPlayerRequest.bind(this));
+		this.protocol.messageHandlers.addListener(Messages.layerPreference.typeName, this.onLayerPreference.bind(this));
+	}
+
+	private onTransportError(error: ErrorEvent): void {
+		Logger.error(`Streamer (${this.streamerId}) transport error ${error}`);
+	}
+
+	private onTransportClose(): void {
+		if (this.idTimer !== undefined) {
+			clearTimeout(this.idTimer);
+		}
+		Streamers.unregisterStreamer(this.streamerId);
 	}
 
 	private onEndpointId(message: Messages.endpointId): void {
@@ -77,12 +92,9 @@ export class StreamerConnection implements IStreamer {
 	}
 
 	private onLayerPreference(message: Messages.layerPreference): void {
-		// sfu nonsense
-		// let sfuPlayer = getSFUForStreamer(streamer.streamerId);
-		// if (sfuPlayer) {
-		// 	logOutgoing(sfuPlayer.streamerId, msg);
-		// 	sfuPlayer.sendTo(msg);
-		// }
+		Players.doForSubscribed(this.streamerId, (player: IPlayer) => {
+			player.sendLayerPreference(message);
+		});
 	}
 
 	private forwardMessage(message: BaseMessage): void {
@@ -95,16 +107,5 @@ export class StreamerConnection implements IStreamer {
 				player.protocol.sendMessage(message);
 			}
 		}
-	}
-
-	private onTransportError(error: ErrorEvent): void {
-		Logger.error(`Streamer (${this.streamerId}) transport error ${error}`);
-	}
-
-	private onTransportClose(): void {
-		if (this.idTimer !== undefined) {
-			clearTimeout(this.idTimer);
-		}
-		Streamers.unregisterStreamer(this.streamerId);
 	}
 }

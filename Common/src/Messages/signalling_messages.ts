@@ -61,15 +61,6 @@ export interface config {
     protocolVersion?: string;
 }
 /**
- * @generated from protobuf message dataChannelRequest
- */
-export interface dataChannelRequest {
-    /**
-     * @generated from protobuf field: string type = 1;
-     */
-    type: string;
-}
-/**
  * @generated from protobuf message disconnectPlayer
  */
 export interface disconnectPlayer {
@@ -151,27 +142,6 @@ export interface identify {
     type: string;
 }
 /**
- * @generated from protobuf message layerPreference
- */
-export interface layerPreference {
-    /**
-     * @generated from protobuf field: string type = 1;
-     */
-    type: string;
-    /**
-     * @generated from protobuf field: int32 spatialLayer = 2;
-     */
-    spatialLayer: number;
-    /**
-     * @generated from protobuf field: int32 temporalLayer = 3;
-     */
-    temporalLayer: number;
-    /**
-     * @generated from protobuf field: string playerId = 4;
-     */
-    playerId: string;
-}
-/**
  * @generated from protobuf message listStreamers
  */
 export interface listStreamers {
@@ -200,15 +170,6 @@ export interface offer {
      * @generated from protobuf field: optional bool sfu = 4;
      */
     sfu?: boolean;
-}
-/**
- * @generated from protobuf message peerDataChannelsReady
- */
-export interface peerDataChannelsReady {
-    /**
-     * @generated from protobuf field: string type = 1;
-     */
-    type: string;
 }
 /**
  * @generated from protobuf message ping
@@ -301,27 +262,6 @@ export interface stats {
     data: string;
 }
 /**
- * @generated from protobuf message streamerDataChannels
- */
-export interface streamerDataChannels {
-    /**
-     * @generated from protobuf field: string type = 1;
-     */
-    type: string;
-    /**
-     * @generated from protobuf field: int32 sendStreamId = 2;
-     */
-    sendStreamId: number;
-    /**
-     * @generated from protobuf field: int32 recvStreamId = 3;
-     */
-    recvStreamId: number;
-    /**
-     * @generated from protobuf field: string playerId = 4;
-     */
-    playerId: string;
-}
-/**
  * @generated from protobuf message streamerDisconnected
  */
 export interface streamerDisconnected {
@@ -381,6 +321,105 @@ export interface streamerIdChanged {
      * @generated from protobuf field: string newID = 2;
      */
     newID: string;
+}
+/**
+ * @generated from protobuf message layerPreference
+ */
+export interface layerPreference {
+    /**
+     * @generated from protobuf field: string type = 1;
+     */
+    type: string;
+    /**
+     * @generated from protobuf field: int32 spatialLayer = 2;
+     */
+    spatialLayer: number;
+    /**
+     * @generated from protobuf field: int32 temporalLayer = 3;
+     */
+    temporalLayer: number;
+    /**
+     * @generated from protobuf field: string playerId = 4;
+     */
+    playerId: string;
+}
+/**
+ * @generated from protobuf message dataChannelRequest
+ */
+export interface dataChannelRequest {
+    /**
+     * @generated from protobuf field: string type = 1;
+     */
+    type: string;
+}
+/**
+ * @generated from protobuf message peerDataChannels
+ */
+export interface peerDataChannels {
+    /**
+     * @generated from protobuf field: string type = 1;
+     */
+    type: string;
+    /**
+     * @generated from protobuf field: string playerId = 2;
+     */
+    playerId: string;
+    /**
+     * @generated from protobuf field: int32 sendStreamId = 3;
+     */
+    sendStreamId: number;
+    /**
+     * @generated from protobuf field: int32 recvStreamId = 4;
+     */
+    recvStreamId: number;
+}
+/**
+ * @generated from protobuf message peerDataChannelsReady
+ */
+export interface peerDataChannelsReady {
+    /**
+     * @generated from protobuf field: string type = 1;
+     */
+    type: string;
+}
+/**
+ * @generated from protobuf message streamerDataChannels
+ */
+export interface streamerDataChannels {
+    /**
+     * @generated from protobuf field: string type = 1;
+     */
+    type: string;
+    /**
+     * @generated from protobuf field: string sfuId = 2;
+     */
+    sfuId: string;
+    /**
+     * @generated from protobuf field: int32 sendStreamId = 3;
+     */
+    sendStreamId: number;
+    /**
+     * @generated from protobuf field: int32 recvStreamId = 4;
+     */
+    recvStreamId: number;
+}
+/**
+ * @generated from protobuf message startStreaming
+ */
+export interface startStreaming {
+    /**
+     * @generated from protobuf field: string type = 1;
+     */
+    type: string;
+}
+/**
+ * @generated from protobuf message stopStreaming
+ */
+export interface stopStreaming {
+    /**
+     * @generated from protobuf field: string type = 1;
+     */
+    type: string;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class base_message$Type extends MessageType<base_message> {
@@ -577,53 +616,6 @@ class config$Type extends MessageType<config> {
  * @generated MessageType for protobuf message config
  */
 export const config = new config$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class dataChannelRequest$Type extends MessageType<dataChannelRequest> {
-    constructor() {
-        super("dataChannelRequest", [
-            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
-        ]);
-    }
-    create(value?: PartialMessage<dataChannelRequest>): dataChannelRequest {
-        const message = globalThis.Object.create((this.messagePrototype!));
-        message.type = "";
-        if (value !== undefined)
-            reflectionMergePartial<dataChannelRequest>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: dataChannelRequest): dataChannelRequest {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* string type */ 1:
-                    message.type = reader.string();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: dataChannelRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string type = 1; */
-        if (message.type !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.type);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message dataChannelRequest
- */
-export const dataChannelRequest = new dataChannelRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class disconnectPlayer$Type extends MessageType<disconnectPlayer> {
     constructor() {
@@ -927,77 +919,6 @@ class identify$Type extends MessageType<identify> {
  */
 export const identify = new identify$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class layerPreference$Type extends MessageType<layerPreference> {
-    constructor() {
-        super("layerPreference", [
-            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "spatialLayer", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 3, name: "temporalLayer", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 4, name: "playerId", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
-        ]);
-    }
-    create(value?: PartialMessage<layerPreference>): layerPreference {
-        const message = globalThis.Object.create((this.messagePrototype!));
-        message.type = "";
-        message.spatialLayer = 0;
-        message.temporalLayer = 0;
-        message.playerId = "";
-        if (value !== undefined)
-            reflectionMergePartial<layerPreference>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: layerPreference): layerPreference {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* string type */ 1:
-                    message.type = reader.string();
-                    break;
-                case /* int32 spatialLayer */ 2:
-                    message.spatialLayer = reader.int32();
-                    break;
-                case /* int32 temporalLayer */ 3:
-                    message.temporalLayer = reader.int32();
-                    break;
-                case /* string playerId */ 4:
-                    message.playerId = reader.string();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: layerPreference, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string type = 1; */
-        if (message.type !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.type);
-        /* int32 spatialLayer = 2; */
-        if (message.spatialLayer !== 0)
-            writer.tag(2, WireType.Varint).int32(message.spatialLayer);
-        /* int32 temporalLayer = 3; */
-        if (message.temporalLayer !== 0)
-            writer.tag(3, WireType.Varint).int32(message.temporalLayer);
-        /* string playerId = 4; */
-        if (message.playerId !== "")
-            writer.tag(4, WireType.LengthDelimited).string(message.playerId);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message layerPreference
- */
-export const layerPreference = new layerPreference$Type();
-// @generated message type with reflection information, may provide speed optimized methods
 class listStreamers$Type extends MessageType<listStreamers> {
     constructor() {
         super("listStreamers", [
@@ -1113,53 +1034,6 @@ class offer$Type extends MessageType<offer> {
  * @generated MessageType for protobuf message offer
  */
 export const offer = new offer$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class peerDataChannelsReady$Type extends MessageType<peerDataChannelsReady> {
-    constructor() {
-        super("peerDataChannelsReady", [
-            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
-        ]);
-    }
-    create(value?: PartialMessage<peerDataChannelsReady>): peerDataChannelsReady {
-        const message = globalThis.Object.create((this.messagePrototype!));
-        message.type = "";
-        if (value !== undefined)
-            reflectionMergePartial<peerDataChannelsReady>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: peerDataChannelsReady): peerDataChannelsReady {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* string type */ 1:
-                    message.type = reader.string();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: peerDataChannelsReady, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string type = 1; */
-        if (message.type !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.type);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message peerDataChannelsReady
- */
-export const peerDataChannelsReady = new peerDataChannelsReady$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ping$Type extends MessageType<ping> {
     constructor() {
@@ -1514,77 +1388,6 @@ class stats$Type extends MessageType<stats> {
  */
 export const stats = new stats$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class streamerDataChannels$Type extends MessageType<streamerDataChannels> {
-    constructor() {
-        super("streamerDataChannels", [
-            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "sendStreamId", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 3, name: "recvStreamId", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 4, name: "playerId", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
-        ]);
-    }
-    create(value?: PartialMessage<streamerDataChannels>): streamerDataChannels {
-        const message = globalThis.Object.create((this.messagePrototype!));
-        message.type = "";
-        message.sendStreamId = 0;
-        message.recvStreamId = 0;
-        message.playerId = "";
-        if (value !== undefined)
-            reflectionMergePartial<streamerDataChannels>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: streamerDataChannels): streamerDataChannels {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* string type */ 1:
-                    message.type = reader.string();
-                    break;
-                case /* int32 sendStreamId */ 2:
-                    message.sendStreamId = reader.int32();
-                    break;
-                case /* int32 recvStreamId */ 3:
-                    message.recvStreamId = reader.int32();
-                    break;
-                case /* string playerId */ 4:
-                    message.playerId = reader.string();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: streamerDataChannels, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string type = 1; */
-        if (message.type !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.type);
-        /* int32 sendStreamId = 2; */
-        if (message.sendStreamId !== 0)
-            writer.tag(2, WireType.Varint).int32(message.sendStreamId);
-        /* int32 recvStreamId = 3; */
-        if (message.recvStreamId !== 0)
-            writer.tag(3, WireType.Varint).int32(message.recvStreamId);
-        /* string playerId = 4; */
-        if (message.playerId !== "")
-            writer.tag(4, WireType.LengthDelimited).string(message.playerId);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message streamerDataChannels
- */
-export const streamerDataChannels = new streamerDataChannels$Type();
-// @generated message type with reflection information, may provide speed optimized methods
 class streamerDisconnected$Type extends MessageType<streamerDisconnected> {
     constructor() {
         super("streamerDisconnected", [
@@ -1851,3 +1654,404 @@ class streamerIdChanged$Type extends MessageType<streamerIdChanged> {
  * @generated MessageType for protobuf message streamerIdChanged
  */
 export const streamerIdChanged = new streamerIdChanged$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class layerPreference$Type extends MessageType<layerPreference> {
+    constructor() {
+        super("layerPreference", [
+            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "spatialLayer", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "temporalLayer", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "playerId", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<layerPreference>): layerPreference {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.type = "";
+        message.spatialLayer = 0;
+        message.temporalLayer = 0;
+        message.playerId = "";
+        if (value !== undefined)
+            reflectionMergePartial<layerPreference>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: layerPreference): layerPreference {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string type */ 1:
+                    message.type = reader.string();
+                    break;
+                case /* int32 spatialLayer */ 2:
+                    message.spatialLayer = reader.int32();
+                    break;
+                case /* int32 temporalLayer */ 3:
+                    message.temporalLayer = reader.int32();
+                    break;
+                case /* string playerId */ 4:
+                    message.playerId = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: layerPreference, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string type = 1; */
+        if (message.type !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.type);
+        /* int32 spatialLayer = 2; */
+        if (message.spatialLayer !== 0)
+            writer.tag(2, WireType.Varint).int32(message.spatialLayer);
+        /* int32 temporalLayer = 3; */
+        if (message.temporalLayer !== 0)
+            writer.tag(3, WireType.Varint).int32(message.temporalLayer);
+        /* string playerId = 4; */
+        if (message.playerId !== "")
+            writer.tag(4, WireType.LengthDelimited).string(message.playerId);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message layerPreference
+ */
+export const layerPreference = new layerPreference$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class dataChannelRequest$Type extends MessageType<dataChannelRequest> {
+    constructor() {
+        super("dataChannelRequest", [
+            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<dataChannelRequest>): dataChannelRequest {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.type = "";
+        if (value !== undefined)
+            reflectionMergePartial<dataChannelRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: dataChannelRequest): dataChannelRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string type */ 1:
+                    message.type = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: dataChannelRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string type = 1; */
+        if (message.type !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.type);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message dataChannelRequest
+ */
+export const dataChannelRequest = new dataChannelRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class peerDataChannels$Type extends MessageType<peerDataChannels> {
+    constructor() {
+        super("peerDataChannels", [
+            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "playerId", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "sendStreamId", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "recvStreamId", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+        ]);
+    }
+    create(value?: PartialMessage<peerDataChannels>): peerDataChannels {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.type = "";
+        message.playerId = "";
+        message.sendStreamId = 0;
+        message.recvStreamId = 0;
+        if (value !== undefined)
+            reflectionMergePartial<peerDataChannels>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: peerDataChannels): peerDataChannels {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string type */ 1:
+                    message.type = reader.string();
+                    break;
+                case /* string playerId */ 2:
+                    message.playerId = reader.string();
+                    break;
+                case /* int32 sendStreamId */ 3:
+                    message.sendStreamId = reader.int32();
+                    break;
+                case /* int32 recvStreamId */ 4:
+                    message.recvStreamId = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: peerDataChannels, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string type = 1; */
+        if (message.type !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.type);
+        /* string playerId = 2; */
+        if (message.playerId !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.playerId);
+        /* int32 sendStreamId = 3; */
+        if (message.sendStreamId !== 0)
+            writer.tag(3, WireType.Varint).int32(message.sendStreamId);
+        /* int32 recvStreamId = 4; */
+        if (message.recvStreamId !== 0)
+            writer.tag(4, WireType.Varint).int32(message.recvStreamId);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message peerDataChannels
+ */
+export const peerDataChannels = new peerDataChannels$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class peerDataChannelsReady$Type extends MessageType<peerDataChannelsReady> {
+    constructor() {
+        super("peerDataChannelsReady", [
+            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<peerDataChannelsReady>): peerDataChannelsReady {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.type = "";
+        if (value !== undefined)
+            reflectionMergePartial<peerDataChannelsReady>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: peerDataChannelsReady): peerDataChannelsReady {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string type */ 1:
+                    message.type = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: peerDataChannelsReady, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string type = 1; */
+        if (message.type !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.type);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message peerDataChannelsReady
+ */
+export const peerDataChannelsReady = new peerDataChannelsReady$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class streamerDataChannels$Type extends MessageType<streamerDataChannels> {
+    constructor() {
+        super("streamerDataChannels", [
+            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "sfuId", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "sendStreamId", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "recvStreamId", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+        ]);
+    }
+    create(value?: PartialMessage<streamerDataChannels>): streamerDataChannels {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.type = "";
+        message.sfuId = "";
+        message.sendStreamId = 0;
+        message.recvStreamId = 0;
+        if (value !== undefined)
+            reflectionMergePartial<streamerDataChannels>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: streamerDataChannels): streamerDataChannels {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string type */ 1:
+                    message.type = reader.string();
+                    break;
+                case /* string sfuId */ 2:
+                    message.sfuId = reader.string();
+                    break;
+                case /* int32 sendStreamId */ 3:
+                    message.sendStreamId = reader.int32();
+                    break;
+                case /* int32 recvStreamId */ 4:
+                    message.recvStreamId = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: streamerDataChannels, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string type = 1; */
+        if (message.type !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.type);
+        /* string sfuId = 2; */
+        if (message.sfuId !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.sfuId);
+        /* int32 sendStreamId = 3; */
+        if (message.sendStreamId !== 0)
+            writer.tag(3, WireType.Varint).int32(message.sendStreamId);
+        /* int32 recvStreamId = 4; */
+        if (message.recvStreamId !== 0)
+            writer.tag(4, WireType.Varint).int32(message.recvStreamId);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message streamerDataChannels
+ */
+export const streamerDataChannels = new streamerDataChannels$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class startStreaming$Type extends MessageType<startStreaming> {
+    constructor() {
+        super("startStreaming", [
+            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<startStreaming>): startStreaming {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.type = "";
+        if (value !== undefined)
+            reflectionMergePartial<startStreaming>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: startStreaming): startStreaming {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string type */ 1:
+                    message.type = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: startStreaming, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string type = 1; */
+        if (message.type !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.type);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message startStreaming
+ */
+export const startStreaming = new startStreaming$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class stopStreaming$Type extends MessageType<stopStreaming> {
+    constructor() {
+        super("stopStreaming", [
+            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<stopStreaming>): stopStreaming {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.type = "";
+        if (value !== undefined)
+            reflectionMergePartial<stopStreaming>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: stopStreaming): stopStreaming {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string type */ 1:
+                    message.type = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: stopStreaming, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string type = 1; */
+        if (message.type !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.type);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message stopStreaming
+ */
+export const stopStreaming = new stopStreaming$Type();

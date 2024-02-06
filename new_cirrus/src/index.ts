@@ -6,8 +6,9 @@ import { SignallingProtocol,
 		 BaseMessage,
 		 MessageHelpers,
 		 Messages } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { StreamerType, StreamerConnection } from './streamer_connection';
-import { PlayerType, PlayerConnection } from './player_connection';
+import { StreamerConnection } from './streamer_connection';
+import { PlayerConnection } from './player_connection';
+import { SFUConnection } from './sfu_connection';
 import { Logger } from './logger';
 import { stringify } from './utils';
 import path from 'path';
@@ -18,6 +19,7 @@ const server = http.createServer(app);
 
 const streamerPort = 8888;
 const playerPort = 80;
+const sfuPort = 8889;
 const clientConfig = { peerConnectionOptions: {} };
 
 const streamerServer = new WebSocket.Server({ port: streamerPort, backlog: 1 });
@@ -30,7 +32,13 @@ streamerServer.on('connection', (ws: WebSocket, reqest: any) => {
 const playerServer = new WebSocket.Server({ server: server });
 playerServer.on('connection', (ws: WebSocket, reqest: any) => {
 	Logger.info(`New player connection...`);
-	const newPlayer = new PlayerConnection(ws, PlayerType.Regular, clientConfig);
+	const newPlayer = new PlayerConnection(ws, clientConfig);
+});
+
+const sfuServer = new WebSocket.Server({ port: sfuPort, backlog: 1 });
+sfuServer.on('connection', (ws: WebSocket, reqest: any) => {
+	Logger.info(`New SFU connection...`);
+	const newSFU = new SFUConnection(ws, clientConfig);
 });
 
 server.listen(80, function () {

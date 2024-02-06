@@ -26,6 +26,8 @@ Hotfix version - a non-breaking new field in an existing message type.
 	- [answer](#sfu-answer)
 	- [offer](#sfu-offer)
 	- [peerDataChannels](#sfu-peerdatachannels)
+	- [startStreaming](#sfu-startstreaming)
+	- [stopStreaming](#sfu-stopstreaming)
 	- [streamerDataChannels](#sfu-streamerdatachannels)
 - [Signalling Server Sent Messages](#source-signalling)
 	- [config](#signalling-config)
@@ -102,6 +104,18 @@ opt Streamer Disconnect
 	Streamer->>Signalling: Close Connection
 	Signalling->>Player: streamerDisconnected
 end
+```
+
+## Example SFU data channel negotiation<a name="example-sfu-datachannel"></a>
+
+>When streaming through an SFU some extra negotiation is needed to establish a datachannel between the peer and the original streamer. The following diagram should explain the negotiation. This diagram omits the signalling middle man. Each message passes through the signalling server.
+
+```mermaid
+sequenceDiagram
+Peer->>SFU: dataChannelRequest
+SFU->>Peer: peerDataChannels
+Peer->>SFU: peerDataChannelsReady
+SFU->>Streamer: streamerDataChannels
 ```
 
 ## Player Sent Messages<a name="source-player"></a>
@@ -203,6 +217,20 @@ end
 | sendStreamId | number | The datachannel id for sending data. |
 | recvStreamId | number | The datachannel id for receiving data. |
 
+### startStreaming<a name="sfu-startstreaming"></a>
+
+>Message indicates to the signalling server that the SFU is ready to behave like a streamer and accept subscriptions.
+
+| Param Name | Type | Description |
+|-|-|-|
+
+### stopStreaming<a name="sfu-stopstreaming"></a>
+
+>Message indicates to the signalling server that the SFU is no longer acting as a streamer and will not accept subscriptions.
+
+| Param Name | Type | Description |
+|-|-|-|
+
 ### streamerDataChannels<a name="sfu-streamerdatachannels"></a>
 
 >Message is forwarded to the [Streamer](#term-streamer). Sends a request to the Streamer to open up data channels for a given [Player](#term-player).
@@ -249,7 +277,7 @@ end
 | sfu | boolean | Indicates if the player is an SFU or not. |
 | sendOffer | boolean | Indicates if the new player want's an offer or not. |
 
-### playerCount
+### playerCount<a name="signalling-playercount"></a>
 
 > Message is sent to Players to indicate how many currently connected players there are on this signalling server. (Note: This is mostly old behaviour and is not influenced by multi streamers or who is subscribed to what Streamer. It just reports the number of players it knows about.)
 

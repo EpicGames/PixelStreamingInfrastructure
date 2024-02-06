@@ -211,8 +211,8 @@ export class WebRtcPlayerController {
         this.protocol.messageHandlers.addListener(Messages.offer.typeName, (msg: BaseMessage) =>
             this.handleWebRtcOffer(msg as Messages.offer)
         );
-        this.protocol.messageHandlers.addListener(Messages.streamerDataChannels.typeName, (msg: BaseMessage) =>
-            this.handleWebRtcSFUPeerDatachannels(msg as Messages.streamerDataChannels)
+        this.protocol.messageHandlers.addListener(Messages.peerDataChannels.typeName, (msg: BaseMessage) =>
+            this.handleWebRtcSFUPeerDatachannels(msg as Messages.peerDataChannels)
         );
         this.protocol.messageHandlers.addListener(Messages.iceCandidate.typeName, (msg: BaseMessage) => {
             const iceCandidateMessage = msg as Messages.iceCandidate;
@@ -1488,7 +1488,7 @@ export class WebRtcPlayerController {
      * Handle when the SFU provides the peer with its data channels
      * @param DataChannels - The message from the SFU containing the data channels ids
      */
-    handleWebRtcSFUPeerDatachannels(DataChannels: Messages.streamerDataChannels) {
+    handleWebRtcSFUPeerDatachannels(DataChannels: Messages.peerDataChannels) {
         const SendOptions: RTCDataChannelInit = {
             ordered: true,
             negotiated: true,
