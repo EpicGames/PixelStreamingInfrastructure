@@ -15,10 +15,10 @@ export class SFUConnection implements IPlayer, IStreamer {
 	protocol: SignallingProtocol;
 
 	playerId: string;
-	subscribedStreamer: IStreamer | null;
-	layerPreferenceListener: (message: Messages.layerPreference) => void;
-	streamerIdChangeListener: (newId: string) => void;
-	streamerDisconnectedListener: () => void;
+	private subscribedStreamer: IStreamer | null;
+	private layerPreferenceListener: (message: Messages.layerPreference) => void;
+	private streamerIdChangeListener: (newId: string) => void;
+	private streamerDisconnectedListener: () => void;
 
 	streamerId: string;
 	idCommitted: boolean;
@@ -106,6 +106,19 @@ export class SFUConnection implements IPlayer, IStreamer {
 		this.subscribedStreamer = null;
 	}
 
+	private sendToStreamer(message: BaseMessage): void {
+		if (!this.subscribedStreamer) {
+			Logger.error(`SFU ${this.playerId} tried to send to a streamer but they're not subscribed to any.`)
+			return;
+		}
+
+		// normally we want to indicate what player this message came from
+		// but in some instances we might already have set this (streamerDataChannels) due to poor choices
+		message.playerId = message.playerId || this.playerId;
+
+		this.subscribedStreamer.protocol.sendMessage(message);
+	}
+
 	private disconnect() {
 		if (this.playerId) {
 			Players.unregisterPlayer(this.playerId);
@@ -169,19 +182,6 @@ export class SFUConnection implements IPlayer, IStreamer {
 		} else {
 			Logger.error(`SFU attempted to forward to player ${message.playerId} which does not exist.`);
 		}
-	}
-
-	private sendToStreamer(message: BaseMessage): void {
-		if (!this.subscribedStreamer) {
-			Logger.error(`SFU ${this.playerId} tried to send to a streamer but they're not subscribed to any.`)
-			return;
-		}
-
-		// normally we want to indicate what player this message came from
-		// but in some instances we might already have set this (streamerDataChannels) due to poor choices
-		message.playerId = message.playerId || this.playerId;
-
-		this.subscribedStreamer.protocol.sendMessage(message);
 	}
 
 	private onEndpointId(message: Messages.endpointId): void {

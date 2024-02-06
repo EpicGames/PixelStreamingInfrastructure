@@ -12,12 +12,12 @@ import { StreamerConnection } from './streamer_connection';
 
 export class PlayerConnection implements IPlayer {
 	playerId: string;
-	subscribedStreamer: IStreamer | null;
 	protocol: SignallingProtocol;
-	sendOffer: boolean;
 
-	streamerIdChangeListener: (newId: string) => void;
-	streamerDisconnectedListener: () => void;
+	private subscribedStreamer: IStreamer | null;
+	private sendOffer: boolean;
+	private streamerIdChangeListener: (newId: string) => void;
+	private streamerDisconnectedListener: () => void;
 
 	constructor(ws: WebSocket, config: any) {
 		this.playerId = Players.getUniquePlayerId();
@@ -37,10 +37,6 @@ export class PlayerConnection implements IPlayer {
 		Players.registerPlayer(this);
 
 		this.protocol.sendMessage(MessageHelpers.createMessage(Messages.config, config));
-	}
-
-	sendLayerPreference(message: Messages.layerPreference): void {
-		// nothing. only for SFU players
 	}
 
 	private registerMessageHandlers(): void {

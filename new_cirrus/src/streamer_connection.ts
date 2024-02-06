@@ -14,8 +14,8 @@ export class StreamerConnection implements IStreamer {
 	streamerId: string;
 	protocol: SignallingProtocol;
 	idCommitted: boolean;
-	idTimer: null | any;
 	events: EventEmitter;
+	private idTimer: null | any;
 
 	constructor(initialId: string, ws: WebSocket, config: any) {
 		this.streamerId = initialId;
