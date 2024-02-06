@@ -1,12 +1,14 @@
 import { StreamerConnection } from './streamer_connection';
-import { Players } from './player_registry';
+import { IPlayer, Players } from './player_registry';
 import { Logger } from './logger';
-import { SignallingProtocol } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
+import { SignallingProtocol, MessageHelpers, Messages } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
+import { EventEmitter } from 'events';
 
 export interface IStreamer {
 	streamerId: string;
 	protocol: SignallingProtocol;
 	idCommitted: boolean;
+	events: EventEmitter;
 }
 
 export class StreamerRegistry {
@@ -20,9 +22,9 @@ export class StreamerRegistry {
 	}
 
 	registerStreamer(id: string, streamer: IStreamer) {
-		// remove any existing streamer id
-		if (!!streamer.streamerId) {
-			Players.onStreamerIdChanged(streamer.streamerId, id);
+		// if the streamer was previously registered, trigger a id change event
+		// and remove the old entry
+		if (streamer.idCommitted) {
 			this.streamers.delete(streamer.streamerId);
 		}
 
@@ -31,6 +33,7 @@ export class StreamerRegistry {
 		streamer.idCommitted = true;
 
 		this.streamers.set(streamer.streamerId, streamer);
+
 		Logger.log(`Registered new streamer: ${streamer.streamerId}`);
 	}
 
@@ -39,8 +42,8 @@ export class StreamerRegistry {
 			return;
 		}
 
-		Players.onStreamerDisconnected(id);
 		this.streamers.delete(id);
+
 		Logger.log(`Unregistered streamer: ${id}`);
 	}
 

@@ -1,32 +1,46 @@
-import { WebSocketTransportNJS, SignallingProtocol, MessageHelpers, Messages, BaseMessage } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { IPlayer, PlayerRegistry, Players } from './player_registry';
+import * as WebSocket from 'ws';
+import { WebSocketTransportNJS,
+		 SignallingProtocol,
+		 MessageHelpers,
+		 Messages,
+		 BaseMessage } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
+import { IPlayer, Players } from './player_registry';
 import { IStreamer, Streamers } from './streamer_registry';
 import { Logger } from './logger';
-import * as WebSocket from 'ws';
 import { stringify } from './utils';
 import { StreamerConnection } from './streamer_connection';
+import { EventEmitter } from 'events';
 
-export class SFUConnection implements IPlayer {
+export class SFUConnection implements IPlayer, IStreamer {
 	protocol: SignallingProtocol;
 
 	playerId: string;
-	subscribedToStreamerId: string | null;
+	subscribedStreamer: IStreamer | null;
+	layerPreferenceListener: (message: Messages.layerPreference) => void;
+	streamerIdChangeListener: (newId: string) => void;
+	streamerDisconnectedListener: () => void;
 
 	streamerId: string;
 	idCommitted: boolean;
 	idTimer: null | any;
+	events: EventEmitter;
 
 	constructor(ws: WebSocket, config: any) {
 		this.protocol = new SignallingProtocol(new WebSocketTransportNJS(ws));
 		this.playerId = Players.getUniquePlayerId();
 		this.streamerId = 'SFU';
 		this.idCommitted = false;
-		this.subscribedToStreamerId = null;
+		this.subscribedStreamer = null;
+		this.events = new EventEmitter();
 
 		this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`SFU:${this.playerId} <- ${stringify(message)}`));
 		this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`SFU:${this.playerId} -> ${stringify(message)}`));
 		this.protocol.transportEvents.addListener('error', this.onTransportError.bind(this));
 		this.protocol.transportEvents.addListener('close', this.onTransportClose.bind(this));
+
+		this.layerPreferenceListener = this.onLayerPreference.bind(this);
+		this.streamerIdChangeListener = this.onStreamerIdChanged.bind(this);
+		this.streamerDisconnectedListener = this.onStreamerDisconnected.bind(this);
 
 		this.registerMessageHandlers();
 		Players.registerPlayer(this);
@@ -59,13 +73,17 @@ export class SFUConnection implements IPlayer {
 		this.protocol.messageHandlers.addListener(Messages.stopStreaming.typeName, this.onStopStreaming.bind(this));
 	}
 
-	subscribe(streamerId: string) {
-		if (!Streamers.has(streamerId)) {
+	private subscribe(streamerId: string) {
+		let streamer = Streamers.get(streamerId);
+		if (!streamer) {
 			Logger.error(`subscribe: SFU ${this.playerId} tried to subscribe to a non-existent streamer ${streamerId}`);
 			return;
 		}
 
-		this.subscribedToStreamerId = streamerId;
+		this.subscribedStreamer = streamer;
+		this.subscribedStreamer.events.on('layer_preference', this.layerPreferenceListener);
+		this.subscribedStreamer.events.on('id_changed', this.streamerIdChangeListener);
+		this.subscribedStreamer.events.on('disconnect', this.streamerDisconnectedListener);
 
 		const connectedMessage = MessageHelpers.createMessage(Messages.playerConnected, { playerId: this.playerId,
 																						  dataChannel: true,
@@ -74,15 +92,21 @@ export class SFUConnection implements IPlayer {
 		this.sendToStreamer(connectedMessage);
 	}
 
-	unsubscribe() {
-		if (this.subscribedToStreamerId && Streamers.has(this.subscribedToStreamerId)) {
-			const disconnectedMessage = MessageHelpers.createMessage(Messages.playerDisconnected, { playerId: this.playerId });
-			this.sendToStreamer(disconnectedMessage);
+	private unsubscribe() {
+		if (!this.subscribedStreamer) {
+			return;
 		}
-		this.subscribedToStreamerId = null;
+
+		const disconnectedMessage = MessageHelpers.createMessage(Messages.playerDisconnected, { playerId: this.playerId });
+		this.sendToStreamer(disconnectedMessage);
+
+		this.subscribedStreamer.events.on('layer_preference', this.layerPreferenceListener);
+		this.subscribedStreamer.events.off('id_changed', this.streamerIdChangeListener);
+		this.subscribedStreamer.events.off('disconnect', this.streamerDisconnectedListener);
+		this.subscribedStreamer = null;
 	}
 
-	disconnect() {
+	private disconnect() {
 		if (this.playerId) {
 			Players.unregisterPlayer(this.playerId);
 		}
@@ -92,20 +116,20 @@ export class SFUConnection implements IPlayer {
 		}
 		Streamers.unregisterStreamer(this.streamerId);
 		this.protocol.disconnect();
+		this.events.emit('disconnect');
 	}
 
-	onStreamerIdChanged(newId: string): void {
+	private onLayerPreference(message: Messages.layerPreference): void {
+		this.protocol.sendMessage(message);
+	}
+
+	private onStreamerIdChanged(newId: string): void {
 		const renameMessage = MessageHelpers.createMessage(Messages.streamerIdChanged, { newID: newId });
 		this.protocol.sendMessage(renameMessage);
-	 	this.subscribedToStreamerId = newId;
 	}
 
-	onStreamerDisconnected(): void {
+	private onStreamerDisconnected(): void {
 		this.disconnect();
-	}
-
-	sendLayerPreference(message: Messages.layerPreference): void {
-		this.protocol.sendMessage(message);
 	}
 
 	private onTransportError(error: ErrorEvent): void {
@@ -148,30 +172,16 @@ export class SFUConnection implements IPlayer {
 	}
 
 	private sendToStreamer(message: BaseMessage): void {
-		let streamer: IStreamer | undefined;
-		if (!this.subscribedToStreamerId) {
-			streamer = Streamers.getDefault();
-			if (streamer) {
-				Logger.error(`P:${this.playerId} sending but isn't subscribed. Picking first streamer.`)
-			} else {
-				Logger.error(`P:${this.playerId} sending but there are no streamers.`);
-				return;
-			}
-		} else {
-			streamer = Streamers.get(this.subscribedToStreamerId);
-			if (!streamer) {
-				Logger.error(`P:${this.playerId} is subscribed to streamer that doesn't exist. ${this.subscribedToStreamerId}`);
-				return;
-			}
+		if (!this.subscribedStreamer) {
+			Logger.error(`SFU ${this.playerId} tried to send to a streamer but they're not subscribed to any.`)
+			return;
 		}
 
 		// normally we want to indicate what player this message came from
 		// but in some instances we might already have set this (streamerDataChannels) due to poor choices
-		if (!message.playerId) {
-			message.playerId = this.playerId;
-		}
+		message.playerId = message.playerId || this.playerId;
 
-		streamer.protocol.sendMessage(message);
+		this.subscribedStreamer.protocol.sendMessage(message);
 	}
 
 	private onEndpointId(message: Messages.endpointId): void {
@@ -179,6 +189,7 @@ export class SFUConnection implements IPlayer {
 			clearTimeout(this.idTimer);
 			delete this.idTimer;
 		}
+		this.events.emit('id_changed');
 	}
 
 	private onStartStreaming(message: Messages.startStreaming): void {

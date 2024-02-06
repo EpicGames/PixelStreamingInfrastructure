@@ -1,29 +1,27 @@
+import WebSocket from 'ws';
 import { SignallingProtocol,
 		 WebSocketTransportNJS,
 		 BaseMessage,
 		 Messages,
 		 MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import WebSocket from 'ws';
 import { Logger } from './logger';
 import { stringify } from './utils';
-import { IStreamer, StreamerRegistry, Streamers } from './streamer_registry';
+import { IStreamer, Streamers } from './streamer_registry';
 import { IPlayer, Players } from './player_registry';
-
-export enum StreamerType {
-	Regular,
-	SFU
-}
+import { EventEmitter } from 'events';
 
 export class StreamerConnection implements IStreamer {
 	streamerId: string;
 	protocol: SignallingProtocol;
 	idCommitted: boolean;
 	idTimer: null | any;
+	events: EventEmitter;
 
 	constructor(initialId: string, ws: WebSocket, config: any) {
 		this.streamerId = initialId;
 		this.protocol = new SignallingProtocol(new WebSocketTransportNJS(ws));
 		this.idCommitted = false;
+		this.events = new EventEmitter();
 
 		this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`S:${this.streamerId} <- ${stringify(message)}`));
 		this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`S:${this.streamerId} -> ${stringify(message)}`));
@@ -68,6 +66,7 @@ export class StreamerConnection implements IStreamer {
 			clearTimeout(this.idTimer);
 		}
 		Streamers.unregisterStreamer(this.streamerId);
+		this.events.emit('disconnect');
 	}
 
 	private onEndpointId(message: Messages.endpointId): void {
@@ -76,6 +75,7 @@ export class StreamerConnection implements IStreamer {
 			delete this.idTimer;
 		}
 		Streamers.registerStreamer(message.id, this);
+		this.events.emit('id_changed');
 	}
 
 	private onPing(message: Messages.ping): void {
@@ -92,9 +92,7 @@ export class StreamerConnection implements IStreamer {
 	}
 
 	private onLayerPreference(message: Messages.layerPreference): void {
-		Players.doForSubscribed(this.streamerId, (player: IPlayer) => {
-			player.sendLayerPreference(message);
-		});
+		this.events.emit('layer_preference', message);
 	}
 
 	private forwardMessage(message: BaseMessage): void {

@@ -1,29 +1,25 @@
 import { Messages,
-		 MessageHelpers,
 		 SignallingProtocol } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { PlayerConnection } from './player_connection';
 import { Logger } from './logger';
+import { EventEmitter } from 'events';
 
 export interface IPlayer {
 	playerId: string;
-	subscribedToStreamerId: string | null;
 	protocol: SignallingProtocol;
-
-	onStreamerIdChanged(newId: string): void;
-	onStreamerDisconnected(): void;
-
-	sendLayerPreference(message: Messages.layerPreference): void;
 }
 
 export class PlayerRegistry {
 	players: Map<string, IPlayer> = new Map();
 	playerCount: number;
 	nextPlayerId: number;
+	events: EventEmitter;
 
 	constructor() {
 		this.players = new Map();
 		this.playerCount = 0;
 		this.nextPlayerId = 0;
+		this.events = new EventEmitter();
 	}
 
 	getUniquePlayerId(): string {
@@ -35,15 +31,19 @@ export class PlayerRegistry {
 	registerPlayer(player: IPlayer): void {
 		this.players.set(player.playerId, player);
 		this.playerCount++;
+		this.events.emit('added', player.playerId);
 		Logger.info(`Registered new player: ${player.playerId}`);
 	}
 
 	unregisterPlayer(playerId: string): void {
-		const player = this.players.get(playerId);
-		if (player) {
-			this.players.delete(playerId);
-			this.playerCount--;
+		if (!this.players.has(playerId)) {
+			return;
 		}
+
+		this.events.emit('added', playerId);
+		this.players.delete(playerId);
+		this.playerCount--;
+
 		Logger.info(`Unregistered player: ${playerId}`);
 	}
 
@@ -53,33 +53,6 @@ export class PlayerRegistry {
 
 	get(playerId: string): IPlayer | undefined {
 		return this.players.get(playerId);
-	}
-
-	onStreamerIdChanged(oldId: string, newId: string) {
-		const clonedMap = new Map(this.players); // work on a cloned map to avoid async issues
-		for (let player of clonedMap.values()) {
-			if (player.subscribedToStreamerId == oldId) {
-				player.onStreamerIdChanged(newId);
-			}
-		}
-	}
-
-	onStreamerDisconnected(streamerId: string) {
-		const clonedMap = new Map(this.players);
-		for (let player of clonedMap.values()) {
-			if (player.subscribedToStreamerId == streamerId) {
-				player.onStreamerDisconnected();
-			}
-		}
-	}
-
-	doForSubscribed(streamerId: string, callback: (player: IPlayer) => void): void {
-		const clonedMap = new Map(this.players);
-		for (let player of clonedMap.values()) {
-			if (player.subscribedToStreamerId == streamerId) {
-				callback(player);
-			}
-		}
 	}
 }
 
