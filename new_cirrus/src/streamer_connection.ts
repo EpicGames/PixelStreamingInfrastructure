@@ -4,12 +4,12 @@ import { SignallingProtocol,
 		 BaseMessage,
 		 Messages,
 		 MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { Logger } from './logger';
+import { Logger } from './Logging/Logger';
 import { IStreamer, Streamers } from './streamer_registry';
 import { IPlayer, Players } from './player_registry';
 import { EventEmitter } from 'events';
 import { stringify } from './utils';
-import * as LogUtils from './logging_utils';
+import * as LogUtils from './Logging/Utils';
 
 export class StreamerConnection implements IStreamer, LogUtils.IMessageLogger {
 	streamerId: string;

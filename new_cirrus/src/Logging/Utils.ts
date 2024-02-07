@@ -1,6 +1,34 @@
 import { BaseMessage } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { Logger } from './logger';
-import { stringify } from './utils';
+import { Logger, ILogSink, LogLevel, logLevelToString, StructuredLog } from './Logger';
+import { stringify } from '../utils';
+
+/**
+ * Pad the start of the given number with zeros so it takes up the number of digits.
+ * e.g. zeroPad(5, 3) = '005' and zeroPad(23, 2) = '23'.
+ */
+export function zeroPad(number: number, digits: number) {
+    let string = number.toString();
+    while (string.length < digits) {
+        string = '0' + string;
+    }
+    return string;
+}
+
+/**
+ * Create a string of the form 'YEAR.MONTH.DATE.HOURS.MINUTES.SECONDS'.
+ */
+function dateTimeToString() {
+    let date = new Date();
+    return `${date.getFullYear()}.${zeroPad(date.getMonth(), 2)}.${zeroPad(date.getDate(), 2)}.${zeroPad(date.getHours(), 2)}.${zeroPad(date.getMinutes(), 2)}.${zeroPad(date.getSeconds(), 2)}`;
+}
+
+/**
+ * Create a string of the form 'HOURS.MINUTES.SECONDS.MILLISECONDS'.
+ */
+function timeToString() {
+    let date = new Date();
+    return `${zeroPad(date.getHours(), 2)}:${zeroPad(date.getMinutes(), 2)}:${zeroPad(date.getSeconds(), 2)}.${zeroPad(date.getMilliseconds(), 3)}`;
+}
 
 /**
  * Most methods in here rely on connections implementing this interface so we can identify
@@ -34,7 +62,12 @@ export function sfuIdentifier(streamerId: string, playerId: string): string {
  * @param recvr IMessageLogger The connection the message was received on.
  */
 export function logIncoming(recvr: IMessageLogger, message: BaseMessage): void {
-	Logger.info(`${formatIdentifier(recvr.getIdentifier())} ${formatDirection('>')} ${separator()} ${formatMessage(message)}`);
+	const logData = {
+		type: 'incoming',
+		receiver: recvr.getIdentifier(),
+		message: message
+	};
+	Logger.info(logData);
 }
 
 /**
@@ -43,7 +76,12 @@ export function logIncoming(recvr: IMessageLogger, message: BaseMessage): void {
  * @param sender IMessageLogger The connection the message is being sent to.
  */
 export function logOutgoing(sender: IMessageLogger, message: BaseMessage): void {
-	Logger.info(`${formatIdentifier(sender.getIdentifier())} ${formatDirection('<')} ${separator()} ${formatMessage(message)}`);
+	const logData = {
+		type: 'outgoing',
+		sender: sender.getIdentifier(),
+		message: message
+	};
+	Logger.info(logData);
 }
 
 /**
@@ -53,7 +91,13 @@ export function logOutgoing(sender: IMessageLogger, message: BaseMessage): void 
  * @param sender IMessageLogger The connection the message is being sent to.
  */
 export function logForward(recvr: IMessageLogger, target: IMessageLogger, message: BaseMessage): void {
-	Logger.info(`${formatIdentifier(recvr.getIdentifier())} ${formatDirection('>')} ${formatIdentifier(target.getIdentifier())} ${separator()} ${formatMessage(message)}`);
+	const logData = {
+		type: 'forward',
+		receiver: recvr.getIdentifier(),
+		target: target.getIdentifier(),
+		message: message
+	};
+	Logger.info(logData);
 }
 
 /**
@@ -69,48 +113,4 @@ export function createHandlerListener(obj: IMessageLogger, handler: (message: an
 		logIncoming(obj, message);
 		handler.bind(obj)(message);
 	};
-}
-
-function formatMessage(message: any): string {
-	// Compact version
-	return `[${message.type}]`;
-
-	// Full message
-	//return stringify(message);
-
-	// List a compact version of the message. I don't really like this currently.
-	// let str = '';
-	// for (const param in message) {
-	// 	const value = message[param];
-	// 	if (str.length > 0) {
-	// 		str += ', ';
-	// 	}
-	// 	if (param == 'type') {
-	// 		str += `${param}=${value}`;
-	// 	} else if (typeof value == 'object') {
-	// 		str += `${param}={...}`;
-	// 	} else if (typeof value == 'string') {
-	// 		const maxLength = 20;
-	// 		if (value.length > maxLength) {
-	// 			str += `${param}=${JSON.stringify(value.substring(0, maxLength) + '...')}`;
-	// 		} else {
-	// 			str += `${param}="${JSON.stringify(value)}"`;
-	// 		}
-	// 	} else {
-	// 		str += `${param}=${value}`;
-	// 	}
-	// }
-	// return `[${str}]`;
-}
-
-function formatIdentifier(id: string): string {
-	return `\x1b[34m${id}\x1b[0m`;
-}
-
-function formatDirection(indicator: string): string {
-	return `\x1b[32m${indicator}\x1b[0m`;
-}
-
-function separator(): string {
-	return `\x1b[36m::\x1b[0m`;
 }

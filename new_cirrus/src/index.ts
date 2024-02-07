@@ -6,7 +6,9 @@ import fs from 'fs';
 import { StreamerConnection } from './streamer_connection';
 import { PlayerConnection } from './player_connection';
 import { SFUConnection } from './sfu_connection';
-import { Logger } from './logger';
+import { Logger } from './Logging/Logger';
+import { ConsoleLogSink } from './Logging/ConsoleLogSink';
+import { FileLogSink } from './Logging/FileLogSink';
 
 const app = express();
 const server = http.createServer(app);
@@ -15,6 +17,9 @@ const streamerPort = 8888;
 const playerPort = 80;
 const sfuPort = 8889;
 const clientConfig = { peerConnectionOptions: {} };
+
+Logger.addWriter(new ConsoleLogSink());
+Logger.addWriter(new FileLogSink('basic.log'));
 
 const streamerServer = new WebSocket.Server({ port: streamerPort, backlog: 1 });
 streamerServer.on('connection', (ws: WebSocket, reqest: any) => {

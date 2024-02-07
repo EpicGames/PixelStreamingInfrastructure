@@ -6,10 +6,10 @@ import { WebSocketTransportNJS,
 		 BaseMessage } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { IPlayer, Players } from './player_registry';
 import { IStreamer, Streamers } from './streamer_registry';
-import { Logger } from './logger';
+import { Logger } from './Logging/Logger';
 import { StreamerConnection } from './streamer_connection';
 import { stringify } from './utils';
-import * as LogUtils from './logging_utils';
+import * as LogUtils from './Logging/Utils';
 
 export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 	playerId: string;

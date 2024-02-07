@@ -1,6 +1,6 @@
 import { StreamerConnection } from './streamer_connection';
 import { IPlayer, Players } from './player_registry';
-import { Logger } from './logger';
+import { Logger } from './Logging/Logger';
 import { SignallingProtocol, MessageHelpers, Messages } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { EventEmitter } from 'events';
 
