@@ -7,6 +7,7 @@ import { EventEmitter } from 'events';
 export interface IPlayer {
 	playerId: string;
 	protocol: SignallingProtocol;
+	getIdentifier(): string;
 }
 
 export class PlayerRegistry {

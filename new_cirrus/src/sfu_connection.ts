@@ -7,11 +7,18 @@ import { WebSocketTransportNJS,
 import { IPlayer, Players } from './player_registry';
 import { IStreamer, Streamers } from './streamer_registry';
 import { Logger } from './logger';
-import { stringify } from './utils';
 import { StreamerConnection } from './streamer_connection';
 import { EventEmitter } from 'events';
+import { formatIncoming,
+		 formatOutgoing,
+		 formatForward,
+		 streamerIdentifier,
+		 playerIdentifier,
+		 createHandlerListener,
+		 IMessageLogger,
+		 stringify } from './utils';
 
-export class SFUConnection implements IPlayer, IStreamer {
+export class SFUConnection implements IPlayer, IStreamer, IMessageLogger {
 	protocol: SignallingProtocol;
 
 	playerId: string;
@@ -33,8 +40,8 @@ export class SFUConnection implements IPlayer, IStreamer {
 		this.subscribedStreamer = null;
 		this.events = new EventEmitter();
 
-		this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`SFU:${this.playerId} <- ${stringify(message)}`));
-		this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`SFU:${this.playerId} -> ${stringify(message)}`));
+		//this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`SFU:${this.playerId} <- ${stringify(message)}`));
+		//this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`SFU:${this.playerId} -> ${stringify(message)}`));
 		this.protocol.transportEvents.addListener('error', this.onTransportError.bind(this));
 		this.protocol.transportEvents.addListener('close', this.onTransportClose.bind(this));
 
@@ -56,21 +63,29 @@ export class SFUConnection implements IPlayer, IStreamer {
 
 		}, 5 * 1000);
 
-		this.protocol.sendMessage(MessageHelpers.createMessage(Messages.config, config));
-		this.protocol.sendMessage(MessageHelpers.createMessage(Messages.identify));
+		this.sendMessage(MessageHelpers.createMessage(Messages.config, config));
+		this.sendMessage(MessageHelpers.createMessage(Messages.identify));
 	}
 
+	getIdentifier(): string { return `(${this.streamerId}:${this.playerId})`; }
+
 	private registerMessageHandlers(): void {
-		this.protocol.messageHandlers.addListener(Messages.subscribe.typeName, this.onSubscribeMessage.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.unsubscribe.typeName, this.onUnsubscribeMessage.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.listStreamers.typeName, this.onListStreamers.bind(this));
+		this.protocol.messageHandlers.addListener(Messages.subscribe.typeName, createHandlerListener(this, this.onSubscribeMessage));
+		this.protocol.messageHandlers.addListener(Messages.unsubscribe.typeName, createHandlerListener(this, this.onUnsubscribeMessage));
+		this.protocol.messageHandlers.addListener(Messages.listStreamers.typeName, createHandlerListener(this, this.onListStreamers));
+		this.protocol.messageHandlers.addListener(Messages.endpointId.typeName, createHandlerListener(this, this.onEndpointId));
+		this.protocol.messageHandlers.addListener(Messages.streamerDataChannels.typeName, createHandlerListener(this, this.onStreamerDataChannels));
+		this.protocol.messageHandlers.addListener(Messages.startStreaming.typeName, createHandlerListener(this, this.onStartStreaming));
+		this.protocol.messageHandlers.addListener(Messages.stopStreaming.typeName, createHandlerListener(this, this.onStopStreaming));
+
 		this.protocol.messageHandlers.addListener(Messages.offer.typeName, this.sendToPlayer.bind(this));
 		this.protocol.messageHandlers.addListener(Messages.answer.typeName, this.sendToStreamer.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.endpointId.typeName, this.onEndpointId.bind(this));
 		this.protocol.messageHandlers.addListener(Messages.peerDataChannels.typeName, this.sendToPlayer.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.streamerDataChannels.typeName, this.onStreamerDataChannels.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.startStreaming.typeName, this.onStartStreaming.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.stopStreaming.typeName, this.onStopStreaming.bind(this));
+	}
+
+	private sendMessage(message: BaseMessage): void {
+		Logger.info(formatOutgoing(this.getIdentifier(), message));
+		this.protocol.sendMessage(message);
 	}
 
 	private subscribe(streamerId: string) {
@@ -112,11 +127,28 @@ export class SFUConnection implements IPlayer, IStreamer {
 			return;
 		}
 
+		Logger.info(formatForward(this.getIdentifier(), this.subscribedStreamer.getIdentifier(), message));
+
 		// normally we want to indicate what player this message came from
 		// but in some instances we might already have set this (streamerDataChannels) due to poor choices
 		message.playerId = message.playerId || this.playerId;
 
 		this.subscribedStreamer.protocol.sendMessage(message);
+	}
+
+	private sendToPlayer(message: BaseMessage): void {
+		if (!message.playerId) {
+			Logger.error(`SFU ${this.streamerId} trying to send a message to a player with no playerId. Ignored.`);
+			return;
+		}
+		const player = Players.get(message.playerId);
+		if (player) {
+			delete message.playerId;
+			Logger.info(formatForward(this.getIdentifier(), player.getIdentifier(), message));
+			player.protocol.sendMessage(message);
+		} else {
+			Logger.error(`SFU attempted to forward to player ${message.playerId} which does not exist.`);
+		}
 	}
 
 	private disconnect() {
@@ -133,12 +165,12 @@ export class SFUConnection implements IPlayer, IStreamer {
 	}
 
 	private onLayerPreference(message: Messages.layerPreference): void {
-		this.protocol.sendMessage(message);
+		this.sendMessage(message);
 	}
 
 	private onStreamerIdChanged(newId: string): void {
 		const renameMessage = MessageHelpers.createMessage(Messages.streamerIdChanged, { newID: newId });
-		this.protocol.sendMessage(renameMessage);
+		this.sendMessage(renameMessage);
 	}
 
 	private onStreamerDisconnected(): void {
@@ -163,25 +195,12 @@ export class SFUConnection implements IPlayer, IStreamer {
 
 	private onListStreamers(message: Messages.listStreamers): void {
 		const listMessage = MessageHelpers.createMessage(Messages.streamerList, { ids: Streamers.getStreamerIds() });
-		this.protocol.sendMessage(listMessage);
+		this.sendMessage(listMessage);
 	}
 
 	private onStreamerDataChannels(message: Messages.streamerDataChannels): void {
 		message.sfuId = this.playerId!;
 		this.sendToStreamer(message);
-	}
-
-	private sendToPlayer(message: BaseMessage): void {
-		if (!message.playerId) {
-			Logger.error(`SFU ${this.streamerId} trying to send a message to a player with no playerId. Ignored.`);
-			return;
-		}
-		const player = Players.get(message.playerId);
-		if (player) {
-			player.protocol.sendMessage(message);
-		} else {
-			Logger.error(`SFU attempted to forward to player ${message.playerId} which does not exist.`);
-		}
 	}
 
 	private onEndpointId(message: Messages.endpointId): void {

@@ -19,25 +19,25 @@ const clientConfig = { peerConnectionOptions: {} };
 
 const streamerServer = new WebSocket.Server({ port: streamerPort, backlog: 1 });
 streamerServer.on('connection', (ws: WebSocket, reqest: any) => {
-	Logger.info(`New streamer connection...`);
+	Logger.log(`New streamer connection...`);
 	const temporaryId = reqest.connection.remoteAddress;
 	const newServer = new StreamerConnection(temporaryId, ws, clientConfig);
 });
 
 const playerServer = new WebSocket.Server({ server: server });
 playerServer.on('connection', (ws: WebSocket, reqest: any) => {
-	Logger.info(`New player connection...`);
+	Logger.log(`New player connection...`);
 	const newPlayer = new PlayerConnection(ws, clientConfig);
 });
 
 const sfuServer = new WebSocket.Server({ port: sfuPort, backlog: 1 });
 sfuServer.on('connection', (ws: WebSocket, reqest: any) => {
-	Logger.info(`New SFU connection...`);
+	Logger.log(`New SFU connection...`);
 	const newSFU = new SFUConnection(ws, clientConfig);
 });
 
 server.listen(80, function () {
-	Logger.info('Http listening on *: 80');
+	Logger.log('Http listening on *: 80');
 });
 
 // Request has been sent to site root, send the homepage file

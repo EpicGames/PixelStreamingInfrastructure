@@ -56,8 +56,8 @@ export class Logger$Type {
         switch (logLevel) {
         case LogLevel.Info: return "Info";
         case LogLevel.Log: return "Log";
-        case LogLevel.Warning: return "Warning";
-        case LogLevel.Error: return "Error";
+        case LogLevel.Warning: return "\x1b[33mWarning\x1b[0m";
+        case LogLevel.Error: return "\x1b[31mError\x1b[0m";
         }
         return "Unknown";
     }

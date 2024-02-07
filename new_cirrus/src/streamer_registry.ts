@@ -9,6 +9,7 @@ export interface IStreamer {
 	protocol: SignallingProtocol;
 	idCommitted: boolean;
 	events: EventEmitter;
+	getIdentifier(): string;
 }
 
 export class StreamerRegistry {

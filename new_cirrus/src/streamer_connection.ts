@@ -5,12 +5,19 @@ import { SignallingProtocol,
 		 Messages,
 		 MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { Logger } from './logger';
-import { stringify } from './utils';
 import { IStreamer, Streamers } from './streamer_registry';
 import { IPlayer, Players } from './player_registry';
 import { EventEmitter } from 'events';
+import { formatIncoming,
+		 formatOutgoing,
+		 formatForward,
+		 streamerIdentifier,
+		 playerIdentifier,
+		 createHandlerListener,
+		 IMessageLogger,
+		 stringify } from './utils';
 
-export class StreamerConnection implements IStreamer {
+export class StreamerConnection implements IStreamer, IMessageLogger {
 	streamerId: string;
 	protocol: SignallingProtocol;
 	idCommitted: boolean;
@@ -23,38 +30,61 @@ export class StreamerConnection implements IStreamer {
 		this.idCommitted = false;
 		this.events = new EventEmitter();
 
-		this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`S:${this.streamerId} <- ${stringify(message)}`));
-		this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`S:${this.streamerId} -> ${stringify(message)}`));
+		//this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`S:${this.streamerId} <- ${stringify(message)}`));
+		//this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`S:${this.streamerId} -> ${stringify(message)}`));
 		this.protocol.transportEvents.addListener('error', this.onTransportError.bind(this));
 		this.protocol.transportEvents.addListener('close', this.onTransportClose.bind(this));
 
 		this.registerMessageHandlers();
+		this.requestIdentification();
 
+		this.sendMessage(MessageHelpers.createMessage(Messages.config, config));
+	}
+
+	getIdentifier(): string { return streamerIdentifier(this.streamerId); }
+
+	private registerMessageHandlers(): void {
+		this.protocol.messageHandlers.on(Messages.endpointId.typeName, createHandlerListener(this, this.onEndpointId));
+		this.protocol.messageHandlers.on(Messages.ping.typeName, createHandlerListener(this, this.onPing));
+		this.protocol.messageHandlers.on(Messages.disconnectPlayer.typeName, createHandlerListener(this, this.onDisconnectPlayerRequest));
+		this.protocol.messageHandlers.on(Messages.layerPreference.typeName, createHandlerListener(this, this.onLayerPreference));
+
+		this.protocol.messageHandlers.on(Messages.offer.typeName, this.forwardMessage.bind(this));
+		this.protocol.messageHandlers.on(Messages.answer.typeName, this.forwardMessage.bind(this));
+		this.protocol.messageHandlers.on(Messages.iceCandidate.typeName, this.forwardMessage.bind(this));
+	}
+
+	private sendMessage(message: BaseMessage): void {
+		Logger.info(formatOutgoing(this.getIdentifier(), message));
+		this.protocol.sendMessage(message);
+	}
+
+	private forwardMessage(message: BaseMessage): void {
+		if (!message.playerId) {
+			Logger.warning(`No playerId specified, cannot forward message: ${stringify(message)}`);
+		} else {
+			const player = Players.get(message.playerId);
+			if (player) {
+				delete message.playerId;
+				Logger.info(formatForward(this.getIdentifier(), player.getIdentifier(), message));
+				player.protocol.sendMessage(message);
+			}
+		}
+	}
+
+	private requestIdentification():void {
 		this.idTimer = setTimeout(() => {
 			// streamer did not respond in time. give it a legacy id.
 			const newLegacyId = Streamers.getUniqueLegacyStreamerId();
 			if (newLegacyId.length == 0) {
-				const error = `Ran out of legacy ids.`;
-				console.error(error);
+				Logger.error(`Ran out of legacy ids.`);
 				this.protocol.disconnect();
 			} else {
 				Streamers.registerStreamer(newLegacyId, this);
 			}
 
 		}, 5 * 1000);
-
-		this.protocol.sendMessage(MessageHelpers.createMessage(Messages.config, config));
-		this.protocol.sendMessage(MessageHelpers.createMessage(Messages.identify));
-	}
-
-	private registerMessageHandlers(): void {
-		this.protocol.messageHandlers.addListener(Messages.endpointId.typeName, this.onEndpointId.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.ping.typeName, this.onPing.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.offer.typeName, this.forwardMessage.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.answer.typeName, this.forwardMessage.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.iceCandidate.typeName, this.forwardMessage.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.disconnectPlayer.typeName, this.onDisconnectPlayerRequest.bind(this));
-		this.protocol.messageHandlers.addListener(Messages.layerPreference.typeName, this.onLayerPreference.bind(this));
+		this.sendMessage(MessageHelpers.createMessage(Messages.identify));
 	}
 
 	private onTransportError(error: ErrorEvent): void {
@@ -79,7 +109,7 @@ export class StreamerConnection implements IStreamer {
 	}
 
 	private onPing(message: Messages.ping): void {
-		this.protocol.sendMessage(MessageHelpers.createMessage(Messages.pong, { time: message.time }));
+		this.sendMessage(MessageHelpers.createMessage(Messages.pong, { time: message.time }));
 	}
 
 	private onDisconnectPlayerRequest(message: Messages.disconnectPlayer): void {
@@ -93,17 +123,5 @@ export class StreamerConnection implements IStreamer {
 
 	private onLayerPreference(message: Messages.layerPreference): void {
 		this.events.emit('layer_preference', message);
-	}
-
-	private forwardMessage(message: BaseMessage): void {
-		if (!message.playerId) {
-			Logger.warning(`No playerId specified, cannot forward message: ${stringify(message)}`);
-		} else {
-			const player = Players.get(message.playerId);
-			if (player) {
-				delete message.playerId;
-				player.protocol.sendMessage(message);
-			}
-		}
 	}
 }
