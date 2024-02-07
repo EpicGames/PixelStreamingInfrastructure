@@ -9,9 +9,11 @@ export enum LogLevel {
 
 export class Logger$Type {
     minLogLevel: LogLevel;
+    timestamp: boolean;
 
     constructor() {
         this.minLogLevel = LogLevel.Info;
+        this.timestamp = true;
     }
 
     /**
@@ -48,7 +50,11 @@ export class Logger$Type {
 
     private logInternal(logLevel: LogLevel, message: string): void {
         if (logLevel >= this.minLogLevel) {
-            console.log(`[${this.levelToString(logLevel)}] ${message}`);
+            let timestamp = '';
+            if (this.timestamp) {
+                timestamp = timeToString() + ' ';
+            }
+            console.log(`${timestamp}[${this.levelToString(logLevel)}] ${message}`);
         }
     }
 
@@ -81,3 +87,31 @@ export class Logger$Type {
 }
 
 export const Logger = new Logger$Type();
+
+/**
+ * Pad the start of the given number with zeros so it takes up the number of digits.
+ * e.g. zeroPad(5, 3) = '005' and zeroPad(23, 2) = '23'.
+ */
+function zeroPad(number: number, digits: number) {
+    let string = number.toString();
+    while (string.length < digits) {
+        string = '0' + string;
+    }
+    return string;
+}
+
+/**
+ * Create a string of the form 'YEAR.MONTH.DATE.HOURS.MINUTES.SECONDS'.
+ */
+function dateTimeToString() {
+    let date = new Date();
+    return `${date.getFullYear()}.${zeroPad(date.getMonth(), 2)}.${zeroPad(date.getDate(), 2)}.${zeroPad(date.getHours(), 2)}.${zeroPad(date.getMinutes(), 2)}.${zeroPad(date.getSeconds(), 2)}`;
+}
+
+/**
+ * Create a string of the form 'HOURS.MINUTES.SECONDS.MILLISECONDS'.
+ */
+function timeToString() {
+    let date = new Date();
+    return `${zeroPad(date.getHours(), 2)}:${zeroPad(date.getMinutes(), 2)}:${zeroPad(date.getSeconds(), 2)}.${zeroPad(date.getMilliseconds(), 3)}`;
+}
