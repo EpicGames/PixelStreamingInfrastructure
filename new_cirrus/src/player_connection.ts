@@ -8,16 +8,10 @@ import { IPlayer, Players } from './player_registry';
 import { IStreamer, Streamers } from './streamer_registry';
 import { Logger } from './logger';
 import { StreamerConnection } from './streamer_connection';
-import { formatIncoming,
-		 formatOutgoing,
-		 formatForward,
-		 streamerIdentifier,
-		 playerIdentifier,
-		 createHandlerListener,
-		 IMessageLogger,
-		 stringify } from './utils';
+import { stringify } from './utils';
+import * as LogUtils from './logging_utils';
 
-export class PlayerConnection implements IPlayer {
+export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 	playerId: string;
 	protocol: SignallingProtocol;
 
@@ -32,8 +26,6 @@ export class PlayerConnection implements IPlayer {
 		this.protocol = new SignallingProtocol(new WebSocketTransportNJS(ws));
 		this.sendOffer = true;
 
-		//this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`P:${this.playerId} <- ${stringify(message)}`));
-		//this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`P:${this.playerId} -> ${stringify(message)}`));
 		this.protocol.transportEvents.addListener('error', this.onTransportError.bind(this));
 		this.protocol.transportEvents.addListener('close', this.onTransportClose.bind(this));
 
@@ -43,15 +35,15 @@ export class PlayerConnection implements IPlayer {
 		this.registerMessageHandlers();
 		Players.registerPlayer(this);
 
-		this.protocol.sendMessage(MessageHelpers.createMessage(Messages.config, config));
+		this.sendMessage(MessageHelpers.createMessage(Messages.config, config));
 	}
 
-	getIdentifier(): string { return playerIdentifier(this.playerId); }
+	getIdentifier(): string { return LogUtils.playerIdentifier(this.playerId); }
 
 	private registerMessageHandlers(): void {
-		this.protocol.messageHandlers.addListener(Messages.subscribe.typeName, createHandlerListener(this, this.onSubscribeMessage));
-		this.protocol.messageHandlers.addListener(Messages.unsubscribe.typeName, createHandlerListener(this, this.onUnsubscribeMessage));
-		this.protocol.messageHandlers.addListener(Messages.listStreamers.typeName, createHandlerListener(this, this.onListStreamers));
+		this.protocol.messageHandlers.addListener(Messages.subscribe.typeName, LogUtils.createHandlerListener(this, this.onSubscribeMessage));
+		this.protocol.messageHandlers.addListener(Messages.unsubscribe.typeName, LogUtils.createHandlerListener(this, this.onUnsubscribeMessage));
+		this.protocol.messageHandlers.addListener(Messages.listStreamers.typeName, LogUtils.createHandlerListener(this, this.onListStreamers));
 
 		this.protocol.messageHandlers.addListener(Messages.offer.typeName, this.sendToStreamer.bind(this));
 		this.protocol.messageHandlers.addListener(Messages.answer.typeName, this.sendToStreamer.bind(this));
@@ -61,8 +53,19 @@ export class PlayerConnection implements IPlayer {
 	}
 
 	private sendMessage(message: BaseMessage): void {
-		Logger.info(formatOutgoing(this.getIdentifier(), message));
+		LogUtils.logOutgoing(this, message);
 		this.protocol.sendMessage(message);
+	}
+
+	private sendToStreamer(message: BaseMessage): void {
+		if (!this.subscribedStreamer) {
+			Logger.error(`Player ${this.playerId} tried to send to a streamer but they're not subscribed to any.`)
+			return;
+		}
+
+		LogUtils.logForward(this, this.subscribedStreamer, message);
+		message.playerId = this.playerId;
+		this.subscribedStreamer.protocol.sendMessage(message);
 	}
 
 	private subscribe(streamerId: string) {
@@ -130,17 +133,6 @@ export class PlayerConnection implements IPlayer {
 	private onListStreamers(message: Messages.listStreamers): void {
 		const listMessage = MessageHelpers.createMessage(Messages.streamerList, { ids: Streamers.getStreamerIds() });
 		this.sendMessage(listMessage);
-	}
-
-	private sendToStreamer(message: BaseMessage): void {
-		if (!this.subscribedStreamer) {
-			Logger.error(`Player ${this.playerId} tried to send to a streamer but they're not subscribed to any.`)
-			return;
-		}
-
-		Logger.info(formatForward(this.getIdentifier(), this.subscribedStreamer.getIdentifier(), message));
-		message.playerId = this.playerId;
-		this.subscribedStreamer.protocol.sendMessage(message);
 	}
 
 	private onStreamerIdChanged(newId: string) {

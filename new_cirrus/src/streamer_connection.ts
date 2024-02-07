@@ -8,20 +8,15 @@ import { Logger } from './logger';
 import { IStreamer, Streamers } from './streamer_registry';
 import { IPlayer, Players } from './player_registry';
 import { EventEmitter } from 'events';
-import { formatIncoming,
-		 formatOutgoing,
-		 formatForward,
-		 streamerIdentifier,
-		 playerIdentifier,
-		 createHandlerListener,
-		 IMessageLogger,
-		 stringify } from './utils';
+import { stringify } from './utils';
+import * as LogUtils from './logging_utils';
 
-export class StreamerConnection implements IStreamer, IMessageLogger {
+export class StreamerConnection implements IStreamer, LogUtils.IMessageLogger {
 	streamerId: string;
 	protocol: SignallingProtocol;
 	idCommitted: boolean;
 	events: EventEmitter;
+	
 	private idTimer: null | any;
 
 	constructor(initialId: string, ws: WebSocket, config: any) {
@@ -30,8 +25,6 @@ export class StreamerConnection implements IStreamer, IMessageLogger {
 		this.idCommitted = false;
 		this.events = new EventEmitter();
 
-		//this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`S:${this.streamerId} <- ${stringify(message)}`));
-		//this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`S:${this.streamerId} -> ${stringify(message)}`));
 		this.protocol.transportEvents.addListener('error', this.onTransportError.bind(this));
 		this.protocol.transportEvents.addListener('close', this.onTransportClose.bind(this));
 
@@ -41,13 +34,13 @@ export class StreamerConnection implements IStreamer, IMessageLogger {
 		this.sendMessage(MessageHelpers.createMessage(Messages.config, config));
 	}
 
-	getIdentifier(): string { return streamerIdentifier(this.streamerId); }
+	getIdentifier(): string { return LogUtils.streamerIdentifier(this.streamerId); }
 
 	private registerMessageHandlers(): void {
-		this.protocol.messageHandlers.on(Messages.endpointId.typeName, createHandlerListener(this, this.onEndpointId));
-		this.protocol.messageHandlers.on(Messages.ping.typeName, createHandlerListener(this, this.onPing));
-		this.protocol.messageHandlers.on(Messages.disconnectPlayer.typeName, createHandlerListener(this, this.onDisconnectPlayerRequest));
-		this.protocol.messageHandlers.on(Messages.layerPreference.typeName, createHandlerListener(this, this.onLayerPreference));
+		this.protocol.messageHandlers.on(Messages.endpointId.typeName, LogUtils.createHandlerListener(this, this.onEndpointId));
+		this.protocol.messageHandlers.on(Messages.ping.typeName, LogUtils.createHandlerListener(this, this.onPing));
+		this.protocol.messageHandlers.on(Messages.disconnectPlayer.typeName, LogUtils.createHandlerListener(this, this.onDisconnectPlayerRequest));
+		this.protocol.messageHandlers.on(Messages.layerPreference.typeName, LogUtils.createHandlerListener(this, this.onLayerPreference));
 
 		this.protocol.messageHandlers.on(Messages.offer.typeName, this.forwardMessage.bind(this));
 		this.protocol.messageHandlers.on(Messages.answer.typeName, this.forwardMessage.bind(this));
@@ -55,7 +48,7 @@ export class StreamerConnection implements IStreamer, IMessageLogger {
 	}
 
 	private sendMessage(message: BaseMessage): void {
-		Logger.info(formatOutgoing(this.getIdentifier(), message));
+		LogUtils.logOutgoing(this, message);
 		this.protocol.sendMessage(message);
 	}
 
@@ -66,7 +59,7 @@ export class StreamerConnection implements IStreamer, IMessageLogger {
 			const player = Players.get(message.playerId);
 			if (player) {
 				delete message.playerId;
-				Logger.info(formatForward(this.getIdentifier(), player.getIdentifier(), message));
+				LogUtils.logForward(this, player, message);
 				player.protocol.sendMessage(message);
 			}
 		}

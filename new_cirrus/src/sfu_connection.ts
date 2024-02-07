@@ -9,28 +9,21 @@ import { IStreamer, Streamers } from './streamer_registry';
 import { Logger } from './logger';
 import { StreamerConnection } from './streamer_connection';
 import { EventEmitter } from 'events';
-import { formatIncoming,
-		 formatOutgoing,
-		 formatForward,
-		 streamerIdentifier,
-		 playerIdentifier,
-		 createHandlerListener,
-		 IMessageLogger,
-		 stringify } from './utils';
+import { stringify } from './utils';
+import * as LogUtils from './logging_utils';
 
-export class SFUConnection implements IPlayer, IStreamer, IMessageLogger {
+export class SFUConnection implements IPlayer, IStreamer, LogUtils.IMessageLogger {
 	protocol: SignallingProtocol;
-
 	playerId: string;
-	private subscribedStreamer: IStreamer | null;
-	private layerPreferenceListener: (message: Messages.layerPreference) => void;
-	private streamerIdChangeListener: (newId: string) => void;
-	private streamerDisconnectedListener: () => void;
-
 	streamerId: string;
 	idCommitted: boolean;
 	idTimer: null | any;
 	events: EventEmitter;
+
+	private subscribedStreamer: IStreamer | null;
+	private layerPreferenceListener: (message: Messages.layerPreference) => void;
+	private streamerIdChangeListener: (newId: string) => void;
+	private streamerDisconnectedListener: () => void;
 
 	constructor(ws: WebSocket, config: any) {
 		this.protocol = new SignallingProtocol(new WebSocketTransportNJS(ws));
@@ -40,8 +33,6 @@ export class SFUConnection implements IPlayer, IStreamer, IMessageLogger {
 		this.subscribedStreamer = null;
 		this.events = new EventEmitter();
 
-		//this.protocol.transportEvents.addListener('message', (message: BaseMessage) => Logger.info(`SFU:${this.playerId} <- ${stringify(message)}`));
-		//this.protocol.transportEvents.addListener('out', (message: BaseMessage) => Logger.info(`SFU:${this.playerId} -> ${stringify(message)}`));
 		this.protocol.transportEvents.addListener('error', this.onTransportError.bind(this));
 		this.protocol.transportEvents.addListener('close', this.onTransportClose.bind(this));
 
@@ -50,33 +41,22 @@ export class SFUConnection implements IPlayer, IStreamer, IMessageLogger {
 		this.streamerDisconnectedListener = this.onStreamerDisconnected.bind(this);
 
 		this.registerMessageHandlers();
+		this.requestIdentification();
 		Players.registerPlayer(this);
 
-		this.idTimer = setTimeout(() => {
-			// streamer did not respond in time. give it a legacy id.
-			const newLegacyId = Streamers.getUniqueLegacyStreamerId();
-			if (newLegacyId.length == 0) {
-				const error = `Ran out of legacy ids.`;
-				console.error(error);
-				this.protocol.disconnect();
-			}
-
-		}, 5 * 1000);
-
 		this.sendMessage(MessageHelpers.createMessage(Messages.config, config));
-		this.sendMessage(MessageHelpers.createMessage(Messages.identify));
 	}
 
-	getIdentifier(): string { return `(${this.streamerId}:${this.playerId})`; }
+	getIdentifier(): string { return LogUtils.sfuIdentifier(this.streamerId, this.playerId); }
 
 	private registerMessageHandlers(): void {
-		this.protocol.messageHandlers.addListener(Messages.subscribe.typeName, createHandlerListener(this, this.onSubscribeMessage));
-		this.protocol.messageHandlers.addListener(Messages.unsubscribe.typeName, createHandlerListener(this, this.onUnsubscribeMessage));
-		this.protocol.messageHandlers.addListener(Messages.listStreamers.typeName, createHandlerListener(this, this.onListStreamers));
-		this.protocol.messageHandlers.addListener(Messages.endpointId.typeName, createHandlerListener(this, this.onEndpointId));
-		this.protocol.messageHandlers.addListener(Messages.streamerDataChannels.typeName, createHandlerListener(this, this.onStreamerDataChannels));
-		this.protocol.messageHandlers.addListener(Messages.startStreaming.typeName, createHandlerListener(this, this.onStartStreaming));
-		this.protocol.messageHandlers.addListener(Messages.stopStreaming.typeName, createHandlerListener(this, this.onStopStreaming));
+		this.protocol.messageHandlers.addListener(Messages.subscribe.typeName, LogUtils.createHandlerListener(this, this.onSubscribeMessage));
+		this.protocol.messageHandlers.addListener(Messages.unsubscribe.typeName, LogUtils.createHandlerListener(this, this.onUnsubscribeMessage));
+		this.protocol.messageHandlers.addListener(Messages.listStreamers.typeName, LogUtils.createHandlerListener(this, this.onListStreamers));
+		this.protocol.messageHandlers.addListener(Messages.endpointId.typeName, LogUtils.createHandlerListener(this, this.onEndpointId));
+		this.protocol.messageHandlers.addListener(Messages.streamerDataChannels.typeName, LogUtils.createHandlerListener(this, this.onStreamerDataChannels));
+		this.protocol.messageHandlers.addListener(Messages.startStreaming.typeName, LogUtils.createHandlerListener(this, this.onStartStreaming));
+		this.protocol.messageHandlers.addListener(Messages.stopStreaming.typeName, LogUtils.createHandlerListener(this, this.onStopStreaming));
 
 		this.protocol.messageHandlers.addListener(Messages.offer.typeName, this.sendToPlayer.bind(this));
 		this.protocol.messageHandlers.addListener(Messages.answer.typeName, this.sendToStreamer.bind(this));
@@ -84,8 +64,23 @@ export class SFUConnection implements IPlayer, IStreamer, IMessageLogger {
 	}
 
 	private sendMessage(message: BaseMessage): void {
-		Logger.info(formatOutgoing(this.getIdentifier(), message));
+		LogUtils.logOutgoing(this, message);
 		this.protocol.sendMessage(message);
+	}
+
+	private requestIdentification():void {
+		this.idTimer = setTimeout(() => {
+			// streamer did not respond in time. give it a legacy id.
+			const newLegacyId = Streamers.getUniqueLegacyStreamerId();
+			if (newLegacyId.length == 0) {
+				Logger.error(`Ran out of legacy ids.`);
+				this.protocol.disconnect();
+			} else {
+				Streamers.registerStreamer(newLegacyId, this);
+			}
+
+		}, 5 * 1000);
+		this.sendMessage(MessageHelpers.createMessage(Messages.identify));
 	}
 
 	private subscribe(streamerId: string) {
@@ -127,7 +122,7 @@ export class SFUConnection implements IPlayer, IStreamer, IMessageLogger {
 			return;
 		}
 
-		Logger.info(formatForward(this.getIdentifier(), this.subscribedStreamer.getIdentifier(), message));
+		LogUtils.logForward(this, this.subscribedStreamer, message);
 
 		// normally we want to indicate what player this message came from
 		// but in some instances we might already have set this (streamerDataChannels) due to poor choices
@@ -144,7 +139,7 @@ export class SFUConnection implements IPlayer, IStreamer, IMessageLogger {
 		const player = Players.get(message.playerId);
 		if (player) {
 			delete message.playerId;
-			Logger.info(formatForward(this.getIdentifier(), player.getIdentifier(), message));
+			LogUtils.logForward(this, player, message);
 			player.protocol.sendMessage(message);
 		} else {
 			Logger.error(`SFU attempted to forward to player ${message.playerId} which does not exist.`);

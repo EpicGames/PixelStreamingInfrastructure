@@ -7,7 +7,6 @@ import { StreamerConnection } from './streamer_connection';
 import { PlayerConnection } from './player_connection';
 import { SFUConnection } from './sfu_connection';
 import { Logger } from './logger';
-import { stringify } from './utils';
 
 const app = express();
 const server = http.createServer(app);
