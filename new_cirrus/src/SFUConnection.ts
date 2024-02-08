@@ -4,11 +4,9 @@ import { WebSocketTransportNJS,
 		 MessageHelpers,
 		 Messages,
 		 BaseMessage } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { IPlayer, Players } from './player_registry';
-import { IStreamer, Streamers } from './streamer_registry';
-import { StreamerConnection } from './streamer_connection';
+import { IPlayer, Players } from './PlayerRegistry';
+import { IStreamer, Streamers } from './StreamerRegistry';
 import { EventEmitter } from 'events';
-import { stringify } from './utils';
 import { Logger } from './Logger';
 import * as LogUtils from './LoggingUtils';
 

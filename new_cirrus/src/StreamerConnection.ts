@@ -4,10 +4,10 @@ import { SignallingProtocol,
 		 BaseMessage,
 		 Messages,
 		 MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { IStreamer, Streamers } from './streamer_registry';
-import { IPlayer, Players } from './player_registry';
+import { IStreamer, Streamers } from './StreamerRegistry';
+import { Players } from './PlayerRegistry';
 import { EventEmitter } from 'events';
-import { stringify } from './utils';
+import { stringify } from './Utils';
 import { Logger } from './Logger';
 import * as LogUtils from './LoggingUtils';
 

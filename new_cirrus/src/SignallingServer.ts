@@ -3,9 +3,9 @@ import * as http from 'http';
 import * as WebSocket from 'ws';
 import path from 'path';
 import fs from 'fs';
-import { StreamerConnection } from './streamer_connection';
-import { PlayerConnection } from './player_connection';
-import { SFUConnection } from './sfu_connection';
+import { StreamerConnection } from './StreamerConnection';
+import { PlayerConnection } from './PlayerConnection';
+import { SFUConnection } from './SFUConnection';
 import { Logger } from './Logger';
 
 interface Config {
