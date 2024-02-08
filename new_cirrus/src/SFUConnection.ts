@@ -175,6 +175,7 @@ export class SFUConnection implements IPlayer, IStreamer, LogUtils.IMessageLogge
 	}
 
 	private onTransportClose(event: CloseEvent): void {
+		Logger.debug('SFUConnection transport close.');
 		this.disconnect();
 	}
 

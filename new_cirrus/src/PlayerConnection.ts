@@ -18,11 +18,11 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 	private streamerIdChangeListener: (newId: string) => void;
 	private streamerDisconnectedListener: () => void;
 
-	constructor(ws: WebSocket, config: any) {
+	constructor(ws: WebSocket, sendOffer: boolean, config: any) {
 		this.playerId = Players.getUniquePlayerId();
 		this.subscribedStreamer = null;
 		this.protocol = new SignallingProtocol(new WebSocketTransportNJS(ws));
-		this.sendOffer = true;
+		this.sendOffer = sendOffer;
 
 		this.protocol.transportEvents.addListener('error', this.onTransportError.bind(this));
 		this.protocol.transportEvents.addListener('close', this.onTransportClose.bind(this));
@@ -57,13 +57,21 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 
 	private sendToStreamer(message: BaseMessage): void {
 		if (!this.subscribedStreamer) {
-			Logger.error(`Player ${this.playerId} tried to send to a streamer but they're not subscribed to any.`)
-			return;
+			Logger.warn(`Player ${this.playerId} tried to send to a streamer but they're not subscribed to any.`);
+			const streamerId = Streamers.getFirstStreamerId();
+			if (!streamerId) {
+				Logger.error('There are no streamers to force a subscription. Disconnecting.');
+				this.disconnect();
+				return;
+			} else {
+				Logger.warn(`Subscribing to ${streamerId}`);
+				this.subscribe(streamerId);
+			}
 		}
 
-		LogUtils.logForward(this, this.subscribedStreamer, message);
+		LogUtils.logForward(this, this.subscribedStreamer!, message);
 		message.playerId = this.playerId;
-		this.subscribedStreamer.protocol.sendMessage(message);
+		this.subscribedStreamer!.protocol.sendMessage(message);
 	}
 
 	private subscribe(streamerId: string) {
@@ -117,6 +125,7 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 	}
 
 	private onTransportClose(event: CloseEvent): void {
+		Logger.debug('PlayerConnection transport close.');
 		this.disconnect();
 	}
 

@@ -46,9 +46,9 @@ export class StreamerRegistry {
 		Logger.info(`Unregistered streamer: ${id}`);
 	}
 
-	getDefault(): IStreamer | undefined {
+	getFirstStreamerId(): string | null {
 		if (this.empty()) {
-			return;
+			return null;
 		}
 		return this.streamers.entries().next().value[0];
 	}

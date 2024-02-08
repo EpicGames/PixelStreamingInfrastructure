@@ -65,7 +65,7 @@ export class StreamerConnection implements IStreamer, LogUtils.IMessageLogger {
 		}
 	}
 
-	private requestIdentification():void {
+	private requestIdentification(): void {
 		this.idTimer = setTimeout(() => {
 			// streamer did not respond in time. give it a legacy id.
 			const newLegacyId = Streamers.getUniqueLegacyStreamerId();
@@ -85,6 +85,7 @@ export class StreamerConnection implements IStreamer, LogUtils.IMessageLogger {
 	}
 
 	private onTransportClose(): void {
+		Logger.debug('StreamerConnection transport close.');
 		if (this.idTimer !== undefined) {
 			clearTimeout(this.idTimer);
 		}
