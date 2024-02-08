@@ -6,11 +6,11 @@ import { WebSocketTransportNJS,
 		 BaseMessage } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { IPlayer, Players } from './player_registry';
 import { IStreamer, Streamers } from './streamer_registry';
-import { Logger } from './Logging/Logger';
 import { StreamerConnection } from './streamer_connection';
 import { EventEmitter } from 'events';
 import { stringify } from './utils';
-import * as LogUtils from './Logging/Utils';
+import { Logger } from './Logger';
+import * as LogUtils from './LoggingUtils';
 
 export class SFUConnection implements IPlayer, IStreamer, LogUtils.IMessageLogger {
 	protocol: SignallingProtocol;
@@ -47,7 +47,7 @@ export class SFUConnection implements IPlayer, IStreamer, LogUtils.IMessageLogge
 		this.sendMessage(MessageHelpers.createMessage(Messages.config, config));
 	}
 
-	getIdentifier(): string { return LogUtils.sfuIdentifier(this.streamerId, this.playerId); }
+	getIdentifier(): string { return `(${this.streamerId}:${this.playerId})`; }
 
 	private registerMessageHandlers(): void {
 		this.protocol.messageHandlers.addListener(Messages.subscribe.typeName, LogUtils.createHandlerListener(this, this.onSubscribeMessage));

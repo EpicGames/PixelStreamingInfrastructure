@@ -1,8 +1,8 @@
 import { StreamerConnection } from './streamer_connection';
 import { IPlayer, Players } from './player_registry';
-import { Logger } from './Logging/Logger';
 import { SignallingProtocol, MessageHelpers, Messages } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { EventEmitter } from 'events';
+import { Logger } from './Logger';
 
 export interface IStreamer {
 	streamerId: string;
@@ -35,7 +35,7 @@ export class StreamerRegistry {
 
 		this.streamers.set(streamer.streamerId, streamer);
 
-		Logger.log(`Registered new streamer: ${streamer.streamerId}`);
+		Logger.info(`Registered new streamer: ${streamer.streamerId}`);
 	}
 
 	unregisterStreamer(id: string) {
@@ -45,7 +45,7 @@ export class StreamerRegistry {
 
 		this.streamers.delete(id);
 
-		Logger.log(`Unregistered streamer: ${id}`);
+		Logger.info(`Unregistered streamer: ${id}`);
 	}
 
 	getDefault(): IStreamer | undefined {

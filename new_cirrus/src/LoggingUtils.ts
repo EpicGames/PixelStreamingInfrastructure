@@ -1,34 +1,5 @@
 import { BaseMessage } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { Logger, ILogSink, LogLevel, logLevelToString, StructuredLog } from './Logger';
-import { stringify } from '../utils';
-
-/**
- * Pad the start of the given number with zeros so it takes up the number of digits.
- * e.g. zeroPad(5, 3) = '005' and zeroPad(23, 2) = '23'.
- */
-export function zeroPad(number: number, digits: number) {
-    let string = number.toString();
-    while (string.length < digits) {
-        string = '0' + string;
-    }
-    return string;
-}
-
-/**
- * Create a string of the form 'YEAR.MONTH.DATE.HOURS.MINUTES.SECONDS'.
- */
-function dateTimeToString() {
-    let date = new Date();
-    return `${date.getFullYear()}.${zeroPad(date.getMonth(), 2)}.${zeroPad(date.getDate(), 2)}.${zeroPad(date.getHours(), 2)}.${zeroPad(date.getMinutes(), 2)}.${zeroPad(date.getSeconds(), 2)}`;
-}
-
-/**
- * Create a string of the form 'HOURS.MINUTES.SECONDS.MILLISECONDS'.
- */
-function timeToString() {
-    let date = new Date();
-    return `${zeroPad(date.getHours(), 2)}:${zeroPad(date.getMinutes(), 2)}:${zeroPad(date.getSeconds(), 2)}.${zeroPad(date.getMilliseconds(), 3)}`;
-}
+import { Logger } from './Logger';
 
 /**
  * Most methods in here rely on connections implementing this interface so we can identify
@@ -39,35 +10,17 @@ export interface IMessageLogger {
 }
 
 /**
- * These identifier methods are here for convenience so all the connection types can have
- * their identifying strings changed in the one place. Rather than each of them implementing
- * their own in whatever code we're executing.
- */
-
-export function streamerIdentifier(streamerId: string): string {
-	return `S:${streamerId}`;
-}
-
-export function playerIdentifier(playerId: string): string {
-	return `P:${playerId}`;
-}
-
-export function sfuIdentifier(streamerId: string, playerId: string): string {
-	return `(${streamerId}:${playerId})`;
-}
-
-/**
  * Call to log messages received on a connection that we will handle here at the server.
  * Do not call this for messages being forwarded to another connection.
  * @param recvr IMessageLogger The connection the message was received on.
  */
 export function logIncoming(recvr: IMessageLogger, message: BaseMessage): void {
-	const logData = {
-		type: 'incoming',
+	Logger.info({
+		event: 'proto_message',
+		direction: 'incoming',
 		receiver: recvr.getIdentifier(),
-		message: message
-	};
-	Logger.info(logData);
+		protoMessage: message
+	});
 }
 
 /**
@@ -76,12 +29,12 @@ export function logIncoming(recvr: IMessageLogger, message: BaseMessage): void {
  * @param sender IMessageLogger The connection the message is being sent to.
  */
 export function logOutgoing(sender: IMessageLogger, message: BaseMessage): void {
-	const logData = {
-		type: 'outgoing',
+	Logger.info({
+		event: 'proto_message',
+		direction: 'outgoing',
 		sender: sender.getIdentifier(),
-		message: message
-	};
-	Logger.info(logData);
+		protoMessage: message
+	});
 }
 
 /**
@@ -91,13 +44,13 @@ export function logOutgoing(sender: IMessageLogger, message: BaseMessage): void 
  * @param sender IMessageLogger The connection the message is being sent to.
  */
 export function logForward(recvr: IMessageLogger, target: IMessageLogger, message: BaseMessage): void {
-	const logData = {
-		type: 'forward',
+	Logger.info({
+		event: 'proto_message',
+		direction: 'forward',
 		receiver: recvr.getIdentifier(),
 		target: target.getIdentifier(),
-		message: message
-	};
-	Logger.info(logData);
+		protoMessage: message
+	});
 }
 
 /**

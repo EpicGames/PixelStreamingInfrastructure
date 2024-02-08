@@ -1,8 +1,8 @@
 import { Messages,
 		 SignallingProtocol } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { PlayerConnection } from './player_connection';
-import { Logger } from './Logging/Logger';
 import { EventEmitter } from 'events';
+import { Logger } from './Logger';
 
 export interface IPlayer {
 	playerId: string;

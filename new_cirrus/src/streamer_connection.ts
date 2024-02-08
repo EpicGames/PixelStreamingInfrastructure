@@ -4,12 +4,12 @@ import { SignallingProtocol,
 		 BaseMessage,
 		 Messages,
 		 MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { Logger } from './Logging/Logger';
 import { IStreamer, Streamers } from './streamer_registry';
 import { IPlayer, Players } from './player_registry';
 import { EventEmitter } from 'events';
 import { stringify } from './utils';
-import * as LogUtils from './Logging/Utils';
+import { Logger } from './Logger';
+import * as LogUtils from './LoggingUtils';
 
 export class StreamerConnection implements IStreamer, LogUtils.IMessageLogger {
 	streamerId: string;
@@ -34,7 +34,7 @@ export class StreamerConnection implements IStreamer, LogUtils.IMessageLogger {
 		this.sendMessage(MessageHelpers.createMessage(Messages.config, config));
 	}
 
-	getIdentifier(): string { return LogUtils.streamerIdentifier(this.streamerId); }
+	getIdentifier(): string { return this.streamerId; }
 
 	private registerMessageHandlers(): void {
 		this.protocol.messageHandlers.on(Messages.endpointId.typeName, LogUtils.createHandlerListener(this, this.onEndpointId));
@@ -54,7 +54,7 @@ export class StreamerConnection implements IStreamer, LogUtils.IMessageLogger {
 
 	private forwardMessage(message: BaseMessage): void {
 		if (!message.playerId) {
-			Logger.warning(`No playerId specified, cannot forward message: ${stringify(message)}`);
+			Logger.warn(`No playerId specified, cannot forward message: ${stringify(message)}`);
 		} else {
 			const player = Players.get(message.playerId);
 			if (player) {

@@ -6,10 +6,10 @@ import { WebSocketTransportNJS,
 		 BaseMessage } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { IPlayer, Players } from './player_registry';
 import { IStreamer, Streamers } from './streamer_registry';
-import { Logger } from './Logging/Logger';
 import { StreamerConnection } from './streamer_connection';
 import { stringify } from './utils';
-import * as LogUtils from './Logging/Utils';
+import { Logger } from './Logger';
+import * as LogUtils from './LoggingUtils';
 
 export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 	playerId: string;
@@ -38,7 +38,7 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 		this.sendMessage(MessageHelpers.createMessage(Messages.config, config));
 	}
 
-	getIdentifier(): string { return LogUtils.playerIdentifier(this.playerId); }
+	getIdentifier(): string { return this.playerId; }
 
 	private registerMessageHandlers(): void {
 		this.protocol.messageHandlers.addListener(Messages.subscribe.typeName, LogUtils.createHandlerListener(this, this.onSubscribeMessage));
@@ -76,7 +76,7 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 		}
 
 		if (this.subscribedStreamer) {
-			Logger.warning(`subscribe: Player ${this.playerId} is resubscribing to a streamer but is already subscribed to ${this.subscribedStreamer.streamerId}`);
+			Logger.warn(`subscribe: Player ${this.playerId} is resubscribing to a streamer but is already subscribed to ${this.subscribedStreamer.streamerId}`);
 			this.unsubscribe();
 		}
 
