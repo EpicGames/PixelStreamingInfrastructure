@@ -75,10 +75,15 @@ export class StreamerRegistry {
 		return this.streamers.length == 0;
 	}
 
+	/**
+	 * Returns a list of streaming streamers.
+	 */
 	getStreamerIds(): string[] {
 		const ids = [];
 		for (let streamer of this.streamers) {
-			ids.push(streamer.streamerId);
+			if (streamer.streaming) {
+				ids.push(streamer.streamerId);
+			}
 		}
 		return ids;
 	}
