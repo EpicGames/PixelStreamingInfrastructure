@@ -1,53 +1,53 @@
 import WebSocket from 'ws';
-import { SignallingProtocol,
+import { ITransport,
+		 SignallingProtocol,
 		 WebSocketTransportNJS,
 		 BaseMessage,
 		 Messages,
 		 MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { IStreamer, Streamers } from './StreamerRegistry';
-import { Players } from './PlayerRegistry';
+import { IStreamer } from './StreamerRegistry';
 import { EventEmitter } from 'events';
 import { stringify } from './Utils';
 import { Logger } from './Logger';
 import * as LogUtils from './LoggingUtils';
+import { SignallingServer } from './SignallingServer';
 
-export class StreamerConnection implements IStreamer, LogUtils.IMessageLogger {
+export class StreamerConnection extends EventEmitter implements IStreamer, LogUtils.IMessageLogger {
+	server: SignallingServer;
 	streamerId: string;
+	transport: ITransport;
 	protocol: SignallingProtocol;
-	idCommitted: boolean;
-	events: EventEmitter;
-	
-	private idTimer: null | any;
+	streaming: boolean;
 
-	constructor(initialId: string, ws: WebSocket, config: any) {
-		this.streamerId = initialId;
-		this.protocol = new SignallingProtocol(new WebSocketTransportNJS(ws));
-		this.idCommitted = false;
-		this.events = new EventEmitter();
+	constructor(server: SignallingServer, ws: WebSocket) {
+		super();
 
-		this.protocol.transportEvents.addListener('error', this.onTransportError.bind(this));
-		this.protocol.transportEvents.addListener('close', this.onTransportClose.bind(this));
+		this.server = server;
+		this.streamerId = '';
+		this.transport = new WebSocketTransportNJS(ws);
+		this.protocol = new SignallingProtocol(this.transport);
+		this.streaming = false;
+
+		this.transport.on('error', this.onTransportError.bind(this));
+		this.transport.on('close', this.onTransportClose.bind(this));
 
 		this.registerMessageHandlers();
-		this.requestIdentification();
-
-		this.sendMessage(MessageHelpers.createMessage(Messages.config, config));
 	}
 
-	getIdentifier(): string { return this.streamerId; }
+	getReadableIdentifier(): string { return this.streamerId; }
 
 	private registerMessageHandlers(): void {
-		this.protocol.messageHandlers.on(Messages.endpointId.typeName, LogUtils.createHandlerListener(this, this.onEndpointId));
-		this.protocol.messageHandlers.on(Messages.ping.typeName, LogUtils.createHandlerListener(this, this.onPing));
-		this.protocol.messageHandlers.on(Messages.disconnectPlayer.typeName, LogUtils.createHandlerListener(this, this.onDisconnectPlayerRequest));
-		this.protocol.messageHandlers.on(Messages.layerPreference.typeName, LogUtils.createHandlerListener(this, this.onLayerPreference));
+		this.protocol.on(Messages.endpointId.typeName, LogUtils.createHandlerListener(this, this.onEndpointId));
+		this.protocol.on(Messages.ping.typeName, LogUtils.createHandlerListener(this, this.onPing));
+		this.protocol.on(Messages.disconnectPlayer.typeName, LogUtils.createHandlerListener(this, this.onDisconnectPlayerRequest));
+		this.protocol.on(Messages.layerPreference.typeName, LogUtils.createHandlerListener(this, this.onLayerPreference));
 
-		this.protocol.messageHandlers.on(Messages.offer.typeName, this.forwardMessage.bind(this));
-		this.protocol.messageHandlers.on(Messages.answer.typeName, this.forwardMessage.bind(this));
-		this.protocol.messageHandlers.on(Messages.iceCandidate.typeName, this.forwardMessage.bind(this));
+		this.protocol.on(Messages.offer.typeName, this.forwardMessage.bind(this));
+		this.protocol.on(Messages.answer.typeName, this.forwardMessage.bind(this));
+		this.protocol.on(Messages.iceCandidate.typeName, this.forwardMessage.bind(this));
 	}
 
-	private sendMessage(message: BaseMessage): void {
+	sendMessage(message: BaseMessage): void {
 		LogUtils.logOutgoing(this, message);
 		this.protocol.sendMessage(message);
 	}
@@ -56,7 +56,7 @@ export class StreamerConnection implements IStreamer, LogUtils.IMessageLogger {
 		if (!message.playerId) {
 			Logger.warn(`No playerId specified, cannot forward message: ${stringify(message)}`);
 		} else {
-			const player = Players.get(message.playerId);
+			const player = this.server.playerRegistry.get(message.playerId);
 			if (player) {
 				delete message.playerId;
 				LogUtils.logForward(this, player, message);
@@ -65,41 +65,17 @@ export class StreamerConnection implements IStreamer, LogUtils.IMessageLogger {
 		}
 	}
 
-	private requestIdentification(): void {
-		this.idTimer = setTimeout(() => {
-			// streamer did not respond in time. give it a legacy id.
-			const newLegacyId = Streamers.getUniqueLegacyStreamerId();
-			if (newLegacyId.length == 0) {
-				Logger.error(`Ran out of legacy ids.`);
-				this.protocol.disconnect();
-			} else {
-				Streamers.registerStreamer(newLegacyId, this);
-			}
-
-		}, 5 * 1000);
-		this.sendMessage(MessageHelpers.createMessage(Messages.identify));
-	}
-
 	private onTransportError(error: ErrorEvent): void {
 		Logger.error(`Streamer (${this.streamerId}) transport error ${error}`);
 	}
 
 	private onTransportClose(): void {
 		Logger.debug('StreamerConnection transport close.');
-		if (this.idTimer !== undefined) {
-			clearTimeout(this.idTimer);
-		}
-		Streamers.unregisterStreamer(this.streamerId);
-		this.events.emit('disconnect');
+		this.emit('disconnect');
 	}
 
 	private onEndpointId(message: Messages.endpointId): void {
-		if (this.idTimer !== undefined) {
-			clearTimeout(this.idTimer);
-			delete this.idTimer;
-		}
-		Streamers.registerStreamer(message.id, this);
-		this.events.emit('id_changed');
+		this.streaming = true; // we're ready to stream when we id ourselves
 	}
 
 	private onPing(message: Messages.ping): void {
@@ -108,7 +84,7 @@ export class StreamerConnection implements IStreamer, LogUtils.IMessageLogger {
 
 	private onDisconnectPlayerRequest(message: Messages.disconnectPlayer): void {
 		if (message.playerId) {
-			const player = Players.get(message.playerId);
+			const player = this.server.playerRegistry.get(message.playerId);
 			if (player) {
 				player.protocol.disconnect(1011, message.reason);
 			}
@@ -116,6 +92,6 @@ export class StreamerConnection implements IStreamer, LogUtils.IMessageLogger {
 	}
 
 	private onLayerPreference(message: Messages.layerPreference): void {
-		this.events.emit('layer_preference', message);
+		this.emit('layer_preference', message);
 	}
 }

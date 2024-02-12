@@ -7,6 +7,7 @@ export const MessageRegistry: Record<string, IMessageType<BaseMessage>> = {
     'config': Messages.config,
     'disconnectPlayer': Messages.disconnectPlayer,
     'endpointId': Messages.endpointId,
+    'endpointIdConfirm': Messages.endpointIdConfirm,
     'iceCandidate': Messages.iceCandidate,
     'identify': Messages.identify,
     'listStreamers': Messages.listStreamers,

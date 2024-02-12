@@ -9,6 +9,9 @@ import { PlayerConnection } from './PlayerConnection';
 import { SFUConnection } from './SFUConnection';
 import { Logger } from './Logger';
 import { stringify } from './Utils';
+import { StreamerRegistry } from './StreamerRegistry';
+import { PlayerRegistry } from './PlayerRegistry';
+import { Messages, MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 
 interface IConfig {
 	httpServer?: any;
@@ -22,8 +25,16 @@ interface IConfig {
 }
 
 export class SignallingServer {
+	config: IConfig;
+	streamerRegistry: StreamerRegistry;
+	playerRegistry: PlayerRegistry;
+
 	constructor(config: IConfig) {
 		Logger.debug('Started SignallingServer with config: %s', config);
+
+		this.config = config;
+		this.streamerRegistry = new StreamerRegistry();
+		this.playerRegistry = new PlayerRegistry();
 
 		if (!config.playerPort && !config.httpServer) {
 			Logger.error('No player port or http server supplied to SignallingServer.');
@@ -32,27 +43,12 @@ export class SignallingServer {
 
 		// Streamer connections
 		const streamerServer = new WebSocket.Server({ port: config.streamerPort, backlog: 1, ...config.streamerWsOptions});
-		streamerServer.on('connection', (ws: WebSocket, request: any) => {
-			Logger.info(`New streamer connection: %s`, request.connection.remoteAddress);
-			const temporaryId = request.connection.remoteAddress;
-			const newServer = new StreamerConnection(temporaryId, ws, config.clientConfig);
-			// I don't like that here we just create connections and something magical happens
-			// Perhaps we should add it to the registry ourselves here? But connections aren't
-			// always immediately registered. Might need to rethink this design.
-		});
+		streamerServer.on('connection', this.onStreamerConnected.bind(this));
 		Logger.info(`Listening for streamer connections on port ${config.streamerPort}`);
 
 		// Player connections
 		const playerServer = new WebSocket.Server({ server: config.httpServer, port: config.playerPort, ...config.playerWsOptions });
-		playerServer.on('connection', (ws: WebSocket, request: any) => {
-			Logger.info(`New player connection: %s`, request.connection.remoteAddress);
-			Logger.debug(`Request URL: %s`, request.url);
-			const parsedUrl = url.parse(request.url);
-			const urlParams = new URLSearchParams(parsedUrl.search!);
-			const offerToReceive: boolean = (urlParams.get('OfferToReceive') === 'true');
-			const sendOffer: boolean = offerToReceive ? false : true;
-			const newPlayer = new PlayerConnection(ws, sendOffer, config.clientConfig);
-		});
+		playerServer.on('connection', this.onPlayerConnected.bind(this));
 		if (config.playerPort) {
 			Logger.info(`Listening for player connections on port ${config.playerPort}`);
 		}
@@ -60,11 +56,54 @@ export class SignallingServer {
 		// Optional SFU connections
 		if (config.sfuPort) {
 			const sfuServer = new WebSocket.Server({ port: config.sfuPort, backlog: 1, ...config.sfuWsOptions });
-			sfuServer.on('connection', (ws: WebSocket, request: any) => {
-				Logger.info(`New SFU connection: %s`, request.connection.remoteAddress);
-				const newSFU = new SFUConnection(ws, config.clientConfig);
-			});
+			sfuServer.on('connection', this.onSFUConnected.bind(this));
 			Logger.info(`Listening for SFU connections on port ${config.sfuPort}`);
 		}
+	}
+
+	private onStreamerConnected(ws: WebSocket, request: any) {
+		Logger.info(`New streamer connection: %s`, request.connection.remoteAddress);
+
+		const newStreamer = new StreamerConnection(this, ws);
+
+		// add it to the registry and when the transport closes, remove it.
+		this.streamerRegistry.add(newStreamer);
+		newStreamer.transport.on('close', () => { this.streamerRegistry.remove(newStreamer); });
+
+		newStreamer.sendMessage(MessageHelpers.createMessage(Messages.config, this.config.clientConfig));
+	}
+
+	private onPlayerConnected(ws: WebSocket, request: any) {
+		Logger.info(`New player connection: %s (%s)`, request.connection.remoteAddress, request.url);
+
+		// extract some options from the request url
+		const parsedUrl = url.parse(request.url);
+		const urlParams = new URLSearchParams(parsedUrl.search!);
+		const offerToReceive: boolean = (urlParams.get('OfferToReceive') === 'true');
+		const sendOffer: boolean = offerToReceive ? false : true;
+
+		const newPlayer = new PlayerConnection(this, ws, sendOffer);
+
+		// add it to the registry and when the transport closes, remove it
+		this.playerRegistry.add(newPlayer);
+		newPlayer.transport.on('close', () => { this.playerRegistry.remove(newPlayer); });
+
+		newPlayer.sendMessage(MessageHelpers.createMessage(Messages.config, this.config.clientConfig));
+	}
+
+	private onSFUConnected(ws: WebSocket, request: any) {
+		Logger.info(`New SFU connection: %s`, request.connection.remoteAddress);
+		const newSFU = new SFUConnection(this, ws);
+
+		// SFU acts as both a streamer and player
+		this.streamerRegistry.add(newSFU);
+		this.playerRegistry.add(newSFU);
+		newSFU.transport.on('close', () => {
+			this.streamerRegistry.remove(newSFU);
+			this.playerRegistry.remove(newSFU);
+		});
+
+		newSFU.sendMessage(MessageHelpers.createMessage(Messages.config, this.config.clientConfig));
+
 	}
 }

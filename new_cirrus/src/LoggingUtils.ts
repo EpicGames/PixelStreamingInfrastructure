@@ -6,7 +6,7 @@ import { Logger } from './Logger';
  * who is sending or receiving etc.
  */
 export interface IMessageLogger {
-	getIdentifier(): string;
+	getReadableIdentifier(): string;
 }
 
 /**
@@ -18,7 +18,7 @@ export function logIncoming(recvr: IMessageLogger, message: BaseMessage): void {
 	Logger.info({
 		event: 'proto_message',
 		direction: 'incoming',
-		receiver: recvr.getIdentifier(),
+		receiver: recvr.getReadableIdentifier(),
 		protoMessage: message
 	});
 }
@@ -32,7 +32,7 @@ export function logOutgoing(sender: IMessageLogger, message: BaseMessage): void 
 	Logger.info({
 		event: 'proto_message',
 		direction: 'outgoing',
-		sender: sender.getIdentifier(),
+		sender: sender.getReadableIdentifier(),
 		protoMessage: message
 	});
 }
@@ -47,8 +47,8 @@ export function logForward(recvr: IMessageLogger, target: IMessageLogger, messag
 	Logger.info({
 		event: 'proto_message',
 		direction: 'forward',
-		receiver: recvr.getIdentifier(),
-		target: target.getIdentifier(),
+		receiver: recvr.getReadableIdentifier(),
+		target: target.getReadableIdentifier(),
 		protoMessage: message
 	});
 }

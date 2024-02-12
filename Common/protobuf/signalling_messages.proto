@@ -32,6 +32,11 @@ message endpointId {
   optional string protocolVersion = 3;
 }
 
+message endpointIdConfirm {
+  string type = 1;
+  string committedId = 2;
+}
+
 message iceCandidateData {
   string candidate = 1;
   string sdpMid = 2;
@@ -93,14 +98,14 @@ message stats {
   string data = 2;
 }
 
+// sent to the sfu only to notify it when the streamer its subscribed to disconnects
 message streamerDisconnected {
   string type = 1;
-  string streamerId = 2; // NEW
 }
 
 message streamerList {
   string type = 1;
-  repeated string ids = 2; // CHECK
+  repeated string ids = 2;
 }
 
 message subscribe {

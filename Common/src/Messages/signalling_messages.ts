@@ -95,6 +95,19 @@ export interface endpointId {
     protocolVersion?: string;
 }
 /**
+ * @generated from protobuf message endpointIdConfirm
+ */
+export interface endpointIdConfirm {
+    /**
+     * @generated from protobuf field: string type = 1;
+     */
+    type: string;
+    /**
+     * @generated from protobuf field: string committedId = 2;
+     */
+    committedId: string;
+}
+/**
  * @generated from protobuf message iceCandidateData
  */
 export interface iceCandidateData {
@@ -262,6 +275,8 @@ export interface stats {
     data: string;
 }
 /**
+ * sent to the sfu only to notify it when the streamer its subscribed to disconnects
+ *
  * @generated from protobuf message streamerDisconnected
  */
 export interface streamerDisconnected {
@@ -269,10 +284,6 @@ export interface streamerDisconnected {
      * @generated from protobuf field: string type = 1;
      */
     type: string;
-    /**
-     * @generated from protobuf field: string streamerId = 2;
-     */
-    streamerId: string; // NEW
 }
 /**
  * @generated from protobuf message streamerList
@@ -285,7 +296,7 @@ export interface streamerList {
     /**
      * @generated from protobuf field: repeated string ids = 2;
      */
-    ids: string[]; // CHECK
+    ids: string[];
 }
 /**
  * @generated from protobuf message subscribe
@@ -740,6 +751,61 @@ class endpointId$Type extends MessageType<endpointId> {
  * @generated MessageType for protobuf message endpointId
  */
 export const endpointId = new endpointId$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class endpointIdConfirm$Type extends MessageType<endpointIdConfirm> {
+    constructor() {
+        super("endpointIdConfirm", [
+            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "committedId", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<endpointIdConfirm>): endpointIdConfirm {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.type = "";
+        message.committedId = "";
+        if (value !== undefined)
+            reflectionMergePartial<endpointIdConfirm>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: endpointIdConfirm): endpointIdConfirm {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string type */ 1:
+                    message.type = reader.string();
+                    break;
+                case /* string committedId */ 2:
+                    message.committedId = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: endpointIdConfirm, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string type = 1; */
+        if (message.type !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.type);
+        /* string committedId = 2; */
+        if (message.committedId !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.committedId);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message endpointIdConfirm
+ */
+export const endpointIdConfirm = new endpointIdConfirm$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class iceCandidateData$Type extends MessageType<iceCandidateData> {
     constructor() {
@@ -1391,14 +1457,12 @@ export const stats = new stats$Type();
 class streamerDisconnected$Type extends MessageType<streamerDisconnected> {
     constructor() {
         super("streamerDisconnected", [
-            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "streamerId", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<streamerDisconnected>): streamerDisconnected {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.type = "";
-        message.streamerId = "";
         if (value !== undefined)
             reflectionMergePartial<streamerDisconnected>(this, message, value);
         return message;
@@ -1410,9 +1474,6 @@ class streamerDisconnected$Type extends MessageType<streamerDisconnected> {
             switch (fieldNo) {
                 case /* string type */ 1:
                     message.type = reader.string();
-                    break;
-                case /* string streamerId */ 2:
-                    message.streamerId = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1429,9 +1490,6 @@ class streamerDisconnected$Type extends MessageType<streamerDisconnected> {
         /* string type = 1; */
         if (message.type !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.type);
-        /* string streamerId = 2; */
-        if (message.streamerId !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.streamerId);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

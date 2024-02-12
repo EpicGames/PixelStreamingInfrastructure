@@ -16,13 +16,12 @@ declare global {
 /**
  * The controller for the WebSocket and all associated methods
  */
-export class WebSocketTransport implements ITransport {
+export class WebSocketTransport extends EventEmitter implements ITransport {
     WS_OPEN_STATE = 1;
     webSocket: WebSocket;
-    events: EventEmitter;
 
     constructor() {
-        this.events = new EventEmitter();
+        super();
     }
 
     sendMessage(msg: BaseMessage): void {
@@ -133,7 +132,7 @@ export class WebSocketTransport implements ITransport {
             'Connected to the signalling server via WebSocket',
             6
         );
-        this.events.emit('open');
+        this.emit('open');
     }
 
     /**
@@ -142,7 +141,7 @@ export class WebSocketTransport implements ITransport {
      */
     handleOnError() {
         //Logger.Error(Logger.GetStackTrace(), 'WebSocket error');
-        this.events.emit('error');
+        this.emit('error');
     }
 
     /**
@@ -157,7 +156,7 @@ export class WebSocketTransport implements ITransport {
                 ' - ' +
                 event.reason
         );
-        this.events.emit('close', event);
+        this.emit('close', event);
     }
 
     /**

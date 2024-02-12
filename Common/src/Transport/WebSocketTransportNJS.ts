@@ -11,19 +11,17 @@ import { EventEmitter } from 'events';
  * supported in the browsers.
  * If you are using this code in a browser use 'WebSocketTransport' instead.
  */
-export class WebSocketTransportNJS implements ITransport {
+export class WebSocketTransportNJS extends EventEmitter implements ITransport {
     WS_OPEN_STATE = 1;
     webSocket: WebSocket;
     webSocketServer: WebSocket.Server;
-    events: EventEmitter;
 
     constructor(existingSocket?: WebSocket) {
-        this.events = new EventEmitter();
-
+        super();
         if (existingSocket) {
             this.webSocket = existingSocket;
             this.setupSocketHandlers();
-            this.events.emit('open');
+            this.emit('open');
         }
     }
 
@@ -73,7 +71,7 @@ export class WebSocketTransportNJS implements ITransport {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     handleOnOpen(event: WebSocket.Event) {
-        this.events.emit('open', event);
+        this.emit('open', event);
     }
 
     /**
@@ -81,7 +79,7 @@ export class WebSocketTransportNJS implements ITransport {
      * @param event - Error Payload
      */
     handleOnError(event: WebSocket.ErrorEvent) {
-        this.events.emit('error', event);
+        this.emit('error', event);
     }
 
     /**
@@ -89,7 +87,7 @@ export class WebSocketTransportNJS implements ITransport {
      * @param event - Close Event
      */
     handleOnClose(event: WebSocket.CloseEvent) {
-        this.events.emit('close', event);
+        this.emit('close', event);
     }
 
     /**

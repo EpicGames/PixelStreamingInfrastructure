@@ -6,12 +6,7 @@ import { EventEmitter } from 'events';
  * Implement this interface to support your custom transport. You can then supply an instance of your
  * transport to the constructor of SignallingProtocol during startup.
  */
-export interface ITransport {
-    /**
-     * Dispatch open/error/close events on this to indicate transport events to the protocol.
-     */
-    events: EventEmitter;
-
+export interface ITransport extends EventEmitter {
     /**
      * Called when the protocol wants to send a message over the transport.
      */

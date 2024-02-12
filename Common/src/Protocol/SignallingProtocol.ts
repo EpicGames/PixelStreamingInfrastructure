@@ -10,7 +10,7 @@ import * as MessageHelpers from '../Messages/message_helpers';
 /**
  * Signalling protocol for handling messages from the signalling server.
  */
-export class SignallingProtocol {
+export class SignallingProtocol extends EventEmitter {
     private transport: ITransport;
 
     /**
@@ -36,7 +36,7 @@ export class SignallingProtocol {
      *      Emitted when sending a message out on the transport. Similar to 'message' but
      *      only for when messages are sent from this endpoint. Useful for debugging.
      */
-    transportEvents: EventEmitter;
+    //transportEvents: EventEmitter;
 
     /**
      * Listen on this emitter for messages. Message type is the name of the event to listen for.
@@ -44,16 +44,17 @@ export class SignallingProtocol {
      * Example:
      *      messageHandlers.addListener('config', (message: Messages.config) => console.log(`Got a config message: ${message}`)));
      */
-    messageHandlers: EventEmitter;
+    //messageHandlers: EventEmitter;
 
     constructor(transport: ITransport) {
+        super();
         this.transport = transport;
-        this.transportEvents = new EventEmitter();
-        this.messageHandlers = new EventEmitter();
+        //this.transportEvents = new EventEmitter();
+        //this.messageHandlers = new EventEmitter();
 
-        transport.events.addListener('open', (event: Event) => this.transportEvents.emit('open', event));
-        transport.events.addListener('error', (event: Event) => this.transportEvents.emit('error', event));
-        transport.events.addListener('close', (event: CloseEvent) => this.transportEvents.emit('close', event));
+        // transport.on('open', (event: Event) => transport.emit('open', event));
+        // transport.on('error', (event: Event) => transport.emit('error', event));
+        // transport.on('close', (event: CloseEvent) => transport.emit('close', event));
 
         transport.onMessage = (msg: BaseMessage) => {
             // auto handle ping messages
@@ -63,8 +64,8 @@ export class SignallingProtocol {
             }
             
             // call the handlers
-            this.transportEvents.emit('message', msg); // emit this for listeners listening to any message
-            this.messageHandlers.emit(msg.type, msg);  // emit this for listeners listening for specific messages
+            transport.emit('message', msg); // emit this for listeners listening to any message
+            this.emit(msg.type, msg);  // emit this for listeners listening for specific messages
         };
     }
 
@@ -94,7 +95,7 @@ export class SignallingProtocol {
      */
     sendMessage(msg: BaseMessage) {
         this.transport.sendMessage(msg);
-        this.transportEvents.emit('out', msg); // emit this for listeners listening to outgoing messages
+        this.transport.emit('out', msg); // emit this for listeners listening to outgoing messages
     }
 
     // the following are just wrappers for sendMessage and should be deprioritized.

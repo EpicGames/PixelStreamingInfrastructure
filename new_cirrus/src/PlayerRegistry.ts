@@ -1,11 +1,13 @@
-import { SignallingProtocol } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
+import { SignallingProtocol, BaseMessage } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { EventEmitter } from 'events';
 import { Logger } from './Logger';
+import { IMessageLogger } from './LoggingUtils';
 
-export interface IPlayer {
+export interface IPlayer extends IMessageLogger {
 	playerId: string;
 	protocol: SignallingProtocol;
-	getIdentifier(): string;
+
+	sendMessage(message: BaseMessage): void;
 }
 
 export class PlayerRegistry {
@@ -21,29 +23,24 @@ export class PlayerRegistry {
 		this.events = new EventEmitter();
 	}
 
-	getUniquePlayerId(): string {
-		const newPlayerId = `Player${this.nextPlayerId}`;
-		this.nextPlayerId++;
-		return newPlayerId;
-	}
-
-	registerPlayer(player: IPlayer): void {
+	add(player: IPlayer): void {
+		player.playerId = this.getUniquePlayerId();
 		this.players.set(player.playerId, player);
 		this.playerCount++;
 		this.events.emit('added', player.playerId);
 		Logger.info(`Registered new player: ${player.playerId}`);
 	}
 
-	unregisterPlayer(playerId: string): void {
-		if (!this.players.has(playerId)) {
+	remove(player: IPlayer): void {
+		if (!this.players.has(player.playerId)) {
 			return;
 		}
 
-		this.events.emit('added', playerId);
-		this.players.delete(playerId);
+		this.events.emit('removed', player.playerId);
+		this.players.delete(player.playerId);
 		this.playerCount--;
 
-		Logger.info(`Unregistered player: ${playerId}`);
+		Logger.info(`Unregistered player: ${player.playerId}`);
 	}
 
 	has(playerId: string): boolean {
@@ -53,6 +50,10 @@ export class PlayerRegistry {
 	get(playerId: string): IPlayer | undefined {
 		return this.players.get(playerId);
 	}
-}
 
-export const Players = new PlayerRegistry();
+	private getUniquePlayerId(): string {
+		const newPlayerId = `Player${this.nextPlayerId}`;
+		this.nextPlayerId++;
+		return newPlayerId;
+	}
+}
