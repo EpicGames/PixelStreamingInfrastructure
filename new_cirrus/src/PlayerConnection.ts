@@ -11,8 +11,19 @@ import { Logger } from './Logger';
 import * as LogUtils from './LoggingUtils';
 import { SignallingServer } from './SignallingServer';
 
+/**
+ * A connection between the signalling server and a player connection.
+ * This is where messages expected to be handled by the player come in
+ * and where messages are sent to the player.
+ * 
+ * Interesting internals:
+ * playerId: The unique id string of this player.
+ * transport: The ITransport where transport events can be subscribed to
+ * protocol: The SignallingProtocol where signalling messages can be
+ * subscribed to.
+ */
 export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
-	server: SignallingServer;
+	private server: SignallingServer;
 	playerId: string;
 	transport: ITransport;
 	protocol: SignallingProtocol;
@@ -22,6 +33,13 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 	private streamerIdChangeListener: (newId: string) => void;
 	private streamerDisconnectedListener: () => void;
 
+	/**
+	 * Construct a new player connection.
+	 * @param server The signalling server object that spawned this player.
+	 * @param ws The websocket coupled to this player connection.
+	 * @param sendOffer True if the player is requesting to receive offers
+	 * from streamers.
+	 */
 	constructor(server: SignallingServer, ws: WebSocket, sendOffer: boolean) {
 		this.server = server;
 		this.playerId = '';
@@ -41,6 +59,14 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 
 	getReadableIdentifier(): string { return this.playerId; }
 
+	/**
+	 * Sends a signalling message to the player.
+	 */
+	sendMessage(message: BaseMessage): void {
+		LogUtils.logOutgoing(this, message);
+		this.protocol.sendMessage(message);
+	}
+
 	private registerMessageHandlers(): void {
 		this.protocol.on(Messages.subscribe.typeName, LogUtils.createHandlerListener(this, this.onSubscribeMessage));
 		this.protocol.on(Messages.unsubscribe.typeName, LogUtils.createHandlerListener(this, this.onUnsubscribeMessage));
@@ -51,11 +77,6 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 		this.protocol.on(Messages.iceCandidate.typeName, this.sendToStreamer.bind(this));
 		this.protocol.on(Messages.dataChannelRequest.typeName, this.sendToStreamer.bind(this));
 		this.protocol.on(Messages.peerDataChannelsReady.typeName, this.sendToStreamer.bind(this));
-	}
-
-	sendMessage(message: BaseMessage): void {
-		LogUtils.logOutgoing(this, message);
-		this.protocol.sendMessage(message);
 	}
 
 	private sendToStreamer(message: BaseMessage): void {

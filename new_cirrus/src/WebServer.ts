@@ -4,13 +4,28 @@ import fs from 'fs';
 import { Logger } from './Logger';
 import RateLimit from 'express-rate-limit';
 
+/**
+ * An interface that describes the possible options to pass to
+ * WebServer.
+ */
 interface IWebServerConfig {
+	// The port to run the webserver on. 80 by default.
 	port?: number;
+
+	// The root of the serve directory. Current working directory by default.
 	root?: string;
+
+	// The filename to direct connections to if none suppllied in the url. player.html by default.
 	homepageFile: string;
+
+	// An optional rate limit to prevent overloading.
 	perMinuteRateLimit?: number;
 }
 
+/**
+ * An object to manage the initialization of a web server. Used to serve the
+ * pixel streaming frontend.
+ */
 export class WebServer {
 	constructor(app: any, server: any, config: IWebServerConfig) {
 		Logger.debug('Starting WebServer with config: %s', config);

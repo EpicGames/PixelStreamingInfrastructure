@@ -1,25 +1,39 @@
 const winston = require('winston');
 require('winston-daily-rotate-file');
 const path = require('path');
-
 const { combine, timestamp, json, align, printf, colorize, splat } = winston.format;
 
+/**
+ * The actual logger object. This is just a winston logger.
+ * You can use InitLogging to get a decent result, or you can
+ * completely create your own winston logger and assign it.
+ */
 export let Logger = createDefaultLogger();
 
 interface IConfig {
+    // the directory to store log files
     logDir?: string;
+
+    // if true, every message will be logged to the console in a condensed form
     logMessagesToConsole?: boolean;
+
+    // the minimum log level for console messages
     logLevelConsole?: string;
+
+    // the minimum log level for file messages
     logLevelFile?: string;
 }
 
-let logMessagesToConsole = false;
-
-export function InitLogging(config: IConfig) {
+/**
+ * Call this as early as possible to setup the logging module with your
+ * preferred settings.
+ * @param config The settings to init the logger with. See IConfig interface
+ */
+export function InitLogging(config: IConfig): void {
     const logDir = config.logDir || 'logs';
-    const logMessagesToConsole = config.logMessagesToConsole || false;
     const logLevelConsole = config.logLevelConsole || 'info';
     const logLevelFile = config.logLevelFile || 'info';
+    logMessagesToConsole = config.logMessagesToConsole || false;
 
     Logger = winston.createLogger({
         transports: [
@@ -28,6 +42,8 @@ export function InitLogging(config: IConfig) {
         ],
     });
 }
+
+let logMessagesToConsole = false;
 
 function createDefaultLogger() {
     return winston.createLogger({

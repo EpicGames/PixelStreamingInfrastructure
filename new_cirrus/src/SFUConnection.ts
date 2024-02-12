@@ -12,8 +12,23 @@ import { Logger } from './Logger';
 import * as LogUtils from './LoggingUtils';
 import { SignallingServer } from './SignallingServer';
 
+/**
+ * A SFU connection to the signalling server.
+ * An SFU can act as both a streamer and a player. It can subscribe to
+ * streamers like a player, and other players can subscribe to the sfu.
+ * Therefore the SFU will have a streamer id and a player id and be
+ * registered in both streamer registries and player registries.
+ * 
+ * Interesting internals:
+ * playerId: The player id of this connectiom.
+ * streamerId: The streamer id of this connection.
+ * transport: The ITransport where transport events can be subscribed to
+ * protocol: The SignallingProtocol where signalling messages can be
+ * subscribed to.
+ * streaming: True when the streamer is ready to accept subscriptions.
+ */
 export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, LogUtils.IMessageLogger {
-	server: SignallingServer;
+	private server: SignallingServer;
 	transport: ITransport;
 	protocol: SignallingProtocol;
 	playerId: string;
@@ -25,6 +40,11 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
 	private streamerIdChangeListener: (newId: string) => void;
 	private streamerDisconnectedListener: () => void;
 
+	/**
+	 * Construct a new SFU connection.
+	 * @param server The signalling server object that spawned this sfu.
+	 * @param ws The websocket coupled to this sfu connection.
+	 */
 	constructor(server: SignallingServer, ws: WebSocket) {
 		super();
 
@@ -48,6 +68,14 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
 
 	getReadableIdentifier(): string { return `(${this.streamerId}:${this.playerId})`; }
 
+	/**
+	 * Sends a signalling message to the player.
+	 */
+	sendMessage(message: BaseMessage): void {
+		LogUtils.logOutgoing(this, message);
+		this.protocol.sendMessage(message);
+	}
+
 	private registerMessageHandlers(): void {
 		this.protocol.on(Messages.subscribe.typeName, LogUtils.createHandlerListener(this, this.onSubscribeMessage));
 		this.protocol.on(Messages.unsubscribe.typeName, LogUtils.createHandlerListener(this, this.onUnsubscribeMessage));
@@ -60,11 +88,6 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
 		this.protocol.on(Messages.offer.typeName, this.sendToPlayer.bind(this));
 		this.protocol.on(Messages.answer.typeName, this.sendToStreamer.bind(this));
 		this.protocol.on(Messages.peerDataChannels.typeName, this.sendToPlayer.bind(this));
-	}
-
-	sendMessage(message: BaseMessage): void {
-		LogUtils.logOutgoing(this, message);
-		this.protocol.sendMessage(message);
 	}
 
 	private subscribe(streamerId: string) {

@@ -12,13 +12,30 @@ import { Logger } from './Logger';
 import * as LogUtils from './LoggingUtils';
 import { SignallingServer } from './SignallingServer';
 
+/**
+ * A connection between the signalling server and a streamer connection.
+ * This is where messages expected to be handled by the streamer come in
+ * and where messages are sent to the streamer.
+ * 
+ * Interesting internals:
+ * streamerId: The unique id string of this streamer.
+ * transport: The ITransport where transport events can be subscribed to
+ * protocol: The SignallingProtocol where signalling messages can be
+ * subscribed to.
+ * streaming: True when the streamer is ready to accept subscriptions.
+ */
 export class StreamerConnection extends EventEmitter implements IStreamer, LogUtils.IMessageLogger {
-	server: SignallingServer;
+	private server: SignallingServer;
 	streamerId: string;
 	transport: ITransport;
 	protocol: SignallingProtocol;
 	streaming: boolean;
 
+	/**
+	 * Construct a new streamer connection.
+	 * @param server The signalling server object that spawned this streamer.
+	 * @param ws The websocket coupled to this streamer connection.
+	 */
 	constructor(server: SignallingServer, ws: WebSocket) {
 		super();
 
@@ -36,6 +53,14 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
 
 	getReadableIdentifier(): string { return this.streamerId; }
 
+	/**
+	 * Sends a signalling message to the player.
+	 */
+	sendMessage(message: BaseMessage): void {
+		LogUtils.logOutgoing(this, message);
+		this.protocol.sendMessage(message);
+	}
+
 	private registerMessageHandlers(): void {
 		this.protocol.on(Messages.endpointId.typeName, LogUtils.createHandlerListener(this, this.onEndpointId));
 		this.protocol.on(Messages.ping.typeName, LogUtils.createHandlerListener(this, this.onPing));
@@ -45,11 +70,6 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
 		this.protocol.on(Messages.offer.typeName, this.forwardMessage.bind(this));
 		this.protocol.on(Messages.answer.typeName, this.forwardMessage.bind(this));
 		this.protocol.on(Messages.iceCandidate.typeName, this.forwardMessage.bind(this));
-	}
-
-	sendMessage(message: BaseMessage): void {
-		LogUtils.logOutgoing(this, message);
-		this.protocol.sendMessage(message);
 	}
 
 	private forwardMessage(message: BaseMessage): void {

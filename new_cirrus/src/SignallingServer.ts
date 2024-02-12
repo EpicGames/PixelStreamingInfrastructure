@@ -1,31 +1,51 @@
-import express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
-import path from 'path';
-import fs from 'fs';
 import url from 'url';
 import { StreamerConnection } from './StreamerConnection';
 import { PlayerConnection } from './PlayerConnection';
 import { SFUConnection } from './SFUConnection';
 import { Logger } from './Logger';
-import { stringify } from './Utils';
 import { StreamerRegistry } from './StreamerRegistry';
 import { PlayerRegistry } from './PlayerRegistry';
 import { Messages, MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 
+/**
+ * An interface describing the possible options to pass when creating
+ * a new SignallingServer object.
+ */
 interface IConfig {
+	// An http server to use for player connections rather than a port. Not needed if playerPort supplied.
 	httpServer?: any;
+
+	// The port to listen on for streamer connections.
 	streamerPort: number;
+
+	// The port to listen on for player connections. Not needed if httpServer supplied.
 	playerPort?: number;
+
+	// The port to listen on for SFU connections. If not supplied SFU connections will be disabled.
 	sfuPort?: number;
+
+	// The peer configuration object to send to peers when they connect.
 	clientConfig: any;
+
+	// Additional websocket options for the streamer listening websocket.
 	streamerWsOptions?: any;
+
+	// Additional websocket options for the player listening websocket.
 	playerWsOptions?: any;
+
+	// Additional websocket options for the SFU listening websocket.
 	sfuWsOptions?: any;
 }
 
+/**
+ * The main signalling server object.
+ * Contains a streamer and player registry and handles setting up of websockets
+ * to listen for incoming connections.
+ */
 export class SignallingServer {
-	config: IConfig;
+	private config: IConfig;
 	streamerRegistry: StreamerRegistry;
 	playerRegistry: PlayerRegistry;
 
