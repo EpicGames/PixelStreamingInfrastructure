@@ -120,16 +120,11 @@ export class AggregatedStats {
      * @param stat - the stats coming in from ice candidates
      */
     handleCandidatePair(stat: CandidatePairStats) {
-        this.candidatePair.bytesReceived = stat.bytesReceived;
-        this.candidatePair.bytesSent = stat.bytesSent;
-        this.candidatePair.localCandidateId = stat.localCandidateId;
-        this.candidatePair.remoteCandidateId = stat.remoteCandidateId;
-        this.candidatePair.nominated = stat.nominated;
-        this.candidatePair.readable = stat.readable;
-        this.candidatePair.selected = stat.selected;
-        this.candidatePair.writable = stat.writable;
-        this.candidatePair.state = stat.state;
-        this.candidatePair.currentRoundTripTime = stat.currentRoundTripTime;
+
+        // If the candidate pair is nominated and selected set to the candidate pair
+        if (stat.nominated && stat.selected){
+            this.candidatePair = stat;
+        }
     }
 
     /**
