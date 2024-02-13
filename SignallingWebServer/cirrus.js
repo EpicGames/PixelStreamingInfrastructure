@@ -246,7 +246,7 @@ if (config.UseHTTPS) {
 	});
 }
 
-console.logColor(logging.Cyan, `Running Cirrus - The Pixel Streaming reference implementation signalling server for Unreal Engine 5.3.`);
+console.logColor(logging.Cyan, `Running Cirrus - The Pixel Streaming reference implementation signalling server for Unreal Engine.`);
 
 let nextPlayerId = 1;
 
