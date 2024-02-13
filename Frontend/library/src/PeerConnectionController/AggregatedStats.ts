@@ -171,7 +171,7 @@ export class AggregatedStats {
      */
     handleRemoteCandidate(stat: CandidateStat) {
         const RemoteCandidate = new CandidateStat();
-        RemoteCandidate.label = 'local-candidate';
+        RemoteCandidate.label = 'remote-candidate';
         RemoteCandidate.address = stat.address;
         RemoteCandidate.port = stat.port;
         RemoteCandidate.protocol = stat.protocol;
