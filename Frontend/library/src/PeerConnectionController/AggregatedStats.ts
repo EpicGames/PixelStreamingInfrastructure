@@ -162,6 +162,8 @@ export class AggregatedStats {
         localCandidate.protocol = stat.protocol;
         localCandidate.candidateType = stat.candidateType;
         localCandidate.id = stat.id;
+        localCandidate.relayProtocol = stat.relayProtocol;
+        localCandidate.transportId = stat.transportId;
         this.localCandidates.push(localCandidate);
     }
 
@@ -177,6 +179,8 @@ export class AggregatedStats {
         RemoteCandidate.protocol = stat.protocol;
         RemoteCandidate.id = stat.id;
         RemoteCandidate.candidateType = stat.candidateType;
+        RemoteCandidate.relayProtocol = stat.relayProtocol;
+        RemoteCandidate.transportId = stat.transportId
         this.remoteCandidates.push(RemoteCandidate);
     }
 
