@@ -120,9 +120,8 @@ export class AggregatedStats {
      * @param stat - the stats coming in from ice candidates
      */
     handleCandidatePair(stat: CandidatePairStats) {
-
-        // If the candidate pair is nominated and selected set to the candidate pair
-        if (stat.nominated && stat.selected){
+        // If the candidate pair has received bytes then set as the candidate pair
+        if (stat.bytesReceived > 0){
             this.candidatePair = stat;
         }
     }
