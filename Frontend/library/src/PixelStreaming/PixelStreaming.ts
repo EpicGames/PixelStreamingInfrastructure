@@ -18,6 +18,7 @@ import {
     StreamPreConnectEvent,
     StreamReconnectEvent,
     StreamPreDisconnectEvent,
+    StreamWarningEvent,
     VideoEncoderAvgQPEvent,
     VideoInitializedEvent,
     WebRtcAutoConnectEvent,
@@ -533,6 +534,30 @@ export class PixelStreaming {
         this._eventEmitter.dispatchEvent(
             new StatsReceivedEvent({ aggregatedStats: videoStats })
         );
+
+        // Get the local candidate from the candidate pair
+        let localSelectedCandidate = videoStats.localCandidates.find((candid) => {
+            return candid.id == videoStats.candidatePair.localCandidateId
+        })
+
+        // Check if the local candidate is relaying over TCP
+        if (localSelectedCandidate.candidateType == 'relay' && localSelectedCandidate.relayProtocol == 'tcp'){
+            
+            // Send a warning to the logger informing the user the stream will be severely degraded 
+            Logger.Warning(
+                Logger.GetStackTrace(),
+                `Stream quality severely degraded, local connection is relayed over TCP due to the local network environment.`
+            );
+            
+            // Emit a stream warning event
+            this._eventEmitter.dispatchEvent(
+                new StreamWarningEvent({ 
+                    candidateType: localSelectedCandidate.candidateType,
+                    protocol: localSelectedCandidate.protocol,
+                    relayProtocol: localSelectedCandidate.relayProtocol,
+                })
+            );
+        }
     }
 
     /**
