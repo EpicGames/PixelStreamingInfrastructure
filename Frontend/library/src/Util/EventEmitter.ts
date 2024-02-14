@@ -537,6 +537,23 @@ export class PlayerCountEvent extends Event {
     }
 }
 
+/**
+ * An event that is emitted when the stream quality is degraded due to local network environment.
+ */
+export class StreamWarningEvent extends Event {
+    readonly type: 'streamWarning';
+    readonly data: {
+        /** stream warning event */
+        protocol: 'tcp' | 'udp'
+        relayProtocol: 'tcp' | 'udp' | 'tls'
+        candidateType: string
+    };
+    constructor(data: StreamWarningEvent['data']) {
+        super('streamWarning');
+        this.data = data;
+    }
+}
+
 export type PixelStreamingEvent =
     | AfkWarningActivateEvent
     | AfkWarningUpdateEvent
@@ -557,6 +574,7 @@ export type PixelStreamingEvent =
     | StreamPreConnectEvent
     | StreamReconnectEvent
     | StreamPreDisconnectEvent
+    | StreamWarningEvent    
     | PlayStreamErrorEvent
     | PlayStreamEvent
     | PlayStreamRejectedEvent
