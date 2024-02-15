@@ -318,14 +318,17 @@ export class StatsPanel {
             );
         }
 
+        // Store the active candidate pair
+        let activeCandidatePair = stats.getActiveCandidatePair();
+
         // RTT
         const netRTT =
             Object.prototype.hasOwnProperty.call(
-                stats.getActiveCandidatePair(),
+                activeCandidatePair,
                 'currentRoundTripTime'
-            ) && stats.isNumber(stats.getActiveCandidatePair().currentRoundTripTime)
+            ) && stats.isNumber(activeCandidatePair.currentRoundTripTime)
                 ? numberFormat.format(
-                      stats.getActiveCandidatePair().currentRoundTripTime * 1000
+                    activeCandidatePair.currentRoundTripTime * 1000
                   )
                 : "Can't calculate";
         this.addOrUpdateStat('RTTStat', 'Net RTT (ms)', netRTT);
