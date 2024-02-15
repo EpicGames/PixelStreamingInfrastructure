@@ -538,19 +538,12 @@ export class PlayerCountEvent extends Event {
 }
 
 /**
- * An event that is emitted when the stream quality is degraded due to local network environment.
+ * An event that is emitted when the webRTC connections is relayed over TCP.
  */
-export class StreamWarningEvent extends Event {
-    readonly type: 'streamWarning';
-    readonly data: {
-        /** stream warning event */
-        protocol: 'tcp' | 'udp'
-        relayProtocol: 'tcp' | 'udp' | 'tls'
-        candidateType: string
-    };
-    constructor(data: StreamWarningEvent['data']) {
-        super('streamWarning');
-        this.data = data;
+export class WebRtcTCPRelayDetectedEvent extends Event {
+    readonly type: 'webRtcTCPRelayDetected';
+    constructor() {
+        super('webRtcTCPRelayDetected');
     }
 }
 
@@ -574,7 +567,6 @@ export type PixelStreamingEvent =
     | StreamPreConnectEvent
     | StreamReconnectEvent
     | StreamPreDisconnectEvent
-    | StreamWarningEvent    
     | PlayStreamErrorEvent
     | PlayStreamEvent
     | PlayStreamRejectedEvent
@@ -591,7 +583,8 @@ export type PixelStreamingEvent =
     | XrSessionStartedEvent
     | XrSessionEndedEvent
     | XrFrameEvent
-    | PlayerCountEvent;
+    | PlayerCountEvent
+    | WebRtcTCPRelayDetectedEvent;
 
 export class EventEmitter extends EventTarget {
     /**
