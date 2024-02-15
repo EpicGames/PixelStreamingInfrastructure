@@ -25,7 +25,7 @@ export class AggregatedStats {
     inboundAudioStats: InboundAudioStats;
     lastVideoStats: InboundVideoStats;
     lastAudioStats: InboundAudioStats;
-    candidatePair: CandidatePairStats;
+    candidatePairs: Array<CandidatePairStats>;
     DataChannelStats: DataChannelStats;
     localCandidates: Array<CandidateStat>;
     remoteCandidates: Array<CandidateStat>;
@@ -37,7 +37,6 @@ export class AggregatedStats {
     constructor() {
         this.inboundVideoStats = new InboundVideoStats();
         this.inboundAudioStats = new InboundAudioStats();
-        this.candidatePair = new CandidatePairStats();
         this.DataChannelStats = new DataChannelStats();
         this.outBoundVideoStats = new OutBoundVideoStats();
         this.sessionStats = new SessionStats();
@@ -52,6 +51,7 @@ export class AggregatedStats {
     processStats(rtcStatsReport: RTCStatsReport) {
         this.localCandidates = new Array<CandidateStat>();
         this.remoteCandidates = new Array<CandidateStat>();
+        this.candidatePairs = new Array<CandidatePairStats>();
 
         rtcStatsReport.forEach((stat) => {
             const type: RTCStatsTypePS = stat.type;
@@ -120,10 +120,10 @@ export class AggregatedStats {
      * @param stat - the stats coming in from ice candidates
      */
     handleCandidatePair(stat: CandidatePairStats) {
-        // If the candidate pair has received bytes then set as the candidate pair
-        if (stat.bytesReceived > 0){
-            this.candidatePair = stat;
-        }
+
+        // Add the candidate pair to the candidate pair array
+        this.candidatePairs.push(stat)
+
     }
 
     /**
@@ -306,4 +306,17 @@ export class AggregatedStats {
     isNumber(value: unknown): boolean {
         return typeof value === 'number' && isFinite(value);
     }
+
+    /**
+     * Helper function to return the active candidate pair
+     * @returns The candidate pair that is currently receiving data
+     */
+    public getActiveCandidatePair(): CandidatePairStats | null {
+        this.candidatePairs.forEach((candidatePair) => {
+            if (candidatePair.bytesReceived >0) {
+                return candidatePair
+            }
+        })
+        return null
+    }  
 }
