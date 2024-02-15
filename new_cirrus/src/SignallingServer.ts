@@ -13,7 +13,7 @@ import { Messages, MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon
  * An interface describing the possible options to pass when creating
  * a new SignallingServer object.
  */
-interface IConfig {
+export interface IServerConfig {
 	// An http server to use for player connections rather than a port. Not needed if playerPort supplied.
 	httpServer?: any;
 
@@ -45,11 +45,11 @@ interface IConfig {
  * to listen for incoming connections.
  */
 export class SignallingServer {
-	private config: IConfig;
+	private config: IServerConfig;
 	streamerRegistry: StreamerRegistry;
 	playerRegistry: PlayerRegistry;
 
-	constructor(config: IConfig) {
+	constructor(config: IServerConfig) {
 		Logger.debug('Started SignallingServer with config: %s', config);
 
 		this.config = config;
@@ -67,9 +67,12 @@ export class SignallingServer {
 		Logger.info(`Listening for streamer connections on port ${config.streamerPort}`);
 
 		// Player connections
-		const playerServer = new WebSocket.Server({ server: config.httpServer, port: config.playerPort, ...config.playerWsOptions });
+		const playerServer = new WebSocket.Server({
+			server: config.httpServer,
+			port: config.httpServer ? undefined : config.playerPort,
+			...config.playerWsOptions });
 		playerServer.on('connection', this.onPlayerConnected.bind(this));
-		if (config.playerPort) {
+		if (!config.httpServer) {
 			Logger.info(`Listening for player connections on port ${config.playerPort}`);
 		}
 

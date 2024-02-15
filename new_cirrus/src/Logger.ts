@@ -1,3 +1,4 @@
+import { stringify, beautify } from './Utils';
 const winston = require('winston');
 require('winston-daily-rotate-file');
 const path = require('path');
@@ -15,7 +16,7 @@ interface IConfig {
     logDir?: string;
 
     // if true, every message will be logged to the console in a condensed form
-    logMessagesToConsole?: boolean;
+    logMessagesToConsole?: string;
 
     // the minimum log level for console messages
     logLevelConsole?: string;
@@ -33,7 +34,7 @@ export function InitLogging(config: IConfig): void {
     const logDir = config.logDir || 'logs';
     const logLevelConsole = config.logLevelConsole || 'info';
     const logLevelFile = config.logLevelFile || 'info';
-    logMessagesToConsole = config.logMessagesToConsole || false;
+    logMessagesToConsole = config.logMessagesToConsole || 'none';
 
     Logger = winston.createLogger({
         transports: [
@@ -43,7 +44,7 @@ export function InitLogging(config: IConfig): void {
     });
 }
 
-let logMessagesToConsole = false;
+let logMessagesToConsole = 'none';
 
 function createDefaultLogger() {
     return winston.createLogger({
@@ -74,9 +75,9 @@ function createConsoleFormat() {
         } else if (logObj.message.event && logObj.message.event == 'proto_message') {
             const { direction, receiver, sender, target, protoMessage } = logObj.message;
             switch (direction) {
-            case 'incoming': return prefix + `> ${receiver} :: [${protoMessage.type}]`;
-            case 'outgoing': return prefix + `< ${sender} :: [${protoMessage.type}]`;
-            case 'forward': return prefix + `${receiver} > ${target} :: [${protoMessage.type}]`;
+            case 'incoming': return prefix + `> ${receiver} :: ${formatMessageForConsole(protoMessage)}`;
+            case 'outgoing': return prefix + `< ${sender} :: ${formatMessageForConsole(protoMessage)}`;
+            case 'forward': return prefix + `${receiver} > ${target} :: ${formatMessageForConsole(protoMessage)}`;
             default: return prefix + `Unknown proto direction: ${direction}`;
             }
         }
@@ -84,11 +85,19 @@ function createConsoleFormat() {
     });
 }
 
+function formatMessageForConsole(message: any) {
+    switch (logMessagesToConsole) {
+    case 'verbose': return stringify(message);
+    case 'formatted': return beautify(message);
+    default: return `[${message.type}]`;
+    }
+}
+
 function createProtoMessageFilter() {
     return winston.format((info: any, opts: any) => {
         if (typeof info.message !== 'string'
             && info.message.event == 'proto_message'
-            && !logMessagesToConsole) {
+            && logMessagesToConsole == 'none') {
             return false;
         }
         return info;

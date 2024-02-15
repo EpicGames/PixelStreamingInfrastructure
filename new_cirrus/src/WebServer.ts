@@ -32,34 +32,22 @@ export class WebServer {
 
 		const httpPort = config.port || 80;
 		const serveRoot = config.root || '.';
-		const homepageFile = config.homepageFile || 'player.html';
+		const homepageFile = config.homepageFile || 'index.html';
 
 		server.listen(httpPort, function () {
 			Logger.info(`Http server listening on port ${httpPort}`);
 		});
 
-		app.use(express.static(path.join(serveRoot, '/Public')));
-		app.use('/images', express.static(path.join(serveRoot, './images')));
-		app.use('/scripts', express.static(path.join(serveRoot, '/scripts')));
-		app.use('/', express.static(path.join(serveRoot, '/custom_html')));
-
-		const pathsToTry = [
-			path.join(serveRoot, homepageFile),
-			path.join(serveRoot, '/Public', homepageFile),
-			path.join(serveRoot, '/custom_html', homepageFile),
-			homepageFile
-		];
+		app.use(express.static(serveRoot));
 
 		// Request has been sent to site root, send the homepage file
 		app.get('/', function (req: any, res: any) {
 			// Try a few paths, see if any resolve to a homepage file the user has set
-			for (let pathToTry of pathsToTry) {
-				const p = path.resolve(pathToTry);
-				if (fs.existsSync(p)) {
-					// Send the file for browser to display it
-					res.sendFile(p);
-					return;
-				}
+			const p = path.resolve(path.join(serveRoot, homepageFile));
+			if (fs.existsSync(p)) {
+				// Send the file for browser to display it
+				res.sendFile(p);
+				return;
 			}
 
 			// Catch file doesn't exist, and send back 404 if not
