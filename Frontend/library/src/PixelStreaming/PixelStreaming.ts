@@ -18,7 +18,6 @@ import {
     StreamPreConnectEvent,
     StreamReconnectEvent,
     StreamPreDisconnectEvent,
-    StreamWarningEvent,
     VideoEncoderAvgQPEvent,
     VideoInitializedEvent,
     WebRtcAutoConnectEvent,
@@ -29,7 +28,8 @@ import {
     WebRtcSdpEvent,
     DataChannelLatencyTestResponseEvent,
     DataChannelLatencyTestResultEvent,
-    PlayerCountEvent
+    PlayerCountEvent,
+    WebRtcTCPRelayDetectedEvent
 } from '../Util/EventEmitter';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
@@ -80,6 +80,9 @@ export class PixelStreaming {
 
     private _eventEmitter: EventEmitter;
 
+    private _webRtcTCPRelayDetectedCheck: boolean;
+
+
     /**
      * @param config - A newly instantiated config object
      * @param overrides - Parameters to override default behaviour
@@ -87,6 +90,7 @@ export class PixelStreaming {
      */
     constructor(config: Config, overrides?: PixelStreamingOverrides) {
         this.config = config;
+        this._webRtcTCPRelayDetectedCheck = false;
 
         if (overrides?.videoElementParent) {
             this._videoElementParent = overrides.videoElementParent;
@@ -535,28 +539,28 @@ export class PixelStreaming {
             new StatsReceivedEvent({ aggregatedStats: videoStats })
         );
 
-        // Get the local candidate from the candidate pair
-        let localSelectedCandidate = videoStats.localCandidates.find((candid) => {
-            return candid.id == videoStats.candidatePair.localCandidateId
-        })
-
-        // Check if the local candidate is relaying over TCP
-        if (localSelectedCandidate.candidateType == 'relay' && localSelectedCandidate.relayProtocol == 'tcp'){
+        // Check if the web rtc rely detected check has completed
+        if (!this._webRtcTCPRelayDetectedCheck){
             
-            // Send a warning to the logger informing the user the stream will be severely degraded 
-            Logger.Warning(
-                Logger.GetStackTrace(),
-                `Stream quality severely degraded, local connection is relayed over TCP due to the local network environment.`
-            );
+            // Get the active candidate pair
+            let activeCandidatePair = videoStats.getActiveCandidatePair();
             
-            // Emit a stream warning event
-            this._eventEmitter.dispatchEvent(
-                new StreamWarningEvent({ 
-                    candidateType: localSelectedCandidate.candidateType,
-                    protocol: localSelectedCandidate.protocol,
-                    relayProtocol: localSelectedCandidate.relayProtocol,
-                })
-            );
+            // Check if the active candidate pair is not null
+            if (activeCandidatePair != null){
+                
+                // Get the local candidate assigned to the active candidate pair
+                let localCandidate = videoStats.localCandidates.find((candidate) => candidate.id == activeCandidatePair.localCandidateId,null)
+                
+                // Check if the local candidate is not null, candidate type is relay and the relay protocol is tcp
+                if (localCandidate != null && localCandidate.candidateType == 'relay' && localCandidate.relayProtocol == 'tcp'){
+                    
+                    // Send the web rtc tcp relay detected Evebt
+                    this._eventEmitter.dispatchEvent(new WebRtcTCPRelayDetectedEvent());
+                }
+                
+                // set the web rtc tcp relay detected check to true
+                this._webRtcTCPRelayDetectedCheck = true;
+           }          
         }
     }
 
