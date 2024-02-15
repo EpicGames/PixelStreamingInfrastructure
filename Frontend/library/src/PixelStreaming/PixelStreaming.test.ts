@@ -398,9 +398,9 @@ describe('PixelStreaming', () => {
             expect.objectContaining({
                 data: {
                     aggregatedStats: expect.objectContaining({
-                        candidatePair: expect.objectContaining({
-                            bytesReceived: 123
-                        }),
+                        candidatePairs: [
+                            expect.objectContaining({ bytesReceived: 123 })
+                        ],
                         localCandidates: [
                             expect.objectContaining({ address: 'mock-address' })
                         ]
