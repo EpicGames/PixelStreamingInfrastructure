@@ -378,6 +378,14 @@ export class Application {
             ({ data: { count }}) => 
                 this.onPlayerCount(count)
         );
+        this.stream.addEventListener(
+            'webRtcTCPRelayDetected', 
+            ({}) => 
+                Logger.Warning(
+                    Logger.GetStackTrace(),
+                    `Stream quailty degraded due to network enviroment, stream is relayed over TCP.`
+               )
+        );
     }
 
     /**
