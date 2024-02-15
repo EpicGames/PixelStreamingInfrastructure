@@ -312,11 +312,6 @@ export class AggregatedStats {
      * @returns The candidate pair that is currently receiving data
      */
     public getActiveCandidatePair(): CandidatePairStats | null {
-        this.candidatePairs.forEach((candidatePair) => {
-            if (candidatePair.bytesReceived >0) {
-                return candidatePair
-            }
-        })
-        return null
+        return this.candidatePairs.find((candidatePair) => candidatePair.bytesReceived > 0, null)
     }  
 }
