@@ -7,7 +7,7 @@ import { SFUConnection } from './SFUConnection';
 import { Logger } from './Logger';
 import { StreamerRegistry } from './StreamerRegistry';
 import { PlayerRegistry } from './PlayerRegistry';
-import { Messages, MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
+import { Messages, MessageHelpers, SignallingProtocol } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 
 /**
  * An interface describing the possible options to pass when creating
@@ -26,8 +26,8 @@ export interface IServerConfig {
 	// The port to listen on for SFU connections. If not supplied SFU connections will be disabled.
 	sfuPort?: number;
 
-	// The peer configuration object to send to peers when they connect.
-	clientConfig: any;
+	// The peer configuration object to send to peers in the config message when they connect.
+	peerOptions: any;
 
 	// Additional websocket options for the streamer listening websocket.
 	streamerWsOptions?: any;
@@ -46,6 +46,7 @@ export interface IServerConfig {
  */
 export class SignallingServer {
 	private config: IServerConfig;
+	private protocolConfig: any;
 	streamerRegistry: StreamerRegistry;
 	playerRegistry: PlayerRegistry;
 
@@ -55,6 +56,10 @@ export class SignallingServer {
 		this.config = config;
 		this.streamerRegistry = new StreamerRegistry();
 		this.playerRegistry = new PlayerRegistry();
+		this.protocolConfig = {
+			protocolVersion: SignallingProtocol.SIGNALLING_VERSION,
+			peerConnectionOptions: this.config.peerOptions || {}
+		};
 
 		if (!config.playerPort && !config.httpServer) {
 			Logger.error('No player port or http server supplied to SignallingServer.');
@@ -93,7 +98,7 @@ export class SignallingServer {
 		this.streamerRegistry.add(newStreamer);
 		newStreamer.transport.on('close', () => { this.streamerRegistry.remove(newStreamer); });
 
-		newStreamer.sendMessage(MessageHelpers.createMessage(Messages.config, this.config.clientConfig));
+		newStreamer.sendMessage(MessageHelpers.createMessage(Messages.config, this.protocolConfig));
 	}
 
 	private onPlayerConnected(ws: WebSocket, request: any) {
@@ -111,7 +116,7 @@ export class SignallingServer {
 		this.playerRegistry.add(newPlayer);
 		newPlayer.transport.on('close', () => { this.playerRegistry.remove(newPlayer); });
 
-		newPlayer.sendMessage(MessageHelpers.createMessage(Messages.config, this.config.clientConfig));
+		newPlayer.sendMessage(MessageHelpers.createMessage(Messages.config, this.protocolConfig));
 	}
 
 	private onSFUConnected(ws: WebSocket, request: any) {
@@ -126,7 +131,6 @@ export class SignallingServer {
 			this.playerRegistry.remove(newSFU);
 		});
 
-		newSFU.sendMessage(MessageHelpers.createMessage(Messages.config, this.config.clientConfig));
-
+		newSFU.sendMessage(MessageHelpers.createMessage(Messages.config, this.protocolConfig));
 	}
 }

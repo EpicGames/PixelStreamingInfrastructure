@@ -9,52 +9,31 @@ import * as MessageHelpers from '../Messages/message_helpers';
 
 /**
  * Signalling protocol for handling messages from the signalling server.
+ * 
+ * Listen on this emitter for messages. Message type is the name of the event to listen for.
+ * Example:
+ *      signallingProtocol.on('config', (message: Messages.config) => console.log(`Got a config message: ${message}`)));
+ * 
+ * The transport in this class will also emit on message events.
+ * 
+ * Events emitted on transport:
+ *   message:
+ *      Emitted any time a message is received by the transport. Listen on this if
+ *      you wish to capture all messages, rather than specific messages on
+ *      'messageHandlers'.
+ * 
+ *   out:
+ *      Emitted when sending a message out on the transport. Similar to 'message' but
+ *      only for when messages are sent from this endpoint. Useful for debugging.
  */
 export class SignallingProtocol extends EventEmitter {
-    private transport: ITransport;
+    static get SIGNALLING_VERSION(): string { return '1.0'; }
 
-    /**
-     * Listen on this emitter for transport events.
-     * 
-     * Events emitted:
-     *   open:
-     *      Emitted when the transport connection opens and is ready to handle messages.
-     * 
-     *   error:
-     *      Emitted when there is an error on the transport has an error and must close.
-     * 
-     *   close:
-     *      Emitted when the transport connection closes and can no longer send or
-     *      receive messages. Will also be emitted after an error.
-     * 
-     *   message:
-     *      Emitted any time a message is received by the transport. Listen on this if
-     *      you wish to capture all messages, rather than specific messages on
-     *      'messageHandlers'.
-     * 
-     *   out:
-     *      Emitted when sending a message out on the transport. Similar to 'message' but
-     *      only for when messages are sent from this endpoint. Useful for debugging.
-     */
-    //transportEvents: EventEmitter;
-
-    /**
-     * Listen on this emitter for messages. Message type is the name of the event to listen for.
-     * 
-     * Example:
-     *      messageHandlers.addListener('config', (message: Messages.config) => console.log(`Got a config message: ${message}`)));
-     */
-    //messageHandlers: EventEmitter;
+    transport: ITransport;
 
     constructor(transport: ITransport) {
         super();
         this.transport = transport;
-        //this.transportEvents = new EventEmitter();
-        //this.messageHandlers = new EventEmitter();
-
-        // transport.on('open', (event: Event) => transport.emit('open', event));
-        // transport.on('error', (event: Event) => transport.emit('error', event));
-        // transport.on('close', (event: CloseEvent) => transport.emit('close', event));
 
         transport.onMessage = (msg: BaseMessage) => {
             // auto handle ping messages

@@ -8,12 +8,12 @@ import RateLimit from 'express-rate-limit';
  * An interface that describes the possible options to pass to
  * WebServer.
  */
-interface IWebServerConfig {
+export interface IWebServerConfig {
 	// The port to run the webserver on. 80 by default.
-	port?: number;
+	port: number;
 
 	// The root of the serve directory. Current working directory by default.
-	root?: string;
+	root: string;
 
 	// The filename to direct connections to if none suppllied in the url. player.html by default.
 	homepageFile: string;
@@ -30,9 +30,9 @@ export class WebServer {
 	constructor(app: any, server: any, config: IWebServerConfig) {
 		Logger.debug('Starting WebServer with config: %s', config);
 
-		const httpPort = config.port || 80;
-		const serveRoot = config.root || '.';
-		const homepageFile = config.homepageFile || 'index.html';
+		const httpPort = config.port;
+		const serveRoot = config.root;
+		const homepageFile = config.homepageFile;
 
 		server.listen(httpPort, function () {
 			Logger.info(`Http server listening on port ${httpPort}`);

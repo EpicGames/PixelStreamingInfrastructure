@@ -4,11 +4,13 @@ import { SignallingServer, IServerConfig } from './SignallingServer';
 import { WebServer } from './WebServer';
 import { InitLogging, Logger } from './Logger';
 import { Command, Option } from 'commander';
+const pjson = require('../package.json');
 
 const program = new Command();
 program
-    .description("Cirrus 2 - Electric boogaloo.\nThe new hotness in pixel streaming signalling")
-    .version("9000.1");
+    .name(pjson.name)
+    .description(pjson.description)
+    .version(pjson.version);
 
 program
     .option('--log_folder <path>', 'Sets the path for the log files.', 'logs')
@@ -26,8 +28,8 @@ program
     .option('--sfu_port <port>', 'Sets the listening port for SFU connections.', '8889')
     .addOption(new Option('--serve', 'Enables the webserver on player_port.'))
     .option('--http_root <path>', 'Sets the path for the webserver root.', 'www')
-    .option('--homepage <filename>', 'The default html file to serve on the web server.', 'player.html')
-    .addOption(new Option('--client_config <json-string>', 'Additional JSON data to send to connecting peers.')
+    .option('--homepage <filename>', 'The default html file to serve on the web server.', 'index.html')
+    .addOption(new Option('--peer_options <json-string>', 'Additional JSON data to send in peerConnectionOptions of the config message.')
         .argParser(JSON.parse))
     .helpOption('-h, --help', 'Display this help text.')
     .parse();
@@ -41,13 +43,15 @@ InitLogging({
     logLevelFile: options.log_level_file,
 });
 
+Logger.info(`${pjson.name} v${pjson.version} starting...`);
+
 const app = express();
 
 const serverOpts: IServerConfig = {
     streamerPort: options.streamer_port,
     playerPort: options.player_port,
     sfuPort: options.sfu_port,
-    clientConfig: options.client_config
+    peerOptions: options.peer_options
 }
 
 if (options.serve) {
