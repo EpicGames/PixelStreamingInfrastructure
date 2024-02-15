@@ -321,11 +321,11 @@ export class StatsPanel {
         // RTT
         const netRTT =
             Object.prototype.hasOwnProperty.call(
-                stats.candidatePair,
+                stats.getActiveCandidatePair(),
                 'currentRoundTripTime'
-            ) && stats.isNumber(stats.candidatePair.currentRoundTripTime)
+            ) && stats.isNumber(stats.getActiveCandidatePair().currentRoundTripTime)
                 ? numberFormat.format(
-                      stats.candidatePair.currentRoundTripTime * 1000
+                      stats.getActiveCandidatePair().currentRoundTripTime * 1000
                   )
                 : "Can't calculate";
         this.addOrUpdateStat('RTTStat', 'Net RTT (ms)', netRTT);
