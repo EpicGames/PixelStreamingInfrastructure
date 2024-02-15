@@ -80,9 +80,6 @@ export class PixelStreaming {
 
     private _eventEmitter: EventEmitter;
 
-    private _webRtcTCPRelayDetectedCheck: boolean;
-
-
     /**
      * @param config - A newly instantiated config object
      * @param overrides - Parameters to override default behaviour
@@ -90,7 +87,6 @@ export class PixelStreaming {
      */
     constructor(config: Config, overrides?: PixelStreamingOverrides) {
         this.config = config;
-        this._webRtcTCPRelayDetectedCheck = false;
 
         if (overrides?.videoElementParent) {
             this._videoElementParent = overrides.videoElementParent;
@@ -121,7 +117,39 @@ export class PixelStreaming {
             this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
 
         this._webXrController = new WebXRController(this._webRtcController);
+
+        // Add event listener for the webRtcConnected event
+        this._eventEmitter.addEventListener("webRtcConnected", (webRtcConnectedEvent: WebRtcConnectedEvent) => {
+            
+            // Create a function to handle the web rtc tcp detect check the stats received event
+            let webRTCTCPdetectCheck = (statsReceivedEvent: StatsReceivedEvent) => {
+      
+                // Get the active candidate pair
+                let activeCandidatePair = statsReceivedEvent.data.aggregatedStats.getActiveCandidatePair();
+        
+                // Check if the active candidate pair is not null
+                if (activeCandidatePair != null) {
+        
+                    // Get the local candidate assigned to the active candidate pair
+                    let localCandidate = statsReceivedEvent.data.aggregatedStats.localCandidates.find((candidate) => candidate.id == activeCandidatePair.localCandidateId, null)
+        
+                    // Check if the local candidate is not null, candidate type is relay and the relay protocol is tcp
+                    if (localCandidate != null && localCandidate.candidateType == 'relay' && localCandidate.relayProtocol == 'tcp') {
+        
+                        // Send the web rtc tcp relay detected Evebt
+                        this._eventEmitter.dispatchEvent(new WebRtcTCPRelayDetectedEvent());
+                    }
+                    // The check is completed and the stats listen event can be removed
+                    this._eventEmitter.removeEventListener("statsReceived", webRTCTCPdetectCheck);
+                }
+            }
+
+            // Bind to the stats received event
+            this._eventEmitter.addEventListener("statsReceived", webRTCTCPdetectCheck);
+        });
     }
+
+
 
     /**
      * Gets the element that contains the video stream element.
@@ -538,30 +566,6 @@ export class PixelStreaming {
         this._eventEmitter.dispatchEvent(
             new StatsReceivedEvent({ aggregatedStats: videoStats })
         );
-
-        // Check if the web rtc rely detected check has completed
-        if (!this._webRtcTCPRelayDetectedCheck){
-            
-            // Get the active candidate pair
-            let activeCandidatePair = videoStats.getActiveCandidatePair();
-            
-            // Check if the active candidate pair is not null
-            if (activeCandidatePair != null){
-                
-                // Get the local candidate assigned to the active candidate pair
-                let localCandidate = videoStats.localCandidates.find((candidate) => candidate.id == activeCandidatePair.localCandidateId,null)
-                
-                // Check if the local candidate is not null, candidate type is relay and the relay protocol is tcp
-                if (localCandidate != null && localCandidate.candidateType == 'relay' && localCandidate.relayProtocol == 'tcp'){
-                    
-                    // Send the web rtc tcp relay detected Evebt
-                    this._eventEmitter.dispatchEvent(new WebRtcTCPRelayDetectedEvent());
-                }
-                
-                // set the web rtc tcp relay detected check to true
-                this._webRtcTCPRelayDetectedCheck = true;
-           }          
-        }
     }
 
     /**
