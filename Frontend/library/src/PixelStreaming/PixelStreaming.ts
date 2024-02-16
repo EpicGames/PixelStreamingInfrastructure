@@ -119,17 +119,18 @@ export class PixelStreaming {
 
         this._webXrController = new WebXRController(this._webRtcController);
 
-        this._setupWebRtcTCPRelayDetection = this._setupWebRtcTCPRelayDetection.bind(this)
-
         // Add event listener for the webRtcConnected event
         this._eventEmitter.addEventListener("webRtcConnected", (webRtcConnectedEvent: WebRtcConnectedEvent) => {
 
             // Bind to the stats received event
-            this._eventEmitter.addEventListener("statsReceived", this._setupWebRtcTCPRelayDetection);
-
+            this._eventEmitter.addEventListener("statsReceived",  (statsReceivedEvent: StatsReceivedEvent) => { this._setupWebRtcTCPRelayDetection(statsReceivedEvent)});
         });
     }
 
+
+    
+
+    
     /**
      * Gets the element that contains the video stream element.
      */
@@ -657,7 +658,7 @@ export class PixelStreaming {
                 this._eventEmitter.dispatchEvent(new WebRtcTCPRelayDetectedEvent());
             }
             // The check is completed and the stats listen event can be removed
-            this._eventEmitter.removeEventListener("statsReceived", this._setupWebRtcTCPRelayDetection);
+            this._eventEmitter.removeEventListener("statsReceived",  (statsReceivedEvent: StatsReceivedEvent) => { this._setupWebRtcTCPRelayDetection(statsReceivedEvent)});
         }
     }
 
