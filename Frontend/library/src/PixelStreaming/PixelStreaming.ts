@@ -127,10 +127,6 @@ export class PixelStreaming {
         });
     }
 
-
-    
-
-    
     /**
      * Gets the element that contains the video stream element.
      */
