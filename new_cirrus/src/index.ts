@@ -4,7 +4,20 @@ import { SignallingServer, IServerConfig } from './SignallingServer';
 import { WebServer } from './WebServer';
 import { InitLogging, Logger } from './Logger';
 import { Command, Option } from 'commander';
+import { initInputHandler } from './InputHandler';
+import { stringify, beautify } from './Utils';
+
+const fs = require("fs");
 const pjson = require('../package.json');
+
+// read any config file
+let config_file: any = {};
+try {
+    let configData = fs.readFileSync('config_file.json', 'UTF8');
+    config_file = JSON.parse(configData);
+} catch(error) {
+    console.log(error);
+}
 
 const program = new Command();
 program
@@ -31,10 +44,21 @@ program
     .option('--homepage <filename>', 'The default html file to serve on the web server.', 'index.html')
     .addOption(new Option('--peer_options <json-string>', 'Additional JSON data to send in peerConnectionOptions of the config message.')
         .argParser(JSON.parse))
+    .option('--log_config', 'Will print the program configuration on startup.')
+    .option('--stdin', 'Allows stdin input while running.')
+    .option('--no_save', 'On startup the given configuration is resaved out to config.json. This switch will prevent this behaviour allowing the config.json file to remain untouched while running with new configurations.')
     .helpOption('-h, --help', 'Display this help text.')
     .parse();
 
-const options = program.opts();
+const cli_options = program.opts();
+const options = { ...config_file, ...cli_options };
+
+if (!options.no_save) {
+    // save out the config file with the current settings
+    fs.writeFile('config_file.json', beautify(options), (error: any) => {
+        if (error) throw error;
+    });
+}
 
 InitLogging({
     logDir: options.log_folder,
@@ -44,6 +68,9 @@ InitLogging({
 });
 
 Logger.info(`${pjson.name} v${pjson.version} starting...`);
+if (options.log_config) {
+    Logger.info(`Config: ${stringify(options)}`);
+}
 
 const app = express();
 
@@ -65,3 +92,7 @@ if (options.serve) {
 }
 
 const signallingServer = new SignallingServer(serverOpts);
+
+if (options.stdin) {
+    initInputHandler(options, signallingServer);
+}

@@ -76,6 +76,10 @@ export class PlayerRegistry extends EventEmitter {
 		return this.players.get(playerId);
 	}
 
+	getPlayerIds(): string[] {
+		return Array.from(this.players.keys());
+	}
+
 	private getUniquePlayerId(): string {
 		const newPlayerId = `Player${this.nextPlayerId}`;
 		this.nextPlayerId++;
