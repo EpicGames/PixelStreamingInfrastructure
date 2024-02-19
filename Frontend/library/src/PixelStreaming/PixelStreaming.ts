@@ -123,7 +123,7 @@ export class PixelStreaming {
         this._eventEmitter.addEventListener("webRtcConnected", (webRtcConnectedEvent: WebRtcConnectedEvent) => {
 
             // Bind to the stats received event
-            this._eventEmitter.addEventListener("statsReceived",  (statsReceivedEvent: StatsReceivedEvent) => { this._setupWebRtcTCPRelayDetection(statsReceivedEvent)});
+            this._eventEmitter.addEventListener("statsReceived",  this._setupWebRtcTCPRelayDetection.bind(this));
         });
     }
 
@@ -654,7 +654,7 @@ export class PixelStreaming {
                 this._eventEmitter.dispatchEvent(new WebRtcTCPRelayDetectedEvent());
             }
             // The check is completed and the stats listen event can be removed
-            this._eventEmitter.removeEventListener("statsReceived",  (statsReceivedEvent: StatsReceivedEvent) => { this._setupWebRtcTCPRelayDetection(statsReceivedEvent)});
+            this._eventEmitter.removeEventListener("statsReceived", this._setupWebRtcTCPRelayDetection);
         }
     }
 
