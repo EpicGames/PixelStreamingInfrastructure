@@ -537,6 +537,16 @@ export class PlayerCountEvent extends Event {
     }
 }
 
+/**
+ * An event that is emitted when the webRTC connections is relayed over TCP.
+ */
+export class WebRtcTCPRelayDetectedEvent extends Event {
+    readonly type: 'webRtcTCPRelayDetected';
+    constructor() {
+        super('webRtcTCPRelayDetected');
+    }
+}
+
 export type PixelStreamingEvent =
     | AfkWarningActivateEvent
     | AfkWarningUpdateEvent
@@ -573,7 +583,8 @@ export type PixelStreamingEvent =
     | XrSessionStartedEvent
     | XrSessionEndedEvent
     | XrFrameEvent
-    | PlayerCountEvent;
+    | PlayerCountEvent
+    | WebRtcTCPRelayDetectedEvent;
 
 export class EventEmitter extends EventTarget {
     /**

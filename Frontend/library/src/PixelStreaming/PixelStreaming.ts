@@ -28,7 +28,8 @@ import {
     WebRtcSdpEvent,
     DataChannelLatencyTestResponseEvent,
     DataChannelLatencyTestResultEvent,
-    PlayerCountEvent
+    PlayerCountEvent,
+    WebRtcTCPRelayDetectedEvent
 } from '../Util/EventEmitter';
 import { MessageOnScreenKeyboard } from '../WebSockets/MessageReceive';
 import { WebXRController } from '../WebXR/WebXRController';
@@ -62,6 +63,7 @@ export class PixelStreaming {
     protected _webRtcController: WebRtcPlayerController;
     protected _webXrController: WebXRController;
     protected _dataChannelLatencyTestController: DataChannelLatencyTestController;
+
     /**
      * Configuration object. You can read or modify config through this object. Whenever
      * the configuration is changed, the library will emit a `settingsChanged` event.
@@ -116,6 +118,13 @@ export class PixelStreaming {
             this.onScreenKeyboardHelper.showOnScreenKeyboard(command);
 
         this._webXrController = new WebXRController(this._webRtcController);
+
+        // Add event listener for the webRtcConnected event
+        this._eventEmitter.addEventListener("webRtcConnected", (webRtcConnectedEvent: WebRtcConnectedEvent) => {
+
+            // Bind to the stats received event
+            this._eventEmitter.addEventListener("statsReceived",  this._setupWebRtcTCPRelayDetection.bind(this));
+        });
     }
 
     /**
@@ -625,6 +634,28 @@ export class PixelStreaming {
         this._eventEmitter.dispatchEvent(
             new PlayerCountEvent({ count: playerCount })
         );
+    }
+
+    // Sets up to emit the webrtc tcp relay detect event 
+    _setupWebRtcTCPRelayDetection(statsReceivedEvent: StatsReceivedEvent) {
+        // Get the active candidate pair
+        let activeCandidatePair = statsReceivedEvent.data.aggregatedStats.getActiveCandidatePair();
+                
+        // Check if the active candidate pair is not null
+        if (activeCandidatePair != null) {
+
+            // Get the local candidate assigned to the active candidate pair
+            let localCandidate = statsReceivedEvent.data.aggregatedStats.localCandidates.find((candidate) => candidate.id == activeCandidatePair.localCandidateId, null)
+
+            // Check if the local candidate is not null, candidate type is relay and the relay protocol is tcp
+            if (localCandidate != null && localCandidate.candidateType == 'relay' && localCandidate.relayProtocol == 'tcp') {
+
+                // Send the web rtc tcp relay detected event
+                this._eventEmitter.dispatchEvent(new WebRtcTCPRelayDetectedEvent());
+            }
+            // The check is completed and the stats listen event can be removed
+            this._eventEmitter.removeEventListener("statsReceived", this._setupWebRtcTCPRelayDetection);
+        }
     }
 
     /**

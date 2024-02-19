@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { LatencyTest } from './LatencyTest';
-import { InitialSettings, Logger, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
+import { CandidatePairStats, InitialSettings, Logger, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
 import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.4';
 import { MathUtils } from '../Util/MathUtils';
 import {DataChannelLatencyTest} from "./DataChannelLatencyTest";
@@ -318,14 +318,17 @@ export class StatsPanel {
             );
         }
 
+        // Store the active candidate pair return a new Candidate pair stat if getActiveCandidate is null
+        let activeCandidatePair = stats.getActiveCandidatePair() != null ? stats.getActiveCandidatePair() : new CandidatePairStats();
+
         // RTT
         const netRTT =
             Object.prototype.hasOwnProperty.call(
-                stats.candidatePair,
+                activeCandidatePair,
                 'currentRoundTripTime'
-            ) && stats.isNumber(stats.candidatePair.currentRoundTripTime)
+            ) && stats.isNumber(activeCandidatePair.currentRoundTripTime)
                 ? numberFormat.format(
-                      stats.candidatePair.currentRoundTripTime * 1000
+                    activeCandidatePair.currentRoundTripTime * 1000
                   )
                 : "Can't calculate";
         this.addOrUpdateStat('RTTStat', 'Net RTT (ms)', netRTT);
