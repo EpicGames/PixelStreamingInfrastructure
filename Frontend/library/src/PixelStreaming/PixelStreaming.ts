@@ -119,11 +119,13 @@ export class PixelStreaming {
 
         this._webXrController = new WebXRController(this._webRtcController);
 
+        this._setupWebRtcTCPRelayDetection = this._setupWebRtcTCPRelayDetection.bind(this)
+
         // Add event listener for the webRtcConnected event
         this._eventEmitter.addEventListener("webRtcConnected", (webRtcConnectedEvent: WebRtcConnectedEvent) => {
 
             // Bind to the stats received event
-            this._eventEmitter.addEventListener("statsReceived",  this._setupWebRtcTCPRelayDetection.bind(this));
+            this._eventEmitter.addEventListener("statsReceived",  this._setupWebRtcTCPRelayDetection);
         });
     }
 
