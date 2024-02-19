@@ -5,7 +5,7 @@ import { ITransport,
 		 BaseMessage,
 		 Messages,
 		 MessageHelpers } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { IStreamer } from './StreamerRegistry';
+import { IStreamer, IStreamerInfo } from './StreamerRegistry';
 import { EventEmitter } from 'events';
 import { stringify } from './Utils';
 import { Logger } from './Logger';
@@ -59,6 +59,15 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
 	sendMessage(message: BaseMessage): void {
 		LogUtils.logOutgoing(this, message);
 		this.protocol.sendMessage(message);
+	}
+
+	getStreamerInfo(): IStreamerInfo {
+		return {
+			streamerId: this.streamerId,
+			type: 'Streamer',
+			streaming: this.streaming,
+			subscribers: this.server.playerRegistry.listPlayers().filter(player => player.subscribedStreamer == this).map(player => player.getPlayerInfo()),
+		};
 	}
 
 	private registerMessageHandlers(): void {

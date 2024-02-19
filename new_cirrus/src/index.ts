@@ -6,6 +6,7 @@ import { InitLogging, Logger } from './Logger';
 import { Command, Option } from 'commander';
 import { initInputHandler } from './InputHandler';
 import { stringify, beautify } from './Utils';
+import { initialize } from 'express-openapi';
 
 const fs = require("fs");
 const pjson = require('../package.json');
@@ -96,3 +97,18 @@ const signallingServer = new SignallingServer(serverOpts);
 if (options.stdin) {
     initInputHandler(options, signallingServer);
 }
+
+// app.get('/api/streamers', (req, res, next) => {
+//     res.status(200).json(signallingServer.playerRegistry.getPlayerIds());
+// })
+
+initialize({
+    app,
+    docsPath: "/api-definition",
+    exposeApiDocs: true,
+    apiDoc: "./doc/api-definition-base.yml",
+    paths: "./build/paths",
+    dependencies: {
+        signallingServer,
+    }
+});

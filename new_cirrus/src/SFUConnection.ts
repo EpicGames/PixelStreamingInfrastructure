@@ -5,8 +5,8 @@ import { ITransport,
 		 MessageHelpers,
 		 Messages,
 		 BaseMessage } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { IPlayer } from './PlayerRegistry';
-import { IStreamer } from './StreamerRegistry';
+import { IPlayer, IPlayerInfo } from './PlayerRegistry';
+import { IStreamer, IStreamerInfo } from './StreamerRegistry';
 import { EventEmitter } from 'events';
 import { Logger } from './Logger';
 import * as LogUtils from './LoggingUtils';
@@ -34,8 +34,8 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
 	playerId: string;
 	streamerId: string;
 	streaming: boolean;
+	subscribedStreamer: IStreamer | null;
 
-	private subscribedStreamer: IStreamer | null;
 	private layerPreferenceListener: (message: Messages.layerPreference) => void;
 	private streamerIdChangeListener: (newId: string) => void;
 	private streamerDisconnectedListener: () => void;
@@ -74,6 +74,24 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
 	sendMessage(message: BaseMessage): void {
 		LogUtils.logOutgoing(this, message);
 		this.protocol.sendMessage(message);
+	}
+
+	getStreamerInfo(): IStreamerInfo {
+		return {
+			streamerId: this.streamerId,
+			type: 'SFU',
+			streaming: this.streaming,
+			subscribers: this.server.playerRegistry.listPlayers().filter(player => player.subscribedStreamer == this).map(player => player.getPlayerInfo()),
+		};
+	}
+
+	getPlayerInfo(): IPlayerInfo {
+		return {
+			playerId: this.playerId,
+			type: 'SFU',
+			subscribedTo: this.subscribedStreamer ? this.subscribedStreamer.streamerId : null,
+			sendOffer: true,
+		};
 	}
 
 	private registerMessageHandlers(): void {

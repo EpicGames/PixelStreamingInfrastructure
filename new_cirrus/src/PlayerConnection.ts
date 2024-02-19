@@ -5,7 +5,7 @@ import { ITransport,
 		 MessageHelpers,
 		 Messages,
 		 BaseMessage } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
-import { IPlayer } from './PlayerRegistry';
+import { IPlayer, IPlayerInfo } from './PlayerRegistry';
 import { IStreamer } from './StreamerRegistry';
 import { Logger } from './Logger';
 import * as LogUtils from './LoggingUtils';
@@ -27,9 +27,9 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 	playerId: string;
 	transport: ITransport;
 	protocol: SignallingProtocol;
+	subscribedStreamer: IStreamer | null;
 
 	private sendOffer: boolean;
-	private subscribedStreamer: IStreamer | null;
 	private streamerIdChangeListener: (newId: string) => void;
 	private streamerDisconnectedListener: () => void;
 
@@ -65,6 +65,15 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 	sendMessage(message: BaseMessage): void {
 		LogUtils.logOutgoing(this, message);
 		this.protocol.sendMessage(message);
+	}
+
+	getPlayerInfo(): IPlayerInfo {
+		return {
+			playerId: this.playerId,
+			type: 'Player',
+			subscribedTo: this.subscribedStreamer ? this.subscribedStreamer.streamerId : null,
+			sendOffer: this.sendOffer,
+		};
 	}
 
 	private registerMessageHandlers(): void {

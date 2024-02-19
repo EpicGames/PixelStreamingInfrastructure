@@ -2,6 +2,7 @@ import { ITransport, SignallingProtocol, Messages, MessageHelpers, BaseMessage }
 import { EventEmitter } from 'events';
 import { Logger } from './Logger';
 import { IMessageLogger } from './LoggingUtils';
+import { IPlayerInfo } from './PlayerRegistry';
 
 /**
  * An interface that describes a streamer that can be added to the
@@ -14,6 +15,17 @@ export interface IStreamer extends EventEmitter, IMessageLogger  {
 	streaming: boolean;
 
 	sendMessage(message: BaseMessage): void;
+	getStreamerInfo(): IStreamerInfo;
+}
+
+/**
+ * Used by the API to describe a streamer.
+ */
+export interface IStreamerInfo {
+	streamerId: string,
+	type: string,
+	streaming: boolean,
+	subscribers: IPlayerInfo[],
 }
 
 /**

@@ -2,6 +2,7 @@ import { SignallingProtocol, BaseMessage } from '@epicgames-ps/lib-pixelstreamin
 import { EventEmitter } from 'events';
 import { Logger } from './Logger';
 import { IMessageLogger } from './LoggingUtils';
+import { IStreamer } from './StreamerRegistry';
 
 /**
  * An interface that describes a player that can be added to the
@@ -10,8 +11,20 @@ import { IMessageLogger } from './LoggingUtils';
 export interface IPlayer extends IMessageLogger {
 	playerId: string;
 	protocol: SignallingProtocol;
+	subscribedStreamer: IStreamer | null;
 
 	sendMessage(message: BaseMessage): void;
+	getPlayerInfo(): IPlayerInfo;
+}
+
+/**
+ * Used by the API to describe the current state of the player.
+ */
+export interface IPlayerInfo {
+	playerId: string,
+	type: string,
+	subscribedTo: string | null,
+	sendOffer: boolean,
 }
 
 /**
@@ -76,8 +89,8 @@ export class PlayerRegistry extends EventEmitter {
 		return this.players.get(playerId);
 	}
 
-	getPlayerIds(): string[] {
-		return Array.from(this.players.keys());
+	listPlayers(): IPlayer[] {
+		return Array.from(this.players.values());
 	}
 
 	private getUniquePlayerId(): string {

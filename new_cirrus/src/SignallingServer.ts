@@ -8,6 +8,7 @@ import { Logger } from './Logger';
 import { StreamerRegistry } from './StreamerRegistry';
 import { PlayerRegistry } from './PlayerRegistry';
 import { Messages, MessageHelpers, SignallingProtocol } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
+import { stringify } from './Utils';
 
 /**
  * An interface describing the possible options to pass when creating
@@ -51,7 +52,7 @@ export class SignallingServer {
 	playerRegistry: PlayerRegistry;
 
 	constructor(config: IServerConfig) {
-		Logger.debug('Started SignallingServer with config: %s', config);
+		Logger.debug('Started SignallingServer with config: %s', stringify(config));
 
 		this.config = config;
 		this.streamerRegistry = new StreamerRegistry();
