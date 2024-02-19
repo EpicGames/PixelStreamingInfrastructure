@@ -11,21 +11,18 @@ import { initialize } from 'express-openapi';
 const fs = require("fs");
 const pjson = require('../package.json');
 
-// read any config file
-let config_file: any = {};
-try {
-    let configData = fs.readFileSync('config_file.json', 'UTF8');
-    config_file = JSON.parse(configData);
-} catch(error) {
-    console.log(error);
-}
-
 const program = new Command();
 program
     .name(pjson.name)
     .description(pjson.description)
     .version(pjson.version);
 
+// For any switch that doesn't take an argument, like --serve, its important to give it the default
+// of false. Without the default, not supplying the default will mean the option is undefined in
+// cli_options. When merged with the config_file options, if the app was previously run with --serve
+// you will not be able to turn serving off without editing the config file.
+// an alternative could be to use --serve <enabled>, but then the options come through as strings
+// as 'true' or 'false', which might not be terrible, but it's not as neat.
 program
     .option('--log_folder <path>', 'Sets the path for the log files.', 'logs')
     .addOption(new Option('--log_level_console <level>', 'Sets the logging level for console messages.')
@@ -40,23 +37,48 @@ program
     .option('--streamer_port <port>', 'Sets the listening port for streamer connections.', '8888')
     .option('--player_port <port>', 'Sets the listening port for player connections.', '80')
     .option('--sfu_port <port>', 'Sets the listening port for SFU connections.', '8889')
-    .addOption(new Option('--serve', 'Enables the webserver on player_port.'))
+    .addOption(new Option('--serve', 'Enables the webserver on player_port.').default(false))
     .option('--http_root <path>', 'Sets the path for the webserver root.', 'www')
     .option('--homepage <filename>', 'The default html file to serve on the web server.', 'index.html')
     .addOption(new Option('--peer_options <json-string>', 'Additional JSON data to send in peerConnectionOptions of the config message.')
         .argParser(JSON.parse))
-    .option('--log_config', 'Will print the program configuration on startup.')
-    .option('--stdin', 'Allows stdin input while running.')
-    .option('--no_save', 'On startup the given configuration is resaved out to config.json. This switch will prevent this behaviour allowing the config.json file to remain untouched while running with new configurations.')
+    .addOption(new Option('--log_config', 'Will print the program configuration on startup.').default(false))
+    .addOption(new Option('--stdin', 'Allows stdin input while running.').default(false))
+    .addOption(new Option('--no_config', 'Skips the reading of the config file. Only CLI options will be used.').default(false))
+    .addOption(new Option('--config_file <path>', 'Sets the path of the config file.').default("config_file.json"))
+    .addOption(new Option('--no_save', 'On startup the given configuration is resaved out to config.json. This switch will prevent this behaviour allowing the config.json file to remain untouched while running with new configurations.').default(false))
     .helpOption('-h, --help', 'Display this help text.')
     .parse();
 
+// parsed command line options
 const cli_options = program.opts();
+
+// possible config file options
+let config_file: any = {};
+if (!cli_options.no_config) {
+    // read any config file
+    try {
+        const configData = fs.readFileSync(cli_options.config_file, 'UTF8');
+        config_file = JSON.parse(configData);
+    } catch(error) {
+        // silently fail here since we havent started the logging system yet.
+    }
+}
+
+// merge the configurations
 const options = { ...config_file, ...cli_options };
 
+// save out new configuration (unless disabled)
 if (!options.no_save) {
+
+    // dont save certain options
+    const save_options = { ...options };
+    delete save_options.no_config;
+    delete save_options.config_file;
+    delete save_options.no_save;
+
     // save out the config file with the current settings
-    fs.writeFile('config_file.json', beautify(options), (error: any) => {
+    fs.writeFile(options.config_file, beautify(save_options), (error: any) => {
         if (error) throw error;
     });
 }
