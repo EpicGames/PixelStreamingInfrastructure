@@ -1,5 +1,5 @@
 import express from 'express';
-import * as http from 'http';
+import http from 'http';
 import { SignallingServer, IServerConfig } from './SignallingServer';
 import { WebServer } from './WebServer';
 import { InitLogging, Logger } from './Logger';
@@ -97,10 +97,6 @@ const signallingServer = new SignallingServer(serverOpts);
 if (options.stdin) {
     initInputHandler(options, signallingServer);
 }
-
-// app.get('/api/streamers', (req, res, next) => {
-//     res.status(200).json(signallingServer.playerRegistry.getPlayerIds());
-// })
 
 initialize({
     app,

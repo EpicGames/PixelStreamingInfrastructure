@@ -1,4 +1,5 @@
-import * as WebSocket from 'ws';
+import WebSocket from 'ws';
+import http from 'http';
 import { ITransport,
 		 WebSocketTransportNJS,
 		 SignallingProtocol,
@@ -28,6 +29,7 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 	transport: ITransport;
 	protocol: SignallingProtocol;
 	subscribedStreamer: IStreamer | null;
+	remoteAddress: string | undefined;
 
 	private sendOffer: boolean;
 	private streamerIdChangeListener: (newId: string) => void;
@@ -40,13 +42,14 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 	 * @param sendOffer True if the player is requesting to receive offers
 	 * from streamers.
 	 */
-	constructor(server: SignallingServer, ws: WebSocket, sendOffer: boolean) {
+	constructor(server: SignallingServer, ws: WebSocket, request: http.IncomingMessage, sendOffer: boolean) {
 		this.server = server;
 		this.playerId = '';
 		this.subscribedStreamer = null;
 		this.transport = new WebSocketTransportNJS(ws);
 		this.protocol = new SignallingProtocol(this.transport);
 		this.sendOffer = sendOffer;
+		this.remoteAddress = request.socket.remoteAddress;
 
 		this.transport.on('error', this.onTransportError.bind(this));
 		this.transport.on('close', this.onTransportClose.bind(this));
@@ -71,8 +74,9 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 		return {
 			playerId: this.playerId,
 			type: 'Player',
-			subscribedTo: this.subscribedStreamer ? this.subscribedStreamer.streamerId : null,
+			subscribedTo: this.subscribedStreamer?.streamerId,
 			sendOffer: this.sendOffer,
+			remoteAddress: this.remoteAddress,
 		};
 	}
 
@@ -170,7 +174,7 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 	}
 
 	private onListStreamers(message: Messages.listStreamers): void {
-		const listMessage = MessageHelpers.createMessage(Messages.streamerList, { ids: this.server.streamerRegistry.getStreamerIds() });
+		const listMessage = MessageHelpers.createMessage(Messages.streamerList, { ids: this.server.streamerRegistry.streamers.map(streamer => streamer.streamerId) });
 		this.sendMessage(listMessage);
 	}
 

@@ -47,7 +47,7 @@ function printServerInfo(options: unknown, signallingServer: SignallingServer) {
 }
 
 function printStreamerList(options: unknown, signallingServer: SignallingServer) {
-	process.stdout.write(`Streamer Ids: ${signallingServer.streamerRegistry.getStreamerIds()}\n`);
+	process.stdout.write(`Streamer Ids: ${signallingServer.streamerRegistry.streamers.map(streamer => streamer.streamerId)}\n`);
 }
 
 function printPlayerList(soptions: unknown, signallingServer: SignallingServer) {

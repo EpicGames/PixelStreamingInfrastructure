@@ -25,6 +25,7 @@ export interface IStreamerInfo {
 	streamerId: string,
 	type: string,
 	streaming: boolean,
+	remoteAddress: string | undefined,
 	subscribers: IPlayerInfo[],
 }
 
@@ -115,16 +116,10 @@ export class StreamerRegistry extends EventEmitter {
 	}
 
 	/**
-	 * Returns a list of streaming streamers.
+	 * Returns the total number of connected streamers.
 	 */
-	getStreamerIds(): string[] {
-		const ids = [];
-		for (let streamer of this.streamers) {
-			if (streamer.streaming) {
-				ids.push(streamer.streamerId);
-			}
-		}
-		return ids;
+	count(): number {
+		return this.streamers.length;
 	}
 
 	private onEndpointId(streamer: IStreamer, message: Messages.endpointId): void {

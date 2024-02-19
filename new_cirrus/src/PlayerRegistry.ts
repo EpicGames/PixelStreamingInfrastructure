@@ -23,8 +23,9 @@ export interface IPlayer extends IMessageLogger {
 export interface IPlayerInfo {
 	playerId: string,
 	type: string,
-	subscribedTo: string | null,
+	subscribedTo: string | undefined,
 	sendOffer: boolean,
+	remoteAddress: string | undefined,
 }
 
 /**
@@ -91,6 +92,13 @@ export class PlayerRegistry extends EventEmitter {
 
 	listPlayers(): IPlayer[] {
 		return Array.from(this.players.values());
+	}
+
+	/**
+	 * Gets the total number of connected players.
+	 */
+	count(): number {
+		return this.players.size;
 	}
 
 	private getUniquePlayerId(): string {

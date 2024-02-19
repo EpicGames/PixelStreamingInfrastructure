@@ -1,4 +1,5 @@
 import WebSocket from 'ws';
+import http from 'http';
 import { ITransport,
 		 SignallingProtocol,
 		 WebSocketTransportNJS,
@@ -30,13 +31,14 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
 	transport: ITransport;
 	protocol: SignallingProtocol;
 	streaming: boolean;
+	remoteAddress: string | undefined;
 
 	/**
 	 * Construct a new streamer connection.
 	 * @param server The signalling server object that spawned this streamer.
 	 * @param ws The websocket coupled to this streamer connection.
 	 */
-	constructor(server: SignallingServer, ws: WebSocket) {
+	constructor(server: SignallingServer, ws: WebSocket, request: http.IncomingMessage) {
 		super();
 
 		this.server = server;
@@ -44,6 +46,7 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
 		this.transport = new WebSocketTransportNJS(ws);
 		this.protocol = new SignallingProtocol(this.transport);
 		this.streaming = false;
+		this.remoteAddress = request.socket.remoteAddress;
 
 		this.transport.on('error', this.onTransportError.bind(this));
 		this.transport.on('close', this.onTransportClose.bind(this));
@@ -66,6 +69,7 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
 			streamerId: this.streamerId,
 			type: 'Streamer',
 			streaming: this.streaming,
+			remoteAddress: this.remoteAddress,
 			subscribers: this.server.playerRegistry.listPlayers().filter(player => player.subscribedStreamer == this).map(player => player.getPlayerInfo()),
 		};
 	}

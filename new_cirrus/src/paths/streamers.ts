@@ -6,7 +6,7 @@ export default function(signallingServer: SignallingServer) {
     };
 
     function GET(req: any, res: any, next: any) {
-        res.status(200).json(signallingServer.streamerRegistry.getStreamerIds());
+        res.status(200).json(signallingServer.streamerRegistry.streamers.map(streamer => streamer.getStreamerInfo()));
     }
 
     GET.apiDoc = {

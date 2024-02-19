@@ -1,4 +1,5 @@
-import * as WebSocket from 'ws';
+import WebSocket from 'ws';
+import http from 'http';
 import { ITransport,
 		 WebSocketTransportNJS,
 		 SignallingProtocol,
@@ -34,6 +35,7 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
 	playerId: string;
 	streamerId: string;
 	streaming: boolean;
+	remoteAddress: string | undefined;
 	subscribedStreamer: IStreamer | null;
 
 	private layerPreferenceListener: (message: Messages.layerPreference) => void;
@@ -45,7 +47,7 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
 	 * @param server The signalling server object that spawned this sfu.
 	 * @param ws The websocket coupled to this sfu connection.
 	 */
-	constructor(server: SignallingServer, ws: WebSocket) {
+	constructor(server: SignallingServer, ws: WebSocket, request: http.IncomingMessage) {
 		super();
 
 		this.server = server;
@@ -54,6 +56,7 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
 		this.playerId = '';
 		this.streamerId = '';
 		this.streaming = false;
+		this.remoteAddress = request.socket.remoteAddress;
 		this.subscribedStreamer = null;
 
 		this.transport.on('error', this.onTransportError.bind(this));
@@ -81,6 +84,7 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
 			streamerId: this.streamerId,
 			type: 'SFU',
 			streaming: this.streaming,
+			remoteAddress: this.remoteAddress,
 			subscribers: this.server.playerRegistry.listPlayers().filter(player => player.subscribedStreamer == this).map(player => player.getPlayerInfo()),
 		};
 	}
@@ -89,7 +93,8 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
 		return {
 			playerId: this.playerId,
 			type: 'SFU',
-			subscribedTo: this.subscribedStreamer ? this.subscribedStreamer.streamerId : null,
+			remoteAddress: this.remoteAddress,
+			subscribedTo: this.subscribedStreamer?.streamerId,
 			sendOffer: true,
 		};
 	}
@@ -211,7 +216,7 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
 	}
 
 	private onListStreamers(message: Messages.listStreamers): void {
-		const listMessage = MessageHelpers.createMessage(Messages.streamerList, { ids: this.server.streamerRegistry.getStreamerIds() });
+		const listMessage = MessageHelpers.createMessage(Messages.streamerList, { ids: this.server.streamerRegistry.streamers.map(streamer => streamer.streamerId) });
 		this.sendMessage(listMessage);
 	}
 

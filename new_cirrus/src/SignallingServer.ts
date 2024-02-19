@@ -1,5 +1,5 @@
-import * as http from 'http';
-import * as WebSocket from 'ws';
+import http from 'http';
+import WebSocket from 'ws';
 import url from 'url';
 import { StreamerConnection } from './StreamerConnection';
 import { PlayerConnection } from './PlayerConnection';
@@ -46,10 +46,11 @@ export interface IServerConfig {
  * to listen for incoming connections.
  */
 export class SignallingServer {
-	private config: IServerConfig;
-	private protocolConfig: any;
+	config: IServerConfig;
+	protocolConfig: any;
 	streamerRegistry: StreamerRegistry;
 	playerRegistry: PlayerRegistry;
+	startTime: Date;
 
 	constructor(config: IServerConfig) {
 		Logger.debug('Started SignallingServer with config: %s', stringify(config));
@@ -61,6 +62,7 @@ export class SignallingServer {
 			protocolVersion: SignallingProtocol.SIGNALLING_VERSION,
 			peerConnectionOptions: this.config.peerOptions || {}
 		};
+		this.startTime = new Date();
 
 		if (!config.playerPort && !config.httpServer) {
 			Logger.error('No player port or http server supplied to SignallingServer.');
@@ -90,10 +92,10 @@ export class SignallingServer {
 		}
 	}
 
-	private onStreamerConnected(ws: WebSocket, request: any) {
-		Logger.info(`New streamer connection: %s`, request.connection.remoteAddress);
+	private onStreamerConnected(ws: WebSocket, request: http.IncomingMessage) {
+		Logger.info(`New streamer connection: %s`, request.socket.remoteAddress);
 
-		const newStreamer = new StreamerConnection(this, ws);
+		const newStreamer = new StreamerConnection(this, ws, request);
 
 		// add it to the registry and when the transport closes, remove it.
 		this.streamerRegistry.add(newStreamer);
@@ -102,16 +104,19 @@ export class SignallingServer {
 		newStreamer.sendMessage(MessageHelpers.createMessage(Messages.config, this.protocolConfig));
 	}
 
-	private onPlayerConnected(ws: WebSocket, request: any) {
-		Logger.info(`New player connection: %s (%s)`, request.connection.remoteAddress, request.url);
+	private onPlayerConnected(ws: WebSocket, request: http.IncomingMessage) {
+		Logger.info(`New player connection: %s (%s)`, request.socket.remoteAddress, request.url);
 
 		// extract some options from the request url
-		const parsedUrl = url.parse(request.url);
-		const urlParams = new URLSearchParams(parsedUrl.search!);
-		const offerToReceive: boolean = (urlParams.get('OfferToReceive') === 'true');
-		const sendOffer: boolean = offerToReceive ? false : true;
+		let sendOffer = true;
+		if (request.url) {
+			const parsedUrl = url.parse(request.url);
+			const urlParams = new URLSearchParams(parsedUrl.search!);
+			const offerToReceive: boolean = (urlParams.get('OfferToReceive') === 'true');
+			sendOffer = offerToReceive ? false : true;
+		}
 
-		const newPlayer = new PlayerConnection(this, ws, sendOffer);
+		const newPlayer = new PlayerConnection(this, ws, request, sendOffer);
 
 		// add it to the registry and when the transport closes, remove it
 		this.playerRegistry.add(newPlayer);
@@ -120,9 +125,9 @@ export class SignallingServer {
 		newPlayer.sendMessage(MessageHelpers.createMessage(Messages.config, this.protocolConfig));
 	}
 
-	private onSFUConnected(ws: WebSocket, request: any) {
-		Logger.info(`New SFU connection: %s`, request.connection.remoteAddress);
-		const newSFU = new SFUConnection(this, ws);
+	private onSFUConnected(ws: WebSocket, request: http.IncomingMessage) {
+		Logger.info(`New SFU connection: %s`, request.socket.remoteAddress);
+		const newSFU = new SFUConnection(this, ws, request);
 
 		// SFU acts as both a streamer and player
 		this.streamerRegistry.add(newSFU);
