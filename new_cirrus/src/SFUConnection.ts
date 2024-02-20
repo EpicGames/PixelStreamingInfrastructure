@@ -44,8 +44,8 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
 
     /**
      * Construct a new SFU connection.
-     * @param server The signalling server object that spawned this sfu.
-     * @param ws The websocket coupled to this sfu connection.
+     * @param server - The signalling server object that spawned this sfu.
+     * @param ws - The websocket coupled to this sfu connection.
      */
     constructor(server: SignallingServer, ws: WebSocket, request: http.IncomingMessage) {
         super();

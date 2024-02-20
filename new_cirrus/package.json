@@ -18,9 +18,13 @@
     "@types/ws": "^8.5.10",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "eslint": "^8.56.0",
+    "eslint-plugin-tsdoc": "^0.2.17",
     "nodemon": "^3.0.3",
     "openapi-typescript": "^6.7.4",
     "ts-node": "^10.9.2",
+    "typedoc": "^0.25.8",
+    "typedoc-gitlab-wiki-theme": "^1.1.1",
+    "typedoc-plugin-markdown": "^3.17.1",
     "typescript": "^5.3.3"
   },
   "dependencies": {

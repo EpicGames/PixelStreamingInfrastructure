@@ -35,8 +35,8 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
 
     /**
      * Construct a new streamer connection.
-     * @param server The signalling server object that spawned this streamer.
-     * @param ws The websocket coupled to this streamer connection.
+     * @param server - The signalling server object that spawned this streamer.
+     * @param ws - The websocket coupled to this streamer connection.
      */
     constructor(server: SignallingServer, ws: WebSocket, request: http.IncomingMessage) {
         super();

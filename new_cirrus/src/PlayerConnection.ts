@@ -37,9 +37,9 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
 
     /**
      * Construct a new player connection.
-     * @param server The signalling server object that spawned this player.
-     * @param ws The websocket coupled to this player connection.
-     * @param sendOffer True if the player is requesting to receive offers
+     * @param server - The signalling server object that spawned this player.
+     * @param ws - The websocket coupled to this player connection.
+     * @param sendOffer - True if the player is requesting to receive offers
      * from streamers.
      */
     constructor(server: SignallingServer, ws: WebSocket, request: http.IncomingMessage, sendOffer: boolean) {

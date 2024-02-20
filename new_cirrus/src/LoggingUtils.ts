@@ -12,7 +12,7 @@ export interface IMessageLogger {
 /**
  * Call to log messages received on a connection that we will handle here at the server.
  * Do not call this for messages being forwarded to another connection.
- * @param recvr IMessageLogger The connection the message was received on.
+ * @param recvr - IMessageLogger The connection the message was received on.
  */
 export function logIncoming(recvr: IMessageLogger, message: BaseMessage): void {
     Logger.info({
@@ -26,7 +26,7 @@ export function logIncoming(recvr: IMessageLogger, message: BaseMessage): void {
 /**
  * Call to log messages created here at the server and being sent to the connection.
  * Do not call this for messages being forwarded to this connection.
- * @param sender IMessageLogger The connection the message is being sent to.
+ * @param sender - IMessageLogger The connection the message is being sent to.
  */
 export function logOutgoing(sender: IMessageLogger, message: BaseMessage): void {
     Logger.info({
@@ -40,8 +40,8 @@ export function logOutgoing(sender: IMessageLogger, message: BaseMessage): void 
 /**
  * Call this for messages being forwarded to this connection. That is messages received on
  * one connection and being sent to another with only minor changes being made.
- * @param recvr: IMessageLogger The connection the message was received on.
- * @param sender IMessageLogger The connection the message is being sent to.
+ * @param recvr - The connection the message was received on.
+ * @param target - The connection the message is being sent to.
  */
 export function logForward(recvr: IMessageLogger, target: IMessageLogger, message: BaseMessage): void {
     Logger.info({

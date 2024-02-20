@@ -12,7 +12,7 @@ const { combine, timestamp, printf, colorize, splat } = winston.format;
  */
 export let Logger = createDefaultLogger();
 
-interface IConfig {
+export interface IConfig {
     // the directory to store log files
     logDir?: string;
 
@@ -29,7 +29,7 @@ interface IConfig {
 /**
  * Call this as early as possible to setup the logging module with your
  * preferred settings.
- * @param config The settings to init the logger with. See IConfig interface
+ * @param config - The settings to init the logger with. See IConfig interface
  */
 export function InitLogging(config: IConfig): void {
     const logDir = config.logDir || 'logs';

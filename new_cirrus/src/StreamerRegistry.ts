@@ -75,7 +75,7 @@ export class StreamerRegistry extends EventEmitter {
     /**
      * Removes a streamer from the registry. If the streamer isn't found
      * it does nothing.
-     * @return True if the streamer was removed.
+     * @returns True if the streamer was removed.
      */
     remove(streamer: IStreamer): boolean {
         const index = this.streamers.indexOf(streamer);
@@ -99,7 +99,7 @@ export class StreamerRegistry extends EventEmitter {
      * Used by players who haven't subscribed but try to send a message.
      * This is to cover legacy connections that do not know how to subscribe.
      * The player will be assigned the first streamer in the list.
-     * @return The first streamerId in the registry or null if there are none.
+     * @returns The first streamerId in the registry or null if there are none.
      */
     getFirstStreamerId(): string | null {
         if (this.empty()) {
