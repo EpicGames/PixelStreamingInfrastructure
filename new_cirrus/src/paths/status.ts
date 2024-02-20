@@ -1,5 +1,9 @@
 import { SignallingServer } from '../SignallingServer';
 
+/* eslint-disable  @typescript-eslint/no-var-requires */
+const pjson = require('../../package.json');
+/* eslint-enable  @typescript-eslint/no-var-requires */
+
 export default function(signallingServer: SignallingServer) {
     const operations = {
         GET,
@@ -12,6 +16,7 @@ export default function(signallingServer: SignallingServer) {
             uptime: uptime,
             streamer_count: signallingServer.streamerRegistry.count(),
             player_count: signallingServer.playerRegistry.count(),
+            version: pjson.version,
         });
     }
 
@@ -34,6 +39,9 @@ export default function(signallingServer: SignallingServer) {
                                 },
                                 "player_count": {
                                     type: "number"
+                                },
+                                "version": {
+                                    type: "string"
                                 },
                             },
                         },
