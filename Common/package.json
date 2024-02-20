@@ -7,7 +7,7 @@
     "types": "build/types/pixelstreamingcommon.d.ts",
     "sideEffects": false,
     "scripts": {
-        "build_proto": "npx protoc --ts_out src/Messages --proto_path protobuf protobuf/signalling_messages.proto",
+        "build_proto": "npx protoc --experimental_allow_proto3_optional --ts_out src/Messages --proto_path protobuf protobuf/signalling_messages.proto",
         "compile": "rimraf ./build && tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
         "build": "npm run build_proto && npm run compile",
         "test": "echo \"Error: no test specified\" && exit 1",

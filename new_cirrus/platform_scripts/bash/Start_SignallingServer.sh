@@ -13,14 +13,14 @@ print_parameters
 
 peerconnectionoptions='{\"iceServers\":[{\"urls\":[\"stun:${stunserver}\"]}]}'
 
-process="${BASH_LOCATION}/node/lib/node_modules/npm/bin/npm-cli.js run start:default --"
+process="${BASH_LOCATION}/node/lib/node_modules/npm/bin/npm-cli.js run start --"
 arguments=""
 
 if [ ! -z $IS_DEBUG ]; then
 	arguments+=" --inspect"
 fi
 
-arguments+=" --peerConnectionOptions=\"${peerconnectionoptions}\" --PublicIp=${publicip}"
+arguments+=" --peer_options=\"${peerconnectionoptions}\" --public_ip=${publicip}"
 # Add arguments passed to script to arguments for executable
 arguments+=" ${cirruscmd}"
 

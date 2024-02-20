@@ -3,6 +3,10 @@
 BASH_LOCATION="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
 NODE_VERSION=v18.17.0
 
+pushd "${BASH_LOCATION}/../../"
+export WEBPACK_OUTPUT_PATH=$(pwd)/www
+popd
+
 pushd "${BASH_LOCATION}" > /dev/null
 
 source common_utils.sh
@@ -93,30 +97,31 @@ function setup_frontend() {
 	set -e
 	# navigate to root
 	pushd ${BASH_LOCATION}/../../.. > /dev/null
-	export PATH="../../SignallingWebServer/platform_scripts/bash/node/bin:$PATH"
+	export PATH="${BASH_LOCATION}/node/bin:$PATH"
 	# If player.html doesn't exist, or --build passed as arg, rebuild the frontend
-	if [ ! -f SignallingWebServer/Public/player.html ] || [ ! -z "$FORCE_BUILD" ] ; then
+    echo Testing ${WEBPACK_OUTPUT_PATH}/player.html
+	if [ ! -f ${WEBPACK_OUTPUT_PATH}/player.html ] || [ ! -z "$FORCE_BUILD" ] ; then
 		echo "Building Typescript Frontend."
 		# Using our bundled NodeJS, build the web frontend files
 		pushd ${BASH_LOCATION}/../../../Common > /dev/null
-		../SignallingWebServer/platform_scripts/bash/node/bin/npm install
-		../SignallingWebServer/platform_scripts/bash/node/bin/npm run build
+		${BASH_LOCATION}/node/bin/npm install
+		${BASH_LOCATION}/node/bin/npm run build
 		popd
 		pushd ${BASH_LOCATION}/../../../Frontend/library > /dev/null
-		../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
-		../../SignallingWebServer/platform_scripts/bash/node/bin/npm link ../../Common
-		../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-dev
+		${BASH_LOCATION}/node/bin/npm install
+		${BASH_LOCATION}/node/bin/npm link ../../Common
+		${BASH_LOCATION}/node/bin/npm run build-dev
 		popd
 		pushd ${BASH_LOCATION}/../../../Frontend/ui-library > /dev/null
-		../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
-		../../SignallingWebServer/platform_scripts/bash/node/bin/npm link ../library
-		../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-dev
+		${BASH_LOCATION}/node/bin/npm install
+		${BASH_LOCATION}/node/bin/npm link ../library
+		${BASH_LOCATION}/node/bin/npm run build-dev
 		popd
 
 		pushd ${BASH_LOCATION}/../../../Frontend/implementations/typescript > /dev/null
-		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm install
-		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm link ../../library ../../ui-library
-		../../../SignallingWebServer/platform_scripts/bash/node/bin/npm run build-dev
+		${BASH_LOCATION}/node/bin/npm install
+		${BASH_LOCATION}/node/bin/npm link ../../library ../../ui-library
+		${BASH_LOCATION}/node/bin/npm run build-dev
 		popd
 	else
 		echo 'Skipping building Frontend because files already exist. Please run with "--build" to force a rebuild'
