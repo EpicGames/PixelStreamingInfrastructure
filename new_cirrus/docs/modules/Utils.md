@@ -1,13 +1,27 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / Utils
+[wilbur](../README.md) / [Exports](../modules.md) / Utils
 
 # Module: Utils
 
 ## Table of contents
 
+### Type Aliases
+
+- [IProgramOptions](Utils.md#iprogramoptions)
+
 ### Functions
 
 - [beautify](Utils.md#beautify)
 - [stringify](Utils.md#stringify)
+
+## Type Aliases
+
+### IProgramOptions
+
+Ƭ **IProgramOptions**: `Record`\<`string`, `any`\>
+
+#### Defined in
+
+[Utils.ts:4](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/Utils.ts#L4)
 
 ## Functions
 
@@ -29,7 +43,7 @@ Circular reference save version of JSON.stringify with extra formatting.
 
 #### Defined in
 
-[Utils.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/Utils.ts#L13)
+[Utils.ts:16](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/Utils.ts#L16)
 
 ___
 
@@ -51,4 +65,4 @@ Cirular reference safe version of JSON.stringify
 
 #### Defined in
 
-[Utils.ts:6](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/Utils.ts#L6)
+[Utils.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/Utils.ts#L9)

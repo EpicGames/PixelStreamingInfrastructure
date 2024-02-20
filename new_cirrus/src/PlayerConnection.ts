@@ -1,5 +1,4 @@
 import WebSocket from 'ws';
-import http from 'http';
 import { ITransport,
          WebSocketTransportNJS,
          SignallingProtocol,
@@ -29,27 +28,29 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
     transport: ITransport;
     protocol: SignallingProtocol;
     subscribedStreamer: IStreamer | null;
-    remoteAddress: string | undefined;
+    remoteAddress?: string;
 
     private sendOffer: boolean;
     private streamerIdChangeListener: (newId: string) => void;
     private streamerDisconnectedListener: () => void;
 
     /**
-     * Construct a new player connection.
+     * Initializes a new connection with given and sane values. Adds listeners for the
+     * websocket close and error so it can react by unsubscribing and resetting itself.
      * @param server - The signalling server object that spawned this player.
      * @param ws - The websocket coupled to this player connection.
+     * @param remoteAddress - The remote address of this connection. Only used as display.
      * @param sendOffer - True if the player is requesting to receive offers
      * from streamers.
      */
-    constructor(server: SignallingServer, ws: WebSocket, request: http.IncomingMessage, sendOffer: boolean) {
+    constructor(server: SignallingServer, ws: WebSocket, sendOffer: boolean, remoteAddress?: string) {
         this.server = server;
         this.playerId = '';
         this.subscribedStreamer = null;
         this.transport = new WebSocketTransportNJS(ws);
         this.protocol = new SignallingProtocol(this.transport);
         this.sendOffer = sendOffer;
-        this.remoteAddress = request.socket.remoteAddress;
+        this.remoteAddress = remoteAddress;
 
         this.transport.on('error', this.onTransportError.bind(this));
         this.transport.on('close', this.onTransportClose.bind(this));
@@ -60,16 +61,25 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
         this.registerMessageHandlers();
     }
 
+    /**
+     * Returns an identifier that is displayed in logs.
+     * @returns A string describing this connection.
+     */
     getReadableIdentifier(): string { return this.playerId; }
 
     /**
      * Sends a signalling message to the player.
+     * @param message - The message to send.
      */
     sendMessage(message: BaseMessage): void {
         LogUtils.logOutgoing(this, message);
         this.protocol.sendMessage(message);
     }
 
+    /**
+     * Returns a descriptive object for the REST API inspection operations.
+     * @returns An IPlayerInfo object containing viewable information about this connection.
+     */
     getPlayerInfo(): IPlayerInfo {
         return {
             playerId: this.playerId,

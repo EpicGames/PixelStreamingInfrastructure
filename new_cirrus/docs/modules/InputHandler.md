@@ -1,4 +1,4 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / InputHandler
+[wilbur](../README.md) / [Exports](../modules.md) / InputHandler
 
 # Module: InputHandler
 
@@ -18,7 +18,7 @@
 
 | Name | Type |
 | :------ | :------ |
-| `options` | `unknown` |
+| `options` | [`IProgramOptions`](Utils.md#iprogramoptions) |
 | `signallingServer` | [`SignallingServer`](../classes/SignallingServer.SignallingServer.md) |
 
 #### Returns
@@ -27,4 +27,4 @@
 
 #### Defined in
 
-[InputHandler.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/InputHandler.ts#L9)
+[InputHandler.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/InputHandler.ts#L9)

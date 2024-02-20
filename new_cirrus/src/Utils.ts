@@ -1,5 +1,8 @@
 import { jsonc } from 'jsonc';
 
+// A simple interface to describe the options from commander.js
+export type IProgramOptions = Record<string, any>;
+
 /**
  * Cirular reference safe version of JSON.stringify
  */

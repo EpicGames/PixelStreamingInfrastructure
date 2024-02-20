@@ -1,4 +1,4 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / [StreamerConnection](../modules/StreamerConnection.md) / StreamerConnection
+[wilbur](../README.md) / [Exports](../modules.md) / [StreamerConnection](../modules/StreamerConnection.md) / StreamerConnection
 
 # Class: StreamerConnection
 
@@ -50,9 +50,10 @@ streaming: True when the streamer is ready to accept subscriptions.
 
 ### constructor
 
-• **new StreamerConnection**(`server`, `ws`, `request`): [`StreamerConnection`](StreamerConnection.StreamerConnection.md)
+• **new StreamerConnection**(`server`, `ws`, `remoteAddress?`): [`StreamerConnection`](StreamerConnection.StreamerConnection.md)
 
-Construct a new streamer connection.
+Initializes a new connection with given and sane values. Adds listeners for the
+websocket close and error and will emit a disconnected event when disconneted.
 
 #### Parameters
 
@@ -60,7 +61,7 @@ Construct a new streamer connection.
 | :------ | :------ | :------ |
 | `server` | [`SignallingServer`](SignallingServer.SignallingServer.md) | The signalling server object that spawned this streamer. |
 | `ws` | `WebSocket` | The websocket coupled to this streamer connection. |
-| `request` | `IncomingMessage` | - |
+| `remoteAddress?` | `string` | The remote address of this connection. Only used as display. |
 
 #### Returns
 
@@ -72,7 +73,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[StreamerConnection.ts:41](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/StreamerConnection.ts#L41)
+[StreamerConnection.ts:42](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerConnection.ts#L42)
 
 ## Properties
 
@@ -86,17 +87,17 @@ EventEmitter.constructor
 
 #### Defined in
 
-[StreamerConnection.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/StreamerConnection.ts#L32)
+[StreamerConnection.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerConnection.ts#L31)
 
 ___
 
 ### remoteAddress
 
-• **remoteAddress**: `undefined` \| `string`
+• `Optional` **remoteAddress**: `string`
 
 #### Defined in
 
-[StreamerConnection.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/StreamerConnection.ts#L34)
+[StreamerConnection.ts:33](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerConnection.ts#L33)
 
 ___
 
@@ -110,7 +111,7 @@ ___
 
 #### Defined in
 
-[StreamerConnection.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/StreamerConnection.ts#L30)
+[StreamerConnection.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerConnection.ts#L29)
 
 ___
 
@@ -124,7 +125,7 @@ ___
 
 #### Defined in
 
-[StreamerConnection.ts:33](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/StreamerConnection.ts#L33)
+[StreamerConnection.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerConnection.ts#L32)
 
 ___
 
@@ -138,7 +139,7 @@ ___
 
 #### Defined in
 
-[StreamerConnection.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/StreamerConnection.ts#L31)
+[StreamerConnection.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerConnection.ts#L30)
 
 ## Methods
 
@@ -146,9 +147,13 @@ ___
 
 ▸ **getReadableIdentifier**(): `string`
 
+Returns an identifier that is displayed in logs.
+
 #### Returns
 
 `string`
+
+A string describing this connection.
 
 #### Implementation of
 
@@ -156,7 +161,7 @@ ___
 
 #### Defined in
 
-[StreamerConnection.ts:57](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/StreamerConnection.ts#L57)
+[StreamerConnection.ts:62](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerConnection.ts#L62)
 
 ___
 
@@ -164,9 +169,13 @@ ___
 
 ▸ **getStreamerInfo**(): [`IStreamerInfo`](../interfaces/StreamerRegistry.IStreamerInfo.md)
 
+Returns a descriptive object for the REST API inspection operations.
+
 #### Returns
 
 [`IStreamerInfo`](../interfaces/StreamerRegistry.IStreamerInfo.md)
+
+An IStreamerInfo object containing viewable information about this connection.
 
 #### Implementation of
 
@@ -174,7 +183,7 @@ ___
 
 #### Defined in
 
-[StreamerConnection.ts:67](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/StreamerConnection.ts#L67)
+[StreamerConnection.ts:77](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerConnection.ts#L77)
 
 ___
 
@@ -186,9 +195,9 @@ Sends a signalling message to the player.
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `message` | `BaseMessage` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `message` | `BaseMessage` | The message to send. |
 
 #### Returns
 
@@ -200,4 +209,4 @@ Sends a signalling message to the player.
 
 #### Defined in
 
-[StreamerConnection.ts:62](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/StreamerConnection.ts#L62)
+[StreamerConnection.ts:68](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerConnection.ts#L68)

@@ -1,4 +1,4 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / StreamerConnection
+[wilbur](../README.md) / [Exports](../modules.md) / StreamerConnection
 
 # Module: StreamerConnection
 

@@ -1,4 +1,4 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / [LoggingUtils](../modules/LoggingUtils.md) / IMessageLogger
+[wilbur](../README.md) / [Exports](../modules.md) / [LoggingUtils](../modules/LoggingUtils.md) / IMessageLogger
 
 # Interface: IMessageLogger
 
@@ -39,4 +39,4 @@ who is sending or receiving etc.
 
 #### Defined in
 
-[LoggingUtils.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/LoggingUtils.ts#L9)
+[LoggingUtils.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/LoggingUtils.ts#L9)

@@ -1,4 +1,4 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / [SignallingServer](../modules/SignallingServer.md) / SignallingServer
+[wilbur](../README.md) / [Exports](../modules.md) / [SignallingServer](../modules/SignallingServer.md) / SignallingServer
 
 # Class: SignallingServer
 
@@ -28,11 +28,14 @@ to listen for incoming connections.
 
 • **new SignallingServer**(`config`): [`SignallingServer`](SignallingServer.SignallingServer.md)
 
+Initializes the server object and sets up listening sockets for streamers
+players and optionally SFU connections.
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `config` | [`IServerConfig`](../interfaces/SignallingServer.IServerConfig.md) |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `config` | [`IServerConfig`](../interfaces/SignallingServer.IServerConfig.md) | A collection of options for this server. |
 
 #### Returns
 
@@ -40,7 +43,7 @@ to listen for incoming connections.
 
 #### Defined in
 
-[SignallingServer.ts:55](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SignallingServer.ts#L55)
+[SignallingServer.ts:60](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SignallingServer.ts#L60)
 
 ## Properties
 
@@ -50,7 +53,7 @@ to listen for incoming connections.
 
 #### Defined in
 
-[SignallingServer.ts:49](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SignallingServer.ts#L49)
+[SignallingServer.ts:49](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SignallingServer.ts#L49)
 
 ___
 
@@ -60,7 +63,7 @@ ___
 
 #### Defined in
 
-[SignallingServer.ts:52](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SignallingServer.ts#L52)
+[SignallingServer.ts:52](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SignallingServer.ts#L52)
 
 ___
 
@@ -70,7 +73,7 @@ ___
 
 #### Defined in
 
-[SignallingServer.ts:50](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SignallingServer.ts#L50)
+[SignallingServer.ts:50](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SignallingServer.ts#L50)
 
 ___
 
@@ -80,7 +83,7 @@ ___
 
 #### Defined in
 
-[SignallingServer.ts:53](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SignallingServer.ts#L53)
+[SignallingServer.ts:53](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SignallingServer.ts#L53)
 
 ___
 
@@ -90,4 +93,4 @@ ___
 
 #### Defined in
 
-[SignallingServer.ts:51](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SignallingServer.ts#L51)
+[SignallingServer.ts:51](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SignallingServer.ts#L51)

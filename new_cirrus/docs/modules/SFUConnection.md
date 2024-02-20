@@ -1,4 +1,4 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / SFUConnection
+[wilbur](../README.md) / [Exports](../modules.md) / SFUConnection
 
 # Module: SFUConnection
 

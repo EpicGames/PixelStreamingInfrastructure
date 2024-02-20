@@ -1,4 +1,4 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / Logger
+[wilbur](../README.md) / [Exports](../modules.md) / Logger
 
 # Module: Logger
 
@@ -28,7 +28,7 @@ completely create your own winston logger and assign it.
 
 #### Defined in
 
-[Logger.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/Logger.ts#L13)
+[Logger.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/Logger.ts#L13)
 
 ## Functions
 
@@ -51,4 +51,4 @@ preferred settings.
 
 #### Defined in
 
-[Logger.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/Logger.ts#L34)
+[Logger.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/Logger.ts#L34)

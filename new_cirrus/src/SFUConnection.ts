@@ -1,5 +1,4 @@
 import WebSocket from 'ws';
-import http from 'http';
 import { ITransport,
          WebSocketTransportNJS,
          SignallingProtocol,
@@ -35,7 +34,7 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
     playerId: string;
     streamerId: string;
     streaming: boolean;
-    remoteAddress: string | undefined;
+    remoteAddress?: string;
     subscribedStreamer: IStreamer | null;
 
     private layerPreferenceListener: (message: Messages.layerPreference) => void;
@@ -46,8 +45,9 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
      * Construct a new SFU connection.
      * @param server - The signalling server object that spawned this sfu.
      * @param ws - The websocket coupled to this sfu connection.
+     * @param remoteAddress - The remote address of this connection. Only used as display.
      */
-    constructor(server: SignallingServer, ws: WebSocket, request: http.IncomingMessage) {
+    constructor(server: SignallingServer, ws: WebSocket, remoteAddress?: string) {
         super();
 
         this.server = server;
@@ -56,7 +56,7 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
         this.playerId = '';
         this.streamerId = '';
         this.streaming = false;
-        this.remoteAddress = request.socket.remoteAddress;
+        this.remoteAddress = remoteAddress;
         this.subscribedStreamer = null;
 
         this.transport.on('error', this.onTransportError.bind(this));
@@ -69,16 +69,25 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
         this.registerMessageHandlers();
     }
 
+    /**
+     * Returns an identifier that is displayed in logs.
+     * @returns A string describing this connection.
+     */
     getReadableIdentifier(): string { return `(${this.streamerId}:${this.playerId})`; }
 
     /**
-     * Sends a signalling message to the player.
+     * Sends a signalling message to the SFU.
+     * @param message - The message to send.
      */
     sendMessage(message: BaseMessage): void {
         LogUtils.logOutgoing(this, message);
         this.protocol.sendMessage(message);
     }
 
+    /**
+     * Returns a descriptive object for the REST API inspection operations.
+     * @returns An IStreamerInfo object containing viewable information about this connection.
+     */
     getStreamerInfo(): IStreamerInfo {
         return {
             streamerId: this.streamerId,
@@ -89,6 +98,10 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
         };
     }
 
+    /**
+     * Returns a descriptive object for the REST API inspection operations.
+     * @returns An IPlayerInfo object containing viewable information about this connection.
+     */
     getPlayerInfo(): IPlayerInfo {
         return {
             playerId: this.playerId,

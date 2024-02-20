@@ -2,8 +2,11 @@
   @Rem Copyright Epic Games, Inc. All Rights Reserved.
   @echo off
 
+  set SCRIPTS_PATH=%~dp0
+
   pushd %~dp0\..\..\
-  set WEBPACK_OUTPUT_PATH=%CD%\www
+  set PROJECT_PATH=%CD%
+  set WEBPACK_OUTPUT_PATH=%PROJECT_PATH%\www
   popd
 
   @Rem Set root directory as working directory for commands.
@@ -41,14 +44,15 @@
   echo Building frontend files...
 
   @Rem Look for a node directory next to this script
-  if not exist node call SignallingWebServer\platform_scripts\cmd\setup_node.bat
+  if not exist node call %SCRIPTS_PATH%\setup_node.bat
 
   @Rem NOTE: We want to use our NodeJS (not system NodeJS!) to build the web frontend files.
   @Rem Save our current directory (the NodeJS dir) in a variable
-  set "NodeDir=%CD%\SignallingWebServer\platform_scripts\cmd\node"
+  set "NodeDir=%SCRIPTS_PATH%\node"
 
   @rem Save the old path variable
   set OLDPATH=%PATH%
+
   @Rem Prepend NodeDir to PATH temporarily
   set PATH=%PATH%;%NodeDir%
 
@@ -56,19 +60,19 @@
   echo ----------------------------
   echo Building common library...
   pushd %CD%\Common
-  call ..\SignallingWebServer\platform_scripts\cmd\node\npm install
-  call ..\SignallingWebServer\platform_scripts\cmd\node\npm run build
+  call %SCRIPTS_PATH%\node\npm install
+  call %SCRIPTS_PATH%\node\npm run build
   popd
   echo Building frontend library...
   pushd %CD%\Frontend\library
-  call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
-  call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm link ../../Common
-  call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm run build-dev
+  call %SCRIPTS_PATH%\node\npm install
+  call %SCRIPTS_PATH%\node\npm link ../../Common
+  call %SCRIPTS_PATH%\node\npm run build
   popd
   pushd %CD%\Frontend\ui-library
-  call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
-  call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm link ../library
-  call ..\..\SignallingWebServer\platform_scripts\cmd\node\npm run build-dev
+  call %SCRIPTS_PATH%\node\npm install
+  call %SCRIPTS_PATH%\node\npm link ../library
+  call %SCRIPTS_PATH%\node\npm run build
   popd
   echo End of build PS frontend lib step.
 
@@ -76,9 +80,9 @@
   echo ----------------------------
   echo Building Epic Games reference frontend...
   pushd %CD%\Frontend\implementations\typescript
-  call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm install
-  call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm link ../../library ../../ui-library
-  call ..\..\..\SignallingWebServer\platform_scripts\cmd\node\npm run build-dev
+  call %SCRIPTS_PATH%\node\npm install
+  call %SCRIPTS_PATH%\node\npm link ../../library ../../ui-library
+  call %SCRIPTS_PATH%\node\npm run build
   popd
   echo End of build reference frontend step.
   echo ----------------------------

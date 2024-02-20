@@ -1,4 +1,4 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / [SFUConnection](../modules/SFUConnection.md) / SFUConnection
+[wilbur](../README.md) / [Exports](../modules.md) / [SFUConnection](../modules/SFUConnection.md) / SFUConnection
 
 # Class: SFUConnection
 
@@ -57,7 +57,7 @@ streaming: True when the streamer is ready to accept subscriptions.
 
 ### constructor
 
-• **new SFUConnection**(`server`, `ws`, `request`): [`SFUConnection`](SFUConnection.SFUConnection.md)
+• **new SFUConnection**(`server`, `ws`, `remoteAddress?`): [`SFUConnection`](SFUConnection.SFUConnection.md)
 
 Construct a new SFU connection.
 
@@ -67,7 +67,7 @@ Construct a new SFU connection.
 | :------ | :------ | :------ |
 | `server` | [`SignallingServer`](SignallingServer.SignallingServer.md) | The signalling server object that spawned this sfu. |
 | `ws` | `WebSocket` | The websocket coupled to this sfu connection. |
-| `request` | `IncomingMessage` | - |
+| `remoteAddress?` | `string` | The remote address of this connection. Only used as display. |
 
 #### Returns
 
@@ -79,7 +79,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[SFUConnection.ts:50](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SFUConnection.ts#L50)
+[SFUConnection.ts:50](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SFUConnection.ts#L50)
 
 ## Properties
 
@@ -93,7 +93,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[SFUConnection.ts:35](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SFUConnection.ts#L35)
+[SFUConnection.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SFUConnection.ts#L34)
 
 ___
 
@@ -107,17 +107,17 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SFUConnection.ts#L34)
+[SFUConnection.ts:33](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SFUConnection.ts#L33)
 
 ___
 
 ### remoteAddress
 
-• **remoteAddress**: `undefined` \| `string`
+• `Optional` **remoteAddress**: `string`
 
 #### Defined in
 
-[SFUConnection.ts:38](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SFUConnection.ts#L38)
+[SFUConnection.ts:37](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SFUConnection.ts#L37)
 
 ___
 
@@ -131,7 +131,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:36](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SFUConnection.ts#L36)
+[SFUConnection.ts:35](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SFUConnection.ts#L35)
 
 ___
 
@@ -145,7 +145,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:37](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SFUConnection.ts#L37)
+[SFUConnection.ts:36](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SFUConnection.ts#L36)
 
 ___
 
@@ -159,7 +159,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:39](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SFUConnection.ts#L39)
+[SFUConnection.ts:38](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SFUConnection.ts#L38)
 
 ___
 
@@ -173,7 +173,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:33](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SFUConnection.ts#L33)
+[SFUConnection.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SFUConnection.ts#L32)
 
 ## Methods
 
@@ -181,9 +181,13 @@ ___
 
 ▸ **getPlayerInfo**(): [`IPlayerInfo`](../interfaces/PlayerRegistry.IPlayerInfo.md)
 
+Returns a descriptive object for the REST API inspection operations.
+
 #### Returns
 
 [`IPlayerInfo`](../interfaces/PlayerRegistry.IPlayerInfo.md)
+
+An IPlayerInfo object containing viewable information about this connection.
 
 #### Implementation of
 
@@ -191,7 +195,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:92](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SFUConnection.ts#L92)
+[SFUConnection.ts:105](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SFUConnection.ts#L105)
 
 ___
 
@@ -199,9 +203,13 @@ ___
 
 ▸ **getReadableIdentifier**(): `string`
 
+Returns an identifier that is displayed in logs.
+
 #### Returns
 
 `string`
+
+A string describing this connection.
 
 #### Implementation of
 
@@ -209,7 +217,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:72](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SFUConnection.ts#L72)
+[SFUConnection.ts:76](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SFUConnection.ts#L76)
 
 ___
 
@@ -217,9 +225,13 @@ ___
 
 ▸ **getStreamerInfo**(): [`IStreamerInfo`](../interfaces/StreamerRegistry.IStreamerInfo.md)
 
+Returns a descriptive object for the REST API inspection operations.
+
 #### Returns
 
 [`IStreamerInfo`](../interfaces/StreamerRegistry.IStreamerInfo.md)
+
+An IStreamerInfo object containing viewable information about this connection.
 
 #### Implementation of
 
@@ -227,7 +239,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:82](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SFUConnection.ts#L82)
+[SFUConnection.ts:91](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SFUConnection.ts#L91)
 
 ___
 
@@ -235,13 +247,13 @@ ___
 
 ▸ **sendMessage**(`message`): `void`
 
-Sends a signalling message to the player.
+Sends a signalling message to the SFU.
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `message` | `BaseMessage` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `message` | `BaseMessage` | The message to send. |
 
 #### Returns
 
@@ -253,4 +265,4 @@ Sends a signalling message to the player.
 
 #### Defined in
 
-[SFUConnection.ts:77](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SFUConnection.ts#L77)
+[SFUConnection.ts:82](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/SFUConnection.ts#L82)

@@ -1,5 +1,4 @@
 import WebSocket from 'ws';
-import http from 'http';
 import { ITransport,
          SignallingProtocol,
          WebSocketTransportNJS,
@@ -31,14 +30,16 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
     transport: ITransport;
     protocol: SignallingProtocol;
     streaming: boolean;
-    remoteAddress: string | undefined;
+    remoteAddress?: string;
 
     /**
-     * Construct a new streamer connection.
+     * Initializes a new connection with given and sane values. Adds listeners for the
+     * websocket close and error and will emit a disconnected event when disconneted.
      * @param server - The signalling server object that spawned this streamer.
      * @param ws - The websocket coupled to this streamer connection.
+     * @param remoteAddress - The remote address of this connection. Only used as display.
      */
-    constructor(server: SignallingServer, ws: WebSocket, request: http.IncomingMessage) {
+    constructor(server: SignallingServer, ws: WebSocket, remoteAddress?: string) {
         super();
 
         this.server = server;
@@ -46,7 +47,7 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
         this.transport = new WebSocketTransportNJS(ws);
         this.protocol = new SignallingProtocol(this.transport);
         this.streaming = false;
-        this.remoteAddress = request.socket.remoteAddress;
+        this.remoteAddress = remoteAddress;
 
         this.transport.on('error', this.onTransportError.bind(this));
         this.transport.on('close', this.onTransportClose.bind(this));
@@ -54,16 +55,25 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
         this.registerMessageHandlers();
     }
 
+    /**
+     * Returns an identifier that is displayed in logs.
+     * @returns A string describing this connection.
+     */
     getReadableIdentifier(): string { return this.streamerId; }
 
     /**
      * Sends a signalling message to the player.
+     * @param message - The message to send.
      */
     sendMessage(message: BaseMessage): void {
         LogUtils.logOutgoing(this, message);
         this.protocol.sendMessage(message);
     }
 
+    /**
+     * Returns a descriptive object for the REST API inspection operations.
+     * @returns An IStreamerInfo object containing viewable information about this connection.
+     */
     getStreamerInfo(): IStreamerInfo {
         return {
             streamerId: this.streamerId,

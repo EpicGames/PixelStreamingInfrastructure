@@ -1,4 +1,4 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / [PlayerConnection](../modules/PlayerConnection.md) / PlayerConnection
+[wilbur](../README.md) / [Exports](../modules.md) / [PlayerConnection](../modules/PlayerConnection.md) / PlayerConnection
 
 # Class: PlayerConnection
 
@@ -43,9 +43,10 @@ subscribed to.
 
 ### constructor
 
-• **new PlayerConnection**(`server`, `ws`, `request`, `sendOffer`): [`PlayerConnection`](PlayerConnection.PlayerConnection.md)
+• **new PlayerConnection**(`server`, `ws`, `sendOffer`, `remoteAddress?`): [`PlayerConnection`](PlayerConnection.PlayerConnection.md)
 
-Construct a new player connection.
+Initializes a new connection with given and sane values. Adds listeners for the
+websocket close and error so it can react by unsubscribing and resetting itself.
 
 #### Parameters
 
@@ -53,8 +54,8 @@ Construct a new player connection.
 | :------ | :------ | :------ |
 | `server` | [`SignallingServer`](SignallingServer.SignallingServer.md) | The signalling server object that spawned this player. |
 | `ws` | `WebSocket` | The websocket coupled to this player connection. |
-| `request` | `IncomingMessage` | - |
 | `sendOffer` | `boolean` | True if the player is requesting to receive offers from streamers. |
+| `remoteAddress?` | `string` | The remote address of this connection. Only used as display. |
 
 #### Returns
 
@@ -62,7 +63,7 @@ Construct a new player connection.
 
 #### Defined in
 
-[PlayerConnection.ts:45](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L45)
+[PlayerConnection.ts:46](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/PlayerConnection.ts#L46)
 
 ## Properties
 
@@ -76,7 +77,7 @@ Construct a new player connection.
 
 #### Defined in
 
-[PlayerConnection.ts:28](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L28)
+[PlayerConnection.ts:27](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/PlayerConnection.ts#L27)
 
 ___
 
@@ -90,17 +91,17 @@ ___
 
 #### Defined in
 
-[PlayerConnection.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L30)
+[PlayerConnection.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/PlayerConnection.ts#L29)
 
 ___
 
 ### remoteAddress
 
-• **remoteAddress**: `undefined` \| `string`
+• `Optional` **remoteAddress**: `string`
 
 #### Defined in
 
-[PlayerConnection.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L32)
+[PlayerConnection.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/PlayerConnection.ts#L31)
 
 ___
 
@@ -114,7 +115,7 @@ ___
 
 #### Defined in
 
-[PlayerConnection.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L31)
+[PlayerConnection.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/PlayerConnection.ts#L30)
 
 ___
 
@@ -124,7 +125,7 @@ ___
 
 #### Defined in
 
-[PlayerConnection.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L29)
+[PlayerConnection.ts:28](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/PlayerConnection.ts#L28)
 
 ## Methods
 
@@ -132,9 +133,13 @@ ___
 
 ▸ **getPlayerInfo**(): [`IPlayerInfo`](../interfaces/PlayerRegistry.IPlayerInfo.md)
 
+Returns a descriptive object for the REST API inspection operations.
+
 #### Returns
 
 [`IPlayerInfo`](../interfaces/PlayerRegistry.IPlayerInfo.md)
+
+An IPlayerInfo object containing viewable information about this connection.
 
 #### Implementation of
 
@@ -142,7 +147,7 @@ ___
 
 #### Defined in
 
-[PlayerConnection.ts:73](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L73)
+[PlayerConnection.ts:83](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/PlayerConnection.ts#L83)
 
 ___
 
@@ -150,9 +155,13 @@ ___
 
 ▸ **getReadableIdentifier**(): `string`
 
+Returns an identifier that is displayed in logs.
+
 #### Returns
 
 `string`
+
+A string describing this connection.
 
 #### Implementation of
 
@@ -160,7 +169,7 @@ ___
 
 #### Defined in
 
-[PlayerConnection.ts:63](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L63)
+[PlayerConnection.ts:68](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/PlayerConnection.ts#L68)
 
 ___
 
@@ -172,9 +181,9 @@ Sends a signalling message to the player.
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `message` | `BaseMessage` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `message` | `BaseMessage` | The message to send. |
 
 #### Returns
 
@@ -186,4 +195,4 @@ Sends a signalling message to the player.
 
 #### Defined in
 
-[PlayerConnection.ts:68](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L68)
+[PlayerConnection.ts:74](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/PlayerConnection.ts#L74)

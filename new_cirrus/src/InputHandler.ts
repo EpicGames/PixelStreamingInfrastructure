@@ -1,12 +1,12 @@
 import { SignallingServer } from './SignallingServer';
-import { beautify } from './Utils';
+import { IProgramOptions, beautify } from './Utils';
 
 interface IHandlerFunc {
     desc: string,
-    func: (options: unknown, signallingServer: SignallingServer) => void,
+    func: (options: IProgramOptions, signallingServer: SignallingServer) => void,
 }
 
-export function initInputHandler(options: unknown, signallingServer: SignallingServer) {
+export function initInputHandler(options: IProgramOptions, signallingServer: SignallingServer) {
     const stdin = process.stdin;
 
     stdin.setRawMode( true );
@@ -43,18 +43,18 @@ export function initInputHandler(options: unknown, signallingServer: SignallingS
     });
 }
 
-function printConfig(options: unknown) {
+function printConfig(options: IProgramOptions) {
     process.stdout.write(`${beautify(options)}\n`);
 }
 
-function printServerInfo(_options: unknown, _signallingServer: SignallingServer) {
+function printServerInfo(_options: IProgramOptions, _signallingServer: SignallingServer) {
     process.stdout.write(`Info:\n\t<TODO input times/counts/errors etc>\n`);
 }
 
-function printStreamerList(_options: unknown, signallingServer: SignallingServer) {
+function printStreamerList(_options: IProgramOptions, signallingServer: SignallingServer) {
     process.stdout.write(`Streamer Ids: ${signallingServer.streamerRegistry.streamers.map(streamer => streamer.streamerId)}\n`);
 }
 
-function printPlayerList(_options: unknown, signallingServer: SignallingServer) {
+function printPlayerList(_options: IProgramOptions, signallingServer: SignallingServer) {
     process.stdout.write(`Player Ids: ${signallingServer.playerRegistry.listPlayers().map(player => player.playerId)}\n`);
 }

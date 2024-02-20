@@ -1,4 +1,4 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / PlayerConnection
+[wilbur](../README.md) / [Exports](../modules.md) / PlayerConnection
 
 # Module: PlayerConnection
 

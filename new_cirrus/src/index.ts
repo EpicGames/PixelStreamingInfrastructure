@@ -5,7 +5,7 @@ import { WebServer } from './WebServer';
 import { InitLogging, Logger } from './Logger';
 import { Command, Option } from 'commander';
 import { initInputHandler } from './InputHandler';
-import { stringify, beautify } from './Utils';
+import { IProgramOptions, stringify, beautify } from './Utils';
 import { initialize } from 'express-openapi';
 import fs from 'fs';
 
@@ -51,10 +51,11 @@ program
     .addOption(new Option('--config_file <path>', 'Sets the path of the config file.').default("config.json"))
     .addOption(new Option('--no_save', 'On startup the given configuration is resaved out to config.json. This switch will prevent this behaviour allowing the config.json file to remain untouched while running with new configurations.').default(false))
     .helpOption('-h, --help', 'Display this help text.')
+    .allowUnknownOption() // ignore unknown options which will allow versions to be swapped out into existing scripts with maybe older/newer options
     .parse();
 
 // parsed command line options
-const cli_options = program.opts();
+const cli_options: IProgramOptions = program.opts();
 
 // possible config file options
 let config_file: any = {};
@@ -69,7 +70,7 @@ if (!cli_options.no_config) {
 }
 
 // merge the configurations
-const options = { ...config_file, ...cli_options };
+const options: IProgramOptions = { ...config_file, ...cli_options };
 
 // save out new configuration (unless disabled)
 if (!options.no_save) {
@@ -127,7 +128,7 @@ initialize({
     app,
     docsPath: "/api-definition",
     exposeApiDocs: true,
-    apiDoc: "./doc/api-definition-base.yml",
+    apiDoc: "./apidoc/api-definition-base.yml",
     paths: "./build/paths",
     dependencies: {
         signallingServer,

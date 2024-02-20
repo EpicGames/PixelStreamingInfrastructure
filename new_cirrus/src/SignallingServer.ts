@@ -52,6 +52,11 @@ export class SignallingServer {
     playerRegistry: PlayerRegistry;
     startTime: Date;
 
+    /**
+     * Initializes the server object and sets up listening sockets for streamers
+     * players and optionally SFU connections.
+     * @param config - A collection of options for this server.
+     */
     constructor(config: IServerConfig) {
         Logger.debug('Started SignallingServer with config: %s', stringify(config));
 
@@ -95,7 +100,7 @@ export class SignallingServer {
     private onStreamerConnected(ws: WebSocket, request: http.IncomingMessage) {
         Logger.info(`New streamer connection: %s`, request.socket.remoteAddress);
 
-        const newStreamer = new StreamerConnection(this, ws, request);
+        const newStreamer = new StreamerConnection(this, ws, request.socket.remoteAddress);
 
         // add it to the registry and when the transport closes, remove it.
         this.streamerRegistry.add(newStreamer);
@@ -116,7 +121,7 @@ export class SignallingServer {
             sendOffer = offerToReceive ? false : true;
         }
 
-        const newPlayer = new PlayerConnection(this, ws, request, sendOffer);
+        const newPlayer = new PlayerConnection(this, ws, sendOffer, request.socket.remoteAddress);
 
         // add it to the registry and when the transport closes, remove it
         this.playerRegistry.add(newPlayer);
@@ -127,7 +132,7 @@ export class SignallingServer {
 
     private onSFUConnected(ws: WebSocket, request: http.IncomingMessage) {
         Logger.info(`New SFU connection: %s`, request.socket.remoteAddress);
-        const newSFU = new SFUConnection(this, ws, request);
+        const newSFU = new SFUConnection(this, ws, request.socket.remoteAddress);
 
         // SFU acts as both a streamer and player
         this.streamerRegistry.add(newSFU);

@@ -107,7 +107,8 @@
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
   "typedocOptions": {
-    "entryPoints": ["src/**.ts"],
+    "entryPoints": ["src/**/*.ts"],
+    "exclude": ["src/paths/**/*"],
     "out": "docs",
     "excludeExternals": true,
     "excludePrivate": true,

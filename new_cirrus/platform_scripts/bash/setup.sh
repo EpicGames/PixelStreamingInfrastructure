@@ -110,18 +110,18 @@ function setup_frontend() {
 		pushd ${BASH_LOCATION}/../../../Frontend/library > /dev/null
 		${BASH_LOCATION}/node/bin/npm install
 		${BASH_LOCATION}/node/bin/npm link ../../Common
-		${BASH_LOCATION}/node/bin/npm run build-dev
+		${BASH_LOCATION}/node/bin/npm run build
 		popd
 		pushd ${BASH_LOCATION}/../../../Frontend/ui-library > /dev/null
 		${BASH_LOCATION}/node/bin/npm install
 		${BASH_LOCATION}/node/bin/npm link ../library
-		${BASH_LOCATION}/node/bin/npm run build-dev
+		${BASH_LOCATION}/node/bin/npm run build
 		popd
 
 		pushd ${BASH_LOCATION}/../../../Frontend/implementations/typescript > /dev/null
 		${BASH_LOCATION}/node/bin/npm install
 		${BASH_LOCATION}/node/bin/npm link ../../library ../../ui-library
-		${BASH_LOCATION}/node/bin/npm run build-dev
+		${BASH_LOCATION}/node/bin/npm run build
 		popd
 	else
 		echo 'Skipping building Frontend because files already exist. Please run with "--build" to force a rebuild'
@@ -134,7 +134,7 @@ function setup_frontend() {
 
 echo "Checking Pixel Streaming Server dependencies."
 
-# navigate to SignallingWebServer root
+# navigate to project root
 pushd ${BASH_LOCATION}/../.. > /dev/null
 
 node_version=""
@@ -164,7 +164,7 @@ check_and_install "node" "$node_version" "$NODE_VERSION" "curl $node_url --outpu
 PATH="${BASH_LOCATION}/node/bin:$PATH"
 "${BASH_LOCATION}/node/lib/node_modules/npm/bin/npm-cli.js" install
 
-popd > /dev/null # SignallingWebServer
+popd > /dev/null
 
 # Trigger Frontend Build if needed or requested
 # This has to be done after check_and_install "node"

@@ -22,7 +22,7 @@ fi
 
 arguments+=" --peer_options=\"${peerconnectionoptions}\" --public_ip=${publicip}"
 # Add arguments passed to script to arguments for executable
-arguments+=" ${cirruscmd}"
+arguments+=" ${servercmd}"
 
 pushd ../..
 echo "Running: $process $arguments"

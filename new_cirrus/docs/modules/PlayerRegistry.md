@@ -1,4 +1,4 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / PlayerRegistry
+[wilbur](../README.md) / [Exports](../modules.md) / PlayerRegistry
 
 # Module: PlayerRegistry
 

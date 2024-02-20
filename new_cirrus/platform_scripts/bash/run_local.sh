@@ -19,12 +19,12 @@ if [ ! -z $IS_DEBUG ]; then
 fi
 
 arguments+=" --public_ip=${publicip}"
-arguments+=" ${cirruscmd}"
+arguments+=" ${servercmd}"
 
 pushd ../.. > /dev/null
 
 echo ""
-echo "Starting Cirrus server use ctrl-c to exit"
+echo "Starting server use ctrl-c to exit"
 echo "-----------------------------------------"
 echo ""
 

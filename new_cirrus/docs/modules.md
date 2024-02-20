@@ -1,6 +1,6 @@
-[new-cirrus](README.md) / Exports
+[wilbur](README.md) / Exports
 
-# new-cirrus
+# wilbur
 
 ## Table of contents
 
