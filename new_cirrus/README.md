@@ -24,7 +24,7 @@ Invoking `npm start -- --help` or `node build/index.js --help` will display the 
 ```
 Usage: wilbur [options]
 
-A rewrite of the old cirrus signalling server
+A basic signalling server application for Unreal Engine's Pixel Streaming applications.
 
 Options:
   -V, --version                 output the version number
@@ -51,7 +51,6 @@ Options:
                                 prevent this behaviour allowing the config.json file to remain untouched while running
                                 with new configurations. (default: false)
   -h, --help                    Display this help text.
-
 ```
 These CLI options can also be described in a `config.json` (default config file overridable with --config_file) by specifying the command option name and value in a simple JSON object. eg.
 ```

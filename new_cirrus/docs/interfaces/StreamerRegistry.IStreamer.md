@@ -43,7 +43,7 @@ streamer registry.
 
 #### Defined in
 
-[StreamerRegistry.ts:14](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerRegistry.ts#L14)
+[StreamerRegistry.ts:14](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9e99810/new_cirrus/src/StreamerRegistry.ts#L14)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 #### Defined in
 
-[StreamerRegistry.ts:12](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerRegistry.ts#L12)
+[StreamerRegistry.ts:12](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9e99810/new_cirrus/src/StreamerRegistry.ts#L12)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 #### Defined in
 
-[StreamerRegistry.ts:15](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerRegistry.ts#L15)
+[StreamerRegistry.ts:15](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9e99810/new_cirrus/src/StreamerRegistry.ts#L15)
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 #### Defined in
 
-[StreamerRegistry.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerRegistry.ts#L13)
+[StreamerRegistry.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9e99810/new_cirrus/src/StreamerRegistry.ts#L13)
 
 ## Methods
 
@@ -91,7 +91,7 @@ ___
 
 #### Defined in
 
-[LoggingUtils.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/LoggingUtils.ts#L9)
+[LoggingUtils.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9e99810/new_cirrus/src/LoggingUtils.ts#L9)
 
 ___
 
@@ -105,7 +105,7 @@ ___
 
 #### Defined in
 
-[StreamerRegistry.ts:18](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerRegistry.ts#L18)
+[StreamerRegistry.ts:18](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9e99810/new_cirrus/src/StreamerRegistry.ts#L18)
 
 ___
 
@@ -125,4 +125,4 @@ ___
 
 #### Defined in
 
-[StreamerRegistry.ts:17](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/e8a95da/new_cirrus/src/StreamerRegistry.ts#L17)
+[StreamerRegistry.ts:17](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9e99810/new_cirrus/src/StreamerRegistry.ts#L17)
