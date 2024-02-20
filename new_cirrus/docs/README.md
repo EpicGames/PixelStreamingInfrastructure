@@ -7,7 +7,7 @@ The signalling server is a small intermediary application that sits between stre
 This is a new implementation of the now deprecated cirrus. Differences in behaviour are described [here](TODO).
 
 ## Building
-Building is handled by npm and tsc as a very basic typescript project. The easiest method is to invoke
+Building is handled by `npm` and `tsc` as a very basic typescript project. The easiest method is to invoke
 ```
 npm run build
 ```
