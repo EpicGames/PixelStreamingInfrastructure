@@ -1,13 +1,11 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / Utils
-
 # Module: Utils
 
 ## Table of contents
 
 ### Functions
 
-- [beautify](Utils.md#beautify)
-- [stringify](Utils.md#stringify)
+- [beautify](../wiki/Utils#beautify)
+- [stringify](../wiki/Utils#stringify)
 
 ## Functions
 
@@ -29,7 +27,7 @@ Circular reference save version of JSON.stringify with extra formatting.
 
 #### Defined in
 
-[src/Utils.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/Utils.ts#L13)
+[src/Utils.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/Utils.ts#L13)
 
 ___
 
@@ -51,4 +49,4 @@ Cirular reference safe version of JSON.stringify
 
 #### Defined in
 
-[src/Utils.ts:6](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/Utils.ts#L6)
+[src/Utils.ts:6](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/Utils.ts#L6)

@@ -1,8 +1,6 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / [StreamerRegistry](../modules/StreamerRegistry.md) / IStreamer
-
 # Interface: IStreamer
 
-[StreamerRegistry](../modules/StreamerRegistry.md).IStreamer
+[StreamerRegistry](../wiki/StreamerRegistry).IStreamer
 
 An interface that describes a streamer that can be added to the
 streamer registry.
@@ -11,45 +9,45 @@ streamer registry.
 
 - `EventEmitter`
 
-- [`IMessageLogger`](LoggingUtils.IMessageLogger.md)
+- [`IMessageLogger`](../wiki/LoggingUtils.IMessageLogger)
 
   ↳ **`IStreamer`**
 
 ## Implemented by
 
-- [`SFUConnection`](../classes/SFUConnection.SFUConnection.md)
-- [`StreamerConnection`](../classes/StreamerConnection.StreamerConnection.md)
+- [`SFUConnection`](../wiki/SFUConnection.SFUConnection)
+- [`StreamerConnection`](../wiki/StreamerConnection.StreamerConnection)
 
 ## Table of contents
 
 ### Properties
 
-- [protocol](StreamerRegistry.IStreamer.md#protocol)
-- [streamerId](StreamerRegistry.IStreamer.md#streamerid)
-- [streaming](StreamerRegistry.IStreamer.md#streaming)
-- [transport](StreamerRegistry.IStreamer.md#transport)
+- [protocol](../wiki/StreamerRegistry.IStreamer#protocol)
+- [streamerId](../wiki/StreamerRegistry.IStreamer#streamerid)
+- [streaming](../wiki/StreamerRegistry.IStreamer#streaming)
+- [transport](../wiki/StreamerRegistry.IStreamer#transport)
 
 ### Methods
 
-- [[captureRejectionSymbol]](StreamerRegistry.IStreamer.md#[capturerejectionsymbol])
-- [addListener](StreamerRegistry.IStreamer.md#addlistener)
-- [emit](StreamerRegistry.IStreamer.md#emit)
-- [eventNames](StreamerRegistry.IStreamer.md#eventnames)
-- [getMaxListeners](StreamerRegistry.IStreamer.md#getmaxlisteners)
-- [getReadableIdentifier](StreamerRegistry.IStreamer.md#getreadableidentifier)
-- [getStreamerInfo](StreamerRegistry.IStreamer.md#getstreamerinfo)
-- [listenerCount](StreamerRegistry.IStreamer.md#listenercount)
-- [listeners](StreamerRegistry.IStreamer.md#listeners)
-- [off](StreamerRegistry.IStreamer.md#off)
-- [on](StreamerRegistry.IStreamer.md#on)
-- [once](StreamerRegistry.IStreamer.md#once)
-- [prependListener](StreamerRegistry.IStreamer.md#prependlistener)
-- [prependOnceListener](StreamerRegistry.IStreamer.md#prependoncelistener)
-- [rawListeners](StreamerRegistry.IStreamer.md#rawlisteners)
-- [removeAllListeners](StreamerRegistry.IStreamer.md#removealllisteners)
-- [removeListener](StreamerRegistry.IStreamer.md#removelistener)
-- [sendMessage](StreamerRegistry.IStreamer.md#sendmessage)
-- [setMaxListeners](StreamerRegistry.IStreamer.md#setmaxlisteners)
+- [[captureRejectionSymbol]](../wiki/StreamerRegistry.IStreamer#%5Bcapturerejectionsymbol%5D)
+- [addListener](../wiki/StreamerRegistry.IStreamer#addlistener)
+- [emit](../wiki/StreamerRegistry.IStreamer#emit)
+- [eventNames](../wiki/StreamerRegistry.IStreamer#eventnames)
+- [getMaxListeners](../wiki/StreamerRegistry.IStreamer#getmaxlisteners)
+- [getReadableIdentifier](../wiki/StreamerRegistry.IStreamer#getreadableidentifier)
+- [getStreamerInfo](../wiki/StreamerRegistry.IStreamer#getstreamerinfo)
+- [listenerCount](../wiki/StreamerRegistry.IStreamer#listenercount)
+- [listeners](../wiki/StreamerRegistry.IStreamer#listeners)
+- [off](../wiki/StreamerRegistry.IStreamer#off)
+- [on](../wiki/StreamerRegistry.IStreamer#on)
+- [once](../wiki/StreamerRegistry.IStreamer#once)
+- [prependListener](../wiki/StreamerRegistry.IStreamer#prependlistener)
+- [prependOnceListener](../wiki/StreamerRegistry.IStreamer#prependoncelistener)
+- [rawListeners](../wiki/StreamerRegistry.IStreamer#rawlisteners)
+- [removeAllListeners](../wiki/StreamerRegistry.IStreamer#removealllisteners)
+- [removeListener](../wiki/StreamerRegistry.IStreamer#removelistener)
+- [sendMessage](../wiki/StreamerRegistry.IStreamer#sendmessage)
+- [setMaxListeners](../wiki/StreamerRegistry.IStreamer#setmaxlisteners)
 
 ## Properties
 
@@ -59,7 +57,7 @@ streamer registry.
 
 #### Defined in
 
-[src/StreamerRegistry.ts:14](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerRegistry.ts#L14)
+[src/StreamerRegistry.ts:14](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L14)
 
 ___
 
@@ -69,7 +67,7 @@ ___
 
 #### Defined in
 
-[src/StreamerRegistry.ts:12](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerRegistry.ts#L12)
+[src/StreamerRegistry.ts:12](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L12)
 
 ___
 
@@ -79,7 +77,7 @@ ___
 
 #### Defined in
 
-[src/StreamerRegistry.ts:15](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerRegistry.ts#L15)
+[src/StreamerRegistry.ts:15](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L15)
 
 ___
 
@@ -89,7 +87,7 @@ ___
 
 #### Defined in
 
-[src/StreamerRegistry.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerRegistry.ts#L13)
+[src/StreamerRegistry.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L13)
 
 ## Methods
 
@@ -291,25 +289,25 @@ ___
 
 #### Inherited from
 
-[IMessageLogger](LoggingUtils.IMessageLogger.md).[getReadableIdentifier](LoggingUtils.IMessageLogger.md#getreadableidentifier)
+[IMessageLogger](../wiki/LoggingUtils.IMessageLogger).[getReadableIdentifier](../wiki/LoggingUtils.IMessageLogger#getreadableidentifier)
 
 #### Defined in
 
-[src/LoggingUtils.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/LoggingUtils.ts#L9)
+[src/LoggingUtils.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/LoggingUtils.ts#L9)
 
 ___
 
 ### getStreamerInfo
 
-▸ **getStreamerInfo**(): [`IStreamerInfo`](StreamerRegistry.IStreamerInfo.md)
+▸ **getStreamerInfo**(): [`IStreamerInfo`](../wiki/StreamerRegistry.IStreamerInfo)
 
 #### Returns
 
-[`IStreamerInfo`](StreamerRegistry.IStreamerInfo.md)
+[`IStreamerInfo`](../wiki/StreamerRegistry.IStreamerInfo)
 
 #### Defined in
 
-[src/StreamerRegistry.ts:18](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerRegistry.ts#L18)
+[src/StreamerRegistry.ts:18](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L18)
 
 ___
 
@@ -824,7 +822,7 @@ ___
 
 #### Defined in
 
-[src/StreamerRegistry.ts:17](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerRegistry.ts#L17)
+[src/StreamerRegistry.ts:17](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L17)
 
 ___
 

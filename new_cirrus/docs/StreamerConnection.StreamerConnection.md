@@ -1,18 +1,13 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / [SFUConnection](../modules/SFUConnection.md) / SFUConnection
+# Class: StreamerConnection
 
-# Class: SFUConnection
+[StreamerConnection](../wiki/StreamerConnection).StreamerConnection
 
-[SFUConnection](../modules/SFUConnection.md).SFUConnection
-
-A SFU connection to the signalling server.
-An SFU can act as both a streamer and a player. It can subscribe to
-streamers like a player, and other players can subscribe to the sfu.
-Therefore the SFU will have a streamer id and a player id and be
-registered in both streamer registries and player registries.
+A connection between the signalling server and a streamer connection.
+This is where messages expected to be handled by the streamer come in
+and where messages are sent to the streamer.
 
 Interesting internals:
-playerId: The player id of this connectiom.
-streamerId: The streamer id of this connection.
+streamerId: The unique id string of this streamer.
 transport: The ITransport where transport events can be subscribed to
 protocol: The SignallingProtocol where signalling messages can be
 subscribed to.
@@ -22,105 +17,88 @@ streaming: True when the streamer is ready to accept subscriptions.
 
 - `EventEmitter`
 
-  ↳ **`SFUConnection`**
+  ↳ **`StreamerConnection`**
 
 ## Implements
 
-- [`IPlayer`](../interfaces/PlayerRegistry.IPlayer.md)
-- [`IStreamer`](../interfaces/StreamerRegistry.IStreamer.md)
-- [`IMessageLogger`](../interfaces/LoggingUtils.IMessageLogger.md)
+- [`IStreamer`](../wiki/StreamerRegistry.IStreamer)
+- [`IMessageLogger`](../wiki/LoggingUtils.IMessageLogger)
 
 ## Table of contents
 
 ### Constructors
 
-- [constructor](SFUConnection.SFUConnection.md#constructor)
+- [constructor](../wiki/StreamerConnection.StreamerConnection#constructor)
 
 ### Properties
 
-- [layerPreferenceListener](SFUConnection.SFUConnection.md#layerpreferencelistener)
-- [playerId](SFUConnection.SFUConnection.md#playerid)
-- [protocol](SFUConnection.SFUConnection.md#protocol)
-- [remoteAddress](SFUConnection.SFUConnection.md#remoteaddress)
-- [server](SFUConnection.SFUConnection.md#server)
-- [streamerDisconnectedListener](SFUConnection.SFUConnection.md#streamerdisconnectedlistener)
-- [streamerId](SFUConnection.SFUConnection.md#streamerid)
-- [streamerIdChangeListener](SFUConnection.SFUConnection.md#streameridchangelistener)
-- [streaming](SFUConnection.SFUConnection.md#streaming)
-- [subscribedStreamer](SFUConnection.SFUConnection.md#subscribedstreamer)
-- [transport](SFUConnection.SFUConnection.md#transport)
-- [captureRejectionSymbol](SFUConnection.SFUConnection.md#capturerejectionsymbol)
-- [captureRejections](SFUConnection.SFUConnection.md#capturerejections)
-- [defaultMaxListeners](SFUConnection.SFUConnection.md#defaultmaxlisteners)
-- [errorMonitor](SFUConnection.SFUConnection.md#errormonitor)
+- [protocol](../wiki/StreamerConnection.StreamerConnection#protocol)
+- [remoteAddress](../wiki/StreamerConnection.StreamerConnection#remoteaddress)
+- [server](../wiki/StreamerConnection.StreamerConnection#server)
+- [streamerId](../wiki/StreamerConnection.StreamerConnection#streamerid)
+- [streaming](../wiki/StreamerConnection.StreamerConnection#streaming)
+- [transport](../wiki/StreamerConnection.StreamerConnection#transport)
+- [captureRejectionSymbol](../wiki/StreamerConnection.StreamerConnection#capturerejectionsymbol)
+- [captureRejections](../wiki/StreamerConnection.StreamerConnection#capturerejections)
+- [defaultMaxListeners](../wiki/StreamerConnection.StreamerConnection#defaultmaxlisteners)
+- [errorMonitor](../wiki/StreamerConnection.StreamerConnection#errormonitor)
 
 ### Methods
 
-- [[captureRejectionSymbol]](SFUConnection.SFUConnection.md#[capturerejectionsymbol])
-- [addListener](SFUConnection.SFUConnection.md#addlistener)
-- [disconnect](SFUConnection.SFUConnection.md#disconnect)
-- [emit](SFUConnection.SFUConnection.md#emit)
-- [eventNames](SFUConnection.SFUConnection.md#eventnames)
-- [getMaxListeners](SFUConnection.SFUConnection.md#getmaxlisteners)
-- [getPlayerInfo](SFUConnection.SFUConnection.md#getplayerinfo)
-- [getReadableIdentifier](SFUConnection.SFUConnection.md#getreadableidentifier)
-- [getStreamerInfo](SFUConnection.SFUConnection.md#getstreamerinfo)
-- [listenerCount](SFUConnection.SFUConnection.md#listenercount)
-- [listeners](SFUConnection.SFUConnection.md#listeners)
-- [off](SFUConnection.SFUConnection.md#off)
-- [on](SFUConnection.SFUConnection.md#on)
-- [onEndpointId](SFUConnection.SFUConnection.md#onendpointid)
-- [onLayerPreference](SFUConnection.SFUConnection.md#onlayerpreference)
-- [onListStreamers](SFUConnection.SFUConnection.md#onliststreamers)
-- [onStartStreaming](SFUConnection.SFUConnection.md#onstartstreaming)
-- [onStopStreaming](SFUConnection.SFUConnection.md#onstopstreaming)
-- [onStreamerDataChannels](SFUConnection.SFUConnection.md#onstreamerdatachannels)
-- [onStreamerDisconnected](SFUConnection.SFUConnection.md#onstreamerdisconnected)
-- [onStreamerIdChanged](SFUConnection.SFUConnection.md#onstreameridchanged)
-- [onSubscribeMessage](SFUConnection.SFUConnection.md#onsubscribemessage)
-- [onTransportClose](SFUConnection.SFUConnection.md#ontransportclose)
-- [onTransportError](SFUConnection.SFUConnection.md#ontransporterror)
-- [onUnsubscribeMessage](SFUConnection.SFUConnection.md#onunsubscribemessage)
-- [once](SFUConnection.SFUConnection.md#once)
-- [prependListener](SFUConnection.SFUConnection.md#prependlistener)
-- [prependOnceListener](SFUConnection.SFUConnection.md#prependoncelistener)
-- [rawListeners](SFUConnection.SFUConnection.md#rawlisteners)
-- [registerMessageHandlers](SFUConnection.SFUConnection.md#registermessagehandlers)
-- [removeAllListeners](SFUConnection.SFUConnection.md#removealllisteners)
-- [removeListener](SFUConnection.SFUConnection.md#removelistener)
-- [sendMessage](SFUConnection.SFUConnection.md#sendmessage)
-- [sendToPlayer](SFUConnection.SFUConnection.md#sendtoplayer)
-- [sendToStreamer](SFUConnection.SFUConnection.md#sendtostreamer)
-- [setMaxListeners](SFUConnection.SFUConnection.md#setmaxlisteners)
-- [subscribe](SFUConnection.SFUConnection.md#subscribe)
-- [unsubscribe](SFUConnection.SFUConnection.md#unsubscribe)
-- [addAbortListener](SFUConnection.SFUConnection.md#addabortlistener)
-- [getEventListeners](SFUConnection.SFUConnection.md#geteventlisteners)
-- [getMaxListeners](SFUConnection.SFUConnection.md#getmaxlisteners-1)
-- [listenerCount](SFUConnection.SFUConnection.md#listenercount-1)
-- [on](SFUConnection.SFUConnection.md#on-1)
-- [once](SFUConnection.SFUConnection.md#once-1)
-- [setMaxListeners](SFUConnection.SFUConnection.md#setmaxlisteners-1)
+- [[captureRejectionSymbol]](../wiki/StreamerConnection.StreamerConnection#%5Bcapturerejectionsymbol%5D)
+- [addListener](../wiki/StreamerConnection.StreamerConnection#addlistener)
+- [emit](../wiki/StreamerConnection.StreamerConnection#emit)
+- [eventNames](../wiki/StreamerConnection.StreamerConnection#eventnames)
+- [forwardMessage](../wiki/StreamerConnection.StreamerConnection#forwardmessage)
+- [getMaxListeners](../wiki/StreamerConnection.StreamerConnection#getmaxlisteners)
+- [getReadableIdentifier](../wiki/StreamerConnection.StreamerConnection#getreadableidentifier)
+- [getStreamerInfo](../wiki/StreamerConnection.StreamerConnection#getstreamerinfo)
+- [listenerCount](../wiki/StreamerConnection.StreamerConnection#listenercount)
+- [listeners](../wiki/StreamerConnection.StreamerConnection#listeners)
+- [off](../wiki/StreamerConnection.StreamerConnection#off)
+- [on](../wiki/StreamerConnection.StreamerConnection#on)
+- [onDisconnectPlayerRequest](../wiki/StreamerConnection.StreamerConnection#ondisconnectplayerrequest)
+- [onEndpointId](../wiki/StreamerConnection.StreamerConnection#onendpointid)
+- [onLayerPreference](../wiki/StreamerConnection.StreamerConnection#onlayerpreference)
+- [onPing](../wiki/StreamerConnection.StreamerConnection#onping)
+- [onTransportClose](../wiki/StreamerConnection.StreamerConnection#ontransportclose)
+- [onTransportError](../wiki/StreamerConnection.StreamerConnection#ontransporterror)
+- [once](../wiki/StreamerConnection.StreamerConnection#once)
+- [prependListener](../wiki/StreamerConnection.StreamerConnection#prependlistener)
+- [prependOnceListener](../wiki/StreamerConnection.StreamerConnection#prependoncelistener)
+- [rawListeners](../wiki/StreamerConnection.StreamerConnection#rawlisteners)
+- [registerMessageHandlers](../wiki/StreamerConnection.StreamerConnection#registermessagehandlers)
+- [removeAllListeners](../wiki/StreamerConnection.StreamerConnection#removealllisteners)
+- [removeListener](../wiki/StreamerConnection.StreamerConnection#removelistener)
+- [sendMessage](../wiki/StreamerConnection.StreamerConnection#sendmessage)
+- [setMaxListeners](../wiki/StreamerConnection.StreamerConnection#setmaxlisteners)
+- [addAbortListener](../wiki/StreamerConnection.StreamerConnection#addabortlistener)
+- [getEventListeners](../wiki/StreamerConnection.StreamerConnection#geteventlisteners)
+- [getMaxListeners](../wiki/StreamerConnection.StreamerConnection#getmaxlisteners-1)
+- [listenerCount](../wiki/StreamerConnection.StreamerConnection#listenercount-1)
+- [on](../wiki/StreamerConnection.StreamerConnection#on-1)
+- [once](../wiki/StreamerConnection.StreamerConnection#once-1)
+- [setMaxListeners](../wiki/StreamerConnection.StreamerConnection#setmaxlisteners-1)
 
 ## Constructors
 
 ### constructor
 
-• **new SFUConnection**(`server`, `ws`, `request`): [`SFUConnection`](SFUConnection.SFUConnection.md)
+• **new StreamerConnection**(`server`, `ws`, `request`): [`StreamerConnection`](../wiki/StreamerConnection.StreamerConnection)
 
-Construct a new SFU connection.
+Construct a new streamer connection.
 
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `server` | [`SignallingServer`](SignallingServer.SignallingServer.md) | The signalling server object that spawned this sfu. |
-| `ws` | `WebSocket` | The websocket coupled to this sfu connection. |
+| `server` | [`SignallingServer`](../wiki/SignallingServer.SignallingServer) | The signalling server object that spawned this streamer. |
+| `ws` | `WebSocket` | The websocket coupled to this streamer connection. |
 | `request` | `IncomingMessage` | - |
 
 #### Returns
 
-[`SFUConnection`](SFUConnection.SFUConnection.md)
+[`StreamerConnection`](../wiki/StreamerConnection.StreamerConnection)
 
 #### Overrides
 
@@ -128,47 +106,9 @@ EventEmitter.constructor
 
 #### Defined in
 
-[src/SFUConnection.ts:50](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L50)
+[src/StreamerConnection.ts:41](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L41)
 
 ## Properties
-
-### layerPreferenceListener
-
-• `Private` **layerPreferenceListener**: (`message`: `layerPreference`) => `void`
-
-#### Type declaration
-
-▸ (`message`): `void`
-
-##### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `message` | `layerPreference` |
-
-##### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:41](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L41)
-
-___
-
-### playerId
-
-• **playerId**: `string`
-
-#### Implementation of
-
-[IPlayer](../interfaces/PlayerRegistry.IPlayer.md).[playerId](../interfaces/PlayerRegistry.IPlayer.md#playerid)
-
-#### Defined in
-
-[src/SFUConnection.ts:35](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L35)
-
-___
 
 ### protocol
 
@@ -176,11 +116,11 @@ ___
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[protocol](../interfaces/StreamerRegistry.IStreamer.md#protocol)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[protocol](../wiki/StreamerRegistry.IStreamer#protocol)
 
 #### Defined in
 
-[src/SFUConnection.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L34)
+[src/StreamerConnection.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L32)
 
 ___
 
@@ -190,35 +130,17 @@ ___
 
 #### Defined in
 
-[src/SFUConnection.ts:38](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L38)
+[src/StreamerConnection.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L34)
 
 ___
 
 ### server
 
-• `Private` **server**: [`SignallingServer`](SignallingServer.SignallingServer.md)
+• `Private` **server**: [`SignallingServer`](../wiki/SignallingServer.SignallingServer)
 
 #### Defined in
 
-[src/SFUConnection.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L32)
-
-___
-
-### streamerDisconnectedListener
-
-• `Private` **streamerDisconnectedListener**: () => `void`
-
-#### Type declaration
-
-▸ (): `void`
-
-##### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:43](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L43)
+[src/StreamerConnection.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L29)
 
 ___
 
@@ -228,35 +150,11 @@ ___
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[streamerId](../interfaces/StreamerRegistry.IStreamer.md#streamerid)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[streamerId](../wiki/StreamerRegistry.IStreamer#streamerid)
 
 #### Defined in
 
-[src/SFUConnection.ts:36](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L36)
-
-___
-
-### streamerIdChangeListener
-
-• `Private` **streamerIdChangeListener**: (`newId`: `string`) => `void`
-
-#### Type declaration
-
-▸ (`newId`): `void`
-
-##### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `newId` | `string` |
-
-##### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:42](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L42)
+[src/StreamerConnection.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L30)
 
 ___
 
@@ -266,25 +164,11 @@ ___
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[streaming](../interfaces/StreamerRegistry.IStreamer.md#streaming)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[streaming](../wiki/StreamerRegistry.IStreamer#streaming)
 
 #### Defined in
 
-[src/SFUConnection.ts:37](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L37)
-
-___
-
-### subscribedStreamer
-
-• **subscribedStreamer**: ``null`` \| [`IStreamer`](../interfaces/StreamerRegistry.IStreamer.md)
-
-#### Implementation of
-
-[IPlayer](../interfaces/PlayerRegistry.IPlayer.md).[subscribedStreamer](../interfaces/PlayerRegistry.IPlayer.md#subscribedstreamer)
-
-#### Defined in
-
-[src/SFUConnection.ts:39](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L39)
+[src/StreamerConnection.ts:33](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L33)
 
 ___
 
@@ -294,17 +178,17 @@ ___
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[transport](../interfaces/StreamerRegistry.IStreamer.md#transport)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[transport](../wiki/StreamerRegistry.IStreamer#transport)
 
 #### Defined in
 
-[src/SFUConnection.ts:33](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L33)
+[src/StreamerConnection.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L31)
 
 ___
 
 ### captureRejectionSymbol
 
-▪ `Static` `Readonly` **captureRejectionSymbol**: typeof [`captureRejectionSymbol`](PlayerRegistry.PlayerRegistry.md#capturerejectionsymbol)
+▪ `Static` `Readonly` **captureRejectionSymbol**: typeof [`captureRejectionSymbol`](../wiki/PlayerRegistry.PlayerRegistry#capturerejectionsymbol)
 
 Value: `Symbol.for('nodejs.rejection')`
 
@@ -400,7 +284,7 @@ ___
 
 ### errorMonitor
 
-▪ `Static` `Readonly` **errorMonitor**: typeof [`errorMonitor`](PlayerRegistry.PlayerRegistry.md#errormonitor)
+▪ `Static` `Readonly` **errorMonitor**: typeof [`errorMonitor`](../wiki/PlayerRegistry.PlayerRegistry#errormonitor)
 
 This symbol shall be used to install a listener for only monitoring `'error'`events. Listeners installed using this symbol are called before the regular`'error'` listeners are called.
 
@@ -439,7 +323,7 @@ node_modules/@types/node/events.d.ts:395
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[[captureRejectionSymbol]](../interfaces/StreamerRegistry.IStreamer.md#[capturerejectionsymbol])
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[[captureRejectionSymbol]](../wiki/StreamerRegistry.IStreamer#%5Bcapturerejectionsymbol%5D)
 
 #### Inherited from
 
@@ -474,7 +358,7 @@ v0.1.26
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[addListener](../interfaces/StreamerRegistry.IStreamer.md#addlistener)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[addListener](../wiki/StreamerRegistry.IStreamer#addlistener)
 
 #### Inherited from
 
@@ -483,20 +367,6 @@ EventEmitter.addListener
 #### Defined in
 
 node_modules/@types/node/events.d.ts:545
-
-___
-
-### disconnect
-
-▸ **disconnect**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:179](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L179)
 
 ___
 
@@ -559,7 +429,7 @@ v0.1.26
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[emit](../interfaces/StreamerRegistry.IStreamer.md#emit)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[emit](../wiki/StreamerRegistry.IStreamer#emit)
 
 #### Inherited from
 
@@ -602,7 +472,7 @@ v6.0.0
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[eventNames](../interfaces/StreamerRegistry.IStreamer.md#eventnames)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[eventNames](../wiki/StreamerRegistry.IStreamer#eventnames)
 
 #### Inherited from
 
@@ -614,12 +484,32 @@ node_modules/@types/node/events.d.ts:870
 
 ___
 
+### forwardMessage
+
+▸ **forwardMessage**(`message`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `message` | `BaseMessage` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/StreamerConnection.ts:88](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L88)
+
+___
+
 ### getMaxListeners
 
 ▸ **getMaxListeners**(): `number`
 
 Returns the current max listener value for the `EventEmitter` which is either
-set by `emitter.setMaxListeners(n)` or defaults to [defaultMaxListeners](SFUConnection.SFUConnection.md#defaultmaxlisteners).
+set by `emitter.setMaxListeners(n)` or defaults to [defaultMaxListeners](../wiki/StreamerConnection.StreamerConnection#defaultmaxlisteners).
 
 #### Returns
 
@@ -631,7 +521,7 @@ v1.0.0
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[getMaxListeners](../interfaces/StreamerRegistry.IStreamer.md#getmaxlisteners)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[getMaxListeners](../wiki/StreamerRegistry.IStreamer#getmaxlisteners)
 
 #### Inherited from
 
@@ -640,24 +530,6 @@ EventEmitter.getMaxListeners
 #### Defined in
 
 node_modules/@types/node/events.d.ts:722
-
-___
-
-### getPlayerInfo
-
-▸ **getPlayerInfo**(): [`IPlayerInfo`](../interfaces/PlayerRegistry.IPlayerInfo.md)
-
-#### Returns
-
-[`IPlayerInfo`](../interfaces/PlayerRegistry.IPlayerInfo.md)
-
-#### Implementation of
-
-[IPlayer](../interfaces/PlayerRegistry.IPlayer.md).[getPlayerInfo](../interfaces/PlayerRegistry.IPlayer.md#getplayerinfo)
-
-#### Defined in
-
-[src/SFUConnection.ts:92](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L92)
 
 ___
 
@@ -671,29 +543,29 @@ ___
 
 #### Implementation of
 
-[IMessageLogger](../interfaces/LoggingUtils.IMessageLogger.md).[getReadableIdentifier](../interfaces/LoggingUtils.IMessageLogger.md#getreadableidentifier)
+[IMessageLogger](../wiki/LoggingUtils.IMessageLogger).[getReadableIdentifier](../wiki/LoggingUtils.IMessageLogger#getreadableidentifier)
 
 #### Defined in
 
-[src/SFUConnection.ts:72](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L72)
+[src/StreamerConnection.ts:57](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L57)
 
 ___
 
 ### getStreamerInfo
 
-▸ **getStreamerInfo**(): [`IStreamerInfo`](../interfaces/StreamerRegistry.IStreamerInfo.md)
+▸ **getStreamerInfo**(): [`IStreamerInfo`](../wiki/StreamerRegistry.IStreamerInfo)
 
 #### Returns
 
-[`IStreamerInfo`](../interfaces/StreamerRegistry.IStreamerInfo.md)
+[`IStreamerInfo`](../wiki/StreamerRegistry.IStreamerInfo)
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[getStreamerInfo](../interfaces/StreamerRegistry.IStreamer.md#getstreamerinfo)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[getStreamerInfo](../wiki/StreamerRegistry.IStreamer#getstreamerinfo)
 
 #### Defined in
 
-[src/SFUConnection.ts:82](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L82)
+[src/StreamerConnection.ts:67](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L67)
 
 ___
 
@@ -722,7 +594,7 @@ v3.2.0
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[listenerCount](../interfaces/StreamerRegistry.IStreamer.md#listenercount)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[listenerCount](../wiki/StreamerRegistry.IStreamer#listenercount)
 
 #### Inherited from
 
@@ -764,7 +636,7 @@ v0.1.26
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[listeners](../interfaces/StreamerRegistry.IStreamer.md#listeners)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[listeners](../wiki/StreamerRegistry.IStreamer#listeners)
 
 #### Inherited from
 
@@ -799,7 +671,7 @@ v10.0.0
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[off](../interfaces/StreamerRegistry.IStreamer.md#off)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[off](../wiki/StreamerRegistry.IStreamer#off)
 
 #### Inherited from
 
@@ -859,7 +731,7 @@ v0.1.101
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[on](../interfaces/StreamerRegistry.IStreamer.md#on)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[on](../wiki/StreamerRegistry.IStreamer#on)
 
 #### Inherited from
 
@@ -868,6 +740,26 @@ EventEmitter.on
 #### Defined in
 
 node_modules/@types/node/events.d.ts:577
+
+___
+
+### onDisconnectPlayerRequest
+
+▸ **onDisconnectPlayerRequest**(`message`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `message` | `disconnectPlayer` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/StreamerConnection.ts:118](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L118)
 
 ___
 
@@ -887,7 +779,7 @@ ___
 
 #### Defined in
 
-[src/SFUConnection.ts:228](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L228)
+[src/StreamerConnection.ts:110](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L110)
 
 ___
 
@@ -907,19 +799,19 @@ ___
 
 #### Defined in
 
-[src/SFUConnection.ts:185](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L185)
+[src/StreamerConnection.ts:127](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L127)
 
 ___
 
-### onListStreamers
+### onPing
 
-▸ **onListStreamers**(`_message`): `void`
+▸ **onPing**(`message`): `void`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `_message` | `listStreamers` |
+| `message` | `ping` |
 
 #### Returns
 
@@ -927,133 +819,13 @@ ___
 
 #### Defined in
 
-[src/SFUConnection.ts:218](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L218)
-
-___
-
-### onStartStreaming
-
-▸ **onStartStreaming**(`_message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `_message` | `startStreaming` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:232](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L232)
-
-___
-
-### onStopStreaming
-
-▸ **onStopStreaming**(`_message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `_message` | `stopStreaming` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:236](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L236)
-
-___
-
-### onStreamerDataChannels
-
-▸ **onStreamerDataChannels**(`message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `message` | `streamerDataChannels` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:223](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L223)
-
-___
-
-### onStreamerDisconnected
-
-▸ **onStreamerDisconnected**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:194](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L194)
-
-___
-
-### onStreamerIdChanged
-
-▸ **onStreamerIdChanged**(`newId`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `newId` | `string` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:189](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L189)
-
-___
-
-### onSubscribeMessage
-
-▸ **onSubscribeMessage**(`message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `message` | `subscribe` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:210](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L210)
+[src/StreamerConnection.ts:114](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L114)
 
 ___
 
 ### onTransportClose
 
-▸ **onTransportClose**(`_event`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `_event` | `CloseEvent` |
+▸ **onTransportClose**(): `void`
 
 #### Returns
 
@@ -1061,7 +833,7 @@ ___
 
 #### Defined in
 
-[src/SFUConnection.ts:205](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L205)
+[src/StreamerConnection.ts:105](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L105)
 
 ___
 
@@ -1081,27 +853,7 @@ ___
 
 #### Defined in
 
-[src/SFUConnection.ts:201](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L201)
-
-___
-
-### onUnsubscribeMessage
-
-▸ **onUnsubscribeMessage**(`_message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `_message` | `unsubscribe` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:214](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L214)
+[src/StreamerConnection.ts:101](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L101)
 
 ___
 
@@ -1151,7 +903,7 @@ v0.3.0
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[once](../interfaces/StreamerRegistry.IStreamer.md#once)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[once](../wiki/StreamerRegistry.IStreamer#once)
 
 #### Inherited from
 
@@ -1197,7 +949,7 @@ v6.0.0
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[prependListener](../interfaces/StreamerRegistry.IStreamer.md#prependlistener)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[prependListener](../wiki/StreamerRegistry.IStreamer#prependlistener)
 
 #### Inherited from
 
@@ -1241,7 +993,7 @@ v6.0.0
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[prependOnceListener](../interfaces/StreamerRegistry.IStreamer.md#prependoncelistener)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[prependOnceListener](../wiki/StreamerRegistry.IStreamer#prependoncelistener)
 
 #### Inherited from
 
@@ -1301,7 +1053,7 @@ v9.4.0
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[rawListeners](../interfaces/StreamerRegistry.IStreamer.md#rawlisteners)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[rawListeners](../wiki/StreamerRegistry.IStreamer#rawlisteners)
 
 #### Inherited from
 
@@ -1323,7 +1075,7 @@ ___
 
 #### Defined in
 
-[src/SFUConnection.ts:102](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L102)
+[src/StreamerConnection.ts:77](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L77)
 
 ___
 
@@ -1355,7 +1107,7 @@ v0.1.26
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[removeAllListeners](../interfaces/StreamerRegistry.IStreamer.md#removealllisteners)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[removeAllListeners](../wiki/StreamerRegistry.IStreamer#removealllisteners)
 
 #### Inherited from
 
@@ -1468,7 +1220,7 @@ v0.1.26
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[removeListener](../interfaces/StreamerRegistry.IStreamer.md#removelistener)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[removeListener](../wiki/StreamerRegistry.IStreamer#removelistener)
 
 #### Inherited from
 
@@ -1498,51 +1250,11 @@ Sends a signalling message to the player.
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[sendMessage](../interfaces/StreamerRegistry.IStreamer.md#sendmessage)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[sendMessage](../wiki/StreamerRegistry.IStreamer#sendmessage)
 
 #### Defined in
 
-[src/SFUConnection.ts:77](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L77)
-
-___
-
-### sendToPlayer
-
-▸ **sendToPlayer**(`message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `message` | `BaseMessage` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:164](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L164)
-
-___
-
-### sendToStreamer
-
-▸ **sendToStreamer**(`message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `message` | `BaseMessage` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:149](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L149)
+[src/StreamerConnection.ts:62](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerConnection.ts#L62)
 
 ___
 
@@ -1573,7 +1285,7 @@ v0.3.5
 
 #### Implementation of
 
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[setMaxListeners](../interfaces/StreamerRegistry.IStreamer.md#setmaxlisteners)
+[IStreamer](../wiki/StreamerRegistry.IStreamer).[setMaxListeners](../wiki/StreamerRegistry.IStreamer#setmaxlisteners)
 
 #### Inherited from
 
@@ -1582,40 +1294,6 @@ EventEmitter.setMaxListeners
 #### Defined in
 
 node_modules/@types/node/events.d.ts:716
-
-___
-
-### subscribe
-
-▸ **subscribe**(`streamerId`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `streamerId` | `string` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:116](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L116)
-
-___
-
-### unsubscribe
-
-▸ **unsubscribe**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SFUConnection.ts:135](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/SFUConnection.ts#L135)
 
 ___
 

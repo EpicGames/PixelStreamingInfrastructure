@@ -1,19 +1,17 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / LoggingUtils
-
 # Module: LoggingUtils
 
 ## Table of contents
 
 ### Interfaces
 
-- [IMessageLogger](../interfaces/LoggingUtils.IMessageLogger.md)
+- [IMessageLogger](../wiki/LoggingUtils.IMessageLogger)
 
 ### Functions
 
-- [createHandlerListener](LoggingUtils.md#createhandlerlistener)
-- [logForward](LoggingUtils.md#logforward)
-- [logIncoming](LoggingUtils.md#logincoming)
-- [logOutgoing](LoggingUtils.md#logoutgoing)
+- [createHandlerListener](../wiki/LoggingUtils#createhandlerlistener)
+- [logForward](../wiki/LoggingUtils#logforward)
+- [logIncoming](../wiki/LoggingUtils#logincoming)
+- [logOutgoing](../wiki/LoggingUtils#logoutgoing)
 
 ## Functions
 
@@ -32,7 +30,7 @@ be preceded by the logging call.
 
 | Name | Type |
 | :------ | :------ |
-| `obj` | [`IMessageLogger`](../interfaces/LoggingUtils.IMessageLogger.md) |
+| `obj` | [`IMessageLogger`](../wiki/LoggingUtils.IMessageLogger) |
 | `handler` | (`message`: `any`) => `void` |
 
 #### Returns
@@ -53,7 +51,7 @@ be preceded by the logging call.
 
 #### Defined in
 
-[src/LoggingUtils.ts:64](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/LoggingUtils.ts#L64)
+[src/LoggingUtils.ts:64](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/LoggingUtils.ts#L64)
 
 ___
 
@@ -68,8 +66,8 @@ one connection and being sent to another with only minor changes being made.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `recvr` | [`IMessageLogger`](../interfaces/LoggingUtils.IMessageLogger.md) | The connection the message was received on. |
-| `target` | [`IMessageLogger`](../interfaces/LoggingUtils.IMessageLogger.md) | The connection the message is being sent to. |
+| `recvr` | [`IMessageLogger`](../wiki/LoggingUtils.IMessageLogger) | The connection the message was received on. |
+| `target` | [`IMessageLogger`](../wiki/LoggingUtils.IMessageLogger) | The connection the message is being sent to. |
 | `message` | `BaseMessage` | - |
 
 #### Returns
@@ -78,7 +76,7 @@ one connection and being sent to another with only minor changes being made.
 
 #### Defined in
 
-[src/LoggingUtils.ts:46](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/LoggingUtils.ts#L46)
+[src/LoggingUtils.ts:46](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/LoggingUtils.ts#L46)
 
 ___
 
@@ -93,7 +91,7 @@ Do not call this for messages being forwarded to another connection.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `recvr` | [`IMessageLogger`](../interfaces/LoggingUtils.IMessageLogger.md) | IMessageLogger The connection the message was received on. |
+| `recvr` | [`IMessageLogger`](../wiki/LoggingUtils.IMessageLogger) | IMessageLogger The connection the message was received on. |
 | `message` | `BaseMessage` | - |
 
 #### Returns
@@ -102,7 +100,7 @@ Do not call this for messages being forwarded to another connection.
 
 #### Defined in
 
-[src/LoggingUtils.ts:17](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/LoggingUtils.ts#L17)
+[src/LoggingUtils.ts:17](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/LoggingUtils.ts#L17)
 
 ___
 
@@ -117,7 +115,7 @@ Do not call this for messages being forwarded to this connection.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `sender` | [`IMessageLogger`](../interfaces/LoggingUtils.IMessageLogger.md) | IMessageLogger The connection the message is being sent to. |
+| `sender` | [`IMessageLogger`](../wiki/LoggingUtils.IMessageLogger) | IMessageLogger The connection the message is being sent to. |
 | `message` | `BaseMessage` | - |
 
 #### Returns
@@ -126,4 +124,4 @@ Do not call this for messages being forwarded to this connection.
 
 #### Defined in
 
-[src/LoggingUtils.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/LoggingUtils.ts#L31)
+[src/LoggingUtils.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/LoggingUtils.ts#L31)

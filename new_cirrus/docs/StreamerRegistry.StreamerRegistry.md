@@ -1,106 +1,78 @@
-[new-cirrus](../README.md) / [Exports](../modules.md) / [StreamerConnection](../modules/StreamerConnection.md) / StreamerConnection
+# Class: StreamerRegistry
 
-# Class: StreamerConnection
+[StreamerRegistry](../wiki/StreamerRegistry).StreamerRegistry
 
-[StreamerConnection](../modules/StreamerConnection.md).StreamerConnection
-
-A connection between the signalling server and a streamer connection.
-This is where messages expected to be handled by the streamer come in
-and where messages are sent to the streamer.
-
-Interesting internals:
-streamerId: The unique id string of this streamer.
-transport: The ITransport where transport events can be subscribed to
-protocol: The SignallingProtocol where signalling messages can be
-subscribed to.
-streaming: True when the streamer is ready to accept subscriptions.
+Handles all the streamer connections of a signalling server and
+can be used to lookup connections by id etc.
+Fires events when streamers are added or removed.
+Events:
+  'added': (playerId: string) Player was added.
+  'removed': (playerId: string) Player was removed.
 
 ## Hierarchy
 
 - `EventEmitter`
 
-  ↳ **`StreamerConnection`**
-
-## Implements
-
-- [`IStreamer`](../interfaces/StreamerRegistry.IStreamer.md)
-- [`IMessageLogger`](../interfaces/LoggingUtils.IMessageLogger.md)
+  ↳ **`StreamerRegistry`**
 
 ## Table of contents
 
 ### Constructors
 
-- [constructor](StreamerConnection.StreamerConnection.md#constructor)
+- [constructor](../wiki/StreamerRegistry.StreamerRegistry#constructor)
 
 ### Properties
 
-- [protocol](StreamerConnection.StreamerConnection.md#protocol)
-- [remoteAddress](StreamerConnection.StreamerConnection.md#remoteaddress)
-- [server](StreamerConnection.StreamerConnection.md#server)
-- [streamerId](StreamerConnection.StreamerConnection.md#streamerid)
-- [streaming](StreamerConnection.StreamerConnection.md#streaming)
-- [transport](StreamerConnection.StreamerConnection.md#transport)
-- [captureRejectionSymbol](StreamerConnection.StreamerConnection.md#capturerejectionsymbol)
-- [captureRejections](StreamerConnection.StreamerConnection.md#capturerejections)
-- [defaultMaxListeners](StreamerConnection.StreamerConnection.md#defaultmaxlisteners)
-- [errorMonitor](StreamerConnection.StreamerConnection.md#errormonitor)
+- [defaultStreamerIdPrefix](../wiki/StreamerRegistry.StreamerRegistry#defaultstreameridprefix)
+- [streamers](../wiki/StreamerRegistry.StreamerRegistry#streamers)
+- [captureRejectionSymbol](../wiki/StreamerRegistry.StreamerRegistry#capturerejectionsymbol)
+- [captureRejections](../wiki/StreamerRegistry.StreamerRegistry#capturerejections)
+- [defaultMaxListeners](../wiki/StreamerRegistry.StreamerRegistry#defaultmaxlisteners)
+- [errorMonitor](../wiki/StreamerRegistry.StreamerRegistry#errormonitor)
 
 ### Methods
 
-- [[captureRejectionSymbol]](StreamerConnection.StreamerConnection.md#[capturerejectionsymbol])
-- [addListener](StreamerConnection.StreamerConnection.md#addlistener)
-- [emit](StreamerConnection.StreamerConnection.md#emit)
-- [eventNames](StreamerConnection.StreamerConnection.md#eventnames)
-- [forwardMessage](StreamerConnection.StreamerConnection.md#forwardmessage)
-- [getMaxListeners](StreamerConnection.StreamerConnection.md#getmaxlisteners)
-- [getReadableIdentifier](StreamerConnection.StreamerConnection.md#getreadableidentifier)
-- [getStreamerInfo](StreamerConnection.StreamerConnection.md#getstreamerinfo)
-- [listenerCount](StreamerConnection.StreamerConnection.md#listenercount)
-- [listeners](StreamerConnection.StreamerConnection.md#listeners)
-- [off](StreamerConnection.StreamerConnection.md#off)
-- [on](StreamerConnection.StreamerConnection.md#on)
-- [onDisconnectPlayerRequest](StreamerConnection.StreamerConnection.md#ondisconnectplayerrequest)
-- [onEndpointId](StreamerConnection.StreamerConnection.md#onendpointid)
-- [onLayerPreference](StreamerConnection.StreamerConnection.md#onlayerpreference)
-- [onPing](StreamerConnection.StreamerConnection.md#onping)
-- [onTransportClose](StreamerConnection.StreamerConnection.md#ontransportclose)
-- [onTransportError](StreamerConnection.StreamerConnection.md#ontransporterror)
-- [once](StreamerConnection.StreamerConnection.md#once)
-- [prependListener](StreamerConnection.StreamerConnection.md#prependlistener)
-- [prependOnceListener](StreamerConnection.StreamerConnection.md#prependoncelistener)
-- [rawListeners](StreamerConnection.StreamerConnection.md#rawlisteners)
-- [registerMessageHandlers](StreamerConnection.StreamerConnection.md#registermessagehandlers)
-- [removeAllListeners](StreamerConnection.StreamerConnection.md#removealllisteners)
-- [removeListener](StreamerConnection.StreamerConnection.md#removelistener)
-- [sendMessage](StreamerConnection.StreamerConnection.md#sendmessage)
-- [setMaxListeners](StreamerConnection.StreamerConnection.md#setmaxlisteners)
-- [addAbortListener](StreamerConnection.StreamerConnection.md#addabortlistener)
-- [getEventListeners](StreamerConnection.StreamerConnection.md#geteventlisteners)
-- [getMaxListeners](StreamerConnection.StreamerConnection.md#getmaxlisteners-1)
-- [listenerCount](StreamerConnection.StreamerConnection.md#listenercount-1)
-- [on](StreamerConnection.StreamerConnection.md#on-1)
-- [once](StreamerConnection.StreamerConnection.md#once-1)
-- [setMaxListeners](StreamerConnection.StreamerConnection.md#setmaxlisteners-1)
+- [[captureRejectionSymbol]](../wiki/StreamerRegistry.StreamerRegistry#%5Bcapturerejectionsymbol%5D)
+- [add](../wiki/StreamerRegistry.StreamerRegistry#add)
+- [addListener](../wiki/StreamerRegistry.StreamerRegistry#addlistener)
+- [count](../wiki/StreamerRegistry.StreamerRegistry#count)
+- [emit](../wiki/StreamerRegistry.StreamerRegistry#emit)
+- [empty](../wiki/StreamerRegistry.StreamerRegistry#empty)
+- [eventNames](../wiki/StreamerRegistry.StreamerRegistry#eventnames)
+- [find](../wiki/StreamerRegistry.StreamerRegistry#find)
+- [getFirstStreamerId](../wiki/StreamerRegistry.StreamerRegistry#getfirststreamerid)
+- [getMaxListeners](../wiki/StreamerRegistry.StreamerRegistry#getmaxlisteners)
+- [listenerCount](../wiki/StreamerRegistry.StreamerRegistry#listenercount)
+- [listeners](../wiki/StreamerRegistry.StreamerRegistry#listeners)
+- [off](../wiki/StreamerRegistry.StreamerRegistry#off)
+- [on](../wiki/StreamerRegistry.StreamerRegistry#on)
+- [onEndpointId](../wiki/StreamerRegistry.StreamerRegistry#onendpointid)
+- [once](../wiki/StreamerRegistry.StreamerRegistry#once)
+- [prependListener](../wiki/StreamerRegistry.StreamerRegistry#prependlistener)
+- [prependOnceListener](../wiki/StreamerRegistry.StreamerRegistry#prependoncelistener)
+- [rawListeners](../wiki/StreamerRegistry.StreamerRegistry#rawlisteners)
+- [remove](../wiki/StreamerRegistry.StreamerRegistry#remove)
+- [removeAllListeners](../wiki/StreamerRegistry.StreamerRegistry#removealllisteners)
+- [removeListener](../wiki/StreamerRegistry.StreamerRegistry#removelistener)
+- [sanitizeStreamerId](../wiki/StreamerRegistry.StreamerRegistry#sanitizestreamerid)
+- [setMaxListeners](../wiki/StreamerRegistry.StreamerRegistry#setmaxlisteners)
+- [addAbortListener](../wiki/StreamerRegistry.StreamerRegistry#addabortlistener)
+- [getEventListeners](../wiki/StreamerRegistry.StreamerRegistry#geteventlisteners)
+- [getMaxListeners](../wiki/StreamerRegistry.StreamerRegistry#getmaxlisteners-1)
+- [listenerCount](../wiki/StreamerRegistry.StreamerRegistry#listenercount-1)
+- [on](../wiki/StreamerRegistry.StreamerRegistry#on-1)
+- [once](../wiki/StreamerRegistry.StreamerRegistry#once-1)
+- [setMaxListeners](../wiki/StreamerRegistry.StreamerRegistry#setmaxlisteners-1)
 
 ## Constructors
 
 ### constructor
 
-• **new StreamerConnection**(`server`, `ws`, `request`): [`StreamerConnection`](StreamerConnection.StreamerConnection.md)
-
-Construct a new streamer connection.
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `server` | [`SignallingServer`](SignallingServer.SignallingServer.md) | The signalling server object that spawned this streamer. |
-| `ws` | `WebSocket` | The websocket coupled to this streamer connection. |
-| `request` | `IncomingMessage` | - |
+• **new StreamerRegistry**(): [`StreamerRegistry`](../wiki/StreamerRegistry.StreamerRegistry)
 
 #### Returns
 
-[`StreamerConnection`](StreamerConnection.StreamerConnection.md)
+[`StreamerRegistry`](../wiki/StreamerRegistry.StreamerRegistry)
 
 #### Overrides
 
@@ -108,89 +80,33 @@ EventEmitter.constructor
 
 #### Defined in
 
-[src/StreamerConnection.ts:41](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L41)
+[src/StreamerRegistry.ts:44](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L44)
 
 ## Properties
 
-### protocol
+### defaultStreamerIdPrefix
 
-• **protocol**: `SignallingProtocol`
-
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[protocol](../interfaces/StreamerRegistry.IStreamer.md#protocol)
+• **defaultStreamerIdPrefix**: `string` = `"UnknownStreamer"`
 
 #### Defined in
 
-[src/StreamerConnection.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L32)
+[src/StreamerRegistry.ts:42](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L42)
 
 ___
 
-### remoteAddress
+### streamers
 
-• **remoteAddress**: `undefined` \| `string`
-
-#### Defined in
-
-[src/StreamerConnection.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L34)
-
-___
-
-### server
-
-• `Private` **server**: [`SignallingServer`](SignallingServer.SignallingServer.md)
+• **streamers**: [`IStreamer`](../wiki/StreamerRegistry.IStreamer)[]
 
 #### Defined in
 
-[src/StreamerConnection.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L29)
-
-___
-
-### streamerId
-
-• **streamerId**: `string`
-
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[streamerId](../interfaces/StreamerRegistry.IStreamer.md#streamerid)
-
-#### Defined in
-
-[src/StreamerConnection.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L30)
-
-___
-
-### streaming
-
-• **streaming**: `boolean`
-
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[streaming](../interfaces/StreamerRegistry.IStreamer.md#streaming)
-
-#### Defined in
-
-[src/StreamerConnection.ts:33](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L33)
-
-___
-
-### transport
-
-• **transport**: `ITransport`
-
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[transport](../interfaces/StreamerRegistry.IStreamer.md#transport)
-
-#### Defined in
-
-[src/StreamerConnection.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L31)
+[src/StreamerRegistry.ts:41](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L41)
 
 ___
 
 ### captureRejectionSymbol
 
-▪ `Static` `Readonly` **captureRejectionSymbol**: typeof [`captureRejectionSymbol`](PlayerRegistry.PlayerRegistry.md#capturerejectionsymbol)
+▪ `Static` `Readonly` **captureRejectionSymbol**: typeof [`captureRejectionSymbol`](../wiki/PlayerRegistry.PlayerRegistry#capturerejectionsymbol)
 
 Value: `Symbol.for('nodejs.rejection')`
 
@@ -286,7 +202,7 @@ ___
 
 ### errorMonitor
 
-▪ `Static` `Readonly` **errorMonitor**: typeof [`errorMonitor`](PlayerRegistry.PlayerRegistry.md#errormonitor)
+▪ `Static` `Readonly` **errorMonitor**: typeof [`errorMonitor`](../wiki/PlayerRegistry.PlayerRegistry#errormonitor)
 
 This symbol shall be used to install a listener for only monitoring `'error'`events. Listeners installed using this symbol are called before the regular`'error'` listeners are called.
 
@@ -323,10 +239,6 @@ node_modules/@types/node/events.d.ts:395
 
 `void`
 
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[[captureRejectionSymbol]](../interfaces/StreamerRegistry.IStreamer.md#[capturerejectionsymbol])
-
 #### Inherited from
 
 EventEmitter.[captureRejectionSymbol]
@@ -334,6 +246,33 @@ EventEmitter.[captureRejectionSymbol]
 #### Defined in
 
 node_modules/@types/node/events.d.ts:112
+
+___
+
+### add
+
+▸ **add**(`streamer`): `boolean`
+
+Adds a streamer to the registry. If the streamer already has an id
+it will be sanitized (checked against existing ids and altered if
+there are collisions), or if it has no id it will be assigned a
+default unique id.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `streamer` | [`IStreamer`](../wiki/StreamerRegistry.IStreamer) |
+
+#### Returns
+
+`boolean`
+
+True if the add was successful.
+
+#### Defined in
+
+[src/StreamerRegistry.ts:56](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L56)
 
 ___
 
@@ -358,10 +297,6 @@ Alias for `emitter.on(eventName, listener)`.
 
 v0.1.26
 
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[addListener](../interfaces/StreamerRegistry.IStreamer.md#addlistener)
-
 #### Inherited from
 
 EventEmitter.addListener
@@ -369,6 +304,22 @@ EventEmitter.addListener
 #### Defined in
 
 node_modules/@types/node/events.d.ts:545
+
+___
+
+### count
+
+▸ **count**(): `number`
+
+Returns the total number of connected streamers.
+
+#### Returns
+
+`number`
+
+#### Defined in
+
+[src/StreamerRegistry.ts:121](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L121)
 
 ___
 
@@ -429,10 +380,6 @@ myEmitter.emit('event', 1, 2, 3, 4, 5);
 
 v0.1.26
 
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[emit](../interfaces/StreamerRegistry.IStreamer.md#emit)
-
 #### Inherited from
 
 EventEmitter.emit
@@ -440,6 +387,22 @@ EventEmitter.emit
 #### Defined in
 
 node_modules/@types/node/events.d.ts:807
+
+___
+
+### empty
+
+▸ **empty**(): `boolean`
+
+Returns true when the registry is empty.
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[src/StreamerRegistry.ts:114](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L114)
 
 ___
 
@@ -472,10 +435,6 @@ console.log(myEE.eventNames());
 
 v6.0.0
 
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[eventNames](../interfaces/StreamerRegistry.IStreamer.md#eventnames)
-
 #### Inherited from
 
 EventEmitter.eventNames
@@ -486,23 +445,45 @@ node_modules/@types/node/events.d.ts:870
 
 ___
 
-### forwardMessage
+### find
 
-▸ **forwardMessage**(`message`): `void`
+▸ **find**(`streamerId`): `undefined` \| [`IStreamer`](../wiki/StreamerRegistry.IStreamer)
+
+Attempts to find the given streamer id in the registry.
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `message` | `BaseMessage` |
+| `streamerId` | `string` |
 
 #### Returns
 
-`void`
+`undefined` \| [`IStreamer`](../wiki/StreamerRegistry.IStreamer)
 
 #### Defined in
 
-[src/StreamerConnection.ts:88](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L88)
+[src/StreamerRegistry.ts:94](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L94)
+
+___
+
+### getFirstStreamerId
+
+▸ **getFirstStreamerId**(): ``null`` \| `string`
+
+Used by players who haven't subscribed but try to send a message.
+This is to cover legacy connections that do not know how to subscribe.
+The player will be assigned the first streamer in the list.
+
+#### Returns
+
+``null`` \| `string`
+
+The first streamerId in the registry or null if there are none.
+
+#### Defined in
+
+[src/StreamerRegistry.ts:104](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L104)
 
 ___
 
@@ -511,7 +492,7 @@ ___
 ▸ **getMaxListeners**(): `number`
 
 Returns the current max listener value for the `EventEmitter` which is either
-set by `emitter.setMaxListeners(n)` or defaults to [defaultMaxListeners](StreamerConnection.StreamerConnection.md#defaultmaxlisteners).
+set by `emitter.setMaxListeners(n)` or defaults to [defaultMaxListeners](../wiki/StreamerRegistry.StreamerRegistry#defaultmaxlisteners).
 
 #### Returns
 
@@ -521,10 +502,6 @@ set by `emitter.setMaxListeners(n)` or defaults to [defaultMaxListeners](Streame
 
 v1.0.0
 
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[getMaxListeners](../interfaces/StreamerRegistry.IStreamer.md#getmaxlisteners)
-
 #### Inherited from
 
 EventEmitter.getMaxListeners
@@ -532,42 +509,6 @@ EventEmitter.getMaxListeners
 #### Defined in
 
 node_modules/@types/node/events.d.ts:722
-
-___
-
-### getReadableIdentifier
-
-▸ **getReadableIdentifier**(): `string`
-
-#### Returns
-
-`string`
-
-#### Implementation of
-
-[IMessageLogger](../interfaces/LoggingUtils.IMessageLogger.md).[getReadableIdentifier](../interfaces/LoggingUtils.IMessageLogger.md#getreadableidentifier)
-
-#### Defined in
-
-[src/StreamerConnection.ts:57](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L57)
-
-___
-
-### getStreamerInfo
-
-▸ **getStreamerInfo**(): [`IStreamerInfo`](../interfaces/StreamerRegistry.IStreamerInfo.md)
-
-#### Returns
-
-[`IStreamerInfo`](../interfaces/StreamerRegistry.IStreamerInfo.md)
-
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[getStreamerInfo](../interfaces/StreamerRegistry.IStreamer.md#getstreamerinfo)
-
-#### Defined in
-
-[src/StreamerConnection.ts:67](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L67)
 
 ___
 
@@ -593,10 +534,6 @@ in the list of the listeners of the event.
 **`Since`**
 
 v3.2.0
-
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[listenerCount](../interfaces/StreamerRegistry.IStreamer.md#listenercount)
 
 #### Inherited from
 
@@ -636,10 +573,6 @@ console.log(util.inspect(server.listeners('connection')));
 
 v0.1.26
 
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[listeners](../interfaces/StreamerRegistry.IStreamer.md#listeners)
-
 #### Inherited from
 
 EventEmitter.listeners
@@ -670,10 +603,6 @@ Alias for `emitter.removeListener()`.
 **`Since`**
 
 v10.0.0
-
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[off](../interfaces/StreamerRegistry.IStreamer.md#off)
 
 #### Inherited from
 
@@ -731,10 +660,6 @@ myEE.emit('foo');
 
 v0.1.101
 
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[on](../interfaces/StreamerRegistry.IStreamer.md#on)
-
 #### Inherited from
 
 EventEmitter.on
@@ -745,35 +670,16 @@ node_modules/@types/node/events.d.ts:577
 
 ___
 
-### onDisconnectPlayerRequest
-
-▸ **onDisconnectPlayerRequest**(`message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `message` | `disconnectPlayer` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/StreamerConnection.ts:118](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L118)
-
-___
-
 ### onEndpointId
 
-▸ **onEndpointId**(`_message`): `void`
+▸ **onEndpointId**(`streamer`, `message`): `void`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `_message` | `endpointId` |
+| `streamer` | [`IStreamer`](../wiki/StreamerRegistry.IStreamer) |
+| `message` | `endpointId` |
 
 #### Returns
 
@@ -781,81 +687,7 @@ ___
 
 #### Defined in
 
-[src/StreamerConnection.ts:110](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L110)
-
-___
-
-### onLayerPreference
-
-▸ **onLayerPreference**(`message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `message` | `layerPreference` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/StreamerConnection.ts:127](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L127)
-
-___
-
-### onPing
-
-▸ **onPing**(`message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `message` | `ping` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/StreamerConnection.ts:114](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L114)
-
-___
-
-### onTransportClose
-
-▸ **onTransportClose**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/StreamerConnection.ts:105](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L105)
-
-___
-
-### onTransportError
-
-▸ **onTransportError**(`error`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `error` | `ErrorEvent` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/StreamerConnection.ts:101](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L101)
+[src/StreamerRegistry.ts:125](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L125)
 
 ___
 
@@ -903,10 +735,6 @@ myEE.emit('foo');
 
 v0.3.0
 
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[once](../interfaces/StreamerRegistry.IStreamer.md#once)
-
 #### Inherited from
 
 EventEmitter.once
@@ -949,10 +777,6 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 
 v6.0.0
 
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[prependListener](../interfaces/StreamerRegistry.IStreamer.md#prependlistener)
-
 #### Inherited from
 
 EventEmitter.prependListener
@@ -992,10 +816,6 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 **`Since`**
 
 v6.0.0
-
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[prependOnceListener](../interfaces/StreamerRegistry.IStreamer.md#prependoncelistener)
 
 #### Inherited from
 
@@ -1053,10 +873,6 @@ emitter.emit('log');
 
 v9.4.0
 
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[rawListeners](../interfaces/StreamerRegistry.IStreamer.md#rawlisteners)
-
 #### Inherited from
 
 EventEmitter.rawListeners
@@ -1067,17 +883,28 @@ node_modules/@types/node/events.d.ts:766
 
 ___
 
-### registerMessageHandlers
+### remove
 
-▸ **registerMessageHandlers**(): `void`
+▸ **remove**(`streamer`): `boolean`
+
+Removes a streamer from the registry. If the streamer isn't found
+it does nothing.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `streamer` | [`IStreamer`](../wiki/StreamerRegistry.IStreamer) |
 
 #### Returns
 
-`void`
+`boolean`
+
+True if the streamer was removed.
 
 #### Defined in
 
-[src/StreamerConnection.ts:77](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L77)
+[src/StreamerRegistry.ts:80](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L80)
 
 ___
 
@@ -1106,10 +933,6 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 **`Since`**
 
 v0.1.26
-
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[removeAllListeners](../interfaces/StreamerRegistry.IStreamer.md#removealllisteners)
 
 #### Inherited from
 
@@ -1220,10 +1043,6 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 
 v0.1.26
 
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[removeListener](../interfaces/StreamerRegistry.IStreamer.md#removelistener)
-
 #### Inherited from
 
 EventEmitter.removeListener
@@ -1234,29 +1053,23 @@ node_modules/@types/node/events.d.ts:690
 
 ___
 
-### sendMessage
+### sanitizeStreamerId
 
-▸ **sendMessage**(`message`): `void`
-
-Sends a signalling message to the player.
+▸ **sanitizeStreamerId**(`id`): `string`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `message` | `BaseMessage` |
+| `id` | `string` |
 
 #### Returns
 
-`void`
-
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[sendMessage](../interfaces/StreamerRegistry.IStreamer.md#sendmessage)
+`string`
 
 #### Defined in
 
-[src/StreamerConnection.ts:62](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/12733bc/new_cirrus/src/StreamerConnection.ts#L62)
+[src/StreamerRegistry.ts:138](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L138)
 
 ___
 
@@ -1284,10 +1097,6 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 **`Since`**
 
 v0.3.5
-
-#### Implementation of
-
-[IStreamer](../interfaces/StreamerRegistry.IStreamer.md).[setMaxListeners](../interfaces/StreamerRegistry.IStreamer.md#setmaxlisteners)
 
 #### Inherited from
 

@@ -23,6 +23,7 @@
     "openapi-typescript": "^6.7.4",
     "ts-node": "^10.9.2",
     "typedoc": "^0.25.8",
+    "typedoc-github-wiki-theme": "^1.1.0",
     "typedoc-gitlab-wiki-theme": "^1.1.1",
     "typedoc-plugin-markdown": "^3.17.1",
     "typescript": "^5.3.3"
