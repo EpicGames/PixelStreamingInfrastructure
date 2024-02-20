@@ -22,12 +22,6 @@ to listen for incoming connections.
 - [startTime](SignallingServer.SignallingServer.md#starttime)
 - [streamerRegistry](SignallingServer.SignallingServer.md#streamerregistry)
 
-### Methods
-
-- [onPlayerConnected](SignallingServer.SignallingServer.md#onplayerconnected)
-- [onSFUConnected](SignallingServer.SignallingServer.md#onsfuconnected)
-- [onStreamerConnected](SignallingServer.SignallingServer.md#onstreamerconnected)
-
 ## Constructors
 
 ### constructor
@@ -46,7 +40,7 @@ to listen for incoming connections.
 
 #### Defined in
 
-[src/SignallingServer.ts:55](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/SignallingServer.ts#L55)
+[SignallingServer.ts:55](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SignallingServer.ts#L55)
 
 ## Properties
 
@@ -56,7 +50,7 @@ to listen for incoming connections.
 
 #### Defined in
 
-[src/SignallingServer.ts:49](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/SignallingServer.ts#L49)
+[SignallingServer.ts:49](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SignallingServer.ts#L49)
 
 ___
 
@@ -66,7 +60,7 @@ ___
 
 #### Defined in
 
-[src/SignallingServer.ts:52](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/SignallingServer.ts#L52)
+[SignallingServer.ts:52](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SignallingServer.ts#L52)
 
 ___
 
@@ -76,7 +70,7 @@ ___
 
 #### Defined in
 
-[src/SignallingServer.ts:50](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/SignallingServer.ts#L50)
+[SignallingServer.ts:50](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SignallingServer.ts#L50)
 
 ___
 
@@ -86,7 +80,7 @@ ___
 
 #### Defined in
 
-[src/SignallingServer.ts:53](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/SignallingServer.ts#L53)
+[SignallingServer.ts:53](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SignallingServer.ts#L53)
 
 ___
 
@@ -96,67 +90,4 @@ ___
 
 #### Defined in
 
-[src/SignallingServer.ts:51](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/SignallingServer.ts#L51)
-
-## Methods
-
-### onPlayerConnected
-
-▸ **onPlayerConnected**(`ws`, `request`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `ws` | `WebSocket` |
-| `request` | `IncomingMessage` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SignallingServer.ts:107](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/SignallingServer.ts#L107)
-
-___
-
-### onSFUConnected
-
-▸ **onSFUConnected**(`ws`, `request`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `ws` | `WebSocket` |
-| `request` | `IncomingMessage` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SignallingServer.ts:128](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/SignallingServer.ts#L128)
-
-___
-
-### onStreamerConnected
-
-▸ **onStreamerConnected**(`ws`, `request`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `ws` | `WebSocket` |
-| `request` | `IncomingMessage` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/SignallingServer.ts:95](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/SignallingServer.ts#L95)
+[SignallingServer.ts:51](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/SignallingServer.ts#L51)

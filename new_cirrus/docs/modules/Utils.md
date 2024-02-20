@@ -29,7 +29,7 @@ Circular reference save version of JSON.stringify with extra formatting.
 
 #### Defined in
 
-[src/Utils.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/Utils.ts#L13)
+[Utils.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/Utils.ts#L13)
 
 ___
 
@@ -51,4 +51,4 @@ Cirular reference safe version of JSON.stringify
 
 #### Defined in
 
-[src/Utils.ts:6](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/Utils.ts#L6)
+[Utils.ts:6](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/Utils.ts#L6)

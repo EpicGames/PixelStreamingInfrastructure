@@ -27,4 +27,4 @@
 
 #### Defined in
 
-[src/InputHandler.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/InputHandler.ts#L9)
+[InputHandler.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/InputHandler.ts#L9)

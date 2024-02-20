@@ -30,31 +30,14 @@ subscribed to.
 - [playerId](PlayerConnection.PlayerConnection.md#playerid)
 - [protocol](PlayerConnection.PlayerConnection.md#protocol)
 - [remoteAddress](PlayerConnection.PlayerConnection.md#remoteaddress)
-- [sendOffer](PlayerConnection.PlayerConnection.md#sendoffer)
-- [server](PlayerConnection.PlayerConnection.md#server)
-- [streamerDisconnectedListener](PlayerConnection.PlayerConnection.md#streamerdisconnectedlistener)
-- [streamerIdChangeListener](PlayerConnection.PlayerConnection.md#streameridchangelistener)
 - [subscribedStreamer](PlayerConnection.PlayerConnection.md#subscribedstreamer)
 - [transport](PlayerConnection.PlayerConnection.md#transport)
 
 ### Methods
 
-- [disconnect](PlayerConnection.PlayerConnection.md#disconnect)
 - [getPlayerInfo](PlayerConnection.PlayerConnection.md#getplayerinfo)
 - [getReadableIdentifier](PlayerConnection.PlayerConnection.md#getreadableidentifier)
-- [onListStreamers](PlayerConnection.PlayerConnection.md#onliststreamers)
-- [onStreamerDisconnected](PlayerConnection.PlayerConnection.md#onstreamerdisconnected)
-- [onStreamerIdChanged](PlayerConnection.PlayerConnection.md#onstreameridchanged)
-- [onStreamerRemoved](PlayerConnection.PlayerConnection.md#onstreamerremoved)
-- [onSubscribeMessage](PlayerConnection.PlayerConnection.md#onsubscribemessage)
-- [onTransportClose](PlayerConnection.PlayerConnection.md#ontransportclose)
-- [onTransportError](PlayerConnection.PlayerConnection.md#ontransporterror)
-- [onUnsubscribeMessage](PlayerConnection.PlayerConnection.md#onunsubscribemessage)
-- [registerMessageHandlers](PlayerConnection.PlayerConnection.md#registermessagehandlers)
 - [sendMessage](PlayerConnection.PlayerConnection.md#sendmessage)
-- [sendToStreamer](PlayerConnection.PlayerConnection.md#sendtostreamer)
-- [subscribe](PlayerConnection.PlayerConnection.md#subscribe)
-- [unsubscribe](PlayerConnection.PlayerConnection.md#unsubscribe)
 
 ## Constructors
 
@@ -79,7 +62,7 @@ Construct a new player connection.
 
 #### Defined in
 
-[src/PlayerConnection.ts:45](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L45)
+[PlayerConnection.ts:45](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L45)
 
 ## Properties
 
@@ -93,7 +76,7 @@ Construct a new player connection.
 
 #### Defined in
 
-[src/PlayerConnection.ts:28](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L28)
+[PlayerConnection.ts:28](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L28)
 
 ___
 
@@ -107,7 +90,7 @@ ___
 
 #### Defined in
 
-[src/PlayerConnection.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L30)
+[PlayerConnection.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L30)
 
 ___
 
@@ -117,69 +100,7 @@ ___
 
 #### Defined in
 
-[src/PlayerConnection.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L32)
-
-___
-
-### sendOffer
-
-• `Private` **sendOffer**: `boolean`
-
-#### Defined in
-
-[src/PlayerConnection.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L34)
-
-___
-
-### server
-
-• `Private` **server**: [`SignallingServer`](SignallingServer.SignallingServer.md)
-
-#### Defined in
-
-[src/PlayerConnection.ts:27](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L27)
-
-___
-
-### streamerDisconnectedListener
-
-• `Private` **streamerDisconnectedListener**: () => `void`
-
-#### Type declaration
-
-▸ (): `void`
-
-##### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:36](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L36)
-
-___
-
-### streamerIdChangeListener
-
-• `Private` **streamerIdChangeListener**: (`newId`: `string`) => `void`
-
-#### Type declaration
-
-▸ (`newId`): `void`
-
-##### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `newId` | `string` |
-
-##### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:35](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L35)
+[PlayerConnection.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L32)
 
 ___
 
@@ -193,7 +114,7 @@ ___
 
 #### Defined in
 
-[src/PlayerConnection.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L31)
+[PlayerConnection.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L31)
 
 ___
 
@@ -203,23 +124,9 @@ ___
 
 #### Defined in
 
-[src/PlayerConnection.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L29)
+[PlayerConnection.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L29)
 
 ## Methods
-
-### disconnect
-
-▸ **disconnect**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:150](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L150)
-
-___
 
 ### getPlayerInfo
 
@@ -235,7 +142,7 @@ ___
 
 #### Defined in
 
-[src/PlayerConnection.ts:73](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L73)
+[PlayerConnection.ts:73](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L73)
 
 ___
 
@@ -253,169 +160,7 @@ ___
 
 #### Defined in
 
-[src/PlayerConnection.ts:63](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L63)
-
-___
-
-### onListStreamers
-
-▸ **onListStreamers**(`_message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `_message` | `listStreamers` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:176](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L176)
-
-___
-
-### onStreamerDisconnected
-
-▸ **onStreamerDisconnected**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:155](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L155)
-
-___
-
-### onStreamerIdChanged
-
-▸ **onStreamerIdChanged**(`newId`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `newId` | `string` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:181](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L181)
-
-___
-
-### onStreamerRemoved
-
-▸ **onStreamerRemoved**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:186](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L186)
-
-___
-
-### onSubscribeMessage
-
-▸ **onSubscribeMessage**(`message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `message` | `subscribe` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:168](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L168)
-
-___
-
-### onTransportClose
-
-▸ **onTransportClose**(`_event`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `_event` | `CloseEvent` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:163](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L163)
-
-___
-
-### onTransportError
-
-▸ **onTransportError**(`error`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `error` | `ErrorEvent` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:159](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L159)
-
-___
-
-### onUnsubscribeMessage
-
-▸ **onUnsubscribeMessage**(`_message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `_message` | `unsubscribe` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:172](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L172)
-
-___
-
-### registerMessageHandlers
-
-▸ **registerMessageHandlers**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:83](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L83)
+[PlayerConnection.ts:63](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L63)
 
 ___
 
@@ -441,58 +186,4 @@ Sends a signalling message to the player.
 
 #### Defined in
 
-[src/PlayerConnection.ts:68](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L68)
-
-___
-
-### sendToStreamer
-
-▸ **sendToStreamer**(`message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `message` | `BaseMessage` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:95](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L95)
-
-___
-
-### subscribe
-
-▸ **subscribe**(`streamerId`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `streamerId` | `string` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:114](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L114)
-
-___
-
-### unsubscribe
-
-▸ **unsubscribe**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/PlayerConnection.ts:137](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerConnection.ts#L137)
+[PlayerConnection.ts:68](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerConnection.ts#L68)

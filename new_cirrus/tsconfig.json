@@ -108,6 +108,10 @@
   },
   "typedocOptions": {
     "entryPoints": ["src/**.ts"],
-    "out": "docs"
+    "out": "docs",
+    "excludeExternals": true,
+    "excludePrivate": true,
+    "excludeInternal": true,
+    "plugin": "typedoc-plugin-markdown"
   }
 }

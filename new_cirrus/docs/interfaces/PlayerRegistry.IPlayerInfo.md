@@ -24,7 +24,7 @@ Used by the API to describe the current state of the player.
 
 #### Defined in
 
-[src/PlayerRegistry.ts:24](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L24)
+[PlayerRegistry.ts:24](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerRegistry.ts#L24)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-[src/PlayerRegistry.ts:28](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L28)
+[PlayerRegistry.ts:28](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerRegistry.ts#L28)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-[src/PlayerRegistry.ts:27](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L27)
+[PlayerRegistry.ts:27](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerRegistry.ts#L27)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 #### Defined in
 
-[src/PlayerRegistry.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L26)
+[PlayerRegistry.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerRegistry.ts#L26)
 
 ___
 
@@ -64,4 +64,4 @@ ___
 
 #### Defined in
 
-[src/PlayerRegistry.ts:25](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L25)
+[PlayerRegistry.ts:25](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/95d2b15/new_cirrus/src/PlayerRegistry.ts#L25)
