@@ -6,7 +6,7 @@ import { Logger } from './Logger';
  * who is sending or receiving etc.
  */
 export interface IMessageLogger {
-	getReadableIdentifier(): string;
+    getReadableIdentifier(): string;
 }
 
 /**
@@ -15,12 +15,12 @@ export interface IMessageLogger {
  * @param recvr IMessageLogger The connection the message was received on.
  */
 export function logIncoming(recvr: IMessageLogger, message: BaseMessage): void {
-	Logger.info({
-		event: 'proto_message',
-		direction: 'incoming',
-		receiver: recvr.getReadableIdentifier(),
-		protoMessage: message
-	});
+    Logger.info({
+        event: 'proto_message',
+        direction: 'incoming',
+        receiver: recvr.getReadableIdentifier(),
+        protoMessage: message
+    });
 }
 
 /**
@@ -29,12 +29,12 @@ export function logIncoming(recvr: IMessageLogger, message: BaseMessage): void {
  * @param sender IMessageLogger The connection the message is being sent to.
  */
 export function logOutgoing(sender: IMessageLogger, message: BaseMessage): void {
-	Logger.info({
-		event: 'proto_message',
-		direction: 'outgoing',
-		sender: sender.getReadableIdentifier(),
-		protoMessage: message
-	});
+    Logger.info({
+        event: 'proto_message',
+        direction: 'outgoing',
+        sender: sender.getReadableIdentifier(),
+        protoMessage: message
+    });
 }
 
 /**
@@ -44,13 +44,13 @@ export function logOutgoing(sender: IMessageLogger, message: BaseMessage): void 
  * @param sender IMessageLogger The connection the message is being sent to.
  */
 export function logForward(recvr: IMessageLogger, target: IMessageLogger, message: BaseMessage): void {
-	Logger.info({
-		event: 'proto_message',
-		direction: 'forward',
-		receiver: recvr.getReadableIdentifier(),
-		target: target.getReadableIdentifier(),
-		protoMessage: message
-	});
+    Logger.info({
+        event: 'proto_message',
+        direction: 'forward',
+        receiver: recvr.getReadableIdentifier(),
+        target: target.getReadableIdentifier(),
+        protoMessage: message
+    });
 }
 
 /**
@@ -62,8 +62,8 @@ export function logForward(recvr: IMessageLogger, target: IMessageLogger, messag
  * be preceded by the logging call.
  */
 export function createHandlerListener(obj: IMessageLogger, handler: (message: any) => void) {
-	return (message: BaseMessage) => {
-		logIncoming(obj, message);
-		handler.bind(obj)(message);
-	};
+    return (message: BaseMessage) => {
+        logIncoming(obj, message);
+        handler.bind(obj)(message);
+    };
 }

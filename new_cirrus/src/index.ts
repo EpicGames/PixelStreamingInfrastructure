@@ -7,9 +7,11 @@ import { Command, Option } from 'commander';
 import { initInputHandler } from './InputHandler';
 import { stringify, beautify } from './Utils';
 import { initialize } from 'express-openapi';
+import fs from 'fs';
 
-const fs = require("fs");
+/* eslint-disable  @typescript-eslint/no-var-requires */
 const pjson = require('../package.json');
+/* eslint-enable  @typescript-eslint/no-var-requires */
 
 const program = new Command();
 program
@@ -58,7 +60,7 @@ let config_file: any = {};
 if (!cli_options.no_config) {
     // read any config file
     try {
-        const configData = fs.readFileSync(cli_options.config_file, 'UTF8');
+        const configData = fs.readFileSync(cli_options.config_file, { encoding: 'utf8' });
         config_file = JSON.parse(configData);
     } catch(error) {
         // silently fail here since we havent started the logging system yet.
@@ -106,7 +108,7 @@ const serverOpts: IServerConfig = {
 
 if (options.serve) {
     const server = http.createServer(app);
-    const webServer = new WebServer(app, server, {
+    const _webServer = new WebServer(app, server, {
         port: options.player_port,
         root: options.http_root,
         homepageFile: options.homepage

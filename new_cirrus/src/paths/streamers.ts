@@ -1,11 +1,11 @@
 import { SignallingServer } from '../SignallingServer';
 
 export default function(signallingServer: SignallingServer) {
-    let operations = {
+    const operations = {
         GET,
     };
 
-    function GET(req: any, res: any, next: any) {
+    function GET(req: any, res: any, _next: any) {
         res.status(200).json(signallingServer.streamerRegistry.streamers.map(streamer => streamer.getStreamerInfo()));
     }
 

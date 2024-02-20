@@ -1,11 +1,11 @@
 import { SignallingServer } from '../../SignallingServer';
 
 export default function (signallingServer: SignallingServer) {
-    let operations = {
+    const operations = {
         GET,
     };
 
-    function GET(req: any, res: any, next: any) {
+    function GET(req: any, res: any, _next: any) {
         const player = signallingServer.playerRegistry.get(req.params.playerId);
         if (!player) {
             throw new Error(`No player ID matches ${req.params.playerId}.`);

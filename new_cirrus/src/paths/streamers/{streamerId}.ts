@@ -1,11 +1,11 @@
 import { SignallingServer } from '../../SignallingServer';
 
 export default function (signallingServer: SignallingServer) {
-    let operations = {
+    const operations = {
         GET,
     };
 
-    function GET(req: any, res: any, next: any) {
+    function GET(req: any, res: any, _next: any) {
         const streamer = signallingServer.streamerRegistry.find(req.params.streamerId);
         if (!streamer) {
             throw new Error(`No streamer id matches ${req.params.streamerId}.`);

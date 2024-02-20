@@ -8,7 +8,7 @@
     "start": "npm run build && node ./build/index.js",
     "dev": "nodemon src/index.ts --no_save --log_level_console debug --console_messages verbose --serve --http_root Public --log_config",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "generate-types": "openapi-typescript api/spec.yml --output src/types/api.ts"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "author": "Matthew Cotton",
   "license": "ISC",
@@ -16,6 +16,8 @@
     "@types/express": "^4.17.21",
     "@types/node": "^20.11.13",
     "@types/ws": "^8.5.10",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "eslint": "^8.56.0",
     "nodemon": "^3.0.3",
     "openapi-typescript": "^6.7.4",
     "ts-node": "^10.9.2",

@@ -1,0 +1,9 @@
+build
+doc
+logs
+node_modules
+Public
+package-lock.json
+package.json
+tsconfig.json
+.eslintrc.js

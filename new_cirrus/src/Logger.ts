@@ -1,8 +1,9 @@
 import { stringify, beautify } from './Utils';
-const winston = require('winston');
-require('winston-daily-rotate-file');
-const path = require('path');
-const { combine, timestamp, json, align, printf, colorize, splat } = winston.format;
+import path from 'path';
+import winston from 'winston';
+import 'winston-daily-rotate-file';
+
+const { combine, timestamp, printf, colorize, splat } = winston.format;
 
 /**
  * The actual logger object. This is just a winston logger.
@@ -81,7 +82,7 @@ function createConsoleFormat() {
             default: return prefix + `Unknown proto direction: ${direction}`;
             }
         }
-        return false;
+        return '';
     });
 }
 
@@ -94,7 +95,7 @@ function formatMessageForConsole(message: any) {
 }
 
 function createProtoMessageFilter() {
-    return winston.format((info: any, opts: any) => {
+    return winston.format((info: any, _opts: any) => {
         if (typeof info.message !== 'string'
             && info.message.event == 'proto_message'
             && logMessagesToConsole == 'none') {
@@ -136,5 +137,6 @@ function createFileFormat() {
                 ...message
             });
         }
+        return '';
     });
 }
