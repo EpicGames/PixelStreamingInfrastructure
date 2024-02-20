@@ -33,4 +33,4 @@ pixel streaming frontend.
 
 #### Defined in
 
-[WebServer.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9e99810/new_cirrus/src/WebServer.ts#L30)
+[WebServer.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/WebServer.ts#L30)
