@@ -6,12 +6,19 @@
 export class CandidatePairStats {
     bytesReceived: number;
     bytesSent: number;
+    currentRoundTripTime: number;
+    id: string;
+    lastPacketReceivedTimestamp: number;
+    lastPacketSentTimestamp: number;
     localCandidateId: string;
-    remoteCandidateId: string;
     nominated: boolean;
+    priority: number;
     readable: boolean;
-    writable: boolean;
+    remoteCandidateId: string;
     selected: boolean;
     state: string;
-    currentRoundTripTime: number;
+    timestamp: number;
+    transportId: string;
+    type: string;
+    writable: boolean;  
 }

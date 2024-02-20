@@ -25,7 +25,7 @@ If you have encountered a bug, have suggestions for our documentation or infrast
 
 If you have a solution to a problem you've encountered or to any other open issue, you can create a pull request with your changes.
 1. Fork the repo and branch off of the `main` branch in your fork.
-2. Implement your changes in your branch.
+2. Implement your changes in your branch and make sure your commits are Verified! Signed commits are required for merging! [Github Signing Documentation](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification)
 3. Do as much testing as you can, and when you are happy, tidy up your work and commit the update.
 4. Create a [pull request](https://github.com/EpicGames/PixelStreamingInfrastructure/pulls) and don't forget to link it to an issue if there's an existing one. Add as much information as possible to your PR: describe the problem your change solves, mention any testing you have done and attach any relevant documents and screenshots.
 5. If your are contributing a PR for a new feature, we strongly encourage you to accompany it with relevant documentation and a detailed description of the tests you have done. PRs that don't have this information may take a long time to be addressed, since our team will have to do the testing.
@@ -65,4 +65,4 @@ Documentation should be broken up into separate `.md` files per directory, ideal
 
 ## Legal
 
-© 2004-2023, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere.
+© 2004-2024, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere.

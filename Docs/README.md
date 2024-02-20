@@ -9,4 +9,4 @@ Welcome to the general documentation page for Pixel Streaming. This page serves 
 
 
 ## Legal
-© 2004-2023, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere. 
+© 2004-2024, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere.

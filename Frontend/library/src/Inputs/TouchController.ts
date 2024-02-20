@@ -178,7 +178,7 @@ export class TouchController implements ITouchController {
                         coord.x,
                         coord.y,
                         this.fingerIds.get(touch.identifier),
-                        this.maxByteValue * touch.force,
+                        this.maxByteValue * (touch.force > 0 ? touch.force : 1),
                         coord.inRange ? 1 : 0
                     ]);
                     break;
@@ -198,7 +198,7 @@ export class TouchController implements ITouchController {
                         coord.x,
                         coord.y,
                         this.fingerIds.get(touch.identifier),
-                        this.maxByteValue * touch.force,
+                        this.maxByteValue * (touch.force > 0 ? touch.force : 1),
                         coord.inRange ? 1 : 0
                     ]);
                     break;

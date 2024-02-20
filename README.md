@@ -28,7 +28,7 @@ The Pixel Streaming Infrastructure contains reference implementations for all th
 - A matchmaker, found in [`Matchmaker/`](Matchmaker/).
 - Several frontend projects for the WebRTC player and input, found in [`Frontend/`](Frontend/):
   - shared libraries for [communication](Frontend/library/) and [UI](Frontend/ui-library/) functionality
-  - separate [implementations](Frontend/implementations/) using different techologies such as TypeScript or React/JSX
+  - separate [implementations](Frontend/implementations/) using different technologies such as TypeScript or React/JSX
 
   For detailed information, see the [/frontend](/Frontend/).
 
@@ -88,6 +88,7 @@ This repository contains the following in branches that track Unreal Engine vers
 | Branch | Status |
 |--------|--------|
 |[Master](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/master)| Dev |
+|[UE5.5](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.5)| Pre-release |
 |[UE5.4](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.4)| Pre-release |
 |[UE5.3](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.3)| Current |
 |[UE5.2](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.2)| Supported |
@@ -106,4 +107,4 @@ This repository contains the following in branches that track Unreal Engine vers
 | Unsupported | We will not be supporting this version with bugfixes. |
 
 ## Legal
-© 2004-2023, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere. 
+© 2004-2024, Epic Games, Inc. Unreal and its logo are Epic’s trademarks or registered trademarks in the US and elsewhere. 
