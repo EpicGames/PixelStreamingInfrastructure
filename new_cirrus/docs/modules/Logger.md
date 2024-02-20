@@ -1,18 +1,20 @@
+[new-cirrus](../README.md) / [Exports](../modules.md) / Logger
+
 # Module: Logger
 
 ## Table of contents
 
 ### Interfaces
 
-- [IConfig](../wiki/Logger.IConfig)
+- [IConfig](../interfaces/Logger.IConfig.md)
 
 ### Variables
 
-- [Logger](../wiki/Logger#logger)
+- [Logger](Logger.md#logger)
 
 ### Functions
 
-- [InitLogging](../wiki/Logger#initlogging)
+- [InitLogging](Logger.md#initlogging)
 
 ## Variables
 
@@ -26,7 +28,7 @@ completely create your own winston logger and assign it.
 
 #### Defined in
 
-[src/Logger.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/Logger.ts#L13)
+[src/Logger.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/Logger.ts#L13)
 
 ## Functions
 
@@ -41,7 +43,7 @@ preferred settings.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `config` | [`IConfig`](../wiki/Logger.IConfig) | The settings to init the logger with. See IConfig interface |
+| `config` | [`IConfig`](../interfaces/Logger.IConfig.md) | The settings to init the logger with. See IConfig interface |
 
 #### Returns
 
@@ -49,4 +51,4 @@ preferred settings.
 
 #### Defined in
 
-[src/Logger.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/Logger.ts#L34)
+[src/Logger.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/Logger.ts#L34)

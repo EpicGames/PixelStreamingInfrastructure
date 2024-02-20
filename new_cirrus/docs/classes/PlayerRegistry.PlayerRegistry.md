@@ -1,10 +1,12 @@
-# Class: StreamerRegistry
+[new-cirrus](../README.md) / [Exports](../modules.md) / [PlayerRegistry](../modules/PlayerRegistry.md) / PlayerRegistry
 
-[StreamerRegistry](../wiki/StreamerRegistry).StreamerRegistry
+# Class: PlayerRegistry
 
-Handles all the streamer connections of a signalling server and
+[PlayerRegistry](../modules/PlayerRegistry.md).PlayerRegistry
+
+Handles all the player connections of a signalling server and
 can be used to lookup connections by id etc.
-Fires events when streamers are added or removed.
+Fires events when players are added or removed.
 Events:
   'added': (playerId: string) Player was added.
   'removed': (playerId: string) Player was removed.
@@ -13,66 +15,66 @@ Events:
 
 - `EventEmitter`
 
-  ↳ **`StreamerRegistry`**
+  ↳ **`PlayerRegistry`**
 
 ## Table of contents
 
 ### Constructors
 
-- [constructor](../wiki/StreamerRegistry.StreamerRegistry#constructor)
+- [constructor](PlayerRegistry.PlayerRegistry.md#constructor)
 
 ### Properties
 
-- [defaultStreamerIdPrefix](../wiki/StreamerRegistry.StreamerRegistry#defaultstreameridprefix)
-- [streamers](../wiki/StreamerRegistry.StreamerRegistry#streamers)
-- [captureRejectionSymbol](../wiki/StreamerRegistry.StreamerRegistry#capturerejectionsymbol)
-- [captureRejections](../wiki/StreamerRegistry.StreamerRegistry#capturerejections)
-- [defaultMaxListeners](../wiki/StreamerRegistry.StreamerRegistry#defaultmaxlisteners)
-- [errorMonitor](../wiki/StreamerRegistry.StreamerRegistry#errormonitor)
+- [nextPlayerId](PlayerRegistry.PlayerRegistry.md#nextplayerid)
+- [playerCount](PlayerRegistry.PlayerRegistry.md#playercount)
+- [players](PlayerRegistry.PlayerRegistry.md#players)
+- [captureRejectionSymbol](PlayerRegistry.PlayerRegistry.md#capturerejectionsymbol)
+- [captureRejections](PlayerRegistry.PlayerRegistry.md#capturerejections)
+- [defaultMaxListeners](PlayerRegistry.PlayerRegistry.md#defaultmaxlisteners)
+- [errorMonitor](PlayerRegistry.PlayerRegistry.md#errormonitor)
 
 ### Methods
 
-- [[captureRejectionSymbol]](../wiki/StreamerRegistry.StreamerRegistry#%5Bcapturerejectionsymbol%5D)
-- [add](../wiki/StreamerRegistry.StreamerRegistry#add)
-- [addListener](../wiki/StreamerRegistry.StreamerRegistry#addlistener)
-- [count](../wiki/StreamerRegistry.StreamerRegistry#count)
-- [emit](../wiki/StreamerRegistry.StreamerRegistry#emit)
-- [empty](../wiki/StreamerRegistry.StreamerRegistry#empty)
-- [eventNames](../wiki/StreamerRegistry.StreamerRegistry#eventnames)
-- [find](../wiki/StreamerRegistry.StreamerRegistry#find)
-- [getFirstStreamerId](../wiki/StreamerRegistry.StreamerRegistry#getfirststreamerid)
-- [getMaxListeners](../wiki/StreamerRegistry.StreamerRegistry#getmaxlisteners)
-- [listenerCount](../wiki/StreamerRegistry.StreamerRegistry#listenercount)
-- [listeners](../wiki/StreamerRegistry.StreamerRegistry#listeners)
-- [off](../wiki/StreamerRegistry.StreamerRegistry#off)
-- [on](../wiki/StreamerRegistry.StreamerRegistry#on)
-- [onEndpointId](../wiki/StreamerRegistry.StreamerRegistry#onendpointid)
-- [once](../wiki/StreamerRegistry.StreamerRegistry#once)
-- [prependListener](../wiki/StreamerRegistry.StreamerRegistry#prependlistener)
-- [prependOnceListener](../wiki/StreamerRegistry.StreamerRegistry#prependoncelistener)
-- [rawListeners](../wiki/StreamerRegistry.StreamerRegistry#rawlisteners)
-- [remove](../wiki/StreamerRegistry.StreamerRegistry#remove)
-- [removeAllListeners](../wiki/StreamerRegistry.StreamerRegistry#removealllisteners)
-- [removeListener](../wiki/StreamerRegistry.StreamerRegistry#removelistener)
-- [sanitizeStreamerId](../wiki/StreamerRegistry.StreamerRegistry#sanitizestreamerid)
-- [setMaxListeners](../wiki/StreamerRegistry.StreamerRegistry#setmaxlisteners)
-- [addAbortListener](../wiki/StreamerRegistry.StreamerRegistry#addabortlistener)
-- [getEventListeners](../wiki/StreamerRegistry.StreamerRegistry#geteventlisteners)
-- [getMaxListeners](../wiki/StreamerRegistry.StreamerRegistry#getmaxlisteners-1)
-- [listenerCount](../wiki/StreamerRegistry.StreamerRegistry#listenercount-1)
-- [on](../wiki/StreamerRegistry.StreamerRegistry#on-1)
-- [once](../wiki/StreamerRegistry.StreamerRegistry#once-1)
-- [setMaxListeners](../wiki/StreamerRegistry.StreamerRegistry#setmaxlisteners-1)
+- [[captureRejectionSymbol]](PlayerRegistry.PlayerRegistry.md#[capturerejectionsymbol])
+- [add](PlayerRegistry.PlayerRegistry.md#add)
+- [addListener](PlayerRegistry.PlayerRegistry.md#addlistener)
+- [count](PlayerRegistry.PlayerRegistry.md#count)
+- [emit](PlayerRegistry.PlayerRegistry.md#emit)
+- [eventNames](PlayerRegistry.PlayerRegistry.md#eventnames)
+- [get](PlayerRegistry.PlayerRegistry.md#get)
+- [getMaxListeners](PlayerRegistry.PlayerRegistry.md#getmaxlisteners)
+- [getUniquePlayerId](PlayerRegistry.PlayerRegistry.md#getuniqueplayerid)
+- [has](PlayerRegistry.PlayerRegistry.md#has)
+- [listPlayers](PlayerRegistry.PlayerRegistry.md#listplayers)
+- [listenerCount](PlayerRegistry.PlayerRegistry.md#listenercount)
+- [listeners](PlayerRegistry.PlayerRegistry.md#listeners)
+- [off](PlayerRegistry.PlayerRegistry.md#off)
+- [on](PlayerRegistry.PlayerRegistry.md#on)
+- [once](PlayerRegistry.PlayerRegistry.md#once)
+- [prependListener](PlayerRegistry.PlayerRegistry.md#prependlistener)
+- [prependOnceListener](PlayerRegistry.PlayerRegistry.md#prependoncelistener)
+- [rawListeners](PlayerRegistry.PlayerRegistry.md#rawlisteners)
+- [remove](PlayerRegistry.PlayerRegistry.md#remove)
+- [removeAllListeners](PlayerRegistry.PlayerRegistry.md#removealllisteners)
+- [removeListener](PlayerRegistry.PlayerRegistry.md#removelistener)
+- [setMaxListeners](PlayerRegistry.PlayerRegistry.md#setmaxlisteners)
+- [addAbortListener](PlayerRegistry.PlayerRegistry.md#addabortlistener)
+- [getEventListeners](PlayerRegistry.PlayerRegistry.md#geteventlisteners)
+- [getMaxListeners](PlayerRegistry.PlayerRegistry.md#getmaxlisteners-1)
+- [listenerCount](PlayerRegistry.PlayerRegistry.md#listenercount-1)
+- [on](PlayerRegistry.PlayerRegistry.md#on-1)
+- [once](PlayerRegistry.PlayerRegistry.md#once-1)
+- [setMaxListeners](PlayerRegistry.PlayerRegistry.md#setmaxlisteners-1)
 
 ## Constructors
 
 ### constructor
 
-• **new StreamerRegistry**(): [`StreamerRegistry`](../wiki/StreamerRegistry.StreamerRegistry)
+• **new PlayerRegistry**(): [`PlayerRegistry`](PlayerRegistry.PlayerRegistry.md)
 
 #### Returns
 
-[`StreamerRegistry`](../wiki/StreamerRegistry.StreamerRegistry)
+[`PlayerRegistry`](PlayerRegistry.PlayerRegistry.md)
 
 #### Overrides
 
@@ -80,33 +82,43 @@ EventEmitter.constructor
 
 #### Defined in
 
-[src/StreamerRegistry.ts:44](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L44)
+[src/PlayerRegistry.ts:44](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L44)
 
 ## Properties
 
-### defaultStreamerIdPrefix
+### nextPlayerId
 
-• **defaultStreamerIdPrefix**: `string` = `"UnknownStreamer"`
+• `Private` **nextPlayerId**: `number`
 
 #### Defined in
 
-[src/StreamerRegistry.ts:42](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L42)
+[src/PlayerRegistry.ts:42](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L42)
 
 ___
 
-### streamers
+### playerCount
 
-• **streamers**: [`IStreamer`](../wiki/StreamerRegistry.IStreamer)[]
+• `Private` **playerCount**: `number`
 
 #### Defined in
 
-[src/StreamerRegistry.ts:41](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L41)
+[src/PlayerRegistry.ts:41](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L41)
+
+___
+
+### players
+
+• `Private` **players**: `Map`\<`string`, [`IPlayer`](../interfaces/PlayerRegistry.IPlayer.md)\>
+
+#### Defined in
+
+[src/PlayerRegistry.ts:40](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L40)
 
 ___
 
 ### captureRejectionSymbol
 
-▪ `Static` `Readonly` **captureRejectionSymbol**: typeof [`captureRejectionSymbol`](../wiki/PlayerRegistry.PlayerRegistry#capturerejectionsymbol)
+▪ `Static` `Readonly` **captureRejectionSymbol**: typeof [`captureRejectionSymbol`](PlayerRegistry.PlayerRegistry.md#capturerejectionsymbol)
 
 Value: `Symbol.for('nodejs.rejection')`
 
@@ -202,7 +214,7 @@ ___
 
 ### errorMonitor
 
-▪ `Static` `Readonly` **errorMonitor**: typeof [`errorMonitor`](../wiki/PlayerRegistry.PlayerRegistry#errormonitor)
+▪ `Static` `Readonly` **errorMonitor**: typeof [`errorMonitor`](PlayerRegistry.PlayerRegistry.md#errormonitor)
 
 This symbol shall be used to install a listener for only monitoring `'error'`events. Listeners installed using this symbol are called before the regular`'error'` listeners are called.
 
@@ -251,28 +263,23 @@ ___
 
 ### add
 
-▸ **add**(`streamer`): `boolean`
+▸ **add**(`player`): `void`
 
-Adds a streamer to the registry. If the streamer already has an id
-it will be sanitized (checked against existing ids and altered if
-there are collisions), or if it has no id it will be assigned a
-default unique id.
+Assigns a unique id to the player and adds it to the registry
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `streamer` | [`IStreamer`](../wiki/StreamerRegistry.IStreamer) |
+| `player` | [`IPlayer`](../interfaces/PlayerRegistry.IPlayer.md) |
 
 #### Returns
 
-`boolean`
-
-True if the add was successful.
+`void`
 
 #### Defined in
 
-[src/StreamerRegistry.ts:56](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L56)
+[src/PlayerRegistry.ts:54](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L54)
 
 ___
 
@@ -311,7 +318,7 @@ ___
 
 ▸ **count**(): `number`
 
-Returns the total number of connected streamers.
+Gets the total number of connected players.
 
 #### Returns
 
@@ -319,7 +326,7 @@ Returns the total number of connected streamers.
 
 #### Defined in
 
-[src/StreamerRegistry.ts:121](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L121)
+[src/PlayerRegistry.ts:100](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L100)
 
 ___
 
@@ -390,22 +397,6 @@ node_modules/@types/node/events.d.ts:807
 
 ___
 
-### empty
-
-▸ **empty**(): `boolean`
-
-Returns true when the registry is empty.
-
-#### Returns
-
-`boolean`
-
-#### Defined in
-
-[src/StreamerRegistry.ts:114](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L114)
-
-___
-
 ### eventNames
 
 ▸ **eventNames**(): (`string` \| `symbol`)[]
@@ -445,45 +436,26 @@ node_modules/@types/node/events.d.ts:870
 
 ___
 
-### find
+### get
 
-▸ **find**(`streamerId`): `undefined` \| [`IStreamer`](../wiki/StreamerRegistry.IStreamer)
+▸ **get**(`playerId`): `undefined` \| [`IPlayer`](../interfaces/PlayerRegistry.IPlayer.md)
 
-Attempts to find the given streamer id in the registry.
+Gets a player from the registry using the player id.
+Returns undefined if the player doesn't exist.
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `streamerId` | `string` |
+| `playerId` | `string` |
 
 #### Returns
 
-`undefined` \| [`IStreamer`](../wiki/StreamerRegistry.IStreamer)
+`undefined` \| [`IPlayer`](../interfaces/PlayerRegistry.IPlayer.md)
 
 #### Defined in
 
-[src/StreamerRegistry.ts:94](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L94)
-
-___
-
-### getFirstStreamerId
-
-▸ **getFirstStreamerId**(): ``null`` \| `string`
-
-Used by players who haven't subscribed but try to send a message.
-This is to cover legacy connections that do not know how to subscribe.
-The player will be assigned the first streamer in the list.
-
-#### Returns
-
-``null`` \| `string`
-
-The first streamerId in the registry or null if there are none.
-
-#### Defined in
-
-[src/StreamerRegistry.ts:104](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L104)
+[src/PlayerRegistry.ts:89](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L89)
 
 ___
 
@@ -492,7 +464,7 @@ ___
 ▸ **getMaxListeners**(): `number`
 
 Returns the current max listener value for the `EventEmitter` which is either
-set by `emitter.setMaxListeners(n)` or defaults to [defaultMaxListeners](../wiki/StreamerRegistry.StreamerRegistry#defaultmaxlisteners).
+set by `emitter.setMaxListeners(n)` or defaults to [defaultMaxListeners](PlayerRegistry.PlayerRegistry.md#defaultmaxlisteners).
 
 #### Returns
 
@@ -509,6 +481,56 @@ EventEmitter.getMaxListeners
 #### Defined in
 
 node_modules/@types/node/events.d.ts:722
+
+___
+
+### getUniquePlayerId
+
+▸ **getUniquePlayerId**(): `string`
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[src/PlayerRegistry.ts:104](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L104)
+
+___
+
+### has
+
+▸ **has**(`playerId`): `boolean`
+
+Tests if a player id exists in the registry.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `playerId` | `string` |
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[src/PlayerRegistry.ts:81](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L81)
+
+___
+
+### listPlayers
+
+▸ **listPlayers**(): [`IPlayer`](../interfaces/PlayerRegistry.IPlayer.md)[]
+
+#### Returns
+
+[`IPlayer`](../interfaces/PlayerRegistry.IPlayer.md)[]
+
+#### Defined in
+
+[src/PlayerRegistry.ts:93](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L93)
 
 ___
 
@@ -667,27 +689,6 @@ EventEmitter.on
 #### Defined in
 
 node_modules/@types/node/events.d.ts:577
-
-___
-
-### onEndpointId
-
-▸ **onEndpointId**(`streamer`, `message`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `streamer` | [`IStreamer`](../wiki/StreamerRegistry.IStreamer) |
-| `message` | `endpointId` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[src/StreamerRegistry.ts:125](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L125)
 
 ___
 
@@ -885,26 +886,24 @@ ___
 
 ### remove
 
-▸ **remove**(`streamer`): `boolean`
+▸ **remove**(`player`): `void`
 
-Removes a streamer from the registry. If the streamer isn't found
-it does nothing.
+Removes a player from the registry. Does nothing if the id
+does not exist.
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `streamer` | [`IStreamer`](../wiki/StreamerRegistry.IStreamer) |
+| `player` | [`IPlayer`](../interfaces/PlayerRegistry.IPlayer.md) |
 
 #### Returns
 
-`boolean`
-
-True if the streamer was removed.
+`void`
 
 #### Defined in
 
-[src/StreamerRegistry.ts:80](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L80)
+[src/PlayerRegistry.ts:66](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/33ba8d3/new_cirrus/src/PlayerRegistry.ts#L66)
 
 ___
 
@@ -1050,26 +1049,6 @@ EventEmitter.removeListener
 #### Defined in
 
 node_modules/@types/node/events.d.ts:690
-
-___
-
-### sanitizeStreamerId
-
-▸ **sanitizeStreamerId**(`id`): `string`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `id` | `string` |
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-[src/StreamerRegistry.ts:138](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/6b3496e/new_cirrus/src/StreamerRegistry.ts#L138)
 
 ___
 
