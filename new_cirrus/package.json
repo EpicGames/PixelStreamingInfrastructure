@@ -4,7 +4,7 @@
   "description": "A rewrite of the old cirrus signalling server",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npm link ../Common && tsc",
     "start": "npm run build && node ./build/index.js",
     "dev": "nodemon src/index.ts --no_save --log_level_console debug --console_messages verbose --serve --http_root Public --log_config",
     "test": "echo \"Error: no test specified\" && exit 1",

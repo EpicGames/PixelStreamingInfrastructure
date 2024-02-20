@@ -59,7 +59,7 @@ module.exports = {
       filename: '[name].js',
       library: 'epicgames-frontend',
       libraryTarget: 'umd',
-      path: path.resolve(__dirname, '../../../SignallingWebServer/Public'),
+      path: process.env.WEBPACK_OUTPUT_PATH ? path.resolve(process.env.WEBPACK_OUTPUT_PATH) : path.resolve(__dirname, '../../../SignallingWebServer/Public'),
       clean: true,
       globalObject: 'this',
       hashFunction: 'xxhash64',
