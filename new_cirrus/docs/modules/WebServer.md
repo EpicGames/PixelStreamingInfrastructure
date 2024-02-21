@@ -1,4 +1,4 @@
-[wilbur](../README.md) / [Exports](../modules.md) / WebServer
+[wilbur](../README.md) / WebServer
 
 # Module: WebServer
 

@@ -1,4 +1,4 @@
-[wilbur](../README.md) / [Exports](../modules.md) / [Logger](../modules/Logger.md) / IConfig
+[wilbur](../README.md) / [Logger](../modules/Logger.md) / IConfig
 
 # Interface: IConfig
 
@@ -21,7 +21,7 @@
 
 #### Defined in
 
-[Logger.ts:17](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/4b7b7a5/new_cirrus/src/Logger.ts#L17)
+[Logger.ts:17](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/59fc21f/new_cirrus/src/Logger.ts#L17)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 #### Defined in
 
-[Logger.ts:23](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/4b7b7a5/new_cirrus/src/Logger.ts#L23)
+[Logger.ts:23](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/59fc21f/new_cirrus/src/Logger.ts#L23)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 #### Defined in
 
-[Logger.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/4b7b7a5/new_cirrus/src/Logger.ts#L26)
+[Logger.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/59fc21f/new_cirrus/src/Logger.ts#L26)
 
 ___
 
@@ -51,4 +51,4 @@ ___
 
 #### Defined in
 
-[Logger.ts:20](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/4b7b7a5/new_cirrus/src/Logger.ts#L20)
+[Logger.ts:20](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/59fc21f/new_cirrus/src/Logger.ts#L20)

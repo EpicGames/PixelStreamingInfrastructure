@@ -1,4 +1,4 @@
-[wilbur](../README.md) / [Exports](../modules.md) / [WebServer](../modules/WebServer.md) / WebServer
+[wilbur](../README.md) / [WebServer](../modules/WebServer.md) / WebServer
 
 # Class: WebServer
 
@@ -33,4 +33,4 @@ pixel streaming frontend.
 
 #### Defined in
 
-[WebServer.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/4b7b7a5/new_cirrus/src/WebServer.ts#L30)
+[WebServer.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/59fc21f/new_cirrus/src/WebServer.ts#L30)

@@ -1,4 +1,4 @@
-[wilbur](../README.md) / [Exports](../modules.md) / StreamerConnection
+[wilbur](../README.md) / StreamerConnection
 
 # Module: StreamerConnection
 

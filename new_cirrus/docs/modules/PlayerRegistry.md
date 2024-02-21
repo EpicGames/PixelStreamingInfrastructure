@@ -1,4 +1,4 @@
-[wilbur](../README.md) / [Exports](../modules.md) / PlayerRegistry
+[wilbur](../README.md) / PlayerRegistry
 
 # Module: PlayerRegistry
 

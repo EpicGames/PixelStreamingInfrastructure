@@ -1,4 +1,4 @@
-[wilbur](../README.md) / [Exports](../modules.md) / StreamerRegistry
+[wilbur](../README.md) / StreamerRegistry
 
 # Module: StreamerRegistry
 

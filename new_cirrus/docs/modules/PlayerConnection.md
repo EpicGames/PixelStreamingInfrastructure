@@ -1,4 +1,4 @@
-[wilbur](../README.md) / [Exports](../modules.md) / PlayerConnection
+[wilbur](../README.md) / PlayerConnection
 
 # Module: PlayerConnection
 

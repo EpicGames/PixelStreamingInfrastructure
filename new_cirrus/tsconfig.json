@@ -113,6 +113,7 @@
     "excludeExternals": true,
     "excludePrivate": true,
     "excludeInternal": true,
-    "plugin": "typedoc-plugin-markdown"
+    "plugin": "typedoc-plugin-markdown",
+    "readme": "none"
   }
 }

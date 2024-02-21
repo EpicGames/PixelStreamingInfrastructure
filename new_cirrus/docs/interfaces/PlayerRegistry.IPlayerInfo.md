@@ -1,4 +1,4 @@
-[wilbur](../README.md) / [Exports](../modules.md) / [PlayerRegistry](../modules/PlayerRegistry.md) / IPlayerInfo
+[wilbur](../README.md) / [PlayerRegistry](../modules/PlayerRegistry.md) / IPlayerInfo
 
 # Interface: IPlayerInfo
 
@@ -24,7 +24,7 @@ Used by the API to describe the current state of the player.
 
 #### Defined in
 
-[PlayerRegistry.ts:24](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/4b7b7a5/new_cirrus/src/PlayerRegistry.ts#L24)
+[PlayerRegistry.ts:24](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/59fc21f/new_cirrus/src/PlayerRegistry.ts#L24)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-[PlayerRegistry.ts:28](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/4b7b7a5/new_cirrus/src/PlayerRegistry.ts#L28)
+[PlayerRegistry.ts:28](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/59fc21f/new_cirrus/src/PlayerRegistry.ts#L28)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-[PlayerRegistry.ts:27](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/4b7b7a5/new_cirrus/src/PlayerRegistry.ts#L27)
+[PlayerRegistry.ts:27](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/59fc21f/new_cirrus/src/PlayerRegistry.ts#L27)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 #### Defined in
 
-[PlayerRegistry.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/4b7b7a5/new_cirrus/src/PlayerRegistry.ts#L26)
+[PlayerRegistry.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/59fc21f/new_cirrus/src/PlayerRegistry.ts#L26)
 
 ___
 
@@ -64,4 +64,4 @@ ___
 
 #### Defined in
 
-[PlayerRegistry.ts:25](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/4b7b7a5/new_cirrus/src/PlayerRegistry.ts#L25)
+[PlayerRegistry.ts:25](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/59fc21f/new_cirrus/src/PlayerRegistry.ts#L25)

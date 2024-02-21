@@ -1,4 +1,4 @@
-[wilbur](../README.md) / [Exports](../modules.md) / SignallingServer
+[wilbur](../README.md) / SignallingServer
 
 # Module: SignallingServer
 

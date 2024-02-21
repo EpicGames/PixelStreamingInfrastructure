@@ -1,4 +1,4 @@
-[wilbur](../README.md) / [Exports](../modules.md) / SFUConnection
+[wilbur](../README.md) / SFUConnection
 
 # Module: SFUConnection
 

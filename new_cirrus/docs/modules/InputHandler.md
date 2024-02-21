@@ -1,4 +1,4 @@
-[wilbur](../README.md) / [Exports](../modules.md) / InputHandler
+[wilbur](../README.md) / InputHandler
 
 # Module: InputHandler
 
@@ -27,4 +27,4 @@
 
 #### Defined in
 
-[InputHandler.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/4b7b7a5/new_cirrus/src/InputHandler.ts#L9)
+[InputHandler.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/59fc21f/new_cirrus/src/InputHandler.ts#L9)

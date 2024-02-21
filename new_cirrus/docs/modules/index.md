@@ -1,3 +1,3 @@
-[wilbur](../README.md) / [Exports](../modules.md) / index
+[wilbur](../README.md) / index
 
 # Module: index
