@@ -8,6 +8,7 @@ export interface IMatchmakerConfig {
     publicPort: number;
     address: string;
     port: number;
+    https: boolean;
     retryInterval: number;
     keepAliveInterval: number;
 }
@@ -51,6 +52,7 @@ export class MatchmakerConnection {
             type: 'connect',
             address: this.config.publicIp,
             port: this.config.publicPort,
+            https: this.config.https,
             ready: !this.streamerRegistry.empty(),
             playerConnected: !this.playerRegistry.empty()
         };

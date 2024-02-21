@@ -1,8 +1,15 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
+import http from 'http';
+import https from 'https';
+import helmet from 'helmet';
 import { Logger } from './Logger';
 import RateLimit from 'express-rate-limit';
+
+/* eslint-disable  @typescript-eslint/no-var-requires */
+const hsts = require('hsts');
+/* eslint-enable  @typescript-eslint/no-var-requires */
 
 /**
  * An interface that describes the possible options to pass to
@@ -10,7 +17,7 @@ import RateLimit from 'express-rate-limit';
  */
 export interface IWebServerConfig {
     // The port to run the webserver on. 80 by default.
-    port: number;
+    httpPort: number;
 
     // The root of the serve directory. Current working directory by default.
     root: string;
@@ -20,6 +27,15 @@ export interface IWebServerConfig {
 
     // An optional rate limit to prevent overloading.
     perMinuteRateLimit?: number;
+
+    // when set an https server will be created
+    httpsPort?: number;
+
+    // the ssl key data for https
+    ssl_key?: Buffer;
+
+    // the ssl cert data for https
+    ssl_cert?: Buffer;
 }
 
 /**
@@ -27,23 +43,55 @@ export interface IWebServerConfig {
  * pixel streaming frontend.
  */
 export class WebServer {
-    constructor(app: any, server: any, config: IWebServerConfig) {
+    httpServer: http.Server;
+    httpsServer: https.Server;
+
+    constructor(app: any, config: IWebServerConfig) {
         Logger.debug('Starting WebServer with config: %s', config);
 
-        const httpPort = config.port;
-        const serveRoot = config.root;
-        const homepageFile = config.homepageFile;
-
-        server.listen(httpPort, function () {
-            Logger.info(`Http server listening on port ${httpPort}`);
+        this.httpServer = http.createServer(app);
+        this.httpServer.listen(config.httpPort, () => {
+            Logger.info(`Http server listening on port ${config.httpPort}`);
         });
 
-        app.use(express.static(serveRoot));
+        if (config.httpsPort) {
+            const options = { key: config.ssl_key, cert: config.ssl_cert };
+            this.httpsServer = https.createServer(options, app);
+            this.httpsServer.listen(config.httpsPort, () => {
+                Logger.info(`Https server listening on port ${config.httpsPort}`);
+            });
+
+            app.use(helmet());
+            app.use(hsts({
+                maxAge: 15552000  // 180 days in seconds
+            }));
+
+            //Setup http -> https redirect
+            Logger.info(`Redirecting http->https`);
+            app.use((req: any, res: any, next: any) => {
+                if (!req.secure) {
+                    if (req.get('Host')) {
+                        const hostAddressParts = req.get('Host').split(':');
+                        let hostAddress = hostAddressParts[0];
+                        if (config.httpsPort != 443) {
+                            hostAddress = `${hostAddress}:${config.httpsPort}`;
+                        }
+                        return res.redirect(['https://', hostAddress, req.originalUrl].join(''));
+                    } else {
+                        Logger.error(`Unable to get host name from header. Requestor ${req.ip}, url path: '${req.originalUrl}', available headers ${JSON.stringify(req.headers)}`);
+                        return res.status(400).send('Bad Request');
+                    }
+                }
+                next();
+            });
+        }
+
+        app.use(express.static(config.root));
 
         // Request has been sent to site root, send the homepage file
         app.get('/', function (req: any, res: any) {
             // Try a few paths, see if any resolve to a homepage file the user has set
-            const p = path.resolve(path.join(serveRoot, homepageFile));
+            const p = path.resolve(path.join(config.root, config.homepageFile));
             if (fs.existsSync(p)) {
                 // Send the file for browser to display it
                 res.sendFile(p);
@@ -51,7 +99,7 @@ export class WebServer {
             }
 
             // Catch file doesn't exist, and send back 404 if not
-            const error = 'Unable to locate file ' + homepageFile;
+            const error = 'Unable to locate file ' + config.homepageFile;
             Logger.error(error);
             res.status(404).send(error);
             return;

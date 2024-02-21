@@ -1,11 +1,12 @@
 import express from 'express';
-import http from 'http';
 import fs from 'fs';
+import path from 'path';
 import { SignallingServer,
          IServerConfig,
          WebServer,
          InitLogging,
-         Logger } from '@epicgames-ps/lib-pixelstreamingsignalling-ue5.5';
+         Logger,
+         IWebServerConfig } from '@epicgames-ps/lib-pixelstreamingsignalling-ue5.5';
 import { stringify, beautify, IProgramOptions } from './Utils';
 import { initInputHandler } from './InputHandler';
 import { Command, Option } from 'commander';
@@ -42,12 +43,18 @@ program
     .option('--player_port <port>', 'Sets the listening port for player connections.', '80')
     .option('--sfu_port <port>', 'Sets the listening port for SFU connections.', '8889')
     .option('--serve', 'Enables the webserver on player_port.', false)
+    .option('--https', 'Enables the webserver on https_port and enabling SSL', false)
+    .addOption(new Option('--https_port <port>', 'Sets the listen port for the https server.')
+        .implies({https: true})
+        .default(443))
+    .option('--ssl_key_path <path>', 'Sets the path for the SSL key file.','ssl/key.pem')
+    .option('--ssl_cert_path <path>', 'Sets the path for the SSL certificate file.','ssl/cert.pem')
     .option('--http_root <path>', 'Sets the path for the webserver root.', 'www')
     .option('--homepage <filename>', 'The default html file to serve on the web server.', 'player.html')
-    .option('--rest_api', 'Enables the rest API interface that can be accessed at <server_url>/api/api-definition')
+    .option('--rest_api', 'Enables the rest API interface that can be accessed at <server_url>/api/api-definition', false)
     .addOption(new Option('--peer_options <json-string>', 'Additional JSON data to send in peerConnectionOptions of the config message.')
         .argParser(JSON.parse))
-    .option('--matchmaker', 'Enable matchmaker connection.')
+    .option('--matchmaker', 'Enable matchmaker connection.', false)
     .addOption(new Option('--matchmaker_address <address>', 'Sets the matchmaker address to connect to.')
         .default('127.0.0.1')
         .implies({ matchmaker: true }))
@@ -126,17 +133,23 @@ const serverOpts: IServerConfig = {
     matchmakerRetryInterval: options.matchmaker_retry,
     matchmakerKeepAliveInterval: options.matchmaker_keepalive,
     publicIp: options.public_ip,
-    publicPort: options.player_port
+    publicPort: options.https ? options.https_port : options.player_port
 }
 
 if (options.serve) {
-    const server = http.createServer(app);
-    const _webServer = new WebServer(app, server, {
-        port: options.player_port,
+    const webserverOptions: IWebServerConfig = {
+        httpPort: options.player_port,
         root: options.http_root,
         homepageFile: options.homepage
-    });
-    serverOpts.httpServer = server;
+    };
+    if (options.https) {
+        webserverOptions.httpsPort = options.https_port;
+        webserverOptions.ssl_key = fs.readFileSync(path.join(__dirname, '..', options.ssl_key_path));
+        webserverOptions.ssl_cert = fs.readFileSync(path.join(__dirname, '..', options.ssl_cert_path));
+    }
+    const webServer = new WebServer(app, webserverOptions);
+    serverOpts.httpServer = webServer.httpServer;
+    serverOpts.httpsServer = webServer.httpsServer;
 }
 
 const signallingServer = new SignallingServer(serverOpts);

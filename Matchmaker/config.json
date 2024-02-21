@@ -1,6 +1,6 @@
 {
 	"HttpPort": 90,
-	"UseHTTPS": false,
+	"UseHTTPS": true,
 	"MatchmakerPort": 9999,
 	"LogToFile": true,
 	"EnableWebserver": true

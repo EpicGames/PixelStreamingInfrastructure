@@ -1,4 +1,5 @@
 import http from 'http';
+import https from 'https';
 import WebSocket from 'ws';
 import url from 'url';
 import { StreamerConnection } from './StreamerConnection';
@@ -16,13 +17,16 @@ import { stringify } from './Utils';
  * a new SignallingServer object.
  */
 export interface IServerConfig {
-    // An http server to use for player connections rather than a port. Not needed if playerPort supplied.
+    // An http server to use for player connections rather than a port. Not needed if playerPort or httpsServer supplied.
     httpServer?: http.Server;
+
+    // An https server to use for player connections rather than a port. Not needed if playerPort or httpServer supplied.
+    httpsServer?: https.Server;
 
     // The port to listen on for streamer connections.
     streamerPort: number;
 
-    // The port to listen on for player connections. Not needed if httpServer supplied.
+    // The port to listen on for player connections. Not needed if httpServer or httpsServer supplied.
     playerPort?: number;
 
     // The port to listen on for SFU connections. If not supplied SFU connections will be disabled.
@@ -79,8 +83,8 @@ export class SignallingServer {
         };
         this.startTime = new Date();
 
-        if (!config.playerPort && !config.httpServer) {
-            Logger.error('No player port or http server supplied to SignallingServer.');
+        if (!config.playerPort && !config.httpServer && !config.httpsServer) {
+            Logger.error('No player port, http server or https server supplied to SignallingServer.');
             return;
         }
 
@@ -90,12 +94,13 @@ export class SignallingServer {
         Logger.info(`Listening for streamer connections on port ${config.streamerPort}`);
 
         // Player connections
+        const server = config.httpsServer || config.httpServer;
         const playerServer = new WebSocket.Server({
-            server: config.httpServer,
-            port: config.httpServer ? undefined : config.playerPort,
+            server: server,
+            port: server ? undefined : config.playerPort,
             ...config.playerWsOptions });
         playerServer.on('connection', this.onPlayerConnected.bind(this));
-        if (!config.httpServer) {
+        if (!config.httpServer && !config.httpsServer) {
             Logger.info(`Listening for player connections on port ${config.playerPort}`);
         }
 
@@ -113,6 +118,7 @@ export class SignallingServer {
                 publicPort: config.publicPort,
                 address: config.matchmakerAddress,
                 port: config.matchmakerPort,
+                https: config.httpsServer != undefined,
                 retryInterval: config.matchmakerRetryInterval,
                 keepAliveInterval: config.matchmakerKeepAliveInterval,
             };
