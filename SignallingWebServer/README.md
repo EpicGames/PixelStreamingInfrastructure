@@ -1,8 +1,10 @@
 # Wilbur
 
-The signalling server is a small intermediary application that sits between streamers and other peers. It handles the initial connection negotiations and some other small ongoing control messages between peers as well as acting as a simple web server for serving the [Frontend](/Frontend/README.md) web application.
+A Direct replacement for cirrus.
 
-This is a new implementation of the now deprecated cirrus. Differences in behaviour are described [here](from_cirrus.md).
+Wilbur is a small intermediary application that sits between streamers and other peers. It handles the initial connection negotiations and some other small ongoing control messages between peers as well as acting as a simple web server for serving the [Frontend](/Frontend/README.md) web application.
+
+Differences of behaviour from the old cirrus are described [here](from_cirrus.md).
 
 ## Building
 Building is handled by `npm` and `tsc` as a very basic typescript project. The easiest method is to invoke
@@ -75,4 +77,4 @@ npm start -- --console_messages verbose --serve --http_root Public --homepage pl
 Note that `Public` being used as the http root assumes your Frontend is in that directory from the old behaviour of the scripts. The new convenience scripts (`platform_scripts` directory) will now build the frontend into the `www` directory.
 
 ## Development
-Documentation on this implementation can be found [here](./docs). This implementation is built on the [Common](../Common) library which is supplied as a library for developing signalling applications. Visit its [documentation](../Common/docs) for more information.
+This implementation is built on the [Signalling](../Signalling) library which is supplied as a library for developing signalling applications. Visit its [documentation](../Signalling/docs) for more information.
