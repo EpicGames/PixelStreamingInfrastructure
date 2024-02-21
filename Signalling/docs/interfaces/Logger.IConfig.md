@@ -21,7 +21,7 @@
 
 #### Defined in
 
-[Logger.ts:17](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/Logger.ts#L17)
+[Logger.ts:17](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/Logger.ts#L17)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 #### Defined in
 
-[Logger.ts:23](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/Logger.ts#L23)
+[Logger.ts:23](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/Logger.ts#L23)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 #### Defined in
 
-[Logger.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/Logger.ts#L26)
+[Logger.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/Logger.ts#L26)
 
 ___
 
@@ -51,4 +51,4 @@ ___
 
 #### Defined in
 
-[Logger.ts:20](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/Logger.ts#L20)
+[Logger.ts:20](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/Logger.ts#L20)

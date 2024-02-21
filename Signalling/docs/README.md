@@ -8,6 +8,7 @@
 
 - [Logger](modules/Logger.md)
 - [LoggingUtils](modules/LoggingUtils.md)
+- [MatchmakerConnection](modules/MatchmakerConnection.md)
 - [PlayerConnection](modules/PlayerConnection.md)
 - [PlayerRegistry](modules/PlayerRegistry.md)
 - [SFUConnection](modules/SFUConnection.md)

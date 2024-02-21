@@ -23,13 +23,18 @@ import { SignallingServer } from './SignallingServer';
  * subscribed to.
  */
 export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
-    private server: SignallingServer;
+    // The unique id of this player connection.
     playerId: string;
+    // The websocket transport used by this connection.
     transport: ITransport;
+    // The protocol abstraction on this connection. Used for sending/receiving signalling messages.
     protocol: SignallingProtocol;
+    // When the player is subscribed to a streamer this will be the streamer being subscribed to.
     subscribedStreamer: IStreamer | null;
+    // A descriptive string describing the remote address of this connection.
     remoteAddress?: string;
 
+    private server: SignallingServer;
     private sendOffer: boolean;
     private streamerIdChangeListener: (newId: string) => void;
     private streamerDisconnectedListener: () => void;
@@ -39,9 +44,8 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
      * websocket close and error so it can react by unsubscribing and resetting itself.
      * @param server - The signalling server object that spawned this player.
      * @param ws - The websocket coupled to this player connection.
+     * @param sendOffer - True if the player is requesting to receive offers from streamers.
      * @param remoteAddress - The remote address of this connection. Only used as display.
-     * @param sendOffer - True if the player is requesting to receive offers
-     * from streamers.
      */
     constructor(server: SignallingServer, ws: WebSocket, sendOffer: boolean, remoteAddress?: string) {
         this.server = server;

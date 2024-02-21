@@ -39,4 +39,4 @@ who is sending or receiving etc.
 
 #### Defined in
 
-[LoggingUtils.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/LoggingUtils.ts#L9)
+[LoggingUtils.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/LoggingUtils.ts#L9)

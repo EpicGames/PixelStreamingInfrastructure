@@ -13,18 +13,22 @@ pixel streaming frontend.
 
 - [constructor](WebServer.WebServer.md#constructor)
 
+### Properties
+
+- [httpServer](WebServer.WebServer.md#httpserver)
+- [httpsServer](WebServer.WebServer.md#httpsserver)
+
 ## Constructors
 
 ### constructor
 
-• **new WebServer**(`app`, `server`, `config`): [`WebServer`](WebServer.WebServer.md)
+• **new WebServer**(`app`, `config`): [`WebServer`](WebServer.WebServer.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `app` | `any` |
-| `server` | `any` |
 | `config` | [`IWebServerConfig`](../interfaces/WebServer.IWebServerConfig.md) |
 
 #### Returns
@@ -33,4 +37,24 @@ pixel streaming frontend.
 
 #### Defined in
 
-[WebServer.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/WebServer.ts#L30)
+[WebServer.ts:52](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/WebServer.ts#L52)
+
+## Properties
+
+### httpServer
+
+• **httpServer**: `Server`\<typeof `IncomingMessage`, typeof `ServerResponse`\>
+
+#### Defined in
+
+[WebServer.ts:49](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/WebServer.ts#L49)
+
+___
+
+### httpsServer
+
+• **httpsServer**: `Server`\<typeof `IncomingMessage`, typeof `ServerResponse`\>
+
+#### Defined in
+
+[WebServer.ts:50](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/WebServer.ts#L50)

@@ -28,14 +28,17 @@ export interface IWebServerConfig {
     // An optional rate limit to prevent overloading.
     perMinuteRateLimit?: number;
 
-    // when set an https server will be created
+    // When set an https server will be created
     httpsPort?: number;
 
-    // the ssl key data for https
+    // The ssl key data for https
     ssl_key?: Buffer;
 
-    // the ssl cert data for https
+    // The ssl cert data for https
     ssl_cert?: Buffer;
+
+    // If true, connections to http will be redirected to https.
+    https_redirect?: Boolean;
 }
 
 /**
@@ -49,11 +52,15 @@ export class WebServer {
     constructor(app: any, config: IWebServerConfig) {
         Logger.debug('Starting WebServer with config: %s', config);
 
-        this.httpServer = http.createServer(app);
-        this.httpServer.listen(config.httpPort, () => {
-            Logger.info(`Http server listening on port ${config.httpPort}`);
-        });
+        // only listen on the http port if we're not using https or if we want to redirect
+        if (!config.httpsPort || config.https_redirect) {
+            this.httpServer = http.createServer(app);
+            this.httpServer.listen(config.httpPort, () => {
+                Logger.info(`Http server listening on port ${config.httpPort}`);
+            });
+        }
 
+        // if using https listen on the given ports and setup some details
         if (config.httpsPort) {
             const options = { key: config.ssl_key, cert: config.ssl_cert };
             this.httpsServer = https.createServer(options, app);
@@ -66,24 +73,25 @@ export class WebServer {
                 maxAge: 15552000  // 180 days in seconds
             }));
 
-            //Setup http -> https redirect
-            Logger.info(`Redirecting http->https`);
-            app.use((req: any, res: any, next: any) => {
-                if (!req.secure) {
-                    if (req.get('Host')) {
-                        const hostAddressParts = req.get('Host').split(':');
-                        let hostAddress = hostAddressParts[0];
-                        if (config.httpsPort != 443) {
-                            hostAddress = `${hostAddress}:${config.httpsPort}`;
+            // Setup http -> https redirect if requested
+            if (config.https_redirect) {
+                app.use((req: any, res: any, next: any) => {
+                    if (!req.secure) {
+                        if (req.get('Host')) {
+                            const hostAddressParts = req.get('Host').split(':');
+                            let hostAddress = hostAddressParts[0];
+                            if (config.httpsPort != 443) {
+                                hostAddress = `${hostAddress}:${config.httpsPort}`;
+                            }
+                            return res.redirect(['https://', hostAddress, req.originalUrl].join(''));
+                        } else {
+                            Logger.error(`Unable to get host name from header. Requestor ${req.ip}, url path: '${req.originalUrl}', available headers ${JSON.stringify(req.headers)}`);
+                            return res.status(400).send('Bad Request');
                         }
-                        return res.redirect(['https://', hostAddress, req.originalUrl].join(''));
-                    } else {
-                        Logger.error(`Unable to get host name from header. Requestor ${req.ip}, url path: '${req.originalUrl}', available headers ${JSON.stringify(req.headers)}`);
-                        return res.status(400).send('Bad Request');
                     }
-                }
-                next();
-            });
+                    next();
+                });
+            }
         }
 
         app.use(express.static(config.root));

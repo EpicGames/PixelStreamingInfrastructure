@@ -28,15 +28,22 @@ import { SignallingServer } from './SignallingServer';
  * streaming: True when the streamer is ready to accept subscriptions.
  */
 export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, LogUtils.IMessageLogger {
-    private server: SignallingServer;
-    transport: ITransport;
-    protocol: SignallingProtocol;
+    // The player id related to this SFU connection.
     playerId: string;
+    // The streamer id related to this SFU connection.
     streamerId: string;
+    // The websocket transport used by this connection.
+    transport: ITransport;
+    // The protocol abstraction on this connection. Used for sending/receiving signalling messages.
+    protocol: SignallingProtocol;
+    // True when this SFU is subscribed to another streamer and is ready to be subscribed to itself.
     streaming: boolean;
-    remoteAddress?: string;
+    // When the player is subscribed to a streamer this will be the streamer being subscribed to.
     subscribedStreamer: IStreamer | null;
+    // A descriptive string describing the remote address of this connection.
+    remoteAddress?: string;
 
+    private server: SignallingServer;
     private layerPreferenceListener: (message: Messages.layerPreference) => void;
     private streamerIdChangeListener: (newId: string) => void;
     private streamerDisconnectedListener: () => void;

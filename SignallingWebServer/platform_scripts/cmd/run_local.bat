@@ -15,7 +15,7 @@ call setup.bat %*
 pushd ..\..
 
 @Rem Run node server and pass any argument along.
-platform_scripts\cmd\node\npm.cmd run start -- --serve %*
+platform_scripts\cmd\node\npm.cmd run start -- --serve --https_redirect %*
 
 @Rem Pop server directory.
 popd

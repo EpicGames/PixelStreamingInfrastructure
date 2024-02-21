@@ -28,6 +28,7 @@ import * as MessageHelpers from '../Messages/message_helpers';
 export class SignallingProtocol extends EventEmitter {
     static get SIGNALLING_VERSION(): string { return '1.0'; }
 
+    // The transport in use by this protocol object.
     transport: ITransport;
 
     constructor(transport: ITransport) {
@@ -49,71 +50,77 @@ export class SignallingProtocol extends EventEmitter {
 
     /**
      * Asks the transport to connect to the given URL.
+     * @param url - The url to connect to.
+     * @returns True if the connection call succeeded.
      */
-    connect(url: string) {
+    connect(url: string): boolean {
         return this.transport.connect(url);
     }
 
     /**
      * Asks the transport to disconnect from any connection it might have.
+     * @param code - An optional disconnection code.
+     * @param reason - An optional descriptive string for the disconnect reason.
      */
-    disconnect(code?: number, reason?: string) {
+    disconnect(code?: number, reason?: string): void {
         this.transport.disconnect(code, reason);
     }
 
     /**
      * Returns true if the transport is connected and ready to send/receive messages.
+     * @returns True if the protocol is connected.
      */
-    isConnected() {
+    isConnected(): boolean {
         return this.transport.isConnected();
     }
 
     /**
      * Passes a message to the transport to send to the other end.
+     * @param msg - The message to send.
      */
-    sendMessage(msg: BaseMessage) {
+    sendMessage(msg: BaseMessage): void {
         this.transport.sendMessage(msg);
         this.transport.emit('out', msg); // emit this for listeners listening to outgoing messages
     }
 
     // the following are just wrappers for sendMessage and should be deprioritized.
     
-    requestStreamerList() {
+    requestStreamerList(): void {
         const payload = MessageHelpers.createMessage(Messages.listStreamers);
         this.transport.sendMessage(payload);
     }
 
-    sendSubscribe(streamerid: string) {
+    sendSubscribe(streamerid: string): void {
         const payload = MessageHelpers.createMessage(Messages.subscribe, { streamerid: streamerid });
         this.transport.sendMessage(payload);
     }
 
-    sendUnsubscribe() {
+    sendUnsubscribe(): void {
         const payload = MessageHelpers.createMessage(Messages.unsubscribe);
         this.transport.sendMessage(payload);
     }
 
-    sendWebRtcOffer(extraParams: object) {
+    sendWebRtcOffer(extraParams: object): void {
         const payload = MessageHelpers.createMessage(Messages.offer, extraParams);
         this.transport.sendMessage(payload);
     }
 
-    sendWebRtcAnswer(extraParams: object) {
+    sendWebRtcAnswer(extraParams: object): void {
         const payload = MessageHelpers.createMessage(Messages.answer, extraParams);
         this.transport.sendMessage(payload);
     }
 
-    sendWebRtcDatachannelRequest() {
+    sendWebRtcDatachannelRequest(): void {
         const payload = MessageHelpers.createMessage(Messages.dataChannelRequest);
         this.transport.sendMessage(payload);
     }
 
-    sendSFURecvDataChannelReady() {
+    sendSFURecvDataChannelReady(): void {
         const payload = MessageHelpers.createMessage(Messages.peerDataChannelsReady);
         this.transport.sendMessage(payload);
     }
 
-    sendIceCandidate(candidate: RTCIceCandidate) {
+    sendIceCandidate(candidate: RTCIceCandidate): void {
         const payload = MessageHelpers.createMessage(Messages.iceCandidate, { candidate: candidate });
         this.transport.sendMessage(payload);
     }

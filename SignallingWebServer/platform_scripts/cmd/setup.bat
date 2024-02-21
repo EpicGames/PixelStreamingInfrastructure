@@ -17,6 +17,7 @@ call setup_coturn.bat
 @Rem Move to server directory and install its package.json
 pushd %~dp0\..\..\
 call platform_scripts\cmd\node\npm install --no-save
+call platform_scripts\cmd\node\npm link ../Signalling
 popd
 
 @Rem Pop working directory

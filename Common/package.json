@@ -11,6 +11,7 @@
         "build": "rimraf ./build && npm run build-proto && npm run compile",
         "build-dev": "npm run build-proto && npm run compile",
         "build-proto": "npx protoc --experimental_allow_proto3_optional --ts_out src/Messages --proto_path protobuf protobuf/signalling_messages.proto",
+        "build-docs": "typedoc --tsconfig tsconfig.base.json",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
@@ -29,7 +30,8 @@
         "ts-jest": "27.1.5",
         "ts-loader": "^9.4.2",
         "ts-node": "^10.9.2",
-        "typedoc": "^0.23.24",
+        "typedoc": "^0.25.8",
+        "typedoc-plugin-markdown": "^3.17.1",
         "typescript": "^4.9.4"
     },
     "author": "Epic Games",

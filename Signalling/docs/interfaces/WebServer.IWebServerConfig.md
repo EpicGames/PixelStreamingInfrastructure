@@ -12,9 +12,13 @@ WebServer.
 ### Properties
 
 - [homepageFile](WebServer.IWebServerConfig.md#homepagefile)
+- [httpPort](WebServer.IWebServerConfig.md#httpport)
+- [httpsPort](WebServer.IWebServerConfig.md#httpsport)
+- [https\_redirect](WebServer.IWebServerConfig.md#https_redirect)
 - [perMinuteRateLimit](WebServer.IWebServerConfig.md#perminuteratelimit)
-- [port](WebServer.IWebServerConfig.md#port)
 - [root](WebServer.IWebServerConfig.md#root)
+- [ssl\_cert](WebServer.IWebServerConfig.md#ssl_cert)
+- [ssl\_key](WebServer.IWebServerConfig.md#ssl_key)
 
 ## Properties
 
@@ -24,7 +28,37 @@ WebServer.
 
 #### Defined in
 
-[WebServer.ts:19](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/WebServer.ts#L19)
+[WebServer.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/WebServer.ts#L26)
+
+___
+
+### httpPort
+
+• **httpPort**: `number`
+
+#### Defined in
+
+[WebServer.ts:20](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/WebServer.ts#L20)
+
+___
+
+### httpsPort
+
+• `Optional` **httpsPort**: `number`
+
+#### Defined in
+
+[WebServer.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/WebServer.ts#L32)
+
+___
+
+### https\_redirect
+
+• `Optional` **https\_redirect**: `Boolean`
+
+#### Defined in
+
+[WebServer.ts:41](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/WebServer.ts#L41)
 
 ___
 
@@ -34,17 +68,7 @@ ___
 
 #### Defined in
 
-[WebServer.ts:22](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/WebServer.ts#L22)
-
-___
-
-### port
-
-• **port**: `number`
-
-#### Defined in
-
-[WebServer.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/WebServer.ts#L13)
+[WebServer.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/WebServer.ts#L29)
 
 ___
 
@@ -54,4 +78,24 @@ ___
 
 #### Defined in
 
-[WebServer.ts:16](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/WebServer.ts#L16)
+[WebServer.ts:23](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/WebServer.ts#L23)
+
+___
+
+### ssl\_cert
+
+• `Optional` **ssl\_cert**: `Buffer`
+
+#### Defined in
+
+[WebServer.ts:38](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/WebServer.ts#L38)
+
+___
+
+### ssl\_key
+
+• `Optional` **ssl\_key**: `Buffer`
+
+#### Defined in
+
+[WebServer.ts:35](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/WebServer.ts#L35)

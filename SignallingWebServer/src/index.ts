@@ -43,14 +43,15 @@ program
     .option('--player_port <port>', 'Sets the listening port for player connections.', '80')
     .option('--sfu_port <port>', 'Sets the listening port for SFU connections.', '8889')
     .option('--serve', 'Enables the webserver on player_port.', false)
+    .option('--http_root <path>', 'Sets the path for the webserver root.', 'www')
+    .option('--homepage <filename>', 'The default html file to serve on the web server.', 'player.html')
     .option('--https', 'Enables the webserver on https_port and enabling SSL', false)
     .addOption(new Option('--https_port <port>', 'Sets the listen port for the https server.')
         .implies({https: true})
         .default(443))
     .option('--ssl_key_path <path>', 'Sets the path for the SSL key file.','ssl/key.pem')
     .option('--ssl_cert_path <path>', 'Sets the path for the SSL certificate file.','ssl/cert.pem')
-    .option('--http_root <path>', 'Sets the path for the webserver root.', 'www')
-    .option('--homepage <filename>', 'The default html file to serve on the web server.', 'player.html')
+    .option('--https_redirect', 'Enables the redirection of connection attempts on http to https. If this is not set the webserver will only listen on https_port. Player websockets will still listen on player_port.', false)
     .option('--rest_api', 'Enables the rest API interface that can be accessed at <server_url>/api/api-definition', false)
     .addOption(new Option('--peer_options <json-string>', 'Additional JSON data to send in peerConnectionOptions of the config message.')
         .argParser(JSON.parse))
@@ -146,9 +147,12 @@ if (options.serve) {
         webserverOptions.httpsPort = options.https_port;
         webserverOptions.ssl_key = fs.readFileSync(path.join(__dirname, '..', options.ssl_key_path));
         webserverOptions.ssl_cert = fs.readFileSync(path.join(__dirname, '..', options.ssl_cert_path));
+        webserverOptions.https_redirect = options.https_redirect;
     }
     const webServer = new WebServer(app, webserverOptions);
-    serverOpts.httpServer = webServer.httpServer;
+    if (!options.https || webserverOptions.https_redirect) {
+        serverOpts.httpServer = webServer.httpServer;
+    }
     serverOpts.httpsServer = webServer.httpsServer;
 }
 

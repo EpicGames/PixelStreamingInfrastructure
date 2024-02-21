@@ -27,6 +27,7 @@ Events:
 
 - [add](PlayerRegistry.PlayerRegistry.md#add)
 - [count](PlayerRegistry.PlayerRegistry.md#count)
+- [empty](PlayerRegistry.PlayerRegistry.md#empty)
 - [get](PlayerRegistry.PlayerRegistry.md#get)
 - [has](PlayerRegistry.PlayerRegistry.md#has)
 - [listPlayers](PlayerRegistry.PlayerRegistry.md#listplayers)
@@ -48,7 +49,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[PlayerRegistry.ts:44](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/PlayerRegistry.ts#L44)
+[PlayerRegistry.ts:44](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/PlayerRegistry.ts#L44)
 
 ## Methods
 
@@ -70,7 +71,7 @@ Assigns a unique id to the player and adds it to the registry
 
 #### Defined in
 
-[PlayerRegistry.ts:54](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/PlayerRegistry.ts#L54)
+[PlayerRegistry.ts:54](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/PlayerRegistry.ts#L54)
 
 ___
 
@@ -86,7 +87,23 @@ Gets the total number of connected players.
 
 #### Defined in
 
-[PlayerRegistry.ts:100](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/PlayerRegistry.ts#L100)
+[PlayerRegistry.ts:107](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/PlayerRegistry.ts#L107)
+
+___
+
+### empty
+
+▸ **empty**(): `boolean`
+
+Returns true when the registry is empty.
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[PlayerRegistry.ts:100](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/PlayerRegistry.ts#L100)
 
 ___
 
@@ -109,7 +126,7 @@ Returns undefined if the player doesn't exist.
 
 #### Defined in
 
-[PlayerRegistry.ts:89](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/PlayerRegistry.ts#L89)
+[PlayerRegistry.ts:89](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/PlayerRegistry.ts#L89)
 
 ___
 
@@ -131,7 +148,7 @@ Tests if a player id exists in the registry.
 
 #### Defined in
 
-[PlayerRegistry.ts:81](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/PlayerRegistry.ts#L81)
+[PlayerRegistry.ts:81](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/PlayerRegistry.ts#L81)
 
 ___
 
@@ -145,7 +162,7 @@ ___
 
 #### Defined in
 
-[PlayerRegistry.ts:93](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/PlayerRegistry.ts#L93)
+[PlayerRegistry.ts:93](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/PlayerRegistry.ts#L93)
 
 ___
 
@@ -168,4 +185,4 @@ does not exist.
 
 #### Defined in
 
-[PlayerRegistry.ts:66](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/PlayerRegistry.ts#L66)
+[PlayerRegistry.ts:66](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/PlayerRegistry.ts#L66)

@@ -44,14 +44,26 @@ export interface IServerConfig {
     // Additional websocket options for the SFU listening websocket.
     sfuWsOptions?: any;
 
-    publicIp?: string;
-    publicPort?: number;
-
+    // Enables the matchmaker connection.
     useMatchmaker?: boolean;
+
+    // The ip/hostname of the matchmaker application.
     matchmakerAddress?: string;
+
+    // The port that the matchmaker is listening for connections on.
     matchmakerPort?: number;
+
+    // Number of seconds to delay before a reconnection attempt when the matchmaker connection is lost.
     matchmakerRetryInterval?: number;
+
+    // Number of seconds between keep alive pings to the matchmaker.
     matchmakerKeepAliveInterval?: number;
+
+    // Sent to the matchmaker so it can tell clients the ip/hostname to connect to
+    publicIp?: string;
+
+    // Sent to the matchmaker so it can tell clients what port to connect to
+    publicPort?: number;
 }
 
 /**
