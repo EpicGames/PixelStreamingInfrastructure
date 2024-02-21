@@ -95,6 +95,13 @@ export class PlayerRegistry extends EventEmitter {
     }
 
     /**
+     * Returns true when the registry is empty.
+     */
+    empty(): boolean {
+        return this.players.size == 0;
+    }
+
+    /**
      * Gets the total number of connected players.
      */
     count(): number {

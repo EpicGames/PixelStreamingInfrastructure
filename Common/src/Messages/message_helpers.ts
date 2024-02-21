@@ -3,7 +3,7 @@ import { BaseMessage } from './base_message';
 import { Logger } from '../Logger/Logger';
 import { MessageRegistry } from './message_registry';
 
-export function createMessage(messageType: IMessageType<BaseMessage>, params?: any) {
+export function createMessage(messageType: IMessageType<BaseMessage>, params?: object) {
     const message = messageType.create();
     message.type = messageType.typeName;
     if (params) {
@@ -12,8 +12,8 @@ export function createMessage(messageType: IMessageType<BaseMessage>, params?: a
     return message;
 }
 
-export function validateMessage(msg: any): IMessageType<BaseMessage> | null {
-    let valid: boolean = true;
+export function validateMessage(msg: BaseMessage): IMessageType<BaseMessage> | null {
+    let valid = true;
 
     if (!msg.type) {
         Logger.Error(Logger.GetStackTrace(), `Parsed message has no type. Rejected. ${JSON.stringify(msg)}`);
@@ -27,9 +27,9 @@ export function validateMessage(msg: any): IMessageType<BaseMessage> | null {
     }
 
     if (messageType.fields) {
-        for (let field of messageType.fields) {
+        for (const field of messageType.fields) {
             if (!field.opt) {
-                if (!msg.hasOwnProperty(field.name)) {
+                if (!Object.prototype.hasOwnProperty.call(msg, field.name)) {
                     Logger.Error(Logger.GetStackTrace(), `Message "${msg.type}"" is missing required field "${field.name}". Rejected.`);
                     valid = false;
                 }

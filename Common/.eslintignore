@@ -1,7 +1,8 @@
-dist
+build
 node_modules
 types
 package-lock.json
 package.json
 tsconfig.json
 .eslintrc.js
+src/Messages/signalling_messages.ts

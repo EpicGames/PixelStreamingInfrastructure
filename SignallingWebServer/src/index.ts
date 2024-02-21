@@ -41,17 +41,29 @@ program
     .option('--streamer_port <port>', 'Sets the listening port for streamer connections.', '8888')
     .option('--player_port <port>', 'Sets the listening port for player connections.', '80')
     .option('--sfu_port <port>', 'Sets the listening port for SFU connections.', '8889')
-    .addOption(new Option('--serve', 'Enables the webserver on player_port.').default(false))
+    .option('--serve', 'Enables the webserver on player_port.', false)
     .option('--http_root <path>', 'Sets the path for the webserver root.', 'www')
     .option('--homepage <filename>', 'The default html file to serve on the web server.', 'player.html')
+    .option('--rest_api', 'Enables the rest API interface that can be accessed at <server_url>/api/api-definition')
     .addOption(new Option('--peer_options <json-string>', 'Additional JSON data to send in peerConnectionOptions of the config message.')
         .argParser(JSON.parse))
-    .option('--public_ip <ip address>', 'The public IP address to be used to connect to this server.')
-    .addOption(new Option('--log_config', 'Will print the program configuration on startup.').default(false))
-    .addOption(new Option('--stdin', 'Allows stdin input while running.').default(false))
-    .addOption(new Option('--no_config', 'Skips the reading of the config file. Only CLI options will be used.').default(false))
-    .addOption(new Option('--config_file <path>', 'Sets the path of the config file.').default("config.json"))
-    .addOption(new Option('--no_save', 'On startup the given configuration is resaved out to config.json. This switch will prevent this behaviour allowing the config.json file to remain untouched while running with new configurations.').default(false))
+    .option('--matchmaker', 'Enable matchmaker connection.')
+    .addOption(new Option('--matchmaker_address <address>', 'Sets the matchmaker address to connect to.')
+        .default('127.0.0.1')
+        .implies({ matchmaker: true }))
+    .addOption(new Option('--matchmaker_port <port>', 'Sets the matchmaker port to connect to.')
+        .default('9999')
+        .argParser(parseInt))
+    .addOption(new Option('--matchmaker_retry <seconds>', 'Sets the delay before reconnecting to the matchmaker after a disconnect.').default("5").argParser(parseInt))
+    .addOption(new Option('--matchmaker_keepalive <seconds>', 'Sets the delay between matchmaker pings.')
+        .default('30')
+        .argParser(parseInt))
+    .option('--public_ip <ip address>', 'The public IP address to be used to connect to this server. Only needed when using matchmaker.', '127.0.0.1')
+    .option('--log_config', 'Will print the program configuration on startup.', false)
+    .option('--stdin', 'Allows stdin input while running.', false)
+    .option('--no_config', 'Skips the reading of the config file. Only CLI options will be used.', false)
+    .option('--config_file <path>', 'Sets the path of the config file.', 'config.json')
+    .option('--no_save', 'On startup the given configuration is resaved out to config.json. This switch will prevent this behaviour allowing the config.json file to remain untouched while running with new configurations.', false)
     .helpOption('-h, --help', 'Display this help text.')
     .allowUnknownOption() // ignore unknown options which will allow versions to be swapped out into existing scripts with maybe older/newer options
     .parse();
@@ -107,7 +119,14 @@ const serverOpts: IServerConfig = {
     streamerPort: options.streamer_port,
     playerPort: options.player_port,
     sfuPort: options.sfu_port,
-    peerOptions: options.peer_options
+    peerOptions: options.peer_options,
+    useMatchmaker: options.matchmaker,
+    matchmakerAddress: options.matchmaker_address,
+    matchmakerPort: options.matchmaker_port,
+    matchmakerRetryInterval: options.matchmaker_retry,
+    matchmakerKeepAliveInterval: options.matchmaker_keepalive,
+    publicIp: options.public_ip,
+    publicPort: options.player_port
 }
 
 if (options.serve) {
@@ -126,13 +145,15 @@ if (options.stdin) {
     initInputHandler(options, signallingServer);
 }
 
-initialize({
-    app,
-    docsPath: "/api-definition",
-    exposeApiDocs: true,
-    apiDoc: "./apidoc/api-definition-base.yml",
-    paths: "./build/paths",
-    dependencies: {
-        signallingServer,
-    }
-});
+if (options.rest_api) {
+    initialize({
+        app,
+        docsPath: "/api-definition",
+        exposeApiDocs: true,
+        apiDoc: "./apidoc/api-definition-base.yml",
+        paths: "./build/paths",
+        dependencies: {
+            signallingServer,
+        }
+    });
+}

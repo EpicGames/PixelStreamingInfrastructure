@@ -7,6 +7,7 @@ import { SFUConnection } from './SFUConnection';
 import { Logger } from './Logger';
 import { StreamerRegistry } from './StreamerRegistry';
 import { PlayerRegistry } from './PlayerRegistry';
+import { IMatchmakerConfig, MatchmakerConnection } from './MatchmakerConnection';
 import { Messages, MessageHelpers, SignallingProtocol } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.5';
 import { stringify } from './Utils';
 
@@ -38,6 +39,15 @@ export interface IServerConfig {
 
     // Additional websocket options for the SFU listening websocket.
     sfuWsOptions?: any;
+
+    publicIp?: string;
+    publicPort?: number;
+
+    useMatchmaker?: boolean;
+    matchmakerAddress?: string;
+    matchmakerPort?: number;
+    matchmakerRetryInterval?: number;
+    matchmakerKeepAliveInterval?: number;
 }
 
 /**
@@ -94,6 +104,19 @@ export class SignallingServer {
             const sfuServer = new WebSocket.Server({ port: config.sfuPort, backlog: 1, ...config.sfuWsOptions });
             sfuServer.on('connection', this.onSFUConnected.bind(this));
             Logger.info(`Listening for SFU connections on port ${config.sfuPort}`);
+        }
+
+        // Optional Matchmaker connections
+        if (config.useMatchmaker) {
+            const mmConfig: IMatchmakerConfig = {
+                publicIp: config.publicIp,
+                publicPort: config.publicPort,
+                address: config.matchmakerAddress,
+                port: config.matchmakerPort,
+                retryInterval: config.matchmakerRetryInterval,
+                keepAliveInterval: config.matchmakerKeepAliveInterval,
+            };
+            const _matchmakerConnection = new MatchmakerConnection(mmConfig, this.streamerRegistry, this.playerRegistry);
         }
     }
 

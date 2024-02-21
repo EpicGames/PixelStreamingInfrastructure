@@ -1,6 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Logger } from '../Logger/Logger';
 import { ITransport } from '../Transport/ITransport';
 import { EventEmitter } from 'events';
 import { BaseMessage } from '../Messages/base_message';
@@ -94,12 +93,12 @@ export class SignallingProtocol extends EventEmitter {
         this.transport.sendMessage(payload);
     }
 
-    sendWebRtcOffer(extraParams: any) {
+    sendWebRtcOffer(extraParams: object) {
         const payload = MessageHelpers.createMessage(Messages.offer, extraParams);
         this.transport.sendMessage(payload);
     }
 
-    sendWebRtcAnswer(extraParams: any) {
+    sendWebRtcAnswer(extraParams: object) {
         const payload = MessageHelpers.createMessage(Messages.answer, extraParams);
         this.transport.sendMessage(payload);
     }

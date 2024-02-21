@@ -4,7 +4,6 @@ import { Logger } from '../Logger/Logger';
 import { ITransport } from './ITransport';
 import { EventEmitter } from 'events';
 import { BaseMessage } from '../Messages/base_message';
-import * as MessageHelpers from '../Messages/message_helpers';
 
 // declare the new method for the websocket interface
 declare global {

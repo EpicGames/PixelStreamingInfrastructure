@@ -7,11 +7,12 @@
     "types": "build/types/pixelstreamingcommon.d.ts",
     "sideEffects": false,
     "scripts": {
-        "build_proto": "npx protoc --experimental_allow_proto3_optional --ts_out src/Messages --proto_path protobuf protobuf/signalling_messages.proto",
-        "compile": "rimraf ./build && tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
-        "build": "npm run build_proto && npm run compile",
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+        "compile": "tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
+        "build": "rimraf ./build && npm run build-proto && npm run compile",
+        "build-dev": "npm run build-proto && npm run compile",
+        "build-proto": "npx protoc --experimental_allow_proto3_optional --ts_out src/Messages --proto_path protobuf protobuf/signalling_messages.proto",
+        "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "devDependencies": {
         "@types/jest": "27.5.1",
@@ -20,6 +21,7 @@
         "@typescript-eslint/parser": "^5.16.0",
         "cspell": "^4.1.0",
         "eslint": "^8.11.0",
+        "eslint-plugin-tsdoc": "^0.2.17",
         "jest": "^27.5.1",
         "jest-environment-jsdom": "27.5.1",
         "prettier": "2.8.3",

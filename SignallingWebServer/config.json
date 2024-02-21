@@ -8,6 +8,12 @@
 	"serve": true,
 	"http_root": "www",
 	"homepage": "player.html",
+	"matchmaker_address": "127.0.0.1",
+	"matchmaker_port": "9999",
+	"matchmaker_retry": "5",
+	"matchmaker_keepalive": "30",
+	"public_ip": "127.0.0.1",
 	"log_config": false,
-	"stdin": false
+	"stdin": false,
+	"matchmaker": true
 }

@@ -6,7 +6,10 @@
   "module": "build/esm/pixelstreamingsignalling.js",
   "types": "build/types/pixelstreamingsignalling.d.ts",
   "scripts": {
-    "build": "rimraf ./build && tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
+    "compile": "tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
+    "build": "rimraf ./build && npm link ../Common && npm run compile",
+    "build-dev": "npm link ../Common && npm run compile",
+    "build-all": "cd ../Common && npm run build-dev && cd ../Signalling && npm run build-dev",
     "build-docs": "typedoc --tsconfig tsconfig.base.json",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "test": "echo \"Error: no test specified\" && exit 1"
