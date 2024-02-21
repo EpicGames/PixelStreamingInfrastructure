@@ -79,7 +79,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[SFUConnection.ts:50](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/SFUConnection.ts#L50)
+[SFUConnection.ts:50](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/SFUConnection.ts#L50)
 
 ## Properties
 
@@ -93,7 +93,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[SFUConnection.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/SFUConnection.ts#L34)
+[SFUConnection.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/SFUConnection.ts#L34)
 
 ___
 
@@ -107,7 +107,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:33](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/SFUConnection.ts#L33)
+[SFUConnection.ts:33](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/SFUConnection.ts#L33)
 
 ___
 
@@ -117,7 +117,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:37](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/SFUConnection.ts#L37)
+[SFUConnection.ts:37](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/SFUConnection.ts#L37)
 
 ___
 
@@ -131,7 +131,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:35](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/SFUConnection.ts#L35)
+[SFUConnection.ts:35](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/SFUConnection.ts#L35)
 
 ___
 
@@ -145,7 +145,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:36](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/SFUConnection.ts#L36)
+[SFUConnection.ts:36](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/SFUConnection.ts#L36)
 
 ___
 
@@ -159,7 +159,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:38](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/SFUConnection.ts#L38)
+[SFUConnection.ts:38](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/SFUConnection.ts#L38)
 
 ___
 
@@ -173,7 +173,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/SFUConnection.ts#L32)
+[SFUConnection.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/SFUConnection.ts#L32)
 
 ## Methods
 
@@ -195,7 +195,7 @@ An IPlayerInfo object containing viewable information about this connection.
 
 #### Defined in
 
-[SFUConnection.ts:105](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/SFUConnection.ts#L105)
+[SFUConnection.ts:105](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/SFUConnection.ts#L105)
 
 ___
 
@@ -217,7 +217,7 @@ A string describing this connection.
 
 #### Defined in
 
-[SFUConnection.ts:76](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/SFUConnection.ts#L76)
+[SFUConnection.ts:76](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/SFUConnection.ts#L76)
 
 ___
 
@@ -239,7 +239,7 @@ An IStreamerInfo object containing viewable information about this connection.
 
 #### Defined in
 
-[SFUConnection.ts:91](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/SFUConnection.ts#L91)
+[SFUConnection.ts:91](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/SFUConnection.ts#L91)
 
 ___
 
@@ -265,4 +265,4 @@ Sends a signalling message to the SFU.
 
 #### Defined in
 
-[SFUConnection.ts:82](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/SFUConnection.ts#L82)
+[SFUConnection.ts:82](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/SFUConnection.ts#L82)

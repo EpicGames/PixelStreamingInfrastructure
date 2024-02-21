@@ -2,7 +2,7 @@
 
 The signalling server is a small intermediary application that sits between streamers and other peers. It handles the initial connection negotiations and some other small ongoing control messages between peers as well as acting as a simple web server for serving the [Frontend](/Frontend/README.md) web application.
 
-This is a new implementation of the now deprecated cirrus. Differences in behaviour are described [here](TODO).
+This is a new implementation of the now deprecated cirrus. Differences in behaviour are described [here](from_cirrus.md).
 
 ## Building
 Building is handled by `npm` and `tsc` as a very basic typescript project. The easiest method is to invoke

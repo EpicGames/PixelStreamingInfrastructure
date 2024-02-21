@@ -28,7 +28,7 @@ completely create your own winston logger and assign it.
 
 #### Defined in
 
-[Logger.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/Logger.ts#L13)
+[Logger.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/Logger.ts#L13)
 
 ## Functions
 
@@ -51,4 +51,4 @@ preferred settings.
 
 #### Defined in
 
-[Logger.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/Logger.ts#L34)
+[Logger.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/Logger.ts#L34)

@@ -21,7 +21,7 @@
 
 #### Defined in
 
-[Utils.ts:4](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/Utils.ts#L4)
+[Utils.ts:4](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/Utils.ts#L4)
 
 ## Functions
 
@@ -43,7 +43,7 @@ Circular reference save version of JSON.stringify with extra formatting.
 
 #### Defined in
 
-[Utils.ts:16](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/Utils.ts#L16)
+[Utils.ts:16](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/Utils.ts#L16)
 
 ___
 
@@ -65,4 +65,4 @@ Cirular reference safe version of JSON.stringify
 
 #### Defined in
 
-[Utils.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/32068e1/new_cirrus/src/Utils.ts#L9)
+[Utils.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/ebacbf2/new_cirrus/src/Utils.ts#L9)
