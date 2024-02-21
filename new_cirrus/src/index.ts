@@ -15,7 +15,7 @@ const pjson = require('../package.json');
 
 const program = new Command();
 program
-    .name(pjson.name)
+    .name('node build/index.js')
     .description(pjson.description)
     .version(pjson.version);
 

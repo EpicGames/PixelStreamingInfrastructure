@@ -22,7 +22,7 @@ node build/index.js [arguments]
 ```
 Invoking `npm start -- --help` or `node build/index.js --help` will display the configuration options.
 ```
-Usage: wilbur [options]
+Usage: node build/index.js [options]
 
 A basic signalling server application for Unreal Engine's Pixel Streaming applications.
 
