@@ -1,4 +1,4 @@
-[@epicgames-ps/lib-signalling](../README.md) / [StreamerConnection](../modules/StreamerConnection.md) / StreamerConnection
+[@epicgames-ps/lib-pixelstreamingsignalling-ue5.5](../README.md) / [StreamerConnection](../modules/StreamerConnection.md) / StreamerConnection
 
 # Class: StreamerConnection
 
@@ -73,7 +73,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-StreamerConnection.ts:42
+[StreamerConnection.ts:42](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/StreamerConnection.ts#L42)
 
 ## Properties
 
@@ -87,7 +87,7 @@ StreamerConnection.ts:42
 
 #### Defined in
 
-StreamerConnection.ts:31
+[StreamerConnection.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/StreamerConnection.ts#L31)
 
 ___
 
@@ -97,7 +97,7 @@ ___
 
 #### Defined in
 
-StreamerConnection.ts:33
+[StreamerConnection.ts:33](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/StreamerConnection.ts#L33)
 
 ___
 
@@ -111,7 +111,7 @@ ___
 
 #### Defined in
 
-StreamerConnection.ts:29
+[StreamerConnection.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/StreamerConnection.ts#L29)
 
 ___
 
@@ -125,7 +125,7 @@ ___
 
 #### Defined in
 
-StreamerConnection.ts:32
+[StreamerConnection.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/StreamerConnection.ts#L32)
 
 ___
 
@@ -139,7 +139,7 @@ ___
 
 #### Defined in
 
-StreamerConnection.ts:30
+[StreamerConnection.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/StreamerConnection.ts#L30)
 
 ## Methods
 
@@ -161,7 +161,7 @@ A string describing this connection.
 
 #### Defined in
 
-StreamerConnection.ts:62
+[StreamerConnection.ts:62](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/StreamerConnection.ts#L62)
 
 ___
 
@@ -183,7 +183,7 @@ An IStreamerInfo object containing viewable information about this connection.
 
 #### Defined in
 
-StreamerConnection.ts:77
+[StreamerConnection.ts:77](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/StreamerConnection.ts#L77)
 
 ___
 
@@ -209,4 +209,4 @@ Sends a signalling message to the player.
 
 #### Defined in
 
-StreamerConnection.ts:68
+[StreamerConnection.ts:68](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/StreamerConnection.ts#L68)

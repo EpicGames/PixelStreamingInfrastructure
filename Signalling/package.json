@@ -1,5 +1,5 @@
 {
-  "name": "@epicgames-ps/lib-signalling",
+  "name": "@epicgames-ps/lib-pixelstreamingsignalling-ue5.5",
   "version": "1.0.0",
   "description": "Basic signalling library for developers wishing to build applications that signal a Pixel Streaming application.",
   "main": "build/commonjs/pixelstreamingsignalling.js",

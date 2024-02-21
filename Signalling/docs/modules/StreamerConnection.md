@@ -1,4 +1,4 @@
-[@epicgames-ps/lib-signalling](../README.md) / StreamerConnection
+[@epicgames-ps/lib-pixelstreamingsignalling-ue5.5](../README.md) / StreamerConnection
 
 # Module: StreamerConnection
 

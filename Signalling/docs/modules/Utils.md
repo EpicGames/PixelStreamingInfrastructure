@@ -1,4 +1,4 @@
-[@epicgames-ps/lib-signalling](../README.md) / Utils
+[@epicgames-ps/lib-pixelstreamingsignalling-ue5.5](../README.md) / Utils
 
 # Module: Utils
 
@@ -29,7 +29,7 @@ Circular reference save version of JSON.stringify with extra formatting.
 
 #### Defined in
 
-Utils.ts:13
+[Utils.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/Utils.ts#L13)
 
 ___
 
@@ -51,4 +51,4 @@ Cirular reference safe version of JSON.stringify
 
 #### Defined in
 
-Utils.ts:6
+[Utils.ts:6](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/Utils.ts#L6)

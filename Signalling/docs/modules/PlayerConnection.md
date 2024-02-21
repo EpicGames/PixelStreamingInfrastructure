@@ -1,4 +1,4 @@
-[@epicgames-ps/lib-signalling](../README.md) / PlayerConnection
+[@epicgames-ps/lib-pixelstreamingsignalling-ue5.5](../README.md) / PlayerConnection
 
 # Module: PlayerConnection
 

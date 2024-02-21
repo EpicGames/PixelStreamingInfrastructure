@@ -1,4 +1,4 @@
-[@epicgames-ps/lib-signalling](../README.md) / [LoggingUtils](../modules/LoggingUtils.md) / IMessageLogger
+[@epicgames-ps/lib-pixelstreamingsignalling-ue5.5](../README.md) / [LoggingUtils](../modules/LoggingUtils.md) / IMessageLogger
 
 # Interface: IMessageLogger
 
@@ -39,4 +39,4 @@ who is sending or receiving etc.
 
 #### Defined in
 
-LoggingUtils.ts:9
+[LoggingUtils.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/LoggingUtils.ts#L9)

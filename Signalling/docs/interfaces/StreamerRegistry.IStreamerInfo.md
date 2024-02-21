@@ -1,4 +1,4 @@
-[@epicgames-ps/lib-signalling](../README.md) / [StreamerRegistry](../modules/StreamerRegistry.md) / IStreamerInfo
+[@epicgames-ps/lib-pixelstreamingsignalling-ue5.5](../README.md) / [StreamerRegistry](../modules/StreamerRegistry.md) / IStreamerInfo
 
 # Interface: IStreamerInfo
 
@@ -24,7 +24,7 @@ Used by the API to describe a streamer.
 
 #### Defined in
 
-StreamerRegistry.ts:28
+[StreamerRegistry.ts:28](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/StreamerRegistry.ts#L28)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-StreamerRegistry.ts:25
+[StreamerRegistry.ts:25](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/StreamerRegistry.ts#L25)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-StreamerRegistry.ts:27
+[StreamerRegistry.ts:27](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/StreamerRegistry.ts#L27)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 #### Defined in
 
-StreamerRegistry.ts:29
+[StreamerRegistry.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/StreamerRegistry.ts#L29)
 
 ___
 
@@ -64,4 +64,4 @@ ___
 
 #### Defined in
 
-StreamerRegistry.ts:26
+[StreamerRegistry.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/StreamerRegistry.ts#L26)

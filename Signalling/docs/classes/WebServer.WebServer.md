@@ -1,4 +1,4 @@
-[@epicgames-ps/lib-signalling](../README.md) / [WebServer](../modules/WebServer.md) / WebServer
+[@epicgames-ps/lib-pixelstreamingsignalling-ue5.5](../README.md) / [WebServer](../modules/WebServer.md) / WebServer
 
 # Class: WebServer
 
@@ -33,4 +33,4 @@ pixel streaming frontend.
 
 #### Defined in
 
-WebServer.ts:30
+[WebServer.ts:30](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/WebServer.ts#L30)

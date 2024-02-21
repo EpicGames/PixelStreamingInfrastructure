@@ -1,4 +1,4 @@
-[@epicgames-ps/lib-signalling](../README.md) / [WebServer](../modules/WebServer.md) / IWebServerConfig
+[@epicgames-ps/lib-pixelstreamingsignalling-ue5.5](../README.md) / [WebServer](../modules/WebServer.md) / IWebServerConfig
 
 # Interface: IWebServerConfig
 
@@ -24,7 +24,7 @@ WebServer.
 
 #### Defined in
 
-WebServer.ts:19
+[WebServer.ts:19](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/WebServer.ts#L19)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-WebServer.ts:22
+[WebServer.ts:22](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/WebServer.ts#L22)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-WebServer.ts:13
+[WebServer.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/WebServer.ts#L13)
 
 ___
 
@@ -54,4 +54,4 @@ ___
 
 #### Defined in
 
-WebServer.ts:16
+[WebServer.ts:16](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/WebServer.ts#L16)

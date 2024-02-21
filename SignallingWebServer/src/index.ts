@@ -5,7 +5,7 @@ import { SignallingServer,
          IServerConfig,
          WebServer,
          InitLogging,
-         Logger } from '@epicgames-ps/lib-signalling';
+         Logger } from '@epicgames-ps/lib-pixelstreamingsignalling-ue5.5';
 import { stringify, beautify, IProgramOptions } from './Utils';
 import { initInputHandler } from './InputHandler';
 import { Command, Option } from 'commander';

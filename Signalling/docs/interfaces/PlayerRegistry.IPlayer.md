@@ -1,4 +1,4 @@
-[@epicgames-ps/lib-signalling](../README.md) / [PlayerRegistry](../modules/PlayerRegistry.md) / IPlayer
+[@epicgames-ps/lib-pixelstreamingsignalling-ue5.5](../README.md) / [PlayerRegistry](../modules/PlayerRegistry.md) / IPlayer
 
 # Interface: IPlayer
 
@@ -40,7 +40,7 @@ player registry.
 
 #### Defined in
 
-PlayerRegistry.ts:12
+[PlayerRegistry.ts:12](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/PlayerRegistry.ts#L12)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 #### Defined in
 
-PlayerRegistry.ts:13
+[PlayerRegistry.ts:13](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/PlayerRegistry.ts#L13)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-PlayerRegistry.ts:14
+[PlayerRegistry.ts:14](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/PlayerRegistry.ts#L14)
 
 ## Methods
 
@@ -74,7 +74,7 @@ PlayerRegistry.ts:14
 
 #### Defined in
 
-PlayerRegistry.ts:17
+[PlayerRegistry.ts:17](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/PlayerRegistry.ts#L17)
 
 ___
 
@@ -92,7 +92,7 @@ ___
 
 #### Defined in
 
-LoggingUtils.ts:9
+[LoggingUtils.ts:9](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/LoggingUtils.ts#L9)
 
 ___
 
@@ -112,4 +112,4 @@ ___
 
 #### Defined in
 
-PlayerRegistry.ts:16
+[PlayerRegistry.ts:16](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/PlayerRegistry.ts#L16)

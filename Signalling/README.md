@@ -1,4 +1,4 @@
-# lib-signalling
+# @epicgames-ps/lib-pixelstreamingsignalling-ue5.5
 
 A library for developers withing to implement tools that signal Pixel Streaming applications
 

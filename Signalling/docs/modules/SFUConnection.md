@@ -1,4 +1,4 @@
-[@epicgames-ps/lib-signalling](../README.md) / SFUConnection
+[@epicgames-ps/lib-pixelstreamingsignalling-ue5.5](../README.md) / SFUConnection
 
 # Module: SFUConnection
 

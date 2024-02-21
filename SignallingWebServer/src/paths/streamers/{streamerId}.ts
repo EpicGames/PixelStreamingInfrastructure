@@ -1,4 +1,4 @@
-import { SignallingServer } from '@epicgames-ps/lib-signalling';
+import { SignallingServer } from '@epicgames-ps/lib-pixelstreamingsignalling-ue5.5';
 
 export default function (signallingServer: SignallingServer) {
     const operations = {

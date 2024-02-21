@@ -1,4 +1,4 @@
-[@epicgames-ps/lib-signalling](../README.md) / [SignallingServer](../modules/SignallingServer.md) / IServerConfig
+[@epicgames-ps/lib-pixelstreamingsignalling-ue5.5](../README.md) / [SignallingServer](../modules/SignallingServer.md) / IServerConfig
 
 # Interface: IServerConfig
 
@@ -28,7 +28,7 @@ a new SignallingServer object.
 
 #### Defined in
 
-SignallingServer.ts:19
+[SignallingServer.ts:19](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/SignallingServer.ts#L19)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 #### Defined in
 
-SignallingServer.ts:31
+[SignallingServer.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/SignallingServer.ts#L31)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 #### Defined in
 
-SignallingServer.ts:25
+[SignallingServer.ts:25](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/SignallingServer.ts#L25)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 #### Defined in
 
-SignallingServer.ts:37
+[SignallingServer.ts:37](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/SignallingServer.ts#L37)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 #### Defined in
 
-SignallingServer.ts:28
+[SignallingServer.ts:28](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/SignallingServer.ts#L28)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 #### Defined in
 
-SignallingServer.ts:40
+[SignallingServer.ts:40](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/SignallingServer.ts#L40)
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 #### Defined in
 
-SignallingServer.ts:22
+[SignallingServer.ts:22](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/SignallingServer.ts#L22)
 
 ___
 
@@ -98,4 +98,4 @@ ___
 
 #### Defined in
 
-SignallingServer.ts:34
+[SignallingServer.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/SignallingServer.ts#L34)

@@ -1,4 +1,4 @@
-[@epicgames-ps/lib-signalling](../README.md) / [SignallingServer](../modules/SignallingServer.md) / SignallingServer
+[@epicgames-ps/lib-pixelstreamingsignalling-ue5.5](../README.md) / [SignallingServer](../modules/SignallingServer.md) / SignallingServer
 
 # Class: SignallingServer
 
@@ -43,7 +43,7 @@ players and optionally SFU connections.
 
 #### Defined in
 
-SignallingServer.ts:60
+[SignallingServer.ts:60](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/SignallingServer.ts#L60)
 
 ## Properties
 
@@ -53,7 +53,7 @@ SignallingServer.ts:60
 
 #### Defined in
 
-SignallingServer.ts:49
+[SignallingServer.ts:49](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/SignallingServer.ts#L49)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 #### Defined in
 
-SignallingServer.ts:52
+[SignallingServer.ts:52](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/SignallingServer.ts#L52)
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 #### Defined in
 
-SignallingServer.ts:50
+[SignallingServer.ts:50](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/SignallingServer.ts#L50)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 #### Defined in
 
-SignallingServer.ts:53
+[SignallingServer.ts:53](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/SignallingServer.ts#L53)
 
 ___
 
@@ -93,4 +93,4 @@ ___
 
 #### Defined in
 
-SignallingServer.ts:51
+[SignallingServer.ts:51](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/2412e3a/Signalling/src/SignallingServer.ts#L51)

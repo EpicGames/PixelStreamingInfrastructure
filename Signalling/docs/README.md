@@ -1,6 +1,6 @@
-@epicgames-ps/lib-signalling
+@epicgames-ps/lib-pixelstreamingsignalling-ue5.5
 
-# @epicgames-ps/lib-signalling
+# @epicgames-ps/lib-pixelstreamingsignalling-ue5.5
 
 ## Table of contents
 
