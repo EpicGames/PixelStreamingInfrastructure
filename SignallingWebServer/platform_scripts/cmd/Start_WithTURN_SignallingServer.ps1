@@ -12,8 +12,8 @@ Start-Process -FilePath "PowerShell" -ArgumentList ".\Start_TURNServer.ps1" -Wor
 
 $peerConnectionOptions = "{ \""iceServers\"": [{\""urls\"": [\""stun:" + $global:StunServer + "\"",\""turn:" + $global:TurnServer + "\""], \""username\"": \""PixelStreamingUser\"", \""credential\"": \""AnotherTURNintheroad\""}] }"
 
-$ProcessExe = "platform_scripts\cmd\node\node.exe"
-$Arguments = @("cirrus", "--peerConnectionOptions=""$peerConnectionOptions""", "--PublicIp=$global:PublicIp")
+$ProcessExe = "platform_scripts\cmd\node\npm.cmd"
+$Arguments = @("start", "--peer_options=""$peerConnectionOptions""", "--public_ip=$global:PublicIp")
 # Add arguments passed to script to Arguments for executable
 $Arguments += $args
 

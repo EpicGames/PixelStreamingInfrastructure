@@ -16,22 +16,22 @@ $global:ScriptName = $MyInvocation.MyCommand.Name
 $global:PublicIP = $null
 $global:StunServer = $null
 $global:TurnServer = $null
-$global:CirrusCmd = $null
+$global:ServerCmd = $null
 $global:BuildFrontend = $null
 
 function print_usage {
  echo "
  Usage (in MS Windows Power Shell):
-  $global:ScriptName [--help] [--publicip <IP Address>] [--turn <turn server>] [--stun <stun server>] [cirrus options...]
+  $global:ScriptName [--help] [--publicip <IP Address>] [--turn <turn server>] [--stun <stun server>] [server options...]
  Where:
   --help will print this message and stop this script.
   --publicip is used to define public ip address (using default port) for turn server, syntax: --publicip ; it is used for 
-    default value: Retrieved from 'curl https://api.ipify.org' or if unsuccessful then set to  127.0.0.1.  It is the IP address of the Cirrus server and the default IP address of the TURN server
+    default value: Retrieved from 'curl https://api.ipify.org' or if unsuccessful then set to  127.0.0.1.  It is the IP address of the server and the default IP address of the TURN server
   --turn defines what TURN server to be used, syntax: --turn 127.0.0.1:19303
     default value: as above, IP address downloaded from https://api.ipify.org; in case if download failure it is set to 127.0.0.1
   --stun defined what STUN server to be used, syntax: --stun stun.l.google.com:19302
     default value as above
-  Other options: stored and passed to the Cirrus server.  All parameters printed once the script values are set.
+  Other options: stored and passed to the server.  All parameters printed once the script values are set.
   Command line options might be omitted to run with defaults and it is a good practice to omit specific ones when just starting the TURN or the STUN server alone, not the whole set of scripts.
  "
  exit 1
@@ -44,19 +44,19 @@ function print_parameters {
  if ($global:StunServer -ne $null) { echo "STUN server       : $global:StunServer" }
  if ($global:TurnServer -ne $null) { echo "TURN server       : $global:TurnServer" }
  echo "Public IP address : $global:PublicIP"
- echo "Cirrus server command line arguments: $global:CirrusCmd"
+ echo "Server command line arguments: $global:ServerCmd"
  echo ""
 }
 
 function set_start_default_values($SetTurnServerVar, $SetStunServerVar) {
- # publicip and cirruscmd are always needed
+ # publicip and servercmd are always needed
  $global:PublicIP = Invoke-WebRequest -Uri "https://api.ipify.org" -UseBasicParsing
  if ($global:PublicIP -eq $null -Or $global:PublicIP.length -eq 0) {
   $global:PublicIP = "127.0.0.1"
  } else {
     $global:PublicIP = ($global:PublicIP).Content
  }
- $global:cirruscmd = ""
+ $global:ServerCmd = ""
 
  if ($SetTurnServerVar -eq "y") {
   $global:TurnServer = $global:PublicIP + ":19303"
@@ -82,8 +82,8 @@ function use_args($arg) {
   } elseif ($Cmd -eq "--help") {
    print_usage
   } else {
-   echo "Unknown command, adding to cirrus command line: $Cmd"
-   $global:CirrusCmd += " $Cmd"
+   echo "Unknown command, adding to server command line: $Cmd"
+   $global:ServerCmd += " $Cmd"
   }
  }
 }

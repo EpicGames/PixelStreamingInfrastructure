@@ -1,12 +1,13 @@
 {
-  "name": "@epicgames-ps/wilbur",
+  "name": "@epicgames-ps/lib-signalling",
   "version": "1.0.0",
-  "description": "A basic signalling server application for Unreal Engine's Pixel Streaming applications.",
-  "main": "index.js",
+  "description": "Basic signalling library for developers wishing to build applications that signal a Pixel Streaming application.",
+  "main": "build/commonjs/pixelstreamingsignalling.js",
+  "module": "build/esm/pixelstreamingsignalling.js",
+  "types": "build/types/pixelstreamingsignalling.d.ts",
   "scripts": {
-    "build": "npm link ../Signalling && tsc",
-    "start": "npm run build && node ./build/index.js",
-    "dev": "nodemon src/index.ts --no_save --log_level_console debug --console_messages verbose --serve --http_root Public --log_config",
+    "build": "rimraf ./build && tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
+    "build-docs": "typedoc --tsconfig tsconfig.base.json",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -11,20 +11,20 @@ use_args "$*"
 call_setup_sh $*
 print_parameters
 
-process="${BASH_LOCATION}/node/lib/node_modules/npm/bin/npm-cli.js run start:default --"
+process="${BASH_LOCATION}/node/lib/node_modules/npm/bin/npm-cli.js run start --"
 arguments=""
 
 if [ ! -z $IS_DEBUG ]; then
 	arguments+=" --inspect"
 fi
 
-arguments+=" --publicIp=${publicip}"
-arguments+=" ${cirruscmd}"
+arguments+=" --public_ip=${publicip}"
+arguments+=" ${servercmd}"
 
 pushd ../.. > /dev/null
 
 echo ""
-echo "Starting Cirrus server use ctrl-c to exit"
+echo "Starting server use ctrl-c to exit"
 echo "-----------------------------------------"
 echo ""
 

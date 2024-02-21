@@ -8,10 +8,10 @@ print_parameters
 
 $peerConnectionOptions = "{ \""iceServers\"": [{\""urls\"": [\""stun:" + $global:StunServer + "\""]}] }"
 
-$ProcessExe = "platform_scripts\cmd\node\node.exe"
-$Arguments = @("cirrus", "--peerConnectionOptions=""$peerConnectionOptions""", "--PublicIp=$global:PublicIp")
+$ProcessExe = "platform_scripts\cmd\node\npm.cmd"
+$Arguments = @("start", "--", "--peer_options=""$peerConnectionOptions""", "--public_ip=$global:PublicIp")
 # Add arguments passed to script to Arguments for executable
-$Arguments += $global:CirrusCmd
+$Arguments += $global:ServerCmd
 
 Push-Location $PSScriptRoot\..\..\
 Write-Output "Running: $ProcessExe $Arguments"
