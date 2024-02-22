@@ -49,7 +49,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[PlayerRegistry.ts:44](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/PlayerRegistry.ts#L44)
+[PlayerRegistry.ts:44](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/PlayerRegistry.ts#L44)
 
 ## Methods
 
@@ -71,7 +71,7 @@ Assigns a unique id to the player and adds it to the registry
 
 #### Defined in
 
-[PlayerRegistry.ts:54](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/PlayerRegistry.ts#L54)
+[PlayerRegistry.ts:54](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/PlayerRegistry.ts#L54)
 
 ___
 
@@ -87,7 +87,7 @@ Gets the total number of connected players.
 
 #### Defined in
 
-[PlayerRegistry.ts:107](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/PlayerRegistry.ts#L107)
+[PlayerRegistry.ts:107](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/PlayerRegistry.ts#L107)
 
 ___
 
@@ -103,7 +103,7 @@ Returns true when the registry is empty.
 
 #### Defined in
 
-[PlayerRegistry.ts:100](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/PlayerRegistry.ts#L100)
+[PlayerRegistry.ts:100](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/PlayerRegistry.ts#L100)
 
 ___
 
@@ -126,7 +126,7 @@ Returns undefined if the player doesn't exist.
 
 #### Defined in
 
-[PlayerRegistry.ts:89](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/PlayerRegistry.ts#L89)
+[PlayerRegistry.ts:89](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/PlayerRegistry.ts#L89)
 
 ___
 
@@ -148,7 +148,7 @@ Tests if a player id exists in the registry.
 
 #### Defined in
 
-[PlayerRegistry.ts:81](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/PlayerRegistry.ts#L81)
+[PlayerRegistry.ts:81](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/PlayerRegistry.ts#L81)
 
 ___
 
@@ -162,7 +162,7 @@ ___
 
 #### Defined in
 
-[PlayerRegistry.ts:93](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/PlayerRegistry.ts#L93)
+[PlayerRegistry.ts:93](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/PlayerRegistry.ts#L93)
 
 ___
 
@@ -185,4 +185,4 @@ does not exist.
 
 #### Defined in
 
-[PlayerRegistry.ts:66](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/PlayerRegistry.ts#L66)
+[PlayerRegistry.ts:66](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/PlayerRegistry.ts#L66)

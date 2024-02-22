@@ -79,7 +79,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[SFUConnection.ts:57](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SFUConnection.ts#L57)
+[SFUConnection.ts:57](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SFUConnection.ts#L57)
 
 ## Properties
 
@@ -93,7 +93,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[SFUConnection.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SFUConnection.ts#L32)
+[SFUConnection.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SFUConnection.ts#L32)
 
 ___
 
@@ -107,7 +107,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:38](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SFUConnection.ts#L38)
+[SFUConnection.ts:38](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SFUConnection.ts#L38)
 
 ___
 
@@ -117,7 +117,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:44](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SFUConnection.ts#L44)
+[SFUConnection.ts:44](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SFUConnection.ts#L44)
 
 ___
 
@@ -131,7 +131,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SFUConnection.ts#L34)
+[SFUConnection.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SFUConnection.ts#L34)
 
 ___
 
@@ -145,7 +145,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:40](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SFUConnection.ts#L40)
+[SFUConnection.ts:40](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SFUConnection.ts#L40)
 
 ___
 
@@ -159,7 +159,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:42](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SFUConnection.ts#L42)
+[SFUConnection.ts:42](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SFUConnection.ts#L42)
 
 ___
 
@@ -173,7 +173,7 @@ ___
 
 #### Defined in
 
-[SFUConnection.ts:36](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SFUConnection.ts#L36)
+[SFUConnection.ts:36](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SFUConnection.ts#L36)
 
 ## Methods
 
@@ -195,7 +195,7 @@ An IPlayerInfo object containing viewable information about this connection.
 
 #### Defined in
 
-[SFUConnection.ts:112](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SFUConnection.ts#L112)
+[SFUConnection.ts:112](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SFUConnection.ts#L112)
 
 ___
 
@@ -217,7 +217,7 @@ A string describing this connection.
 
 #### Defined in
 
-[SFUConnection.ts:83](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SFUConnection.ts#L83)
+[SFUConnection.ts:83](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SFUConnection.ts#L83)
 
 ___
 
@@ -239,7 +239,7 @@ An IStreamerInfo object containing viewable information about this connection.
 
 #### Defined in
 
-[SFUConnection.ts:98](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SFUConnection.ts#L98)
+[SFUConnection.ts:98](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SFUConnection.ts#L98)
 
 ___
 
@@ -265,4 +265,4 @@ Sends a signalling message to the SFU.
 
 #### Defined in
 
-[SFUConnection.ts:89](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SFUConnection.ts#L89)
+[SFUConnection.ts:89](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SFUConnection.ts#L89)

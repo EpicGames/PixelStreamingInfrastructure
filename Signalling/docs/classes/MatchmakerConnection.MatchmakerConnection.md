@@ -42,7 +42,7 @@ loss.
 
 #### Defined in
 
-[MatchmakerConnection.ts:49](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/MatchmakerConnection.ts#L49)
+[MatchmakerConnection.ts:49](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/MatchmakerConnection.ts#L49)
 
 ## Properties
 
@@ -52,4 +52,4 @@ loss.
 
 #### Defined in
 
-[MatchmakerConnection.ts:36](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/MatchmakerConnection.ts#L36)
+[MatchmakerConnection.ts:36](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/MatchmakerConnection.ts#L36)

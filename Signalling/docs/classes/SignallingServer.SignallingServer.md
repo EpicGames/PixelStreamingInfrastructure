@@ -43,7 +43,7 @@ players and optionally SFU connections.
 
 #### Defined in
 
-[SignallingServer.ts:86](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SignallingServer.ts#L86)
+[SignallingServer.ts:86](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SignallingServer.ts#L86)
 
 ## Properties
 
@@ -53,7 +53,7 @@ players and optionally SFU connections.
 
 #### Defined in
 
-[SignallingServer.ts:75](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SignallingServer.ts#L75)
+[SignallingServer.ts:75](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SignallingServer.ts#L75)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 #### Defined in
 
-[SignallingServer.ts:78](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SignallingServer.ts#L78)
+[SignallingServer.ts:78](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SignallingServer.ts#L78)
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 #### Defined in
 
-[SignallingServer.ts:76](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SignallingServer.ts#L76)
+[SignallingServer.ts:76](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SignallingServer.ts#L76)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 #### Defined in
 
-[SignallingServer.ts:79](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SignallingServer.ts#L79)
+[SignallingServer.ts:79](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SignallingServer.ts#L79)
 
 ___
 
@@ -93,4 +93,4 @@ ___
 
 #### Defined in
 
-[SignallingServer.ts:77](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/SignallingServer.ts#L77)
+[SignallingServer.ts:77](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/SignallingServer.ts#L77)

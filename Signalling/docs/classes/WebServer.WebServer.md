@@ -37,7 +37,7 @@ pixel streaming frontend.
 
 #### Defined in
 
-[WebServer.ts:52](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/WebServer.ts#L52)
+[WebServer.ts:52](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/WebServer.ts#L52)
 
 ## Properties
 
@@ -47,7 +47,7 @@ pixel streaming frontend.
 
 #### Defined in
 
-[WebServer.ts:49](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/WebServer.ts#L49)
+[WebServer.ts:49](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/WebServer.ts#L49)
 
 ___
 
@@ -57,4 +57,4 @@ ___
 
 #### Defined in
 
-[WebServer.ts:50](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/WebServer.ts#L50)
+[WebServer.ts:50](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Signalling/src/WebServer.ts#L50)
