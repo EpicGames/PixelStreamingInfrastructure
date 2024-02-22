@@ -8,17 +8,19 @@ Signalling protocol for handling messages from the signalling server.
 
 Listen on this emitter for messages. Message type is the name of the event to listen for.
 Example:
+     ```
      signallingProtocol.on('config', (message: Messages.config) => console.log(`Got a config message: ${message}`)));
+     ```
 
 The transport in this class will also emit on message events.
 
-Events emitted on transport:
-  message:
+Events emitted on transport:  
+  message:  
      Emitted any time a message is received by the transport. Listen on this if
      you wish to capture all messages, rather than specific messages on
      'messageHandlers'.
 
-  out:
+  out:  
      Emitted when sending a message out on the transport. Similar to 'message' but
      only for when messages are sent from this endpoint. Useful for debugging.
 
@@ -79,7 +81,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L34)
+[Protocol/SignallingProtocol.ts:36](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L36)
 
 ## Properties
 
@@ -89,7 +91,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:32](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L32)
+[Protocol/SignallingProtocol.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L34)
 
 ## Accessors
 
@@ -103,7 +105,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L29)
+[Protocol/SignallingProtocol.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L31)
 
 ## Methods
 
@@ -127,7 +129,7 @@ True if the connection call succeeded.
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:56](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L56)
+[Protocol/SignallingProtocol.ts:58](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L58)
 
 ___
 
@@ -150,7 +152,7 @@ Asks the transport to disconnect from any connection it might have.
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:65](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L65)
+[Protocol/SignallingProtocol.ts:67](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L67)
 
 ___
 
@@ -168,7 +170,7 @@ True if the protocol is connected.
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:73](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L73)
+[Protocol/SignallingProtocol.ts:75](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L75)
 
 ___
 
@@ -182,7 +184,7 @@ ___
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:88](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L88)
+[Protocol/SignallingProtocol.ts:90](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L90)
 
 ___
 
@@ -202,7 +204,7 @@ ___
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:123](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L123)
+[Protocol/SignallingProtocol.ts:125](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L125)
 
 ___
 
@@ -224,7 +226,7 @@ Passes a message to the transport to send to the other end.
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:81](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L81)
+[Protocol/SignallingProtocol.ts:83](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L83)
 
 ___
 
@@ -238,7 +240,7 @@ ___
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:118](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L118)
+[Protocol/SignallingProtocol.ts:120](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L120)
 
 ___
 
@@ -258,7 +260,7 @@ ___
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:93](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L93)
+[Protocol/SignallingProtocol.ts:95](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L95)
 
 ___
 
@@ -272,7 +274,7 @@ ___
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:98](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L98)
+[Protocol/SignallingProtocol.ts:100](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L100)
 
 ___
 
@@ -292,7 +294,7 @@ ___
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:108](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L108)
+[Protocol/SignallingProtocol.ts:110](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L110)
 
 ___
 
@@ -306,7 +308,7 @@ ___
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:113](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L113)
+[Protocol/SignallingProtocol.ts:115](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L115)
 
 ___
 
@@ -326,4 +328,4 @@ ___
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:103](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Common/src/Protocol/SignallingProtocol.ts#L103)
+[Protocol/SignallingProtocol.ts:105](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/9763671/Common/src/Protocol/SignallingProtocol.ts#L105)

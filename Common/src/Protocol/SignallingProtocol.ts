@@ -11,17 +11,19 @@ import * as MessageHelpers from '../Messages/message_helpers';
  * 
  * Listen on this emitter for messages. Message type is the name of the event to listen for.
  * Example:
+ *      ```
  *      signallingProtocol.on('config', (message: Messages.config) => console.log(`Got a config message: ${message}`)));
+ *      ```
  * 
  * The transport in this class will also emit on message events.
  * 
- * Events emitted on transport:
- *   message:
+ * Events emitted on transport:  
+ *   message:  
  *      Emitted any time a message is received by the transport. Listen on this if
  *      you wish to capture all messages, rather than specific messages on
  *      'messageHandlers'.
  * 
- *   out:
+ *   out:  
  *      Emitted when sending a message out on the transport. Similar to 'message' but
  *      only for when messages are sent from this endpoint. Useful for debugging.
  */
