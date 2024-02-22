@@ -24,7 +24,7 @@ Used by the API to describe a streamer.
 
 #### Defined in
 
-[StreamerRegistry.ts:28](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/StreamerRegistry.ts#L28)
+[StreamerRegistry.ts:28](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/StreamerRegistry.ts#L28)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-[StreamerRegistry.ts:25](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/StreamerRegistry.ts#L25)
+[StreamerRegistry.ts:25](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/StreamerRegistry.ts#L25)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-[StreamerRegistry.ts:27](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/StreamerRegistry.ts#L27)
+[StreamerRegistry.ts:27](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/StreamerRegistry.ts#L27)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 #### Defined in
 
-[StreamerRegistry.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/StreamerRegistry.ts#L29)
+[StreamerRegistry.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/StreamerRegistry.ts#L29)
 
 ___
 
@@ -64,4 +64,4 @@ ___
 
 #### Defined in
 
-[StreamerRegistry.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/StreamerRegistry.ts#L26)
+[StreamerRegistry.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/StreamerRegistry.ts#L26)

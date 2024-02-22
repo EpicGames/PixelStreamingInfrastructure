@@ -53,7 +53,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[StreamerRegistry.ts:44](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/StreamerRegistry.ts#L44)
+[StreamerRegistry.ts:44](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/StreamerRegistry.ts#L44)
 
 ## Properties
 
@@ -63,7 +63,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[StreamerRegistry.ts:42](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/StreamerRegistry.ts#L42)
+[StreamerRegistry.ts:42](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/StreamerRegistry.ts#L42)
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 #### Defined in
 
-[StreamerRegistry.ts:41](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/StreamerRegistry.ts#L41)
+[StreamerRegistry.ts:41](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/StreamerRegistry.ts#L41)
 
 ## Methods
 
@@ -100,7 +100,7 @@ True if the add was successful.
 
 #### Defined in
 
-[StreamerRegistry.ts:56](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/StreamerRegistry.ts#L56)
+[StreamerRegistry.ts:56](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/StreamerRegistry.ts#L56)
 
 ___
 
@@ -116,7 +116,7 @@ Returns the total number of connected streamers.
 
 #### Defined in
 
-[StreamerRegistry.ts:121](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/StreamerRegistry.ts#L121)
+[StreamerRegistry.ts:121](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/StreamerRegistry.ts#L121)
 
 ___
 
@@ -132,7 +132,7 @@ Returns true when the registry is empty.
 
 #### Defined in
 
-[StreamerRegistry.ts:114](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/StreamerRegistry.ts#L114)
+[StreamerRegistry.ts:114](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/StreamerRegistry.ts#L114)
 
 ___
 
@@ -154,7 +154,7 @@ Attempts to find the given streamer id in the registry.
 
 #### Defined in
 
-[StreamerRegistry.ts:94](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/StreamerRegistry.ts#L94)
+[StreamerRegistry.ts:94](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/StreamerRegistry.ts#L94)
 
 ___
 
@@ -174,7 +174,7 @@ The first streamerId in the registry or null if there are none.
 
 #### Defined in
 
-[StreamerRegistry.ts:104](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/StreamerRegistry.ts#L104)
+[StreamerRegistry.ts:104](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/StreamerRegistry.ts#L104)
 
 ___
 
@@ -199,4 +199,4 @@ True if the streamer was removed.
 
 #### Defined in
 
-[StreamerRegistry.ts:80](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/StreamerRegistry.ts#L80)
+[StreamerRegistry.ts:80](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/StreamerRegistry.ts#L80)

@@ -24,7 +24,7 @@
 
 #### Defined in
 
-[MatchmakerConnection.ts:14](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/MatchmakerConnection.ts#L14)
+[MatchmakerConnection.ts:14](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/MatchmakerConnection.ts#L14)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-[MatchmakerConnection.ts:20](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/MatchmakerConnection.ts#L20)
+[MatchmakerConnection.ts:20](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/MatchmakerConnection.ts#L20)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-[MatchmakerConnection.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/MatchmakerConnection.ts#L26)
+[MatchmakerConnection.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/MatchmakerConnection.ts#L26)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 #### Defined in
 
-[MatchmakerConnection.ts:17](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/MatchmakerConnection.ts#L17)
+[MatchmakerConnection.ts:17](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/MatchmakerConnection.ts#L17)
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 #### Defined in
 
-[MatchmakerConnection.ts:8](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/MatchmakerConnection.ts#L8)
+[MatchmakerConnection.ts:8](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/MatchmakerConnection.ts#L8)
 
 ___
 
@@ -74,7 +74,7 @@ ___
 
 #### Defined in
 
-[MatchmakerConnection.ts:11](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/MatchmakerConnection.ts#L11)
+[MatchmakerConnection.ts:11](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/MatchmakerConnection.ts#L11)
 
 ___
 
@@ -84,4 +84,4 @@ ___
 
 #### Defined in
 
-[MatchmakerConnection.ts:23](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/8a78930/Signalling/src/MatchmakerConnection.ts#L23)
+[MatchmakerConnection.ts:23](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Signalling/src/MatchmakerConnection.ts#L23)
