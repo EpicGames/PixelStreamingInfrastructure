@@ -2,6 +2,8 @@
 
 @echo off
 
+set SCRIPTS_PATH=%~dp0
+
 @Rem Set script location as working directory for commands.
 pushd "%~dp0"
 
@@ -14,10 +16,17 @@ call setup_frontend.bat %*
 @Rem Ensure we have CoTURN available for calling.
 call setup_coturn.bat
 
-@Rem Move to server directory and install its package.json
-pushd %~dp0\..\..\
-call platform_scripts\cmd\node\npm install --no-save
-call platform_scripts\cmd\node\npm link ../Signalling
+pushd %SCRIPTS_PATH%\..\..\
+echo Building signalling library...
+echo ----------------------------
+pushd ..\Signalling
+call %SCRIPTS_PATH%\node\npm link ../Common
+call %SCRIPTS_PATH%\node\npm run build
+popd
+echo Building wilbur...
+echo ----------------------------
+call %SCRIPTS_PATH%\node\npm link ../Signalling
+call %SCRIPTS_PATH%\node\npm run build
 popd
 
 @Rem Pop working directory

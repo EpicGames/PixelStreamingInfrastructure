@@ -56,37 +56,34 @@
   @Rem Prepend NodeDir to PATH temporarily
   set PATH=%PATH%;%NodeDir%
 
-  @Rem Do npm install in the Frontend\lib directory (note we use start because that loads PATH)
-  echo ----------------------------
+  @Rem We could replace this all with a single npm script that does all this. we do have several build-all scripts already
+  @Rem but this does give a good reference about the dependency chain for all of this.
+  @Rem Note: npm link will also run npm install so we dont need that here
   echo Building common library...
+  echo ----------------------------
   pushd %CD%\Common
   call %SCRIPTS_PATH%\node\npm install
   call %SCRIPTS_PATH%\node\npm run build
   popd
   echo Building frontend library...
+  echo ----------------------------
   pushd %CD%\Frontend\library
-  call %SCRIPTS_PATH%\node\npm install
   call %SCRIPTS_PATH%\node\npm link ../../Common
   call %SCRIPTS_PATH%\node\npm run build
   popd
+  echo Building frontend-ui library...
+  echo ----------------------------
   pushd %CD%\Frontend\ui-library
-  call %SCRIPTS_PATH%\node\npm install
   call %SCRIPTS_PATH%\node\npm link ../library
   call %SCRIPTS_PATH%\node\npm run build
   popd
-  echo End of build PS frontend lib step.
-
-  @Rem Do npm install in the Frontend\implementations\typescript directory (note we use start because that loads PATH)
-  echo ----------------------------
   echo Building Epic Games reference frontend...
+  echo ----------------------------
   pushd %CD%\Frontend\implementations\typescript
-  call %SCRIPTS_PATH%\node\npm install
   call %SCRIPTS_PATH%\node\npm link ../../library ../../ui-library
   call %SCRIPTS_PATH%\node\npm run build
   popd
-  echo End of build reference frontend step.
-  echo ----------------------------
-
+  
   @Rem Restore path
   set PATH=%OLDPATH%
 

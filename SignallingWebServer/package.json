@@ -4,10 +4,9 @@
   "description": "A basic signalling server application for Unreal Engine's Pixel Streaming applications.",
   "main": "index.js",
   "scripts": {
-    "compile": "tsc",
-    "build": "rimraf ./build && npm link ../Signalling && npm run compile",
-    "build-dev": "npm link ../Signalling && npm run compile",
-    "build-all": "cd ../Signalling && npm run build-all && cd ../SignallingWebServer && npm run build-dev",
+    "build": "tsc",
+    "build-dev": "npm link ../Signalling && npm run build",
+    "build-all": "rimraf ./build && cd ../Signalling && npm run build-all && cd ../SignallingWebServer && npm run build-dev",
     "start": "node ./build/index.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "test": "echo \"Error: no test specified\" && exit 1"

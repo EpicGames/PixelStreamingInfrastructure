@@ -84,46 +84,4 @@ export class SignallingProtocol extends EventEmitter {
         this.transport.sendMessage(msg);
         this.transport.emit('out', msg); // emit this for listeners listening to outgoing messages
     }
-
-    // the following are just wrappers for sendMessage and should be deprioritized.
-    
-    requestStreamerList(): void {
-        const payload = MessageHelpers.createMessage(Messages.listStreamers);
-        this.transport.sendMessage(payload);
-    }
-
-    sendSubscribe(streamerid: string): void {
-        const payload = MessageHelpers.createMessage(Messages.subscribe, { streamerid: streamerid });
-        this.transport.sendMessage(payload);
-    }
-
-    sendUnsubscribe(): void {
-        const payload = MessageHelpers.createMessage(Messages.unsubscribe);
-        this.transport.sendMessage(payload);
-    }
-
-    sendWebRtcOffer(extraParams: object): void {
-        const payload = MessageHelpers.createMessage(Messages.offer, extraParams);
-        this.transport.sendMessage(payload);
-    }
-
-    sendWebRtcAnswer(extraParams: object): void {
-        const payload = MessageHelpers.createMessage(Messages.answer, extraParams);
-        this.transport.sendMessage(payload);
-    }
-
-    sendWebRtcDatachannelRequest(): void {
-        const payload = MessageHelpers.createMessage(Messages.dataChannelRequest);
-        this.transport.sendMessage(payload);
-    }
-
-    sendSFURecvDataChannelReady(): void {
-        const payload = MessageHelpers.createMessage(Messages.peerDataChannelsReady);
-        this.transport.sendMessage(payload);
-    }
-
-    sendIceCandidate(candidate: RTCIceCandidate): void {
-        const payload = MessageHelpers.createMessage(Messages.iceCandidate, { candidate: candidate });
-        this.transport.sendMessage(payload);
-    }
 }

@@ -49,15 +49,7 @@ Events emitted on transport:
 - [connect](Protocol_SignallingProtocol.SignallingProtocol.md#connect)
 - [disconnect](Protocol_SignallingProtocol.SignallingProtocol.md#disconnect)
 - [isConnected](Protocol_SignallingProtocol.SignallingProtocol.md#isconnected)
-- [requestStreamerList](Protocol_SignallingProtocol.SignallingProtocol.md#requeststreamerlist)
-- [sendIceCandidate](Protocol_SignallingProtocol.SignallingProtocol.md#sendicecandidate)
 - [sendMessage](Protocol_SignallingProtocol.SignallingProtocol.md#sendmessage)
-- [sendSFURecvDataChannelReady](Protocol_SignallingProtocol.SignallingProtocol.md#sendsfurecvdatachannelready)
-- [sendSubscribe](Protocol_SignallingProtocol.SignallingProtocol.md#sendsubscribe)
-- [sendUnsubscribe](Protocol_SignallingProtocol.SignallingProtocol.md#sendunsubscribe)
-- [sendWebRtcAnswer](Protocol_SignallingProtocol.SignallingProtocol.md#sendwebrtcanswer)
-- [sendWebRtcDatachannelRequest](Protocol_SignallingProtocol.SignallingProtocol.md#sendwebrtcdatachannelrequest)
-- [sendWebRtcOffer](Protocol_SignallingProtocol.SignallingProtocol.md#sendwebrtcoffer)
 
 ## Constructors
 
@@ -81,7 +73,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:36](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L36)
+[Protocol/SignallingProtocol.ts:36](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/1d8a258/Common/src/Protocol/SignallingProtocol.ts#L36)
 
 ## Properties
 
@@ -91,7 +83,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L34)
+[Protocol/SignallingProtocol.ts:34](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/1d8a258/Common/src/Protocol/SignallingProtocol.ts#L34)
 
 ## Accessors
 
@@ -105,7 +97,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L31)
+[Protocol/SignallingProtocol.ts:31](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/1d8a258/Common/src/Protocol/SignallingProtocol.ts#L31)
 
 ## Methods
 
@@ -129,7 +121,7 @@ True if the connection call succeeded.
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:58](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L58)
+[Protocol/SignallingProtocol.ts:58](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/1d8a258/Common/src/Protocol/SignallingProtocol.ts#L58)
 
 ___
 
@@ -152,7 +144,7 @@ Asks the transport to disconnect from any connection it might have.
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:67](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L67)
+[Protocol/SignallingProtocol.ts:67](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/1d8a258/Common/src/Protocol/SignallingProtocol.ts#L67)
 
 ___
 
@@ -170,41 +162,7 @@ True if the protocol is connected.
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:75](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L75)
-
-___
-
-### requestStreamerList
-
-▸ **requestStreamerList**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[Protocol/SignallingProtocol.ts:90](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L90)
-
-___
-
-### sendIceCandidate
-
-▸ **sendIceCandidate**(`candidate`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `candidate` | `RTCIceCandidate` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[Protocol/SignallingProtocol.ts:125](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L125)
+[Protocol/SignallingProtocol.ts:75](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/1d8a258/Common/src/Protocol/SignallingProtocol.ts#L75)
 
 ___
 
@@ -226,106 +184,4 @@ Passes a message to the transport to send to the other end.
 
 #### Defined in
 
-[Protocol/SignallingProtocol.ts:83](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L83)
-
-___
-
-### sendSFURecvDataChannelReady
-
-▸ **sendSFURecvDataChannelReady**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[Protocol/SignallingProtocol.ts:120](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L120)
-
-___
-
-### sendSubscribe
-
-▸ **sendSubscribe**(`streamerid`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `streamerid` | `string` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[Protocol/SignallingProtocol.ts:95](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L95)
-
-___
-
-### sendUnsubscribe
-
-▸ **sendUnsubscribe**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[Protocol/SignallingProtocol.ts:100](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L100)
-
-___
-
-### sendWebRtcAnswer
-
-▸ **sendWebRtcAnswer**(`extraParams`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `extraParams` | `object` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[Protocol/SignallingProtocol.ts:110](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L110)
-
-___
-
-### sendWebRtcDatachannelRequest
-
-▸ **sendWebRtcDatachannelRequest**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[Protocol/SignallingProtocol.ts:115](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L115)
-
-___
-
-### sendWebRtcOffer
-
-▸ **sendWebRtcOffer**(`extraParams`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `extraParams` | `object` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[Protocol/SignallingProtocol.ts:105](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Protocol/SignallingProtocol.ts#L105)
+[Protocol/SignallingProtocol.ts:83](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/1d8a258/Common/src/Protocol/SignallingProtocol.ts#L83)

@@ -58,7 +58,7 @@ Callback filled in by the SignallingProtocol and should be called by the transpo
 
 #### Defined in
 
-[Transport/ITransport.ts:19](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Transport/ITransport.ts#L19)
+[Transport/ITransport.ts:19](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/1d8a258/Common/src/Transport/ITransport.ts#L19)
 
 ## Methods
 
@@ -82,7 +82,7 @@ True if the connection was successful.
 
 #### Defined in
 
-[Transport/ITransport.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Transport/ITransport.ts#L26)
+[Transport/ITransport.ts:26](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/1d8a258/Common/src/Transport/ITransport.ts#L26)
 
 ___
 
@@ -105,7 +105,7 @@ Disconnect this transport.
 
 #### Defined in
 
-[Transport/ITransport.ts:33](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Transport/ITransport.ts#L33)
+[Transport/ITransport.ts:33](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/1d8a258/Common/src/Transport/ITransport.ts#L33)
 
 ___
 
@@ -123,7 +123,7 @@ True if the transport is connected.
 
 #### Defined in
 
-[Transport/ITransport.ts:39](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Transport/ITransport.ts#L39)
+[Transport/ITransport.ts:39](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/1d8a258/Common/src/Transport/ITransport.ts#L39)
 
 ___
 
@@ -145,4 +145,4 @@ Called when the protocol wants to send a message over the transport.
 
 #### Defined in
 
-[Transport/ITransport.ts:14](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/a6184ae/Common/src/Transport/ITransport.ts#L14)
+[Transport/ITransport.ts:14](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/1d8a258/Common/src/Transport/ITransport.ts#L14)

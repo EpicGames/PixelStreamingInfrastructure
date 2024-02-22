@@ -1386,7 +1386,7 @@ export class WebRtcPlayerController {
                     this.isReconnecting = true;
                     this.reconnectAttempt++;
                     setTimeout(() => {
-                        this.protocol.requestStreamerList();
+                        this.protocol.sendMessage(MessageHelpers.createMessage(Messages.listStreamers));
                     }, reconnectDelay);
                 } else {
                     // We've exhausted our reconnect attempts, return to main screen
@@ -1517,7 +1517,7 @@ export class WebRtcPlayerController {
                 RecvOptions
             );
             this.recvDataChannelController.handleOnOpen = () =>
-                this.protocol.sendSFURecvDataChannelReady();
+                this.protocol.sendMessage(MessageHelpers.createMessage(Messages.peerDataChannelsReady));
             // If we're uni-directional, only the recv data channel should handle incoming messages
             this.recvDataChannelController.handleOnMessage = (
                 ev: MessageEvent
@@ -1570,7 +1570,7 @@ export class WebRtcPlayerController {
     handleSendIceCandidate(iceEvent: RTCPeerConnectionIceEvent) {
         Logger.Log(Logger.GetStackTrace(), 'OnIceCandidate', 6);
         if (iceEvent.candidate && iceEvent.candidate.candidate) {
-            this.protocol.sendIceCandidate(iceEvent.candidate);
+            this.protocol.sendMessage(MessageHelpers.createMessage(Messages.iceCandidate, { candidate: iceEvent.candidate }));
         }
     }
 
@@ -1610,7 +1610,7 @@ export class WebRtcPlayerController {
             maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
         };
 
-        this.protocol.sendWebRtcOffer(extraParams);
+        this.protocol.sendMessage(MessageHelpers.createMessage(Messages.offer, extraParams));
     }
 
     /**
@@ -1630,10 +1630,10 @@ export class WebRtcPlayerController {
             maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
         };
 
-        this.protocol.sendWebRtcAnswer(extraParams);
+        this.protocol.sendMessage(MessageHelpers.createMessage(Messages.answer, extraParams));
 
         if (this.isUsingSFU) {
-            this.protocol.sendWebRtcDatachannelRequest();
+            this.protocol.sendMessage(MessageHelpers.createMessage(Messages.dataChannelRequest));
         }
     }
 
