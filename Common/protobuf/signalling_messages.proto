@@ -1,42 +1,199 @@
 syntax = "proto3";
 
-// intermediate message to determine message type
+/**
+ * This is just a helper message type that allows us to use a "base interface"
+ * in code to describe that all messages should at least have a 'type field'.
+ */
 message base_message {
+  // The type of the message.
   string type = 1;
 }
 
-message answer {
-  string type = 1;
-  string sdp = 2;
-  optional string playerId = 3;
-}
-
+/**
+ * This is a user defined structure that is sent as part of the `config`
+ * message. Left empty here because everything is optional.
+ */
 message peerConnectionOptions {
 }
 
+/**
+ * A config message is sent to each connecting peer when it connects to
+ * describe to them the setup of the signalling server they're
+ * connecting to.
+ */
 message config {
+  // Should always be 'config'
   string type = 1;
+  // The user defined peer connnection options
   peerConnectionOptions peerConnectionOptions = 2;
+  // The signalling protocol version the signalling server is using
   optional string protocolVersion = 3;
 }
 
-message disconnectPlayer {
+/**
+ * A request for a new streamer to give itself an ID. The flow for these
+ * messages should be connect->identify->endpointId->endpointIdConfirm
+ */
+message identify {
+  // Should always be 'identify'
   string type = 1;
-  string playerId = 2;
-  optional string reason = 3;
 }
 
+/**
+ * Message is consumed by the Signalling Server. Specifies an id for the
+ * streamer. This is used to uniquely identify multiple streamers connected
+ * to the same Signalling Server.
+ * Note: to preserve backward compatibility when Streamer IDs were optional,
+ * when a Streamer first connects it is assigned a temporary ID which
+ * allows use of older Streamers if needed.
+ * Note: Streamer IDs must be unique and so if the ID provided here clashes
+ * with an existing ID, the ID may be altered slightly (usually just an
+ * appended number). The streamer will be sent an `endpointIdConfirm`
+ * message to notify it of it's final ID.
+ */
 message endpointId {
+  // Should always be 'endpointId'
   string type = 1;
+  // The requested ID of the streamer.
   string id = 2;
+  // The signalling protocol version the streamer is using
   optional string protocolVersion = 3;
 }
 
+/**
+ * A response to `endpointId` that will notify the streamer of its final
+ * ID given. Since streamer IDs must be unique the requested ID may not be
+ * available and may need to be altered.
+ */
 message endpointIdConfirm {
+  // Should always be 'endpointIdConfirm'
   string type = 1;
+  // The final ID of the streamer.
   string committedId = 2;
 }
 
+/**
+ * Message is used to communicate to players that the streamer it is currently
+ * subscribed to is changing its ID. This allows players to keep track of it's
+ * currently subscribed streamer and allow auto reconnects to the correct
+ * streamer. This happens if a streamer sends an `endpointID` message after it
+ * already has an ID assigned. (Can happen if it is late to respond to the
+ * `identify` message and is auto assigned a legacy ID.)
+ */
+message streamerIdChanged {
+  // Should always be 'streamerIdChanged'
+  string type = 1;
+  // The new ID of the streamer.
+  string newID = 2;
+}
+
+/**
+ * A request to the signalling server to send the player a list of
+ * available streamers it could possibly subscribe to.
+ */
+message listStreamers {
+  // Should always be 'listStreamers'
+  string type = 1;
+}
+
+/**
+ * Message is a reply to `listStreamers` from a player. Replies with a list of
+ * currently active streamers connected to this server.
+ */
+message streamerList {
+  // Should always be 'streamerList'
+  string type = 1;
+  // A list of streamer IDs active on the server.
+  repeated string ids = 2;
+}
+
+/**
+ * Message is consumed by the signalling server. Tells the signalling server
+ * that the player requests to subscribe to the given stream.
+ */
+message subscribe {
+  // Should always be 'subscribe'
+  string type = 1;
+  // The ID of the streamer the player wishes to subscribe to.
+  string streamerId = 2;
+}
+
+/**
+ * Message is consumed by the signalling server. Tells the signalling server
+ * that the player wishes to unsubscribe from the current stream. The player
+ * must have previously used the `subscribe` message for this to have any effect.
+ */
+message unsubscribe {
+  // Should always be 'unsubscribe'
+  string type = 1;
+}
+
+/**
+ * A message sent to a streamer to notify it that a player has just
+ * subscribed to it.
+ */
+message playerConnected {
+  // Should always be 'playerConnected'
+  string type = 1;
+  // True if the player should be given a datachannel for stream control purposes.
+  bool dataChannel = 2;
+  // True if the player connected is an SFU
+  bool sfu = 3;
+  // True if the streamer should send an offer. False if the player is offering to receive
+  bool sendOffer = 4;
+  // The ID of the player that connected.
+  string playerId = 5;
+}
+
+/**
+ * Message is used to notify a streamer that a player has
+ * unsubscribed/disconnected from the stream.
+ */
+message playerDisconnected {
+  // Should always be 'playerDisconnected'
+  string type = 1;
+  // The ID of the player that disconnected.
+  string playerId = 2;
+}
+
+/**
+ * An offer message can be an offer of a WebRTC stream, or an offer to
+ * receive a WebRTC stream, depending on the configuration of the player.
+ * The default behaviour is that when a player subscribes to a streamer
+ * the streamer will offer the stream to the new player.
+ * An alternative configuration exists where a player can be configured
+ * to offer to receive and in that case the player will subscribe to a
+ * streamer and then offer to receive the stream.
+ */
+message offer {
+  // Should always be 'offer'
+  string type = 1;
+  // The SDP payload from WebRTC
+  string sdp = 2;
+  // If being sent to a player this should be a valid player ID
+  optional string playerId = 3;
+  // Indiates that this offer is coming from an SFU.
+  optional bool sfu = 4;
+}
+
+/**
+ * This is a response to an `offer` message. It contains the answer `SDP`.
+ * Part of the normal subscribe flow. A peer will subscribe to a streamer
+ * and depending on whether `offer_to_receive` is set, one peer will make
+ * an offer and the other should answer.
+ */
+message answer {
+  // Should always be 'answer'
+  string type = 1;
+  // The WebRTC SDP payload
+  string sdp = 2;
+  // If being sent to a player this should be set to a valid player ID.
+  optional string playerId = 3;
+}
+
+/**
+ * A submessage that contains data from a WebRTC ICE candidate.
+ */
 message iceCandidateData {
   string candidate = 1;
   string sdpMid = 2;
@@ -44,117 +201,163 @@ message iceCandidateData {
   optional string usernameFragment = 4;
 }
 
+/**
+ * A single ICE candidate entry from WebRTC. Notifies a peer of a possible
+ * connection option to another peer.
+ */
 message iceCandidate {
+  // Should always be 'iceCandidate'
   string type = 1;
+  // The ICE candidate data from WebRTC
   iceCandidateData candidate = 2;
+  // If being sent to a player this should be a valid player ID.
   optional string playerId = 3;
 }
 
-message identify {
+/**
+ * Message is consumed by the Signalling Server. Requests that the
+ * signalling server disconnect the given player matching the player ID.
+ */
+message disconnectPlayer {
+  // Should always be 'disconnectPlayer'
   string type = 1;
-}
-
-message listStreamers {
-  string type = 1;
-}
-
-message offer {
-  string type = 1;
-  string sdp = 2;
-  optional string playerId = 3;
-  optional bool sfu = 4;
-}
-
-message ping {
-  string type = 1;
-  int32 time = 2;
-}
-
-message playerConnected {
-  string type = 1;
-  bool dataChannel = 2;
-  bool sfu = 3;
-  bool sendOffer = 4;
-  optional string playerId = 5;
-}
-
-message playerCount {
-  string type = 1;
-  int32 count = 2;
-}
-
-message playerDisconnected {
-  string type = 1;
+  // The ID of the player to disconnect.
   string playerId = 2;
+  // An optional reason string to send to the player.
+  optional string reason = 3;
 }
 
-message pong {
+/**
+ * A keepalive ping message used to test that the connection is still open.
+ */
+message ping {
+  // Should always be 'ping'
   string type = 1;
+  // The current time
   int32 time = 2;
 }
 
-message stats {
+/**
+ * Message is a reply to `ping` from a streamer. Replies with the time from the
+ * ping message.
+ */
+message pong {
+  // Should always be 'pong'
   string type = 1;
-  string data = 2;
+  // The echoed time from the ping message
+  int32 time = 2;
 }
 
-// sent to the sfu only to notify it when the streamer its subscribed to disconnects
+/**
+ * Message is used to notify players when a Streamer disconnects from the
+ * signalling server.
+ */
 message streamerDisconnected {
+  // Should always be 'streamerDisconnected'
   string type = 1;
 }
 
-message streamerList {
-  string type = 1;
-  repeated string ids = 2;
-}
-
-message subscribe {
-  string type = 1;
-  string streamerId = 2;
-}
-
-message unsubscribe {
-  string type = 1;
-}
-
-message streamerIdChanged {
-  string type = 1;
-  string newID = 2;
-}
-
+/**
+ * Message is forwarded to a connected SFU. Sends a preferred layer index to a
+ * connected SFU for a specified player. Useful for switching between SFU
+ * quality layers to force a certain resolution/quality option either as part
+ * of UX or testing.
+ */
 message layerPreference {
+  // Should always be 'layerPreference'
   string type = 1;
+  // The requested spatial layer
   int32 spatialLayer = 2;
+  // The requested temporal layer
   int32 temporalLayer = 3;
+  // The player ID this preference refers to
   string playerId = 4;
 }
 
+/**
+ * Message is forwarded to a connected SFU. Tells the SFU that the player
+ * requests data channels to the streamer.
+ */
 message dataChannelRequest {
+  // Should always be 'dataChannelRequest'
   string type = 1;
 }
 
+/**
+ * Message is forwarded to a player. Sends information to the player about what
+ * data channels to use for sending/receiving with the streamer.
+ */
 message peerDataChannels {
+  // Should always be 'peerDataChannels'
   string type = 1;
+  // The player ID this message refers to.
   string playerId = 2;
+  // The channel ID to use for sending data.
   int32 sendStreamId = 3;
+  // The channel ID to use for receiving data.
   int32 recvStreamId = 4;
 }
 
+/**
+ * Message is forwarded to a connected SFU. Tells the SFU that the player is
+ * ready for data channels to be negotiated.
+ */
 message peerDataChannelsReady {
+  // Should always be 'peerDataChannelsReady'
   string type = 1;
 }
 
+/**
+ * Message is forwarded to the streamer. Sends a request to the streamer to
+ * open up data channels for a given player.
+ */
 message streamerDataChannels {
+  // Should always be 'streamerDataChannels'
   string type = 1;
+  // The SFU the player is connected to
   string sfuId = 2;
+  // The channel ID to use for sending data.
   int32 sendStreamId = 3;
+  // The channel ID to use for receiving data.
   int32 recvStreamId = 4;
 }
 
+/**
+ * Sent by the SFU to indicate that it is now streaming.
+ */
 message startStreaming {
+  // Should always be 'startStreaming'
   string type = 1;
 }
 
+/**
+ * Sent by the SFU to indicate that it is now no longer streaming.
+ */
 message stopStreaming {
+  // Should always be 'stopStreaming'
   string type = 1;
+}
+
+/**
+ * DEPRECATED Message is sent to players to indicate how many currently connected players
+ * there are on this signalling server. (Note: This is mostly old behaviour and
+ * is not influenced by multi streamers or who is subscribed to what streamer.
+ * It just reports the number of players it knows about.)
+ */
+message playerCount {
+  // Should always be 'playerCount'
+  string type = 1;
+  // The number of players connected.
+  int32 count = 2;
+}
+
+/**
+ * DEPRECATED Message is consumed by the signalling server. Will print out the provided
+ * stats data on the console.
+ */
+message stats {
+  // Should always be 'stats'
+  string type = 1;
+  // The stats data to echo.
+  string data = 2;
 }

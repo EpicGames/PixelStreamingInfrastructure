@@ -10,7 +10,8 @@
         "compile": "tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
         "build": "rimraf ./build && npm run build-proto && npm run compile",
         "build-dev": "npm run build-proto && npm run compile",
-        "build-proto": "npx protoc --experimental_allow_proto3_optional --ts_out src/Messages --proto_path protobuf protobuf/signalling_messages.proto",
+        "build-proto": "protoc --experimental_allow_proto3_optional --ts_out src/Messages --proto_path protobuf protobuf/signalling_messages.proto",
+        "build-proto-docs": "protoc --doc_out=docs --doc_opt=markdown,messages.md --proto_path protobuf protobuf/signalling_messages.proto",
         "build-docs": "typedoc --tsconfig tsconfig.base.json",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "test": "echo \"Error: no test specified\" && exit 1"
