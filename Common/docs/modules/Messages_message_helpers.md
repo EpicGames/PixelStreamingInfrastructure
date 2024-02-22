@@ -34,7 +34,7 @@ The resulting message object.
 
 #### Defined in
 
-[Messages/message_helpers.ts:14](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/713ba47/Common/src/Messages/message_helpers.ts#L14)
+[Messages/message_helpers.ts:14](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Common/src/Messages/message_helpers.ts#L14)
 
 ___
 
@@ -59,4 +59,4 @@ The message type from MessageRegistry of the supplied message object if it's val
 
 #### Defined in
 
-[Messages/message_helpers.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/713ba47/Common/src/Messages/message_helpers.ts#L29)
+[Messages/message_helpers.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Common/src/Messages/message_helpers.ts#L29)

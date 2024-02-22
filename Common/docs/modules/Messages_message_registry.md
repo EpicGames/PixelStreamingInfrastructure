@@ -20,4 +20,4 @@ to actual message types.
 
 #### Defined in
 
-[Messages/message_registry.ts:10](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/713ba47/Common/src/Messages/message_registry.ts#L10)
+[Messages/message_registry.ts:10](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Common/src/Messages/message_registry.ts#L10)

@@ -45,7 +45,7 @@ logging to the browser console.
 
 #### Defined in
 
-[Logger/Logger.ts:8](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/713ba47/Common/src/Logger/Logger.ts#L8)
+[Logger/Logger.ts:8](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Common/src/Logger/Logger.ts#L8)
 
 ## Methods
 
@@ -69,7 +69,7 @@ The common log function that all other log functions call to.
 
 #### Defined in
 
-[Logger/Logger.ts:87](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/713ba47/Common/src/Logger/Logger.ts#L87)
+[Logger/Logger.ts:87](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Common/src/Logger/Logger.ts#L87)
 
 ___
 
@@ -92,7 +92,7 @@ The standard logging output
 
 #### Defined in
 
-[Logger/Logger.ts:68](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/713ba47/Common/src/Logger/Logger.ts#L68)
+[Logger/Logger.ts:68](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Common/src/Logger/Logger.ts#L68)
 
 ___
 
@@ -110,7 +110,7 @@ the current stack
 
 #### Defined in
 
-[Logger/Logger.ts:14](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/713ba47/Common/src/Logger/Logger.ts#L14)
+[Logger/Logger.ts:14](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Common/src/Logger/Logger.ts#L14)
 
 ___
 
@@ -134,7 +134,7 @@ The standard logging output
 
 #### Defined in
 
-[Logger/Logger.ts:55](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/713ba47/Common/src/Logger/Logger.ts#L55)
+[Logger/Logger.ts:55](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Common/src/Logger/Logger.ts#L55)
 
 ___
 
@@ -158,7 +158,7 @@ The standard logging output
 
 #### Defined in
 
-[Logger/Logger.ts:41](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/713ba47/Common/src/Logger/Logger.ts#L41)
+[Logger/Logger.ts:41](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Common/src/Logger/Logger.ts#L41)
 
 ___
 
@@ -180,7 +180,7 @@ Set the log verbosity level
 
 #### Defined in
 
-[Logger/Logger.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/713ba47/Common/src/Logger/Logger.ts#L29)
+[Logger/Logger.ts:29](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Common/src/Logger/Logger.ts#L29)
 
 ___
 
@@ -203,4 +203,4 @@ The standard logging output
 
 #### Defined in
 
-[Logger/Logger.ts:77](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/713ba47/Common/src/Logger/Logger.ts#L77)
+[Logger/Logger.ts:77](https://github.com/mcottontensor/PixelStreamingInfrastructure/blob/branch/Common/src/Logger/Logger.ts#L77)
