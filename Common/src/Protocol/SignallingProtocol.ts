@@ -10,7 +10,7 @@ import * as MessageHelpers from '../Messages/message_helpers';
  * Signalling protocol for handling messages from the signalling server.
  * 
  * Listen on this emitter for messages. Message type is the name of the event to listen for.
- * Example:
+ * Example:  
  *      ```
  *      signallingProtocol.on('config', (message: Messages.config) => console.log(`Got a config message: ${message}`)));
  *      ```
