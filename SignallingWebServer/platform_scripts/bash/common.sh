@@ -134,6 +134,53 @@ function check_and_install() { #dep_name #get_version_string #version_min #insta
 	fi
 }
 
+function setup_node() {
+    pushd "${SCRIPT_DIR}" > /dev/null
+
+    # Azure specific fix to allow installing NodeJS from NodeSource
+    if test -f "/etc/apt/sources.list.d/azure-cli.list"; then
+        sudo touch /etc/apt/sources.list.d/nodesource.list
+        sudo touch /usr/share/keyrings/nodesource.gpg
+        sudo chmod 644 /etc/apt/sources.list.d/nodesource.list
+        sudo chmod 644 /usr/share/keyrings/nodesource.gpg
+        sudo chmod 644 /etc/apt/sources.list.d/azure-cli.list
+    fi
+
+    popd > /dev/null
+
+    # navigate to project root
+    pushd ${SCRIPT_DIR}/../.. > /dev/null
+
+    node_version=""
+    if [[ -f "${SCRIPT_DIR}/node/bin/node" ]]; then
+        node_version=$("${SCRIPT_DIR}/node/bin/node" --version)
+    fi
+
+    node_url=""
+    if [ "$(uname)" == "Darwin" ]; then
+        arch=$(uname -m)
+        if [[ $arch == x86_64* ]]; then
+            node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-x64.tar.gz"
+        elif  [[ $arch == arm* ]]; then
+            node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-arm64.tar.gz"
+        else
+            echo 'Incompatible architecture. Only x86_64 and ARM64 are supported'
+            exit -1
+        fi
+    else
+        node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
+    fi
+    check_and_install "node" "$node_version" "$NODE_VERSION" "curl $node_url --output node.tar.xz
+                                                                && tar -xf node.tar.xz
+                                                                && rm node.tar.xz
+                                                                && mv node-v*-*-* \"${SCRIPT_DIR}/node\""
+
+    PATH="${SCRIPT_DIR}/node/bin:$PATH"
+    "${SCRIPT_DIR}/node/lib/node_modules/npm/bin/npm-cli.js" install
+
+    popd > /dev/null
+}
+
 function setup_frontend() {
 	set -e
 
@@ -182,58 +229,7 @@ function setup_frontend() {
 	set +e
 }
 
-function setup() {
-    echo "Checking Pixel Streaming Server dependencies."
-
-    pushd "${SCRIPT_DIR}" > /dev/null
-
-    # Azure specific fix to allow installing NodeJS from NodeSource
-    if test -f "/etc/apt/sources.list.d/azure-cli.list"; then
-        sudo touch /etc/apt/sources.list.d/nodesource.list
-        sudo touch /usr/share/keyrings/nodesource.gpg
-        sudo chmod 644 /etc/apt/sources.list.d/nodesource.list
-        sudo chmod 644 /usr/share/keyrings/nodesource.gpg
-        sudo chmod 644 /etc/apt/sources.list.d/azure-cli.list
-    fi
-
-    # navigate to project root
-    pushd ${SCRIPT_DIR}/../.. > /dev/null
-
-    node_version=""
-    if [[ -f "${SCRIPT_DIR}/node/bin/node" ]]; then
-        node_version=$("${SCRIPT_DIR}/node/bin/node" --version)
-    fi
-
-    node_url=""
-    if [ "$(uname)" == "Darwin" ]; then
-        arch=$(uname -m)
-        if [[ $arch == x86_64* ]]; then
-            node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-x64.tar.gz"
-        elif  [[ $arch == arm* ]]; then
-            node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-arm64.tar.gz"
-        else
-            echo 'Incompatible architecture. Only x86_64 and ARM64 are supported'
-            exit -1
-        fi
-    else
-        node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
-    fi
-    check_and_install "node" "$node_version" "$NODE_VERSION" "curl $node_url --output node.tar.xz
-                                                                && tar -xf node.tar.xz
-                                                                && rm node.tar.xz
-                                                                && mv node-v*-*-* \"${SCRIPT_DIR}/node\""
-
-    PATH="${SCRIPT_DIR}/node/bin:$PATH"
-    "${SCRIPT_DIR}/node/lib/node_modules/npm/bin/npm-cli.js" install
-
-    popd > /dev/null
-
-    # Trigger Frontend Build if needed or requested
-    # This has to be done after check_and_install "node"
-    setup_frontend
-
-    popd > /dev/null # BASH_SOURCE
-
+function setup_coturn() {
     if [ "$(uname)" == "Darwin" ]; then
         if [ -d "${SCRIPT_DIR}/coturn" ]; then
             echo 'CoTURN directory found...skipping install.'
@@ -269,6 +265,13 @@ function setup() {
             fi
         fi
     fi
+}
+
+function setup() {
+    echo "Checking Pixel Streaming Server dependencies."
+    setup_node
+    setup_frontend
+    setup_coturn
 }
 
 # Sets PUBLIC_IP to the external ip
@@ -351,7 +354,7 @@ function start_wilbur() {
     ${NPM} link ../Signalling
     ${NPM} run build
 
-    echo "Starting wilbur use ctrl-c to exit"
+    echo "Starting wilbur signalling server use ctrl-c to exit"
     echo "----------------------------------"
     
     start_process "sudo PATH=$PATH ${NPM} start -- ${SERVER_ARGS}"
