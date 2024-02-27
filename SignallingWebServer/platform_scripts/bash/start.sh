@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
 parse_args $@
 setup $@
 set_public_ip
-setup_turn_stun &
+setup_turn_stun "bg"
 
 SERVER_ARGS+=" --serve --https_redirect --public_ip=${PUBLIC_IP}"
 if [[ ! -z "$STUN_SERVER" && ! -z "$TURN_SERVER" ]]; then

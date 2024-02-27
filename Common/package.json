@@ -27,6 +27,7 @@
         "jest": "^27.5.1",
         "jest-environment-jsdom": "27.5.1",
         "prettier": "2.8.3",
+        "protoc-gen-ts": "^0.8.7",
         "rimraf": "^5.0.5",
         "ts-jest": "27.1.5",
         "ts-loader": "^9.4.2",

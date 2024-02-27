@@ -292,8 +292,26 @@ function setup_turn_stun() {
         STUN_SERVER="stun.l.google.com:19302"
     fi
 
+    LOCAL_IP="$(hostname -I | awk '{print $1}')"
+    TURN_PORT="${TURN_SERVER##*:}"
+    if [[ -z "${TURN_PORT}" ]]; then TURN_PORT=3478; fi
+
+    TURN_PROCESS=""
+    if [[ "$(uname)" == "Darwin" ]]; then
+        TURN_PROCESS="${SCRIPT_DIR}/coturn/bin/turnserver"
+    else
+        TURN_PROCESS="sudo turnserver"
+    fi
+ 
+    TURN_REALM="PixelStreaming"
+    TURN_ARGUMENTS="-c turnserver.conf --allowed-peer-ip=$LOCAL_IP -p ${TURN_PORT} -r ${TURN_REALM} -X ${PUBLIC_IP} -E ${LOCAL_IP} --no-cli --no-tls --no-dtls --pidfile /var/run/turnserver.pid -f -a -v -u ${TURN_USER}:${TURN_PASS}"
+
+    if [[ "$1" == "bg" ]]; then
+        TURN_ARGUMENTS+=" &"
+    fi
+
     if [[ "${START_TURN}" == "1" && ! -z "${TURN_SERVER}" && ! -z "${TURN_USER}" && ! -z "${TURN_PASS}" ]]; then
-        start_turn $@
+        start_process ${TURN_PROCESS} ${TURN_ARGUMENTS} $@
     fi
 }
 
@@ -311,34 +329,10 @@ function print_config() {
 # launches a process confitionally removing sudo
 function start_process() {
     if [[ "${NO_SUDO}" == 1 ]]; then
-        eval $(echo "$@" | set 's/sudo//g')
+        eval $(echo "$@" | sed 's/sudo//g')
     else
         eval $@
     fi
-}
-
-# Launches the turn server
-# Assumes the following are set
-# SCRIPT_DIR = The path to the scripts folder
-# TURN_SERVER = The turn server address
-# TURN_USER = The turn username
-# TURN_PASS = The turn password
-function start_turn() {
-    LOCAL_IP="$(hostname -I | awk '{print $1}')"
-    TURN_PORT="${TURN_SERVER##*:}"
-    if [[ -z "${TURN_PORT}" ]]; then TURN_PORT=3478; fi
-
-    PROCESS=""
-    if [[ "$(uname)" == "Darwin" ]]; then
-        PROCESS="${SCRIPT_DIR}/coturn/bin/turnserver"
-    else
-        PROCESS="sudo turnserver"
-    fi
- 
-    TURN_REALM="PixelStreaming"
-    ARGUMENTS="-c turnserver.conf --allowed-peer-ip=$LOCAL_IP -p ${TURN_PORT} -r ${TURN_REALM} -X ${PUBLIC_IP} -E ${LOCAL_IP} --no-cli --no-tls --no-dtls --pidfile /var/run/turnserver.pid -f -a -v -u ${TURN_USER}:${TURN_PASS}"
-
-    start_process ${PROCESS} ${ARGUMENTS} $@
 }
 
 # Assumes the following are set
