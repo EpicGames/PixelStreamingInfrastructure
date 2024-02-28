@@ -1,6 +1,6 @@
 {
     "name": "@epicgames-ps/lib-pixelstreamingcommon-ue5.5",
-    "version": "0.0.9",
+    "version": "0.0.10",
     "description": "Common utilities library for Unreal Engine 5.5 Pixel Streaming",
     "main": "build/commonjs/pixelstreamingcommon.js",
     "module": "build/esm/pixelstreamingcommon.js",
