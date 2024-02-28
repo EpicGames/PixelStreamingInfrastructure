@@ -1,2 +1,2 @@
 #!/bin/bash
-. $(dirname "$0")/start.sh --default-stun
+. $(dirname "$0")/start.sh --default-stun $*
