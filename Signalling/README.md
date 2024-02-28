@@ -1,6 +1,6 @@
 # @epicgames-ps/lib-pixelstreamingsignalling
 
-A library for developers withing to implement tools that signal Pixel Streaming applications
+A library for developers wanting to implement tools that signal Pixel Streaming applications
 
 ## Building
 

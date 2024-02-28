@@ -28,7 +28,7 @@ import * as MessageHelpers from '../Messages/message_helpers';
  *      only for when messages are sent from this endpoint. Useful for debugging.
  */
 export class SignallingProtocol extends EventEmitter {
-    static get SIGNALLING_VERSION(): string { return '1.0'; }
+    static get SIGNALLING_VERSION(): string { return '1.1.1'; }
 
     // The transport in use by this protocol object.
     transport: ITransport;

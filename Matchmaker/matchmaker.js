@@ -71,10 +71,6 @@ if (config.UseHTTPS) {
 			if (req.get('Host')) {
 				var hostAddressParts = req.get('Host').split(':');
 				var hostAddress = hostAddressParts[0];
-				// this seems like a broken copy/paste
-				// if (httpsPort != 443) {
-				// 	hostAddress = `${hostAddress}:${httpsPort}`;
-				// }
 				return res.redirect(['https://', hostAddress, req.originalUrl].join(''));
 			} else {
 				console.error(`unable to get host name from header. Requestor ${req.ip}, url path: '${req.originalUrl}', available headers ${JSON.stringify(req.headers)}`);
