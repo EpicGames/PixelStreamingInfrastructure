@@ -3,7 +3,15 @@ import { BaseMessage } from './base_message';
 import { Logger } from '../Logger/Logger';
 import { MessageRegistry } from './message_registry';
 
-export function createMessage(messageType: IMessageType<BaseMessage>, params?: any) {
+/**
+ * A helper for creating signalling messages. Takes in optional given parameters and
+ * includes them in a message object with the 'type' field set properly for the message
+ * type supplied.
+ * @param messageType - A message type from MessageRegistry that indicates the type of message to create.
+ * @param params - An optional object whose fields are added to the newly created message.
+ * @returns The resulting message object.
+ */
+export function createMessage(messageType: IMessageType<BaseMessage>, params?: object) {
     const message = messageType.create();
     message.type = messageType.typeName;
     if (params) {
@@ -12,8 +20,14 @@ export function createMessage(messageType: IMessageType<BaseMessage>, params?: a
     return message;
 }
 
-export function validateMessage(msg: any): IMessageType<BaseMessage> | null {
-    let valid: boolean = true;
+/**
+ * Tests that the supplied message is valid. That is contains all expected fields and
+ * doesn't contain any unknown fields.
+ * @param msg - The message object to test.
+ * @returns The message type from MessageRegistry of the supplied message object if it's valid, or null if invalid.
+ */
+export function validateMessage(msg: BaseMessage): IMessageType<BaseMessage> | null {
+    let valid = true;
 
     if (!msg.type) {
         Logger.Error(Logger.GetStackTrace(), `Parsed message has no type. Rejected. ${JSON.stringify(msg)}`);
@@ -27,9 +41,9 @@ export function validateMessage(msg: any): IMessageType<BaseMessage> | null {
     }
 
     if (messageType.fields) {
-        for (let field of messageType.fields) {
+        for (const field of messageType.fields) {
             if (!field.opt) {
-                if (!msg.hasOwnProperty(field.name)) {
+                if (!Object.prototype.hasOwnProperty.call(msg, field.name)) {
                     Logger.Error(Logger.GetStackTrace(), `Message "${msg.type}"" is missing required field "${field.name}". Rejected.`);
                     valid = false;
                 }

@@ -8,4 +8,15 @@
         "allowJs": true
     },
     "include": ["./src/*.ts"],
+    "typedocOptions": {
+        "entryPoints": ["src/**/*.ts"],
+        "out": "docs",
+        "exclude": ["src/Messages/signalling_messages.ts"],
+        "excludeExternals": true,
+        "excludePrivate": true,
+        "excludeInternal": true,
+        "cleanOutputDir": false,
+        "plugin": "typedoc-plugin-markdown",
+        "readme": "none"
+    }
 }

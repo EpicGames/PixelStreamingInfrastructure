@@ -192,44 +192,44 @@ export class WebRtcPlayerController {
         // set up websocket methods
         this.transport = new WebSocketTransport();
         this.protocol = new SignallingProtocol(this.transport);
-        this.protocol.messageHandlers.addListener(Messages.config.typeName, (msg: BaseMessage) =>
+        this.protocol.addListener(Messages.config.typeName, (msg: BaseMessage) =>
             this.handleOnConfigMessage(msg as Messages.config)
         );
-        this.protocol.messageHandlers.addListener(Messages.streamerList.typeName, (msg: BaseMessage) =>
+        this.protocol.addListener(Messages.streamerList.typeName, (msg: BaseMessage) =>
             this.handleStreamerListMessage(msg as Messages.streamerList)
         );
-        this.protocol.messageHandlers.addListener(Messages.streamerIdChanged.typeName, (msg: BaseMessage) =>
+        this.protocol.addListener(Messages.streamerIdChanged.typeName, (msg: BaseMessage) =>
             this.handleStreamerIDChangedMessage(msg as Messages.streamerIdChanged)
         );
-        this.protocol.messageHandlers.addListener(Messages.playerCount.typeName, (msg: BaseMessage) => {
+        this.protocol.addListener(Messages.playerCount.typeName, (msg: BaseMessage) => {
             const playerCountMessage = msg as Messages.playerCount;
             this.pixelStreaming._onPlayerCount(playerCountMessage.count);
         });
-        this.protocol.messageHandlers.addListener(Messages.answer.typeName, (msg: BaseMessage) =>
+        this.protocol.addListener(Messages.answer.typeName, (msg: BaseMessage) =>
             this.handleWebRtcAnswer(msg as Messages.answer)
         );
-        this.protocol.messageHandlers.addListener(Messages.offer.typeName, (msg: BaseMessage) =>
+        this.protocol.addListener(Messages.offer.typeName, (msg: BaseMessage) =>
             this.handleWebRtcOffer(msg as Messages.offer)
         );
-        this.protocol.messageHandlers.addListener(Messages.streamerDataChannels.typeName, (msg: BaseMessage) =>
-            this.handleWebRtcSFUPeerDatachannels(msg as Messages.streamerDataChannels)
+        this.protocol.addListener(Messages.peerDataChannels.typeName, (msg: BaseMessage) =>
+            this.handleWebRtcSFUPeerDatachannels(msg as Messages.peerDataChannels)
         );
-        this.protocol.messageHandlers.addListener(Messages.iceCandidate.typeName, (msg: BaseMessage) => {
+        this.protocol.addListener(Messages.iceCandidate.typeName, (msg: BaseMessage) => {
             const iceCandidateMessage = msg as Messages.iceCandidate;
             this.handleIceCandidate(iceCandidateMessage.candidate);
         });
-        this.protocol.transportEvents.addListener('open', () => {
+        this.protocol.transport.addListener('open', () => {
             const BrowserSendsOffer = this.config.isFlagEnabled(Flags.BrowserSendOffer);
             if (!BrowserSendsOffer) {
                 const message = MessageHelpers.createMessage(Messages.listStreamers);
                 this.protocol.sendMessage(message);
             }
         });
-        this.protocol.transportEvents.addListener('error', () => {
+        this.protocol.transport.addListener('error', () => {
             // dont really need to do anything here since the close event should follow.
             Logger.Error(Logger.GetStackTrace(), `Got a transport error.`);
         });
-        this.protocol.transportEvents.addListener('close', (event: CloseEvent) => {
+        this.protocol.transport.addListener('close', (event: CloseEvent) => {
             // when we refresh the page during a stream we get the going away code.
             // in that case we don't want to reconnect since we're navigating away.
             // https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
@@ -1386,7 +1386,7 @@ export class WebRtcPlayerController {
                     this.isReconnecting = true;
                     this.reconnectAttempt++;
                     setTimeout(() => {
-                        this.protocol.requestStreamerList();
+                        this.protocol.sendMessage(MessageHelpers.createMessage(Messages.listStreamers));
                     }, reconnectDelay);
                 } else {
                     // We've exhausted our reconnect attempts, return to main screen
@@ -1488,7 +1488,7 @@ export class WebRtcPlayerController {
      * Handle when the SFU provides the peer with its data channels
      * @param DataChannels - The message from the SFU containing the data channels ids
      */
-    handleWebRtcSFUPeerDatachannels(DataChannels: Messages.streamerDataChannels) {
+    handleWebRtcSFUPeerDatachannels(DataChannels: Messages.peerDataChannels) {
         const SendOptions: RTCDataChannelInit = {
             ordered: true,
             negotiated: true,
@@ -1517,7 +1517,7 @@ export class WebRtcPlayerController {
                 RecvOptions
             );
             this.recvDataChannelController.handleOnOpen = () =>
-                this.protocol.sendSFURecvDataChannelReady();
+                this.protocol.sendMessage(MessageHelpers.createMessage(Messages.peerDataChannelsReady));
             // If we're uni-directional, only the recv data channel should handle incoming messages
             this.recvDataChannelController.handleOnMessage = (
                 ev: MessageEvent
@@ -1570,7 +1570,7 @@ export class WebRtcPlayerController {
     handleSendIceCandidate(iceEvent: RTCPeerConnectionIceEvent) {
         Logger.Log(Logger.GetStackTrace(), 'OnIceCandidate', 6);
         if (iceEvent.candidate && iceEvent.candidate.candidate) {
-            this.protocol.sendIceCandidate(iceEvent.candidate);
+            this.protocol.sendMessage(MessageHelpers.createMessage(Messages.iceCandidate, { candidate: iceEvent.candidate }));
         }
     }
 
@@ -1610,7 +1610,7 @@ export class WebRtcPlayerController {
             maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
         };
 
-        this.protocol.sendWebRtcOffer(extraParams);
+        this.protocol.sendMessage(MessageHelpers.createMessage(Messages.offer, extraParams));
     }
 
     /**
@@ -1630,10 +1630,10 @@ export class WebRtcPlayerController {
             maxBitrateBps: 1000 * this.config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
         };
 
-        this.protocol.sendWebRtcAnswer(extraParams);
+        this.protocol.sendMessage(MessageHelpers.createMessage(Messages.answer, extraParams));
 
         if (this.isUsingSFU) {
-            this.protocol.sendWebRtcDatachannelRequest();
+            this.protocol.sendMessage(MessageHelpers.createMessage(Messages.dataChannelRequest));
         }
     }
 

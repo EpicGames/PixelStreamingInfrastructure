@@ -1,5 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+/**
+ * A basic console logger utilized by the Pixel Streaming frontend to allow
+ * logging to the browser console.
+ */
 export class Logger {
     static verboseLogLevel = 5;
 
@@ -35,7 +39,7 @@ export class Logger {
      * @param verbosity - the verbosity level
      */
     static Log(stack: string, message: string, verbosity?: number) {
-        if (verbosity > this.verboseLogLevel) {
+        if (verbosity !== undefined && verbosity > this.verboseLogLevel) {
             return;
         }
 
@@ -49,7 +53,7 @@ export class Logger {
      * @param verbosity - the verbosity level
      */
     static Info(stack: string, message: string, verbosity?: number) {
-        if (verbosity > this.verboseLogLevel) {
+        if (verbosity !== undefined && verbosity > this.verboseLogLevel) {
             return;
         }
 
@@ -74,6 +78,12 @@ export class Logger {
         this.CommonLog("Warning", null, message);
     }
 
+    /**
+     * The common log function that all other log functions call to.
+     * @param level - the level of this log message.
+     * @param stack - an optional stack trace string from where the log message was called.
+     * @param message - the message to be logged.
+     */
     static CommonLog(level: string, stack: null | string, message: string) {
         if (stack) {
             console.log(`[${level}] - ${message}\nCaller: ${stack}`);

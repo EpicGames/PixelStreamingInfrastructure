@@ -1,0 +1,29 @@
+openapi: "3.1.0"
+info:
+  title: "Pixel Streaming Signalling Server API"
+  version: "1.0.0"
+servers:
+  - url: "/api"
+paths: {}
+components:
+  schemas:
+    Streamer:
+      type: object
+      properties:
+        streamerId:
+          type: string
+          description: The streamer's unique identifier
+        streaming:
+          type: boolean
+          description: True if the streamer is accepting players
+      required:
+        - streamerId
+        - streaming
+    Player:
+      type: object
+      properties:
+        playerId:
+          type: string
+          description: The player's unique identifier
+      required:
+        - playerId

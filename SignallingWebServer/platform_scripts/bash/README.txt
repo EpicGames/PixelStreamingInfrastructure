@@ -1,13 +1,15 @@
 How to use files in this directory:
 
-- Run ./setup.sh to automatically install all required dependencies for your operating system. Note that setup.sh is called from every script designed to run;
-- Run a local instance of the Cirrus server by using the ./run_local.sh script;
-- Use the following scripts to run locally or on your cloud instance (note that TURN server is not expected to work locally due to the nature of its application):
-   - Start_SignallingServer.sh  - start only the Signalling (STUN) server;
-   - Start_TURNServer.sh - start only the TURN server;
-   - Start_WithTURN_SignallingServer.sh - start a TURN server and the Cirrus server together.
-   
+- setup.sh : Ensures the correct node is installed and builds the frontend if it isn't already
+- start.sh : Starts the signalling server with basic settings
+- common.sh : Contains a bunch of helper functions for the contained scripts. Shouldn't be run directly.
+
+The following are provided as handy shortcuts but mostly leverage start.bat functionality
+- start_turn.sh : Starts the turn server only with basic settings
+- start_with_stun.sh : Starts the signalling server with basic STUN settings
+- start_with_turn.sh : Starts the TURN server and then the signalling server with STUN and TURN parameters
+
 Tips:
 
 - Please note that scripts intended to run need to be executable:  $ chmod +x *.sh  will do that job.
-- The local/cloud Start_*.sh shell scripts can be invoked with the  --help  command line option to see how those can be configured.  The following options can be supplied: --publicip, --turn, --stun.  Please read the --help.
+- You can provide --help to start.sh to get a list of customizable arguments.

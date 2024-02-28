@@ -1,23 +1,21 @@
 @Rem Copyright Epic Games, Inc. All Rights Reserved.
-
 @echo off
+setlocal enabledelayedexpansion
 
-@Rem Set script location as working directory for commands.
-pushd "%~dp0"
+call :Init
+call :ParseArgs %*
 
-@Rem Ensure we have NodeJs available for calling.
-call setup_node.bat
+IF "%CONTINUE%"=="1" (
+	call :Setup
+)
 
-@Rem Ensure we have frontend built.
-call setup_frontend.bat %*
+goto :eof
 
-@Rem Ensure we have CoTURN available for calling.
-call setup_coturn.bat
-
-@Rem Move to cirrus.js directory and install its package.json
-pushd %~dp0\..\..\
-call platform_scripts\cmd\node\npm install --no-save
-popd
-
-@Rem Pop working directory
-popd
+:Init
+:ParseArgs
+:Setup
+:SetPublicIP
+:SetupTurnStun
+:PrintConfig
+:StartWilbur
+%~dp0common.bat %*

@@ -85,19 +85,19 @@ export class TestContext {
         const errors = unhandledEvents.filter((event) => event.type == 'error') as ErrorEvent[];
 
         for (const expected of unsatisfiedMessages) {
-            this._errors.push(`Failed to receive expected message: ${expected.messageType.typeName}`);
+            this._errors.push(`(${connection.name}) Failed to receive expected message: ${expected.messageType.typeName}`);
         }
 
         for (const expected of unsatisfiedSocketEvents) {
-            this._errors.push(`Failed to receive expected socket event: ${expected.eventType}`);
+            this._errors.push(`(${connection.name}) Failed to receive expected socket event: ${expected.eventType}`);
         }
 
         for (const message of unhandledMessages) {
-            this._errors.push(`Got message that was not expected/handled:: ${message.message.type}`);
+            this._errors.push(`(${connection.name}) Got message that was not expected/handled:: ${message.message.type}`);
         }
 
         for (const message of unhandledSocketEvents) {
-            this._errors.push(`Event not handled:: ${message.eventType}`);
+            this._errors.push(`(${connection.name}) Event not handled:: ${message.eventType}`);
         }
 
         for (const error of errors) {
@@ -158,10 +158,10 @@ export class SignallingConnection {
         this.processTimer = null;
 
         this.protocol = new SignallingProtocol(new WebSocketTransportNJS());
-        this.protocol.transportEvents.addListener("open", event => this.onConnectionOpen(event));
-        this.protocol.transportEvents.addListener("error", event => this.onConnectionError(event));
-        this.protocol.transportEvents.addListener("close", event => this.onConnectionClose(event));
-        this.protocol.transportEvents.addListener("message", message => this.onMessage(message));
+        this.protocol.transport.addListener("open", event => this.onConnectionOpen(event));
+        this.protocol.transport.addListener("error", event => this.onConnectionError(event));
+        this.protocol.transport.addListener("close", event => this.onConnectionClose(event));
+        this.protocol.transport.addListener("message", message => this.onMessage(message));
 
         this.logCallback(this, `Connecting to Signalling Server at ${url}`);
         this.protocol.connect(url);
@@ -385,6 +385,8 @@ export class SignallingConnection {
                 throw new Error('Unhandled internal event type');
             }
         }
+        eventsToRemove.sort();
+        expectingToRemove.sort();
         for (var i = eventsToRemove.length - 1; i >= 0; --i) {
             this.eventQueue.splice(eventsToRemove[i], 1);
         }

@@ -1,14 +1,14 @@
 How to use files in this directory:
 
-- Files with .ps1 extension can be run with PowerShell[.exe] in Windows. Powershell needs to be started as Administrator to run setup.ps1 so it can run installation / installation check steps;
-- Run .\setup.bat to automatically install all required dependencies for your operating system. Note that .\setup.bat is called from every script designed to run;
-- Run a local instance of the Cirrus server by using the .\run_local.ps1 script;
-- Use the following scripts to run locally or on your cloud instance (note that TURN server is not expected to work locally due to the nature of its application):
-   - Start_SignallingServer.ps1 - start only the Signalling (STUN) server;
-   - Start_TURNServer.ps1 - start only the TURN server;
-   - Start_WithTURN_SignallingServer.ps1 - start a TURN server and the Cirrus server together;
+- setup.bat : Ensures the correct node is installed and builds the frontend if it isn't already
+- start.bat : Starts the signalling server with basic settings
+- common.bat : Contains a bunch of helper functions for the contained scripts. Shouldn't be run directly.
+
+The following are provided as handy shortcuts but mostly leverage start.bat functionality
+- start_turn.bat : Starts the turn server only with basic settings
+- start_with_stun.bat : Starts the signalling server with basic STUN settings
+- start_with_turn.bat : Starts the TURN server and then the signalling server with STUN and TURN parameters
 
 Tips:
 
-- The Start_Common.ps1 file contains shared functions for other Start_*.ps1 scripts and it is not supposed to run alone.
-- The local/cloud Start_*.ps1 powershell scripts can be invoked with the  --help  command line option to see how those can be configured.  The following options can be supplied: --publicip, --turn, --stun.  Please read the --help.
+- You can provide --help to start.bat to get a list of customizable arguments.

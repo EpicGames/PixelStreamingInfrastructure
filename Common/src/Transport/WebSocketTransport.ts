@@ -4,7 +4,6 @@ import { Logger } from '../Logger/Logger';
 import { ITransport } from './ITransport';
 import { EventEmitter } from 'events';
 import { BaseMessage } from '../Messages/base_message';
-import * as MessageHelpers from '../Messages/message_helpers';
 
 // declare the new method for the websocket interface
 declare global {
@@ -16,25 +15,29 @@ declare global {
 /**
  * The controller for the WebSocket and all associated methods
  */
-export class WebSocketTransport implements ITransport {
+export class WebSocketTransport extends EventEmitter implements ITransport {
     WS_OPEN_STATE = 1;
     webSocket: WebSocket;
-    events: EventEmitter;
 
     constructor() {
-        this.events = new EventEmitter();
+        super();
     }
 
+    /**
+     * Sends a message over the websocket.
+     * @param msg - The message to send.
+     */
     sendMessage(msg: BaseMessage): void {
         this.webSocket.send(JSON.stringify(msg));
     }
 
+    // A handler for when messages are received.
     onMessage: (msg: BaseMessage) => void;
 
     /**
      * Connect to the signaling server
      * @param connectionURL - The Address of the signaling server
-     * @returns - If there is a connection
+     * @returns If there is a connection
      */
     connect(connectionURL: string): boolean {
         Logger.Log(Logger.GetStackTrace(), connectionURL, 6);
@@ -52,10 +55,19 @@ export class WebSocketTransport implements ITransport {
         }
     }
 
-    disconnect(): void {
-        this.webSocket.close();
+    /**
+     * Disconnect this transport.
+     * @param code - An optional disconnect code.
+     * @param reason - A descriptive string for the disconnect reason.
+     */
+    disconnect(code?: number, reason?: string): void {
+        this.webSocket.close(code, reason);
     }
 
+    /**
+     * Should return true when the transport is connected and ready to send/receive messages.
+     * @returns True if the transport is connected.
+     */
     isConnected(): boolean {
         return this.webSocket && this.webSocket.readyState != WebSocket.CLOSED
     }
@@ -64,7 +76,7 @@ export class WebSocketTransport implements ITransport {
      * Handles what happens when a message is received in binary form
      * @param event - Message Received
      */
-    handleOnMessageBinary(event: MessageEvent) {
+    handleOnMessageBinary(event: MessageEvent): void {
         // if the event is empty return
         if (!event || !event.data) {
             return;
@@ -97,7 +109,7 @@ export class WebSocketTransport implements ITransport {
      * Handles what happens when a message is received
      * @param event - Message Received
      */
-    handleOnMessage(event: MessageEvent) {
+    handleOnMessage(event: MessageEvent): void {
         // Check if websocket message is binary, if so, stringify it.
         if (event.data && event.data instanceof Blob) {
             this.handleOnMessageBinary(event);
@@ -124,32 +136,29 @@ export class WebSocketTransport implements ITransport {
 
     /**
      * Handles when the Websocket is opened
-     * @param event - Not Used
      */
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    handleOnOpen() {
+    handleOnOpen(): void {
         Logger.Log(
             Logger.GetStackTrace(),
             'Connected to the signalling server via WebSocket',
             6
         );
-        this.events.emit('open');
+        this.emit('open');
     }
 
     /**
      * Handles when there is an error on the websocket
-     * @param event - Error Payload
      */
-    handleOnError() {
+    handleOnError(): void {
         //Logger.Error(Logger.GetStackTrace(), 'WebSocket error');
-        this.events.emit('error');
+        this.emit('error');
     }
 
     /**
      * Handles when the Websocket is closed
      * @param event - Close Event
      */
-    handleOnClose(event: CloseEvent) {
+    handleOnClose(event: CloseEvent): void {
         Logger.Log(
             Logger.GetStackTrace(),
             'Disconnected to the signalling server via WebSocket: ' +
@@ -157,13 +166,13 @@ export class WebSocketTransport implements ITransport {
                 ' - ' +
                 event.reason
         );
-        this.events.emit('close', event);
+        this.emit('close', event);
     }
 
     /**
      * Closes the Websocket connection
      */
-    close() {
+    close(): void {
         this.webSocket?.close();
     }
 }

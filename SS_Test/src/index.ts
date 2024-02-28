@@ -38,13 +38,13 @@ async function main(): Promise<void> {
     streamer.addEventExpect('open', (event: WebSocket.Event) => {});
     streamer.addExpect(Messages.config, (msg: Messages.config) => {});
     streamer.addExpect(Messages.identify, (msg: Messages.identify) => streamer.sendMessage(Messages.endpointId, { id: config.streamerId }));
+    streamer.addExpect(Messages.endpointIdConfirm, (event: Messages.endpointIdConfirm) => {});
 
     let playerId: string | null = null;
     let player: SignallingConnection = context.newConnection('Player', config.playerURL);
 
     player.addEventExpect('open', (event: WebSocket.Event) => {});
     player.addExpect(Messages.config, (msg: Messages.config) => {});
-    player.addExpect(Messages.playerCount, (msg: Messages.playerCount) => {});
 
     if (!await context.validateStep(3000, [streamer, player])) {
         onFailedPhase('initial connection', context);
@@ -118,8 +118,7 @@ async function main(): Promise<void> {
 
     player = context.newConnection('Player', config.playerURL);
     player.addEventExpect('open', (event: WebSocket.Event) => {});
-    player.addExpect(Messages.config, (msg: Messages.config) => {});
-    player.addExpect(Messages.playerCount, (msg: Messages.playerCount) => player.sendMessage(Messages.listStreamers));
+    player.addExpect(Messages.config, (msg: Messages.config) => player.sendMessage(Messages.listStreamers));
     player.addExpect(Messages.streamerList, (msg: Messages.streamerList) => player.sendMessage(Messages.subscribe, { streamerId: config.streamerId }));
     streamer.addExpect(Messages.playerConnected, (msg: Messages.playerConnected) => {
         playerId = msg.playerId!;
