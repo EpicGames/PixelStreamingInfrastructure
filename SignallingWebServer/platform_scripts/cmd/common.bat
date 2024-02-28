@@ -39,6 +39,11 @@ set DEFAULT_TURN=0
 set START_TURN=0
 set SERVER_ARGS=
 set FRONTEND_DIR=
+set TURN_SERVER=
+set TURN_USER=
+set TURN_PASS=
+set STUN_SERVER=
+set PUBLIC_IP=
 :arg_loop
 IF NOT "%1"=="" (
     set HANDLED=0
