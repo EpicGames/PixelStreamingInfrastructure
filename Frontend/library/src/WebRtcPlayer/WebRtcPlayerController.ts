@@ -1828,6 +1828,14 @@ export class WebRtcPlayerController {
     }
 
     /**
+     * Send raw bytes through the data channel for a registered to-streamer
+     * message type. See {@link SendMessageController.sendBytesToStreamer}.
+     */
+    emitData(messageType: string, bytes: Uint8Array | ArrayBuffer): boolean {
+        return this.sendMessageController.sendBytesToStreamer(messageType, bytes);
+    }
+
+    /**
      * Send a console command message
      */
     emitConsoleCommand(command: string) {

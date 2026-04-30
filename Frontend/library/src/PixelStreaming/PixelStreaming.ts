@@ -814,6 +814,29 @@ export class PixelStreaming {
     }
 
     /**
+     * Send raw bytes to the UE application through the data channel without
+     * any JSON encoding or per-field encoding. The bytes are sent as the
+     * payload of a registered to-streamer message type — the message id
+     * is prepended as a single byte.
+     *
+     * The message type must be registered via
+     * `streamMessageController.toStreamerMessages.set(...)` so the id is
+     * known. Useful for custom binary protocols where the receiving side
+     * (UE) decodes the payload itself.
+     *
+     * @param messageType - Name of a registered to-streamer message type.
+     * @param bytes - Payload to send, not including the message id byte.
+     * @returns true if the bytes were submitted, false if rejected (video
+     *   not ready, message type not registered, or data channel not open).
+     */
+    public emitData(messageType: string, bytes: Uint8Array | ArrayBuffer): boolean {
+        if (!this._webRtcController.videoPlayer.isVideoReady()) {
+            return false;
+        }
+        return this._webRtcController.emitData(messageType, bytes);
+    }
+
+    /**
      * Send a console command to UE application. Only allowed if UE has signaled that it allows
      * console commands.
      * @returns true if succeeded, false if rejected

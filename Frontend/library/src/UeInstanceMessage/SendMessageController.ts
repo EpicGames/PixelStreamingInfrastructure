@@ -149,4 +149,44 @@ export class SendMessageController {
 
         this.dataChannelSender.sendData(data.buffer);
     }
+
+    /**
+     * Send a raw byte payload for a registered to-streamer message type. The
+     * registered message id is prepended as a single byte, then the bytes
+     * are sent through the data channel as-is — no JSON encoding, no
+     * per-field structure validation.
+     *
+     * Useful for custom protocols where the application owns the binary
+     * payload format on both ends. The application must have called
+     * `streamMessageController.toStreamerMessages.set(...)` (or relied on
+     * a default-registered type such as `UIInteraction`) so the message id
+     * is known.
+     *
+     * @param messageType - Name of a registered to-streamer message type.
+     * @param bytes - Payload to send, not including the message id byte.
+     * @returns true if the bytes were submitted to the data channel; false
+     *   if the message type isn't registered or the channel can't send.
+     */
+    sendBytesToStreamer(messageType: string, bytes: Uint8Array | ArrayBuffer): boolean {
+        const messageFormat = this.toStreamerMessagesMapProvider.toStreamerMessages.get(messageType);
+        if (messageFormat === undefined) {
+            Logger.Error(
+                `Attempted to send raw bytes for message type "${messageType}" but no such type is registered. Register it via streamMessageController.toStreamerMessages.set(...)`
+            );
+            return false;
+        }
+
+        if (!this.dataChannelSender.canSend()) {
+            Logger.Info(`Data channel cannot send yet, skipping raw bytes for: ${messageType}`);
+            return false;
+        }
+
+        const payload = bytes instanceof ArrayBuffer ? new Uint8Array(bytes) : bytes;
+        const buffer = new ArrayBuffer(1 + payload.byteLength);
+        const view = new Uint8Array(buffer);
+        view[0] = messageFormat.id;
+        view.set(payload, 1);
+        this.dataChannelSender.sendData(buffer);
+        return true;
+    }
 }
