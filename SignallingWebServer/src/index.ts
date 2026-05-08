@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
@@ -328,6 +328,14 @@ if (shouldServerStart) {
 
 const signallingServer = new SignallingServer(serverOpts);
 
+app.get('/health', (_req: express.Request, res: express.Response) => {
+    if (signallingServer.playerRegistry.count() > 0) {
+        res.sendStatus(503);
+    } else {
+        res.sendStatus(200);
+    }
+});
+
 if (options.stdin) {
     initInputHandler(options, signallingServer);
 }
@@ -351,3 +359,5 @@ if (options.rest_api) {
         }
     }).catch((err: unknown) => Logger.error(`REST API initialization failed: ${String(err)}`));
 }
+
+
