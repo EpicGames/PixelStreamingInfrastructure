@@ -36,9 +36,9 @@
         "typescript-eslint": "8.57.2"
     },
     "dependencies": {
-        "body-parser": "^1.20.4",
+        "body-parser": "^1.20.5",
         "cors": "^2.8.5",
-        "express": "^4.22.1",
+        "express": "^4.22.2",
         "express-rate-limit": "^8.5.1",
         "helmet": "^8.0.0",
         "hsts": "^2.2.0",

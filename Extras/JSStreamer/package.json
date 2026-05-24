@@ -33,12 +33,12 @@
         "typescript-eslint": "8.57.2",
         "webpack": "^5.97.1",
         "webpack-cli": "^6.0.1",
-        "webpack-dev-server": "^5.2.3",
+        "webpack-dev-server": "^5.2.4",
         "webpack-node-externals": "^3.0.0"
     },
     "dependencies": {
         "@epicgames-ps/lib-pixelstreamingcommon-ue5.7": "*",
-        "body-parser": "^1.20.4"
+        "body-parser": "^1.20.5"
     },
     "overrides": {
         "http-proxy-middleware": "2.0.8"
