@@ -8,7 +8,7 @@ export class ToStreamerMessage {
 }
 
 export class StreamMessageController {
-    toStreamerHandlers: Map<string, (messageData?: Array<number | string>) => void>;
+    toStreamerHandlers: Map<string, (messageData?: Array<number | string | Uint8Array>) => void>;
     fromStreamerHandlers: Map<string, (messageType: string, messageData?: ArrayBuffer) => void>;
     //                        Type      Format
     toStreamerMessages: Map<string, ToStreamerMessage>;
