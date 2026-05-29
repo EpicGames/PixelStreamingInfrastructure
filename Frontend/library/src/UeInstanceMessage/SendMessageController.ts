@@ -26,7 +26,7 @@ export class SendMessageController {
      * @param messageData - the message data we are sending over the data channel
      * @returns - nil
      */
-    sendMessageToStreamer(messageType: string, messageData?: Array<number | string>) {
+    sendMessageToStreamer(messageType: string, messageData?: Array<number | string | Uint8Array>) {
         if (messageData === undefined) {
             messageData = [];
         }
@@ -54,16 +54,22 @@ export class SendMessageController {
                                 return 'number';
                             case 'string':
                                 return 'string';
+                            case 'raw':
+                                return 'Uint8Array';
                         }
                     })
-                    .toString()} ] but received [ ${messageData.map((element: number | string) => typeof element).toString()} ]`
+                    .toString()} ] but received [ ${messageData
+                    .map((element: number | string | Uint8Array) =>
+                        element instanceof Uint8Array ? 'Uint8Array' : typeof element
+                    )
+                    .toString()} ]`
             );
             return;
         }
 
         let byteLength = 0;
         // One loop to calculate the length in bytes of all of the provided data
-        messageData.forEach((element: number | string, idx: number) => {
+        messageData.forEach((element: number | string | Uint8Array, idx: number) => {
             const type = messageFormat.structure[idx];
             switch (type) {
                 case 'uint8':
@@ -92,6 +98,10 @@ export class SendMessageController {
                     // 2 bytes per character
                     byteLength += 2 * (element as string).length;
                     break;
+
+                case 'raw':
+                    byteLength += (element as Uint8Array).byteLength;
+                    break;
             }
         });
 
@@ -99,7 +109,7 @@ export class SendMessageController {
         data.setUint8(0, messageFormat.id);
         let byteOffset = 1;
 
-        messageData.forEach((element: number | string, idx: number) => {
+        messageData.forEach((element: number | string | Uint8Array, idx: number) => {
             const type = messageFormat.structure[idx];
             switch (type) {
                 case 'uint8':
@@ -135,6 +145,13 @@ export class SendMessageController {
                         byteOffset += 2;
                     }
                     break;
+
+                case 'raw': {
+                    const bytes = element as Uint8Array;
+                    new Uint8Array(data.buffer).set(bytes, byteOffset);
+                    byteOffset += bytes.byteLength;
+                    break;
+                }
             }
         });
 
