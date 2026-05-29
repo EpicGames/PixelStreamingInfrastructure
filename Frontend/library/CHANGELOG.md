@@ -1,5 +1,24 @@
 # @epicgames-ps/lib-pixelstreamingfrontend-ue5.6
 
+## 0.3.0
+
+### Minor Changes
+
+- 9a3404c: Add an `AutoEnterVR` config flag (#461). When enabled, the player checks for `immersive-vr` support after the video is initialized and requests the WebXR session automatically. Default is off. Note: browsers may require a user gesture to start a WebXR session; in flows where there is no pending gesture (for example, a fresh-page-load `AutoConnect`) the request can still be rejected and the player will log a warning.
+- 72c5c53: Added Viewport Resolution Scale parameter to request higher resolution streams on small screens
+
+### Patch Changes
+
+- e120706: Synthesize a `MouseUp` after `MouseDouble` in both mouse controllers so the streamer's pressed-button state stays balanced after a double-click (#10). The plugin treats `MouseDouble` as a press-class event (`RoutePointerDoubleClickEvent` / `IGenericApplicationMessageHandler::OnMouseDoubleClick`) but never synthesizes a release; the browser's preceding `mouseup` was already consumed by the prior `MouseUp`, so UE was left thinking the button was still held — manifesting, for example, as camera pans that latched on after a double-click. Behaviour is gated on the new `MouseDoubleClickAutoRelease` flag (default on); disable it via `?MouseDoubleClickAutoRelease=false` or the settings panel to restore pre-fix behaviour for projects that handle the doubleclick release themselves.
+- c3e46a8: - Addressing security issues raised by dependabot. (glob, js-yaml, playwright)
+    - Added lint npm script to the root project. Running `npm run lint` will now run linting over all packages.
+- 1a2a621: Map the macOS Command (and Windows Meta) keys to UE keycodes 91 (`LeftWindowKey`) and 92 (`RightWindowKey`). `KeyCodes.ts` now contains `MetaLeft`/`MetaRight` (and the legacy `OSLeft`/`OSRight`) entries, and `KeyboardController.getKeycode` normalizes the right-Cmd code so it no longer collides with `ContextMenu` (93) on browsers that report `keyCode === 93` for it, and so Firefox-on-Mac (which reports `keyCode === 224` for both Cmds) is also handled. Frontend portion of issue #276 — UE-side support for these key codes is tracked separately.
+- d932cd9: Fix mouse-button-held tracking so dragging outside the video element keeps sending move and release events to UE (#349). When a button is pressed on the hovering mouse controller, `mousemove`/`mouseup` are temporarily moved from the video element to `window`, with coordinates re-computed against the video element's bounding rect. When all buttons are released, the listeners switch back to the element. This prevents the engine from being left with a stuck button when the user releases outside the video — common with `DefaultViewportMouseCaptureMode=CaptureDuringMouseDown`.
+- 5696f2e: Make `npm run lint` work regardless of the directory it's invoked from. Each workspace's `eslint.config.mjs` now pins `parserOptions.tsconfigRootDir` to `import.meta.dirname`, so `parserOptions.project` resolves relative to the config file's own directory rather than whichever CWD `typescript-eslint` happens to pick by default. Previously the six workspace configs prefixed `project` with the workspace directory (e.g. `'Common/tsconfig.cjs.json'`), which only worked under one specific `typescript-eslint` version's resolution behavior and broke CI when run from within the workspace.
+- Updated dependencies [c3e46a8]
+- Updated dependencies [5696f2e]
+    - @epicgames-ps/lib-pixelstreamingcommon-ue5.7@0.1.5
+
 ## 0.2.2
 
 ### Patch Changes

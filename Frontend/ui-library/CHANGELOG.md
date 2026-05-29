@@ -1,5 +1,26 @@
 # @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.6
 
+## 0.2.0
+
+### Minor Changes
+
+- 72c5c53: Added Viewport Resolution Scale parameter to request higher resolution streams on small screens
+
+### Patch Changes
+
+- e120706: Synthesize a `MouseUp` after `MouseDouble` in both mouse controllers so the streamer's pressed-button state stays balanced after a double-click (#10). The plugin treats `MouseDouble` as a press-class event (`RoutePointerDoubleClickEvent` / `IGenericApplicationMessageHandler::OnMouseDoubleClick`) but never synthesizes a release; the browser's preceding `mouseup` was already consumed by the prior `MouseUp`, so UE was left thinking the button was still held — manifesting, for example, as camera pans that latched on after a double-click. Behaviour is gated on the new `MouseDoubleClickAutoRelease` flag (default on); disable it via `?MouseDoubleClickAutoRelease=false` or the settings panel to restore pre-fix behaviour for projects that handle the doubleclick release themselves.
+- c3e46a8: - Addressing security issues raised by dependabot. (glob, js-yaml, playwright)
+    - Added lint npm script to the root project. Running `npm run lint` will now run linting over all packages.
+- 5696f2e: Make `npm run lint` work regardless of the directory it's invoked from. Each workspace's `eslint.config.mjs` now pins `parserOptions.tsconfigRootDir` to `import.meta.dirname`, so `parserOptions.project` resolves relative to the config file's own directory rather than whichever CWD `typescript-eslint` happens to pick by default. Previously the six workspace configs prefixed `project` with the workspace directory (e.g. `'Common/tsconfig.cjs.json'`), which only worked under one specific `typescript-eslint` version's resolution behavior and broke CI when run from within the workspace.
+- Updated dependencies [9a3404c]
+- Updated dependencies [72c5c53]
+- Updated dependencies [e120706]
+- Updated dependencies [c3e46a8]
+- Updated dependencies [1a2a621]
+- Updated dependencies [d932cd9]
+- Updated dependencies [5696f2e]
+    - @epicgames-ps/lib-pixelstreamingfrontend-ue5.7@0.3.0
+
 ## 0.1.3
 
 ### Patch Changes
