@@ -25,7 +25,7 @@
     },
     "dependencies": {
         "@epicgames-ps/lib-pixelstreamingfrontend-ue5.8": "*",
-        "@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.7": "*"
+        "@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.8": "*"
     },
     "repository": {
         "type": "git",
