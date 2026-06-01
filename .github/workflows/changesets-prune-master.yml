@@ -1,0 +1,53 @@
+name: Prune Master Changesets
+
+# Changesets are authored on master, but master never runs `changeset version`
+# (only the UE* release branches do). Backports cherry-pick the introducing
+# commit -- which carries the changeset from history -- onto each release
+# branch, so master's working-tree copies are redundant the moment a PR merges.
+# This job removes them and surfaces the deletions as a single, continuously-
+# updated cleanup PR (fixed branch -> the existing PR is refreshed in place
+# rather than duplicated).
+on:
+  push:
+    branches: [master]
+    paths: ['.changeset/*.md'] # a merged PR that added a changeset
+  schedule:
+    - cron: '17 4 * * 1' # weekly backstop in case a push event is missed
+  workflow_dispatch:
+
+# Never run two prune jobs at once (they share the cleanup branch).
+concurrency: prune-master-changesets
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prune:
+    name: Prune
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: Prune changesets
+        id: prune
+        env:
+          PRUNE_BODY_PATH: ${{ runner.temp }}/prune-body.md
+        run: bash .github/scripts/prune-master-changesets.sh
+
+      # Fixed branch: peter-evans reuses an open PR if one exists, so an
+      # unmerged cleanup PR is refreshed in place rather than duplicated.
+      - name: Create or update cleanup PR
+        if: steps.prune.outputs.removed_count != '0'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: master
+          branch: automated/prune-changesets
+          delete-branch: true
+          title: 'chore: prune changesets from master'
+          commit-message: 'chore: prune changesets from master'
+          body-path: ${{ runner.temp }}/prune-body.md
