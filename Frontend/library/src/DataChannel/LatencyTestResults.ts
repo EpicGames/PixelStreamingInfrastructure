@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.8';
 /**
  * Latency Test Results Data
  */

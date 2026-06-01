@@ -15,7 +15,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@epicgames-ps/lib-pixelstreamingcommon-ue5.7": "*",
+        "@epicgames-ps/lib-pixelstreamingcommon-ue5.8": "*",
         "@protobuf-ts/plugin": "^2.9.3",
         "ws": "^8.17.1"
     },

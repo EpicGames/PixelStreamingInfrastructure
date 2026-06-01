@@ -1,4 +1,4 @@
-import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.8';
 import { Config, Flags, NumericParameters } from '../Config/Config';
 import { mockRTCRtpReceiver, unmockRTCRtpReceiver } from '../__test__/mockRTCRtpReceiver';
 import { VideoPlayer } from './VideoPlayer';

@@ -1,12 +1,12 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.8';
 import { Config, OptionParameters, Flags } from '../Config/Config';
 import { AggregatedStats } from './AggregatedStats';
 import { parseRtpParameters, splitSections } from 'sdp';
 import { RTCUtils } from '../Util/RTCUtils';
 import { CodecStats } from './CodecStats';
-import { SDPUtils } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
+import { SDPUtils } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.8';
 import { LatencyCalculator, LatencyInfo } from './LatencyCalculator';
 
 export const kAbsCaptureTime = 'http://www.webrtc.org/experiments/rtp-hdrext/abs-capture-time';

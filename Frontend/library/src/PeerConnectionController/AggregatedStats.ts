@@ -9,7 +9,7 @@ import { RemoteOutboundRTPStats, OutboundRTPStats } from './OutBoundRTPStats';
 import { SessionStats } from './SessionStats';
 import { StreamStats } from './StreamStats';
 import { CodecStats } from './CodecStats';
-import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.8';
 
 /**
  * The Aggregated Stats that is generated from the RTC Stats Report

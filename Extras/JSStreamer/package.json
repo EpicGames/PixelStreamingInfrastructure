@@ -37,7 +37,7 @@
         "webpack-node-externals": "^3.0.0"
     },
     "dependencies": {
-        "@epicgames-ps/lib-pixelstreamingcommon-ue5.7": "*",
+        "@epicgames-ps/lib-pixelstreamingcommon-ue5.8": "*",
         "body-parser": "^1.20.4"
     },
     "overrides": {

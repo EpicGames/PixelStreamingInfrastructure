@@ -9,7 +9,7 @@ import {
     MessageHelpers,
     BaseMessage,
     KeepaliveMonitor
-} from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
+} from '@epicgames-ps/lib-pixelstreamingcommon-ue5.8';
 import { StreamController } from '../VideoPlayer/StreamController';
 import { FreezeFrameController } from '../FreezeFrame/FreezeFrameController';
 import { AFKController } from '../AFK/AFKController';
