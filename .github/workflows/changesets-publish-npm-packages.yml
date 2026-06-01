@@ -53,6 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: fetch-package-info
     permissions:
+      id-token: write # Required for OIDC
       contents: write
     if: ${{ fromJSON(needs.fetch-package-info.outputs.matrix).count > 0 }}
     strategy:
@@ -82,8 +83,6 @@ jobs:
 
       - name: Publish ${{ matrix.package.name }}
         working-directory: ${{ matrix.package.path }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           npm install
           npm run build
