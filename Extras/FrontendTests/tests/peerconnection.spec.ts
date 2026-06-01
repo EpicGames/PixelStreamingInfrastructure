@@ -1,7 +1,7 @@
 import { test } from './fixtures';
 import { expect } from './matchers';
 import * as helpers from './helpers';
-import { Flags, PixelStreaming, WebRtcSdpAnswerEvent, WebRtcSdpOfferEvent, LatencyCalculator, LatencyInfo, LatencyCalculatedEvent } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.7';
+import { Flags, PixelStreaming, WebRtcSdpAnswerEvent, WebRtcSdpOfferEvent, LatencyCalculator, LatencyInfo, LatencyCalculatedEvent } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.8';
 
 test('Test abs-capture-time header extension found for streamer', {
     tag: ['@capture-time'],
