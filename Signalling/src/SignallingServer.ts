@@ -13,7 +13,7 @@ import {
     MessageHelpers,
     SignallingProtocol,
     KeepaliveMonitor
-} from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
+} from '@epicgames-ps/lib-pixelstreamingcommon-ue5.8';
 import { stringify } from './Utils';
 
 /**

@@ -9,7 +9,7 @@ import {
     Messages,
     EventEmitter,
     MessageHelpers
-} from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
+} from '@epicgames-ps/lib-pixelstreamingcommon-ue5.8';
 import { IStreamer, IStreamerInfo } from './StreamerRegistry';
 import { stringify } from './Utils';
 import { Logger } from './Logger';

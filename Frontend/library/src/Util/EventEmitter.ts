@@ -4,7 +4,7 @@ import { LatencyTestResults } from '../DataChannel/LatencyTestResults';
 import { AggregatedStats } from '../PeerConnectionController/AggregatedStats';
 import { InitialSettings } from '../DataChannel/InitialSettings';
 import { LatencyInfo } from '../PeerConnectionController/LatencyCalculator';
-import { Messages } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
+import { Messages } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.8';
 import { SettingFlag } from '../Config/SettingFlag';
 import { SettingNumber } from '../Config/SettingNumber';
 import { SettingText } from '../Config/SettingText';
