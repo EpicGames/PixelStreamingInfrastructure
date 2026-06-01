@@ -1,5 +1,25 @@
 # @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.6
 
+## 0.2.0
+
+### Minor Changes
+
+- 60da95c: Added Viewport Resolution Scale parameter to request higher resolution streams on small screens
+
+### Patch Changes
+
+- 06de3f4: Synthesize a `MouseUp` after `MouseDouble` in both mouse controllers so the streamer's pressed-button state stays balanced after a double-click (#10). The plugin treats `MouseDouble` as a press-class event (`RoutePointerDoubleClickEvent` / `IGenericApplicationMessageHandler::OnMouseDoubleClick`) but never synthesizes a release; the browser's preceding `mouseup` was already consumed by the prior `MouseUp`, so UE was left thinking the button was still held — manifesting, for example, as camera pans that latched on after a double-click. Behaviour is gated on the new `MouseDoubleClickAutoRelease` flag (default on); disable it via `?MouseDoubleClickAutoRelease=false` or the settings panel to restore pre-fix behaviour for projects that handle the doubleclick release themselves.
+- 7aa1fe2: Make `npm run lint` work regardless of the directory it's invoked from. Each workspace's `eslint.config.mjs` now pins `parserOptions.tsconfigRootDir` to `import.meta.dirname`, so `parserOptions.project` resolves relative to the config file's own directory rather than whichever CWD `typescript-eslint` happens to pick by default. Previously the six workspace configs prefixed `project` with the workspace directory (e.g. `'Common/tsconfig.cjs.json'`), which only worked under one specific `typescript-eslint` version's resolution behavior and broke CI when run from within the workspace.
+- Updated dependencies [66c6162]
+- Updated dependencies [60da95c]
+- Updated dependencies [493e8ef]
+- Updated dependencies [06de3f4]
+- Updated dependencies [be1e9bd]
+- Updated dependencies [90c1f44]
+- Updated dependencies [42fe9a7]
+- Updated dependencies [7aa1fe2]
+    - @epicgames-ps/lib-pixelstreamingfrontend-ue5.8@0.2.0
+
 ## 0.1.3
 
 ### Patch Changes

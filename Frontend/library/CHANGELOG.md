@@ -1,5 +1,30 @@
 # @epicgames-ps/lib-pixelstreamingfrontend-ue5.6
 
+## 0.2.0
+
+### Minor Changes
+
+- 66c6162: Add an `AutoEnterVR` config flag (#461). When enabled, the player checks for `immersive-vr` support after the video is initialized and requests the WebXR session automatically. Default is off. Note: browsers may require a user gesture to start a WebXR session; in flows where there is no pending gesture (for example, a fresh-page-load `AutoConnect`) the request can still be rejected and the player will log a warning.
+- 60da95c: Added Viewport Resolution Scale parameter to request higher resolution streams on small screens
+- 493e8ef: Add `'raw'` to the structure vocabulary in to-streamer message types (#608). A field declared as `'raw'` accepts a `Uint8Array` and is written into the message buffer verbatim, enabling custom binary protocols (e.g. UTF-8 strings, packed structs) where the receiving UE side decodes the payload itself. Send via the existing `sendMessageToStreamer` path:
+
+    ```ts
+    streamMessageController.toStreamerMessages.set('MyBinaryMsg', { id: 137, structure: ['raw'] });
+    sendMessageController.sendMessageToStreamer('MyBinaryMsg', [myUint8Array]);
+    ```
+
+    Existing structure types and call sites are unchanged.
+
+### Patch Changes
+
+- 06de3f4: Synthesize a `MouseUp` after `MouseDouble` in both mouse controllers so the streamer's pressed-button state stays balanced after a double-click (#10). The plugin treats `MouseDouble` as a press-class event (`RoutePointerDoubleClickEvent` / `IGenericApplicationMessageHandler::OnMouseDoubleClick`) but never synthesizes a release; the browser's preceding `mouseup` was already consumed by the prior `MouseUp`, so UE was left thinking the button was still held — manifesting, for example, as camera pans that latched on after a double-click. Behaviour is gated on the new `MouseDoubleClickAutoRelease` flag (default on); disable it via `?MouseDoubleClickAutoRelease=false` or the settings panel to restore pre-fix behaviour for projects that handle the doubleclick release themselves.
+- be1e9bd: Add guard against closed `peerConnection` in `generateStats`
+- 90c1f44: Map the macOS Command (and Windows Meta) keys to UE keycodes 91 (`LeftWindowKey`) and 92 (`RightWindowKey`). `KeyCodes.ts` now contains `MetaLeft`/`MetaRight` (and the legacy `OSLeft`/`OSRight`) entries, and `KeyboardController.getKeycode` normalizes the right-Cmd code so it no longer collides with `ContextMenu` (93) on browsers that report `keyCode === 93` for it, and so Firefox-on-Mac (which reports `keyCode === 224` for both Cmds) is also handled. Frontend portion of issue #276 — UE-side support for these key codes is tracked separately.
+- 42fe9a7: Fix mouse-button-held tracking so dragging outside the video element keeps sending move and release events to UE (#349). When a button is pressed on the hovering mouse controller, `mousemove`/`mouseup` are temporarily moved from the video element to `window`, with coordinates re-computed against the video element's bounding rect. When all buttons are released, the listeners switch back to the element. This prevents the engine from being left with a stuck button when the user releases outside the video — common with `DefaultViewportMouseCaptureMode=CaptureDuringMouseDown`.
+- 7aa1fe2: Make `npm run lint` work regardless of the directory it's invoked from. Each workspace's `eslint.config.mjs` now pins `parserOptions.tsconfigRootDir` to `import.meta.dirname`, so `parserOptions.project` resolves relative to the config file's own directory rather than whichever CWD `typescript-eslint` happens to pick by default. Previously the six workspace configs prefixed `project` with the workspace directory (e.g. `'Common/tsconfig.cjs.json'`), which only worked under one specific `typescript-eslint` version's resolution behavior and broke CI when run from within the workspace.
+- Updated dependencies [7aa1fe2]
+    - @epicgames-ps/lib-pixelstreamingcommon-ue5.8@0.1.1
+
 ## 0.2.2
 
 ### Patch Changes
