@@ -6,9 +6,9 @@ A library that adds UI support to the `lib-pixelstreamingfrontend` library.
 
 This UI library depends on a the frontend library, so to include this library in your project:
 
-`npm i @epicgames-ps/lib-pixelstreamingfrontend-ue5.7`
+`npm i @epicgames-ps/lib-pixelstreamingfrontend-ue5.8`
 
-`npm i @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.7`
+`npm i @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.8`
 
 ### Key features
 - Default Pixel Streaming frontend look-and-feel
