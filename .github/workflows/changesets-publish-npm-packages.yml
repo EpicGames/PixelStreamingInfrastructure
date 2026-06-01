@@ -68,20 +68,23 @@ jobs:
         id: get_node_version
         run: echo "node_version=$(cat NODE_VERSION)" >> $GITHUB_OUTPUT
 
+      # NOTE: deliberately no `registry-url` here. setup-node's registry-url
+      # writes an .npmrc with `_authToken=${NODE_AUTH_TOKEN}`; with no token set
+      # that resolves to an empty string, which npm uses instead of OIDC and
+      # fails with ENEEDAUTH. Omitting it lets OIDC trusted publishing engage.
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: "${{ steps.get_node_version.outputs.node_version }}"
-          registry-url: 'https://registry.npmjs.org'
 
-      # Ensure npm 11.5.1 or later is installed for OIDC
+      # Ensure npm 11.5.1 or later is installed for OIDC trusted publishing.
       - name: Update npm
-        run: npm install -g npm@11.5.1
+        run: npm install -g npm@latest
 
+      # No NODE_AUTH_TOKEN env: trusted publishing authenticates via OIDC
+      # (requires the `id-token: write` permission above).
       - name: Publish ${{ matrix.package.name }}
         working-directory: ${{ matrix.package.path }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           npm install
           npm run build
