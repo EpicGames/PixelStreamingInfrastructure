@@ -1,6 +1,6 @@
 {
     "name": "@epicgames-ps/lib-pixelstreamingcommon-ue5.6",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "description": "Common utilities library for Unreal Engine 5.6 Pixel Streaming",
     "repository": {
         "type": "git",
