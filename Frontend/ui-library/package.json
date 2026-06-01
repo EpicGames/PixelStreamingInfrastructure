@@ -26,7 +26,7 @@
         "typescript-eslint": "8.57.2"
     },
     "dependencies": {
-        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.7": "^0.2.2",
+        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.8": "^0.1.0",
         "@babel/runtime": "^7.26.10",
         "jss": "^10.10.0",
         "jss-plugin-camel-case": "^10.10.0",

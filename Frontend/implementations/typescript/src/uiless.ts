@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Config, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.7';
+import { Config, PixelStreaming } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.8';
 
 document.body.onload = function() {
 

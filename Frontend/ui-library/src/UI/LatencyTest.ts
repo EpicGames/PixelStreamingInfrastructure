@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { LatencyTestResults } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.7';
-import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.7';
+import { LatencyTestResults } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.8';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.8';
 import { StatsSections } from './UIConfigurationTypes';
 
 /**
