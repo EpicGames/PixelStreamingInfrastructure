@@ -1,6 +1,6 @@
 {
     "name": "@epicgames-ps/lib-pixelstreamingfrontend-ue5.7",
-    "version": "0.2.2",
+    "version": "0.3.0",
     "description": "Frontend library for Unreal Engine 5.7 Pixel Streaming",
     "main": "dist/cjs/pixelstreamingfrontend.js",
     "module": "dist/esm/pixelstreamingfrontend.js",
@@ -33,7 +33,7 @@
         "@types/node": "^22.14.0"
     },
     "dependencies": {
-        "@epicgames-ps/lib-pixelstreamingcommon-ue5.7": "^0.1.4",
+        "@epicgames-ps/lib-pixelstreamingcommon-ue5.7": "^0.1.5",
         "sdp": "^3.2.0"
     },
     "repository": {
