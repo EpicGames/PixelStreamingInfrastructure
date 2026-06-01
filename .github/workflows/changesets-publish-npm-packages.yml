@@ -50,7 +50,11 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     needs: fetch-package-info
+    # A job-level permissions block REPLACES the workflow-level one (no merge),
+    # so id-token must be granted here too or npm can't request an OIDC token
+    # and npm publish fails with ENEEDAUTH.
     permissions:
+      id-token: write # Required for OIDC trusted publishing
       contents: write
     if: ${{ fromJSON(needs.fetch-package-info.outputs.matrix).count > 0 }}
     strategy:
