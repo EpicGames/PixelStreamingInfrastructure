@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { FlagsIds, OptionIds } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.7';
+import { FlagsIds, OptionIds } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.8';
 
 export class ExtraFlags {
     static LightMode = 'LightMode' as const;

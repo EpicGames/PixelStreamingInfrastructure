@@ -4,7 +4,7 @@ import { FullScreenIcon } from './FullscreenIcon';
 import { SettingsIcon } from './SettingsIcon';
 import { StatsIcon } from './StatsIcon';
 import { XRIcon } from './XRIcon';
-import { WebXRController } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.7';
+import { WebXRController } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.8';
 import { UIElementConfig, UIElementCreationMode } from '../UI/UIConfigurationTypes';
 
 /**

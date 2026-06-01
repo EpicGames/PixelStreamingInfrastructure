@@ -9,8 +9,8 @@ import {
     PixelStreaming,
     PixelStreamingSettings,
     Flags
-} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.7';
-import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.7';
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.8';
+import { AggregatedStats } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.8';
 import { MathUtils } from '../Util/MathUtils';
 import { DataChannelLatencyTest } from './DataChannelLatencyTest';
 import { SessionTest } from './SessionTest';

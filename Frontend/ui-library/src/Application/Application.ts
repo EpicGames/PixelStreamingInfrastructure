@@ -13,7 +13,7 @@ import {
     SettingsChangedEvent,
     LatencyInfo,
     ShowOnScreenKeyboardEvent
-} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.7';
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.8';
 import { OverlayBase } from '../Overlay/BaseOverlay';
 import { ActionOverlay } from '../Overlay/ActionOverlay';
 import { TextOverlay } from '../Overlay/TextOverlay';
