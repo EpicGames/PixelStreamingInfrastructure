@@ -4,7 +4,7 @@ import { Config, Flags, PixelStreaming, Logger, LogLevel } from '@epicgames-ps/l
 import {
     Application,
     PixelStreamingApplicationStyle
-} from '@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.7';
+} from '@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.8';
 const PixelStreamingApplicationStyles = new PixelStreamingApplicationStyle();
 PixelStreamingApplicationStyles.applyStyleSheet();
 
