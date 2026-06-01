@@ -12,7 +12,7 @@ See the [reference Pixel Streaming web player](https://github.com/EpicGames/Pixe
 - Programmable (or url specified) settings.
 
 ### Adding it to your project
-`npm install @epicgames-ps/lib-pixelstreamingfrontend-ue5.7`
+`npm install @epicgames-ps/lib-pixelstreamingfrontend-ue5.8`
 
 ### NPM package contents
 - ES6 modules usage
