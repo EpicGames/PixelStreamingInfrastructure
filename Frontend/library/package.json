@@ -33,7 +33,7 @@
         "@types/node": "^22.14.0"
     },
     "dependencies": {
-        "@epicgames-ps/lib-pixelstreamingcommon-ue5.7": "^0.1.4",
+        "@epicgames-ps/lib-pixelstreamingcommon-ue5.8": "^0.1.0",
         "sdp": "^3.2.0"
     },
     "repository": {
