@@ -29,7 +29,7 @@
         "typescript-eslint": "8.57.2"
     },
     "dependencies": {
-        "@epicgames-ps/lib-pixelstreamingsignalling-ue5.7": "*",
+        "@epicgames-ps/lib-pixelstreamingsignalling-ue5.8": "*",
         "body-parser": "^1.20.4",
         "commander": "^12.0.0",
         "express": "^4.22.1",
