@@ -94,7 +94,7 @@ Common  →  Signalling  →  SignallingWebServer (Wilbur)
 
 ### Workspace package names
 
-Packages are published with UE version suffixes (e.g., `@epicgames-ps/lib-pixelstreamingcommon-ue5.7`). The current development branch is `master`; release branches are `UE5.7`, `UE5.6`, `UE5.5`.
+Packages are published with UE version suffixes (e.g., `@epicgames-ps/lib-pixelstreamingcommon-ue5.8`). The current development branch is `master`; release branches are `UE5.8`, `UE5.7`, `UE5.6`.
 
 ### Frontend library internals (`Frontend/library/src/`)
 
