@@ -15,4 +15,4 @@ These versions are currently being supported with security updates.
 
 ## Reporting a Vulnerability
 
-If you find a vulnerability please open an advisory here: https://github.com/EpicGamesExt/PixelStreamingInfrastructure/security/advisories/new
+If you find a vulnerability please open an advisory here: https://github.com/EpicGames/PixelStreamingInfrastructure/security/advisories/new

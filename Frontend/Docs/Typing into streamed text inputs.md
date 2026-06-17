@@ -1,6 +1,6 @@
 # Typing into streamed inputs
 
-Since [PR564](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/pull/564) there has been improved support for typing into streamed text widgets from Unreal Engine.
+Since [PR564](https://github.com/EpicGames/PixelStreamingInfrastructure/pull/564) there has been improved support for typing into streamed text widgets from Unreal Engine.
 
 Out the box the following is supported:
 
