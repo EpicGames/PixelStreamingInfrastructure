@@ -1,5 +1,5 @@
 {
-    "repoOwner": "EpicGamesExt",
+    "repoOwner": "EpicGames",
     "repoName": "PixelStreamingInfrastructure",
     "targetBranchChoices": ["master", "UE5.2", "UE5.3", "UE5.4", "UE5.5", "UE5.6", "UE5.7"],
     "autoMerge": true,

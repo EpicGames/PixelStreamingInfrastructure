@@ -12,7 +12,7 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/EpicGamesExt/PixelStreamingInfrastructure.git"
+    "url": "https://github.com/EpicGames/PixelStreamingInfrastructure.git"
   },
   "funding": {
     "type": "opencollective",
