@@ -20,7 +20,7 @@ permissions:
 jobs:
   # Uncomment when we can Linux test to capture a non-black screenshot using software renderer.
   # streaming-test-linux:
-  #   if: github.repository == 'EpicGamesExt/PixelStreamingInfrastructure'
+  #   if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
   #   runs-on: ubuntu-latest
   #   steps:
   #   - name: Checkout source code
@@ -46,7 +46,7 @@ jobs:
   #       path: Extras/MinimalStreamTester/results
 
   streaming-test-win:
-    if: github.repository == 'EpicGamesExt/PixelStreamingInfrastructure'
+    if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
     runs-on: windows-latest
     steps:
     - name: Checkout source code
@@ -64,7 +64,7 @@ jobs:
     - name: Download streamer
       uses: robinraju/release-downloader@v1
       with:
-        repository: 'EpicGamesExt/PixelStreamingInfrastructure'
+        repository: 'EpicGames/PixelStreamingInfrastructure'
         tag: 'minimal-streamer-5.7'
         fileName: 'Minimal-PixelStreamer-5.7-Win64-Development.7z'
 
