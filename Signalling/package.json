@@ -46,7 +46,7 @@
         "logform": "^2.7.0",
         "winston": "^3.17.0",
         "winston-daily-rotate-file": "^5.0.0",
-        "ws": "^8.18.0"
+        "ws": "^7.5.11"
     },
     "peerDependencies": {
         "@epicgames-ps/lib-pixelstreamingcommon-ue5.7": "^0.1.4"

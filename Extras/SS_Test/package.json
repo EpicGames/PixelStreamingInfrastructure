@@ -17,7 +17,7 @@
     "dependencies": {
         "@epicgames-ps/lib-pixelstreamingcommon-ue5.7": "*",
         "@protobuf-ts/plugin": "^2.9.3",
-        "ws": "^8.17.1"
+        "ws": "^7.5.11"
     },
     "devDependencies": {
         "@types/assert": "^1.5.10",

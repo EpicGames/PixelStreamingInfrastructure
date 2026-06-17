@@ -42,7 +42,7 @@
         "cross-spawn": ">=6.0.6",
         "glob": ">=7.2.3",
         "serialize-javascript": "7.0.5",
-        "tar": "7.5.11",
+        "tar": "7.5.16",
         "handlebars": "4.7.9",
         "test-exclude": "^7.0.2",
         "uuid": "^14.0.0",
