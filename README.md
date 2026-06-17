@@ -136,7 +136,7 @@ This repository contains the following in branches that track Unreal Engine vers
 | Legend | Meaning |
 |---------|-----------|
 | Dev | This is our dev branch, intended to be paired with [ue5-main](https://github.com/EpicGames/UnrealEngine/tree/ue5-main) - experimental. |
-|Pre-release| Code in here will be paired with the next UE release, we periodically update this branch from `master`. |
+| Pre-release | Code in here will be paired with the next UE release, we periodically update this branch from `master`. |
 | Current | Supported and this is the branch tracking the **latest released** version of UE. |
 | Supported | We will accept bugfixes/issues for this version. |
 | End of life | Once the next UE version is released we will not support this version anymore. |
