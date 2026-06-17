@@ -2,7 +2,7 @@
 
 The core library for the browser/client side of Pixel Streaming experiences. **This library contains no UI.**
 
-See the [reference Pixel Streaming web player](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/tree/master/Frontend/implementations/typescript) for an example of how to build a Pixel Streaming web application, with custom UI, on top of this library.
+See the [reference Pixel Streaming web player](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/master/Frontend/implementations/typescript) for an example of how to build a Pixel Streaming web application, with custom UI, on top of this library.
 
 ### Key features
 - Create a WebSocket connection to communicate with the signalling server.

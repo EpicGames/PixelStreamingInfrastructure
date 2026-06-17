@@ -30,7 +30,7 @@ If part of the library is not exposed and you wish to extend it, please do so in
 
 ## Developing
 
-⚠️ Only [this](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/blob/master/NODE_VERSION) NodeJS version is officially supported, other versions may **BREAK YOUR BUILD** ⚠️
+⚠️ Only [this](https://github.com/EpicGames/PixelStreamingInfrastructure/blob/master/NODE_VERSION) NodeJS version is officially supported, other versions may **BREAK YOUR BUILD** ⚠️
 
 ### Prerequisites for local dev
 - Install NodeJS version specified above.
