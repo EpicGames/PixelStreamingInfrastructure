@@ -205,7 +205,7 @@ export class Application {
 
         // Additionally iPad on non-Safari browsers doesn't really allow touch inputs and fullscreen video at the same time.
         // If you do this the video gets dragged off back to normal non-fullscreen video and then the video is paused.
-        // See: https://github.com/EpicGamesExt/PixelStreamingInfrastructure/issues/219
+        // See: https://github.com/EpicGames/PixelStreamingInfrastructure/issues/219
         const disableFullscreenButton = isIphone || (!isSafari && isIpad);
 
         if (this._options.fullScreenControlsConfig === undefined && disableFullscreenButton) {

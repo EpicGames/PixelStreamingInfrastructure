@@ -252,7 +252,7 @@ if exist coturn\ (
   echo CoTURN directory not found...beginning CoTURN download for Windows.
 
   @Rem Download nodejs and follow redirects.
-  curl -L -o ./turnserver.zip "https://github.com/EpicGamesExt/PixelStreamingInfrastructure/releases/download/v4.5.2-coturn-windows/turnserver.zip"
+  curl -L -o ./turnserver.zip "https://github.com/EpicGames/PixelStreamingInfrastructure/releases/download/v4.5.2-coturn-windows/turnserver.zip"
 
   @Rem Unarchive the .zip to a directory called "turnserver"
   mkdir coturn & %TAR% -xf turnserver.zip -C coturn
