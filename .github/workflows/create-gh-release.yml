@@ -18,7 +18,7 @@ env:
 jobs:
   build:
     # only run this on the main repo, not forks
-    if: github.repository == 'EpicGamesExt/PixelStreamingInfrastructure'
+    if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
     runs-on: ubuntu-latest
     defaults:
       run:

@@ -12,7 +12,7 @@ If the user continues not to respond, the AFK system waits 10 more seconds befor
 
 Any user interaction with the player panel resets the AFK timer. This includes mouse moves and drags, mouse button presses, keyboard presses, touch events on mobile devices, and custom interactions you set up with the `emitCommand` and `emitUIInteraction` functions.
 
-To use the AFK system, set the following properties in the [`Config`](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/blob/master/Frontend/library/src/Config/Config.ts) object passed used to create a [`PixelStreaming`](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/blob/master/Frontend/library/src/PixelStreaming/PixelStreaming.ts) stream.
+To use the AFK system, set the following properties in the [`Config`](https://github.com/EpicGames/PixelStreamingInfrastructure/blob/master/Frontend/library/src/Config/Config.ts) object passed used to create a [`PixelStreaming`](https://github.com/EpicGames/PixelStreamingInfrastructure/blob/master/Frontend/library/src/PixelStreaming/PixelStreaming.ts) stream.
 
 | Property | Default | Description |
 |    ---   |   ---   |     ---     |
@@ -32,4 +32,4 @@ const stream = new PixelStreaming(config);
 ```
 
 **_Tip:_**
-If you want to customize the content of the overlay, you can replace the [`AFKOverlay`](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/blob/master/Frontend/ui-library/src/Overlay/AFKOverlay.ts) class. You must then also extend the [`Application`](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/blob/master/Frontend/ui-library/src/Application/Application.ts) class in order to use the new overlay.
+If you want to customize the content of the overlay, you can replace the [`AFKOverlay`](https://github.com/EpicGames/PixelStreamingInfrastructure/blob/master/Frontend/ui-library/src/Overlay/AFKOverlay.ts) class. You must then also extend the [`Application`](https://github.com/EpicGames/PixelStreamingInfrastructure/blob/master/Frontend/ui-library/src/Application/Application.ts) class in order to use the new overlay.

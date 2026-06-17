@@ -8,12 +8,12 @@ We have created a [migration guide](/Docs/pixel-streaming-2-migration-guide.md) 
 
 | Health Checks | UE5.8 | UE5.7 | UE5.6 |
 | - | - | - | - |
-| [![Libraries](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-libraries.yml/badge.svg?branch=master)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-libraries.yml) | [![Publish NPM libraries](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/changesets-publish-npm-packages.yml/badge.svg?branch=UE5.8)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/changesets-publish-npm-packages.yml) | [![Publish NPM libraries](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/changesets-publish-npm-packages.yml/badge.svg?branch=UE5.7)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/changesets-publish-npm-packages.yml) | [![Publish NPM libraries](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/changesets-publish-npm-packages.yml/badge.svg?branch=UE5.6)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/changesets-publish-npm-packages.yml) |
-| [![Platform Scripts](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-platform-scripts.yml/badge.svg?branch=master)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-platform-scripts.yml) | [![Publish container images](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/publish-container-images.yml/badge.svg?branch=UE5.8)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/publish-container-images.yml) | [![Publish container images](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/publish-container-images.yml/badge.svg?branch=UE5.7)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/publish-container-images.yml) | [![Publish container images](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/publish-container-images.yml/badge.svg?branch=UE5.6)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/publish-container-images.yml) |
-| [![Signalling Protocol](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-signalling-protocol.yml/badge.svg?branch=master)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-signalling-protocol.yml) | [![Releases](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml/badge.svg?branch=UE5.8)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml) | [![Releases](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml/badge.svg?branch=UE5.7)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml) | [![Releases](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml/badge.svg?branch=UE5.6)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml) |
-| [![Signalling Server Image](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-image-wilbur.yml/badge.svg?branch=master)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-image-wilbur.yml) | | | |
-| [![SFU Docker Image](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-image-sfu.yml/badge.svg?branch=master)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-image-sfu.yml) | | | |
-| [![Documentation Links](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-markdown-links.yml/badge.svg?branch=master)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-markdown-links.yml) | | | |
+| [![Libraries](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/healthcheck-libraries.yml/badge.svg?branch=master)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/healthcheck-libraries.yml) | [![Publish NPM libraries](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/changesets-publish-npm-packages.yml/badge.svg?branch=UE5.8)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/changesets-publish-npm-packages.yml) | [![Publish NPM libraries](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/changesets-publish-npm-packages.yml/badge.svg?branch=UE5.7)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/changesets-publish-npm-packages.yml) | [![Publish NPM libraries](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/changesets-publish-npm-packages.yml/badge.svg?branch=UE5.6)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/changesets-publish-npm-packages.yml) |
+| [![Platform Scripts](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/healthcheck-platform-scripts.yml/badge.svg?branch=master)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/healthcheck-platform-scripts.yml) | [![Publish container images](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/publish-container-images.yml/badge.svg?branch=UE5.8)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/publish-container-images.yml) | [![Publish container images](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/publish-container-images.yml/badge.svg?branch=UE5.7)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/publish-container-images.yml) | [![Publish container images](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/publish-container-images.yml/badge.svg?branch=UE5.6)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/publish-container-images.yml) |
+| [![Signalling Protocol](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/healthcheck-signalling-protocol.yml/badge.svg?branch=master)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/healthcheck-signalling-protocol.yml) | [![Releases](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml/badge.svg?branch=UE5.8)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml) | [![Releases](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml/badge.svg?branch=UE5.7)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml) | [![Releases](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml/badge.svg?branch=UE5.6)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/create-gh-release.yml) |
+| [![Signalling Server Image](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/healthcheck-image-wilbur.yml/badge.svg?branch=master)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/healthcheck-image-wilbur.yml) | | | |
+| [![SFU Docker Image](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/healthcheck-image-sfu.yml/badge.svg?branch=master)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/healthcheck-image-sfu.yml) | | | |
+| [![Documentation Links](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/healthcheck-markdown-links.yml/badge.svg?branch=master)](https://github.com/EpicGames/PixelStreamingInfrastructure/actions/workflows/healthcheck-markdown-links.yml) | | | |
 
 # The official home for the Pixel Streaming servers and frontend!
 The frontend and web server elements for Unreal Pixel Streaming (previously located in `Samples/PixelStreaming/WebServers`) are now in this repository, for all to contribute to. They are referred to as the **Pixel Streaming Infrastructure**.
@@ -113,7 +113,7 @@ npm i @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.8
 
 ### Tagged source releases + built typescript frontend
 
-[Github releases](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/releases)
+[Github releases](https://github.com/EpicGames/PixelStreamingInfrastructure/releases)
 
 ## Versions
 
@@ -121,22 +121,22 @@ We maintain versions of the servers and frontend that are compatible with existi
 
 :warning: **There are breaking changes between UE versions - so make sure you get the right version**. :warning:
 
-<ins>For a list of major changes between versions please refer to the [changelog](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/blob/master/CHANGELOG.md).</ins>
+<ins>For a list of major changes between versions please refer to the [changelog](https://github.com/EpicGames/PixelStreamingInfrastructure/blob/master/CHANGELOG.md).</ins>
 
 This repository contains the following in branches that track Unreal Engine versions:
 
 | Branch | Status |
 |--------|--------|
-|[Master](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/tree/master)| Dev |
-|[UE5.8](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/tree/UE5.8)| Current |
-|[UE5.7](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/tree/UE5.7)| Supported |
-|[UE5.6](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/tree/UE5.6)| End of life |
-|[UE5.5](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/tree/UE5.5)| Unsupported |
+|[Master](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/master)| Dev |
+|[UE5.8](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.8)| Current |
+|[UE5.7](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.7)| Supported |
+|[UE5.6](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.6)| End of life |
+|[UE5.5](https://github.com/EpicGames/PixelStreamingInfrastructure/tree/UE5.5)| Unsupported |
 
 | Legend | Meaning |
 |---------|-----------|
 | Dev | This is our dev branch, intended to be paired with [ue5-main](https://github.com/EpicGames/UnrealEngine/tree/ue5-main) - experimental. |
-|Pre-release| Code in here will be paired with the next UE release, we periodically update this branch from `master`. |
+| Pre-release | Code in here will be paired with the next UE release, we periodically update this branch from `master`. |
 | Current | Supported and this is the branch tracking the **latest released** version of UE. |
 | Supported | We will accept bugfixes/issues for this version. |
 | End of life | Once the next UE version is released we will not support this version anymore. |

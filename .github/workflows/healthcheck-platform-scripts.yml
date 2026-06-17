@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   run-script-linux:
-    if: github.repository == 'EpicGamesExt/PixelStreamingInfrastructure'
+    if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -24,7 +24,7 @@ jobs:
           curl --retry 10 --retry-delay 20 --retry-connrefused http://localhost:999/api/status
 
   run-script-macos:
-    if: github.repository == 'EpicGamesExt/PixelStreamingInfrastructure'
+    if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
     runs-on: macos-latest
     steps:
       - name: Checkout source code
@@ -36,7 +36,7 @@ jobs:
           curl --retry 10 --retry-delay 20 --retry-connrefused http://localhost:999/api/status
 
   run-script-windows:
-    if: github.repository == 'EpicGamesExt/PixelStreamingInfrastructure'
+    if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
     runs-on: windows-latest
     steps:
       - name: Checkout source code
