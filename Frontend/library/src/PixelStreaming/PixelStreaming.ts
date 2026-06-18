@@ -790,7 +790,11 @@ export class PixelStreaming {
      * @returns true if succeeded, false if rejected
      */
     public emitUIInteraction(descriptor: object | string) {
-        if (!this._webRtcController.videoPlayer.isVideoReady()) {
+        // A UIInteraction only needs the (reliable, ordered) data channel, which opens before
+        // the video is decode-ready. Gating on isVideoReady() instead would silently drop early
+        // interactions until the first video frame arrives - a problem on slow links where the
+        // application may be waiting on this message before it starts streaming video.
+        if (!this._webRtcController.isDataChannelOpen()) {
             return false;
         }
         this._webRtcController.emitUIInteraction(descriptor);

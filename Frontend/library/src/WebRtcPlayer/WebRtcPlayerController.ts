@@ -1810,6 +1810,14 @@ export class WebRtcPlayerController {
     }
 
     /**
+     * Checks whether the to-streamer (send) data channel is open and ready to send.
+     * @returns true if the data channel exists and its readyState is 'open'.
+     */
+    isDataChannelOpen(): boolean {
+        return this.sendrecvDataChannelController?.dataChannel?.readyState === 'open';
+    }
+
+    /**
      * Send a UIInteraction message
      */
     emitUIInteraction(descriptor: object | string) {
