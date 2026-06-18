@@ -22,6 +22,6 @@
         "@epicgames-ps/mediasoup-sdp-bridge": "^1.0.0",
         "minimist": "^1.2.8",
         "run-script-os": "^1.1.6",
-        "ws": "^7.5.10"
+        "ws": "^7.5.11"
     }
 }
