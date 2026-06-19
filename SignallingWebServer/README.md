@@ -50,6 +50,8 @@ Options:
   --player_port <port>          Sets the listening port for player connections. (default: "80")
   --sfu_port <port>             Sets the listening port for SFU connections. (default: "8889")
   --max_players <number>        Sets the maximum number of subscribers per streamer. 0 = unlimited (default: "0")
+  --player_keepalive_timeout <milliseconds>
+                                Disconnect a player after this many milliseconds without a keepalive response. 0 = disabled (default: "30000")
   --serve                       Enables the webserver on player_port. (default: true)
   --http_root <path>            Sets the path for the webserver root. (default: "D:\\PixelStreamingInfrastructure\\SignallingWebServer\\www")
   --homepage <filename>         The default html file to serve on the web server. (default: "player.html")
