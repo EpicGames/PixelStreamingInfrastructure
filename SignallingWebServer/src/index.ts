@@ -108,6 +108,11 @@ program
         'Sets the maximum number of subscribers per streamer. 0 = unlimited',
         config_file.max_players || '0'
     )
+    .option(
+        '--player_keepalive_timeout <milliseconds>',
+        'Disconnect a player after this many milliseconds without a keepalive response. 0 = disabled',
+        config_file.player_keepalive_timeout || '30000'
+    )
     .option('--serve', 'Enables the webserver on player_port.', config_file.serve || false)
     .option(
         '--http_root <path>',
@@ -270,7 +275,8 @@ const serverOpts: IServerConfig = {
     playerPort: options.player_port,
     sfuPort: options.sfu_port,
     peerOptions: options.peer_options,
-    maxSubscribers: options.max_players
+    maxSubscribers: options.max_players,
+    playerKeepaliveTimeout: Number(options.player_keepalive_timeout)
 };
 
 const shouldServerStart = options.serve || options.rest_api;

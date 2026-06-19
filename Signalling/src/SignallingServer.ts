@@ -8,7 +8,12 @@ import { SFUConnection } from './SFUConnection';
 import { Logger } from './Logger';
 import { StreamerRegistry } from './StreamerRegistry';
 import { PlayerRegistry } from './PlayerRegistry';
-import { Messages, MessageHelpers, SignallingProtocol } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
+import {
+    Messages,
+    MessageHelpers,
+    SignallingProtocol,
+    KeepaliveMonitor
+} from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
 import { stringify } from './Utils';
 
 /**
@@ -45,6 +50,10 @@ export interface IServerConfig {
 
     // Max number of players per streamer.
     maxSubscribers?: number;
+
+    // Idle timeout in milliseconds after which a player that has stopped responding to keepalive
+    // pings is forcibly disconnected. 0 (the default) disables the check.
+    playerKeepaliveTimeout?: number;
 }
 
 export type ProtocolConfig = {
@@ -158,6 +167,25 @@ export class SignallingServer {
             this.playerRegistry.remove(newPlayer);
             Logger.info(`Player %s (%s) disconnected.`, newPlayer.playerId, request.socket.remoteAddress);
         });
+
+        // Optionally monitor the player connection for liveness. A player whose socket dies without
+        // a clean close frame (sleeping laptop, dropped Wi-Fi, killed tab) is otherwise only removed
+        // once the OS TCP keepalive eventually reaps it, leaving it subscribed in the meantime. When
+        // maxSubscribers is set this can hold a slot that no live player is using. We use
+        // ws.terminate() rather than a graceful close because a dead peer never completes the close
+        // handshake. The monitor stops itself on transport 'close', so no manual teardown is needed.
+        const keepaliveTimeout = this.config.playerKeepaliveTimeout || 0;
+        if (keepaliveTimeout > 0) {
+            const keepalive = new KeepaliveMonitor(newPlayer.protocol, keepaliveTimeout);
+            keepalive.onTimeout = () => {
+                Logger.info(
+                    `Player %s (%s) failed keepalive - terminating dead connection.`,
+                    newPlayer.playerId,
+                    request.socket.remoteAddress
+                );
+                ws.terminate();
+            };
+        }
 
         this.sendConfigMessage(newPlayer);
     }
