@@ -44,7 +44,9 @@ jobs:
         if: steps.prune.outputs.removed_count != '0'
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Org policy forbids the default GITHUB_TOKEN from creating PRs, so a
+          # PAT (repo + workflow scope) is required here.
+          token: ${{ secrets.AUTOMATION_PAT }}
           base: master
           branch: automated/prune-changesets
           delete-branch: true
