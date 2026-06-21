@@ -36,7 +36,9 @@ jobs:
       - name: Create Release Pull Request
         uses: changesets/action@v1.4.10
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Org policy forbids the default GITHUB_TOKEN from creating PRs, so a
+          # PAT (repo + workflow scope) is required to open the release PR.
+          GITHUB_TOKEN: ${{ secrets.AUTOMATION_PAT }}
         with:
           title: '[Bot] NPM Packages Release ${{ github.ref_name }}'
           commit: 'Updated NPM changelogs'
