@@ -741,7 +741,7 @@ export class PixelStreaming {
      * NOTE: There are plans to refactor all request* functions. Expect changes if you use this!
      */
     public requestDataChannelLatencyTest(config: DataChannelLatencyTestConfig) {
-        if (!this._webRtcController.videoPlayer.isVideoReady()) {
+        if (!this._webRtcController.isDataChannelOpen()) {
             return false;
         }
         if (!this._dataChannelLatencyTestController) {
@@ -764,7 +764,7 @@ export class PixelStreaming {
      * @returns
      */
     public requestShowFps() {
-        if (!this._webRtcController.videoPlayer.isVideoReady()) {
+        if (!this._webRtcController.isDataChannelOpen()) {
             return false;
         }
         this._webRtcController.sendShowFps();
@@ -790,7 +790,11 @@ export class PixelStreaming {
      * @returns true if succeeded, false if rejected
      */
     public emitUIInteraction(descriptor: object | string) {
-        if (!this._webRtcController.videoPlayer.isVideoReady()) {
+        // A UIInteraction only needs the (reliable, ordered) data channel, which opens before
+        // the video is decode-ready. Gating on isVideoReady() instead would silently drop early
+        // interactions until the first video frame arrives - a problem on slow links where the
+        // application may be waiting on this message before it starts streaming video.
+        if (!this._webRtcController.isDataChannelOpen()) {
             return false;
         }
         this._webRtcController.emitUIInteraction(descriptor);
@@ -803,7 +807,7 @@ export class PixelStreaming {
      * @returns true if succeeded, false if rejected
      */
     public emitCommand(descriptor: object) {
-        if (!this._webRtcController.videoPlayer.isVideoReady()) {
+        if (!this._webRtcController.isDataChannelOpen()) {
             return false;
         }
         if (!this.allowConsoleCommands && 'ConsoleCommand' in descriptor) {
@@ -819,7 +823,7 @@ export class PixelStreaming {
      * @returns true if succeeded, false if rejected
      */
     public emitConsoleCommand(command: string) {
-        if (!this.allowConsoleCommands || !this._webRtcController.videoPlayer.isVideoReady()) {
+        if (!this.allowConsoleCommands || !this._webRtcController.isDataChannelOpen()) {
             return false;
         }
         this._webRtcController.emitConsoleCommand(command);
@@ -832,7 +836,7 @@ export class PixelStreaming {
      * @returns True if the message could be sent.
      */
     public sendTextboxEntry(contents: string): boolean {
-        if (!this._webRtcController.videoPlayer.isVideoReady()) {
+        if (!this._webRtcController.isDataChannelOpen()) {
             return false;
         }
         this._webRtcController.sendTextboxEntry(contents);
