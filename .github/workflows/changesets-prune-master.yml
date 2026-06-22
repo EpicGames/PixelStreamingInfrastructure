@@ -24,6 +24,8 @@ permissions:
 
 jobs:
   prune:
+    # only run this on the main repo, not forks
+    if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
     name: Prune
     runs-on: ubuntu-latest
     steps:
