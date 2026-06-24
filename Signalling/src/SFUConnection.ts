@@ -1,4 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
+import type { IncomingMessage } from 'http';
 import WebSocket from 'ws';
 import {
     ITransport,
@@ -45,6 +46,8 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
     subscribedStreamer: IStreamer | null;
     // A descriptive string describing the remote address of this connection.
     remoteAddress?: string;
+    // The HTTP upgrade request that opened this connection, if available.
+    request?: IncomingMessage;
     // The max number of subscribed players at a time. A value of 0 means there is no limit (this the default).
     maxSubscribers: number;
     // A list of all the current subscribed players.
@@ -60,8 +63,9 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
      * @param server - The signalling server object that spawned this sfu.
      * @param ws - The websocket coupled to this sfu connection.
      * @param remoteAddress - The remote address of this connection. Only used as display.
+     * @param request - The HTTP upgrade request that opened this connection, if available.
      */
-    constructor(server: SignallingServer, ws: WebSocket, remoteAddress?: string) {
+    constructor(server: SignallingServer, ws: WebSocket, remoteAddress?: string, request?: IncomingMessage) {
         super();
 
         this.server = server;
@@ -71,6 +75,7 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
         this.streamerId = '';
         this.streaming = false;
         this.remoteAddress = remoteAddress;
+        this.request = request;
         this.subscribedStreamer = null;
         this.maxSubscribers = 0;
         this.subscribers = new Set();
