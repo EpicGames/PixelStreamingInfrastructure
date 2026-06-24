@@ -180,6 +180,9 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
         }
 
         this.subscribedStreamer = streamer;
+        // Register as a subscriber of the upstream streamer so it will forward signalling messages
+        // back to this SFU (the streamer's forwardMessage only sends to subscribed players).
+        this.subscribedStreamer.subscribers.add(this.playerId);
         this.subscribedStreamer.on('layer_preference', this.layerPreferenceListener);
         this.subscribedStreamer.on('id_changed', this.streamerIdChangeListener);
         this.subscribedStreamer.on('disconnect', this.streamerDisconnectedListener);
@@ -202,6 +205,7 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
         });
         this.sendToStreamer(disconnectedMessage);
 
+        this.subscribedStreamer.subscribers.delete(this.playerId);
         this.subscribedStreamer.off('layer_preference', this.layerPreferenceListener);
         this.subscribedStreamer.off('id_changed', this.streamerIdChangeListener);
         this.subscribedStreamer.off('disconnect', this.streamerDisconnectedListener);
@@ -229,6 +233,14 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
         if (!message.playerId) {
             Logger.error(
                 `SFU ${this.streamerId} trying to send a message to a player with no playerId. Ignored.`
+            );
+            return;
+        }
+        if (!this.subscribers.has(message.playerId)) {
+            // Only send to players subscribed to this SFU, otherwise the SFU could target any player
+            // on the server via the global player registry (cross-tenant signalling).
+            Logger.error(
+                `SFU ${this.streamerId} tried to send a message to player ${message.playerId} which is not subscribed to it. Ignored.`
             );
             return;
         }
