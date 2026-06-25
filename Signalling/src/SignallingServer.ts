@@ -6,7 +6,7 @@ import { StreamerConnection } from './StreamerConnection';
 import { PlayerConnection } from './PlayerConnection';
 import { SFUConnection } from './SFUConnection';
 import { Logger } from './Logger';
-import { StreamerRegistry } from './StreamerRegistry';
+import { StreamerRegistry, StreamerIdAuthorizer } from './StreamerRegistry';
 import { PlayerRegistry } from './PlayerRegistry';
 import {
     Messages,
@@ -54,6 +54,12 @@ export interface IServerConfig {
     // Idle timeout in milliseconds after which a player that has stopped responding to keepalive
     // pings is forcibly disconnected. 0 (the default) disables the check.
     playerKeepaliveTimeout?: number;
+
+    // Optional hook to authorize (or override) the id a streamer registers as when it identifies
+    // itself. This is the seam for consumer-supplied anti-squatting / ownership policy; the project
+    // ships no authentication of its own. See StreamerIdAuthorizer. When omitted, the default
+    // behaviour is unchanged (requested id accepted, numeric suffix appended on collision).
+    authorizeStreamerId?: StreamerIdAuthorizer;
 }
 
 export type ProtocolConfig = {
@@ -81,7 +87,7 @@ export class SignallingServer {
         Logger.debug('Started SignallingServer with config: %s', stringify(config));
 
         this.config = config;
-        this.streamerRegistry = new StreamerRegistry();
+        this.streamerRegistry = new StreamerRegistry(config.authorizeStreamerId);
         this.playerRegistry = new PlayerRegistry();
         this.protocolConfig = {
             protocolVersion: SignallingProtocol.SIGNALLING_VERSION,
@@ -139,7 +145,7 @@ export class SignallingServer {
     private onStreamerConnected(ws: wslib.WebSocket, request: http.IncomingMessage) {
         Logger.info(`New streamer connection: %s`, request.socket.remoteAddress);
 
-        const newStreamer = new StreamerConnection(this, ws, request.socket.remoteAddress);
+        const newStreamer = new StreamerConnection(this, ws, request.socket.remoteAddress, request);
         newStreamer.maxSubscribers = this.config.maxSubscribers || 0;
 
         // add it to the registry and when the transport closes, remove it.
@@ -159,7 +165,7 @@ export class SignallingServer {
     private onPlayerConnected(ws: wslib.WebSocket, request: http.IncomingMessage) {
         Logger.info(`New player connection: %s (%s)`, request.socket.remoteAddress, request.url);
 
-        const newPlayer = new PlayerConnection(this, ws, request.socket.remoteAddress);
+        const newPlayer = new PlayerConnection(this, ws, request.socket.remoteAddress, request);
 
         // add it to the registry and when the transport closes, remove it
         this.playerRegistry.add(newPlayer);
@@ -192,7 +198,7 @@ export class SignallingServer {
 
     private onSFUConnected(ws: wslib.WebSocket, request: http.IncomingMessage) {
         Logger.info(`New SFU connection: %s`, request.socket.remoteAddress);
-        const newSFU = new SFUConnection(this, ws, request.socket.remoteAddress);
+        const newSFU = new SFUConnection(this, ws, request.socket.remoteAddress, request);
 
         // SFU acts as both a streamer and player
         this.streamerRegistry.add(newSFU);

@@ -1,4 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
+import type { IncomingMessage } from 'http';
 import { SignallingProtocol, BaseMessage, EventEmitter } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
 import { Logger } from './Logger';
 import { IMessageLogger } from './LoggingUtils';
@@ -12,6 +13,10 @@ export interface IPlayer extends IMessageLogger {
     playerId: string;
     protocol: SignallingProtocol;
     subscribedStreamer: IStreamer | null;
+    // The HTTP upgrade request that opened this connection, if available. Lets a consumer-supplied
+    // verifyClient (or other front door) attach an authenticated identity to the request and
+    // recover it here. The signalling server itself does not read this.
+    request?: IncomingMessage;
 
     sendMessage(message: BaseMessage): void;
     getPlayerInfo(): IPlayerInfo;
