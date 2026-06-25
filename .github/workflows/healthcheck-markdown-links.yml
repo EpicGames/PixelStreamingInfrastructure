@@ -1,13 +1,11 @@
 name: Check health of document links
 
 on:
+  # Manual-only. The automatic pull_request/push triggers were removed: the
+  # checker fails the whole job on any single flaky external link (e.g. a CDN
+  # returning 4xx to CI runners), which created noise and blocked PRs for little
+  # benefit. Run it on demand from the Actions tab when a link sweep is wanted.
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "**.md" # Trigger only when md files are in a PR
-  push:
-    paths:
-      - '**.md'  # Trigger only when md files are pushed
 
 permissions:
   contents: read
