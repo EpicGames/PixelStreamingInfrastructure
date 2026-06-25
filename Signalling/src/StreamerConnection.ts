@@ -1,4 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
+import type { IncomingMessage } from 'http';
 import WebSocket from 'ws';
 import {
     ITransport,
@@ -38,6 +39,8 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
     streaming: boolean;
     // A descriptive string describing the remote address of this connection.
     remoteAddress?: string;
+    // The HTTP upgrade request that opened this connection, if available.
+    request?: IncomingMessage;
     // The max number of subscribed players at a time.
     maxSubscribers: number;
     // A list of all the current subscribed players.
@@ -51,8 +54,9 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
      * @param server - The signalling server object that spawned this streamer.
      * @param ws - The websocket coupled to this streamer connection.
      * @param remoteAddress - The remote address of this connection. Only used as display.
+     * @param request - The HTTP upgrade request that opened this connection, if available.
      */
-    constructor(server: SignallingServer, ws: WebSocket, remoteAddress?: string) {
+    constructor(server: SignallingServer, ws: WebSocket, remoteAddress?: string, request?: IncomingMessage) {
         super();
 
         this.server = server;
@@ -61,6 +65,7 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
         this.protocol = new SignallingProtocol(this.transport);
         this.streaming = false;
         this.remoteAddress = remoteAddress;
+        this.request = request;
         this.maxSubscribers = 0;
         this.subscribers = new Set();
 
