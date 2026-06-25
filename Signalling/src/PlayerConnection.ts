@@ -1,4 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
+import type { IncomingMessage } from 'http';
 import WebSocket from 'ws';
 import {
     ITransport,
@@ -36,6 +37,8 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
     subscribedStreamer: IStreamer | null;
     // A descriptive string describing the remote address of this connection.
     remoteAddress?: string;
+    // The HTTP upgrade request that opened this connection, if available.
+    request?: IncomingMessage;
 
     private server: SignallingServer;
     private streamerIdChangeListener: (newId: string) => void;
@@ -47,14 +50,16 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
      * @param server - The signalling server object that spawned this player.
      * @param ws - The websocket coupled to this player connection.
      * @param remoteAddress - The remote address of this connection. Only used as display.
+     * @param request - The HTTP upgrade request that opened this connection, if available.
      */
-    constructor(server: SignallingServer, ws: WebSocket, remoteAddress?: string) {
+    constructor(server: SignallingServer, ws: WebSocket, remoteAddress?: string, request?: IncomingMessage) {
         this.server = server;
         this.playerId = '';
         this.subscribedStreamer = null;
         this.transport = new WebSocketTransportNJS(ws);
         this.protocol = new SignallingProtocol(this.transport);
         this.remoteAddress = remoteAddress;
+        this.request = request;
 
         this.transport.on('error', this.onTransportError.bind(this));
         this.transport.on('close', this.onTransportClose.bind(this));
