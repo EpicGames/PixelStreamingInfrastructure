@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import type { SettingText, TextParametersIds } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.7';
+import type { SettingText, TextParametersIds } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.8';
 import { SettingUIBase } from './SettingUIBase';
 
 export class SettingUIText<CustomIds extends string = TextParametersIds> extends SettingUIBase {

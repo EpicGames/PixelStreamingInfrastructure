@@ -1,7 +1,7 @@
 import { Page } from 'playwright';
 import { Streamer, DataProtocol } from '@epicgames-ps/js-streamer';
 import { delay } from './helpers';
-import { PixelStreaming, WebRtcSdpAnswerEvent } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.7';
+import { PixelStreaming, WebRtcSdpAnswerEvent } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.8';
 
 declare global {
     interface Window {

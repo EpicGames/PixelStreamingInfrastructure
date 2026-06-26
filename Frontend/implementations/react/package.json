@@ -1,5 +1,5 @@
 {
-    "name": "@epicgames-ps/react-pixelstreamingfrontend-react-ue5.7",
+    "name": "@epicgames-ps/react-pixelstreamingfrontend-react-ue5.8",
     "version": "0.1.0",
     "description": "",
     "main": "./src/index.tsx",
@@ -25,7 +25,7 @@
         "webpack-cli": "^6.0.1"
     },
     "dependencies": {
-        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.7": "*",
+        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.8": "*",
         "react": "^19.0.0",
         "react-dom": "^19.0.0"
     }

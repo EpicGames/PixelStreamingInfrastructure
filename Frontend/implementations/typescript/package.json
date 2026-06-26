@@ -1,5 +1,5 @@
 {
-    "name": "@epicgames-ps/reference-pixelstreamingfrontend-ue5.7",
+    "name": "@epicgames-ps/reference-pixelstreamingfrontend-ue5.8",
     "version": "0.1.0",
     "description": "",
     "main": "./src/player.ts",
@@ -24,8 +24,8 @@
         "webpack-cli": "^6.0.1"
     },
     "dependencies": {
-        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.7": "*",
-        "@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.7": "*"
+        "@epicgames-ps/lib-pixelstreamingfrontend-ue5.8": "*",
+        "@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.8": "*"
     },
     "repository": {
         "type": "git",

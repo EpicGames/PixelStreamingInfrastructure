@@ -6,7 +6,7 @@ import {
     MessageHelpers,
     BaseMessage,
     EventEmitter
-} from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
+} from '@epicgames-ps/lib-pixelstreamingcommon-ue5.8';
 import type { IncomingMessage } from 'http';
 import { Logger } from './Logger';
 import { IMessageLogger } from './LoggingUtils';

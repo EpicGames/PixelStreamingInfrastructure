@@ -1,7 +1,7 @@
 import { test } from './fixtures';
 import { expect } from './matchers';
 import * as helpers from './helpers';
-import { StatsReceivedEvent } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.7';
+import { StatsReceivedEvent } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.8';
 
 // NOTE: add a new test to check qp values
 

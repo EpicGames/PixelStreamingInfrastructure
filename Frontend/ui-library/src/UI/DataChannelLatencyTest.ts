@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-import { Logger, DataChannelLatencyTestResult } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.7';
+import { Logger, DataChannelLatencyTestResult } from '@epicgames-ps/lib-pixelstreamingfrontend-ue5.8';
 import { StatsSections } from './UIConfigurationTypes';
 
 /**

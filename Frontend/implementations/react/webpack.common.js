@@ -69,9 +69,6 @@ module.exports = {
       globalObject: 'this',
       hashFunction: 'xxhash64',
     },
-    experiments: {
-      futureDefaults: true
-    },
 	devServer: {
     	static: {
     		directory: path.join(__dirname, './dist'),

@@ -11,7 +11,8 @@ The repository maintains parallel long-lived branches, each corresponding to a v
 | Branch | Role |
 |--------|------|
 | `master` | Active development. Paired with UE's `ue5-main`. This is where all new work lands first. |
-| `UE5.7` | Current release — tracks the latest shipped UE version. Bug fixes accepted. |
+| `UE5.8` | Current release — tracks the latest shipped UE version. Bug fixes accepted. |
+| `UE5.7` | Supported — bug fixes accepted. |
 | `UE5.6` | Supported — bug fixes accepted. |
 | `UE5.5` | End of life — no further support. |
 | `UE5.4` and earlier | Unsupported. |
@@ -131,9 +132,9 @@ PRs that touch public packages without a changeset will be flagged by the Change
 
 ### 5. Add backport labels if appropriate
 
-If the fix is relevant to a supported release branch (`UE5.7`, `UE5.6`), add the labels:
+If the fix is relevant to a supported release branch (`UE5.8`, `UE5.7`, `UE5.6`), add the labels:
 - `auto-backport` — required, triggers the automation
-- `auto-backport-to-UE5.7` — one label per target branch
+- `auto-backport-to-UE5.8` — one label per target branch
 
 The backport runs automatically after your PR is merged. It creates a separate PR on each target branch using a squash merge. If the backport cannot be applied cleanly (conflicts), it will still create a PR but leave it for manual resolution.
 
@@ -183,13 +184,13 @@ Merging the Version PR changes `package.json` files, which triggers `changesets-
 1. Compares each public package's version in the repo against what is on npm
 2. For any package with a newer version, runs `npm install`, `npm run build`, and `npm publish` — in workspace dependency order (Common first, then its dependents)
 3. Waits for each package to be confirmed available on the registry before moving to the next (avoids install failures due to propagation lag)
-4. Creates a git tag for each published package (e.g. `lib-pixelstreamingcommon-ue5.7-0.1.4`)
+4. Creates a git tag for each published package (e.g. `lib-pixelstreamingcommon-ue5.8-0.1.0`)
 5. Creates a GitHub release for each package with source archives
 
 ### Step 5 — Docker images published automatically
 
 When `SignallingWebServer/package.json` or `SFU/package.json` changes on a `UE*` branch (which happens as part of the Version PR merge), the corresponding publish workflow fires:
-- Builds and pushes the Docker image to Docker Hub tagged with the UE version (e.g. `5.7`)
+- Builds and pushes the Docker image to Docker Hub tagged with the UE version (e.g. `5.8`)
 - Creates a git tag for the image release
 
 Docker Hub repositories:
@@ -200,7 +201,7 @@ Docker Hub repositories:
 
 The full-repository source release is separate and **intentionally manual**. It is triggered by updating the `RELEASE_VERSION` file on a `UE*` branch. When that file is pushed, `create-gh-release` runs and:
 - Packages the repository source (excluding `.git`, `.github`, docs, and `Extras`) into `.tar.gz` and `.zip` archives
-- Creates a GitHub release at a tag like `UE5.7-0.1.2`
+- Creates a GitHub release at a tag like `UE5.8-0.1.0`
 
 This step is decoupled from the npm publish cycle and is typically done when the team wants to ship a milestone source snapshot alongside the UE release.
 
