@@ -1,0 +1,6 @@
+# Re-include the generated TypeScript declarations. dist/ is ignored via the
+# parent Frontend/.gitignore; npm still ships dist/cjs and dist/esm only because
+# they're referenced by package.json "main"/"module", but nothing forces the
+# "types" output, so it must be un-ignored explicitly. Without this the
+# published tarball ships no .d.ts files (see issue #934).
+!dist/types/**
