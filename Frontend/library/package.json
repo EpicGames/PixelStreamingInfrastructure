@@ -1,6 +1,6 @@
 {
     "name": "@epicgames-ps/lib-pixelstreamingfrontend-ue5.8",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Frontend library for Unreal Engine 5.8 Pixel Streaming",
     "main": "dist/cjs/pixelstreamingfrontend.js",
     "module": "dist/esm/pixelstreamingfrontend.js",
