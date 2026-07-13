@@ -1,5 +1,13 @@
 # @epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.6
 
+## 0.1.1
+
+### Patch Changes
+
+- f72438c: Include generated TypeScript declaration files in the published frontend packages.
+- Updated dependencies [f72438c]
+    - @epicgames-ps/lib-pixelstreamingfrontend-ue5.8@0.1.1
+
 ## 0.1.3
 
 ### Patch Changes

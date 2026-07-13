@@ -1,5 +1,11 @@
 # @epicgames-ps/lib-pixelstreamingfrontend-ue5.6
 
+## 0.1.1
+
+### Patch Changes
+
+- f72438c: Include generated TypeScript declaration files in the published frontend packages.
+
 ## 0.2.2
 
 ### Patch Changes
