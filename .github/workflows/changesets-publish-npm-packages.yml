@@ -2,10 +2,15 @@ name: Publish NPM packages
 
 on:
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run: build and 'npm publish --dry-run' every publishable package (ignoring version checks) so you can inspect the tarball contents in the logs. Nothing is published, tagged, or released."
+        type: boolean
+        default: false
   push:
-    branches: 
+    branches:
       - 'UE*'
-    paths: 
+    paths:
       - '**/package.json'
 
 # This makes the matrix of jobs to run one at a time.
@@ -21,6 +26,8 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    env:
+      DRY_RUN: ${{ inputs.dry_run == true }}
     outputs:
       matrix: ${{ steps.query-packages.outputs.matrix }}
     steps:
@@ -38,6 +45,12 @@ jobs:
             package_name=$(echo $row | jq -r '.name')
             package_short_name=${package_name#@epicgames-ps/}
             package_version=$(echo $row | jq -r '.version')
+            # In dry-run we want to inspect every publishable package, so skip
+            # the "is this version newer than what's published" filter entirely.
+            if [ "$DRY_RUN" = "true" ]; then
+              to_publish+=($(echo $row | jq -c ". + { \"tag\": \"${package_short_name}\" }"))
+              continue
+            fi
             package_published=$(npm show "$package_name" version 2>/dev/null || echo "0.0.0")
             if [ "$(printf "%s\n%s" "$package_published" "$package_version" | sort -V | tail -n1)" = "$package_version" ] && [ "$package_version" != "$package_published" ]; then
               to_publish+=($(echo $row | jq -c ". + { \"tag\": \"${package_short_name}\" }"))
@@ -55,6 +68,8 @@ jobs:
     permissions:
       id-token: write # Required for OIDC
       contents: write
+    env:
+      DRY_RUN: ${{ inputs.dry_run == true }}
     if: ${{ fromJSON(needs.fetch-package-info.outputs.matrix).count > 0 }}
     strategy:
       max-parallel: 1
@@ -86,13 +101,20 @@ jobs:
         run: |
           npm install
           npm run build
-          npm publish --access public
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "::notice title=Dry run::Packing ${{ matrix.package.name }} without publishing. Inspect 'Tarball Contents' below."
+            npm publish --dry-run --access public
+          else
+            npm publish --access public
+          fi
 
       - name: Build the version label
+        if: ${{ inputs.dry_run != true }}
         id: build-label
         run: echo "label=${{ matrix.package.tag }}-${{ matrix.package.version }}" >> $GITHUB_OUTPUT
 
       - name: Create or update release tag
+        if: ${{ inputs.dry_run != true }}
         uses: actions/github-script@v5
         with:
           script: |
@@ -119,12 +141,14 @@ jobs:
             }
 
       - name: Split up the archive paths so the path in the archives is nice.
+        if: ${{ inputs.dry_run != true }}
         id: split-paths
         run: |
           echo "basename=$(basename ${{ matrix.package.path }})" >> $GITHUB_OUTPUT
           echo "dirname=$(dirname ${{ matrix.package.path }})" >> $GITHUB_OUTPUT
 
       - name: Archive Release tar.gz
+        if: ${{ inputs.dry_run != true }}
         uses: thedoctor0/zip-release@0.7.1
         with:
           directory: ${{ steps.split-paths.outputs.dirname }}
@@ -135,6 +159,7 @@ jobs:
             node_modules
 
       - name: Archive Release zip
+        if: ${{ inputs.dry_run != true }}
         uses: thedoctor0/zip-release@0.7.1
         with:
           directory: ${{ steps.split-paths.outputs.dirname }}
@@ -145,6 +170,7 @@ jobs:
             /${{ steps.split-paths.outputs.basename }}/node_modules/*
 
       - name: Make the release
+        if: ${{ inputs.dry_run != true }}
         uses: ncipollo/release-action@v1
         with:
           tag: "${{ steps.build-label.outputs.label }}"
@@ -154,6 +180,7 @@ jobs:
           bodyFile: ${{ matrix.package.path }}/CHANGELOG.md
 
       - name: Wait for package to propagate on npm registry
+        if: ${{ inputs.dry_run != true }}
         run: |
           PACKAGE="${{ matrix.package.name }}"
           VERSION="${{ matrix.package.version }}"
