@@ -1,5 +1,5 @@
 {
-    "name": "frontend-tests",
+    "name": "@epicgames-ps/frontend-tests",
     "version": "1.0.1",
     "description": "",
     "main": "index.js",
