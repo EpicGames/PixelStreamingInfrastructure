@@ -53,66 +53,71 @@ set TURN_PASS=
 set STUN_SERVER=
 set PUBLIC_IP=
 :arg_loop
-IF "%1"=="" GOTO LoopExit
-IF "%1"=="--" GOTO PostArgs
+IF "%~1"=="" GOTO LoopExit
+IF "%~1"=="--" GOTO PostArgs
 set HANDLED=0
-IF "%1"=="--help" (
+IF "%~1"=="--help" (
     CALL :Usage
     exit /b
 )
-IF "%1"=="--publicip" (
+IF "%~1"=="--publicip" (
     set HANDLED=1
-    set PUBLIC_IP=%2
+    set "PUBLIC_IP=%~2"
     SHIFT
 )
-IF "%1"=="--turn" (
+rem Values are assigned with the set "VAR=value" form, and compared with %~1
+rem rather than %1, so that cmd.exe does not re-parse operators (&, |, ^, >)
+rem appearing in a value. Both are required: SHIFT happens inside the matched
+rem block, so every comparison below it in the same pass is evaluated against
+rem the argument's value rather than the next flag.
+IF "%~1"=="--turn" (
     set HANDLED=1
-    set TURN_SERVER=%2
+    set "TURN_SERVER=%~2"
     SHIFT
 )
-IF "%1"=="--turn-user" (
+IF "%~1"=="--turn-user" (
     set HANDLED=1
-    set TURN_USER=%~2
+    set "TURN_USER=%~2"
     SHIFT
 )
-IF "%1"=="--turn-pass" (
+IF "%~1"=="--turn-pass" (
     set HANDLED=1
-    set TURN_PASS=%~2
+    set "TURN_PASS=%~2"
     SHIFT
 )
-if "%1"=="--start-turn" (
+if "%~1"=="--start-turn" (
     set HANDLED=1
     set START_TURN=1
 )
-IF "%1"=="--stun" (
+IF "%~1"=="--stun" (
     set HANDLED=1
-    set STUN_SERVER=%2
+    set "STUN_SERVER=%~2"
     SHIFT
 )
-IF "%1"=="--frontend-dir" (
+IF "%~1"=="--frontend-dir" (
     set HANDLED=1
-    set FRONTEND_DIR=%~2
+    set "FRONTEND_DIR=%~2"
     SHIFT
 )
-IF "%1"=="--build" (
+IF "%~1"=="--build" (
     set HANDLED=1
     set BUILD_FRONTEND=1
 )
-IF "%1"=="--rebuild" (
+IF "%~1"=="--rebuild" (
     set HANDLED=1
     set BUILD_LIBRARIES=1
     set BUILD_FRONTEND=1
     set BUILD_WILBUR=1
 )
-IF "%1"=="--build-libraries" (
+IF "%~1"=="--build-libraries" (
     set HANDLED=1
     set BUILD_LIBRARIES=1
 )
-IF "%1"=="--build-wilbur" (
+IF "%~1"=="--build-wilbur" (
     set HANDLED=1
     set BUILD_WILBUR=1
 )
-IF "%1"=="--deps" (
+IF "%~1"=="--deps" (
     set HANDLED=1
     set INSTALL_DEPS=1
 )
@@ -125,7 +130,7 @@ GOTO :arg_loop
 
 :PostArgs
 SHIFT
-IF "%1"=="" GOTO LoopExit
+IF "%~1"=="" GOTO LoopExit
 set SERVER_ARGS=%SERVER_ARGS% %1
 GOTO PostArgs
 
@@ -306,17 +311,19 @@ IF "%TURN_PORT%"=="" ( set TURN_PORT=3478 )
 
 set TURN_PROCESS=turnserver.exe
 set TURN_REALM=PixelStreaming
-set TURN_ARGS=-c ..\..\..\turnserver.conf --allowed-peer-ip=%LOCAL_IP% -p %TURN_PORT% -r %TURN_REALM% -X %PUBLIC_IP% -E %LOCAL_IP% -L %LOCAL_IP% --no-cli --no-tls --no-dtls --pidfile `"C:\coturn.pid`" -f -a -v -u %TURN_USER%:%TURN_PASS%
+rem Credentials are expanded with ! rather than % so that characters cmd.exe
+rem treats as operators (&, |, ^, >) survive intact in a TURN password.
+set TURN_ARGS=-c ..\..\..\turnserver.conf --allowed-peer-ip=%LOCAL_IP% -p %TURN_PORT% -r %TURN_REALM% -X %PUBLIC_IP% -E %LOCAL_IP% -L %LOCAL_IP% --no-cli --no-tls --no-dtls --pidfile `"C:\coturn.pid`" -f -a -v -u !TURN_USER!:!TURN_PASS!
 
-if "%START_TURN%"=="1" (
-    IF NOT "%TURN_SERVER%"=="" (
-        IF NOT "%TURN_USER%"=="" (
-            IF NOT "%TURN_PASS%"=="" (
+if "!START_TURN!"=="1" (
+    IF NOT "!TURN_SERVER!"=="" (
+        IF NOT "!TURN_USER!"=="" (
+            IF NOT "!TURN_PASS!"=="" (
                 pushd %SCRIPT_DIR%coturn\
-                IF "%1"=="bg" (
-                    start "%TURN_PROCESS%" %TURN_PROCESS% %TURN_ARGS%
+                IF "%~1"=="bg" (
+                    start "!TURN_PROCESS!" !TURN_PROCESS! !TURN_ARGS!
                 ) else (
-                    call "%TURN_PROCESS%" %TURN_ARGS%
+                    call "!TURN_PROCESS!" !TURN_ARGS!
                 )
                 popd
             )
