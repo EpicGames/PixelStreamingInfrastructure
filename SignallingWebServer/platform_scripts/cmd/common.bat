@@ -283,7 +283,14 @@ exit /b
 :SetupTurnStun
 IF "%TURN_SERVER%"=="" (
     set TURN_SERVER=%PUBLIC_IP%:19303
+)
+rem Defaults are applied independently of TURN_SERVER so that --turn-user and
+rem --turn-pass are honoured on their own, and so that supplying --turn alone
+rem still leaves credentials set for the launch guard below.
+IF "%TURN_USER%"=="" (
     set TURN_USER=PixelStreamingUser
+)
+IF "%TURN_PASS%"=="" (
     set TURN_PASS=AnotherTURNintheroad
 )
 IF "%STUN_SERVER%"=="" (
