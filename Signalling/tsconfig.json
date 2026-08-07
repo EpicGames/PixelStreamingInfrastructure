@@ -16,6 +16,7 @@
         "moduleResolution": "bundler" // helps IDEs
     },
     "include": ["./src/*.ts"],
+    "exclude": ["./src/*.test.ts"],
     "typedocOptions": {
         "entryPoints": ["src/**/*.ts"],
         "out": "docs",
