@@ -313,7 +313,7 @@ set TURN_PROCESS=turnserver.exe
 set TURN_REALM=PixelStreaming
 rem Credentials are expanded with ! rather than % so that characters cmd.exe
 rem treats as operators (&, |, ^, >) survive intact in a TURN password.
-set TURN_ARGS=-c ..\..\..\turnserver.conf --allowed-peer-ip=%LOCAL_IP% -p %TURN_PORT% -r %TURN_REALM% -X %PUBLIC_IP% -E %LOCAL_IP% -L %LOCAL_IP% --no-cli --no-tls --no-dtls --pidfile `"C:\coturn.pid`" -f -a -v -u !TURN_USER!:!TURN_PASS!
+set TURN_ARGS=-c ..\..\..\turnserver.conf --allowed-peer-ip=%LOCAL_IP% -p %TURN_PORT% -r %TURN_REALM% -X %PUBLIC_IP% -E %LOCAL_IP% -L %LOCAL_IP% --no-cli --no-tls --no-dtls --pidfile "%SCRIPT_DIR%coturn.pid" -f -a -v -u !TURN_USER!:!TURN_PASS!
 
 if "!START_TURN!"=="1" (
     IF NOT "!TURN_SERVER!"=="" (
