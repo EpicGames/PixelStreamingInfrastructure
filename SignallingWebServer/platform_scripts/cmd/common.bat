@@ -72,11 +72,13 @@ IF "%1"=="--turn" (
 )
 IF "%1"=="--turn-user" (
     set HANDLED=1
-    set TURN_USER=1
+    set TURN_USER=%2
+    SHIFT
 )
 IF "%1"=="--turn-pass" (
     set HANDLED=1
-    set TURN_PASS=1
+    set TURN_PASS=%2
+    SHIFT
 )
 if "%1"=="--start-turn" (
     set HANDLED=1
