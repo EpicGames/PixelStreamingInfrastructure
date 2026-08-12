@@ -310,7 +310,16 @@ function set_public_ip() {
 function setup_turn_stun() {
     if [[ -z "$TURN_SERVER" ]]; then
         TURN_SERVER="${PUBLIC_IP}:19303"
+    fi
+
+    # Defaults are applied independently of TURN_SERVER so that --turn-user and
+    # --turn-pass are honoured on their own, and so that supplying --turn alone
+    # still leaves credentials set for the launch guard below.
+    if [[ -z "$TURN_USER" ]]; then
         TURN_USER="PixelStreamingUser"
+    fi
+
+    if [[ -z "$TURN_PASS" ]]; then
         TURN_PASS="AnotherTURNintheroad"
     fi
 
