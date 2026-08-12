@@ -62,6 +62,10 @@ Options:
   --https_redirect              Enables the redirection of connection attempts on http to https. If this is not set the webserver will only listen on https_port. Player websockets will still listen on player_port. (default: true)
   --rest_api                    Enables the rest API interface that can be accessed at <server_url>/api/api-definition (default: false)
   --peer_options <json-string>  Additional JSON data to send in peerConnectionOptions of the config message. (default: "")
+  --turn_secret <secret>        Shared secret for time limited TURN credentials, matching static-auth-secret on the TURN server. When set, the username and credential of every turn: entry in the peer options are replaced with a freshly minted pair for each peer that connects. (default: "")
+  --turn_secret_file <filename>
+                                Reads the value of --turn_secret from a file, so the secret does not appear in the command line of this process. (default: "")
+  --turn_ttl <seconds>          How long a credential issued to a player stays valid. Streamers and SFUs are configured once and cannot be reissued, so they are given a credential that does not practically expire. (default: "86400")
   --log_config                  Will print the program configuration on startup. (default: true)
   --stdin                       Allows stdin input while running. (default: false)
   --save                        After arguments are parsed the config.json is saved with whatever arguments were specified at launch. (default: false)
