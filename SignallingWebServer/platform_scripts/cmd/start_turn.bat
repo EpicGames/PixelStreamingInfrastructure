@@ -6,13 +6,16 @@ title turnserver
 
 call :Init
 call :ParseArgs %*
-IF "%CONTINUE%"=="1" (
-	call :Setup
-	call :SetPublicIP
-	set DEFAULT_TURN=1
-	set START_TURN=1
-	call :SetupTurnStun
+
+IF errorlevel 1 (
+	exit /b 1
 )
+
+call :Setup
+call :SetPublicIP
+set DEFAULT_TURN=1
+set START_TURN=1
+call :SetupTurnStun
 
 goto :eof
 

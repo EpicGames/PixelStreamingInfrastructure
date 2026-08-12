@@ -34,7 +34,7 @@ echo        --build-wilbur      Force build of wilbur
 echo        --deps              Force reinstall of dependencies
 echo    Everything after -- is passed directly to the signalling server executable.
 IF exist "%SCRIPT_DIR%..\..\dist" (
-    pushd %SCRIPT_DIR%..\..
+    pushd "%SCRIPT_DIR%..\.."
     call %NPM% run start --- --help
     popd
 )
@@ -53,64 +53,71 @@ set TURN_PASS=
 set STUN_SERVER=
 set PUBLIC_IP=
 :arg_loop
-IF "%1"=="" GOTO LoopExit
-IF "%1"=="--" GOTO PostArgs
+IF "%~1"=="" GOTO LoopExit
+IF "%~1"=="--" GOTO PostArgs
 set HANDLED=0
-IF "%1"=="--help" (
+IF "%~1"=="--help" (
     CALL :Usage
     exit /b
 )
-IF "%1"=="--publicip" (
+IF "%~1"=="--publicip" (
     set HANDLED=1
-    set PUBLIC_IP=%2
+    set "PUBLIC_IP=%~2"
     SHIFT
 )
-IF "%1"=="--turn" (
+rem Values are assigned with the set "VAR=value" form, and compared with %~1
+rem rather than %1, so that cmd.exe does not re-parse operators (&, |, ^, >)
+rem appearing in a value. Both are required: SHIFT happens inside the matched
+rem block, so every comparison below it in the same pass is evaluated against
+rem the argument's value rather than the next flag.
+IF "%~1"=="--turn" (
     set HANDLED=1
-    set TURN_SERVER=%2
+    set "TURN_SERVER=%~2"
     SHIFT
 )
-IF "%1"=="--turn-user" (
+IF "%~1"=="--turn-user" (
     set HANDLED=1
-    set TURN_USER=1
+    set "TURN_USER=%~2"
+    SHIFT
 )
-IF "%1"=="--turn-pass" (
+IF "%~1"=="--turn-pass" (
     set HANDLED=1
-    set TURN_PASS=1
+    set "TURN_PASS=%~2"
+    SHIFT
 )
-if "%1"=="--start-turn" (
+if "%~1"=="--start-turn" (
     set HANDLED=1
     set START_TURN=1
 )
-IF "%1"=="--stun" (
+IF "%~1"=="--stun" (
     set HANDLED=1
-    set STUN_SERVER=%2
+    set "STUN_SERVER=%~2"
     SHIFT
 )
-IF "%1"=="--frontend-dir" (
+IF "%~1"=="--frontend-dir" (
     set HANDLED=1
-    set FRONTEND_DIR=%~2
+    set "FRONTEND_DIR=%~2"
     SHIFT
 )
-IF "%1"=="--build" (
+IF "%~1"=="--build" (
     set HANDLED=1
     set BUILD_FRONTEND=1
 )
-IF "%1"=="--rebuild" (
+IF "%~1"=="--rebuild" (
     set HANDLED=1
     set BUILD_LIBRARIES=1
     set BUILD_FRONTEND=1
     set BUILD_WILBUR=1
 )
-IF "%1"=="--build-libraries" (
+IF "%~1"=="--build-libraries" (
     set HANDLED=1
     set BUILD_LIBRARIES=1
 )
-IF "%1"=="--build-wilbur" (
+IF "%~1"=="--build-wilbur" (
     set HANDLED=1
     set BUILD_WILBUR=1
 )
-IF "%1"=="--deps" (
+IF "%~1"=="--deps" (
     set HANDLED=1
     set INSTALL_DEPS=1
 )
@@ -123,7 +130,7 @@ GOTO :arg_loop
 
 :PostArgs
 SHIFT
-IF "%1"=="" GOTO LoopExit
+IF "%~1"=="" GOTO LoopExit
 set SERVER_ARGS=%SERVER_ARGS% %1
 GOTO PostArgs
 
@@ -131,7 +138,7 @@ GOTO PostArgs
 exit /b
 
 :SetupNode
-pushd %SCRIPT_DIR%
+pushd "%SCRIPT_DIR%"
 SET NODE_NAME=node-%NODE_VERSION%-win-x64
 if exist node\ (
   echo Node directory found...skipping install.
@@ -159,7 +166,7 @@ popd
 
 if "%INSTALL_DEPS%"=="1" (
     echo Installing dependencies...
-    pushd %SCRIPT_DIR%..\..\..
+    pushd "%SCRIPT_DIR%..\..\.."
     call %NPM% install
     popd
 )
@@ -182,14 +189,14 @@ if NOT exist "%SCRIPT_DIR%..\..\..\Signalling\dist" (
 )
 
 IF "%BUILD_COMMON%"=="1" (
-    pushd %SCRIPT_DIR%..\..\..\Common
+    pushd "%SCRIPT_DIR%..\..\..\Common"
     echo Building common library
     call %NPM% run build:cjs
     popd
 )
 
 IF "%BUILD_SIGNALLING%"=="1" (
-    pushd %SCRIPT_DIR%..\..\..\Signalling
+    pushd "%SCRIPT_DIR%..\..\..\Signalling"
     echo Building signalling library
     call %NPM% run build:cjs
     popd
@@ -199,7 +206,7 @@ exit /b
 
 :SetupFrontend
 rem Start in the repo dir
-pushd %SCRIPT_DIR%..\..\..\
+pushd "%SCRIPT_DIR%..\..\.."
 
 IF "%FRONTEND_DIR%"=="" (
     set FRONTEND_DIR="%SCRIPT_DIR%..\..\www"
@@ -223,16 +230,16 @@ IF "%BUILD_FRONTEND%"=="1" (
     rem We could replace this all with a single npm script that does all this. we do have several build-all scripts already
     rem but this does give a good reference about the dependency chain for all of this.
     echo Building Typescript frontend...
-    pushd %CD%\Common
+    pushd "%CD%\Common"
     call %NPM% run build:esm
     popd
-    pushd %CD%\Frontend\library
+    pushd "%CD%\Frontend\library"
     call %NPM% run build:esm
     popd
-    pushd %CD%\Frontend\ui-library
+    pushd "%CD%\Frontend\ui-library"
     call %NPM% run build:esm
     popd
-    pushd %CD%\Frontend\implementations\typescript
+    pushd "%CD%\Frontend\implementations\typescript"
     rem Note: build:dev implicitly uses esm deps due to node16/bundler module resolution
     call %NPM% run build:dev
     popd
@@ -245,7 +252,7 @@ exit /b
 
 :SetupCoturn
 @Rem Look for CoTURN directory next to this script
-pushd %SCRIPT_DIR%
+pushd "%SCRIPT_DIR%"
 if exist coturn\ (
   echo CoTURN directory found...skipping install.
 ) else (
@@ -281,7 +288,14 @@ exit /b
 :SetupTurnStun
 IF "%TURN_SERVER%"=="" (
     set TURN_SERVER=%PUBLIC_IP%:19303
+)
+rem Defaults are applied independently of TURN_SERVER so that --turn-user and
+rem --turn-pass are honoured on their own, and so that supplying --turn alone
+rem still leaves credentials set for the launch guard below.
+IF "%TURN_USER%"=="" (
     set TURN_USER=PixelStreamingUser
+)
+IF "%TURN_PASS%"=="" (
     set TURN_PASS=AnotherTURNintheroad
 )
 IF "%STUN_SERVER%"=="" (
@@ -297,17 +311,24 @@ IF "%TURN_PORT%"=="" ( set TURN_PORT=3478 )
 
 set TURN_PROCESS=turnserver.exe
 set TURN_REALM=PixelStreaming
-set TURN_ARGS=-c ..\..\..\turnserver.conf --allowed-peer-ip=%LOCAL_IP% -p %TURN_PORT% -r %TURN_REALM% -X %PUBLIC_IP% -E %LOCAL_IP% -L %LOCAL_IP% --no-cli --no-tls --no-dtls --pidfile `"C:\coturn.pid`" -f -a -v -u %TURN_USER%:%TURN_PASS%
+rem Credentials are expanded with ! rather than % so that characters cmd.exe
+rem treats as operators (&, |, ^, >) survive intact in a TURN password. The
+rem launch below must not use CALL for the same reason: CALL parses the line a
+rem second time, after ! expansion has already substituted the password, so an
+rem operator in the credential is re-read as syntax and the launch silently
+rem does nothing. turnserver.exe is an executable, and direct execution is
+rem synchronous without CALL.
+set TURN_ARGS=-c ..\..\..\turnserver.conf --allowed-peer-ip=%LOCAL_IP% -p %TURN_PORT% -r %TURN_REALM% -X %PUBLIC_IP% -E %LOCAL_IP% -L %LOCAL_IP% --no-cli --no-tls --no-dtls --pidfile "%SCRIPT_DIR%coturn\coturn.pid" -f -a -v -u !TURN_USER!:!TURN_PASS!
 
-if "%START_TURN%"=="1" (
-    IF NOT "%TURN_SERVER%"=="" (
-        IF NOT "%TURN_USER%"=="" (
-            IF NOT "%TURN_PASS%"=="" (
-                pushd %SCRIPT_DIR%coturn\
-                IF "%1"=="bg" (
-                    start "%TURN_PROCESS%" %TURN_PROCESS% %TURN_ARGS%
+if "!START_TURN!"=="1" (
+    IF NOT "!TURN_SERVER!"=="" (
+        IF NOT "!TURN_USER!"=="" (
+            IF NOT "!TURN_PASS!"=="" (
+                pushd "%SCRIPT_DIR%coturn"
+                IF "%~1"=="bg" (
+                    start "!TURN_PROCESS!" !TURN_PROCESS! !TURN_ARGS!
                 ) else (
-                    call "%TURN_PROCESS%" %TURN_ARGS%
+                    "!TURN_PROCESS!" !TURN_ARGS!
                 )
                 popd
             )
@@ -332,7 +353,7 @@ IF NOT exist "%SCRIPT_DIR%..\..\dist" (
 )
 
 IF "%BUILD_WILBUR%"=="1" (
-    pushd %SCRIPT_DIR%\..\..\
+    pushd "%SCRIPT_DIR%..\.."
     echo Building wilbur...
     call %NPM% run build
     popd
@@ -340,7 +361,7 @@ IF "%BUILD_WILBUR%"=="1" (
 exit /b
 
 :StartWilbur
-pushd %SCRIPT_DIR%\..\..\
+pushd "%SCRIPT_DIR%..\.."
 call %NPM% run start -- %SERVER_ARGS%
 exit /b
 
