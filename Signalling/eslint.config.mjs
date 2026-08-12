@@ -7,7 +7,7 @@ import baseConfig from '../eslint.config.mjs'
 export default tseslint.config(
     baseConfig,
     {
-        ignores: [],
+        ignores: ["**/*.test.ts"],
     },
     {
         languageOptions: {
