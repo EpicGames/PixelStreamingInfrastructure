@@ -142,12 +142,22 @@ export class PlayerConnection implements IPlayer, LogUtils.IMessageLogger {
             } else {
                 Logger.warn(`Subscribing to ${streamerId}`);
                 this.subscribe(streamerId);
+                // subscribe() declines silently, most often because maxSubscribers is reached, and
+                // says so only by leaving subscribedStreamer unset. Forwarding anyway dereferences
+                // null, which surfaces as an uncaughtException and exits the process.
+                if (!this.subscribedStreamer) {
+                    Logger.error(
+                        `Player ${this.playerId} could not be subscribed to ${streamerId}. Disconnecting.`
+                    );
+                    this.disconnect();
+                    return;
+                }
             }
         }
 
         message.playerId = this.playerId;
-        LogUtils.logForward(this, this.subscribedStreamer!, message);
-        this.subscribedStreamer!.protocol.sendMessage(message);
+        LogUtils.logForward(this, this.subscribedStreamer, message);
+        this.subscribedStreamer.protocol.sendMessage(message);
     }
 
     private subscribe(streamerId: string) {
