@@ -5,9 +5,11 @@ setlocal enabledelayedexpansion
 call :Init
 call :ParseArgs %*
 
-IF "%CONTINUE%"=="1" (
-	call :Setup
+IF errorlevel 1 (
+	exit /b 1
 )
+
+call :Setup
 
 goto :eof
 
@@ -18,4 +20,4 @@ goto :eof
 :SetupTurnStun
 :PrintConfig
 :StartWilbur
-%~dp0common.bat %*
+"%~dp0common.bat" %*
