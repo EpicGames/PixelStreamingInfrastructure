@@ -11,6 +11,7 @@ import {
     IWebServerConfig
 } from '@epicgames-ps/lib-pixelstreamingsignalling-ue5.7';
 import { beautify, IProgramOptions } from './Utils';
+import { createTurnCredentialsProvider, hasCredentiallessTurnServer } from './turnCredentials';
 import { initInputHandler } from './InputHandler';
 import { Command, Option } from 'commander';
 import { initialize } from 'express-openapi';
@@ -189,6 +190,23 @@ program
             'Additional JSON data to send in peerConnectionOptions of the config message. This allows you to provide JSON data without having to deal with it on the command line.'
         ).default(config_file.peer_options_file || '')
     )
+    .addOption(
+        new Option(
+            '--turn_secret <secret>',
+            'Shared secret for time limited TURN credentials, matching static-auth-secret on the TURN server. When set, the username and credential of every turn: entry in the peer options are replaced with a freshly minted pair for each peer that connects.'
+        ).default(config_file.turn_secret || '')
+    )
+    .addOption(
+        new Option(
+            '--turn_secret_file <filename>',
+            'Reads the value of --turn_secret from a file, so the secret does not appear in the command line of this process.'
+        ).default(config_file.turn_secret_file || '')
+    )
+    .option(
+        '--turn_ttl <seconds>',
+        'How long a credential issued to a player stays valid. Streamers and SFUs are configured once and cannot be reissued, so they are given a credential that does not practically expire.',
+        config_file.turn_ttl || '86400'
+    )
     .option(
         '--reverse-proxy',
         'Enables reverse proxy mode. This will trust the X-Forwarded-For header.',
@@ -228,6 +246,8 @@ if (options.save) {
     delete save_options.no_config;
     delete save_options.config_file;
     delete save_options.save;
+    // The secret itself never goes to disk here; turn_secret_file is only a path, so it stays.
+    delete save_options.turn_secret;
 
     // save out the config file with the current settings
     fs.writeFile(configArgsParser.config_file, beautify(save_options), (error: any) => {
@@ -256,12 +276,34 @@ if (options.peer_options_file) {
     );
 }
 
+// read the turn_secret_file
+if (options.turn_secret_file) {
+    if (!fs.existsSync(options.turn_secret_file)) {
+        Logger.error(`turn_secret_file "${options.turn_secret_file}" does not exist.`);
+        throw Error(`Failed to find a turn secret file called ${options.turn_secret_file}.`);
+    }
+
+    // Trimmed because the usual way to write one of these is `echo $SECRET > secret.txt`, which
+    // leaves a trailing newline that would silently produce credentials the TURN server rejects.
+    options.turn_secret = fs.readFileSync(options.turn_secret_file, 'utf-8').trim();
+
+    // An empty file would otherwise read as "no secret configured" and silently start the server
+    // with the feature off, which looks identical to it working until a peer tries to relay.
+    if (!options.turn_secret) {
+        Logger.error(`turn_secret_file "${options.turn_secret_file}" is empty.`);
+        throw Error(`The turn secret file ${options.turn_secret_file} contains no secret.`);
+    }
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 Logger.info(`${pjson.name} v${pjson.version} starting...`);
 if (options.log_config) {
     Logger.info('Config:');
     for (const key in options) {
-        Logger.info(`"${key}": ${JSON.stringify(options[key])}`);
+        // The config dump goes to the log file, which is kept and rotated - a secret written there
+        // is a secret in every backup of this machine.
+        const value: unknown = key === 'turn_secret' && options[key] ? '<redacted>' : options[key];
+        Logger.info(`"${key}": ${JSON.stringify(value)}`);
     }
 }
 
@@ -278,6 +320,33 @@ const serverOpts: IServerConfig = {
     maxSubscribers: options.max_players,
     playerKeepaliveTimeout: Number(options.player_keepalive_timeout)
 };
+
+// Time limited TURN credentials, when a shared secret was supplied. Without one the static username
+// and credential in the peer options are sent to every peer exactly as before.
+if (options.turn_secret) {
+    const turnTtlSeconds = Number(options.turn_ttl);
+    if (!Number.isFinite(turnTtlSeconds) || turnTtlSeconds <= 0) {
+        Logger.error(`turn_ttl "${options.turn_ttl}" is not a positive number of seconds.`);
+        throw Error(`Invalid turn_ttl "${options.turn_ttl}".`);
+    }
+
+    // `|| {}` because peer_options defaults to the empty string. SignallingServer normalises that
+    // for the static path, but a provider's return value is sent as given - and a peer that receives
+    // `""` as its configuration fails to construct its peer connection at all.
+    serverOpts.peerOptionsProvider = createTurnCredentialsProvider(options.peer_options || {}, {
+        secret: options.turn_secret,
+        ttlSeconds: turnTtlSeconds
+    });
+    Logger.info(`Issuing time limited TURN credentials, valid for ${turnTtlSeconds} seconds.`);
+} else if (hasCredentiallessTurnServer(options.peer_options)) {
+    // Nothing is going to fill these in, and a peer that receives a TURN server it cannot
+    // authenticate against fails later, at ICE, as a generic connection failure with nothing in
+    // this log to connect it back to configuration.
+    Logger.warn(
+        'The peer options name a TURN server with no username or credential, and no --turn_secret ' +
+            'was supplied to mint one. Peers will be unable to use that TURN server.'
+    );
+}
 
 const shouldServerStart = options.serve || options.rest_api;
 if (shouldServerStart) {

@@ -14,7 +14,7 @@
         "rebuild": "npm run clean && npm run build",
         "watch": "nodemon -V -d 3 --watch src --watch ../Common/dist -e \"ts,js,mjs,cjs,json\" --exec \"npm run build:cjs\"",
         "lint": "eslint src",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "jest"
     },
     "author": "Epic Games",
     "license": "MIT",
@@ -22,6 +22,7 @@
         "@eslint/js": "^9.20.0",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.0",
+        "@types/jest": "^29.5.14",
         "@types/node": "^22.14.0",
         "@types/ws": "^8.5.14",
         "eslint": "^9.39.0",
@@ -29,9 +30,11 @@
         "eslint-plugin-prettier": "^5.2.3",
         "eslint-plugin-tsdoc": "^0.4.0",
         "nodemon": "^3.1.9",
+        "jest": "^29.7.0",
         "rimraf": "^6.0.1",
         "typedoc": "^0.28.0",
         "typedoc-plugin-markdown": "^4.4.2",
+        "ts-jest": "^29.2.5",
         "typescript": "^5.7.3",
         "typescript-eslint": "8.57.2"
     },

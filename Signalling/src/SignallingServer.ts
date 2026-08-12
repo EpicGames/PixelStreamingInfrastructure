@@ -60,11 +60,45 @@ export interface IServerConfig {
     // ships no authentication of its own. See StreamerIdAuthorizer. When omitted, the default
     // behaviour is unchanged (requested id accepted, numeric suffix appended on collision).
     authorizeStreamerId?: StreamerIdAuthorizer;
+
+    // Optional hook returning the peer configuration to send to a single connecting peer, in place
+    // of the static peerOptions. This is the seam for peer configuration that must not be shared
+    // between connections - time limited TURN credentials being the motivating case, since a static
+    // credential is sent to every peer that ever connects and cannot be changed without a redeploy.
+    // See PeerOptionsProvider. When omitted, every peer receives peerOptions unchanged.
+    peerOptionsProvider?: PeerOptionsProvider;
 }
 
 export type ProtocolConfig = {
     [key: string]: any;
 };
+
+/**
+ * The kind of peer a set of peer options is being built for. Provided so a consumer can vary what
+ * it returns by peer - a streamer connects once and holds its configuration for as long as it runs,
+ * where a player receives a fresh one every time it connects.
+ */
+export type PeerType = 'streamer' | 'player' | 'sfu';
+
+/**
+ * Describes the peer that is about to be sent a config message.
+ */
+export interface IPeerOptionsRequest {
+    // The kind of peer connecting.
+    peerType: PeerType;
+    // The id the registry assigned this peer. For a streamer or an SFU this is the placeholder the
+    // registry allocates on connect, because a streamer is not named until it sends its endpointId
+    // message, which happens after it has been configured. A player id is final.
+    peerId: string;
+}
+
+/**
+ * An optional consumer-supplied hook that builds the peer configuration for one connecting peer.
+ * Return the object to send as peerConnectionOptions in that peer's config message. This is the
+ * seam for per-connection credentials without the project committing to a credential scheme of its
+ * own. A provider that throws is treated as having no answer, and the static peerOptions are sent.
+ */
+export type PeerOptionsProvider = (request: IPeerOptionsRequest) => unknown;
 
 /**
  * The main signalling server object.
@@ -133,13 +167,44 @@ export class SignallingServer {
         }
     }
 
-    private sendConfigMessage(connection: { sendMessage(msg: Messages.config): void }): void {
+    private sendConfigMessage(
+        connection: { sendMessage(msg: Messages.config): void },
+        peerRequest: IPeerOptionsRequest
+    ): void {
         // peer connection options is a general field with all optional fields;
         // it doesnt play nice with mergePartial so we just add it verbatim
         const message: Messages.config = MessageHelpers.createMessage(Messages.config, this.protocolConfig);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        message.peerConnectionOptions = this.protocolConfig['peerConnectionOptions'];
+        message.peerConnectionOptions = this.getPeerOptions(peerRequest);
         connection.sendMessage(message);
+    }
+
+    /**
+     * Resolves the peer options for one connecting peer, deferring to peerOptionsProvider when the
+     * consumer supplied one.
+     */
+    private getPeerOptions(peerRequest: IPeerOptionsRequest): Messages.config['peerConnectionOptions'] {
+        if (!this.config.peerOptionsProvider) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return this.protocolConfig['peerConnectionOptions'];
+        }
+
+        try {
+            // The provider is consumer code, so its return is unknown to us; it travels as an
+            // opaque blob in the config message either way.
+            return this.config.peerOptionsProvider(peerRequest) as Messages.config['peerConnectionOptions'];
+        } catch (error) {
+            // A provider is consumer code and may reach outside the process for a credential. If it
+            // fails we still send a config message, because a peer that never receives one simply
+            // waits forever with nothing in its log to explain why.
+            Logger.error(
+                'peerOptionsProvider threw for %s peer %s, falling back to the static peer options: %s',
+                peerRequest.peerType,
+                peerRequest.peerId,
+                error instanceof Error ? error.message : stringify(error)
+            );
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return this.protocolConfig['peerConnectionOptions'];
+        }
     }
 
     private onStreamerConnected(ws: wslib.WebSocket, request: http.IncomingMessage) {
@@ -159,7 +224,7 @@ export class SignallingServer {
             );
         });
 
-        this.sendConfigMessage(newStreamer);
+        this.sendConfigMessage(newStreamer, { peerType: 'streamer', peerId: newStreamer.streamerId });
     }
 
     private onPlayerConnected(ws: wslib.WebSocket, request: http.IncomingMessage) {
@@ -193,7 +258,7 @@ export class SignallingServer {
             };
         }
 
-        this.sendConfigMessage(newPlayer);
+        this.sendConfigMessage(newPlayer, { peerType: 'player', peerId: newPlayer.playerId });
     }
 
     private onSFUConnected(ws: wslib.WebSocket, request: http.IncomingMessage) {
@@ -209,6 +274,6 @@ export class SignallingServer {
             Logger.info(`SFU %s (%s) disconnected.`, newSFU.streamerId, request.socket.remoteAddress);
         });
 
-        this.sendConfigMessage(newSFU);
+        this.sendConfigMessage(newSFU, { peerType: 'sfu', peerId: newSFU.streamerId });
     }
 }
