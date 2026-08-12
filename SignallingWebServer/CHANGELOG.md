@@ -1,5 +1,21 @@
 # @epicgames-ps/wilbur
 
+## 2.5.0
+
+### Minor Changes
+
+- 47cfc6e: Allow TURN credentials to be issued per connection rather than shared by every session. `peerOptions` is static, so a credential written there is sent to every peer that ever connects and cannot be changed without a redeploy — the weakness noted in tip 3 of the security guidelines. `IServerConfig.peerOptionsProvider` is consulted once per connecting peer and returns the peer options for that peer, falling back to `peerOptions` if it throws. On top of it the signalling server adds `--turn_secret` (or `--turn_secret_file`) and `--turn_ttl`, which give every `turn:`/`turns:` entry a time limited username and credential in the form coturn's `use-auth-secret` mode expects. Default behaviour is unchanged when no secret is supplied. See `Docs/Security-Guidelines.md`.
+
+### Patch Changes
+
+- e1b4d03: Stop an unsubscribed player from crashing the signalling server. When a player sends a message without being subscribed, `sendToStreamer` force-subscribes it to the first available streamer and then forwards through `this.subscribedStreamer!`. `subscribe()` can decline — most commonly because `maxSubscribers` is already reached — and reports that only by leaving `subscribedStreamer` unset, so the non-null assertions throw a TypeError out of a websocket message handler and take the process down, disconnecting every other player. It now checks the subscription took, and disconnects just that player if it did not.
+- c69198d: Add an optional server-side keepalive that disconnects players whose connection has died without a clean close. Previously `KeepaliveMonitor` was only used on the client, so a player whose socket dropped silently (sleeping laptop, lost Wi-Fi, killed tab) stayed subscribed until the OS TCP keepalive reaped it, which could hold a `maxSubscribers` slot in the meantime. The new `IServerConfig.playerKeepaliveTimeout` controls this; the signalling server exposes it as `--player_keepalive_timeout <milliseconds>` (default 30000, 0 disables).
+- Updated dependencies [e1b4d03]
+- Updated dependencies [c69198d]
+- Updated dependencies [4fcf502]
+- Updated dependencies [47cfc6e]
+    - @epicgames-ps/lib-pixelstreamingsignalling-ue5.6@0.3.0
+
 ## 2.4.1
 
 ### Patch Changes
