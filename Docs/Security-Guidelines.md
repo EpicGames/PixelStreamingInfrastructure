@@ -21,7 +21,7 @@ By following these tips, you can enhance the security of your Pixel Streaming se
 
 ## Authenticating and authorizing connections
 
-The signalling server **intentionally ships no authentication**. The streamer, player and SFU ports accept any connection, and any deployment is expected to bring its own authentication and authorization appropriate to its environment. In particular, the streamer port is designed to sit on a trusted/private network and should never be exposed directly to the internet without a front door of your own.
+The signalling server **intentionally ships no authentication beyond an optional shared token on the player port** ([below](#a-shared-token-on-the-player-port)) — no identity, no sessions, no login flow. The streamer and SFU ports accept any connection, and any deployment is expected to bring its own authentication and authorization appropriate to its environment. In particular, the streamer port is designed to sit on a trusted/private network and should never be exposed directly to the internet without a front door of your own.
 
 To make it practical to add your own auth without forking, the `Signalling` library exposes a few seams. None of these provide credentials or a login flow — they are hooks where *your* policy plugs in.
 
@@ -46,6 +46,40 @@ const server = new SignallingServer({
     }
 });
 ```
+
+#### A shared token on the player port
+
+The signalling server application implements the simplest useful case on top of that hook, for a deployment that needs a door rather than an identity — a kiosk, an internal demo, a staging environment that should not be open to whoever finds the address.
+
+Give it `--player_token <token>` (or `--player_token_file`) and every player must present that token to connect, either as a `?token=` query parameter or an `Authorization: Bearer` header. A player that does not is refused at the HTTP upgrade with `401`, so it never becomes a connection and is never sent the config message. Streamer and SFU connections are unaffected.
+
+```
+wilbur --player_token 8f14e45f-ea8d-4b3f-b6de-1cd97b4e2d21
+```
+
+The token has to reach the **signalling WebSocket**, which is not the same thing as the page URL. The bundled frontend builds its signalling URL from the page's protocol, hostname and port and nothing else, so putting `?token=` on the page address does not do it — the page loads normally and then the stream silently never starts. Give it the whole signalling URL instead, with the frontend's `ss` setting:
+
+```
+https://your-server/?ss=wss%3A%2F%2Fyour-server%2F%3Ftoken%3D8f14e45f-ea8d-4b3f-b6de-1cd97b4e2d21
+```
+
+A deployment serving its own page can do better than that by constructing the URL itself, which is what most will want:
+
+```ts
+const stream = new PixelStreaming(config); // config with SignallingServerUrl already set to
+                                           // `wss://your-server/?token=${yourToken}`
+```
+
+It is **one shared token, the same for everybody** — it does not identify a user, it does not expire, and revoking it means restarting the server with a new one. It answers "may this connection exist at all", which is the question a `--turn_secret` deliberately does not answer. If you need sessions, per-user revocation, or an identity attached to a connection, supply your own `verifyClient` instead; the flag exists so that a deployment which genuinely only needs a door does not have to fork the reference server to get one.
+
+Four things to know before relying on it:
+
+- **It gates one of three doors.** Streamer and SFU connections are also sent the config message, and are also unauthenticated. Gating players while leaving the streamer port reachable from the internet moves the problem rather than solving it — firewall those ports as tip 1 describes.
+- **Nothing rate limits guessing.** The `express-rate-limit` middleware only sees HTTP requests, and a WebSocket upgrade is a separate event it never sees, so a wrong token costs an attacker one round trip. Each refusal is logged with its source address, and the server warns at startup about a token short enough to matter. Use a long random one — a GUID is a good default.
+- **A token in a query string is visible to anything that logs URLs** — a reverse proxy's access log, browser history, and the frontend's own console line naming the URL it is connecting to — and it is the only option a browser has, since a WebSocket opened from a page cannot set headers. The server removes it from its own connection log, but it cannot reach anything in front of it. Serve over `https`/`wss`, and prefer the `Authorization` header wherever the client is not a browser.
+- **It is compared byte for byte.** A `+` in a query string means a space, and two Unicode spellings of the same text are different tokens. A GUID avoids both.
+
+If `--rest_api` is enabled, note that `GET /api/config` returns the peer options — including any static TURN credentials in them — to any HTTP caller, with no token required. That endpoint is unauthenticated by design and predates this flag; gate it with your own middleware, or use `--turn_secret` so the only credentials it can disclose are ones no peer was issued.
 
 ### Recovering the authenticated identity
 
@@ -90,6 +124,6 @@ Three things are worth understanding before choosing a TTL:
 
 - **Only players are given a limited credential.** A streamer or SFU receives its configuration once, when it connects, and there is no message that replaces it — so an expiry there would set a deadline on the stream rather than on an attacker. Those peers are issued a credential that outlives any plausible uptime. The exposure this feature exists to close is a credential shared by every browser that loads a page; a streamer is deployed by the operator on a host they control. If you want it rotated too, use `peerOptionsProvider` directly.
 - **A TTL may gate only the allocation, not the session.** Some TURN servers check the credential when a relay is allocated and not again, so a session already running continues past the expiry; others may re-check. Check your server before assuming a short TTL cannot interrupt a long call — with coturn, allocations have been reported to survive it.
-- **It does not decide who may obtain a credential.** Anything that can open a player WebSocket is sent one, so a short TTL limits how long a leaked credential stays useful, not who is issued one. Use the WebSocket upgrade hook above for that.
+- **It does not decide who may obtain a credential.** Anything that can open a player WebSocket is sent one, so a short TTL limits how long a leaked credential stays useful, not who is issued one. Use the WebSocket upgrade hook above for that — [`--player_token`](#a-shared-token-on-the-player-port) is the built-in way, and the server warns at startup when it is issuing TURN credentials without one.
 
 These hooks are deliberately policy-free: the library gives you the connection, its request, and the id it is asking for — what counts as a valid token, a permitted id or a valid credential is entirely up to your deployment.

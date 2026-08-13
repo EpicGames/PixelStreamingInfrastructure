@@ -11,6 +11,7 @@ import {
     IWebServerConfig
 } from '@epicgames-ps/lib-pixelstreamingsignalling-ue5.8';
 import { beautify, IProgramOptions } from './Utils';
+import { createPlayerTokenVerifier } from './playerAuth';
 import { createTurnCredentialsProvider, hasCredentiallessTurnServer } from './turnCredentials';
 import { initInputHandler } from './InputHandler';
 import { Command, Option } from 'commander';
@@ -24,6 +25,9 @@ import streamerByIdHandler from './paths/streamers/{streamerId}';
 
 // eslint-disable-next-line  @typescript-eslint/no-unsafe-assignment
 const pjson = require('../package.json');
+
+/** Below this a token is worth warning about; see where it is used for why it is only a warning. */
+const MINIMUM_PLAYER_TOKEN_LENGTH = 16;
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 // possible config file options
@@ -207,6 +211,22 @@ program
         'How long a credential issued to a player stays valid. Streamers and SFUs are configured once and cannot be reissued, so they are given a credential that does not practically expire.',
         config_file.turn_ttl || '86400'
     )
+    // The default below uses `??` rather than the `||` every option around it uses, deliberately: a
+    // falsy value written in a config file is a mistake worth reporting, and `||` would collapse `0`
+    // and `false` into "no token configured" before anything downstream could tell the difference -
+    // silently leaving the player port open on a deployment that asked for it to be closed.
+    .addOption(
+        new Option(
+            '--player_token <token>',
+            'Requires every player to present this token when it connects, as a ?token= query parameter or an Authorization: Bearer header. A player that does not is refused at the HTTP upgrade with 401, before it is sent the config message. Streamer and SFU connections are not affected.'
+        ).default(config_file.player_token ?? '')
+    )
+    .addOption(
+        new Option(
+            '--player_token_file <filename>',
+            'Reads the value of --player_token from a file, so the token does not appear in the command line of this process.'
+        ).default(config_file.player_token_file || '')
+    )
     .option(
         '--reverse-proxy',
         'Enables reverse proxy mode. This will trust the X-Forwarded-For header.',
@@ -246,8 +266,9 @@ if (options.save) {
     delete save_options.no_config;
     delete save_options.config_file;
     delete save_options.save;
-    // The secret itself never goes to disk here; turn_secret_file is only a path, so it stays.
+    // The secrets themselves never go to disk here; the *_file options are only paths, so they stay.
     delete save_options.turn_secret;
+    delete save_options.player_token;
 
     // save out the config file with the current settings
     fs.writeFile(configArgsParser.config_file, beautify(save_options), (error: any) => {
@@ -276,23 +297,36 @@ if (options.peer_options_file) {
     );
 }
 
+/**
+ * Reads a secret that was supplied as a file rather than on the command line.
+ *
+ * Trimmed because the usual way to write one of these is `echo $SECRET > secret.txt`, which leaves a
+ * trailing newline. An empty file throws rather than returning nothing, because an empty secret
+ * reads as "this feature was not configured" and silently starts the server with it off - which
+ * looks identical to it working until the first peer needs it.
+ */
+function readSecretFile(filename: string, optionName: string): string {
+    if (!fs.existsSync(filename)) {
+        Logger.error(`${optionName} "${filename}" does not exist.`);
+        throw Error(`Failed to find the file ${filename} given to ${optionName}.`);
+    }
+
+    const secret = fs.readFileSync(filename, 'utf-8').trim();
+    if (!secret) {
+        Logger.error(`${optionName} "${filename}" is empty.`);
+        throw Error(`The file ${filename} given to ${optionName} contains no value.`);
+    }
+    return secret;
+}
+
 // read the turn_secret_file
 if (options.turn_secret_file) {
-    if (!fs.existsSync(options.turn_secret_file)) {
-        Logger.error(`turn_secret_file "${options.turn_secret_file}" does not exist.`);
-        throw Error(`Failed to find a turn secret file called ${options.turn_secret_file}.`);
-    }
+    options.turn_secret = readSecretFile(options.turn_secret_file, 'turn_secret_file');
+}
 
-    // Trimmed because the usual way to write one of these is `echo $SECRET > secret.txt`, which
-    // leaves a trailing newline that would silently produce credentials the TURN server rejects.
-    options.turn_secret = fs.readFileSync(options.turn_secret_file, 'utf-8').trim();
-
-    // An empty file would otherwise read as "no secret configured" and silently start the server
-    // with the feature off, which looks identical to it working until a peer tries to relay.
-    if (!options.turn_secret) {
-        Logger.error(`turn_secret_file "${options.turn_secret_file}" is empty.`);
-        throw Error(`The turn secret file ${options.turn_secret_file} contains no secret.`);
-    }
+// read the player_token_file
+if (options.player_token_file) {
+    options.player_token = readSecretFile(options.player_token_file, 'player_token_file');
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -302,7 +336,8 @@ if (options.log_config) {
     for (const key in options) {
         // The config dump goes to the log file, which is kept and rotated - a secret written there
         // is a secret in every backup of this machine.
-        const value: unknown = key === 'turn_secret' && options[key] ? '<redacted>' : options[key];
+        const secret = key === 'turn_secret' || key === 'player_token';
+        const value: unknown = secret && options[key] ? '<redacted>' : options[key];
         Logger.info(`"${key}": ${JSON.stringify(value)}`);
     }
 }
@@ -321,6 +356,63 @@ const serverOpts: IServerConfig = {
     playerKeepaliveTimeout: Number(options.player_keepalive_timeout)
 };
 
+// A shared token on the player port, when one was supplied. This runs at the HTTP upgrade, so a
+// player that cannot present it never becomes a connection and is never sent the config message -
+// which is what keeps the peer options, and any TURN credential in them, away from it.
+// Coerced rather than type checked. A config.json is hand written, and `"player_token": 12345678`
+// arrives here as a number - which a `typeof` guard would quietly turn into an open player port,
+// while the startup dump went on printing <redacted> and implying a token was in force. Whatever was
+// supplied is a token; only the absence of one leaves the port open.
+const rawPlayerToken: unknown = options.player_token;
+let playerToken = '';
+if (typeof rawPlayerToken === 'string') {
+    playerToken = rawPlayerToken;
+} else if (typeof rawPlayerToken === 'number') {
+    // JSON has one number type, so `"player_token": 12345678` is a number here. Coerced rather than
+    // rejected, because the operator plainly meant it as a token - but said out loud, because the
+    // coercion is not always the text they wrote: a long integer loses precision and 1e21 becomes
+    // "1e+21", where the `+` decodes to a space and the query parameter route can never work.
+    playerToken = String(rawPlayerToken);
+    Logger.warn(
+        `player_token was given as a number and is being used as the text "${playerToken}". ` +
+            'Quote it in the config file to be sure of what clients must send.'
+    );
+}
+if (playerToken) {
+    // Nothing rate limits this port: express-rate-limit is Express middleware, and an upgrade is a
+    // different event that Express never sees. So a refusal is logged - the address only, never what
+    // was presented - because an operator who cannot see guessing cannot respond to it.
+    serverOpts.playerWsOptions = {
+        ...serverOpts.playerWsOptions,
+        verifyClient: createPlayerTokenVerifier(playerToken, (request) => {
+            Logger.warn(`Refused a player from %s: no valid token.`, request.socket.remoteAddress);
+        })
+    };
+
+    // Short enough to guess, given the above. Warned rather than refused: the length that is "enough"
+    // depends on a deployment's exposure, and this is not the place to overrule an operator.
+    if (playerToken.length < MINIMUM_PLAYER_TOKEN_LENGTH) {
+        Logger.warn(
+            `player_token is only ${playerToken.length} characters. Nothing rate limits the player ` +
+                'port, so a short token can be guessed quickly. A GUID is a good default.'
+        );
+    }
+    Logger.info('Players must present --player_token to connect.');
+} else if (
+    options.player_token_file ||
+    (rawPlayerToken !== undefined && rawPlayerToken !== null && rawPlayerToken !== '')
+) {
+    // Something was configured and it came to nothing - `true`, an array, an object. Refusing to
+    // start is the only honest answer: carrying on would leave the player port open on a deployment
+    // whose operator has said in writing that it should not be.
+    //
+    // An explicitly empty string is excluded, and means what it says: no token. The throw beats
+    // winston's flush, so this reason reaches the console and stderr but not the log file - which is
+    // also true of the turn_ttl and secret file validation above it.
+    Logger.error('A player token was configured but is empty; refusing to start with an open player port.');
+    throw Error('Invalid player_token.');
+}
+
 // Time limited TURN credentials, when a shared secret was supplied. Without one the static username
 // and credential in the peer options are sent to every peer exactly as before.
 if (options.turn_secret) {
@@ -338,6 +430,16 @@ if (options.turn_secret) {
         ttlSeconds: turnTtlSeconds
     });
     Logger.info(`Issuing time limited TURN credentials, valid for ${turnTtlSeconds} seconds.`);
+    if (!options.player_token) {
+        // Worth saying together, because the two halves are easy to mistake for one another. A TTL
+        // decides how long a credential stays usable; it does not decide who is given one, and
+        // anything that can open a player socket is given one.
+        Logger.warn(
+            'TURN credentials are issued to every player that connects, because no --player_token ' +
+                'was supplied. A short --turn_ttl limits how long a leaked credential lasts, not ' +
+                'who receives one.'
+        );
+    }
 } else if (hasCredentiallessTurnServer(options.peer_options)) {
     // Nothing is going to fill these in, and a peer that receives a TURN server it cannot
     // authenticate against fails later, at ICE, as a generic connection failure with nothing in

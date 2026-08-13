@@ -66,6 +66,9 @@ Options:
   --turn_secret_file <filename>
                                 Reads the value of --turn_secret from a file, so the secret does not appear in the command line of this process. (default: "")
   --turn_ttl <seconds>          How long a credential issued to a player stays valid. Streamers and SFUs are configured once and cannot be reissued, so they are given a credential that does not practically expire. (default: "86400")
+  --player_token <token>        Requires every player to present this token when it connects, as a ?token= query parameter or an Authorization: Bearer header. A player that does not is refused at the HTTP upgrade with 401, before it is sent the config message. Streamer and SFU connections are not affected. (default: "")
+  --player_token_file <filename>
+                                Reads the value of --player_token from a file, so the token does not appear in the command line of this process. (default: "")
   --log_config                  Will print the program configuration on startup. (default: true)
   --stdin                       Allows stdin input while running. (default: false)
   --save                        After arguments are parsed the config.json is saved with whatever arguments were specified at launch. (default: false)
