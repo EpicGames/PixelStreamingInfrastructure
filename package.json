@@ -53,7 +53,8 @@
         "fast-uri@^3": "^3.1.4",
         "shell-quote": "^1.10.0",
         "launch-editor": "^2.14.1",
-        "js-yaml@^4": "^4.3.0",
+        "js-yaml@^3": "^3.15.1",
+        "js-yaml@^4": "^4.3.1",
         "@babel/core": "^7.29.6"
     },
     "dependencies": {}
