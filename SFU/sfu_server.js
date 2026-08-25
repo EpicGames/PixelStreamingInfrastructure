@@ -374,7 +374,7 @@ async function onPeerAnswer(peerId, sdp) {
 function onPeerDisconnected(peerId) {
     console.log("Player %s disconnected", peerId);
     const peer = peers.get(peerId);
-    if (peer !== null) {
+    if (peer) {
         for (const consumer of peer.consumers) {
             consumer.close();
         }
@@ -401,7 +401,7 @@ function disconnectAllPeers() {
 function onLayerPreference(msg) {
     console.log("onLayerPreference: " + JSON.stringify(msg));
     const peer = peers.get(`${msg.playerId}`);
-    if (peer !== null) {
+    if (peer) {
         for (const consumer of peer.consumers) {
             consumer.setPreferredLayers({ spatialLayer: msg.spatialLayer, temporalLayer: msg.temporalLayer });
         }
