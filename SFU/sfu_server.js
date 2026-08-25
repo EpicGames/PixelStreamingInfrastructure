@@ -212,11 +212,13 @@ function onStreamerDisconnected() {
         streamer.transport.close();
         streamer = null;
         signalServer.send(JSON.stringify({ type: 'stopStreaming' }));
-
-        setTimeout(function() {
-            signalServer.send(JSON.stringify({ type: 'listStreamers' }));
-        }, config.retrySubscribeDelaySecs * 1000);
     }
+
+    // Outside the guard above: this handler also runs when streamer is already null, and skipping
+    // the poll then leaves the SFU idle forever instead of waiting for the streamer to come back.
+    setTimeout(function() {
+        signalServer.send(JSON.stringify({ type: 'listStreamers' }));
+    }, config.retrySubscribeDelaySecs * 1000);
 }
 
 async function onPeerConnected(peerId) {
