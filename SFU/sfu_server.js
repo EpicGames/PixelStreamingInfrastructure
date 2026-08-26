@@ -12,6 +12,7 @@ let signalServer = null;
 let mediasoupRouter;
 let streamer = null;
 let peers = new Map();
+let streamerSearchTimer = null;
 let dataRouter;
 let scalabilityMode = "L1T1"; // Scalability mode defaults to L1T1 and is set by the offer from the streamer
 
@@ -121,6 +122,34 @@ async function createDataRouter() {
     };
 }
 
+// Sends a message to the signalling server, but only while the connection is up. ws throws if the
+// socket is still connecting and raises an error event if it has closed, so anything that can run
+// after a disconnect (timers, close handlers) has to send through here.
+function sendToSignalServer(message) {
+    if (!signalServer || signalServer.readyState !== WebSocket.OPEN) {
+        return false;
+    }
+    signalServer.send(JSON.stringify(message));
+    return true;
+}
+
+// Asks for the streamer list again after a delay. Only one search is ever pending, so repeated
+// disconnects cannot build up a backlog of listStreamers messages and duplicate subscriptions.
+function scheduleStreamerSearch() {
+    cancelStreamerSearch();
+    streamerSearchTimer = setTimeout(function() {
+        streamerSearchTimer = null;
+        sendToSignalServer({ type: 'listStreamers' });
+    }, config.retrySubscribeDelaySecs * 1000);
+}
+
+function cancelStreamerSearch() {
+    if (streamerSearchTimer !== null) {
+        clearTimeout(streamerSearchTimer);
+        streamerSearchTimer = null;
+    }
+}
+
 function connectSignalling(server) {
     console.log("Connecting to Signalling Server at %s", server);
     signalServer = new WebSocket(server);
@@ -128,7 +157,10 @@ function connectSignalling(server) {
     signalServer.addEventListener("error", result => { console.log(`Error: ${result.message}`); });
     signalServer.addEventListener("message", result => onSignallingMessage(result.data));
     signalServer.addEventListener("close", result => {
-        onStreamerDisconnected();
+        // Only clean up locally. Nothing can be sent on a closed socket, and the reconnect below
+        // asks for the streamer list again as soon as the new connection is identified.
+        cancelStreamerSearch();
+        teardownStreamer();
         console.log(`Disconnected from signalling server: ${result.code} ${result.reason}`);
         console.log("Attempting reconnect to signalling server...");
         setTimeout(() => {
@@ -162,9 +194,7 @@ async function onStreamerList(msg) {
 
     if (!success) {
         // did not subscribe to anything
-        setTimeout(function() {
-            signalServer.send(JSON.stringify({ type: 'listStreamers' }));
-        }, config.retrySubscribeDelaySecs * 1000);
+        scheduleStreamerSearch();
     }
 }
 
@@ -201,24 +231,34 @@ function getNextStreamerSCTPId() {
     return streamer.transport.getNextSctpStreamId();
 }
 
-function onStreamerDisconnected() {
-    console.log("Streamer disconnected");
+// Drops all players and closes anything we hold for the current streamer. Sends nothing, so it is
+// safe to call when the signalling connection has already gone away. Returns true if we still had
+// a streamer to tear down.
+function teardownStreamer() {
     disconnectAllPeers();
 
-    if (streamer !== null) {
-        for (const mediaProducer of streamer.producers) {
-            mediaProducer.close();
-        }
-        streamer.transport.close();
-        streamer = null;
-        signalServer.send(JSON.stringify({ type: 'stopStreaming' }));
+    if (streamer === null) {
+        return false;
     }
 
-    // Outside the guard above: this handler also runs when streamer is already null, and skipping
-    // the poll then leaves the SFU idle forever instead of waiting for the streamer to come back.
-    setTimeout(function() {
-        signalServer.send(JSON.stringify({ type: 'listStreamers' }));
-    }, config.retrySubscribeDelaySecs * 1000);
+    for (const mediaProducer of streamer.producers) {
+        mediaProducer.close();
+    }
+    streamer.transport.close();
+    streamer = null;
+    return true;
+}
+
+function onStreamerDisconnected() {
+    console.log("Streamer disconnected");
+
+    if (teardownStreamer()) {
+        sendToSignalServer({ type: 'stopStreaming' });
+    }
+
+    // The streamer can also drop before it sends us an offer, in which case there was no streamer
+    // to tear down. Search either way, or the SFU sits idle until someone restarts it.
+    scheduleStreamerSearch();
 }
 
 async function onPeerConnected(peerId) {
