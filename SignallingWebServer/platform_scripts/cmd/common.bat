@@ -167,7 +167,9 @@ popd
 if "%INSTALL_DEPS%"=="1" (
     echo Installing dependencies...
     pushd "%SCRIPT_DIR%..\..\.."
-    call %NPM% install
+    rem --no-audit/--no-fund: neither is read by the startup path, and a slow
+    rem registry audit blocks the server from starting for minutes.
+    call %NPM% install --no-audit --no-fund
     popd
 )
 
