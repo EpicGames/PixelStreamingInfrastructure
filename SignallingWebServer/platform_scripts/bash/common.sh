@@ -181,7 +181,9 @@ function setup_node() {
     # if node_modules doesnt exist or the package-lock file is newer than node_modules, install deps
     if [ ! -d node_modules ] || [ ../package-lock.json -nt node_modules ] || [ "$INSTALL_DEPS" == "1" ]; then
         echo "Installing dependencies..."
-        npm install
+        # --no-audit/--no-fund: neither is read by the startup path, and a slow
+        # registry audit blocks the server from starting for minutes.
+        npm install --no-audit --no-fund
     fi
 
     # log node version for audits
