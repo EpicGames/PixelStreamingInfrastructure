@@ -519,6 +519,34 @@ describe('PixelStreaming', () => {
         expect(rtcPeerConnectionSpyFunctions.sendDataSpy).toHaveBeenCalled();
     });
 
+    it('should not mirror the streamer\'s quality settings into the legacy compat QP settings', () => {
+        mockHTMLMediaElement({ ableToPlay: true, readyState: 2 });
+
+        const config = new Config({ initialSettings: {ss: mockSignallingUrl}});
+        const pixelStreaming = new PixelStreaming(config);
+        pixelStreaming.connect();
+
+        establishMockedPixelStreamingConnection();
+
+        pixelStreaming.play();
+
+        const initialSettings = new InitialSettings();
+        initialSettings.EncoderSettings.MinQuality = 10;
+        initialSettings.EncoderSettings.MaxQuality = 70;
+        pixelStreaming._onInitialSettings(initialSettings);
+
+        // The quality settings themselves take the streamer's values.
+        expect(config.getNumericSettingValue(NumericParameters.MinQuality)).toEqual(10);
+        expect(config.getNumericSettingValue(NumericParameters.MaxQuality)).toEqual(70);
+
+        // The legacy compat settings must stay at their defaults. Mirroring 70 into
+        // CompatQualityMax sends Encoder.MinQP as 15.300000000000004, which the streamer floors to
+        // 15 and converts back by rounding to 70.588 -> 71, so the value it applies drifts one step
+        // looser per connect until it reaches a fixed point unrelated to the configured one.
+        expect(config.getNumericSettingValue(NumericParameters.CompatQualityMin)).toEqual(0);
+        expect(config.getNumericSettingValue(NumericParameters.CompatQualityMax)).toEqual(100);
+    });
+
     it('should send data through the data channel when emitUIInteraction is called', () => {
         mockHTMLMediaElement({ ableToPlay: true, readyState: 2 });
         
