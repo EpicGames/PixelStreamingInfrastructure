@@ -87,7 +87,7 @@ jobs:
         run: echo "node_version=$(cat NODE_VERSION)" >> $GITHUB_OUTPUT
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "${{ steps.get_node_version.outputs.node_version }}"
           registry-url: 'https://registry.npmjs.org'
@@ -115,7 +115,7 @@ jobs:
 
       - name: Create or update release tag
         if: ${{ inputs.dry_run != true }}
-        uses: actions/github-script@v5
+        uses: actions/github-script@v9
         with:
           script: |
             const tag = 'refs/tags/${{ steps.build-label.outputs.label }}';
