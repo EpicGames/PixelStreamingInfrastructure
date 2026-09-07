@@ -40,7 +40,7 @@ jobs:
   #     run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       
   #   - name: Upload results
-  #     uses: actions/upload-artifact@v4
+  #     uses: actions/upload-artifact@v7
   #     with:
   #       name: Results-${{ steps.vars.outputs.sha_short }}-Linux
   #       path: Extras/MinimalStreamTester/results
@@ -144,7 +144,7 @@ jobs:
       run: echo "sha_short=$(git rev-parse --short HEAD)" >> $Env:GITHUB_OUTPUT
       
     - name: Upload results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: Results-${{ steps.vars.outputs.sha_short }}-Win
         path: Extras\MinimalStreamTester\playwright-report
