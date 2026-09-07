@@ -26,7 +26,7 @@ jobs:
       run: mkdir Extras/FrontendTests/results
 
     - name: Launch frontend tests in docker containers
-      uses: isbang/compose-action@v1.5.1
+      uses: isbang/compose-action@v3.1.0
       with:
         compose-file: "Extras/FrontendTests/docker-compose.yml"
         up-flags: "--build --abort-on-container-exit --exit-code-from tester"
