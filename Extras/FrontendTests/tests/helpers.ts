@@ -31,6 +31,15 @@ export function delay(time: number) {
   });
 }
 
+// Browsers warp the cursor when pointer lock engages, and where they warp to differs between
+// browsers and between versions of the same browser (Firefox 155 changed it). That makes the
+// delta on the first move after locking unpredictable. Moving to a known point absorbs it, so
+// call this after the click that locks the pointer and before capturing any events.
+export async function settleLockedPointer(page: Page, anchor: { x: number, y: number }) {
+    await page.mouse.move(anchor.x, anchor.y);
+    await delay(50);
+}
+
 
 export async function startAndWaitForVideo(page: Page) {
     await page.evaluate(()=> {
