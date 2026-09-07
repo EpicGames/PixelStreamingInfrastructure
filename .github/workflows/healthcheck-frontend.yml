@@ -20,13 +20,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
         
     - name: Create results directory
       run: mkdir Extras/FrontendTests/results
 
     - name: Launch frontend tests in docker containers
-      uses: isbang/compose-action@v1.5.1
+      uses: hoverkraft-tech/compose-action@v3.1.0
       with:
         compose-file: "Extras/FrontendTests/docker-compose.yml"
         up-flags: "--build --abort-on-container-exit --exit-code-from tester"
@@ -36,7 +36,7 @@ jobs:
       run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       
     - name: Upload results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: Results-${{ steps.vars.outputs.sha_short }}-Linux
         path: Extras/FrontendTests/results
@@ -46,7 +46,7 @@ jobs:
   #   runs-on: windows-latest
   #   steps:
   #   - name: Checkout source code
-  #     uses: actions/checkout@v4
+  #     uses: actions/checkout@v7
   #
   #   - name: Get node version
   #     id: get_node_version
@@ -135,7 +135,7 @@ jobs:
   #     run: echo "sha_short=$(git rev-parse --short HEAD)" >> $Env:GITHUB_OUTPUT
   #     
   #   - name: Upload results
-  #     uses: actions/upload-artifact@v4
+  #     uses: actions/upload-artifact@v7
   #     with:
   #       name: Results-${{ steps.vars.outputs.sha_short }}-Win
   #       path: Extras\MinimalStreamTester\playwright-report
