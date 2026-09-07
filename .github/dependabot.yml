@@ -1,0 +1,124 @@
+# Dependabot configuration.
+#
+# This file is only ever read from the default branch (master). The
+# `target-branch` entries below are what let a single config here drive updates
+# on the release branches -- do not copy this file onto UE5.x.
+#
+# Why the release branches are listed at all: Dependabot *security* updates
+# (the alert-driven ones) are raised against the default branch only, and
+# `target-branch` applies to version updates exclusively. So an alert like
+# CVE-2026-73088 produces a PR on master and nothing on UE5.8/5.7/5.6. Before
+# this config existed, every such fix had to be backported by hand -- and a
+# lockfile patch does not cherry-pick across these branches, because their
+# dependency graphs have diverged (UE5.7's lockfile differs from master's by
+# thousands of lines). The scheduled version updates below let Dependabot
+# resolve each branch's lockfile natively instead, which is the only way to get
+# a correct result.
+#
+# Two npm roots exist: the workspace root (covering all 13 workspaces via the
+# shared lockfile) and the standalone eslint plugin, which has its own lockfile.
+
+version: 2
+
+updates:
+  # ---------------------------------------------------------------- master ---
+  # Security updates land here automatically and need no configuration; these
+  # entries add the scheduled version updates.
+  - package-ecosystem: npm
+    directories:
+      - "/"
+      - "/Extras/eslint/plugin-check-copyright"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    groups:
+      npm-development:
+        dependency-type: development
+        update-types: ["minor", "patch"]
+      npm-production:
+        dependency-type: production
+        update-types: ["minor", "patch"]
+
+  # -------------------------------------------------------- release: UE5.8 ---
+  # Majors are ignored on release branches: a breaking upgrade should be a
+  # deliberate change, not a scheduled one. (A "bump qs" PR that was really an
+  # Express 4 -> 5 major is what prompted this.) Patches and minors still flow,
+  # which is what picks up security fixes here.
+  - package-ecosystem: npm
+    target-branch: UE5.8
+    directories:
+      - "/"
+      - "/Extras/eslint/plugin-check-copyright"
+    schedule:
+      interval: weekly
+      day: tuesday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      npm-development:
+        dependency-type: development
+        update-types: ["minor", "patch"]
+      npm-production:
+        dependency-type: production
+        update-types: ["minor", "patch"]
+
+  # -------------------------------------------------------- release: UE5.7 ---
+  - package-ecosystem: npm
+    target-branch: UE5.7
+    directories:
+      - "/"
+      - "/Extras/eslint/plugin-check-copyright"
+    schedule:
+      interval: weekly
+      day: wednesday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      npm-development:
+        dependency-type: development
+        update-types: ["minor", "patch"]
+      npm-production:
+        dependency-type: production
+        update-types: ["minor", "patch"]
+
+  # -------------------------------------------------------- release: UE5.6 ---
+  - package-ecosystem: npm
+    target-branch: UE5.6
+    directories:
+      - "/"
+      - "/Extras/eslint/plugin-check-copyright"
+    schedule:
+      interval: weekly
+      day: thursday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      npm-development:
+        dependency-type: development
+        update-types: ["minor", "patch"]
+      npm-production:
+        dependency-type: production
+        update-types: ["minor", "patch"]
+
+  # ------------------------------------------------------- github-actions ---
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    labels:
+      - dependencies
