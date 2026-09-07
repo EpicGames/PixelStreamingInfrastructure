@@ -26,7 +26,7 @@ jobs:
           echo "version=${BRANCH_NAME#UE}" >> $GITHUB_OUTPUT
         
       - name: Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v4
         with:
           username: pixelstreamingunofficial
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -47,7 +47,7 @@ jobs:
           echo 'EOF' >> $GITHUB_OUTPUT
 
       - name: Create or update release tag
-        uses: actions/github-script@v5
+        uses: actions/github-script@v9
         with:
           script: |
             const tag = 'refs/tags/sfu-${{ github.ref_name }}-${{ fromJson(steps.get-package-json.outputs.json).version }}';

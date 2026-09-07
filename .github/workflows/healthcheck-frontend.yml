@@ -52,7 +52,7 @@ jobs:
   #     id: get_node_version
   #     run: echo "node_version=$(cat NODE_VERSION)" >> $Env:GITHUB_OUTPUT
   #
-  #   - uses: actions/setup-node@v4
+  #   - uses: actions/setup-node@v7
   #     with:
   #       node-version: ${{ steps.get_node_version.outputs.node_version }}
   #
