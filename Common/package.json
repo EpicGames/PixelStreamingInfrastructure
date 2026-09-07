@@ -22,20 +22,20 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "devDependencies": {
-        "@eslint/js": "^9.20.0",
+        "@eslint/js": "^9.39.5",
         "@protobuf-ts/plugin": "^2.9.4",
-        "@types/node": "^22.14.0",
-        "concurrently": "^9.1.2",
+        "@types/node": "^22.20.1",
+        "concurrently": "^9.2.4",
         "eslint": "^9.39.0",
         "eslint-config-prettier": "^10.0.1",
-        "eslint-plugin-prettier": "^5.2.3",
-        "eslint-plugin-tsdoc": "^0.4.0",
+        "eslint-plugin-prettier": "^5.5.6",
+        "eslint-plugin-tsdoc": "^0.5.2",
         "nodemon": "^3.1.9",
         "rimraf": "^6.0.1",
-        "typedoc": "^0.28.0",
-        "typedoc-plugin-markdown": "^4.4.2",
+        "typedoc": "^0.28.20",
+        "typedoc-plugin-markdown": "^4.13.0",
         "typescript": "^5.7.3",
-        "typescript-eslint": "8.57.2"
+        "typescript-eslint": "8.69.0"
     },
     "dependencies": {
         "@protobuf-ts/runtime": "^2.9.4",
