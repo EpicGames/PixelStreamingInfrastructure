@@ -116,9 +116,17 @@ updates:
         update-types: ["minor", "patch"]
 
   # ------------------------------------------------------- github-actions ---
+  # Batched into a single PR. Adding this ecosystem opened five separate PRs at
+  # once (#1014-#1018), because nothing had ever checked the workflows before
+  # and Dependabot runs every entry immediately when a config is first merged.
+  # Grouping keeps a monthly sweep to one reviewable PR.
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: monthly
+    open-pull-requests-limit: 3
     labels:
       - dependencies
+    groups:
+      github-actions:
+        patterns: ["*"]
