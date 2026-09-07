@@ -42,14 +42,14 @@
         "body-parser": "^2.3.0",
         "cors": "^2.8.5",
         "express": "^5.2.1",
-        "express-rate-limit": "^8.5.1",
-        "helmet": "^8.0.0",
+        "express-rate-limit": "^8.7.0",
+        "helmet": "^8.3.0",
         "hsts": "^2.2.0",
         "jsonc": "^2.0.0",
         "logform": "^2.7.0",
         "winston": "^3.17.0",
         "winston-daily-rotate-file": "^5.0.0",
-        "ws": "^8.18.0"
+        "ws": "^7.5.13"
     },
     "peerDependencies": {
         "@epicgames-ps/lib-pixelstreamingcommon-ue5.7": "^0.1.5"
