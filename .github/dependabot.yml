@@ -17,31 +17,15 @@
 #
 # Two npm roots exist: the workspace root (covering all 13 workspaces via the
 # shared lockfile) and the standalone eslint plugin, which has its own lockfile.
+#
+# Deliberately scoped to the release branches only. master needs nothing here:
+# it already gets alert-driven security PRs with no configuration, and adding
+# scheduled version updates for it just produced review load nobody asked for.
+# There is no github-actions entry for the same reason -- bump those by hand.
 
 version: 2
 
 updates:
-  # ---------------------------------------------------------------- master ---
-  # Security updates land here automatically and need no configuration; these
-  # entries add the scheduled version updates.
-  - package-ecosystem: npm
-    directories:
-      - "/"
-      - "/Extras/eslint/plugin-check-copyright"
-    schedule:
-      interval: weekly
-      day: monday
-    open-pull-requests-limit: 5
-    labels:
-      - dependencies
-    groups:
-      npm-development:
-        dependency-type: development
-        update-types: ["minor", "patch"]
-      npm-production:
-        dependency-type: production
-        update-types: ["minor", "patch"]
-
   # -------------------------------------------------------- release: UE5.8 ---
   # Majors are ignored on release branches: a breaking upgrade should be a
   # deliberate change, not a scheduled one. (A "bump qs" PR that was really an
@@ -114,11 +98,3 @@ updates:
       npm-production:
         dependency-type: production
         update-types: ["minor", "patch"]
-
-  # ------------------------------------------------------- github-actions ---
-  - package-ecosystem: github-actions
-    directory: "/"
-    schedule:
-      interval: monthly
-    labels:
-      - dependencies
