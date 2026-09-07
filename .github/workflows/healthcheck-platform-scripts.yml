@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Launch and query signalling server using the REST API
         working-directory: SignallingWebServer
         run: |
@@ -28,7 +28,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Launch and query signalling server using the REST API
         working-directory: SignallingWebServer
         run: |
@@ -40,7 +40,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Launch and query signalling server using the REST API
         working-directory: SignallingWebServer
         run: |
