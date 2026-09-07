@@ -45,6 +45,16 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # These span workspaces that deliberately sit on different versions --
+      # ws is ^8 in Common/Signalling/SS_Test but ^7 in SFU, and mediasoup is
+      # pinned exact in mediasoup-sdp-bridge but a caret range in SFU. A
+      # grouped update unifies each package on one version across the whole
+      # monorepo, which levelled ws down from ^8 to ^7 (bypassing the
+      # "ws@^8" overrides pin) and skewed mediasoup-client away from the
+      # mediasoup server it bridges. Both need coordinated manual upgrades.
+      - dependency-name: "ws"
+      - dependency-name: "mediasoup"
+      - dependency-name: "mediasoup-client"
     groups:
       npm-development:
         dependency-type: development
@@ -68,6 +78,16 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # These span workspaces that deliberately sit on different versions --
+      # ws is ^8 in Common/Signalling/SS_Test but ^7 in SFU, and mediasoup is
+      # pinned exact in mediasoup-sdp-bridge but a caret range in SFU. A
+      # grouped update unifies each package on one version across the whole
+      # monorepo, which levelled ws down from ^8 to ^7 (bypassing the
+      # "ws@^8" overrides pin) and skewed mediasoup-client away from the
+      # mediasoup server it bridges. Both need coordinated manual upgrades.
+      - dependency-name: "ws"
+      - dependency-name: "mediasoup"
+      - dependency-name: "mediasoup-client"
     groups:
       npm-development:
         dependency-type: development
@@ -91,6 +111,16 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # These span workspaces that deliberately sit on different versions --
+      # ws is ^8 in Common/Signalling/SS_Test but ^7 in SFU, and mediasoup is
+      # pinned exact in mediasoup-sdp-bridge but a caret range in SFU. A
+      # grouped update unifies each package on one version across the whole
+      # monorepo, which levelled ws down from ^8 to ^7 (bypassing the
+      # "ws@^8" overrides pin) and skewed mediasoup-client away from the
+      # mediasoup server it bridges. Both need coordinated manual upgrades.
+      - dependency-name: "ws"
+      - dependency-name: "mediasoup"
+      - dependency-name: "mediasoup-client"
     groups:
       npm-development:
         dependency-type: development
