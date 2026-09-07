@@ -27,7 +27,7 @@ jobs:
       - name: Find existing link checker issue
         id: find-issue
         if: always()
-        uses: actions/github-script@v5
+        uses: actions/github-script@v9
         with:
           result-encoding: string
           script: |
@@ -42,7 +42,7 @@ jobs:
 
       - name: Create or update link checker issue
         if: env.lychee_exit_code != 0
-        uses: peter-evans/create-issue-from-file@v4
+        uses: peter-evans/create-issue-from-file@v6
         with:
           title: Link Checker Report
           content-filepath: ./lychee/out.md
@@ -51,7 +51,7 @@ jobs:
 
       - name: Close existing issue if all links pass
         if: env.lychee_exit_code == 0 && steps.find-issue.outputs.result != ''
-        uses: actions/github-script@v5
+        uses: actions/github-script@v9
         with:
           script: |
             await github.rest.issues.update({
