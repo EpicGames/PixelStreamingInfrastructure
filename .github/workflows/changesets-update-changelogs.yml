@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup Node.js 20.x
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 20.x
           cache: 'npm'
@@ -34,13 +34,17 @@ jobs:
       # branch's workspace. It runs inside the action's release-branch worktree
       # (after its internal `git reset --hard`) so the rewrites survive.
       - name: Create Release Pull Request
-        uses: changesets/action@v1.4.10
+        uses: changesets/action@v2
         env:
           # Org policy forbids the default GITHUB_TOKEN from creating PRs, so a
           # PAT (repo + workflow scope) is required to open the release PR.
           GITHUB_TOKEN: ${{ secrets.AUTOMATION_PAT }}
         with:
-          title: '[Bot] NPM Packages Release ${{ github.ref_name }}'
-          commit: 'Updated NPM changelogs'
-          version: bash .github/scripts/version-with-normalized-suffixes.sh
+          # v2 renamed these inputs, and its `github-token` defaults to the
+          # default GITHUB_TOKEN -- which org policy forbids from creating
+          # PRs -- so the PAT must now be passed explicitly as an input.
+          github-token: ${{ secrets.AUTOMATION_PAT }}
+          pr-title: '[Bot] NPM Packages Release ${{ github.ref_name }}'
+          commit-message: 'Updated NPM changelogs'
+          version-script: bash .github/scripts/version-with-normalized-suffixes.sh
 
