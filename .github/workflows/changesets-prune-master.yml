@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout master
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: master
 
@@ -44,7 +44,7 @@ jobs:
       # unmerged cleanup PR is refreshed in place rather than duplicated.
       - name: Create or update cleanup PR
         if: steps.prune.outputs.removed_count != '0'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           # Org policy forbids the default GITHUB_TOKEN from creating PRs, so a
           # PAT (repo + workflow scope) is required here.
