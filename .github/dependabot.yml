@@ -55,6 +55,13 @@ updates:
       - dependency-name: "ws"
       - dependency-name: "mediasoup"
       - dependency-name: "mediasoup-client"
+      # @playwright/test pulls a specific browser build with it, so a routine
+      # dev bump is really a browser engine upgrade. Firefox 155 (Playwright
+      # 1.63) broke two unrelated suites: pointer-lock semantics changed under
+      # Extras/FrontendTests, and Extras/MinimalStreamTester stopped receiving
+      # a stream from the UE streamer entirely. Upgrade this deliberately,
+      # alongside whatever test work the new browser needs.
+      - dependency-name: "@playwright/test"
     groups:
       npm-development:
         dependency-type: development
@@ -88,6 +95,13 @@ updates:
       - dependency-name: "ws"
       - dependency-name: "mediasoup"
       - dependency-name: "mediasoup-client"
+      # @playwright/test pulls a specific browser build with it, so a routine
+      # dev bump is really a browser engine upgrade. Firefox 155 (Playwright
+      # 1.63) broke two unrelated suites: pointer-lock semantics changed under
+      # Extras/FrontendTests, and Extras/MinimalStreamTester stopped receiving
+      # a stream from the UE streamer entirely. Upgrade this deliberately,
+      # alongside whatever test work the new browser needs.
+      - dependency-name: "@playwright/test"
     groups:
       npm-development:
         dependency-type: development
@@ -121,6 +135,13 @@ updates:
       - dependency-name: "ws"
       - dependency-name: "mediasoup"
       - dependency-name: "mediasoup-client"
+      # @playwright/test pulls a specific browser build with it, so a routine
+      # dev bump is really a browser engine upgrade. Firefox 155 (Playwright
+      # 1.63) broke two unrelated suites: pointer-lock semantics changed under
+      # Extras/FrontendTests, and Extras/MinimalStreamTester stopped receiving
+      # a stream from the UE streamer entirely. Upgrade this deliberately,
+      # alongside whatever test work the new browser needs.
+      - dependency-name: "@playwright/test"
     groups:
       npm-development:
         dependency-type: development
