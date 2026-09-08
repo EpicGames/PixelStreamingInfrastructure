@@ -166,14 +166,18 @@ export class GamepadController implements IInputController {
                 controller.id === undefined ? this.controllers.indexOf(controller) : controller.id;
             const currentState = controller.currentState;
             for (let i = 0; i < controller.currentState.buttons.length; i++) {
+                // Typed as GamepadLayout so the comparisons below share an enum type.
+                // Asserting `i as GamepadLayout` inline satisfies no-unsafe-enum-comparison
+                // but trips no-unnecessary-type-assertion; this satisfies both.
+                const buttonIndex: GamepadLayout = i;
                 const currentButton = controller.currentState.buttons[i];
                 const previousButton = controller.prevState.buttons[i];
                 if (currentButton.pressed) {
                     // press
-                    if ((i as GamepadLayout) === GamepadLayout.LeftTrigger) {
+                    if (buttonIndex === GamepadLayout.LeftTrigger) {
                         // UEs left analog has a button index of 5
                         toStreamerHandlers.get('GamepadAnalog')([controllerId, 5, currentButton.value]);
-                    } else if ((i as GamepadLayout) === GamepadLayout.RightTrigger) {
+                    } else if (buttonIndex === GamepadLayout.RightTrigger) {
                         // UEs right analog has a button index of 6
                         toStreamerHandlers.get('GamepadAnalog')([controllerId, 6, currentButton.value]);
                     } else {
@@ -185,10 +189,10 @@ export class GamepadController implements IInputController {
                     }
                 } else if (!currentButton.pressed && previousButton.pressed) {
                     // release
-                    if ((i as GamepadLayout) === GamepadLayout.LeftTrigger) {
+                    if (buttonIndex === GamepadLayout.LeftTrigger) {
                         // UEs left analog has a button index of 5
                         toStreamerHandlers.get('GamepadAnalog')([controllerId, 5, 0]);
-                    } else if ((i as GamepadLayout) === GamepadLayout.RightTrigger) {
+                    } else if (buttonIndex === GamepadLayout.RightTrigger) {
                         // UEs right analog has a button index of 6
                         toStreamerHandlers.get('GamepadAnalog')([controllerId, 6, 0]);
                     } else {
