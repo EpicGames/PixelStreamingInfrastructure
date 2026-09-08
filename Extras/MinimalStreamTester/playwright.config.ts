@@ -40,7 +40,15 @@ export default defineConfig({
 
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: {
+        ...devices['Desktop Firefox'],
+        launchOptions: {
+          // Firefox hides host candidates behind mDNS .local names by default.
+          // The CI runner cannot resolve them, so ICE finds no working pair for
+          // what is a same-machine connection. Real IPs are fine in a test browser.
+          firefoxUserPrefs: { 'media.peerconnection.ice.obfuscate_host_addresses': false }
+        }
+      },
     },
 
     // {
