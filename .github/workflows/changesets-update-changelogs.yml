@@ -34,17 +34,19 @@ jobs:
       # branch's workspace. It runs inside the action's release-branch worktree
       # (after its internal `git reset --hard`) so the rewrites survive.
       - name: Create Release Pull Request
-        uses: changesets/action@v2
+        # Stay on v1: changesets/action v2 requires Changesets CLI v3 and this
+        # repo is on @changesets/cli 2.x. v1.9.0 still runs on node24, so the
+        # Node 20 removal is covered without forcing a CLI major.
+        uses: changesets/action@v1.9.0
         env:
           # Org policy forbids the default GITHUB_TOKEN from creating PRs, so a
           # PAT (repo + workflow scope) is required to open the release PR.
           GITHUB_TOKEN: ${{ secrets.AUTOMATION_PAT }}
         with:
-          # v2 renamed these inputs, and its `github-token` defaults to the
-          # default GITHUB_TOKEN -- which org policy forbids from creating
-          # PRs -- so the PAT must now be passed explicitly as an input.
+          # github-token defaults to the default GITHUB_TOKEN, which org policy
+          # forbids from creating PRs, so pass the PAT explicitly.
           github-token: ${{ secrets.AUTOMATION_PAT }}
-          pr-title: '[Bot] NPM Packages Release ${{ github.ref_name }}'
-          commit-message: 'Updated NPM changelogs'
-          version-script: bash .github/scripts/version-with-normalized-suffixes.sh
+          title: '[Bot] NPM Packages Release ${{ github.ref_name }}'
+          commit: 'Updated NPM changelogs'
+          version: bash .github/scripts/version-with-normalized-suffixes.sh
 
