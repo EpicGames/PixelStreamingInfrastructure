@@ -175,7 +175,7 @@ export class WebRtcPlayerController {
         this.transport = new WebSocketTransport(config.webSocketProtocols);
         this.protocol = new SignallingProtocol(this.transport);
         this.protocol.addListener(Messages.config.typeName, (msg: BaseMessage) =>
-            this.handleOnConfigMessage(msg as Messages.config)
+            this.handleOnConfigMessage(msg)
         );
         this.protocol.addListener(Messages.ping.typeName, (msg: BaseMessage) =>
             this.handlePingMessage(msg as Messages.ping)
