@@ -107,10 +107,21 @@ jobs:
         npx playwright install --with-deps
         npx playwright install chrome
 
+    # start.sh/start.bat inject a default STUN server (platform_scripts/bash/
+    # common.sh), but this job runs `npm run start` directly and so skips that,
+    # leaving peer_options empty. With only host candidates, Firefox >=155 fails
+    # ICE and the stream never starts. Written to a file rather than passed
+    # inline to avoid quoting JSON through PowerShell, npm and node.
+    - name: Write peer options
+      run: |
+        $json = '{"iceServers":[{"urls":["stun:stun.l.google.com:19302"]}]}'
+        [System.IO.File]::WriteAllText("${{ github.workspace }}\ci-peer-options.json", $json)
+        Get-Content "${{ github.workspace }}\ci-peer-options.json"
+
     - name: Run Signalling
       working-directory: SignallingWebServer
       # triple hyphen for npm script running issues. With double the arguments get mangled
-      run: Start-Process powershell.exe -ArgumentList "npm","run","start","---","--rest_api","--player_port 999","--http_root ${{ github.workspace }}\www"
+      run: Start-Process powershell.exe -ArgumentList "npm","run","start","---","--rest_api","--player_port 999","--http_root ${{ github.workspace }}\www","--peer_options_file ${{ github.workspace }}\ci-peer-options.json"
 
     - name: Run Streamer
       working-directory: Streamer
