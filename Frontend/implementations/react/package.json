@@ -18,10 +18,10 @@
         "@types/react": "^19.0.8",
         "@types/react-dom": "^19.0.3",
         "html-loader": "^5.1.0",
-        "html-webpack-plugin": "^5.6.3",
-        "ts-loader": "^9.5.2",
+        "html-webpack-plugin": "^5.6.8",
+        "ts-loader": "^9.6.2",
         "typescript": "^5.7.3",
-        "webpack": "^5.97.1",
+        "webpack": "^5.110.3",
         "webpack-cli": "^6.0.1",
         "webpack-merge": "^6.0.1"
     },
