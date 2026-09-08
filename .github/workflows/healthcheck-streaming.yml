@@ -123,6 +123,12 @@ jobs:
     - name: Wait for streamer to come up
       run: curl --fail-with-body --retry-all-errors --retry 10 --retry-delay 20 --retry-connrefused http://localhost:999/api/streamers/DefaultStreamer
 
+    - name: Test if we can stream
+      working-directory: Extras\MinimalStreamTester
+      run: |
+        $Env:PIXELSTREAMING_URL = 'http://localhost:999'
+        npx playwright test
+
     - name: Output signalling logs
       if: always()
       working-directory: SignallingWebServer
@@ -133,17 +139,13 @@ jobs:
       working-directory: Streamer
       run: ls ".\Minimal\" && Test-Path ".\Minimal\Saved\Logs\Minimal.log" && cat ".\Minimal\Saved\Logs\Minimal.log"
 
-    - name: Test if we can stream
-      working-directory: Extras\MinimalStreamTester
-      run: |
-        $Env:PIXELSTREAMING_URL = 'http://localhost:999'
-        npx playwright test
-
     - name: Get short sha
+      if: always()
       id: vars
       run: echo "sha_short=$(git rev-parse --short HEAD)" >> $Env:GITHUB_OUTPUT
       
     - name: Upload results
+      if: always()
       uses: actions/upload-artifact@v7
       with:
         name: Results-${{ steps.vars.outputs.sha_short }}-Win

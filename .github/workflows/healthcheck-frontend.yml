@@ -32,10 +32,12 @@ jobs:
         up-flags: "--build --abort-on-container-exit --exit-code-from tester"
 
     - name: Get short sha
+      if: always()
       id: vars
       run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       
     - name: Upload results
+      if: always()
       uses: actions/upload-artifact@v7
       with:
         name: Results-${{ steps.vars.outputs.sha_short }}-Linux
