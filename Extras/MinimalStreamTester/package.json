@@ -13,7 +13,7 @@
     "author": "",
     "license": "ISC",
     "devDependencies": {
-        "@playwright/test": "^1.49.1",
+        "@playwright/test": "1.60.0",
         "@types/node": "^22.14.0",
         "@types/uuid": "^9.0.8"
     },
