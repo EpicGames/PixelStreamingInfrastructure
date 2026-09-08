@@ -25,10 +25,31 @@ test('Test default stream.', async ({ page }, testinfo) => {
     // set a long timeout to allow for slow software rendering
     test.setTimeout(2 * 60 * 1000);
 
+    // INVESTIGATION ONLY: surface browser-side errors so a stream that never
+    // starts leaves something diagnosable behind.
+    page.on('console', msg => console.log(`[browser:${msg.type()}] ${msg.text()}`));
+    page.on('pageerror', err => console.log(`[pageerror] ${err.message}`));
+
     await page.goto("/?StreamerId=DefaultStreamer");
 
     // wait until we get a stream
-    await startAndWaitForVideo(page);
+    try {
+        await startAndWaitForVideo(page);
+    } catch (e) {
+        const diag = await page.evaluate(() => {
+            const ps = (window as any).pixelStreaming;
+            const pc = ps?.webRtcController?.peerConnectionController?.peerConnection;
+            return {
+                signalingState: pc?.signalingState,
+                iceConnectionState: pc?.iceConnectionState,
+                connectionState: pc?.connectionState,
+                remoteSdp: pc?.remoteDescription?.sdp,
+                localSdp: pc?.localDescription?.sdp
+            };
+        }).catch(() => null);
+        console.log('[diag] peer connection:', JSON.stringify(diag, null, 2));
+        throw e;
+    }
 
     // let the stream run for a small duration
     await delay(15000);
