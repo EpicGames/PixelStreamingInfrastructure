@@ -35,7 +35,7 @@ export class DataChannelController {
         this.label = label;
         this.datachannelOptions = datachannelOptions;
         if (datachannelOptions == null) {
-            this.datachannelOptions = {} as RTCDataChannelInit;
+            this.datachannelOptions = {};
             this.datachannelOptions.ordered = true;
         }
 
