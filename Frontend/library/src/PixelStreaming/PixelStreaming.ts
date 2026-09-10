@@ -196,18 +196,23 @@ export class PixelStreaming {
         });
 
         // direct quality factor settings
+        //
+        // These deliberately do not mirror into CompatQualityMin/Max. The streamer applies
+        // Encoder.MinQuality/Encoder.MaxQuality verbatim, so mirroring only adds a lossy round trip
+        // through the legacy QP commands below: quality -> QP is computed in floating point here, and
+        // the streamer parses that string as an integer before converting back by rounding. Flooring
+        // one way and rounding the other is not the identity, so each pass loosened both bounds and
+        // the streamer's configured values drifted further on every connect.
         this.config._addOnNumericSettingChangedListener(NumericParameters.MinQuality, (newValue: number) => {
             Logger.Info('--------  Sending MinQuality  --------');
             this._webRtcController.sendEncoderMinQuality(newValue);
             Logger.Info('-------------------------------------------');
-            this.config.setNumericSetting(NumericParameters.CompatQualityMin, newValue);
         });
 
         this.config._addOnNumericSettingChangedListener(NumericParameters.MaxQuality, (newValue: number) => {
             Logger.Info('--------  Sending MaxQuality  --------');
             this._webRtcController.sendEncoderMaxQuality(newValue);
             Logger.Info('-------------------------------------------');
-            this.config.setNumericSetting(NumericParameters.CompatQualityMax, newValue);
         });
 
         // new quality value that gets scaled to qp for legacy reasons
