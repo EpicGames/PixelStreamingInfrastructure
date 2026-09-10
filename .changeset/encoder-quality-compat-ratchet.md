@@ -1,0 +1,5 @@
+---
+"@epicgames-ps/lib-pixelstreamingfrontend-ue5.8": patch
+---
+
+Stop the streamer's encoder quality bounds drifting looser on every connect. `EncoderSettings.MinQuality`/`MaxQuality` from `initialSettings` were mirrored into the legacy `CompatQualityMin`/`CompatQualityMax` settings, whose listeners convert quality back to QP in floating point and send it as `Encoder.MinQP`/`Encoder.MaxQP`. A `MaxQuality` of 70 becomes `15.300000000000004`, which the streamer parses with an integer parse (flooring it to 15) and converts back by rounding (`100 * (1 - 15/51)` = 70.588 -> 71). Flooring one way and rounding the other is not the identity, and `initialSettings` is sent per player, so an application configured for 10/70 was running at 12/71 after one viewer, 14/73 after two, and eventually 25/76 — with the raised lower bound also taking away the encoder's room to drop quality under congestion. The mirror is removed: the streamer already applies `Encoder.MinQuality`/`Encoder.MaxQuality` verbatim, so nothing is lost, and the QP path is left in place for applications that send `MinQP`/`MaxQP` themselves.
