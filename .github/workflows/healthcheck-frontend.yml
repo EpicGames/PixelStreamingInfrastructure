@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   streaming-test-linux:
-    if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
+    if: github.event.repository.fork == false
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source code
@@ -42,7 +42,7 @@ jobs:
         path: Extras/FrontendTests/results
 
   # streaming-test-win:
-  #   if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
+  #   if: github.event.repository.fork == false
   #   runs-on: windows-latest
   #   steps:
   #   - name: Checkout source code
