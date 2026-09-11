@@ -20,7 +20,7 @@ permissions:
 jobs:
   # Uncomment when we can Linux test to capture a non-black screenshot using software renderer.
   # streaming-test-linux:
-  #   if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
+  #   if: github.event.repository.fork == false
   #   runs-on: ubuntu-latest
   #   steps:
   #   - name: Checkout source code
@@ -46,7 +46,7 @@ jobs:
   #       path: Extras/MinimalStreamTester/results
 
   streaming-test-win:
-    if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
+    if: github.event.repository.fork == false
     runs-on: windows-latest
     steps:
     - name: Checkout source code
