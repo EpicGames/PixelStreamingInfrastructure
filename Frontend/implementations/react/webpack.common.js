@@ -70,7 +70,14 @@ module.exports = {
       hashFunction: 'xxhash64',
     },
     experiments: {
-      futureDefaults: true
+      futureDefaults: true,
+      // `futureDefaults` force-enables webpack's built-in TypeScript support, which
+      // cannot handle .tsx/JSX and would otherwise claim our .tsx entry points.
+      // ts-loader (configured above) handles .ts/.tsx instead.
+      typescript: false,
+      // Likewise, keep html-loader/html-webpack-plugin in charge of .html templates
+      // rather than the built-in html module type.
+      html: false
     },
 	devServer: {
     	static: {
