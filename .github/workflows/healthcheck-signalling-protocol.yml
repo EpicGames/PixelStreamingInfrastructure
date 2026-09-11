@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   signalling-protocol-test:
-    if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
+    if: github.event.repository.fork == false
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source code
