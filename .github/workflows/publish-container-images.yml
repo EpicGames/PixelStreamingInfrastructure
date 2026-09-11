@@ -10,7 +10,7 @@ on:
 
 jobs:
   signalling-server-image:
-    if: github.repository == 'EpicGamesExt/PixelStreamingInfrastructure'
+    if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
     runs-on: ubuntu-latest
     permissions:
       contents: write
