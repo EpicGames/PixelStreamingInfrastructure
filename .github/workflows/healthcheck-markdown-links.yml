@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   linkChecker:
-    if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
+    if: github.event.repository.fork == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
