@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   build-using-local-deps:
-    if: github.repository == 'EpicGames/PixelStreamingInfrastructure'
+    if: github.event.repository.fork == false
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source code
