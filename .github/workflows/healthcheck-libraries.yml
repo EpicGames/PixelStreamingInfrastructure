@@ -11,6 +11,7 @@ on:
       - "Frontend/library/**"
       - "Frontend/ui-library/**"
       - "Frontend/implementations/typescript/**"
+      - "Frontend/implementations/react/**"
 
 permissions:
   contents: read
@@ -63,3 +64,7 @@ jobs:
     - name: Build of frontend implementation as ES6
       working-directory: Frontend/implementations/typescript
       run: npm run build:esm
+
+    - name: Build of react frontend implementation
+      working-directory: Frontend/implementations/react
+      run: npm run build
