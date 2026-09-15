@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 import http from 'http';
-import { createPlayerTokenVerifier } from './playerAuth';
+import { createTokenVerifier } from './playerAuth';
 
 /** Builds the argument ws passes to verifyClient, with only the parts this code reads. */
 function upgradeRequest(options: { url?: string; authorization?: string }) {
@@ -17,7 +17,7 @@ function upgradeRequest(options: { url?: string; authorization?: string }) {
 
 /** Runs a verifier and returns what it answered, plus the url the request was left holding. */
 function verify(token: string, options: { url?: string; authorization?: string }) {
-    const verifier = createPlayerTokenVerifier(token);
+    const verifier = createTokenVerifier(token);
     const request = upgradeRequest(options);
     let result: { allowed: boolean; code?: number; message?: string; url?: string } | undefined;
     verifier(request, (allowed, code, message) => {
@@ -26,7 +26,7 @@ function verify(token: string, options: { url?: string; authorization?: string }
     return result;
 }
 
-describe('player token verifier', () => {
+describe('shared token verifier', () => {
     it('admits a connection presenting the token as a query parameter', () => {
         expect(verify('opensesame', { url: '/?token=opensesame' })?.allowed).toBe(true);
     });
@@ -157,7 +157,7 @@ describe('player token verifier', () => {
         // The URL parser strips tab, CR and LF before parsing, so `to<tab>ken` IS the token
         // parameter to the reading side. If the splice disagreed, such a request would be accepted
         // and keep its credential in the target that gets logged. Node's HTTP parser rejects these
-        // with 400 before they ever arrive, but createPlayerTokenVerifier is exported and a consumer
+        // with 400 before they ever arrive, but createTokenVerifier is exported and a consumer
         // driving it from a manual `upgrade` handler is not bound by that.
         it.each(['/?to\tken=opensesame', '/?to\nken=opensesame', '/?to\rken=opensesame'])(
             'reads and removes the token from %j alike',

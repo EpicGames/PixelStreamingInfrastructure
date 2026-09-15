@@ -69,6 +69,9 @@ Options:
   --player_token <token>        Requires every player to present this token when it connects, as a ?token= query parameter or an Authorization: Bearer header. A player that does not is refused at the HTTP upgrade with 401, before it is sent the config message. Streamer and SFU connections are not affected. (default: "")
   --player_token_file <filename>
                                 Reads the value of --player_token from a file, so the token does not appear in the command line of this process. (default: "")
+  --streamer_token <token>      Requires every streamer to present this token when it connects, as a ?token= query parameter or an Authorization: Bearer header. (default: "")
+  --streamer_token_file <filename>
+                                Reads the value of --streamer_token from a file, so the token does not appear in the command line of this process. (default: "")
   --log_config                  Will print the program configuration on startup. (default: true)
   --stdin                       Allows stdin input while running. (default: false)
   --save                        After arguments are parsed the config.json is saved with whatever arguments were specified at launch. (default: false)
@@ -125,4 +128,3 @@ During development it may be useful to work with self-signed SSL certificates (e
 The previous reference signalling server was called Cirrus (UE 5.4 and earlier). Wilbur is a direct replacement for Cirrus.
 
 Differences of behaviour from the old Cirrus server are described [here](from_cirrus.md).
-
