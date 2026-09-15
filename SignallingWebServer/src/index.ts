@@ -10,8 +10,14 @@ import {
     Logger,
     IWebServerConfig
 } from '@epicgames-ps/lib-pixelstreamingsignalling-ue5.8';
-import { beautify, IProgramOptions } from './Utils';
-import { createPlayerTokenVerifier } from './playerAuth';
+import { beautify, IProgramOptions, redactConfig } from './Utils';
+import { createTokenVerifier } from './playerAuth';
+import {
+    addStreamerTokenOptions,
+    configureStreamerToken,
+    loadStreamerTokenFile,
+    readSecretFile
+} from './streamerAuth';
 import { createTurnCredentialsProvider, hasCredentiallessTurnServer } from './turnCredentials';
 import { initInputHandler } from './InputHandler';
 import { Command, Option } from 'commander';
@@ -27,7 +33,7 @@ import streamerByIdHandler from './paths/streamers/{streamerId}';
 const pjson = require('../package.json');
 
 /** Below this a token is worth warning about; see where it is used for why it is only a warning. */
-const MINIMUM_PLAYER_TOKEN_LENGTH = 16;
+const MINIMUM_TOKEN_LENGTH = 16;
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 // possible config file options
@@ -226,7 +232,9 @@ program
             '--player_token_file <filename>',
             'Reads the value of --player_token from a file, so the token does not appear in the command line of this process.'
         ).default(config_file.player_token_file || '')
-    )
+    );
+
+addStreamerTokenOptions(program, config_file)
     .option(
         '--reverse-proxy',
         'Enables reverse proxy mode. This will trust the X-Forwarded-For header.',
@@ -269,6 +277,7 @@ if (options.save) {
     // The secrets themselves never go to disk here; the *_file options are only paths, so they stay.
     delete save_options.turn_secret;
     delete save_options.player_token;
+    delete save_options.streamer_token;
 
     // save out the config file with the current settings
     fs.writeFile(configArgsParser.config_file, beautify(save_options), (error: any) => {
@@ -297,28 +306,6 @@ if (options.peer_options_file) {
     );
 }
 
-/**
- * Reads a secret that was supplied as a file rather than on the command line.
- *
- * Trimmed because the usual way to write one of these is `echo $SECRET > secret.txt`, which leaves a
- * trailing newline. An empty file throws rather than returning nothing, because an empty secret
- * reads as "this feature was not configured" and silently starts the server with it off - which
- * looks identical to it working until the first peer needs it.
- */
-function readSecretFile(filename: string, optionName: string): string {
-    if (!fs.existsSync(filename)) {
-        Logger.error(`${optionName} "${filename}" does not exist.`);
-        throw Error(`Failed to find the file ${filename} given to ${optionName}.`);
-    }
-
-    const secret = fs.readFileSync(filename, 'utf-8').trim();
-    if (!secret) {
-        Logger.error(`${optionName} "${filename}" is empty.`);
-        throw Error(`The file ${filename} given to ${optionName} contains no value.`);
-    }
-    return secret;
-}
-
 // read the turn_secret_file
 if (options.turn_secret_file) {
     options.turn_secret = readSecretFile(options.turn_secret_file, 'turn_secret_file');
@@ -329,15 +316,13 @@ if (options.player_token_file) {
     options.player_token = readSecretFile(options.player_token_file, 'player_token_file');
 }
 
+loadStreamerTokenFile(options);
+
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 Logger.info(`${pjson.name} v${pjson.version} starting...`);
 if (options.log_config) {
     Logger.info('Config:');
-    for (const key in options) {
-        // The config dump goes to the log file, which is kept and rotated - a secret written there
-        // is a secret in every backup of this machine.
-        const secret = key === 'turn_secret' || key === 'player_token';
-        const value: unknown = secret && options[key] ? '<redacted>' : options[key];
+    for (const [key, value] of Object.entries(redactConfig(options))) {
         Logger.info(`"${key}": ${JSON.stringify(value)}`);
     }
 }
@@ -384,14 +369,14 @@ if (playerToken) {
     // was presented - because an operator who cannot see guessing cannot respond to it.
     serverOpts.playerWsOptions = {
         ...serverOpts.playerWsOptions,
-        verifyClient: createPlayerTokenVerifier(playerToken, (request) => {
+        verifyClient: createTokenVerifier(playerToken, (request) => {
             Logger.warn(`Refused a player from %s: no valid token.`, request.socket.remoteAddress);
         })
     };
 
     // Short enough to guess, given the above. Warned rather than refused: the length that is "enough"
     // depends on a deployment's exposure, and this is not the place to overrule an operator.
-    if (playerToken.length < MINIMUM_PLAYER_TOKEN_LENGTH) {
+    if (playerToken.length < MINIMUM_TOKEN_LENGTH) {
         Logger.warn(
             `player_token is only ${playerToken.length} characters. Nothing rate limits the player ` +
                 'port, so a short token can be guessed quickly. A GUID is a good default.'
@@ -411,6 +396,27 @@ if (playerToken) {
     // also true of the turn_ttl and secret file validation above it.
     Logger.error('A player token was configured but is empty; refusing to start with an open player port.');
     throw Error('Invalid player_token.');
+}
+
+let streamerToken = '';
+try {
+    streamerToken = configureStreamerToken(options, serverOpts, (request) => {
+        Logger.warn(`Refused a streamer from %s: no valid token.`, request.socket.remoteAddress);
+    });
+} catch {
+    Logger.error(
+        'A streamer token was configured but is invalid; refusing to start with an open streamer port.'
+    );
+    throw Error('Invalid streamer_token.');
+}
+if (streamerToken) {
+    if (streamerToken.length < MINIMUM_TOKEN_LENGTH) {
+        Logger.warn(
+            `streamer_token is only ${streamerToken.length} characters and can be guessed quickly. ` +
+                'A GUID is a good default.'
+        );
+    }
+    Logger.info('Streamers must present --streamer_token to connect.');
 }
 
 // Time limited TURN credentials, when a shared secret was supplied. Without one the static username
