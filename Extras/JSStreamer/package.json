@@ -19,7 +19,7 @@
     "author": "Epic Games",
     "license": "MIT",
     "devDependencies": {
-        "@types/node": "^22.20.1",
+        "@types/node": "^22.20.2",
         "copy-webpack-plugin": "^12.0.2",
         "eslint": "^9.39.0",
         "eslint-config-prettier": "^10.0.1",
@@ -30,7 +30,7 @@
         "rimraf": "^6.0.1",
         "ts-loader": "^9.6.2",
         "typescript": "^5.7.3",
-        "typescript-eslint": "8.69.0",
+        "typescript-eslint": "8.70.0",
         "webpack": "^5.110.3",
         "webpack-cli": "^6.0.1",
         "webpack-dev-server": "^5.2.5",
