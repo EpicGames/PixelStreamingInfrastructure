@@ -15,8 +15,8 @@
         "lint": ""
     },
     "devDependencies": {
-        "@types/react": "^19.2.18",
-        "@types/react-dom": "^19.2.7",
+        "@types/react": "^19.3.0",
+        "@types/react-dom": "^19.3.0",
         "html-loader": "^5.1.0",
         "html-webpack-plugin": "^5.6.8",
         "ts-loader": "^9.6.2",
@@ -27,7 +27,7 @@
     },
     "dependencies": {
         "@epicgames-ps/lib-pixelstreamingfrontend-ue5.7": "*",
-        "react": "^19.2.8",
-        "react-dom": "^19.2.8"
+        "react": "^19.3.0",
+        "react-dom": "^19.3.0"
     }
 }
