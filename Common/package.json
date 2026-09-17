@@ -28,7 +28,7 @@
     "devDependencies": {
         "@eslint/js": "^9.39.5",
         "@protobuf-ts/plugin": "^2.9.4",
-        "@types/node": "^22.20.1",
+        "@types/node": "^22.20.2",
         "concurrently": "^9.1.2",
         "eslint": "^9.39.0",
         "eslint-config-prettier": "^10.0.1",
@@ -39,7 +39,7 @@
         "typedoc": "^0.28.20",
         "typedoc-plugin-markdown": "^4.13.0",
         "typescript": "^5.7.3",
-        "typescript-eslint": "8.69.0"
+        "typescript-eslint": "8.70.0"
     },
     "dependencies": {
         "@protobuf-ts/runtime": "^2.9.4",
