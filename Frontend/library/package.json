@@ -30,7 +30,7 @@
         "ts-jest": "^29.4.12",
         "typescript": "^5.7.3",
         "typescript-eslint": "8.70.0",
-        "@types/node": "^22.20.2"
+        "@types/node": "^22.20.4"
     },
     "dependencies": {
         "@epicgames-ps/lib-pixelstreamingcommon-ue5.7": "^0.1.5",
