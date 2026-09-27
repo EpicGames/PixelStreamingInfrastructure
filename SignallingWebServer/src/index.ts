@@ -10,14 +10,9 @@ import {
     Logger,
     IWebServerConfig
 } from '@epicgames-ps/lib-pixelstreamingsignalling-ue5.8';
-import { beautify, IProgramOptions, redactConfig } from './Utils';
+import { beautify, IProgramOptions, readSecretFile, redactConfig } from './Utils';
 import { createTokenVerifier } from './playerAuth';
-import {
-    addStreamerTokenOptions,
-    configureStreamerToken,
-    loadStreamerTokenFile,
-    readSecretFile
-} from './streamerAuth';
+import { addStreamerTokenOptions, configureStreamerToken, loadStreamerTokenFile } from './streamerAuth';
 import { createTurnCredentialsProvider, hasCredentiallessTurnServer } from './turnCredentials';
 import { initInputHandler } from './InputHandler';
 import { Command, Option } from 'commander';
@@ -403,9 +398,13 @@ try {
     streamerToken = configureStreamerToken(options, serverOpts, (request) => {
         Logger.warn(`Refused a streamer from %s: no valid token.`, request.socket.remoteAddress);
     });
-} catch {
+} catch (error: unknown) {
+    // configureStreamerToken builds the verifier as well as checking the token, so the cause is
+    // logged with its own message rather than discarded: the fixed line below would otherwise
+    // report every failure as an invalid token and say nothing about what really went wrong.
     Logger.error(
-        'A streamer token was configured but is invalid; refusing to start with an open streamer port.'
+        `A streamer token was configured but is invalid (${String(error)}); ` +
+            'refusing to start with an open streamer port.'
     );
     throw Error('Invalid streamer_token.');
 }

@@ -71,6 +71,14 @@ const stream = new PixelStreaming(config); // config with SignallingServerUrl al
                                            // `wss://your-server/?token=${yourToken}`
 ```
 
+A **streamer** has no page and no `ss` setting — it is the UE instance, and the token goes on the signalling URL it is launched with, because that URL *is* its signalling WebSocket:
+
+```
+UEGame.exe -PixelStreamingSignallingURL="ws://your-server:8888?token=8f14e45f-ea8d-4b3f-b6de-1cd97b4e2d21"
+```
+
+That is `--streamer_port` (8888 by default), not the player port. An engine predating Pixel Streaming 2 takes the same URL through `-PixelStreamingURL`. The older `-PixelStreamingIP`/`-PixelStreamingPort` pair builds a bare `ws://address:port/` URL with no query string, so it cannot carry a token: a streamer that has to pass `--streamer_token` must be given the URL form.
+
 Each option configures **one shared token, the same for every peer on that listener** — it does not identify a user, it does not expire, and revoking it means restarting the server with a new one. It answers "may this connection exist at all", which is the question a `--turn_secret` deliberately does not answer. If you need sessions, per-user revocation, or an identity attached to a connection, supply your own `verifyClient` instead; the flags exist so that a deployment which genuinely only needs a door does not have to fork the reference server to get one.
 
 Four things to know before relying on it:
