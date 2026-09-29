@@ -30,7 +30,7 @@
     ],
     "devDependencies": {
         "@changesets/cli": "2.31.1",
-        "@types/node": "^22.20.2",
+        "@types/node": "^22.20.4",
         "eslint": "9.39.1",
         "eslint-plugin-prettier": "^5.5.0",
         "lint-staged": "^15.3.0",
