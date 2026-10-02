@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 import { SignallingServer } from '@epicgames-ps/lib-pixelstreamingsignalling-ue5.8';
-import { IProgramOptions, beautify } from './Utils';
+import { IProgramOptions, beautify, redactConfig } from './Utils';
 
 interface IHandlerFunc {
     desc: string;
@@ -44,19 +44,10 @@ export function initInputHandler(options: IProgramOptions, signallingServer: Sig
     });
 }
 
-/** Options whose value is a credential, and must not be printed. See printConfig. */
-const SECRET_OPTIONS = ['turn_secret', 'player_token'];
-
 function printConfig(options: IProgramOptions) {
     // Redacted like the --log_config dump, and for the same reason: stdout is routinely redirected
     // to a file by a service supervisor, so printing a secret here writes it to disk just as surely.
-    const printable = { ...options };
-    for (const key of SECRET_OPTIONS) {
-        if (printable[key]) {
-            printable[key] = '<redacted>';
-        }
-    }
-    process.stdout.write(`${beautify(printable)}\n`);
+    process.stdout.write(`${beautify(redactConfig(options))}\n`);
 }
 
 function printServerInfo(_options: IProgramOptions, _signallingServer: SignallingServer) {

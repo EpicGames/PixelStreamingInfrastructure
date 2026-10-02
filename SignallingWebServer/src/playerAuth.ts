@@ -147,14 +147,14 @@ function stripToken(request: http.IncomingMessage): void {
  *
  * The scheme is deliberately the simplest one that is useful: a single shared token, compared
  * literally. It is not a session, it does not expire and it does not identify anybody. A deployment
- * needing more than that should supply its own verifyClient through playerWsOptions, which is what
- * this is built on and what the security guidelines describe.
+ * needing more than that should supply its own verifyClient through the relevant WebSocket options,
+ * which is what this is built on and what the security guidelines describe.
  *
- * @param token - The token every player must present.
+ * @param token - The token every peer on the protected listener must present.
  * @param onRefused - Called with the request of each refused connection.
- * @returns A verifyClient suitable for IServerConfig.playerWsOptions.
+ * @returns A verifyClient suitable for an IServerConfig WebSocket listener.
  */
-export function createPlayerTokenVerifier(token: string, onRefused?: OnRefused): VerifyClient {
+export function createTokenVerifier(token: string, onRefused?: OnRefused): VerifyClient {
     // Hashed once rather than per request. The digest is not the token and is never compared to
     // anything an attacker supplies directly, so holding it costs nothing.
     const expected = crypto.createHash('sha256').update(token).digest();
