@@ -274,9 +274,12 @@ if (options.save) {
     delete save_options.player_token;
     delete save_options.streamer_token;
 
-    // save out the config file with the current settings
+    // save out the config file with the current settings. Logged rather than thrown: the callback runs
+    // asynchronously, outside any request, so a throw here would end a server that is otherwise healthy.
     fs.writeFile(configArgsParser.config_file, beautify(save_options), (error: any) => {
-        if (error) throw error;
+        if (error) {
+            Logger.error(`Config not saved to ${configArgsParser.config_file}: ${String(error)}`);
+        }
     });
 }
 
