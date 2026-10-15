@@ -108,6 +108,9 @@ export class WebRtcPlayerController {
     subscribedStream: string;
     signallingUrlBuilder: () => string;
     autoJoinTimer: ReturnType<typeof setTimeout> = undefined;
+    // Pending auto-reconnect and list-streamers retries. Kept so that an explicit close or connect can cancel them.
+    reconnectTimer: ReturnType<typeof setTimeout> = undefined;
+    listStreamersTimer: ReturnType<typeof setTimeout> = undefined;
     keepalive: KeepaliveMonitor;
     playerId: string | null = null;
 
@@ -263,7 +266,7 @@ export class WebRtcPlayerController {
 
             if (willTryReconnect) {
                 // need a small delay here to prevent reconnect spamming
-                setTimeout(() => {
+                this.reconnectTimer = setTimeout(() => {
                     this.reconnectAttempt++;
                     this.doReconnect(event.reason);
                 }, 2000);
@@ -1049,6 +1052,9 @@ export class WebRtcPlayerController {
      * Connect to the Signaling server
      */
     connectToSignallingServer() {
+        // A new connection supersedes any pending retry; otherwise a stale timer would tear it down.
+        clearTimeout(this.reconnectTimer);
+        clearTimeout(this.listStreamersTimer);
         this.locallyClosed = false;
         this.enableAutoReconnect = true;
         this.disconnectMessage = null;
@@ -1284,7 +1290,7 @@ export class WebRtcPlayerController {
                     // still reconnects available
                     this.reconnectAttempt++;
                     this.isReconnecting = true;
-                    setTimeout(() => {
+                    this.listStreamersTimer = setTimeout(() => {
                         this.protocol.sendMessage(MessageHelpers.createMessage(Messages.listStreamers));
                     }, reconnectDelay);
                 } else {
@@ -1608,6 +1614,9 @@ export class WebRtcPlayerController {
      * Close the Connection to the signaling server
      */
     closeSignalingServer(message: string, allowReconnect: boolean) {
+        // Cancel pending retries so a closed session cannot be reopened behind the caller's back.
+        clearTimeout(this.reconnectTimer);
+        clearTimeout(this.listStreamersTimer);
         this.locallyClosed = true;
         this.enableAutoReconnect = allowReconnect;
         this.disconnectMessage = message;
