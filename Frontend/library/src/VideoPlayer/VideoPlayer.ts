@@ -143,6 +143,10 @@ export class VideoPlayer {
     setVideoEnabled(enabled: boolean) {
         // this is a temporary hack until type scripts video element is updated to reflect the need for tracks on a html video element
         const videoElement = this.videoElement;
+        // Nothing to toggle until a stream has been attached (e.g. a freeze frame arriving before the first track).
+        if (!videoElement.srcObject) {
+            return;
+        }
         (<MediaStream>videoElement.srcObject)
             .getTracks()
             .forEach((track: MediaStreamTrack) => (track.enabled = enabled));
