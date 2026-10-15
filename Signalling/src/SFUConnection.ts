@@ -184,6 +184,11 @@ export class SFUConnection extends EventEmitter implements IPlayer, IStreamer, L
             return;
         }
 
+        // Leave the previous streamer first, as PlayerConnection does, so it stops forwarding to this SFU
+        // and a later disconnect of it cannot detach the SFU from the streamer it is now on.
+        if (this.subscribedStreamer) {
+            this.unsubscribe();
+        }
         this.subscribedStreamer = streamer;
         // Register as a subscriber of the upstream streamer so it will forward signalling messages
         // back to this SFU (the streamer's forwardMessage only sends to subscribed players).
