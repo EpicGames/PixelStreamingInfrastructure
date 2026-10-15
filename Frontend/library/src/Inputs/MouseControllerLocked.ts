@@ -146,16 +146,18 @@ export class MouseControllerLocked extends MouseController {
         this.x += event.movementX;
         this.y += event.movementY;
 
-        while (this.x > styleWidth) {
+        // Wrapping needs a non-zero size: with a zero-sized (hidden or unlaid-out) parent the subtraction
+        // never shrinks the coordinate and these loops would spin forever on the main thread.
+        while (styleWidth > 0 && this.x > styleWidth) {
             this.x -= styleWidth;
         }
-        while (this.y > styleHeight) {
+        while (styleHeight > 0 && this.y > styleHeight) {
             this.y -= styleHeight;
         }
-        while (this.x < 0) {
+        while (styleWidth > 0 && this.x < 0) {
             this.x += styleWidth;
         }
-        while (this.y < 0) {
+        while (styleHeight > 0 && this.y < 0) {
             this.y += styleHeight;
         }
 
