@@ -359,7 +359,8 @@ export class WebRtcPlayerController {
      */
     handleOnMessage(event: MessageEvent) {
         const message = new Uint8Array(event.data);
-        Logger.Info('Message incoming:' + message);
+        // Length and type only: stringifying every byte of a freeze-frame chunk is needlessly expensive.
+        Logger.Info(`Message incoming: ${message.length} bytes, type ${message[0]}`);
 
         //try {
         const messageType = this.streamMessageController.fromStreamerMessages.get(message[0]);

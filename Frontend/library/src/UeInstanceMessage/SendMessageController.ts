@@ -157,9 +157,7 @@ export class SendMessageController {
 
         if (!this.dataChannelSender.canSend()) {
             Logger.Info(
-                `Data channel cannot send yet, skipping sending message: ${messageType} - ${new Uint8Array(
-                    data.buffer
-                )}`
+                `Data channel cannot send yet, skipping sending message: ${messageType} - ${data.byteLength} bytes`
             );
             return;
         }

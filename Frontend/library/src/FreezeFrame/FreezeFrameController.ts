@@ -13,6 +13,9 @@ export class FreezeFrameController {
     jpeg: Uint8Array = undefined;
     valid = false;
     freezeFrameDelay = 50;
+    // Chunks of the freeze frame that is arriving; joined into `jpeg` once the last one is in.
+    private chunks: Uint8Array[] = [];
+    private receivedBytes = 0;
 
     /**
      * Construct a freeze frame controller
@@ -64,38 +67,41 @@ export class FreezeFrameController {
             this.valid = false;
             this.size = 0;
             this.jpeg = undefined;
+            this.chunks = [];
+            this.receivedBytes = 0;
         }
 
         // Extract total size of freeze frame (across all chunks)
         this.size = new DataView(view.slice(1, 5).buffer).getInt32(0, true);
 
-        // Get the jpeg part of the payload
+        // Keep the jpeg part of the payload. The frame is joined once, when its last chunk arrives,
+        // instead of reallocating the whole accumulated frame for every chunk.
         const jpegBytes = view.slice(1 + 4);
-
-        // Append to existing jpeg that holds the freeze frame
-        if (this.jpeg) {
-            const jpeg = new Uint8Array(this.jpeg.length + jpegBytes.length);
-            jpeg.set(this.jpeg, 0);
-            jpeg.set(jpegBytes, this.jpeg.length);
-            this.jpeg = jpeg;
-        }
-        // No existing freeze frame jpeg, make one
-        else {
-            this.jpeg = jpegBytes;
-            this.receiving = true;
-            Logger.Info(`received first chunk of freeze frame: ${this.jpeg.length}/${this.size}`);
+        this.chunks.push(jpegBytes);
+        this.receivedBytes += jpegBytes.length;
+        if (this.chunks.length === 1) {
+            Logger.Info(`received first chunk of freeze frame: ${this.receivedBytes}/${this.size}`);
         }
 
         // Finished receiving freeze frame, we can show it now
-        if (this.jpeg.length === this.size) {
+        if (this.receivedBytes === this.size) {
+            const jpeg = new Uint8Array(this.receivedBytes);
+            let offset = 0;
+            for (const chunk of this.chunks) {
+                jpeg.set(chunk, offset);
+                offset += chunk.length;
+            }
+            this.chunks = [];
+            this.jpeg = jpeg;
             this.receiving = false;
             this.valid = true;
             Logger.Info(`received complete freeze frame ${this.size}`);
             this.updateFreezeFrameAndShow(this.jpeg, onLoadCallBack);
         }
         // We received more data than the freeze frame payload message indicate (this is an error)
-        else if (this.jpeg.length > this.size) {
-            Logger.Error(`received bigger freeze frame than advertised: ${this.jpeg.length}/${this.size}`);
+        else if (this.receivedBytes > this.size) {
+            Logger.Error(`received bigger freeze frame than advertised: ${this.receivedBytes}/${this.size}`);
+            this.chunks = [];
             this.jpeg = undefined;
             this.receiving = false;
         }
