@@ -8,13 +8,34 @@ export type IProgramOptions = Record<string, any>;
 
 const SECRET_OPTIONS = ['turn_secret', 'player_token', 'streamer_token'];
 
+/** Keys whose values are credentials, at any depth. A static TURN credential sits inside peer_options. */
+const CREDENTIAL_KEYS = ['credential', 'credentials', 'password'];
+
 /** Returns a copy safe to write to logs or stdout. */
 export function redactConfig(options: IProgramOptions): IProgramOptions {
-    const redacted = { ...options };
+    const redacted = redactCredentials(options) as IProgramOptions;
     for (const key of SECRET_OPTIONS) {
         if (redacted[key]) redacted[key] = '<redacted>';
     }
     return redacted;
+}
+
+/**
+ * Copies a value with every non-empty credential replaced by `'<redacted>'`, at any depth. The value that
+ * was passed in is not changed.
+ */
+function redactCredentials(value: unknown): unknown {
+    if (Array.isArray(value)) {
+        return value.map((item: unknown) => redactCredentials(item));
+    }
+    if (typeof value !== 'object' || value === null) {
+        return value;
+    }
+    const copy: Record<string, unknown> = {};
+    for (const [key, inner] of Object.entries(value as Record<string, unknown>)) {
+        copy[key] = CREDENTIAL_KEYS.includes(key) && inner ? '<redacted>' : redactCredentials(inner);
+    }
+    return copy;
 }
 
 /**
