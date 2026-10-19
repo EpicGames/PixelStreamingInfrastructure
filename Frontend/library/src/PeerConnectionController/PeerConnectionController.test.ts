@@ -1,6 +1,6 @@
 import { Config, OptionParameters } from '../Config/Config';
 import { PeerConnectionController } from './PeerConnectionController';
-import { getCodecIdentity, getCodecOption } from '../Util/CodecUtils';
+import { getCodecOption } from '../Util/CodecUtils';
 import { mockRTCPeerConnection, unmockRTCPeerConnection } from '../__test__/mockRTCPeerConnection';
 
 const flushPromises = () => new Promise(jest.requireActual('timers').setImmediate);
@@ -65,15 +65,24 @@ const createOffer = (codecs: OfferedCodec[]): RTCSessionDescriptionInit => ({
     ].join('\r\n')
 });
 
-// The browser answers with its first codec preference that the offer contains, comparing H264 by its profile and
-// packetization mode rather than the fmtp line.
+// Offered codecs that the browser treats as one of its own codecs despite a different fmtp line, as libwebrtc compares
+// them. This is spelled out rather than derived from getCodecIdentity so that the tests catch getCodecIdentity
+// disagreeing with the browser.
+const browserCodecMatches: Record<string, string[]> = {
+    // AV1 is only compared on its profile, which defaults to 0
+    'AV1 level-idx=5;profile=0;tier=0': ['AV1 ', 'AV1 level-idx=8;profile=0;tier=0']
+};
+
+// The browser answers with its first codec preference that the offer contains
 const getAnsweredCodec = (codecPreferences: RTCRtpCodec[], offeredCodecs: OfferedCodec[]) => {
-    const offeredCodecIdentities = offeredCodecs.map((codec) =>
-        getCodecIdentity(`${codec.name} ${codec.fmtp ?? ''}`)
-    );
+    const offeredCodecOptions = offeredCodecs.map((codec) => `${codec.name} ${codec.fmtp ?? ''}`);
     return codecPreferences
         .map(getCodecOption)
-        .find((codec) => offeredCodecIdentities.includes(getCodecIdentity(codec)));
+        .find((codec) =>
+            offeredCodecOptions.some(
+                (offeredCodec) => offeredCodec === codec || browserCodecMatches[codec]?.includes(offeredCodec)
+            )
+        );
 };
 
 describe('PeerConnectionController', () => {
@@ -171,6 +180,28 @@ describe('PeerConnectionController', () => {
         expect(setCodecPreferencesSpy).toHaveBeenCalledTimes(1);
         expect(getAnsweredCodec(setCodecPreferencesSpy.mock.calls[0][0], offeredCodecs)).toEqual(
             `H264 ${h264Baseline}`
+        );
+    });
+
+    it('should answer with the preferred AV1 when it was offered at a different level', async () => {
+        // AV1 comes after VP8 so that falling back to the streamer's codec order wouldn't pick it
+        const offeredCodecs: OfferedCodec[] = [
+            { payloadType: 96, name: 'VP8' },
+            { payloadType: 97, name: 'AV1', fmtp: 'level-idx=8;profile=0;tier=0' }
+        ];
+        const config = new Config();
+        const peerConnectionController = createPeerConnectionController(
+            config,
+            'AV1 level-idx=5;profile=0;tier=0'
+        );
+        await receiveOffer(peerConnectionController, config, offeredCodecs);
+
+        expect(config.getSettingOption(OptionParameters.PreferredCodec).options).toContain(
+            'AV1 level-idx=5;profile=0;tier=0'
+        );
+        expect(setCodecPreferencesSpy).toHaveBeenCalledTimes(1);
+        expect(getAnsweredCodec(setCodecPreferencesSpy.mock.calls[0][0], offeredCodecs)).toEqual(
+            'AV1 level-idx=5;profile=0;tier=0'
         );
     });
 

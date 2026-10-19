@@ -136,8 +136,35 @@ describe('getCodecIdentity', () => {
         expect(getCodecIdentity('VP9')).not.toEqual(getCodecIdentity('VP9 profile-id=2'));
     });
 
-    it('should apply AV1 defaults', () => {
+    it('should identify H264 by its decoded profile rather than the profile-level-id hex', () => {
+        // Both are constrained baseline: the constraint flags only differ in constraint_set2_flag
+        expect(getCodecIdentity('H264 packetization-mode=1;profile-level-id=42e01f')).toEqual(
+            getCodecIdentity('H264 packetization-mode=1;profile-level-id=42c01f')
+        );
+        // Main with constraint_set1_flag is constrained baseline too
+        expect(getCodecIdentity('H264 packetization-mode=1;profile-level-id=4d801f')).toEqual(
+            getCodecIdentity('H264 packetization-mode=1;profile-level-id=42e01f')
+        );
+        expect(getCodecIdentity('H264 packetization-mode=1;profile-level-id=4d001f')).not.toEqual(
+            getCodecIdentity('H264 packetization-mode=1;profile-level-id=42e01f')
+        );
+        expect(getCodecIdentity('H264 packetization-mode=1;profile-level-id=640c1f')).not.toEqual(
+            getCodecIdentity('H264 packetization-mode=1;profile-level-id=64001f')
+        );
+    });
+
+    it('should default a missing H264 profile-level-id to constrained baseline', () => {
+        expect(getCodecIdentity('H264')).toEqual(getCodecIdentity('H264 profile-level-id=42e01f'));
+    });
+
+    it('should identify AV1 by its profile only', () => {
         expect(getCodecIdentity('AV1')).toEqual(getCodecIdentity('AV1 level-idx=5;profile=0;tier=0'));
+        expect(getCodecIdentity('AV1 level-idx=8;profile=0;tier=0')).toEqual(
+            getCodecIdentity('AV1 level-idx=5;profile=0;tier=0')
+        );
+        expect(getCodecIdentity('AV1 level-idx=5;profile=1;tier=0')).not.toEqual(
+            getCodecIdentity('AV1 level-idx=5;profile=0;tier=0')
+        );
     });
 
     it('should identify codecs without identifying parameters by name', () => {

@@ -17,10 +17,42 @@ function parseCodecOption(codec: string): { name: string; parameters: Map<string
     return { name: (name ?? '').toUpperCase(), parameters };
 }
 
+// H.264 profiles as libwebrtc identifies them (see api/video_codecs/h264_profile_level_id.cc): a profile_idc and a
+// pattern over the constraint flags byte, most significant bit first, where x is either bit
+const h264ProfilePatterns: Array<{ profileIdc: number; pattern: string; profile: string }> = [
+    { profileIdc: 0x42, pattern: 'x1xx0000', profile: 'constrained-baseline' },
+    { profileIdc: 0x4d, pattern: '1xxx0000', profile: 'constrained-baseline' },
+    { profileIdc: 0x58, pattern: '11xx0000', profile: 'constrained-baseline' },
+    { profileIdc: 0x42, pattern: 'x0xx0000', profile: 'baseline' },
+    { profileIdc: 0x58, pattern: '10xx0000', profile: 'baseline' },
+    { profileIdc: 0x4d, pattern: '0x0x0000', profile: 'main' },
+    { profileIdc: 0x64, pattern: '00000000', profile: 'high' },
+    { profileIdc: 0x64, pattern: '00001100', profile: 'constrained-high' },
+    { profileIdc: 0xf4, pattern: '00000000', profile: 'predictive-high-444' }
+];
+
+/**
+ * @param profileLevelId An H.264 profile-level-id: the profile_idc, constraint flags and level_idc bytes in hex
+ * @returns The profile the profile-level-id describes, e.g. 42e01f and 42c01f are both constrained-baseline. A
+ * profile-level-id that doesn't describe a known profile is returned without its level.
+ */
+function getH264Profile(profileLevelId: string): string {
+    const profileIdc = parseInt(profileLevelId.substring(0, 2), 16);
+    const constraintFlags = parseInt(profileLevelId.substring(2, 4), 16);
+    const match = h264ProfilePatterns.find(
+        ({ profileIdc: patternProfileIdc, pattern }) =>
+            patternProfileIdc === profileIdc &&
+            [...pattern].every(
+                (bit, index) => bit === 'x' || ((constraintFlags >> (7 - index)) & 1) === Number(bit)
+            )
+    );
+    return match?.profile ?? profileLevelId.substring(0, 4).toLowerCase();
+}
+
 /**
  * Returns a key that is equal for two codec options only when they describe the same codec. This mirrors WebRTC's
- * codec comparison: parameters that are negotiated rather than identifying (such as H.264 and H.265 levels) are
- * ignored, and missing parameters take their SDP defaults.
+ * codec comparison (see media/base/codec_comparators.cc): parameters that are negotiated rather than identifying
+ * (such as H.264, H.265 and AV1 levels) are ignored, and missing parameters take their SDP defaults.
  * @param codec A codec option of the form "<name> <fmtp line>"
  * @returns The codec name followed by its identifying parameters
  */
@@ -30,8 +62,7 @@ export function getCodecIdentity(codec: string): string {
 
     switch (name) {
         case 'H264': {
-            // profile-level-id is the profile in its first two bytes followed by the level in its last byte
-            const profile = getParameter('profile-level-id', '42e01f').substring(0, 4).toLowerCase();
+            const profile = getH264Profile(getParameter('profile-level-id', '42e01f'));
             return `${name} profile=${profile};packetization-mode=${getParameter('packetization-mode', '0')}`;
         }
         case 'H265':
@@ -39,7 +70,7 @@ export function getCodecIdentity(codec: string): string {
         case 'VP9':
             return `${name} profile-id=${getParameter('profile-id', '0')}`;
         case 'AV1':
-            return `${name} profile=${getParameter('profile', '0')};tier=${getParameter('tier', '0')};level-idx=${getParameter('level-idx', '5')}`;
+            return `${name} profile=${getParameter('profile', '0')}`;
         default:
             return name;
     }
