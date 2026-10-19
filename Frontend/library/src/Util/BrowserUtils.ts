@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
+import { getCodecOption } from './CodecUtils';
 
 export class BrowserUtils {
     static getSupportedVideoCodecs(): Array<string> {
@@ -25,7 +26,7 @@ export class BrowserUtils {
             return browserSupportedCodecs;
         }
         capabilities.codecs.forEach((codec) => {
-            const str = codec.mimeType.split('/')[1] + ' ' + (codec.sdpFmtpLine || '');
+            const str = getCodecOption(codec);
             const match = matcher.exec(str);
             if (match !== null) {
                 browserSupportedCodecs.push(str);
