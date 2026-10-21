@@ -136,8 +136,8 @@ export class Streamer extends EventEmitter {
 
     stopStreaming() {
         this.transport.disconnect(1000, 'Normal shutdown by calling stopStreaming');
-        for (const peer of this.playerMap.values()) {
-            peer.peerConnection.close();
+        for (const playerId of this.playerMap.keys()) {
+            this.removePlayer(playerId);
         }
     }
 
@@ -288,36 +288,44 @@ export class Streamer extends EventEmitter {
                     .catch(() => {});
             }, 1000);
 
-            this.playerMap[playerId] = newPlayer;
+            this.playerMap.set(playerId, newPlayer);
             this.emit('player_connected', newPlayer);
         }
     }
 
     handlePlayerDisconnectedMessage(msg: Messages.playerDisconnected) {
         const playerId = msg.playerId;
-        const playerPeer = this.playerMap[playerId];
-        if (playerPeer && playerPeer.statsTimer) {
+        this.removePlayer(playerId);
+        this.emit('player_disconnected', playerId);
+    }
+
+    private removePlayer(playerId: string) {
+        const playerPeer = this.playerMap.get(playerId);
+        if (!playerPeer) {
+            return;
+        }
+        if (playerPeer.statsTimer !== undefined) {
             clearInterval(playerPeer.statsTimer);
         }
-        delete this.playerMap[playerId];
-        this.emit('player_disconnected', playerId);
+        playerPeer.peerConnection.close();
+        this.playerMap.delete(playerId);
     }
 
     handleAnswerMessage(msg: Messages.answer) {
         const playerId = msg.playerId;
-        if (playerId && this.playerMap[playerId]) {
-            const playerPeer = this.playerMap[playerId];
+        const playerPeer = playerId ? this.playerMap.get(playerId) : undefined;
+        if (playerPeer) {
             const answer = new RTCSessionDescription({ type: 'answer', sdp: msg.sdp });
-            playerPeer.peerConnection.setRemoteDescription(answer);
+            void playerPeer.peerConnection.setRemoteDescription(answer);
         }
     }
 
     handleIceMessage(msg: Messages.iceCandidate) {
         const playerId = msg.playerId;
-        if (playerId && this.playerMap[playerId]) {
-            const playerPeer = this.playerMap[playerId];
+        const playerPeer = playerId ? this.playerMap.get(playerId) : undefined;
+        if (playerPeer) {
             const candidate = new RTCIceCandidate(msg.candidate);
-            playerPeer.peerConnection.addIceCandidate(candidate);
+            void playerPeer.peerConnection.addIceCandidate(candidate);
         }
     }
 
@@ -331,7 +339,7 @@ export class Streamer extends EventEmitter {
     }
 
     sendDataProtocol(playerId: string) {
-        const playerPeer = this.playerMap[playerId];
+        const playerPeer = this.playerMap.get(playerId);
         if (playerPeer) {
             const streamerProto = {
                 Direction: 0
@@ -365,7 +373,7 @@ export class Streamer extends EventEmitter {
     }
 
     sendInitialSettings(playerId: string) {
-        const playerPeer = this.playerMap[playerId];
+        const playerPeer = this.playerMap.get(playerId);
         if (playerPeer) {
             const settingsStr = JSON.stringify(this.settings);
             const settingsBuffer = this.constructMessage(
