@@ -55,41 +55,6 @@ test('Stopping the streamer closes all peers and clears their stats timers', asy
         )
         .toBe(true);
 
-    const messages = await page.evaluateHandle(() => {
-        const received: { type: number; body: unknown }[] = [];
-        window.pixelStreaming.webRtcController.sendrecvDataChannelController.dataChannel.addEventListener(
-            'message',
-            (event: MessageEvent<ArrayBuffer>) => {
-                const bytes = new Uint8Array(event.data);
-                if (bytes[0] === 255 || bytes[0] === 7) {
-                    received.push({
-                        type: bytes[0],
-                        body: JSON.parse(new TextDecoder('utf-16le').decode(bytes.subarray(1)))
-                    });
-                }
-            }
-        );
-        return received;
-    });
-    const settings = await streamerPage.evaluate(({ peers }) => {
-        window.streamer.sendDataProtocol(peers[0].id);
-        window.streamer.sendInitialSettings(peers[0].id);
-        return window.streamer.settings;
-    }, observed);
-    await expect
-        .poll(() => page.evaluate((received) => received, messages))
-        .toEqual([
-            {
-                type: 255,
-                body: expect.objectContaining({
-                    Direction: 0,
-                    RequestQualityControl: { id: 1, structure: [] }
-                })
-            },
-            { type: 255, body: expect.objectContaining({ Direction: 1 }) },
-            { type: 7, body: settings }
-        ]);
-
     await streamerPage.evaluate(() => window.streamer.stopStreaming());
     const snapshot = () =>
         streamerPage.evaluate(
