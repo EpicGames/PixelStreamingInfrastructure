@@ -55,6 +55,11 @@ export interface IServerConfig {
     // pings is forcibly disconnected. 0 (the default) disables the check.
     playerKeepaliveTimeout?: number;
 
+    // When true a player is never shown the streamer's own network addresses: of the streamer's ICE
+    // candidates only relay ones reach it, scrubbed. Only complete together with iceTransportPolicy
+    // "relay" in the player's peer options - see AddressScrub for why.
+    hideStreamerAddresses?: boolean;
+
     // Optional hook to authorize (or override) the id a streamer registers as when it identifies
     // itself. This is the seam for consumer-supplied anti-squatting / ownership policy; the project
     // ships no authentication of its own. See StreamerIdAuthorizer. When omitted, the default
