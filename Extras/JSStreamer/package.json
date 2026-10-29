@@ -20,7 +20,7 @@
     "license": "MIT",
     "devDependencies": {
         "@types/node": "^22.14.0",
-        "copy-webpack-plugin": "^12.0.2",
+        "copy-webpack-plugin": "^14.0.0",
         "eslint": "^9.39.0",
         "eslint-config-prettier": "^10.0.1",
         "eslint-plugin-prettier": "^5.2.3",
@@ -38,7 +38,7 @@
     },
     "dependencies": {
         "@epicgames-ps/lib-pixelstreamingcommon-ue5.8": "*",
-        "body-parser": "^2.3.0"
+        "body-parser": "^2.4.0"
     },
     "overrides": {
         "http-proxy-middleware": "2.0.8"
