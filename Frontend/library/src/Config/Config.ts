@@ -643,10 +643,10 @@ export class Config {
             new SettingFlag(
                 Flags.RequestKeyframeOnStall,
                 'Request keyframe on stall',
-                'Asks the streamer for a keyframe when video data keeps arriving but no frame can be decoded, instead of waiting for the browser to ask after about three seconds.',
+                'Asks the streamer for a keyframe when video data keeps arriving but no frame can be decoded, instead of waiting for the browser to ask after about three seconds. Not used through the SFU.',
                 settings && Object.prototype.hasOwnProperty.call(settings, Flags.RequestKeyframeOnStall)
                     ? settings[Flags.RequestKeyframeOnStall]
-                    : false,
+                    : true,
                 useUrlParams
             )
         );

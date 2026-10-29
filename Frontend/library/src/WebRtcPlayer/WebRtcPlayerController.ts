@@ -1492,7 +1492,8 @@ export class WebRtcPlayerController {
 
         this.statsTimerHandle = window.setInterval(() => this.getStats(), 1000);
 
-        if (this.config.isFlagEnabled(Flags.RequestKeyframeOnStall)) {
+        // Not through the SFU: a keyframe the streamer sends for one viewer goes to every viewer of that stream
+        if (this.config.isFlagEnabled(Flags.RequestKeyframeOnStall) && !this.isUsingSFU) {
             this.videoStallMonitor.start();
         } else {
             this.videoStallMonitor.stop();
