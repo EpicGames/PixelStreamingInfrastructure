@@ -31,8 +31,13 @@ export class ResponseController {
         const responses = new TextDecoder('utf-16').decode(message.slice(1));
 
         Logger.Info(responses);
+        // Every listener gets the message: one that throws must not stop the others from seeing it.
         this.responseEventListeners.forEach((listener: (response: string) => void) => {
-            listener(responses);
+            try {
+                listener(responses);
+            } catch (e) {
+                Logger.Error(`Response listener failed - ${e}`);
+            }
         });
     }
 }
