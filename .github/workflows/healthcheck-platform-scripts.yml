@@ -13,9 +13,10 @@ permissions:
 jobs:
   run-script-linux:
     if: github.event.repository.fork == false
-    # Pinned: mediasoup 3.15.5 has no kernel7 prebuilt for ubuntu-26.04, so
-    # npm install compiles the worker from source and outlasts the curl retries.
-    runs-on: ubuntu-24.04
+    # Pinned: mediasoup 3.15.5 has no kernel7 prebuilt, and the 24.04 and 26.04
+    # images now run kernel 7, so npm install compiles the worker from source and
+    # outlasts the curl retries. 22.04 is still on kernel 6.
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout source code
         uses: actions/checkout@v7
