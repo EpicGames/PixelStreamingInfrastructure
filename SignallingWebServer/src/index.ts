@@ -13,6 +13,7 @@ import {
 import { beautify, IProgramOptions, readSecretFile, redactConfig } from './Utils';
 import { createTokenVerifier } from './playerAuth';
 import { addStreamerTokenOptions, configureStreamerToken, loadStreamerTokenFile } from './streamerAuth';
+import { configureListenHosts } from './listenHosts';
 import { createTurnCredentialsProvider, hasCredentiallessTurnServer } from './turnCredentials';
 import { initInputHandler } from './InputHandler';
 import { Command, Option } from 'commander';
@@ -108,6 +109,16 @@ program
         '--sfu_port <port>',
         'Sets the listening port for SFU connections.',
         config_file.sfu_port || '8889'
+    )
+    .option(
+        '--streamer_host <address>',
+        'Sets the address the streamer port listens on, such as 127.0.0.1 when streamers connect from the same machine or through a tunnel. When empty, it listens on every address.',
+        config_file.streamer_host || ''
+    )
+    .option(
+        '--sfu_host <address>',
+        'Sets the address the SFU port listens on. When empty, it listens on every address.',
+        config_file.sfu_host || ''
     )
     .option(
         '--max_players <number>',
@@ -417,6 +428,8 @@ if (streamerToken) {
     }
     Logger.info('Streamers must present --streamer_token to connect.');
 }
+
+configureListenHosts(options, serverOpts);
 
 // Time limited TURN credentials, when a shared secret was supplied. Without one the static username
 // and credential in the peer options are sent to every peer exactly as before.

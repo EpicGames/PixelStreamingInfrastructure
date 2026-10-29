@@ -49,6 +49,8 @@ Options:
   --streamer_port <port>        Sets the listening port for streamer connections. (default: "8888")
   --player_port <port>          Sets the listening port for player connections. (default: "80")
   --sfu_port <port>             Sets the listening port for SFU connections. (default: "8889")
+  --streamer_host <address>     Sets the address the streamer port listens on, such as 127.0.0.1 when streamers connect from the same machine or through a tunnel. When empty, it listens on every address. (default: "")
+  --sfu_host <address>          Sets the address the SFU port listens on. When empty, it listens on every address. (default: "")
   --max_players <number>        Sets the maximum number of subscribers per streamer. 0 = unlimited (default: "0")
   --player_keepalive_timeout <milliseconds>
                                 Disconnect a player after this many milliseconds without a keepalive response. 0 = disabled (default: "30000")
