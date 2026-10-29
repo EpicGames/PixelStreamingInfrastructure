@@ -51,8 +51,11 @@ export class KeyboardController implements IInputController {
 
         const toStreamerHandlers = this.streamMessageController.toStreamerHandlers;
         toStreamerHandlers.get('KeyDown')?.([this.getKeycode(keyboardEvent), keyboardEvent.repeat ? 1 : 0]);
+        // Track held keys only: auto-repeat would otherwise add an entry per repeat, and the list must not grow.
         const activeKeys = this.activeKeys.getActiveKeys();
-        activeKeys.push(keyCode);
+        if (!activeKeys.includes(keyCode)) {
+            activeKeys.push(keyCode);
+        }
 
         // Backspace is not considered a keypress in JavaScript but we need it
         // to be so characters may be deleted in a UE text entry field.
@@ -79,6 +82,11 @@ export class KeyboardController implements IInputController {
         }
 
         const toStreamerHandlers = this.streamMessageController.toStreamerHandlers;
+        const activeKeys = this.activeKeys.getActiveKeys();
+        const heldIndex = activeKeys.indexOf(keyCode);
+        if (heldIndex !== -1) {
+            activeKeys.splice(heldIndex, 1);
+        }
         toStreamerHandlers.get('KeyUp')?.([keyCode]);
 
         if (this.config.isFlagEnabled(Flags.SuppressBrowserKeys) && this.isKeyCodeBrowserKey(keyCode)) {
