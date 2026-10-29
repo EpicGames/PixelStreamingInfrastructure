@@ -40,6 +40,7 @@ export class Flags {
     static EnableCaptureTimeExt = 'EnableCaptureTimeExt' as const;
     static BrowserSendOffer = 'BrowserSendOffer' as const;
     static LatencyCSV = 'LatencyCSV' as const;
+    static RequestKeyframeOnStall = 'RequestKeyframeOnStall' as const;
 }
 
 export type FlagsKeys = Exclude<keyof typeof Flags, 'prototype'>;
@@ -632,6 +633,19 @@ export class Config {
                 'Shows a button in the stats panel that allows to run a latency test and export the results to a CSV file.',
                 settings && Object.prototype.hasOwnProperty.call(settings, Flags.LatencyCSV)
                     ? settings[Flags.LatencyCSV]
+                    : false,
+                useUrlParams
+            )
+        );
+
+        this.flags.set(
+            Flags.RequestKeyframeOnStall,
+            new SettingFlag(
+                Flags.RequestKeyframeOnStall,
+                'Request keyframe on stall',
+                'Asks the streamer for a keyframe when video data keeps arriving but no frame can be decoded, instead of waiting for the browser to ask after about three seconds.',
+                settings && Object.prototype.hasOwnProperty.call(settings, Flags.RequestKeyframeOnStall)
+                    ? settings[Flags.RequestKeyframeOnStall]
                     : false,
                 useUrlParams
             )

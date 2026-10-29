@@ -24,9 +24,14 @@ export class SendMessageController {
      * Send a message to the streamer through the data channel
      * @param messageType - the type of message we are sending
      * @param messageData - the message data we are sending over the data channel
+     * @param countsAsActivity - whether sending this resets the AFK warning timer
      * @returns - nil
      */
-    sendMessageToStreamer(messageType: string, messageData?: Array<number | string | Uint8Array>) {
+    sendMessageToStreamer(
+        messageType: string,
+        messageData?: Array<number | string | Uint8Array>,
+        countsAsActivity = true
+    ) {
         if (messageData === undefined) {
             messageData = [];
         }
@@ -164,6 +169,6 @@ export class SendMessageController {
             return;
         }
 
-        this.dataChannelSender.sendData(data.buffer);
+        this.dataChannelSender.sendData(data.buffer, countsAsActivity);
     }
 }
