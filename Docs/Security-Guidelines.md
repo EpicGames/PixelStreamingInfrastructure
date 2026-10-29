@@ -136,3 +136,11 @@ Three things are worth understanding before choosing a TTL:
 - **It does not decide who may obtain a credential.** Anything that can open a player WebSocket is sent one, so a short TTL limits how long a leaked credential stays useful, not who is issued one. Use the WebSocket upgrade hook above for that — [`--player_token`](#shared-tokens) is the built-in way, and the server warns at startup when it is issuing TURN credentials without one.
 
 These hooks are deliberately policy-free: the library gives you the connection, its request, and the id it is asking for — what counts as a valid token, a permitted id or a valid credential is entirely up to your deployment.
+
+## Hiding the streamer's addresses from players
+
+A streamer announces every address it can be reached on: its LAN address, its public address, its IPv6 addresses, and its public address again in the related address of each relay candidate. Every player is sent all of them. For a streamer on a home or office network, that tells any viewer where the network is.
+
+`IServerConfig.hideStreamerAddresses` stops this. When it is set, a player is sent only the streamer's relay candidates, with their related address replaced by `0.0.0.0 0`, and the addresses in the streamer's offer or answer are zeroed. The signalling server exposes it as `--hide_streamer_addresses`.
+
+It only works together with `"iceTransportPolicy": "relay"` in the peer options, which also makes each player offer only relay candidates. Otherwise the streamer sends connectivity checks from its own addresses to the player's candidates, and the player sees the address anyway. The signalling server refuses to start with `--hide_streamer_addresses` unless the peer options set that policy. All media then goes through the TURN server, as in tip 2 above.

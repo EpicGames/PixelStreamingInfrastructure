@@ -227,6 +227,11 @@ program
             '--player_token_file <filename>',
             'Reads the value of --player_token from a file, so the token does not appear in the command line of this process.'
         ).default(config_file.player_token_file || '')
+    )
+    .option(
+        '--hide_streamer_addresses',
+        'Never shows a player the network addresses of the streamer: only its relay ICE candidates are forwarded, with their related address zeroed. Requires "iceTransportPolicy": "relay" in the peer options, without which the streamer\'s own connectivity checks would reveal the address anyway.',
+        config_file.hide_streamer_addresses || false
     );
 
 addStreamerTokenOptions(program, config_file)
@@ -333,8 +338,24 @@ const serverOpts: IServerConfig = {
     sfuPort: options.sfu_port,
     peerOptions: options.peer_options,
     maxSubscribers: options.max_players,
-    playerKeepaliveTimeout: Number(options.player_keepalive_timeout)
+    playerKeepaliveTimeout: Number(options.player_keepalive_timeout),
+    hideStreamerAddresses: Boolean(options.hide_streamer_addresses)
 };
+
+if (serverOpts.hideStreamerAddresses) {
+    // Refused rather than warned about: without the policy the address still reaches the player
+    // through the streamer's connectivity checks, so the flag would only look like protection.
+    const policy: unknown = (options.peer_options as { iceTransportPolicy?: unknown } | undefined)
+        ?.iceTransportPolicy;
+    if (policy !== 'relay') {
+        Logger.error(
+            '--hide_streamer_addresses needs "iceTransportPolicy": "relay" in the peer options, ' +
+                "or the streamer's own connectivity checks reveal its address to the player anyway."
+        );
+        throw Error('hide_streamer_addresses without iceTransportPolicy relay.');
+    }
+    Logger.info('Players are shown only relay candidates of the streamer; its own addresses are withheld.');
+}
 
 // A shared token on the player port, when one was supplied. This runs at the HTTP upgrade, so a
 // player that cannot present it never becomes a connection and is never sent the config message -
