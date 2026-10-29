@@ -101,6 +101,14 @@ export interface IPeerOptionsRequest {
 export type PeerOptionsProvider = (request: IPeerOptionsRequest) => unknown;
 
 /**
+ * The largest websocket message, in bytes, accepted on the streamer, player and SFU ports. Signalling
+ * messages are a few kilobytes, and ws would otherwise accept up to 100 MiB in one message. A
+ * connection that sends more is closed with code 1009. Setting maxPayload in streamerWsOptions,
+ * playerWsOptions or sfuWsOptions overrides it for that port.
+ */
+export const DEFAULT_MAX_PAYLOAD = 1024 * 1024;
+
+/**
  * The main signalling server object.
  * Contains a streamer and player registry and handles setting up of websockets
  * to listen for incoming connections.
@@ -138,6 +146,7 @@ export class SignallingServer {
         const streamerServer = new wslib.WebSocketServer({
             port: config.streamerPort,
             backlog: 1,
+            maxPayload: DEFAULT_MAX_PAYLOAD,
             ...config.streamerWsOptions
         });
         streamerServer.on('connection', this.onStreamerConnected.bind(this));
@@ -148,6 +157,7 @@ export class SignallingServer {
         const playerServer = new wslib.WebSocketServer({
             server: server,
             port: server ? undefined : config.playerPort,
+            maxPayload: DEFAULT_MAX_PAYLOAD,
             ...config.playerWsOptions
         });
         playerServer.on('connection', this.onPlayerConnected.bind(this));
@@ -160,6 +170,7 @@ export class SignallingServer {
             const sfuServer = new wslib.WebSocketServer({
                 port: config.sfuPort,
                 backlog: 1,
+                maxPayload: DEFAULT_MAX_PAYLOAD,
                 ...config.sfuWsOptions
             });
             sfuServer.on('connection', this.onSFUConnected.bind(this));
