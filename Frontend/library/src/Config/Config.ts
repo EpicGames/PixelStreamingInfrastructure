@@ -435,7 +435,7 @@ export class Config {
                 'Prefers AV1 over the preferred codec when the streamer offers it and the browser reports that it can decode AV1 in hardware.',
                 settings && Object.prototype.hasOwnProperty.call(settings, Flags.PreferHardwareAV1)
                     ? settings[Flags.PreferHardwareAV1]
-                    : false,
+                    : true,
                 useUrlParams
             )
         );

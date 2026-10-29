@@ -243,10 +243,13 @@ describe('PeerConnectionController', () => {
             });
         };
 
-        // A connection preferring the default codec, the browser's first H264 profile, with the flag on
-        const receiveOfferPreferringHardwareAV1 = async (offeredCodecs: OfferedCodec[]) => {
+        // A connection preferring the default codec, the browser's first H264 profile, with the flag on by default
+        const receiveOfferPreferringHardwareAV1 = async (
+            offeredCodecs: OfferedCodec[],
+            flagEnabled = true
+        ) => {
             const config = new Config();
-            config.setFlagEnabled(Flags.PreferHardwareAV1, true);
+            config.setFlagEnabled(Flags.PreferHardwareAV1, flagEnabled);
             const defaultCodec = config.getSettingOption(OptionParameters.PreferredCodec).selected;
             const peerConnectionController = createPeerConnectionController(config, defaultCodec);
             await receiveOffer(peerConnectionController, config, offeredCodecs);
@@ -292,6 +295,19 @@ describe('PeerConnectionController', () => {
             expect(await receiveOfferPreferringHardwareAV1(ueOfferedCodecs)).toEqual(
                 `H264 ${h264ConstrainedBaseline}`
             );
+        });
+
+        it('should be on by default', () => {
+            expect(new Config().isFlagEnabled(Flags.PreferHardwareAV1)).toBe(true);
+        });
+
+        it('should keep the preferred codec when the flag is off', async () => {
+            mockAV1DecodingInfo({ supported: true, powerEfficient: true });
+
+            expect(await receiveOfferPreferringHardwareAV1(ueOfferedCodecs, false)).toEqual(
+                `H264 ${h264ConstrainedBaseline}`
+            );
+            expect(decodingInfo).not.toHaveBeenCalled();
         });
     });
 });
