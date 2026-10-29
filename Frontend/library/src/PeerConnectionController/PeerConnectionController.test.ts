@@ -1,4 +1,4 @@
-import { Config, OptionParameters } from '../Config/Config';
+import { Config, Flags, OptionParameters } from '../Config/Config';
 import { PeerConnectionController } from './PeerConnectionController';
 import { getCodecOption } from '../Util/CodecUtils';
 import { mockRTCPeerConnection, unmockRTCPeerConnection } from '../__test__/mockRTCPeerConnection';
@@ -228,5 +228,70 @@ describe('PeerConnectionController', () => {
         await receiveOffer(peerConnectionController, config, ueOfferedCodecs);
 
         expect(setCodecPreferencesSpy).not.toHaveBeenCalled();
+    });
+
+    describe('with PreferHardwareAV1', () => {
+        const av1 = 'AV1 level-idx=5;profile=0;tier=0';
+        let decodingInfo: jest.Mock;
+
+        // What navigator.mediaCapabilities says about decoding AV1 from WebRTC
+        const mockAV1DecodingInfo = (info: { supported: boolean; powerEfficient: boolean }) => {
+            decodingInfo = jest.fn(() => Promise.resolve(info));
+            Object.defineProperty(navigator, 'mediaCapabilities', {
+                configurable: true,
+                value: { decodingInfo }
+            });
+        };
+
+        // A connection preferring the default codec, the browser's first H264 profile, with the flag on
+        const receiveOfferPreferringHardwareAV1 = async (offeredCodecs: OfferedCodec[]) => {
+            const config = new Config();
+            config.setFlagEnabled(Flags.PreferHardwareAV1, true);
+            const defaultCodec = config.getSettingOption(OptionParameters.PreferredCodec).selected;
+            const peerConnectionController = createPeerConnectionController(config, defaultCodec);
+            await receiveOffer(peerConnectionController, config, offeredCodecs);
+            expect(setCodecPreferencesSpy).toHaveBeenCalledTimes(1);
+            return getAnsweredCodec(setCodecPreferencesSpy.mock.calls[0][0], offeredCodecs);
+        };
+
+        afterEach(() => {
+            delete (navigator as unknown as { mediaCapabilities?: unknown }).mediaCapabilities;
+        });
+
+        it('should answer with AV1 when the browser decodes it in hardware', async () => {
+            mockAV1DecodingInfo({ supported: true, powerEfficient: true });
+
+            expect(await receiveOfferPreferringHardwareAV1(ueOfferedCodecs)).toEqual(av1);
+            expect(decodingInfo).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: 'webrtc',
+                    video: expect.objectContaining({ contentType: 'video/AV1' })
+                })
+            );
+        });
+
+        it('should keep the preferred codec when the browser would decode AV1 in software', async () => {
+            mockAV1DecodingInfo({ supported: true, powerEfficient: false });
+
+            expect(await receiveOfferPreferringHardwareAV1(ueOfferedCodecs)).toEqual(
+                `H264 ${h264ConstrainedBaseline}`
+            );
+        });
+
+        it('should keep the preferred codec when AV1 was not offered', async () => {
+            mockAV1DecodingInfo({ supported: true, powerEfficient: true });
+            const offeredCodecs = ueOfferedCodecs.filter((codec) => codec.name !== 'AV1');
+
+            expect(await receiveOfferPreferringHardwareAV1(offeredCodecs)).toEqual(
+                `H264 ${h264ConstrainedBaseline}`
+            );
+            expect(decodingInfo).not.toHaveBeenCalled();
+        });
+
+        it('should keep the preferred codec when the browser cannot tell', async () => {
+            expect(await receiveOfferPreferringHardwareAV1(ueOfferedCodecs)).toEqual(
+                `H264 ${h264ConstrainedBaseline}`
+            );
+        });
     });
 });

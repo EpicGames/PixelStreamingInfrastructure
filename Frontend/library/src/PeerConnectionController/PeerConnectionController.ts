@@ -5,6 +5,7 @@ import { Config, OptionParameters, Flags } from '../Config/Config';
 import { AggregatedStats } from './AggregatedStats';
 import { parseRtpParameters, splitSections } from 'sdp';
 import { RTCUtils } from '../Util/RTCUtils';
+import { BrowserUtils } from '../Util/BrowserUtils';
 import { getCodecIdentity, orderCodecCapabilities, resolvePreferredCodec } from '../Util/CodecUtils';
 import { CodecStats } from './CodecStats';
 import { SDPUtils } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.8';
@@ -456,9 +457,19 @@ export class PeerConnectionController {
             const supportedCodecs: string[] = this.config.getSettingOption(
                 OptionParameters.PreferredCodec
             ).options;
+            // Optionally put AV1 first when the remote peer offered it and this browser decodes it in hardware
+            let wantedCodec = this.preferredCodec;
+            if (this.config.isFlagEnabled(Flags.PreferHardwareAV1)) {
+                const av1Identity = getCodecIdentity('AV1');
+                const offeredAV1 = supportedCodecs.find((codec) => getCodecIdentity(codec) === av1Identity);
+                if (offeredAV1 !== undefined && (await BrowserUtils.canDecodeAV1InHardware())) {
+                    Logger.Info('Preferring AV1, which this browser decodes in hardware');
+                    wantedCodec = offeredAV1;
+                }
+            }
             // The preferred codec may be a profile the remote peer didn't offer, so prefer the closest one it did.
             // After that, fall back to the remote peer's order rather than the browser's, which starts with VP8.
-            const preferredCodec = resolvePreferredCodec(this.preferredCodec, supportedCodecs);
+            const preferredCodec = resolvePreferredCodec(wantedCodec, supportedCodecs);
             const codecPreferences = orderCodecCapabilities(
                 RTCRtpReceiver.getCapabilities('video')?.codecs ?? [],
                 preferredCodec !== undefined ? [preferredCodec, ...supportedCodecs] : supportedCodecs
