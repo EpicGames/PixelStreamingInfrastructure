@@ -23,6 +23,8 @@ By following these tips, you can enhance the security of your Pixel Streaming se
 
 The signalling server **only ships optional shared tokens for the player and streamer ports** ([below](#shared-tokens)) — no identity, no sessions, no login flow. The SFU port accepts any connection, and any deployment is expected to bring its own authentication and authorization appropriate to its environment. Keep these ports on a trusted/private network unless they are protected by the built-in token or a front door of your own.
 
+When the streamer runs on the same machine as the signalling server, or reaches it through a tunnel or proxy that ends there, `--streamer_host 127.0.0.1` keeps the streamer port off the network altogether: it listens on that address only. `--sfu_host` does the same for the SFU port. Both default to every address, as before.
+
 To make it practical to add your own auth without forking, the `Signalling` library exposes a few seams. None of these provide credentials or a login flow — they are hooks where *your* policy plugs in.
 
 ### Authenticating at the WebSocket upgrade
