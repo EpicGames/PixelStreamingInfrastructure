@@ -38,7 +38,7 @@
     },
     "dependencies": {
         "@epicgames-ps/lib-pixelstreamingcommon-ue5.7": "*",
-        "body-parser": "^2.3.0"
+        "body-parser": "^2.4.0"
     },
     "overrides": {
         "http-proxy-middleware": "2.0.8"
