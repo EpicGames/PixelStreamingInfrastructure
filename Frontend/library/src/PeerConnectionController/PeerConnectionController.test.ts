@@ -2,6 +2,7 @@ import { Config, OptionParameters } from '../Config/Config';
 import { PeerConnectionController } from './PeerConnectionController';
 import { getCodecOption } from '../Util/CodecUtils';
 import { mockRTCPeerConnection, unmockRTCPeerConnection } from '../__test__/mockRTCPeerConnection';
+import { mockRTCRtpReceiver, unmockRTCRtpReceiver } from '../__test__/mockRTCRtpReceiver';
 
 const flushPromises = () => new Promise(jest.requireActual('timers').setImmediate);
 
@@ -228,5 +229,58 @@ describe('PeerConnectionController', () => {
         await receiveOffer(peerConnectionController, config, ueOfferedCodecs);
 
         expect(setCodecPreferencesSpy).not.toHaveBeenCalled();
+    });
+});
+
+/** The parts of RTCPeerConnection the controller touches in these tests. */
+const makePeerConnection = () => ({
+    getSenders: jest.fn((): RTCRtpSender[] => []),
+    getTransceivers: jest.fn((): RTCRtpTransceiver[] => []),
+    addTransceiver: jest.fn(),
+    close: jest.fn()
+});
+
+describe('PeerConnectionController local media', () => {
+    let peerConnection: ReturnType<typeof makePeerConnection>;
+
+    beforeEach(() => {
+        peerConnection = makePeerConnection();
+        (globalThis as any).RTCPeerConnection = jest.fn(() => peerConnection);
+        mockRTCRtpReceiver();
+        jest.spyOn(console, 'log').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+        delete (globalThis as any).RTCPeerConnection;
+        unmockRTCRtpReceiver();
+        delete (navigator as unknown as { mediaDevices?: unknown }).mediaDevices;
+        jest.restoreAllMocks();
+    });
+
+    it('stops the local capture tracks before closing the connection', () => {
+        const track = { kind: 'audio', stop: jest.fn() } as unknown as MediaStreamTrack;
+        peerConnection.getSenders.mockReturnValue([{ track } as unknown as RTCRtpSender]);
+        const controller = new PeerConnectionController({}, new Config(), '');
+
+        controller.close();
+
+        expect(track.stop).toHaveBeenCalledTimes(1);
+        expect(peerConnection.close).toHaveBeenCalledTimes(1);
+        expect(controller.peerConnection).toBeNull();
+    });
+
+    it('falls back to receive-only when the camera and microphone are refused', async () => {
+        const getUserMedia = jest.fn(() => Promise.reject(new Error('NotAllowedError')));
+        Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getUserMedia } });
+        const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+        const controller = new PeerConnectionController({}, new Config(), '');
+
+        await expect(controller.setupTransceiversAsync(true, true)).resolves.toBeUndefined();
+
+        expect(getUserMedia).toHaveBeenCalledTimes(2);
+        expect(peerConnection.addTransceiver).toHaveBeenCalledWith('video', { direction: 'recvonly' });
+        expect(peerConnection.addTransceiver).toHaveBeenCalledWith('audio', { direction: 'recvonly' });
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining('Webcam unavailable'));
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining('Microphone unavailable'));
     });
 });

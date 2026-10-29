@@ -114,7 +114,7 @@ export class MockRTCPeerConnectionImpl implements RTCPeerConnection {
         return [];
     }
     getSenders(): RTCRtpSender[] {
-        throw new Error("Method not implemented.");
+        return [];
     }
     getStats(selector?: MediaStreamTrack | null | undefined): Promise<RTCStatsReport> {
         const stats = {
