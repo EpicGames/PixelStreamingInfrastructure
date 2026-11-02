@@ -39,6 +39,7 @@ export class Flags {
     static HideUI = 'HideUI' as const;
     static EnableCaptureTimeExt = 'EnableCaptureTimeExt' as const;
     static BrowserSendOffer = 'BrowserSendOffer' as const;
+    static DataChannelOnly = 'DataChannelOnly' as const;
     static LatencyCSV = 'LatencyCSV' as const;
 }
 
@@ -619,6 +620,19 @@ export class Config {
                 'Browser will initiate the WebRTC handshake by sending the offer to the streamer (4.27 ONLY)',
                 settings && Object.prototype.hasOwnProperty.call(settings, Flags.BrowserSendOffer)
                     ? settings[Flags.BrowserSendOffer]
+                    : false,
+                useUrlParams
+            )
+        );
+
+        this.flags.set(
+            Flags.DataChannelOnly,
+            new SettingFlag(
+                Flags.DataChannelOnly,
+                'Data channel only',
+                'Disable audio and video negotiation, keeping the WebRTC data channel available.',
+                settings && Object.prototype.hasOwnProperty.call(settings, Flags.DataChannelOnly)
+                    ? settings[Flags.DataChannelOnly]
                     : false,
                 useUrlParams
             )

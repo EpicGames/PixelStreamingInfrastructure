@@ -63,6 +63,13 @@ export class PeerConnectionController {
      */
     createOffer(offerOptions: RTCOfferOptions, config: Config) {
         Logger.Info('Create Offer');
+        const offerOptionsToUse = config.isFlagEnabled(Flags.DataChannelOnly)
+            ? {
+                  ...offerOptions,
+                  offerToReceiveAudio: false,
+                  offerToReceiveVideo: false
+              }
+            : offerOptions;
 
         const isLocalhostConnection = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
         const isHttpsConnection = location.protocol === 'https:';
@@ -81,7 +88,7 @@ export class PeerConnectionController {
 
         void this.setupTransceiversAsync(useMic, useCamera).finally(() => {
             this.peerConnection
-                ?.createOffer(offerOptions)
+                ?.createOffer(offerOptionsToUse)
                 .then((offer: RTCSessionDescriptionInit) => {
                     this.showTextOverlayConnecting();
                     offer.sdp = this.mungeSDP(offer.sdp, useMic);
@@ -428,6 +435,13 @@ export class PeerConnectionController {
      * @param useCamera - is webcam in use
      */
     async setupTransceiversAsync(useMic: boolean, useCamera: boolean) {
+        if (this.config.isFlagEnabled(Flags.DataChannelOnly)) {
+            for (const transceiver of this.peerConnection?.getTransceivers() ?? []) {
+                transceiver.direction = 'inactive';
+            }
+            return;
+        }
+
         let hasVideoReceiver = false;
         for (const transceiver of this.peerConnection?.getTransceivers() ?? []) {
             if (

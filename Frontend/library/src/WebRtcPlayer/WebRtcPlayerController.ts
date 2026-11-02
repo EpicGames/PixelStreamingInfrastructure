@@ -74,11 +74,11 @@ export class WebRtcPlayerController {
     recvDataChannelController: DataChannelController;
     dataChannelSender: DataChannelSender;
     datachannelOptions: RTCDataChannelInit;
-    videoPlayer: VideoPlayer;
-    streamController: StreamController;
+    videoPlayer?: VideoPlayer;
+    streamController?: StreamController;
     peerConnectionController: PeerConnectionController;
     inputClassesFactory: InputClassesFactory;
-    freezeFrameController: FreezeFrameController;
+    freezeFrameController?: FreezeFrameController;
     shouldShowPlayOverlay = true;
     afkController: AFKController;
     latencyStartTime: number;
@@ -90,7 +90,7 @@ export class WebRtcPlayerController {
     mouseController: IInputController;
     touchController: IInputController;
     gamePadController: GamepadController;
-    coordinateConverter: InputCoordTranslator;
+    coordinateConverter?: InputCoordTranslator;
     isUsingSFU: boolean;
     isUsingSVC: boolean;
     isQualityController: boolean;
@@ -137,29 +137,31 @@ export class WebRtcPlayerController {
             this.closeSignalingServer('You have been disconnected due to inactivity.', false);
         };
 
-        this.freezeFrameController = new FreezeFrameController(this.pixelStreaming.videoElementParent);
+        if (!config.isFlagEnabled(Flags.DataChannelOnly)) {
+            this.freezeFrameController = new FreezeFrameController(this.pixelStreaming.videoElementParent);
 
-        this.videoPlayer = new VideoPlayer(this.pixelStreaming.videoElementParent, this.config);
-        this.videoPlayer.onVideoInitialized = () => this.handleVideoInitialized();
+            this.videoPlayer = new VideoPlayer(this.pixelStreaming.videoElementParent, this.config);
+            this.videoPlayer.onVideoInitialized = () => this.handleVideoInitialized();
 
-        // When in match viewport resolution mode, when the browser viewport is resized we send a resize command back to UE.
-        this.videoPlayer.onMatchViewportResolutionCallback = (width: number, height: number) => {
-            const descriptor = {
-                'Resolution.Width': width,
-                'Resolution.Height': height
+            // When in match viewport resolution mode, when the browser viewport is resized we send a resize command back to UE.
+            this.videoPlayer.onMatchViewportResolutionCallback = (width: number, height: number) => {
+                const descriptor = {
+                    'Resolution.Width': width,
+                    'Resolution.Height': height
+                };
+
+                this.streamMessageController.toStreamerHandlers.get('Command')([JSON.stringify(descriptor)]);
             };
 
-            this.streamMessageController.toStreamerHandlers.get('Command')([JSON.stringify(descriptor)]);
-        };
+            // Every time video player is resized in browser we need to reinitialize the mouse coordinate conversion and freeze frame sizing logic.
+            this.videoPlayer.onResizePlayerCallback = () => {
+                this.setUpMouseAndFreezeFrame();
+            };
 
-        // Every time video player is resized in browser we need to reinitialize the mouse coordinate conversion and freeze frame sizing logic.
-        this.videoPlayer.onResizePlayerCallback = () => {
-            this.setUpMouseAndFreezeFrame();
-        };
+            this.streamController = new StreamController(this.videoPlayer);
 
-        this.streamController = new StreamController(this.videoPlayer);
-
-        this.coordinateConverter = new InputCoordTranslator();
+            this.coordinateConverter = new InputCoordTranslator();
+        }
 
         this.sendrecvDataChannelController = new DataChannelController();
         this.recvDataChannelController = new DataChannelController();
@@ -350,7 +352,7 @@ export class WebRtcPlayerController {
      * where it refuses to make new video players.
      */
     destroyVideoPlayer() {
-        this.videoPlayer.destroy();
+        this.videoPlayer?.destroy();
     }
 
     /**
@@ -837,7 +839,7 @@ export class WebRtcPlayerController {
         this.afkController.onAfkClick();
 
         // if the stream is paused play it, if we can
-        if (this.videoPlayer.isPaused() && this.videoPlayer.hasVideoSource()) {
+        if (this.videoPlayer?.isPaused() && this.videoPlayer.hasVideoSource()) {
             this.playStream();
         }
     }
@@ -890,6 +892,9 @@ export class WebRtcPlayerController {
      * Loads a freeze frame if it is required otherwise shows the play overlay
      */
     loadFreezeFrameOrShowPlayOverlay() {
+        if (!this.freezeFrameController) {
+            return;
+        }
         this.pixelStreaming.dispatchEvent(
             new LoadFreezeFrameEvent({
                 shouldShowPlayOverlay: this.shouldShowPlayOverlay,
@@ -914,6 +919,9 @@ export class WebRtcPlayerController {
      * @param message The freeze frame data in bytes
      */
     onFreezeFrameMessage(message: ArrayBuffer) {
+        if (!this.freezeFrameController) {
+            return;
+        }
         Logger.Info('DataChannelReceiveMessageType.FreezeFrame');
         const view = new Uint8Array(message);
         this.freezeFrameController.processFreezeFrameMessage(view, () =>
@@ -925,11 +933,15 @@ export class WebRtcPlayerController {
      * Enable the video after hiding a freeze frame
      */
     invalidateFreezeFrameAndEnableVideo() {
+        const freezeFrameController = this.freezeFrameController;
+        if (!freezeFrameController) {
+            return;
+        }
         Logger.Info('DataChannelReceiveMessageType.FreezeFrame');
         setTimeout(() => {
             this.pixelStreaming.dispatchEvent(new HideFreezeFrameEvent());
-            this.freezeFrameController.hideFreezeFrame();
-        }, this.freezeFrameController.freezeFrameDelay);
+            freezeFrameController.hideFreezeFrame();
+        }, freezeFrameController.freezeFrameDelay);
         if (this.videoPlayer.getVideoElement()) {
             this.videoPlayer.setVideoEnabled(true);
         }
@@ -966,7 +978,10 @@ export class WebRtcPlayerController {
      * Plays the stream audio and video source and sets up other pieces while the stream starts
      */
     playStream() {
-        if (!this.videoPlayer.getVideoElement()) {
+        if (this.config.isFlagEnabled(Flags.DataChannelOnly)) {
+            return;
+        }
+        if (!this.videoPlayer?.getVideoElement()) {
             const message =
                 'Could not play video stream because the video player was not initialized correctly.';
             this.pixelStreaming.dispatchEvent(new PlayStreamErrorEvent({ message }));
@@ -1014,7 +1029,7 @@ export class WebRtcPlayerController {
         }
 
         this.shouldShowPlayOverlay = false;
-        this.freezeFrameController.showFreezeFrame();
+        this.freezeFrameController?.showFreezeFrame();
     }
 
     /**
@@ -1170,7 +1185,7 @@ export class WebRtcPlayerController {
 
         /* RTC Peer Connection on Track event -> handle on track */
         this.peerConnectionController.onTrack = (trackEvent: RTCTrackEvent) =>
-            this.streamController.handleOnTrack(trackEvent);
+            this.streamController?.handleOnTrack(trackEvent);
 
         const BrowserSendOffer = this.config.isFlagEnabled(Flags.BrowserSendOffer);
         if (BrowserSendOffer) {
@@ -1594,9 +1609,15 @@ export class WebRtcPlayerController {
      * Set the freeze frame overlay to the player div
      */
     setUpMouseAndFreezeFrame() {
+        if (this.config.isFlagEnabled(Flags.DataChannelOnly)) {
+            return;
+        }
         // Calculating and normalizing positions depends on the width and height of the player.
-        const playerElement = this.videoPlayer.getVideoParentElement();
-        const videoElement = this.videoPlayer.getVideoElement();
+        const playerElement = this.videoPlayer?.getVideoParentElement();
+        const videoElement = this.videoPlayer?.getVideoElement();
+        if (!playerElement || !videoElement || !this.coordinateConverter || !this.freezeFrameController) {
+            throw new Error('Cannot set up mouse and freeze frame: media resources are not initialized.');
+        }
         this.coordinateConverter.reconfigure(
             { width: playerElement.clientWidth, height: playerElement.clientHeight },
             { width: videoElement.videoWidth, height: videoElement.videoHeight }
@@ -1993,7 +2014,7 @@ export class WebRtcPlayerController {
      * To Resize the Video Player element
      */
     resizePlayerStyle(): void {
-        this.videoPlayer.resizePlayerStyle();
+        this.videoPlayer?.resizePlayerStyle();
     }
 
     setPreferredCodec(codec: string) {
@@ -2024,7 +2045,7 @@ export class WebRtcPlayerController {
      */
     setMouseInputEnabled(isEnabled: boolean) {
         this.mouseController?.unregister();
-        if (isEnabled) {
+        if (isEnabled && this.videoPlayer) {
             const mouseMode = this.config.isFlagEnabled(Flags.HoveringMouseMode)
                 ? ControlSchemeType.HoveringMouse
                 : ControlSchemeType.LockedMouse;
@@ -2037,7 +2058,7 @@ export class WebRtcPlayerController {
      */
     setTouchInputEnabled(isEnabled: boolean) {
         this.touchController?.unregister();
-        if (isEnabled) {
+        if (isEnabled && this.videoPlayer) {
             this.touchController = this.inputClassesFactory.registerTouch(
                 this.config.isFlagEnabled(Flags.FakeMouseWithTouches)
             );

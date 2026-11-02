@@ -50,6 +50,9 @@ export class WebXRController {
     }
 
     public xrClicked() {
+        if (!this.webRtcController.videoPlayer) {
+            return;
+        }
         if (!this.xrSession) {
             if (!navigator.xr) {
                 Logger.Error('This browser does not support XR.');

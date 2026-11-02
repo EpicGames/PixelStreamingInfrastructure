@@ -1,6 +1,7 @@
 import { mockRTCRtpReceiver, unmockRTCRtpReceiver } from '../__test__/mockRTCRtpReceiver';
 import {
     Config,
+    Flags,
     NumericParameters,
 } from '../Config/Config';
 import { PixelStreaming } from './PixelStreaming';
@@ -10,6 +11,8 @@ import { BaseMessage, Messages, MessageHelpers } from '@epicgames-ps/lib-pixelst
 import { mockRTCPeerConnection, MockRTCPeerConnectionSpyFunctions, MockRTCPeerConnectionTriggerFunctions, unmockRTCPeerConnection } from '../__test__/mockRTCPeerConnection';
 import { mockHTMLMediaElement, mockMediaStream, unmockMediaStream } from '../__test__/mockMediaStream';
 import { InitialSettings } from '../DataChannel/InitialSettings';
+import { KeyboardController } from '../Inputs/KeyboardController';
+import { GamepadController } from '../Inputs/GamepadController';
 
 const flushPromises = () => new Promise(jest.requireActual("timers").setImmediate);
 
@@ -60,6 +63,14 @@ describe('PixelStreaming', () => {
         channel.onopen?.(new Event('open'));
         return { channel };
     };
+    const triggerResponseMessage = (channel: RTCDataChannel, message: string) => {
+        const data = new DataView(new ArrayBuffer(1 + 2 * message.length));
+        data.setUint8(0, 1);
+        for (let index = 0; index < message.length; index++) {
+            data.setUint16(1 + 2 * index, message.charCodeAt(index), true);
+        }
+        channel.dispatchEvent(new MessageEvent('message', { data: data.buffer }));
+    };
     const establishMockedPixelStreamingConnection = (
         streamerIds = streamerIdList,
         iceConnectionState: RTCIceConnectionState = 'connected'
@@ -90,6 +101,38 @@ describe('PixelStreaming', () => {
         unmockWebSocket();
         unmockRTCPeerConnection();
         jest.resetAllMocks();
+        jest.restoreAllMocks();
+    });
+
+    it('constructs a data-only client without media DOM and tolerates media-only calls', () => {
+        const config = new Config({ initialSettings: { [Flags.DataChannelOnly]: true } });
+        const createElement = jest.spyOn(document, 'createElement');
+        const originalXR = Object.getOwnPropertyDescriptor(navigator, 'xr');
+        const requestSession = jest.fn();
+
+        try {
+            Object.defineProperty(navigator, 'xr', {
+                configurable: true,
+                value: { requestSession }
+            });
+            const pixelStreaming = new PixelStreaming(config);
+
+            expect(createElement).not.toHaveBeenCalled();
+            expect(pixelStreaming.requestLatencyTest()).toBe(false);
+            expect(pixelStreaming.requestIframe()).toBe(false);
+            expect(() => config.setFlagEnabled(Flags.MatchViewportResolution, true)).not.toThrow();
+            expect(() => pixelStreaming.play()).not.toThrow();
+            pixelStreaming.webXrController.xrClicked();
+            expect(requestSession).not.toHaveBeenCalled();
+            expect(() => pixelStreaming.disconnect()).not.toThrow();
+        } finally {
+            createElement.mockRestore();
+            if (originalXR) {
+                Object.defineProperty(navigator, 'xr', originalXR);
+            } else {
+                Reflect.deleteProperty(navigator, 'xr');
+            }
+        }
     });
 
     it('should emit settingsChanged events when the configuration is updated', () => {
@@ -547,10 +590,94 @@ describe('PixelStreaming', () => {
         expect(config.getNumericSettingValue(NumericParameters.CompatQualityMax)).toEqual(100);
     });
 
-    it('should send data through the data channel when emitUIInteraction is called', () => {
+    it('reconnects a data-only client and sends messages without creating media resources', async () => {
+        const registerKeyboard = jest.spyOn(KeyboardController.prototype, 'register');
+        const registerGamepad = jest.spyOn(GamepadController.prototype, 'register');
+        const responseListener = jest.fn();
+        const sentAnswers = () => (webSocketSpyFunctions.sendSpy as jest.Mock).mock.calls
+            .map(([message]) => JSON.parse(message))
+            .filter((message) => message.type === Messages.answer.typeName);
+        const config = new Config({
+            initialSettings: {
+                [Flags.DataChannelOnly]: true,
+                [Flags.KeyboardInput]: true,
+                [Flags.GamepadInput]: true,
+                ss: mockSignallingUrl
+            }
+        });
+        const pixelStreaming = new PixelStreaming(config);
+        pixelStreaming.addResponseEventListener('responseListener', responseListener);
+        pixelStreaming.connect();
+        const { channel: originalChannel } = establishMockedPixelStreamingConnection();
+        await flushPromises();
+
+        expect(sentAnswers()).toHaveLength(1);
+        expect(sentAnswers()[0].sdp).toEqual(expect.any(String));
+
+        pixelStreaming.reconnect();
+        jest.advanceTimersByTime(2000);
+
+        expect(webSocketSpyFunctions.constructorSpy).toHaveBeenCalledTimes(2);
+        const { channel } = establishMockedPixelStreamingConnection();
+        await flushPromises();
+
+        expect(sentAnswers()).toHaveLength(2);
+        expect(sentAnswers()[1].sdp).toEqual(expect.any(String));
+        expect(channel).not.toBe(originalChannel);
+        expect(registerKeyboard).toHaveBeenCalledTimes(2);
+        expect(registerGamepad).toHaveBeenCalledTimes(2);
+        expect(pixelStreaming.webRtcController.videoPlayer).toBeUndefined();
+        expect(pixelStreaming.webRtcController.streamController).toBeUndefined();
+        const sentMessageCount = (rtcPeerConnectionSpyFunctions.sendDataSpy as jest.Mock).mock.calls.length;
+        expect(pixelStreaming.emitUIInteraction({ reconnected: true })).toBe(true);
+        expect(rtcPeerConnectionSpyFunctions.sendDataSpy).toHaveBeenCalledTimes(sentMessageCount + 1);
+
+        const response = JSON.stringify({ reconnected: true });
+        triggerResponseMessage(channel, response);
+        expect(responseListener).toHaveBeenCalledTimes(1);
+        expect(responseListener).toHaveBeenCalledWith(response);
+
+        pixelStreaming.disconnect();
+    });
+
+    it.each([
+        [true, true],
+        [true, false],
+        [false, true],
+        [false, false]
+    ])(
+        'honors data-only keyboard/gamepad settings and cleanup (keyboard=%s, gamepad=%s)',
+        (keyboardEnabled: boolean, gamepadEnabled: boolean) => {
+            const registerKeyboard = jest.spyOn(KeyboardController.prototype, 'register');
+            const unregisterKeyboard = jest.spyOn(KeyboardController.prototype, 'unregister');
+            const registerGamepad = jest.spyOn(GamepadController.prototype, 'register');
+            const unregisterGamepad = jest.spyOn(GamepadController.prototype, 'unregister');
+            const config = new Config({
+                initialSettings: {
+                    [Flags.DataChannelOnly]: true,
+                    [Flags.KeyboardInput]: keyboardEnabled,
+                    [Flags.GamepadInput]: gamepadEnabled,
+                    ss: mockSignallingUrl
+                }
+            });
+            const pixelStreaming = new PixelStreaming(config);
+            pixelStreaming.connect();
+            establishMockedPixelStreamingConnection();
+
+            expect(registerKeyboard).toHaveBeenCalledTimes(keyboardEnabled ? 1 : 0);
+            expect(registerGamepad).toHaveBeenCalledTimes(gamepadEnabled ? 1 : 0);
+
+            pixelStreaming.disconnect();
+
+            expect(unregisterKeyboard).toHaveBeenCalledTimes(keyboardEnabled ? 1 : 0);
+            expect(unregisterGamepad).toHaveBeenCalledTimes(gamepadEnabled ? 1 : 0);
+        }
+    );
+
+    it.each([false, true])('should send data through the data channel when emitUIInteraction is called (data-only=%s)', (dataOnly) => {
         mockHTMLMediaElement({ ableToPlay: true, readyState: 2 });
         
-        const config = new Config({ initialSettings: {ss: mockSignallingUrl}});
+        const config = new Config({ initialSettings: {ss: mockSignallingUrl, [Flags.DataChannelOnly]: dataOnly}});
         const pixelStreaming = new PixelStreaming(config);
         pixelStreaming.connect();
 
@@ -564,12 +691,14 @@ describe('PixelStreaming', () => {
         
         expect(commandSent).toEqual(true);
         expect(rtcPeerConnectionSpyFunctions.sendDataSpy).toHaveBeenCalled();
+
+        pixelStreaming.disconnect();
     });
 
-    it('should call user-provided callback if receiving a data channel Response message from the streamer', () => {
+    it.each([false, true])('should call user-provided callback if receiving a data channel Response message from the streamer (data-only=%s)', (dataOnly) => {
         mockHTMLMediaElement({ ableToPlay: true, readyState: 2 });
         
-        const config = new Config({ initialSettings: {ss: mockSignallingUrl}});
+        const config = new Config({ initialSettings: {ss: mockSignallingUrl, [Flags.DataChannelOnly]: dataOnly}});
         const responseListenerSpy = jest.fn();
         const pixelStreaming = new PixelStreaming(config);
         pixelStreaming.addResponseEventListener('responseListener', responseListenerSpy);
@@ -582,14 +711,7 @@ describe('PixelStreaming', () => {
         expect(responseListenerSpy).not.toHaveBeenCalled();
 
         const testMessageContents = JSON.stringify({ test: "mock-data" });
-        const data = new DataView(new ArrayBuffer(1 + 2 * testMessageContents.length));
-        data.setUint8(0, 1); // type 1 == Response
-        let byteIdx = 1;
-        for (let i = 0; i < testMessageContents.length; i++) {
-            data.setUint16(byteIdx, testMessageContents.charCodeAt(i), true);
-            byteIdx += 2;
-        }
-        channel.dispatchEvent(new MessageEvent('message', { data: data.buffer }));
+        triggerResponseMessage(channel, testMessageContents);
 
         expect(responseListenerSpy).toHaveBeenCalledWith(testMessageContents);
     });
