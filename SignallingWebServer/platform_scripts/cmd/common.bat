@@ -281,15 +281,26 @@ call :SetupCoturn
 exit /b
 
 :SetPublicIP
-IF "%PUBLIC_IP%"=="" (
-    FOR /f %%A IN ('curl --silent http://api.ipify.org') DO set PUBLIC_IP=%%A
-    Echo External IP is : %PUBLIC_IP%
-)
+IF NOT "!PUBLIC_IP!"=="" exit /b
+rem The lookup response is untrusted network input, and PUBLIC_IP ends up in
+rem command lines that cmd.exe re-parses for operators (&, |, ^, >). It is
+rem fetched over https and kept only if it consists solely of digits and dots,
+rem as an IPv4 address does. Anything else falls back to 127.0.0.1, matching
+rem the usage text and the bash script.
+set "FETCHED_IP="
+FOR /f %%A IN ('curl --silent https://api.ipify.org') DO set "FETCHED_IP=%%A"
+set "IP_CHARS=!FETCHED_IP!"
+FOR %%C IN (0 1 2 3 4 5 6 7 8 9 .) DO IF DEFINED IP_CHARS set "IP_CHARS=!IP_CHARS:%%C=!"
+IF DEFINED FETCHED_IP IF NOT DEFINED IP_CHARS set "PUBLIC_IP=!FETCHED_IP!"
+IF "!PUBLIC_IP!"=="" set "PUBLIC_IP=127.0.0.1"
+set "FETCHED_IP="
+set "IP_CHARS="
+Echo External IP is : !PUBLIC_IP!
 exit /b
 
 :SetupTurnStun
 IF "%TURN_SERVER%"=="" (
-    set TURN_SERVER=%PUBLIC_IP%:19303
+    set TURN_SERVER=!PUBLIC_IP!:19303
 )
 rem Defaults are applied independently of TURN_SERVER so that --turn-user and
 rem --turn-pass are honoured on their own, and so that supplying --turn alone
@@ -320,7 +331,7 @@ rem second time, after ! expansion has already substituted the password, so an
 rem operator in the credential is re-read as syntax and the launch silently
 rem does nothing. turnserver.exe is an executable, and direct execution is
 rem synchronous without CALL.
-set TURN_ARGS=-c ..\..\..\turnserver.conf --allowed-peer-ip=%LOCAL_IP% -p %TURN_PORT% -r %TURN_REALM% -X %PUBLIC_IP% -E %LOCAL_IP% -L %LOCAL_IP% --no-cli --no-tls --no-dtls --pidfile "%SCRIPT_DIR%coturn\coturn.pid" -f -a -v -u !TURN_USER!:!TURN_PASS!
+set TURN_ARGS=-c ..\..\..\turnserver.conf --allowed-peer-ip=%LOCAL_IP% -p %TURN_PORT% -r %TURN_REALM% -X !PUBLIC_IP! -E %LOCAL_IP% -L %LOCAL_IP% --no-cli --no-tls --no-dtls --pidfile "%SCRIPT_DIR%coturn\coturn.pid" -f -a -v -u !TURN_USER!:!TURN_PASS!
 
 if "!START_TURN!"=="1" (
     IF NOT "!TURN_SERVER!"=="" (
@@ -342,7 +353,7 @@ exit /b
 :PrintConfig
 echo.
 echo Running with config:
-echo Public IP address : %PUBLIC_IP%
+echo Public IP address : !PUBLIC_IP!
 IF NOT "%STUN_SERVER%"=="" ( echo STUN_SERVER       : %STUN_SERVER% )
 IF NOT "%TURN_SERVER%"=="" ( echo TURN_SERVER       : %TURN_SERVER% )
 echo Server command line arguments: %SERVER_ARGS%
