@@ -58,6 +58,7 @@ import { IInputController } from '../Inputs/IInputController';
 import { GamepadController } from '../Inputs/GamepadController';
 import { LatencyInfo } from '../PeerConnectionController/LatencyCalculator';
 import { BrowserUtils } from '../Util/BrowserUtils';
+import { VideoStallMonitor } from '../VideoPlayer/VideoStallMonitor';
 
 /**
  * Entry point for the WebRTC Player
@@ -95,6 +96,7 @@ export class WebRtcPlayerController {
     isUsingSVC: boolean;
     isQualityController: boolean;
     statsTimerHandle: number;
+    videoStallMonitor: VideoStallMonitor;
     file: FileTemplate;
     preferredCodec: string;
     peerConfig: RTCConfiguration;
@@ -251,6 +253,7 @@ export class WebRtcPlayerController {
             if (this.statsTimerHandle) {
                 window.clearInterval(this.statsTimerHandle);
             }
+            this.videoStallMonitor.stop();
 
             // reset the stream quality icon.
             this.setVideoEncoderAvgQP(0);
@@ -276,6 +279,12 @@ export class WebRtcPlayerController {
             this.streamMessageController
         );
         this.toStreamerMessagesController = new ToStreamerMessagesController(this.sendMessageController);
+        this.videoStallMonitor = new VideoStallMonitor(
+            () => this.getVideoReceiverStats(),
+            // Not counted as activity: the user did nothing, and on a lossy link the requests would keep an
+            // abandoned session from ever timing out
+            () => this.sendMessageController.sendMessageToStreamer('IFrameRequest', [], false)
+        );
         this.registerMessageHandlers();
         this.streamMessageController.populateDefaultProtocol();
 
@@ -1483,6 +1492,13 @@ export class WebRtcPlayerController {
 
         this.statsTimerHandle = window.setInterval(() => this.getStats(), 1000);
 
+        // Not through the SFU: a keyframe the streamer sends for one viewer goes to every viewer of that stream
+        if (this.config.isFlagEnabled(Flags.RequestKeyframeOnStall) && !this.isUsingSFU) {
+            this.videoStallMonitor.start();
+        } else {
+            this.videoStallMonitor.stop();
+        }
+
         /*  */
         this.setMouseInputEnabled(this.config.isFlagEnabled(Flags.MouseInput));
         this.setKeyboardInputEnabled(this.config.isFlagEnabled(Flags.KeyboardInput));
@@ -1634,6 +1650,16 @@ export class WebRtcPlayerController {
      */
     getStats() {
         this.peerConnectionController.generateStats();
+    }
+
+    /**
+     * @returns The stats of the receiver of the streamer's video, or undefined when there is none
+     */
+    getVideoReceiverStats(): Promise<RTCStatsReport> | undefined {
+        const videoReceiver = this.peerConnectionController?.peerConnection
+            ?.getReceivers()
+            .find((receiver) => receiver.track?.kind === 'video');
+        return videoReceiver?.getStats();
     }
 
     /**

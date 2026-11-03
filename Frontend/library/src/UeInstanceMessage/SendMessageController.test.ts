@@ -76,4 +76,22 @@ describe('SendMessageController', () => {
             expect(Array.from(sent)).toEqual([1, 0x10, 0x30, 0x20]);
         });
     });
+
+    describe('user activity', () => {
+        beforeEach(() => {
+            streamMessageController.toStreamerMessages.set('Empty', { id: 7, structure: [] });
+        });
+
+        it('counts a message as user activity by default', () => {
+            controller.sendMessageToStreamer('Empty');
+
+            expect(sendData.mock.calls[0][1]).toBe(true);
+        });
+
+        it('passes on a message that is not user activity', () => {
+            controller.sendMessageToStreamer('Empty', [], false);
+
+            expect(sendData.mock.calls[0][1]).toBe(false);
+        });
+    });
 });

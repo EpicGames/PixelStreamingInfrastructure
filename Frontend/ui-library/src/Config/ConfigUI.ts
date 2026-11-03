@@ -166,6 +166,8 @@ export class ConfigUI {
                 this.addSettingFlag(psSettingsSection, this.flagsUi.get(Flags.AFKDetection));
             if (isSettingEnabled(settingsConfig, Flags.WaitForStreamer))
                 this.addSettingFlag(psSettingsSection, this.flagsUi.get(Flags.WaitForStreamer));
+            if (isSettingEnabled(settingsConfig, Flags.RequestKeyframeOnStall))
+                this.addSettingFlag(psSettingsSection, this.flagsUi.get(Flags.RequestKeyframeOnStall));
             if (isSettingEnabled(settingsConfig, NumericParameters.AFKTimeoutSecs))
                 this.addSettingNumeric(
                     psSettingsSection,
