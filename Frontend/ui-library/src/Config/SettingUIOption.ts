@@ -110,7 +110,7 @@ export class SettingUIOption<CustomIds extends string = OptionParametersIds> ext
         values.forEach((value: string) => {
             const opt = document.createElement('option');
             opt.value = value;
-            opt.innerHTML = value;
+            opt.textContent = value;
             this.selector.appendChild(opt);
         });
     }
