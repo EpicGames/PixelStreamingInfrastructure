@@ -19,8 +19,8 @@ import { IInputController } from './IInputController';
  */
 export class InputClassesFactory {
     toStreamerMessagesProvider: StreamMessageController;
-    videoElementProvider: VideoPlayer;
-    coordinateConverter: InputCoordTranslator;
+    videoElementProvider?: VideoPlayer;
+    coordinateConverter?: InputCoordTranslator;
     activeKeys: ActiveKeys = new ActiveKeys();
 
     /**
@@ -30,8 +30,8 @@ export class InputClassesFactory {
      */
     constructor(
         toStreamerMessagesProvider: StreamMessageController,
-        videoElementProvider: VideoPlayer,
-        coordinateConverter: InputCoordTranslator
+        videoElementProvider?: VideoPlayer,
+        coordinateConverter?: InputCoordTranslator
     ) {
         this.toStreamerMessagesProvider = toStreamerMessagesProvider;
         this.videoElementProvider = videoElementProvider;
@@ -57,6 +57,9 @@ export class InputClassesFactory {
      * @param controlScheme - if the mouse is either hovering or locked
      */
     registerMouse(controlScheme: ControlSchemeType, config: Config) {
+        if (!this.videoElementProvider || !this.coordinateConverter) {
+            return undefined;
+        }
         Logger.Info('Register Mouse Events');
         let mouseController: MouseController;
         if (controlScheme == ControlSchemeType.HoveringMouse) {
@@ -86,6 +89,9 @@ export class InputClassesFactory {
      * @param fakeMouseTouch - the faked mouse touch event
      */
     registerTouch(fakeMouseTouch: boolean) {
+        if (!this.videoElementProvider || !this.coordinateConverter) {
+            return undefined;
+        }
         Logger.Info('Registering Touch');
         let touchController: IInputController;
         if (fakeMouseTouch) {

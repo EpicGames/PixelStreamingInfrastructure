@@ -2,7 +2,7 @@
 
 The frontend library exposes a number of configuration options through the [Config](/Frontend/library/src/Config/Config.ts) class. The values of these options can be modified to tweak certain inbuilt behaviour of the frontend.
 
-The following options are available in the frontend library to customize input:
+The following options are available in the frontend library to customize behavior:
 
 |       Property       | Default | Description |
 |         ---          |   ---   |     ---     |
@@ -11,6 +11,7 @@ The following options are available in the frontend library to customize input:
 | FakeMouseWithTouches |  false  | When this option is enabled and the user is viewing the stream on a device with a touch screen such as a smartphone or tablet, this setting causes single-finger touch events to be interpreted by the Unreal Engine application as mouse clicks and drag events. Enabling this setting can provide users on mobile devices with the ability to partially control your Unreal Engine application, even when the application's input controller does not specifically handle touch input events. |
 |   UseMic  |  false  | Indicates whether or not the stream should be created with a microphone track which is sent to the UE application. This microphone track can be listened to using the [`UPixelStreamingAudioComponent`](https://docs.unrealengine.com/5.0/en-US/API/Plugins/PixelStreaming/UPixelStreamingAudioComponent/). If this flag is enabled, a microphone audio track is created (if the browser settings allow for it) and is actively sending audio. For saving bandwidth or other functionality, it's possible to mute the microphone track by calling `PixelStreaming`'s `muteMicrophone`, and later re-enable it with `unmuteMicrophone`. If the `PixelStreaming` object was created without this flag, it's possible to enable it later by calling `unmuteMicrophone(true)`, which will use the `forceEnable` parameter to add the track and trigger a full reconnection (this is a heavier operation that takes a while). |
 |   UseCamera  |  false  | Indicates whether or not the stream should be created with a video track which is sent to the UE application. This video track can be listened to using the `UPixelStreamingVideoComponent`. If this flag is enabled, a camera video track is created (if the browser settings allow for it) and is actively sending video. For saving bandwidth or other functionality, it's possible to mute the video track by calling `PixelStreaming`'s `muteCamera`, and later re-enable it with `unmuteCamera`. If the `PixelStreaming` object was created without this flag, it's possible to enable it later by calling `unmuteCamera(true)`, which will use the `forceEnable` parameter to add the track and trigger a full reconnection (this is a heavier operation that takes a while). |
+| DataChannelOnly | false | When enabled, the browser negotiates data channels without audio or video. The library skips media initialization, including the video container, media elements, freeze-frame overlay, and mouse/touch handlers. Keyboard and gamepad input continue to follow their existing settings. Set this flag before constructing the stream; changing modes requires a new instance. |
 
 When creating a frontend implementation, these options are visible via the [`Config`](/Frontend/library/src/Config/Config.ts) object required in order to create a [`PixelStreaming`](/Frontend/library/src/PixelStreaming/PixelStreaming.ts) stream for your frontend application. Simply set the values you want before initializing the stream object.
 
@@ -21,6 +22,8 @@ When creating a frontend implementation, these options are visible via the [`Con
 
 	const stream = new PixelStreaming(config);
 ```
+
+With `DataChannelOnly` enabled, the `videoPlayer`, `streamController`, `freezeFrameController`, and `coordinateConverter` properties on `stream.webRtcController` are `undefined` and optional in TypeScript. `stream.requestLatencyTest()` and `stream.requestIframe()` return `false` because video is unavailable, and playback and XR are not supported. Data-only applications should use their own connection UI because the reference UI library is video-oriented. Wait for the data channel to open before sending application messages.
 
 ### Disabling User Input
 

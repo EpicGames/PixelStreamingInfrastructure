@@ -1,5 +1,6 @@
-import { Config, OptionParameters } from '../Config/Config';
 import { PeerConnectionController } from './PeerConnectionController';
+import { Config, Flags, OptionParameters } from '../Config/Config';
+import { mockRTCRtpReceiver, unmockRTCRtpReceiver } from '../__test__/mockRTCRtpReceiver';
 import { getCodecOption } from '../Util/CodecUtils';
 import { mockRTCPeerConnection, unmockRTCPeerConnection } from '../__test__/mockRTCPeerConnection';
 
@@ -85,7 +86,7 @@ const getAnsweredCodec = (codecPreferences: RTCRtpCodec[], offeredCodecs: Offere
         );
 };
 
-describe('PeerConnectionController', () => {
+describe('PeerConnectionController codec negotiation', () => {
     const originalRTCRtpReceiver = global.RTCRtpReceiver;
     let setCodecPreferencesSpy: jest.Mock;
 
@@ -228,5 +229,103 @@ describe('PeerConnectionController', () => {
         await receiveOffer(peerConnectionController, config, ueOfferedCodecs);
 
         expect(setCodecPreferencesSpy).not.toHaveBeenCalled();
+    });
+});
+function createSetLocalDescriptionMock() {
+    let resolveCalled: () => void = () => {};
+    const called = new Promise<void>((resolve) => {
+        resolveCalled = resolve;
+    });
+    const mock = jest.fn().mockImplementation(() => {
+        resolveCalled();
+        return Promise.resolve();
+    });
+    return { mock, called };
+}
+
+describe('PeerConnectionController data-channel-only mode', () => {
+    beforeEach(() => {
+        mockRTCRtpReceiver();
+    });
+
+    afterEach(() => {
+        unmockRTCRtpReceiver();
+    });
+
+    it('does not request media when creating an offer in data-channel-only mode', async () => {
+        const createOffer = jest.fn().mockResolvedValue({ type: 'offer', sdp: '' });
+        const { mock: setLocalDescription, called: localDescriptionSet } =
+            createSetLocalDescriptionMock();
+        const controller = Object.create(
+            PeerConnectionController.prototype
+        ) as PeerConnectionController;
+
+        controller.config = {
+            isFlagEnabled: (flag: string) => flag === Flags.DataChannelOnly
+        } as unknown as Config;
+        controller.preferredCodec = '';
+        controller.peerConnection = {
+            getTransceivers: (): RTCRtpTransceiver[] => [],
+            addTransceiver: jest.fn(),
+            createOffer,
+            setLocalDescription
+        } as unknown as RTCPeerConnection;
+        controller.showTextOverlayConnecting = jest.fn();
+        controller.showTextOverlaySetupFailure = jest.fn();
+        controller.mungeSDP = jest.fn((sdp) => sdp);
+        controller.onSendWebRTCOffer = jest.fn();
+
+        controller.createOffer(
+            { offerToReceiveAudio: true, offerToReceiveVideo: true },
+            controller.config
+        );
+        await localDescriptionSet;
+
+        expect(createOffer).toHaveBeenCalledWith({
+            offerToReceiveAudio: false,
+            offerToReceiveVideo: false
+        });
+        expect(controller.peerConnection.addTransceiver).not.toHaveBeenCalled();
+    });
+
+    it('creates an answer with inactive media transceivers for a streamer offer', async () => {
+        const videoTransceiver = { direction: 'recvonly' } as RTCRtpTransceiver;
+        const audioTransceiver = { direction: 'recvonly' } as RTCRtpTransceiver;
+        const transceivers = [videoTransceiver, audioTransceiver];
+        const answer = { type: 'answer', sdp: 'answer-sdp' } as RTCSessionDescriptionInit;
+        const { mock: setLocalDescription, called: localDescriptionSet } =
+            createSetLocalDescriptionMock();
+        let directionsAtAnswerCreation: RTCRtpTransceiverDirection[] = [];
+        const peerConnection = {
+            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
+            getTransceivers: jest.fn(() => transceivers),
+            addTransceiver: jest.fn(),
+            createAnswer: jest.fn().mockImplementation(() => {
+                directionsAtAnswerCreation = transceivers.map((transceiver) => transceiver.direction);
+                return Promise.resolve(answer);
+            }),
+            setLocalDescription
+        } as unknown as RTCPeerConnection;
+        const config = {
+            isFlagEnabled: (flag: string) =>
+                flag === Flags.DataChannelOnly || flag === Flags.UseMic || flag === Flags.UseCamera,
+            setOptionSettingOptions: jest.fn()
+        } as unknown as Config;
+        const controller = Object.create(
+            PeerConnectionController.prototype
+        ) as PeerConnectionController;
+
+        controller.config = config;
+        controller.peerConnection = peerConnection;
+        controller.isFirefox = jest.fn().mockReturnValue(false);
+        controller.fuzzyIntersectUEAndBrowserCodecs = jest.fn().mockReturnValue([]);
+        controller.mungeSDP = jest.fn((sdp) => sdp);
+
+        controller.receiveOffer({ type: 'offer', sdp: 'offer-sdp' }, config);
+        await localDescriptionSet;
+
+        expect(directionsAtAnswerCreation).toEqual(['inactive', 'inactive']);
+        expect(peerConnection.addTransceiver).not.toHaveBeenCalled();
+        expect(peerConnection.setLocalDescription).toHaveBeenCalledWith(answer);
     });
 });

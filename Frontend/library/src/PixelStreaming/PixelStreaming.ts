@@ -143,7 +143,7 @@ export class PixelStreaming {
         });
 
         this.config._addOnSettingChangedListener(Flags.MatchViewportResolution, () => {
-            this._webRtcController.videoPlayer.updateVideoStreamSize();
+            this._webRtcController.videoPlayer?.updateVideoStreamSize();
         });
 
         this.config._addOnSettingChangedListener(Flags.HoveringMouseMode, (isHoveringMouse: boolean) => {
@@ -734,7 +734,7 @@ export class PixelStreaming {
      * @returns
      */
     public requestLatencyTest() {
-        if (!this._webRtcController.videoPlayer.isVideoReady()) {
+        if (!this._webRtcController.videoPlayer?.isVideoReady()) {
             return false;
         }
         this._webRtcController.sendLatencyTest();
@@ -782,7 +782,7 @@ export class PixelStreaming {
      * @returns
      */
     public requestIframe() {
-        if (!this._webRtcController.videoPlayer.isVideoReady()) {
+        if (!this._webRtcController.videoPlayer?.isVideoReady()) {
             return false;
         }
         this._webRtcController.sendIframeRequest();

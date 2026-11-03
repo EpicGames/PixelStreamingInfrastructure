@@ -146,6 +146,7 @@ export class MockRTCPeerConnectionImpl implements RTCPeerConnection {
     setLocalDescription(description?: RTCLocalSessionDescriptionInit | undefined): Promise<void>;
     setLocalDescription(description: RTCLocalSessionDescriptionInit, successCallback: VoidFunction, failureCallback: RTCPeerConnectionErrorCallback): Promise<void>;
     setLocalDescription(description?: unknown, successCallback?: unknown, failureCallback?: unknown): Promise<void> {
+        this.localDescription = description as RTCSessionDescription;
         spyFunctions.setLocalDescriptionSpy?.(description as RTCLocalSessionDescriptionInit);
         return Promise.resolve();
     }

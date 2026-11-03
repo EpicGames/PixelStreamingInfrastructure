@@ -51,6 +51,7 @@ describe('Config', () => {
     it('should populate given initial setting values', () => {
         const initialSettings = {
             [Flags.AutoPlayVideo]: false,
+            [Flags.DataChannelOnly]: true,
             [NumericParameters.WebRTCMaxBitrate]: 12345,
             [TextParameters.SignallingServerUrl]: 'url'
         };
@@ -60,12 +61,19 @@ describe('Config', () => {
         expect(config.isFlagEnabled(Flags.AutoPlayVideo)).toEqual(
             initialSettings[Flags.AutoPlayVideo]
         );
+        expect(config.isFlagEnabled(Flags.DataChannelOnly)).toEqual(true);
         expect(
             config.getNumericSettingValue(NumericParameters.WebRTCMaxBitrate)
         ).toEqual(initialSettings[NumericParameters.WebRTCMaxBitrate]);
         expect(
             config.getTextSettingValue(TextParameters.SignallingServerUrl)
         ).toEqual(initialSettings[TextParameters.SignallingServerUrl]);
+    });
+
+    it('should disable data-channel-only mode by default', () => {
+        const config = new Config();
+
+        expect(config.isFlagEnabled(Flags.DataChannelOnly)).toEqual(false);
     });
 
     it('should replace setting values when new settings are set with setSettings', () => {
