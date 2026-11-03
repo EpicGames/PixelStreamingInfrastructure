@@ -23,6 +23,7 @@ import { PlayOverlay } from '../Overlay/PlayOverlay';
 import { InfoOverlay } from '../Overlay/InfoOverlay';
 import { ErrorOverlay } from '../Overlay/ErrorOverlay';
 import { AFKOverlay } from '../Overlay/AFKOverlay';
+import { HtmlUtils } from '../Util/HtmlUtils';
 import { Controls, ControlsUIConfiguration } from '../UI/Controls';
 import { LabelledButton } from '../UI/LabelledButton';
 import { SettingsPanel } from '../UI/SettingsPanel';
@@ -619,7 +620,7 @@ export class Application {
      * @param allowClickToReconnect - true if we want to allow the user to click to reconnect. Otherwise it's just a message.
      */
     onDisconnect(eventString: string, allowClickToReconnect: boolean) {
-        const overlayMessage = 'Disconnected' + (eventString ? `: ${eventString}` : '.');
+        const overlayMessage = 'Disconnected' + (eventString ? `: ${HtmlUtils.escape(eventString)}` : '.');
         if (allowClickToReconnect) {
             this.showDisconnectOverlay(`${overlayMessage} Click To Restart.`);
         } else {
@@ -728,10 +729,10 @@ export class Application {
         if (!autoSelectedStreamerId) {
             if (waitForStreamer && wantedStreamerId) {
                 if (isReconnecting) {
-                    message = `Waiting for ${wantedStreamerId} to become available.`;
+                    message = `Waiting for ${HtmlUtils.escape(wantedStreamerId)} to become available.`;
                     allowRestart = false;
                 } else {
-                    message = `Gave up waiting for ${wantedStreamerId} to become available. Click to try again`;
+                    message = `Gave up waiting for ${HtmlUtils.escape(wantedStreamerId)} to become available. Click to try again`;
                     if (messageStreamingList.ids.length > 0) {
                         message += ` or select a streamer from the settings menu.`;
                     }
@@ -759,7 +760,7 @@ export class Application {
     }
 
     handleSubscribeFailedMessage(message: string) {
-        this.showDisconnectOverlay(`Subscribe failed: "${message}" Click to try again`);
+        this.showDisconnectOverlay(`Subscribe failed: "${HtmlUtils.escape(message)}" Click to try again`);
     }
 
     /**
