@@ -10,7 +10,10 @@ interface IHandlerFunc {
 export function initInputHandler(options: IProgramOptions, signallingServer: SignallingServer) {
     const stdin = process.stdin;
 
-    stdin.setRawMode(true);
+    // A pipe or a service has no terminal to put into raw mode, and setRawMode is not a function there.
+    if (stdin.isTTY) {
+        stdin.setRawMode(true);
+    }
     stdin.resume();
     stdin.setEncoding('utf8');
 
@@ -34,7 +37,8 @@ export function initInputHandler(options: IProgramOptions, signallingServer: Sig
             process.stdout.write(`\th - Help.\n`);
             process.stdout.write(`\tq - Quit.\n`);
         } else {
-            const handler = handlers[key];
+            // Own keys only: 'constructor' and the like would otherwise reach Object.prototype and crash.
+            const handler = Object.prototype.hasOwnProperty.call(handlers, key) ? handlers[key] : undefined;
             if (!handler) {
                 process.stdout.write(`${key}: No handler.\n`);
             } else {
