@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 import type WebSocket from 'ws';
-import { Messages } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.8';
+import { Messages } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.6';
 import { SFUConnection } from './SFUConnection';
 import { StreamerConnection } from './StreamerConnection';
 import { StreamerRegistry } from './StreamerRegistry';
