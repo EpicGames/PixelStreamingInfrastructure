@@ -53,7 +53,12 @@ export class FreezeFrame {
      * @param jpeg - the freeze frame image as a byte array data
      */
     updateImageElementSource(jpeg: Uint8Array) {
-        const base64 = btoa(jpeg.reduce((data, byte) => data + String.fromCharCode(byte), ''));
+        // Build the binary string in slices; a string concatenation per byte is slow for a full-size frame.
+        let binary = '';
+        for (let i = 0; i < jpeg.length; i += 0x8000) {
+            binary += String.fromCharCode(...jpeg.subarray(i, i + 0x8000));
+        }
+        const base64 = btoa(binary);
         this.imageElement.src = 'data:image/jpeg;base64,' + base64;
     }
 
