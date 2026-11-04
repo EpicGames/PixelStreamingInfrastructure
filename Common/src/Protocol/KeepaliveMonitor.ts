@@ -58,6 +58,8 @@ export class KeepaliveMonitor {
     private sendHeartbeat(): void {
         // if we never got a response from the last heartbeat, assume the connection is dead and timeout
         if (this.alive === false) {
+            // Stop first, so a consumer that keeps the socket open is told once rather than on every tick.
+            this.stop();
             this.onTimeout?.();
             return;
         }
