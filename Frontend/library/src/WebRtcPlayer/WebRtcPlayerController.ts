@@ -361,12 +361,13 @@ export class WebRtcPlayerController {
         const message = new Uint8Array(event.data);
         Logger.Info('Message incoming:' + message);
 
-        //try {
-        const messageType = this.streamMessageController.fromStreamerMessages.get(message[0]);
-        this.streamMessageController.fromStreamerHandlers.get(messageType)(event.data);
-        //} catch (e) {
-        //Logger.Error(Logger.GetStackTrace(), `Custom data channel message with message type that is unknown to the Pixel Streaming protocol. Does your PixelStreamingProtocol need updating? The message type was: ${message[0]}`);
-        //}
+        // An unknown message type or a malformed payload must not escape into the data channel's onmessage.
+        try {
+            const messageType = this.streamMessageController.fromStreamerMessages.get(message[0]);
+            this.streamMessageController.fromStreamerHandlers.get(messageType)(event.data);
+        } catch (e) {
+            Logger.Error(`Dropped a data channel message of type ${message[0]} that failed to handle - ${e}`);
+        }
     }
 
     /**
@@ -930,7 +931,7 @@ export class WebRtcPlayerController {
             this.pixelStreaming.dispatchEvent(new HideFreezeFrameEvent());
             this.freezeFrameController.hideFreezeFrame();
         }, this.freezeFrameController.freezeFrameDelay);
-        if (this.videoPlayer.getVideoElement()) {
+        if (this.videoPlayer.hasVideoSource()) {
             this.videoPlayer.setVideoEnabled(true);
         }
     }
