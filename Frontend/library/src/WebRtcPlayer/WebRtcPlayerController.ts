@@ -1891,9 +1891,11 @@ export class WebRtcPlayerController {
         );
 
         if (latencyTestResults.frameDisplayDeltaTimeMs && latencyTestResults.browserReceiptTimeMs) {
-            latencyTestResults.endToEndLatency = ~~(latencyTestResults.frameDisplayDeltaTimeMs +
-                latencyTestResults.networkLatency,
-            +latencyTestResults.CaptureToSendMs);
+            latencyTestResults.endToEndLatency = ~~(
+                latencyTestResults.frameDisplayDeltaTimeMs +
+                latencyTestResults.networkLatency +
+                latencyTestResults.CaptureToSendMs
+            );
         }
         this.pixelStreaming._onLatencyTestResult(latencyTestResults);
     }
