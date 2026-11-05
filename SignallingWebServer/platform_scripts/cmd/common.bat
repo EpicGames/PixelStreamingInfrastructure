@@ -169,7 +169,9 @@ if "%INSTALL_DEPS%"=="1" (
     pushd "%SCRIPT_DIR%..\..\.."
     rem --no-audit/--no-fund: neither is read by the startup path, and a slow
     rem registry audit blocks the server from starting for minutes.
-    call %NPM% install --no-audit --no-fund
+    rem Only the workspaces this script builds and runs. The SFU's mediasoup
+    rem compiles its worker from source on hosts without a matching prebuilt.
+    call %NPM% install --no-audit --no-fund --include-workspace-root -w Common -w Signalling -w SignallingWebServer -w Frontend/library -w Frontend/ui-library -w Frontend/implementations/typescript
     popd
 )
 
