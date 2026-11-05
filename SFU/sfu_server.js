@@ -227,8 +227,20 @@ async function onStreamerOffer(msg) {
     streamer = { transport: transport, producers: producers, dataEnabled: dataEnabled, multiplexChannels: multiplex };
 }
 
+// Reserves an SCTP stream id on the transport for a DataProducer, so that DataConsumers created on
+// the same transport later are never given the same id. mediasoup has no public API for this;
+// allocateSctpStreamId() is private (older versions called it getNextSctpStreamId()). mediasoup only frees
+// the ids of DataConsumers, so ids reserved here stay in use until the transport closes.
+function allocateSctpStreamId(transport) {
+    try {
+        return transport.allocateSctpStreamId();
+    } catch (error) {
+        throw new Error(`Could not reserve an SCTP stream id on transport ${transport.id}: ${error.message}`);
+    }
+}
+
 function getNextStreamerSCTPId() {
-    return streamer.transport.getNextSctpStreamId();
+    return allocateSctpStreamId(streamer.transport);
 }
 
 // Drops all players and closes anything we hold for the current streamer. Sends nothing, so it is
@@ -358,7 +370,7 @@ async function setupPeerDataChannels(peerId) {
 
 async function setupMultiplexPeerDataChannels(peer) {
     //this will be always 0 as we are using only one producer
-    const nextPeerSCTPStreamId = peer.transport.getNextSctpStreamId();
+    const nextPeerSCTPStreamId = allocateSctpStreamId(peer.transport);
     peer.peerDataProducer = await peer.transport.produceData({ label: 'send-datachannel', sctpStreamParameters: { streamId: nextPeerSCTPStreamId, ordered: true } });
 
     const dataProducerId = await dataRouter.handlePlayer(peer.peerDataProducer, peer.id);
@@ -505,6 +517,15 @@ async function startMediasoup() {
         process.exit(1);
     });
 
+    // mediasoup listens for SIGINT/SIGTERM to close the worker, which stops Node exiting on them and
+    // does not emit 'died', so exit here or the SFU stays connected to signalling without a worker.
+    for (const signal of ['SIGINT', 'SIGTERM']) {
+        process.once(signal, () => {
+            console.log(`${signal} received, exiting`);
+            process.exit(0);
+        });
+    }
+
     const mediaCodecs = config.mediasoup.router.mediaCodecs;
     const mediasoupRouter = await worker.createRouter({ mediaCodecs });
 
@@ -516,7 +537,7 @@ async function onICEStateChange(identifier, iceState) {
 
     if (identifier === 'Streamer' && iceState === 'completed') {
         if (streamer.multiplexChannels) {
-            const nextStreamerSCTPStreamId = streamer.transport.getNextSctpStreamId();
+            const nextStreamerSCTPStreamId = allocateSctpStreamId(streamer.transport);
             //this will always be 0 since we are using one producer only
             console.log(`Attempting streamer SCTP id=${nextStreamerSCTPStreamId}`);
 
