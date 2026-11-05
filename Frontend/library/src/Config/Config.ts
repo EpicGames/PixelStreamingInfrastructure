@@ -20,6 +20,7 @@ export class Flags {
     static HoveringMouseMode = 'HoveringMouse' as const;
     static ForceMonoAudio = 'ForceMonoAudio' as const;
     static ForceTURN = 'ForceTURN' as const;
+    static PreferHardwareAV1 = 'PreferHardwareAV1' as const;
     static FakeMouseWithTouches = 'FakeMouseWithTouches' as const;
     static IsQualityController = 'ControlsQuality' as const;
     static MatchViewportResolution = 'MatchViewportRes' as const;
@@ -422,6 +423,19 @@ export class Config {
                 settings && Object.prototype.hasOwnProperty.call(settings, Flags.ForceTURN)
                     ? settings[Flags.ForceTURN]
                     : false,
+                useUrlParams
+            )
+        );
+
+        this.flags.set(
+            Flags.PreferHardwareAV1,
+            new SettingFlag(
+                Flags.PreferHardwareAV1,
+                'Prefer hardware AV1',
+                'Prefers AV1 over the preferred codec when the streamer offers it and the browser reports that it can decode AV1 in hardware.',
+                settings && Object.prototype.hasOwnProperty.call(settings, Flags.PreferHardwareAV1)
+                    ? settings[Flags.PreferHardwareAV1]
+                    : true,
                 useUrlParams
             )
         );

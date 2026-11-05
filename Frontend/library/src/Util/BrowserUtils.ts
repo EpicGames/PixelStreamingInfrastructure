@@ -34,4 +34,31 @@ export class BrowserUtils {
         });
         return browserSupportedCodecs;
     }
+
+    /**
+     * Whether the browser reports that it can decode AV1 from WebRTC power-efficiently, which in practice means in
+     * hardware. Decoding AV1 in software at streaming resolutions and frame rates drops frames on many devices.
+     * @returns false when the browser cannot tell
+     */
+    static async canDecodeAV1InHardware(): Promise<boolean> {
+        if (!navigator.mediaCapabilities?.decodingInfo) {
+            return false;
+        }
+        try {
+            const decodingInfo = await navigator.mediaCapabilities.decodingInfo({
+                type: 'webrtc',
+                video: {
+                    contentType: 'video/AV1',
+                    width: 1920,
+                    height: 1080,
+                    bitrate: 10000000,
+                    framerate: 60
+                }
+            });
+            return decodingInfo.supported && decodingInfo.powerEfficient;
+        } catch (error) {
+            Logger.Warning(`Could not check whether AV1 is decoded in hardware - ${error}`);
+            return false;
+        }
+    }
 }
