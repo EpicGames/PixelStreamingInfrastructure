@@ -1,5 +1,12 @@
 # @epicgames-ps/lib-pixelstreamingsignalling-ue5.6
 
+## 0.2.1
+
+### Patch Changes
+
+- 9a43ab9: Leave the previous streamer when an SFU subscribes to another. `SFUConnection.subscribe` overwrote `subscribedStreamer` without unsubscribing from the old streamer, so the old streamer kept forwarding to the SFU and kept the SFU's listeners. When that old streamer later disconnected, it detached the SFU from the streamer it was actually on and dropped the SFU's players. `PlayerConnection` already unsubscribes first; the SFU now does the same.
+- b52cb35: Limit websocket messages on the streamer, player and SFU ports to 1 MiB. ws accepts up to 100 MiB in one message by default, and signalling messages are a few kilobytes. A connection that sends more is closed with code 1009. Setting `maxPayload` in `streamerWsOptions`, `playerWsOptions` or `sfuWsOptions` overrides the limit for that port.
+
 ## 0.2.0
 
 ### Minor Changes
