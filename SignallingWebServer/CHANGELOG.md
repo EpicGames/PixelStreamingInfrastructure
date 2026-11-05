@@ -1,5 +1,14 @@
 # @epicgames-ps/wilbur
 
+## 3.2.1
+
+### Patch Changes
+
+- 4346461: Stop two paths from ending the signalling server. With `--stdin`, the server called `setRawMode` unconditionally, which does not exist when stdin is a pipe or a service, so startup threw. A stdin chunk that named an object property, such as `constructor`, was looked up on the command table and the resulting TypeError ended the process. Both are fixed: raw mode is only set on a terminal, and only the table's own keys are commands. A failed write of the config under `--save` is now logged instead of thrown from the file callback, which also ended the process.
+- Updated dependencies [2d098e4]
+- Updated dependencies [6d53a43]
+    - @epicgames-ps/lib-pixelstreamingsignalling-ue5.7@0.5.1
+
 ## 3.2.0
 
 ### Minor Changes
