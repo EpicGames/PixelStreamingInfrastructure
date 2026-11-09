@@ -1,6 +1,6 @@
 {
     "name": "@epicgames-ps/pixelstreaming-sfu",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "description": "Reference implementation for a PixelStreaming SFU",
     "private": true,
     "scripts": {
@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "mediasoup": "~3.31.0",
-        "@epicgames-ps/mediasoup-sdp-bridge": "^1.0.0",
+        "@epicgames-ps/mediasoup-sdp-bridge": "^1.1.0",
         "minimist": "^1.2.8",
         "run-script-os": "^1.1.6",
         "ws": "^7.5.11"
