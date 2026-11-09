@@ -137,6 +137,14 @@ export interface ConfigParams {
     useUrlParams?: boolean;
     /** If webSocketProtocols is set the protocols will be passed to the websocket constructor */
     webSocketProtocols?: string | string[];
+    /**
+     * Extra hosts that the signalling server url (`ss`) URL parameter may point at. By default the URL
+     * parameter is only accepted when it is a ws: or wss: url on the same hostname as the page, so that a
+     * crafted link cannot send the session to someone else's server. Entries are a hostname
+     * (`signalling.example.com`, any port) or a host and port (`signalling.example.com:8443`).
+     * This only restricts the URL parameter. A url set through initialSettings or in code is always used.
+     */
+    allowedSignallingServerHosts?: string[];
 }
 export class Config {
     /* A map of flags that can be toggled - options that can be set in the application - e.g. Use Mic? */
@@ -158,10 +166,72 @@ export class Config {
     // ------------ Settings -----------------
 
     constructor(config: ConfigParams = {}) {
-        const { initialSettings, useUrlParams, webSocketProtocols } = config;
+        const { initialSettings, useUrlParams, webSocketProtocols, allowedSignallingServerHosts } = config;
         this._useUrlParams = !!useUrlParams;
         this._webSocketProtocols = webSocketProtocols;
         this.populateDefaultSettings(this._useUrlParams, initialSettings);
+        this.rejectUntrustedSignallingUrlParam(allowedSignallingServerHosts ?? [], initialSettings);
+    }
+
+    /**
+     * The signalling server url can be given in the page URL (`?ss=`). A link with someone else's server
+     * in it would connect the viewer to that server while the address bar still shows the real site, so the
+     * URL parameter is only honoured when it is a websocket url on the page's own hostname or on one of the
+     * allowed hosts. Otherwise it is ignored and the normal default is used.
+     */
+    private rejectUntrustedSignallingUrlParam(allowedHosts: string[], settings?: Partial<AllSettings>): void {
+        // URL parameter names are matched case-insensitively, the same way SettingBase reads them.
+        const paramName = TextParameters.SignallingServerUrl.toLowerCase();
+        const fromUrl = [...new URLSearchParams(window.location.search).keys()].some(
+            (name) => name.toLowerCase() === paramName
+        );
+        if (!this._useUrlParams || !fromUrl) {
+            return;
+        }
+
+        const setting = this.textParameters.get(TextParameters.SignallingServerUrl);
+        if (Config.isAllowedSignallingUrl(setting.text, allowedHosts)) {
+            return;
+        }
+
+        Logger.Warning(
+            `Ignoring the ${TextParameters.SignallingServerUrl} URL parameter: it must be a ws: or wss: url on ` +
+                `${window.location.hostname} or one of the allowedSignallingServerHosts.`
+        );
+        setting.text =
+            settings && Object.prototype.hasOwnProperty.call(settings, TextParameters.SignallingServerUrl)
+                ? settings[TextParameters.SignallingServerUrl]
+                : Config.defaultSignallingUrl();
+    }
+
+    private static isAllowedSignallingUrl(value: string, allowedHosts: string[]): boolean {
+        let url: URL;
+        try {
+            url = new URL(value);
+        } catch {
+            return false;
+        }
+        if (url.protocol !== 'ws:' && url.protocol !== 'wss:') {
+            return false;
+        }
+        if (url.hostname === window.location.hostname.toLowerCase()) {
+            return true;
+        }
+        // url.host leaves out a default port, so compare against the explicit port as well.
+        const hostWithPort = `${url.hostname}:${url.port || (url.protocol === 'wss:' ? '443' : '80')}`;
+        return allowedHosts.some((entry) => {
+            const allowed = entry.trim().toLowerCase();
+            return allowed !== '' && (allowed === url.hostname || allowed === hostWithPort);
+        });
+    }
+
+    private static defaultSignallingUrl(): string {
+        return (
+            (location.protocol === 'https:' ? 'wss://' : 'ws://') +
+            window.location.hostname +
+            // for readability, we omit the port if it's 80
+            (window.location.port === '80' || window.location.port === '' ? '' : `:${window.location.port}`)
+        );
     }
 
     /**
@@ -195,12 +265,7 @@ export class Config {
                 'Url of the signalling server',
                 settings && Object.prototype.hasOwnProperty.call(settings, TextParameters.SignallingServerUrl)
                     ? settings[TextParameters.SignallingServerUrl]
-                    : (location.protocol === 'https:' ? 'wss://' : 'ws://') +
-                          window.location.hostname +
-                          // for readability, we omit the port if it's 80
-                          (window.location.port === '80' || window.location.port === ''
-                              ? ''
-                              : `:${window.location.port}`),
+                    : Config.defaultSignallingUrl(),
                 useUrlParams
             )
         );
