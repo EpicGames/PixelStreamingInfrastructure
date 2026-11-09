@@ -1,5 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-import { stringify, beautify } from './Utils';
+import { stringify, beautify, limitLogText, limitLoggedMessage } from './Utils';
 import { IProtoLogObj } from './LoggingUtils';
 import path from 'path';
 import winston from 'winston';
@@ -30,6 +30,12 @@ export interface IConfig {
 
     // the minimum log level for file messages
     logLevelFile?: string;
+
+    // the size at which a log file is closed and a new one started, as a whole number followed by k, m or g
+    logMaxSize?: string;
+
+    // the number of log files to keep. The oldest is deleted when a new one is started.
+    logMaxFiles?: number;
 }
 
 /**
@@ -70,10 +76,23 @@ export function InitLogging(config: IConfig): void {
     const logDir = config.logDir || 'logs';
     const logLevelConsole = config.logLevelConsole || 'info';
     const logLevelFile = config.logLevelFile || 'info';
+    const logMaxSize = config.logMaxSize || '100m';
+    const logMaxFiles = config.logMaxFiles ?? 14;
     logMessagesToConsole = config.logMessagesToConsole || 'none';
 
+    // winston-daily-rotate-file takes a size it cannot parse, or a count of 0, as no limit at all.
+    if (!/^[1-9]\d*[kmg]$/i.test(logMaxSize)) {
+        throw new Error(`logMaxSize must be a whole number followed by k, m or g, not "${logMaxSize}".`);
+    }
+    if (!Number.isInteger(logMaxFiles) || logMaxFiles < 1) {
+        throw new Error(`logMaxFiles must be a whole number of at least 1, not "${logMaxFiles}".`);
+    }
+
     Logger = winston.createLogger({
-        transports: [createConsoleTransport(logLevelConsole), createFileTransport(logDir, logLevelFile)]
+        transports: [
+            createConsoleTransport(logLevelConsole),
+            createFileTransport(logDir, logLevelFile, logMaxSize, logMaxFiles)
+        ]
     });
 
     const commonLogger = new CommonLogger(Logger);
@@ -118,7 +137,7 @@ function createConsoleFormat() {
     return printf((logObj: TransformableInfo) => {
         const prefix = `[${String(logObj['timestamp'])}] ${logObj.level}: `;
         if (typeof logObj.message === 'string') {
-            return prefix + logObj.message;
+            return prefix + limitLogText(logObj.message);
         } else if (isLogObject(logObj.message)) {
             const { direction, receiver, sender, target, protoMessage } = logObj.message;
             switch (direction) {
@@ -139,9 +158,9 @@ function createConsoleFormat() {
 function formatMessageForConsole(message: BaseMessage) {
     switch (logMessagesToConsole) {
         case 'verbose':
-            return stringify(message);
+            return limitLogText(stringify(message));
         case 'formatted':
-            return beautify(message);
+            return limitLogText(beautify(message));
         default:
             return `[${message.type}]`;
     }
@@ -156,12 +175,13 @@ function createProtoMessageFilter() {
     });
 }
 
-function createFileTransport(logDirPath: string, logLevel: string) {
+function createFileTransport(logDirPath: string, logLevel: string, maxSize: string, maxFiles: number) {
     return new winston.transports.DailyRotateFile({
         level: logLevel,
         filename: path.join(logDirPath, 'server-%DATE%.log'),
         datePattern: 'YYYY-MM-DD',
-        maxFiles: '14d',
+        maxSize,
+        maxFiles,
         format: combine(timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }), splat(), createFileFormat())
     });
 }
@@ -174,14 +194,15 @@ function createFileFormat() {
                 timestamp,
                 level,
                 event: 'message',
-                message
+                message: limitLogText(message)
             });
         } else if (isLogObject(logObj.message)) {
             const { timestamp, level, message } = logObj;
             return JSON.stringify({
                 timestamp,
                 level,
-                ...message
+                ...message,
+                protoMessage: limitLoggedMessage(message.protoMessage)
             });
         }
         return '';

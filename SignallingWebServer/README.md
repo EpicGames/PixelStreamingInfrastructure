@@ -45,6 +45,8 @@ Options:
   --log_folder <path>           Sets the path for the log files. (default: "logs")
   --log_level_console <level>   Sets the logging level for console messages. (choices: "debug", "info", "warning", "error", default: "info")
   --log_level_file <level>      Sets the logging level for log files. (choices: "debug", "info", "warning", "error", default: "info")
+  --log_max_size <size>         Starts a new log file when the current one reaches this size, given as a whole number followed by k, m or g. (default: "100m")
+  --log_max_files <count>       Sets how many log files are kept. The oldest is deleted when a new one is started. (default: "14")
   --console_messages [detail]   Displays incoming and outgoing signalling messages on the console. (choices: "basic", "verbose", "formatted", preset: "verbose")
   --streamer_port <port>        Sets the listening port for streamer connections. (default: "8888")
   --player_port <port>          Sets the listening port for player connections. (default: "80")
