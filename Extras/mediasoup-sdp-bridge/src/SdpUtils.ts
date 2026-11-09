@@ -9,8 +9,8 @@ import {
   MediaKind,
   RtpCapabilities,
   RtpParameters,
-} from "mediasoup/node/lib/types";
-import { MediaAttributes } from "sdp-transform";
+} from "mediasoup/types";
+import { MediaDescription, SessionDescription } from "sdp-transform";
 import _ from "lodash";
 
 // SDP to RTP Capabilities and Parameters
@@ -20,7 +20,7 @@ import _ from "lodash";
 // of each kind.
 // MsSdpUtils.extractRtpCapabilities() only works for 1 audio and 1 video.
 export function sdpToConsumerRtpCapabilities(
-  sdpObject: object,
+  sdpObject: SessionDescription,
   localCaps: RtpCapabilities
 ): RtpCapabilities {
   // Clone input to avoid side effect modifications.
@@ -37,10 +37,12 @@ export function sdpToConsumerRtpCapabilities(
   // }
 
   // This may throw.
-  MsOrtc.validateRtpCapabilities(_localCaps);
-  MsOrtc.validateRtpCapabilities(caps);
+  MsOrtc.validateAndNormalizeRtpCapabilities(_localCaps);
+  MsOrtc.validateAndNormalizeRtpCapabilities(caps);
 
-  const extendedCaps = MsOrtc.getExtendedRtpCapabilities(caps, _localCaps);
+  // Keep the codec order of the remote caps, as before mediasoup-client made
+  // it configurable.
+  const extendedCaps = MsOrtc.getExtendedRtpCapabilities(caps, _localCaps, false);
   const consumerCaps = MsOrtc.getRecvRtpCapabilities(extendedCaps);
 
   // DEBUG: Uncomment for details.
@@ -57,7 +59,7 @@ export function sdpToConsumerRtpCapabilities(
 // of each kind.
 // MsSdpUtils.extractRtpCapabilities() only works for 1 audio and 1 video.
 export function sdpToProducerRtpParameters(
-  sdpObject: any,
+  sdpObject: SessionDescription,
   localCaps: RtpCapabilities,
   kind: MediaKind,
   scalabilityMode: string
@@ -80,10 +82,12 @@ export function sdpToProducerRtpParameters(
   caps.headerExtensions = caps.headerExtensions?.filter((e) => e.kind === kind);
 
   // This may throw.
-  MsOrtc.validateRtpCapabilities(_localCaps);
-  MsOrtc.validateRtpCapabilities(caps);
+  MsOrtc.validateAndNormalizeRtpCapabilities(_localCaps);
+  MsOrtc.validateAndNormalizeRtpCapabilities(caps);
 
-  const extendedCaps = MsOrtc.getExtendedRtpCapabilities(_localCaps, caps);
+  // Keep the codec order of the remote caps, as before mediasoup-client made
+  // it configurable.
+  const extendedCaps = MsOrtc.getExtendedRtpCapabilities(_localCaps, caps, false);
   const producerParams = MsOrtc.getSendingRtpParameters(kind, extendedCaps);
 
   // DEBUG: Uncomment for details.
@@ -100,9 +104,13 @@ export function sdpToProducerRtpParameters(
   for (const codec of producerParams.codecs) {
     if (rtxCodecRegex.test(codec.mimeType)) {
       const extendedCodec = extendedCaps.codecs.find(
-        (c: any) => c.localPayloadType === codec.parameters.apt
+        (c: any) => c.localPayloadType === codec.parameters?.apt
       );
-      if (extendedCodec) {
+      if (
+        extendedCodec &&
+        extendedCodec.remoteRtxPayloadType !== undefined &&
+        codec.parameters
+      ) {
         codec.payloadType = extendedCodec.remoteRtxPayloadType;
         codec.parameters.apt = extendedCodec.remotePayloadType;
       }
@@ -128,9 +136,14 @@ export function sdpToProducerRtpParameters(
     }
   }
 
-  const sdpMediaObj: MediaAttributes =
-    (sdpObject.media || []).find((m: { type: MediaKind }) => m.type === kind) ||
-    {};
+  const sdpMediaObj: MediaDescription | undefined = sdpObject.media.find(
+    (m) => m.type === kind
+  );
+  if (!sdpMediaObj) {
+    throw new Error(
+      `[SdpUtils.sdpToProducerRtpParameters] No '${kind}' media in the SDP`
+    );
+  }
 
   // Fill `RtpParameters.mid`.
   if ("mid" in sdpMediaObj) {
@@ -144,6 +157,7 @@ export function sdpToProducerRtpParameters(
     if ("ssrcs" in sdpMediaObj) {
       producerParams.encodings = MsSdpUnifiedPlanUtils.getRtpEncodings({
         offerMediaObject: sdpMediaObj,
+        codecs: producerParams.codecs,
       });
     } else {
       producerParams.encodings = [];

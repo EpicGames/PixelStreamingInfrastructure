@@ -10,7 +10,7 @@ import {
   RtpParameters,
   Transport,
   WebRtcTransport,
-} from "mediasoup/node/lib/types";
+} from "mediasoup/types";
 
 import { randomUUID } from "node:crypto";
 import * as SdpTransform from "sdp-transform";
@@ -33,9 +33,9 @@ export class SdpEndpoint {
   private remoteSdp: string | undefined;
 
   private producers: Producer[] = [];
-  private producerOfferMedias: object[] = [];
+  private producerOfferMedias: SdpTransform.MediaDescription[] = [];
   private producerOfferParams: RtpParameters[] = [];
-  private producerOfferSctpMedia: object | undefined;
+  private producerOfferSctpMedia: SdpTransform.MediaDescription | undefined;
 
   private consumers: Consumer[] = [];
   private _receiveData: boolean = false;
@@ -194,7 +194,6 @@ export class SdpEndpoint {
       iceCandidates: this.webRtcTransport.iceCandidates as ClientIceCandidate[],
       dtlsParameters: this.webRtcTransport.dtlsParameters,
       sctpParameters: this.webRtcTransport.sctpParameters,
-      planB: false,
     });
 
     console.log("[SdpEndpoint.createAnswer] Make 'recvonly' SDP Answer");
@@ -249,7 +248,6 @@ export class SdpEndpoint {
       iceCandidates: this.webRtcTransport.iceCandidates as ClientIceCandidate[],
       dtlsParameters: this.webRtcTransport.dtlsParameters,
       sctpParameters: this.webRtcTransport.sctpParameters,
-      planB: false,
     });
 
     // Make an MSID to be used for both "audio" and "video" kinds.
