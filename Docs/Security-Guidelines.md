@@ -17,6 +17,8 @@ Please note that implementing the following suggestions may introduce additional
 
 6. **Separate TURN and Signalling Servers:** It is recommended to avoid colocating the TURN and signalling servers with the UE instance on the same IP or virtual machine (VM). This enables you to configure separate ingress/egress security policies for each server, allowing flexibility in defining the desired level of strictness or looseness. For example, the TURN server can have more relaxed policies while the UE instance can have stricter ones.
 
+7. **Restrict where the frontend connects:** The frontend's `ss` URL parameter sets the signalling server URL. It is only accepted when it is a `ws:` or `wss:` URL on the page's own hostname (any port), so a crafted link to your page cannot connect viewers to someone else's server. Anything else is ignored with a console warning and the default URL is used. If your signalling server is on a different host from the page, list it with `new Config({ useUrlParams: true, allowedSignallingServerHosts: ['signalling.example.com'] })`. An entry with a port (`signalling.example.com:8443`) only allows that port. A `SignallingServerUrl` set through `initialSettings` or in code is not restricted.
+
 By following these tips, you can enhance the security of your Pixel Streaming setup and mitigate potential risks.
 
 ## Authenticating and authorizing connections
