@@ -1,5 +1,13 @@
 # @epicgames-ps/lib-pixelstreamingfrontend-ue5.6
 
+## 0.3.2
+
+### Patch Changes
+
+- 147dbf3: Only accept the `ss` (signalling server url) URL parameter when it is a ws: or wss: url on the page's own hostname, so a crafted link can no longer connect a viewer to another server. A deployment whose signalling server is on a different host can allow it with the new `allowedSignallingServerHosts` Config option. Urls set through `initialSettings` or in code are not affected.
+- Updated dependencies [f3db311]
+    - @epicgames-ps/lib-pixelstreamingcommon-ue5.6@0.1.6
+
 ## 0.3.1
 
 ### Patch Changes
