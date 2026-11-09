@@ -14,7 +14,7 @@
 // * Chrome 116.
 // * Safari 14.1.1 (macOS).
 
-import { RtpCapabilities, RtpHeaderExtensionUri } from "mediasoup/node/lib/types";
+import { RtpCapabilities, RtpHeaderExtensionUri } from "mediasoup/types";
 
 export const firefox: RtpCapabilities = {
   codecs: [
@@ -243,11 +243,6 @@ export const firefox: RtpCapabilities = {
       kind: "video",
       uri: "http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time",
       preferredId: 4,
-    },
-    {
-      kind: "video",
-      uri: "urn:ietf:params:rtp-hdrext:toffset",
-      preferredId: 5,
     },
     {
       kind: "video",
@@ -770,11 +765,6 @@ export const chrome: RtpCapabilities = {
     },
     {
       kind: "video",
-      uri: "urn:ietf:params:rtp-hdrext:toffset",
-      preferredId: 14,
-    },
-    {
-      kind: "video",
       uri: "http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time",
       preferredId: 2,
     },
@@ -1169,11 +1159,6 @@ export const safari: RtpCapabilities = {
       kind: "audio",
       uri: "urn:ietf:params:rtp-hdrext:sdes:repaired-rtp-stream-id",
       preferredId: 6,
-    },
-    {
-      kind: "video",
-      uri: "urn:ietf:params:rtp-hdrext:toffset",
-      preferredId: 14,
     },
     {
       kind: "video",
