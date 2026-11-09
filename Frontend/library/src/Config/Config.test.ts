@@ -1,6 +1,7 @@
 import { mockRTCRtpReceiver, unmockRTCRtpReceiver } from '../__test__/mockRTCRtpReceiver';
 import {
     Config,
+    ConfigParams,
     Flags,
     FlagsKeys,
     NumericParameters,
@@ -206,7 +207,7 @@ describe('Config', () => {
         window.history.replaceState(
             {},
             '',
-            'http://localhost/?AutoPlayVideo=false&WebRTCMaxBitrate=43210&ss=signalling-url-from-url-param'
+            'http://localhost/?AutoPlayVideo=false&WebRTCMaxBitrate=43210&ss=ws%3A%2F%2Flocalhost%3A8888%2F%3Ftoken%3Dabc'
         );
 
         const config = new Config({ useUrlParams: true });
@@ -217,6 +218,69 @@ describe('Config', () => {
         ).toEqual(43210);
         expect(
             config.getTextSettingValue(TextParameters.SignallingServerUrl)
-        ).toEqual('signalling-url-from-url-param');
+        ).toEqual('ws://localhost:8888/?token=abc');
+    });
+
+    describe('signalling server url from the URL parameter', () => {
+        const signallingUrlFor = (pageUrl: string, params: ConfigParams = {}) => {
+            window.history.replaceState({}, '', pageUrl);
+            const config = new Config({ useUrlParams: true, ...params });
+            return config.getTextSettingValue(TextParameters.SignallingServerUrl);
+        };
+
+        it.each([
+            'wss://attacker.example/',
+            'ws://localhost.attacker.example/',
+            'https://localhost/',
+            'javascript:alert(1)',
+            'not a url'
+        ])('should ignore %s and fall back to the default', (ss) => {
+            expect(signallingUrlFor(`http://localhost/?ss=${encodeURIComponent(ss)}`)).toEqual(
+                'ws://localhost'
+            );
+        });
+
+        it('should match the parameter name case-insensitively', () => {
+            expect(signallingUrlFor('http://localhost/?SS=wss%3A%2F%2Fattacker.example%2F')).toEqual(
+                'ws://localhost'
+            );
+        });
+
+        it('should fall back to initialSettings rather than the page default', () => {
+            expect(
+                signallingUrlFor('http://localhost/?ss=wss%3A%2F%2Fattacker.example%2F', {
+                    initialSettings: { [TextParameters.SignallingServerUrl]: 'wss://configured.example/' }
+                })
+            ).toEqual('wss://configured.example/');
+        });
+
+        it('should accept a host listed in allowedSignallingServerHosts', () => {
+            const params = { allowedSignallingServerHosts: ['Signalling.Example', 'other.example:8443'] };
+            expect(
+                signallingUrlFor('http://localhost/?ss=wss%3A%2F%2Fsignalling.example%3A9000%2F', params)
+            ).toEqual('wss://signalling.example:9000/');
+            expect(
+                signallingUrlFor('http://localhost/?ss=wss%3A%2F%2Fother.example%3A8443%2F', params)
+            ).toEqual('wss://other.example:8443/');
+            expect(
+                signallingUrlFor('http://localhost/?ss=wss%3A%2F%2Fother.example%3A9443%2F', params)
+            ).toEqual('ws://localhost');
+            expect(
+                signallingUrlFor('http://localhost/?ss=wss%3A%2F%2Fdefault.example%2F', {
+                    allowedSignallingServerHosts: ['default.example:443']
+                })
+            ).toEqual('wss://default.example/');
+        });
+
+        it('should not restrict a url set through initialSettings', () => {
+            window.history.replaceState({}, '', 'http://localhost/');
+            const config = new Config({
+                useUrlParams: true,
+                initialSettings: { [TextParameters.SignallingServerUrl]: 'wss://elsewhere.example/' }
+            });
+            expect(config.getTextSettingValue(TextParameters.SignallingServerUrl)).toEqual(
+                'wss://elsewhere.example/'
+            );
+        });
     });
 });

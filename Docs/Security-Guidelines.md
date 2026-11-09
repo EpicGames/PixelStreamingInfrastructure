@@ -66,6 +66,14 @@ The token has to reach the **signalling WebSocket**, which is not the same thing
 https://your-server/?ss=wss%3A%2F%2Fyour-server%2F%3Ftoken%3D8f14e45f-ea8d-4b3f-b6de-1cd97b4e2d21
 ```
 
+The frontend only accepts an `ss` URL parameter that is a `ws:` or `wss:` URL on the page's own hostname (any port). Anything else is ignored with a console warning and the default URL is used instead. Without this check, anyone could send out a link to your page that connects viewers to their own server while the address bar still shows your site. If your signalling server is on a different host from the page, list that host in the frontend's `Config`:
+
+```ts
+new Config({ useUrlParams: true, allowedSignallingServerHosts: ['signalling.example.com'] });
+```
+
+An entry with a port (`signalling.example.com:8443`) only allows that port. This only restricts the URL parameter. A `SignallingServerUrl` set through `initialSettings` or in code is always used.
+
 A deployment serving its own page can do better than that by constructing the URL itself, which is what most will want:
 
 ```ts
