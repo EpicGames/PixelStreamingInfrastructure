@@ -179,7 +179,13 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
             }
             const player = this.server.playerRegistry.get(message.playerId);
             if (player) {
-                player.protocol.disconnect(1011, message.reason);
+                // ws throws on a reason over 123 bytes or one that is not a string, which would crash the
+                // server. Such a reason is dropped; the player is still closed.
+                const reason =
+                    typeof message.reason === 'string' && Buffer.byteLength(message.reason) <= 123
+                        ? message.reason
+                        : undefined;
+                player.protocol.disconnect(1011, reason);
             }
         }
     }
