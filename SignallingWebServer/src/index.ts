@@ -87,6 +87,16 @@ program
             .choices(['debug', 'info', 'warning', 'error'])
             .default(config_file.log_level_file || 'info')
     )
+    .option(
+        '--log_max_size <size>',
+        'Starts a new log file when the current one reaches this size, given as a whole number followed by k, m or g.',
+        config_file.log_max_size || '100m'
+    )
+    .option(
+        '--log_max_files <count>',
+        'Sets how many log files are kept. The oldest is deleted when a new one is started.',
+        config_file.log_max_files || '14'
+    )
     .addOption(
         new Option(
             '--console_messages [detail]',
@@ -298,7 +308,9 @@ InitLogging({
     logDir: options.log_folder,
     logMessagesToConsole: options.console_messages,
     logLevelConsole: options.log_level_console,
-    logLevelFile: options.log_level_file
+    logLevelFile: options.log_level_file,
+    logMaxSize: options.log_max_size,
+    logMaxFiles: Number(options.log_max_files)
 });
 
 // read the peer_options_file
