@@ -51,6 +51,11 @@ export class SignallingProtocol extends EventEmitter {
                 }
                 return;
             }
+            // Only an object carries a type. A null frame would throw on parsedMessage.type below.
+            if (parsedMessage === null || typeof parsedMessage !== 'object') {
+                Logger.Error('Rejected a message that is not a JSON object.');
+                return;
+            }
 
             // call the handlers
             transport.emit('message', parsedMessage); // emit this for listeners listening to any message

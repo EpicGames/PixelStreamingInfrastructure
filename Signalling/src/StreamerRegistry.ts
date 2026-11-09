@@ -176,8 +176,12 @@ export class StreamerRegistry extends EventEmitter {
     private onEndpointId(streamer: IStreamer, message: Messages.endpointId): void {
         const oldId = streamer.streamerId;
 
+        // The id arrives as any JSON value. A non-string one is treated as no id, because sanitizing it
+        // would store a value that later lookups cannot handle.
+        const requestedId = typeof message.id === 'string' ? message.id : '';
+
         // id might conflict or be invalid so here we sanitize it
-        const sanitizedId = this.sanitizeStreamerId(message.id);
+        const sanitizedId = this.sanitizeStreamerId(requestedId);
 
         let committedId: string | null = sanitizedId;
         if (this.authorizeStreamerId) {
@@ -185,9 +189,9 @@ export class StreamerRegistry extends EventEmitter {
             // reject the registration entirely. This is where anti-squatting policy lives.
             committedId = this.authorizeStreamerId({
                 streamer,
-                requestedId: message.id,
+                requestedId,
                 sanitizedId,
-                collided: !!message.id && sanitizedId !== message.id
+                collided: !!requestedId && sanitizedId !== requestedId
             });
 
             if (committedId === null) {
