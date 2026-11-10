@@ -11,8 +11,5 @@ module.exports = {
   },
   modulePathIgnorePatterns: ["<rootDir>/build/"],
   testPathIgnorePatterns: ["<rootDir>/build/", "/node_modules/"],
-  globals: {
-    TextDecoder: TextDecoder,
-    TextEncoder: TextEncoder,
-  }
+  setupFiles: ["<rootDir>/jest.setup.js"],
 };

@@ -1,10 +1,4 @@
-import { TextDecoder as NodeTextDecoder } from 'util';
 import { WebRtcPlayerController } from './WebRtcPlayerController';
-
-// The jsdom test environment does not expose TextDecoder (see PixelStreaming.test.ts); the handler needs it.
-if (typeof (globalThis as any).TextDecoder === 'undefined') {
-    (globalThis as any).TextDecoder = NodeTextDecoder;
-}
 
 /** A data channel message: a type byte, then the payload as UTF-16LE text. */
 const utf16Message = (type: number, text: string): ArrayBuffer => {
