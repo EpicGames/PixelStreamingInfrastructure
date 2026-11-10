@@ -1,5 +1,16 @@
 # @epicgames-ps/lib-pixelstreamingsignalling-ue5.6
 
+## 0.2.1
+
+### Patch Changes
+
+- 9a43ab9: Leave the previous streamer when an SFU subscribes to another. `SFUConnection.subscribe` overwrote `subscribedStreamer` without unsubscribing from the old streamer, so the old streamer kept forwarding to the SFU and kept the SFU's listeners. When that old streamer later disconnected, it detached the SFU from the streamer it was actually on and dropped the SFU's players. `PlayerConnection` already unsubscribes first; the SFU now does the same.
+- c37638b: Bound what the signalling server writes to its log. Every message a player sent was written to the log file whole, and the daily file had no size limit, so a client could make the log grow as fast as it could send. Log text and protocol messages longer than 16 KiB are now cut to that length, with their full length noted, and the log files are limited in size and number: by default 14 files of 100 MB, set with `logMaxSize` and `logMaxFiles` in `InitLogging`, or `--log_max_size` and `--log_max_files` in wilbur. Files are now kept by count rather than for 14 days.
+- e373094: Stop malformed messages from crashing the signalling server. A message whose JSON is `null` threw from the protocol's message handler, and since that handler runs inside the websocket's message event, any client could take the process down with one frame. Such a message is now rejected and logged, like unparseable JSON. A streamer's `disconnectPlayer` with a reason over 123 bytes, or one that is not a string, made `ws` throw in the same way; the reason is now dropped and the player is still disconnected. A non-string endpoint id from a streamer was stored as its id and broke the next streamer registration; it is now treated as no id.
+- b52cb35: Limit websocket messages on the streamer, player and SFU ports to 1 MiB. ws accepts up to 100 MiB in one message by default, and signalling messages are a few kilobytes. A connection that sends more is closed with code 1009. Setting `maxPayload` in `streamerWsOptions`, `playerWsOptions` or `sfuWsOptions` overrides the limit for that port.
+- Updated dependencies [e373094]
+    - @epicgames-ps/lib-pixelstreamingcommon-ue5.8@0.1.1
+
 ## 0.2.0
 
 ### Minor Changes

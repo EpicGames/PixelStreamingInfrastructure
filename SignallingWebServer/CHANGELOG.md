@@ -1,5 +1,17 @@
 # @epicgames-ps/wilbur
 
+## 3.1.1
+
+### Patch Changes
+
+- c37638b: Bound what the signalling server writes to its log. Every message a player sent was written to the log file whole, and the daily file had no size limit, so a client could make the log grow as fast as it could send. Log text and protocol messages longer than 16 KiB are now cut to that length, with their full length noted, and the log files are limited in size and number: by default 14 files of 100 MB, set with `logMaxSize` and `logMaxFiles` in `InitLogging`, or `--log_max_size` and `--log_max_files` in wilbur. Files are now kept by count rather than for 14 days.
+- 7d5bc61: Stop two paths from ending the signalling server. With `--stdin`, the server called `setRawMode` unconditionally, which does not exist when stdin is a pipe or a service, so startup threw. A stdin chunk that named an object property, such as `constructor`, was looked up on the command table and the resulting TypeError ended the process. Both are fixed: raw mode is only set on a terminal, and only the table's own keys are commands. A failed write of the config under `--save` is now logged instead of thrown from the file callback, which also ended the process.
+- Updated dependencies [9a43ab9]
+- Updated dependencies [c37638b]
+- Updated dependencies [e373094]
+- Updated dependencies [b52cb35]
+    - @epicgames-ps/lib-pixelstreamingsignalling-ue5.8@0.2.1
+
 ## 3.1.0
 
 ### Minor Changes
