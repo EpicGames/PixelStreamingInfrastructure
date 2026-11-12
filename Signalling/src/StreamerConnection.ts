@@ -15,6 +15,7 @@ import { stringify } from './Utils';
 import { Logger } from './Logger';
 import * as LogUtils from './LoggingUtils';
 import { SignallingServer } from './SignallingServer';
+import { scrubStreamerCandidate, scrubStreamerSdp } from './AddressScrub';
 
 /**
  * A connection between the signalling server and a streamer connection.
@@ -148,10 +149,54 @@ export class StreamerConnection extends EventEmitter implements IStreamer, LogUt
         } else {
             const player = this.server.playerRegistry.get(message.playerId);
             if (player) {
-                LogUtils.logForward(this, player, message);
-                player.protocol.sendMessage(message);
+                const outgoing = this.server.config.hideStreamerAddresses
+                    ? this.withholdAddresses(message, message.playerId)
+                    : message;
+                if (outgoing) {
+                    LogUtils.logForward(this, player, outgoing);
+                    player.protocol.sendMessage(outgoing);
+                }
             }
         }
+    }
+
+    /**
+     * Returns an offer, answer or ICE candidate as a player may see it, or undefined when it must not
+     * reach the player at all. See AddressScrub for what is withheld and why.
+     */
+    private withholdAddresses(message: BaseMessage, playerId: string): BaseMessage | undefined {
+        if (message.type === Messages.iceCandidate.typeName) {
+            const iceMessage = message as Messages.iceCandidate;
+            if (!iceMessage.candidate) {
+                return message;
+            }
+            const verdict = scrubStreamerCandidate(iceMessage.candidate.candidate);
+            if (!verdict.forward) {
+                Logger.info(
+                    `Streamer ${this.streamerId}: ${verdict.type} candidate withheld from player ${playerId}.`
+                );
+                return undefined;
+            }
+            const scrubbed: Messages.iceCandidate = {
+                ...iceMessage,
+                candidate: { ...iceMessage.candidate, candidate: verdict.candidate }
+            };
+            return scrubbed;
+        }
+
+        // An offer or an answer, the only other messages forwarded from a streamer.
+        const sdpMessage = message as Messages.offer | Messages.answer;
+        if (typeof sdpMessage.sdp !== 'string') {
+            return message;
+        }
+        const { sdp, withheld } = scrubStreamerSdp(sdpMessage.sdp);
+        if (withheld.length > 0) {
+            Logger.info(
+                `Streamer ${this.streamerId}: ${withheld.join(', ')} candidates withheld from its ${message.type} to player ${playerId}.`
+            );
+        }
+        const scrubbed: Messages.offer | Messages.answer = { ...sdpMessage, sdp };
+        return scrubbed;
     }
 
     private onTransportError(error: ErrorEvent): void {
