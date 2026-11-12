@@ -34,7 +34,7 @@
     },
     "dependencies": {
         "@epicgames-ps/lib-pixelstreamingcommon-ue5.6": "^0.1.6",
-        "sdp": "^3.2.0"
+        "sdp": "^3.2.3"
     },
     "repository": {
         "type": "git",
