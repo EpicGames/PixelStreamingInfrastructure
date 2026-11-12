@@ -52,11 +52,22 @@ Several scripts are supplied for Windows and Linux in the [platform_scripts](pla
 
 The best way to fully utilize the SFU is to have a single streamer streaming simulcast to the SFU and then have peers subscribe to the SFU stream.
 
-Launch the streaming app with the following arguments
-`-SimulcastParameters="1.0,5000000,20000000,2.0,1000000,5000000,4.0,50000,1000000"`
-This tells the Pixel Streaming plugin to stream simulcast with 3 streams, each one scaling video resolution by half. The sequence of values is as follows, `scale_down_factor,min_bitrate,max_bitrate,...repeating for each stream`
+With the Pixel Streaming 2 plugin, launch the streaming app with `-PixelStreamingEncoderEnableSimulcast=true`. This streams 3 layers at full, half and quarter resolution, using H.264 or VP8.
 
-When this streams to the SFU, the SFU will detect these 3 streams and then selectively stream these out to connected peers based on their connection quality.
+On UE 5.8, Pixel Streaming 2 leaves RTX out of the offer it sends the SFU. Add the following to the project's `Config/DefaultEngine.ini` to keep it:
+```ini
+[SystemSettings]
+PixelStreaming2.WebRTC.CodecPreferences=
+```
+Without RTX, the SFU keeps the streamer's layer order (largest first) and logs a warning, and new peers may get no video until the largest layer fits their bandwidth.
+
+With the original Pixel Streaming plugin, launch the streaming app with
+`-SimulcastParameters="1.0,5000000,20000000,2.0,1000000,5000000,4.0,50000,1000000"`
+This tells the plugin to stream simulcast with 3 streams, each one scaling video resolution by half. The sequence of values is as follows, `scale_down_factor,min_bitrate,max_bitrate,...repeating for each stream`
+
+If the video shows frames out of order (the picture jumping back and forth), also add `-PixelStreamingCaptureUseFence=true`. The original plugin copies captured frames without a GPU fence by default, which is faster but can capture a frame before it has finished rendering. The fence costs some frame rate.
+
+When this streams to the SFU, the SFU will detect these streams and then selectively stream these out to connected peers based on their connection quality. A peer's Preferred Quality setting caps the layer it receives, and "High" is always the largest layer whichever plugin is streaming.
 
 ## Running the Docker image
 
