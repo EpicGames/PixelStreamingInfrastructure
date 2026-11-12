@@ -300,7 +300,7 @@ export class WebRtcPlayerController {
             }
 
             // close the current peer connection and create a new one
-            this.peerConnectionController.peerConnection.close();
+            this.peerConnectionController.close();
             this.peerConnectionController.createPeerConnection(this.peerConfig, this.preferredCodec);
             this.subscribedStream = streamerid;
             const message = MessageHelpers.createMessage(Messages.subscribe, { streamerId: streamerid });
