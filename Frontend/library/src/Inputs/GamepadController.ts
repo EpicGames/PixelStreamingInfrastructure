@@ -58,6 +58,8 @@ export class GamepadController implements IInputController {
     onGamepadDisconnectedListener: (event: GamepadEvent) => void;
     beforeUnloadListener: (event: Event) => void;
     requestAnimationFrame: (callback: FrameRequestCallback) => number;
+    // The pending updateStatus frame; only one status loop runs per controller.
+    statusLoopHandle: number | undefined;
 
     constructor(streamMessageController: StreamMessageController) {
         this.streamMessageController = streamMessageController;
@@ -94,10 +96,15 @@ export class GamepadController implements IInputController {
     }
 
     unregister() {
+        window.removeEventListener('beforeunload', this.beforeUnloadListener);
         window.removeEventListener('gamepadconnected', this.onGamepadConnectedListener);
         window.removeEventListener('gamepaddisconnected', this.onGamepadDisconnectedListener);
         window.removeEventListener('webkitgamepadconnected', this.onGamepadConnectedListener);
         window.removeEventListener('webkitgamepaddisconnected', this.onGamepadDisconnectedListener);
+        if (this.statusLoopHandle !== undefined) {
+            window.cancelAnimationFrame(this.statusLoopHandle);
+            this.statusLoopHandle = undefined;
+        }
         for (const controller of this.controllers) {
             if (controller && controller.id !== undefined) {
                 this.streamMessageController.toStreamerHandlers.get('GamepadDisconnected')([controller.id]);
@@ -124,15 +131,17 @@ export class GamepadController implements IInputController {
         };
 
         this.controllers[gamepad.index] = newController;
-        window.requestAnimationFrame(() => this.updateStatus());
+        this.startStatusLoop();
         this.streamMessageController.toStreamerHandlers.get('GamepadConnected')();
     }
 
     private onGamepadDisconnected(event: GamepadEvent) {
         const gamepad = event.gamepad;
         const deletedController = this.controllers[gamepad.index];
-        this.controllers = this.controllers.filter((_, index) => index !== gamepad.index);
-        if (deletedController.id !== undefined) {
+        // Clear only this slot. Compacting the array would move the remaining pads off the indices that
+        // scanGamepads uses to find them, so they would never receive state updates again.
+        this.controllers[gamepad.index] = undefined;
+        if (deletedController?.id !== undefined) {
             this.streamMessageController.toStreamerHandlers.get('GamepadDisconnected')([
                 deletedController.id
             ]);
@@ -152,7 +161,16 @@ export class GamepadController implements IInputController {
         }
     }
 
+    // Starts the per-frame status loop unless one is already pending. Each connect used to start another
+    // loop, and every loop sends the same messages, so with several pads the traffic was duplicated.
+    private startStatusLoop() {
+        if (this.statusLoopHandle === undefined) {
+            this.statusLoopHandle = this.requestAnimationFrame(() => this.updateStatus());
+        }
+    }
+
     private updateStatus() {
+        this.statusLoopHandle = undefined;
         this.scanGamepads();
         const toStreamerHandlers = this.streamMessageController.toStreamerHandlers;
 
@@ -217,8 +235,9 @@ export class GamepadController implements IInputController {
             const controllerIndex = this.controllers.indexOf(controller);
             this.controllers[controllerIndex].prevState = deepCopyGamepad(currentState);
         }
-        if (this.controllers.length > 0) {
-            this.requestAnimationFrame(() => this.updateStatus());
+        // The array keeps empty slots for disconnected pads, so check for a real controller, not its length.
+        if (this.controllers.some((controller) => !!controller)) {
+            this.startStatusLoop();
         }
     }
 
