@@ -173,6 +173,33 @@ export class MouseControllerHovering extends MouseController {
         this.syncButtons(0, event.clientX, event.clientY);
     }
 
+    /**
+     * The base class presses the buttons held on enter itself, which this controller would not know about
+     * and so never release. Going through `syncButtons` keeps `pressedButtons` accurate and uses coordinates
+     * relative to the video element.
+     */
+    protected override onMouseEnter(event: MouseEvent) {
+        if (!this.videoPlayer.isVideoReady()) {
+            return;
+        }
+        this.streamMessageController.toStreamerHandlers.get('MouseEnter')?.();
+        this.syncButtons(event.buttons, event.clientX, event.clientY);
+    }
+
+    /**
+     * While the pointer is captured the release still reaches us, so only release here when there is no
+     * capture.
+     */
+    protected override onMouseLeave(event: MouseEvent) {
+        if (!this.videoPlayer.isVideoReady()) {
+            return;
+        }
+        this.streamMessageController.toStreamerHandlers.get('MouseLeave')?.();
+        if (this.capturedPointerId === null) {
+            this.syncButtons(0, event.clientX, event.clientY);
+        }
+    }
+
     private onPointerDown(event: PointerEvent) {
         if (this.shouldIgnore(event)) {
             return;

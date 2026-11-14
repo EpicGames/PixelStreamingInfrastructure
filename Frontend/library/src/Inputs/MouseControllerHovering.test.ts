@@ -216,6 +216,58 @@ describe('MouseControllerHovering', () => {
         expect(buttonsOf('MouseDown')).toEqual([MouseButton.mainButton]);
     });
 
+    describe('a press that starts outside the video', () => {
+        function fireMouse(type: string, init: MouseEventInit = {}) {
+            parent.dispatchEvent(new MouseEvent(type, { bubbles: false, cancelable: true, ...init }));
+        }
+
+        it('sends one MouseDown on enter with element relative coordinates and one MouseUp on release', () => {
+            fireMouse('mouseenter', { buttons: MouseButtonsMask.primaryButton, clientX: 50, clientY: 25 });
+            fire('pointerup', { button: 0, buttons: 0, clientX: 50, clientY: 25 });
+
+            expect(callsOf('MouseDown')).toEqual([
+                [MouseButton.mainButton, 50 * unitsPerPixel, 25 * unitsPerPixel]
+            ]);
+            expect(buttonsOf('MouseUp')).toEqual([MouseButton.mainButton]);
+            expect(handlers.MouseEnter).toHaveBeenCalledTimes(1);
+        });
+
+        it('sends a MouseDown for a second button pressed after dragging in and releases both', () => {
+            fireMouse('mouseenter', { buttons: MouseButtonsMask.primaryButton });
+            fire('pointermove', {
+                buttons: MouseButtonsMask.primaryButton | MouseButtonsMask.secondaryButton
+            });
+            fire('pointerup', { buttons: 0 });
+
+            expect(buttonsOf('MouseDown')).toEqual([MouseButton.mainButton, MouseButton.secondaryButton]);
+            expect(buttonsOf('MouseUp').sort()).toEqual(buttonsOf('MouseDown').sort());
+        });
+
+        it('releases held buttons when the pointer leaves without a capture', () => {
+            fireMouse('mouseenter', { buttons: MouseButtonsMask.primaryButton });
+            fireMouse('mouseleave', { buttons: MouseButtonsMask.primaryButton });
+
+            expect(buttonsOf('MouseUp')).toEqual([MouseButton.mainButton]);
+            expect(handlers.MouseLeave).toHaveBeenCalledTimes(1);
+        });
+
+        it('leaves the release to the capture when the pointer leaves a captured press', () => {
+            fire('pointerdown', { button: 0, buttons: MouseButtonsMask.primaryButton });
+            fireMouse('mouseleave', { buttons: MouseButtonsMask.primaryButton });
+            expect(handlers.MouseUp).not.toHaveBeenCalled();
+
+            fire('pointerup', { button: 0, buttons: 0 });
+            expect(buttonsOf('MouseUp')).toEqual([MouseButton.mainButton]);
+        });
+
+        it('sends nothing but MouseEnter when no button is held', () => {
+            fireMouse('mouseenter', { buttons: 0 });
+
+            expect(handlers.MouseEnter).toHaveBeenCalledTimes(1);
+            expect(handlers.MouseDown).not.toHaveBeenCalled();
+        });
+    });
+
     it('ignores touch pointers', () => {
         fire('pointerdown', { pointerType: 'touch', button: 0, buttons: MouseButtonsMask.primaryButton });
         fire('pointermove', { pointerType: 'touch', buttons: MouseButtonsMask.primaryButton });

@@ -73,7 +73,7 @@ export class MouseController implements IInputController {
         videoElementParent?.removeEventListener('mouseleave', this.onLeaveListener);
     }
 
-    private onMouseEnter(event: MouseEvent) {
+    protected onMouseEnter(event: MouseEvent) {
         if (!this.videoPlayer.isVideoReady()) {
             return;
         }
@@ -81,7 +81,7 @@ export class MouseController implements IInputController {
         this.pressMouseButtons(event.buttons, event.x, event.y);
     }
 
-    private onMouseLeave(event: MouseEvent) {
+    protected onMouseLeave(event: MouseEvent) {
         if (!this.videoPlayer.isVideoReady()) {
             return;
         }
