@@ -1,41 +1,41 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  生成 Pixel Streaming 信令服务器的"离线运行时": 便携 Node + 已编译的信令服务器 + 运行期依赖 + 前端静态资源。
+  Builds the self-contained offline runtime for Unreal Engine Pixel Streaming:
+  portable Node.js + compiled Signalling Server + symlink-free node_modules + frontend assets.
 
 .DESCRIPTION
-  兼容两种目录布局:
-    1. PixelStreamingInfrastructure 仓库根目录布局 (SignallingWebServer 在根目录)
-    2. Samples/PixelStreaming2 或 Samples/PixelStreaming 打包布局 (WebServers/SignallingWebServer)
+  Supports two directory layouts:
+    1. PixelStreamingInfrastructure repository root layout (SignallingWebServer at root)
+    2. Packaged UE project layout (Samples/PixelStreaming2/WebServers or Samples/PixelStreaming/WebServers)
 
-  兼容多版本 Unreal Engine:
-    - UE 5.5 / 5.6 / 5.7 / 5.8 / master (Wilbur 架构: Common + Signalling + SignallingWebServer)
-    - UE 5.3 / 5.4 (Cirrus 架构: SignallingWebServer/cirrus.js + Public)
+  Supports multiple Unreal Engine versions:
+    - UE 5.5 / 5.6 / 5.7 / 5.8 / master (Wilbur architecture: Common + Signalling + SignallingWebServer)
+    - UE 5.3 / 5.4 (Cirrus architecture: SignallingWebServer/cirrus.js + Public)
 
-  步骤:
-    1. 下载便携 Node(版本取 NODE_VERSION, Cirrus 分支默认 v18.20.4)并校验 SHA256
-    2. 在临时目录安装依赖, 编译前端(若尚未生成 www/player.html 或 Public/player.html)与信令服务器
-    3. 用 npm 生成只含运行期依赖、没有符号链接/目录联接的 node_modules
-       (npm workspaces 默认用目录联接, 联接里存的是绝对路径, 拷到别的电脑就断)
-    4. 替换进 SignallingWebServer 的 dist 和 node_modules
-    5. 去掉自带网页里的 Google 字体外链(内网/国内无 VPN 环境里会卡住网页加载)
-    6. 可选: 准备 coturn 便携版, 供"本机 TURN"模式使用
-    7. 执行 UE 规范的端到端 Healthcheck (校验 /api/status 与离线网页)
-  全部成功之后才替换现有运行时, 中途失败不会破坏已有的可用版本。
+  Steps:
+    1. Download portable Node.js (version from NODE_VERSION, or v18.20.4 on Cirrus branches) and verify SHA256
+    2. Install dependencies in a temporary workspace, build frontend (if www/player.html or Public/player.html is missing) and signalling server
+    3. Generate a production-only, symlink-free node_modules directory
+       (npm workspaces create directory junctions with absolute paths that break when copied to another machine)
+    4. Replace SignallingWebServer dist and node_modules atomically
+    5. Strip external Google Fonts links from HTML files (which block page loading in offline / intranet / China networks without VPN)
+    6. Optional: prepare portable coturn for local TURN mode
+    7. Run UE-standard end-to-end Healthcheck (/api/status and offline web player verification)
 
 .PARAMETER Mirror
-  official = nodejs.org + registry.npmjs.org(默认)
-  cn       = npmmirror.com 国内镜像(国内无 VPN 环境推荐)
+  official = nodejs.org + registry.npmjs.org (default)
+  cn       = npmmirror.com mirror (recommended in China without VPN)
 .PARAMETER NodeZip
-  已下载好的 node-<版本>-win-x64.zip。指定后不再下载 Node。
+  Path to a pre-downloaded node-<version>-win-x64.zip archive.
 .PARAMETER TurnZip
-  已下载好的 Epic coturn Windows 包(turnserver.zip)。
+  Path to a pre-downloaded turnserver.zip archive.
 .PARAMETER NoTurn
-  不准备 coturn。PixelStreaming.ini 里的 [Turn] Mode=local 将不可用。
+  Skip downloading coturn (disables [Turn] Mode=local in PixelStreaming.ini).
 .PARAMETER BuildFrontend
-  强制重新编译前端 (Frontend/library -> ui-library -> implementations/typescript)。
+  Force rebuilding the TypeScript frontend (Frontend/library -> ui-library -> implementations/typescript).
 .PARAMETER KeepTemp
-  保留临时构建目录, 排查问题时用。
+  Keep temporary build directory for troubleshooting.
 #>
 [CmdletBinding()]
 param(
@@ -60,7 +60,7 @@ if (Test-Path (Join-Path $Root 'SignallingWebServer')) {
 } elseif (Test-Path (Join-Path $Root 'WebServers\SignallingWebServer')) {
     $Web = Join-Path $Root 'WebServers'
 } else {
-    throw "在 $Root 或 $Root\WebServers 下均未找到 SignallingWebServer 目录。"
+    throw "SignallingWebServer directory not found under $Root or $Root\WebServers."
 }
 $Sws = Join-Path $Web 'SignallingWebServer'
 $Tar = Join-Path $env:SystemRoot 'System32\tar.exe'
@@ -80,7 +80,7 @@ function Invoke-Native([string]$WorkDir, [string]$Exe, [string[]]$Arguments) {
         $ErrorActionPreference = $saved
         Pop-Location
     }
-    if ($code -ne 0) { Fail "命令失败(退出码 $code): $Exe $($Arguments -join ' ')" }
+    if ($code -ne 0) { Fail "Command failed (exit code $code): $Exe $($Arguments -join ' ')" }
 }
 
 function Invoke-Robocopy([string]$From, [string]$To, [string[]]$Extra) {
@@ -92,43 +92,49 @@ function Invoke-Robocopy([string]$From, [string]$To, [string[]]$Extra) {
     } finally {
         $ErrorActionPreference = $saved
     }
-    if ($code -ge 8) { Fail "robocopy 失败(退出码 $code): $From -> $To" }
+    if ($code -ge 8) { Fail "robocopy failed (exit code $code): $From -> $To" }
 }
 
 function Get-FileText([string]$Path) { [IO.File]::ReadAllText($Path) }
 function Set-FileText([string]$Path, [string]$Text) { [IO.File]::WriteAllText($Path, $Text, $Utf8NoBom) }
 
-function Get-InstalledVersion([string[]]$SearchRoots, [string]$Package) {
+function Get-InstalledVersion([string[]]$SearchRoots, [string]$Package, [string]$DeclaredSpec) {
+    $reqMajor = $null
+    if ($DeclaredSpec -match '(\d+)') { $reqMajor = $Matches[1] }
     foreach ($r in $SearchRoots) {
         $pj = Join-Path $r ("node_modules\" + ($Package -replace '/', '\') + "\package.json")
-        if (Test-Path $pj) { return (Get-FileText $pj | ConvertFrom-Json).version }
+        if (Test-Path $pj) {
+            $ver = (Get-FileText $pj | ConvertFrom-Json).version
+            if (-not $reqMajor -or $ver.StartsWith("$reqMajor.")) { return $ver }
+        }
     }
-    Fail "构建目录里找不到依赖 $Package"
+    if ($DeclaredSpec) { return $DeclaredSpec }
+    Fail "Dependency $Package not found in build roots"
 }
 
 function Invoke-Download([string]$Url, [string]$OutFile) {
-    Write-Host "    下载 $Url"
+    Write-Host "    Downloading $Url"
     Invoke-WebRequest -Uri $Url -OutFile $OutFile -UseBasicParsing
 }
 
 # ---------------------------------------------------------------------------
-Write-Step '检查目录与 UE 架构版本'
+Write-Step 'Checking directory layout and UE architecture'
 $IsCirrus = (Test-Path "$Sws\cirrus.js") -and -not (Test-Path "$Web\Common\package.json")
 $WwwDir = if ($IsCirrus) { Join-Path $Sws 'Public' } else { Join-Path $Sws 'www' }
 
 if ($IsCirrus) {
     foreach ($p in @("$Sws\package.json", "$Sws\cirrus.js")) {
-        if (-not (Test-Path $p)) { Fail "缺少 $p" }
+        if (-not (Test-Path $p)) { Fail "Missing required file: $p" }
     }
 } else {
     foreach ($p in @("$Web\package-lock.json", "$Web\Common\package.json", "$Web\Signalling\package.json", "$Sws\package.json")) {
-        if (-not (Test-Path $p)) { Fail "缺少 $p" }
+        if (-not (Test-Path $p)) { Fail "Missing required file: $p" }
     }
 }
-if (-not (Test-Path $Tar)) { Fail "找不到 $Tar (需要 Windows 10 1803 或更新版本)" }
+if (-not (Test-Path $Tar)) { Fail "System tar.exe not found at $Tar (Windows 10 1803+ required)" }
 
 $NodeVersion = if (Test-Path "$Web\NODE_VERSION") { (Get-FileText "$Web\NODE_VERSION").Trim() } else { 'v18.20.4' }
-if ($NodeVersion -notmatch '^v\d+\.\d+\.\d+$') { Fail "NODE_VERSION 内容不对: '$NodeVersion'" }
+if ($NodeVersion -notmatch '^v\d+\.\d+\.\d+$') { Fail "Invalid NODE_VERSION value: '$NodeVersion'" }
 $NodeName = "node-$NodeVersion-win-x64"
 $PsInfraVersion = if (Test-Path "$Web\DOWNLOAD_VERSION") {
     (Get-FileText "$Web\DOWNLOAD_VERSION").Trim()
@@ -151,19 +157,19 @@ $env:npm_config_audit = 'false'
 
 $Tmp = Join-Path ([IO.Path]::GetTempPath()) ('ps2-offline-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
 New-Item -ItemType Directory -Force -Path $Tmp | Out-Null
-Write-Host "    架构模式      : $(if ($IsCirrus) { 'Cirrus (UE 5.3/5.4)' } else { 'Wilbur (UE 5.5+)' })"
-Write-Host "    PS 基础设施版本: $PsInfraVersion"
-Write-Host "    Node 版本     : $NodeVersion"
-Write-Host "    npm 源        : $env:npm_config_registry"
-Write-Host "    临时目录      : $Tmp"
+Write-Host "    Architecture  : $(if ($IsCirrus) { 'Cirrus (UE 5.3/5.4)' } else { 'Wilbur (UE 5.5+)' })"
+Write-Host "    PS Infra Ver  : $PsInfraVersion"
+Write-Host "    Node Version  : $NodeVersion"
+Write-Host "    npm Registry  : $env:npm_config_registry"
+Write-Host "    Temp Dir      : $Tmp"
 
 try {
     # -----------------------------------------------------------------------
-    Write-Step "准备便携 Node $NodeVersion"
+    Write-Step "Preparing portable Node.js $NodeVersion"
     $dl = Join-Path $Tmp 'dl'
     New-Item -ItemType Directory -Force -Path $dl | Out-Null
     if ($NodeZip) {
-        if (-not (Test-Path $NodeZip)) { Fail "找不到 -NodeZip 指定的文件: $NodeZip" }
+        if (-not (Test-Path $NodeZip)) { Fail "File specified by -NodeZip not found: $NodeZip" }
         $zip = (Resolve-Path $NodeZip).Path
     } else {
         $zip = Join-Path $dl "$NodeName.zip"
@@ -173,20 +179,20 @@ try {
     try {
         Invoke-Download "$NodeBase/SHASUMS256.txt" $sums
         $line = Select-String -Path $sums -SimpleMatch "$NodeName.zip" | Select-Object -First 1
-        if (-not $line) { Fail "SHASUMS256.txt 里没有 $NodeName.zip" }
+        if (-not $line) { Fail "$NodeName.zip not found in SHASUMS256.txt" }
         $expected = ($line.Line -split '\s+')[0].ToLower()
         $actual = (Get-FileHash -Algorithm SHA256 $zip).Hash.ToLower()
-        if ($expected -ne $actual) { Fail "Node 压缩包 SHA256 不匹配`n期望 $expected`n实际 $actual" }
-        Write-Host "    SHA256 校验通过: $actual"
+        if ($expected -ne $actual) { Fail "Node zip SHA256 mismatch:`nExpected: $expected`nActual:   $actual" }
+        Write-Host "    SHA256 verified: $actual"
     } catch {
         if (-not $NodeZip) { throw }
-        Write-Warning "拿不到官方校验和, 跳过校验(使用本地 -NodeZip): $($_.Exception.Message)"
+        Write-Warning "Could not fetch official checksums; skipping verification for local -NodeZip: $($_.Exception.Message)"
     }
     Invoke-Native $Tmp $Tar @('-xf', $zip, '-C', $Tmp)
     $NodeDir = Join-Path $Tmp $NodeName
     $NodeExe = Join-Path $NodeDir 'node.exe'
     $NpmCli = Join-Path $NodeDir 'node_modules\npm\bin\npm-cli.js'
-    if (-not (Test-Path $NodeExe) -or -not (Test-Path $NpmCli)) { Fail "Node 压缩包内容不完整: $zip" }
+    if (-not (Test-Path $NodeExe) -or -not (Test-Path $NpmCli)) { Fail "Incomplete Node archive: $zip" }
 
     function Invoke-Npm([string]$Dir, [string[]]$NpmArgs) { Invoke-Native $Dir $NodeExe (@($NpmCli) + $NpmArgs) }
 
@@ -194,9 +200,9 @@ try {
 
     if ($IsCirrus) {
         # -------------------------------------------------------------------
-        Write-Step '准备 Cirrus (UE 5.3 / 5.4) 运行时与前端'
+        Write-Step 'Preparing Cirrus (UE 5.3 / 5.4) runtime and frontend'
         if ($NeedFrontend -and (Test-Path "$Web\Frontend\implementations\typescript")) {
-            Write-Step '编译 Cirrus 前端到 SignallingWebServer\Public'
+            Write-Step 'Building Cirrus frontend into SignallingWebServer\Public'
             $libName = (Get-FileText "$Web\Frontend\library\package.json" | ConvertFrom-Json).name -replace '/', '\'
             $uiLibName = (Get-FileText "$Web\Frontend\ui-library\package.json" | ConvertFrom-Json).name -replace '/', '\'
             Invoke-Npm "$Web\Frontend\library" @('install', '--ignore-scripts', '--no-audit', '--no-fund')
@@ -210,7 +216,7 @@ try {
             Invoke-Npm "$Web\Frontend\implementations\typescript" @('run', 'build')
         }
         if (-not (Test-Path (Join-Path $WwwDir 'player.html'))) {
-            Fail "缺少 $WwwDir\player.html"
+            Fail "Missing frontend file: $WwwDir\player.html"
         }
         $Rt = Join-Path $Tmp 'runtime'
         New-Item -ItemType Directory -Force -Path $Rt | Out-Null
@@ -218,10 +224,10 @@ try {
         if (Test-Path "$Sws\package-lock.json") { Copy-Item "$Sws\package-lock.json" "$Rt\package-lock.json" }
         Invoke-Npm $Rt @('install', '--omit=dev', '--ignore-scripts', '--no-audit', '--no-fund', '--install-links')
         $reparse = @(Get-ChildItem "$Rt\node_modules" -Recurse -Force -Attributes ReparsePoint -ErrorAction SilentlyContinue)
-        if ($reparse.Count -gt 0) { Fail "node_modules 里仍有符号链接/目录联接: $($reparse[0].FullName)" }
+        if ($reparse.Count -gt 0) { Fail "Symlink/junction remains in node_modules: $($reparse[0].FullName)" }
     } else {
         # -------------------------------------------------------------------
-        Write-Step '在临时目录安装依赖并编译 Wilbur 信令服务器'
+        Write-Step 'Installing workspace dependencies and building Wilbur signalling server'
         $Ws = Join-Path $Tmp 'ws'
         Invoke-Robocopy "$Web\Common" "$Ws\Common" @('/E', '/XD', 'node_modules', 'dist', 'docs')
         Invoke-Robocopy "$Web\Signalling" "$Ws\Signalling" @('/E', '/XD', 'node_modules', 'dist', 'docs')
@@ -251,21 +257,21 @@ try {
         Invoke-Npm $Ws @('run', 'build:cjs', '--workspace=Common')
         Invoke-Npm $Ws @('run', 'build:cjs', '--workspace=Signalling')
         Invoke-Npm $Ws @('run', 'build', '--workspace=SignallingWebServer')
-        if (-not (Test-Path "$Ws\SignallingWebServer\dist\index.js")) { Fail '编译后没有 SignallingWebServer\dist\index.js' }
+        if (-not (Test-Path "$Ws\SignallingWebServer\dist\index.js")) { Fail 'Build did not produce SignallingWebServer\dist\index.js' }
 
         if ($NeedFrontend) {
-            Write-Step '编译前端静态文件 (SignallingWebServer\www)'
+            Write-Step 'Building frontend static assets (SignallingWebServer\www)'
             Invoke-Npm $Ws @('run', 'build:esm', '--workspace=Common')
             Invoke-Npm $Ws @('run', 'build:esm', '--workspace=Frontend/library')
             Invoke-Npm $Ws @('run', 'build:esm', '--workspace=Frontend/ui-library')
             $env:WEBPACK_OUTPUT_PATH = "$Ws\SignallingWebServer\www"
             Invoke-Npm $Ws @('run', 'build', '--workspace=Frontend/implementations/typescript')
             Remove-Item Env:\WEBPACK_OUTPUT_PATH -ErrorAction SilentlyContinue
-            if (-not (Test-Path "$Ws\SignallingWebServer\www\player.html")) { Fail '前端编译后没有 www\player.html' }
+            if (-not (Test-Path "$Ws\SignallingWebServer\www\player.html")) { Fail 'Frontend build did not produce www\player.html' }
         }
 
         # -------------------------------------------------------------------
-        Write-Step '生成只含运行期依赖的 node_modules (兼容多版本 UE 包名)'
+        Write-Step 'Packaging standalone production node_modules (multi-UE compatible)'
         $npmIgnore = "src/`r`nnode_modules/`r`ndocs/`r`n*.tsbuildinfo`r`n"
         Set-FileText "$Ws\Common\.npmignore" $npmIgnore
         Set-FileText "$Ws\Signalling\.npmignore" $npmIgnore
@@ -274,7 +280,7 @@ try {
         Invoke-Npm $Ws @('pack', '--workspace=Common', '--workspace=Signalling', '--pack-destination', $Pkgs)
         $commonTgz = Get-ChildItem $Pkgs -Filter 'epicgames-ps-lib-pixelstreamingcommon-*.tgz' | Select-Object -First 1
         $signallingTgz = Get-ChildItem $Pkgs -Filter 'epicgames-ps-lib-pixelstreamingsignalling-*.tgz' | Select-Object -First 1
-        if (-not $commonTgz -or -not $signallingTgz) { Fail "npm pack 没有生成预期的 tgz: $Pkgs" }
+        if (-not $commonTgz -or -not $signallingTgz) { Fail "npm pack did not generate expected tarballs in $Pkgs" }
 
         $commonPkgName = (Get-FileText "$Ws\Common\package.json" | ConvertFrom-Json).name
         $signallingPkgName = (Get-FileText "$Ws\Signalling\package.json" | ConvertFrom-Json).name
@@ -287,9 +293,11 @@ try {
         foreach ($pj in @("$Ws\SignallingWebServer\package.json", "$Ws\Signalling\package.json", "$Ws\Common\package.json")) {
             $p = Get-FileText $pj | ConvertFrom-Json
             if (-not $p.dependencies) { continue }
-            foreach ($name in $p.dependencies.PSObject.Properties.Name) {
+            foreach ($prop in $p.dependencies.PSObject.Properties) {
+                $name = $prop.Name
+                $spec = [string]$prop.Value
                 if ($name -like '@epicgames-ps/*' -or $name -like '@types/*' -or $deps.Contains($name)) { continue }
-                $deps[$name] = Get-InstalledVersion $search $name
+                $deps[$name] = Get-InstalledVersion $search $name $spec
             }
         }
         $Rt = Join-Path $Tmp 'runtime'
@@ -299,17 +307,17 @@ try {
         Invoke-Npm $Rt @('install', '--omit=dev', '--ignore-scripts', '--no-audit', '--no-fund', '--install-links')
 
         $reparse = @(Get-ChildItem "$Rt\node_modules" -Recurse -Force -Attributes ReparsePoint -ErrorAction SilentlyContinue)
-        if ($reparse.Count -gt 0) { Fail "node_modules 里仍有符号链接/目录联接: $($reparse[0].FullName)" }
+        if ($reparse.Count -gt 0) { Fail "Symlink/junction remains in node_modules: $($reparse[0].FullName)" }
         $probe = "for (const m of ['$signallingPkgName','$commonPkgName','express','express-openapi','commander','jsonc']) require(m); console.log('    runtime dependencies load OK');"
         Invoke-Native $Rt $NodeExe @('-e', $probe)
     }
 
     # -----------------------------------------------------------------------
     if (-not $NoTurn) {
-        Write-Step '准备 coturn(本机 TURN 模式用)'
+        Write-Step 'Preparing portable coturn (for local TURN mode)'
         try {
             if ($TurnZip) {
-                if (-not (Test-Path $TurnZip)) { Fail "找不到 -TurnZip 指定的文件: $TurnZip" }
+                if (-not (Test-Path $TurnZip)) { Fail "File specified by -TurnZip not found: $TurnZip" }
                 $tz = (Resolve-Path $TurnZip).Path
             } else {
                 $tz = Join-Path $dl 'turnserver.zip'
@@ -318,16 +326,15 @@ try {
             $TurnDir = Join-Path $Tmp 'coturn'
             New-Item -ItemType Directory -Force -Path $TurnDir | Out-Null
             Invoke-Native $Tmp $Tar @('-xf', $tz, '-C', $TurnDir)
-            if (-not (Test-Path "$TurnDir\turnserver.exe")) { Fail 'turnserver.zip 里没有 turnserver.exe' }
+            if (-not (Test-Path "$TurnDir\turnserver.exe")) { Fail 'turnserver.exe not found inside turnserver.zip' }
         } catch {
             $TurnDir = $null
-            Write-Warning "coturn 没准备好, 本机 TURN 模式不可用(不影响默认的内网直连): $($_.Exception.Message)"
-            Write-Warning "可以另外下载 $TurnUrl 后用 -TurnZip 指定。"
+            Write-Warning "coturn was not prepared; local TURN mode will be unavailable (direct LAN mode is unaffected): $($_.Exception.Message)"
         }
     }
 
     # -----------------------------------------------------------------------
-    Write-Step '替换运行时'
+    Write-Step 'Replacing runtime files'
     Invoke-Robocopy "$Rt\node_modules" "$Sws\node_modules" @('/MIR')
     if (-not $IsCirrus) {
         Invoke-Robocopy "$Ws\SignallingWebServer\dist" "$Sws\dist" @('/MIR')
@@ -345,7 +352,7 @@ try {
     if ($TurnDir) { Write-Host "    coturn        -> $OfflineDir\coturn" }
 
     # -----------------------------------------------------------------------
-    Write-Step '去掉网页里的 Google 字体外链'
+    Write-Step 'Stripping external Google Fonts links from HTML files'
     $htmlFiles = @(Get-ChildItem $WwwDir -Filter '*.html' -File -ErrorAction SilentlyContinue) +
                  @(Get-ChildItem "$Web\Frontend\implementations\typescript\src" -Filter '*.html' -File -ErrorAction SilentlyContinue) +
                  @(Get-ChildItem "$Web\Frontend\implementations\react\src" -Filter '*.html' -File -ErrorAction SilentlyContinue)
@@ -355,14 +362,14 @@ try {
         $new = [regex]::Replace($new, "font-family:(\s*)'?Montserrat'?(\s*);", "font-family:`$1'Montserrat', Arial, sans-serif`$2;")
         if ($new -ne $text) {
             Set-FileText $f.FullName $new
-            Write-Host "    已处理 $($f.FullName.Substring($Root.Length + 1))"
+            Write-Host "    Cleaned $($f.FullName.Substring($Root.Length + 1))"
         }
     }
     Copy-Item "$OfflineDir\web\index.html" (Join-Path $WwwDir 'index.html') -Force
-    Write-Host "    已放入 $WwwDir\index.html"
+    Write-Host "    Synced $WwwDir\index.html"
 
     # -----------------------------------------------------------------------
-    Write-Step '写入运行时信息并执行 UE 规范 Healthcheck'
+    Write-Step 'Writing runtime metadata and executing UE Standard Healthcheck'
     $info = [ordered]@{
         preparedAt       = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
         architecture     = if ($IsCirrus) { 'cirrus' } else { 'wilbur' }
@@ -378,13 +385,13 @@ try {
     Invoke-Native $Root "$OfflineDir\node\node.exe" @("$OfflineDir\ps2-offline.js", 'healthcheck')
 
     Write-Host ''
-    Write-Host '完成。现在可以:' -ForegroundColor Green
-    Write-Host "  - 在本机双击 $Root\Start-PixelStreaming.bat 验证"
-    Write-Host "  - 运行 Offline\Install-ToPackage.bat <UE打包目录> 部署到打包产物"
-    Write-Host '  - 或直接把整个目录拷到内网电脑'
+    Write-Host 'Done! You can now:' -ForegroundColor Green
+    Write-Host "  - Run $Root\Start-PixelStreaming.bat to start Pixel Streaming offline"
+    Write-Host "  - Run Offline\Install-ToPackage.bat <PackagedProjectDir> to deploy into a packaged UE build"
+    Write-Host '  - Copy this folder directly to any offline / intranet machine'
 } finally {
     if ($KeepTemp) {
-        Write-Host "临时目录保留在 $Tmp"
+        Write-Host "Temporary directory kept at $Tmp"
     } else {
         $empty = Join-Path ([IO.Path]::GetTempPath()) ('ps2-empty-' + [Guid]::NewGuid().ToString('N'))
         New-Item -ItemType Directory -Force -Path $empty | Out-Null

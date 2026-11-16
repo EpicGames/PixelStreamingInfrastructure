@@ -20,6 +20,7 @@ if not "%PS2_RC%"=="0" (
     echo Prepare-OfflineRuntime failed, exit code %PS2_RC%.
     echo Failures before the final "replace runtime" step leave the existing runtime untouched.
 )
-rem Keep the window open when started by double-click.
-echo "%CMDCMDLINE%" | findstr /i /c:"%~nx0" >nul && pause
+if not defined CI (
+    echo "%CMDCMDLINE%" | findstr /i /c:"%~nx0" >nul && pause
+)
 exit /b %PS2_RC%

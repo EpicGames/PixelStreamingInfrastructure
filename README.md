@@ -32,7 +32,7 @@ This fork includes built-in support for **offline / intranet** deployment and **
    - **Windows**: `.\Check-PixelStreaming.bat` or `node .\Offline\ps2-offline.js healthcheck`
    - **Linux / macOS**: `./Check-PixelStreaming.sh` or `node ./Offline/ps2-offline.js healthcheck`
 
-See [`README-Intranet.txt`](README-Intranet.txt) and [`PixelStreaming.ini`](PixelStreaming.ini) for full configuration details.
+See [`README-Intranet.en.md`](README-Intranet.en.md) (English) / [`README-Intranet.txt`](README-Intranet.txt) (中文) and [`PixelStreaming.ini`](PixelStreaming.ini) for full configuration details.
 
 ## Getting Started
 To **build** and **run** everything you need to connect to the Pixel Streaming plugin simply run the following in the root of your `PixelStreamingInfrastructure` directory:
