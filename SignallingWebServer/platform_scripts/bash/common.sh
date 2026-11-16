@@ -61,6 +61,7 @@ function parse_args() {
         --turn-pass ) TURN_PASS="$2"; shift 2;;
         --start-turn ) START_TURN=1; shift;;
         --publicip ) PUBLIC_IP="$2"; shift 2;;
+        --mirror ) PS_MIRROR="$2"; shift 2;;
         --frontend-dir ) FRONTEND_DIR="$(realpath "$2")"; shift 2;;
         --build-wilbur ) BUILD_WILBUR=1; shift;;
         --build-libraries ) BUILD_LIBRARIES=1; shift;;
@@ -151,24 +152,30 @@ function setup_node() {
     # navigate to project root
     pushd "${SCRIPT_DIR}/../../.." > /dev/null
 
-    local node_version=$("node" --version)
+    local node_version=$("node" --version 2>/dev/null || true)
+
+    local node_dist_base="https://nodejs.org/dist"
+    if [ "${PS_MIRROR:-}" == "cn" ]; then
+        node_dist_base="https://npmmirror.com/mirrors/node"
+        export npm_config_registry="https://registry.npmmirror.com/"
+    fi
 
     local node_url=""
     if [ "$(uname)" == "Darwin" ]; then
         arch=$(uname -m)
         if [[ $arch == x86_64* ]]; then
-            node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-x64.tar.gz"
+            node_url="$node_dist_base/$NODE_VERSION/node-$NODE_VERSION-darwin-x64.tar.gz"
         elif  [[ $arch == arm* ]]; then
-            node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-arm64.tar.gz"
+            node_url="$node_dist_base/$NODE_VERSION/node-$NODE_VERSION-darwin-arm64.tar.gz"
         else
             echo 'Incompatible architecture. Only x86_64 and ARM64 are supported'
             exit -1
         fi
     else
-        node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
+        node_url="$node_dist_base/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
     fi
 
-    check_and_install "node" "$node_version" "$NODE_VERSION" "curl $node_url --output node.tar.xz
+    check_and_install "node" "$node_version" "$NODE_VERSION" "curl -L $node_url --output node.tar.xz
                                                                 && tar -xf node.tar.xz
                                                                 && rm node.tar.xz
                                                                 && mv node-v*-*-* \"${SCRIPT_DIR}/node\""
@@ -176,7 +183,13 @@ function setup_node() {
     # if node_modules doesnt exist or the package-lock file is newer than node_modules, install deps
     if [ ! -d node_modules ] || [ ../package-lock.json -nt node_modules ] || [ "$INSTALL_DEPS" == "1" ]; then
         echo "Installing dependencies..."
-        npm install
+        # --no-audit/--no-fund: neither is read by the startup path, and a slow
+        # registry audit blocks the server from starting for minutes.
+        # Only the workspaces this script builds and runs. The SFU's mediasoup
+        # compiles its worker from source on hosts without a matching prebuilt.
+        npm install --no-audit --no-fund --include-workspace-root \
+            -w Common -w Signalling -w SignallingWebServer \
+            -w Frontend/library -w Frontend/ui-library -w Frontend/implementations/typescript
     fi
 
     # log node version for audits
@@ -290,10 +303,13 @@ function setup() {
     setup_coturn
 }
 
-# Sets PUBLIC_IP to the external ip
+# Sets PUBLIC_IP to the external ip (with timeout and LAN fallback for offline/intranet environments)
 function set_public_ip() {
     if [ -z "$PUBLIC_IP" ]; then
-        PUBLIC_IP=$(curl -s https://api.ipify.org)
+        PUBLIC_IP=$(curl --fail --silent --connect-timeout 3 --max-time 5 https://api.ipify.org 2>/dev/null || true)
+        if [[ -z "$PUBLIC_IP" ]]; then
+            PUBLIC_IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
+        fi
         if [[ -z "$PUBLIC_IP" ]]; then
             PUBLIC_IP="127.0.0.1"
         fi

@@ -12,7 +12,6 @@ on:
 
 jobs:
   signalling-protocol-test:
-    if: github.repository == 'EpicGamesExt/PixelStreamingInfrastructure'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source code

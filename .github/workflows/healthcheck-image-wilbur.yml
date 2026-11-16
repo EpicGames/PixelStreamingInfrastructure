@@ -9,7 +9,6 @@ on:
 
 jobs:
   build-docker-image:
-    if: github.repository == 'EpicGamesExt/PixelStreamingInfrastructure'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

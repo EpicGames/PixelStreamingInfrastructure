@@ -46,7 +46,6 @@ jobs:
   #       path: Extras/MinimalStreamTester/results
 
   streaming-test-win:
-    if: github.repository == 'EpicGamesExt/PixelStreamingInfrastructure'
     runs-on: windows-latest
     steps:
     - name: Checkout source code

@@ -35,7 +35,10 @@ function print_parameters() {
 
 function set_start_default_values() {
  # publicip and sfucmd are always needed
- publicip=$(curl -s https://api.ipify.org)
+ publicip=$(curl --fail --silent --connect-timeout 3 --max-time 5 https://api.ipify.org 2>/dev/null || true)
+ if [[ -z $publicip ]]; then
+  publicip="$(hostname -I 2>/dev/null | awk '{print $1}')"
+ fi
  if [[ -z $publicip ]]; then
   publicip="127.0.0.1"
  fi
