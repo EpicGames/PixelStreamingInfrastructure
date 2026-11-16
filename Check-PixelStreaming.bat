@@ -21,6 +21,7 @@ if not exist "%PS2_NODE%" (
 )
 "%PS2_NODE%" "%~dp0Offline\ps2-offline.js" check %*
 set "PS2_RC=%ERRORLEVEL%"
-rem Keep the window open when started by double-click.
-echo "%CMDCMDLINE%" | findstr /i /c:"%~nx0" >nul && pause
+if not defined CI (
+    echo "%CMDCMDLINE%" | findstr /i /c:"%~nx0" >nul && pause
+)
 exit /b %PS2_RC%
