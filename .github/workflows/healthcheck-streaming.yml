@@ -46,7 +46,6 @@ jobs:
   #       path: Extras/MinimalStreamTester/results
 
   streaming-test-win:
-    if: github.event.repository.fork == false
     runs-on: windows-latest
     steps:
     - name: Checkout source code

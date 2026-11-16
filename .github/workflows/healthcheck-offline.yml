@@ -1,0 +1,58 @@
+name: Check health of offline intranet runtime
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/healthcheck-offline.yml"
+      - "Offline/**"
+      - "PixelStreaming.ini"
+      - "*-PixelStreaming.*"
+      - "Start-SignallingServer.*"
+  pull_request:
+    paths:
+      - ".github/workflows/healthcheck-offline.yml"
+      - "Offline/**"
+      - "Common/**"
+      - "Signalling/**"
+      - "SignallingWebServer/**"
+      - "Frontend/**"
+
+jobs:
+  offline-healthcheck-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Get node version
+        id: get_node_version
+        run: |
+          if [ -f NODE_VERSION ]; then
+            echo "node_version=$(cat NODE_VERSION)" >> $GITHUB_OUTPUT
+          else
+            echo "node_version=v18.20.4" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "${{ steps.get_node_version.outputs.node_version }}"
+          cache: 'npm'
+
+      - name: Prepare offline runtime and run UE healthcheck
+        run: |
+          bash ./Offline/Prepare-OfflineRuntime.sh
+          node ./Offline/ps2-offline.js check
+          node ./Offline/ps2-offline.js healthcheck
+
+  offline-healthcheck-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Prepare offline runtime on Windows and run UE healthcheck
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\Offline\Prepare-OfflineRuntime.ps1 -NoTurn
+          .\Offline\node\node.exe .\Offline\ps2-offline.js check
+          .\Offline\node\node.exe .\Offline\ps2-offline.js healthcheck

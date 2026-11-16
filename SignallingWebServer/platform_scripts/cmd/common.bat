@@ -65,6 +65,11 @@ IF "%~1"=="--publicip" (
     set "PUBLIC_IP=%~2"
     SHIFT
 )
+IF "%~1"=="--mirror" (
+    set HANDLED=1
+    set "PS_MIRROR=%~2"
+    SHIFT
+)
 rem Values are assigned with the set "VAR=value" form, and compared with %~1
 rem rather than %1, so that cmd.exe does not re-parse operators (&, |, ^, >)
 rem appearing in a value. Both are required: SHIFT happens inside the matched
@@ -140,13 +145,18 @@ exit /b
 :SetupNode
 pushd "%SCRIPT_DIR%"
 SET NODE_NAME=node-%NODE_VERSION%-win-x64
+SET "NODE_DIST_BASE=https://nodejs.org/dist"
+IF /I "%PS_MIRROR%"=="cn" (
+    SET "NODE_DIST_BASE=https://npmmirror.com/mirrors/node"
+    SET "npm_config_registry=https://registry.npmmirror.com/"
+)
 if exist node\ (
   echo Node directory found...skipping install.
 ) else (
   echo Node directory not found...beginning NodeJS download for Windows.
 
   rem Download nodejs and follow redirects.
-  curl -L -o ./node.zip "https://nodejs.org/dist/%NODE_VERSION%/%NODE_NAME%.zip"
+  curl -L -o ./node.zip "%NODE_DIST_BASE%/%NODE_VERSION%/%NODE_NAME%.zip"
 
   %TAR% -xf node.zip
   ren "%NODE_NAME%\" "node"
@@ -290,10 +300,16 @@ rem fetched over https and kept only if it consists solely of digits and dots,
 rem as an IPv4 address does. Anything else falls back to 127.0.0.1, matching
 rem the usage text and the bash script.
 set "FETCHED_IP="
-FOR /f %%A IN ('curl --silent https://api.ipify.org') DO set "FETCHED_IP=%%A"
+FOR /f %%A IN ('curl --fail --silent --connect-timeout 3 --max-time 5 https://api.ipify.org 2^>nul') DO set "FETCHED_IP=%%A"
 set "IP_CHARS=!FETCHED_IP!"
 FOR %%C IN (0 1 2 3 4 5 6 7 8 9 .) DO IF DEFINED IP_CHARS set "IP_CHARS=!IP_CHARS:%%C=!"
 IF DEFINED FETCHED_IP IF NOT DEFINED IP_CHARS set "PUBLIC_IP=!FETCHED_IP!"
+IF "!PUBLIC_IP!"=="" (
+    FOR /F "delims=[] tokens=2" %%A in ('ping -4 -n 1 %ComputerName% ^| findstr [') do set "PUBLIC_IP=%%A"
+)
+IF "!PUBLIC_IP!"=="" (
+    FOR /F "delims=[] tokens=2" %%A in ('ping -4 -n 1 %ComputerName% ^| findstr [') do set "PUBLIC_IP=%%A"
+)
 IF "!PUBLIC_IP!"=="" set "PUBLIC_IP=127.0.0.1"
 set "FETCHED_IP="
 set "IP_CHARS="
