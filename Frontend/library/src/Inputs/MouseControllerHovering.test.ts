@@ -62,7 +62,19 @@ describe('MouseControllerHovering', () => {
     beforeEach(() => {
         parent = document.createElement('div');
         document.body.appendChild(parent);
-        parent.getBoundingClientRect = () => new DOMRect(0, 0, playerSize, playerSize);
+        // A plain object, as the jsdom on this branch has no DOMRect.
+        parent.getBoundingClientRect = () =>
+            ({
+                x: 0,
+                y: 0,
+                left: 0,
+                top: 0,
+                right: playerSize,
+                bottom: playerSize,
+                width: playerSize,
+                height: playerSize,
+                toJSON: () => ({})
+            }) as DOMRect;
 
         capturedPointers = new Set();
         parent.setPointerCapture = jest.fn((id: number) => {
