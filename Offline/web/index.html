@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Pixel Streaming</title>
+<script>
+// 打开 http://服务器/ 时带上适合 UI 程序的默认设置跳到播放页, 地址里已有的参数优先。
+//   HoveringMouse=true        悬停鼠标: 浏览器的光标就是 UE 里的光标, 点在哪儿就是哪儿。
+//                             Epic 默认的"锁定鼠标"会隐藏光标, 从画面中心按相对位移推算点击
+//                             位置, 画面里又看不到 UE 的光标, UI 按钮基本点不中。
+//   FakeMouseWithTouches=true Pad / 手机上单指触摸当作鼠标操作(程序是按鼠标操作设计的)。
+// 本文件由 Offline/web/index.html 同步过来, 改那一份。
+(function () {
+    var params = new URLSearchParams(window.location.search);
+    var defaults = { HoveringMouse: 'true', FakeMouseWithTouches: 'true' };
+    Object.keys(defaults).forEach(function (name) {
+        var present = false;
+        params.forEach(function (value, key) {
+            if (key.toLowerCase() === name.toLowerCase()) present = true;
+        });
+        if (!present) params.set(name, defaults[name]);
+    });
+    window.location.replace('player.html?' + params.toString() + window.location.hash);
+})();
+</script>
+</head>
+<body></body>
+</html>
