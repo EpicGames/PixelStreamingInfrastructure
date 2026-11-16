@@ -10,6 +10,21 @@
 # The official home for the Pixel Streaming servers and frontend!
 The frontend and web server elements for Unreal Pixel Streaming (previously located in `Samples/PixelStreaming/WebServers`) are now in this repository, for all to contribute to. They are referred to as the **Pixel Streaming Infrastructure**.
 
+## Offline / Intranet & China Network Quick Start (No VPN Required)
+This fork includes built-in support for **offline / intranet** deployment and **China network environments** (using `npmmirror.com` Mirrors, zero external Google Fonts dependencies, no external IP query blocks, and symlink-free offline `node_modules` bundling across UE 5.3 – UE 5.8).
+
+1. **Prepare Offline Runtime (on an internet-connected machine, once)**:
+   - **Windows**: `.\Offline\Prepare-OfflineRuntime.bat` (uses China mirror by default)
+   - **Linux / macOS**: `./Offline/Prepare-OfflineRuntime.sh --mirror cn`
+2. **Start Signalling Server & UE App (100% offline / LAN)**:
+   - **Windows**: `.\Start-PixelStreaming.bat` or `.\Start-SignallingServer.bat`
+   - **Linux / macOS**: `./Start-PixelStreaming.sh` or `./Start-SignallingServer.sh`
+3. **Run Environment & UE Standard Healthcheck**:
+   - **Windows**: `.\Check-PixelStreaming.bat` or `node .\Offline\ps2-offline.js healthcheck`
+   - **Linux / macOS**: `./Check-PixelStreaming.sh` or `node ./Offline/ps2-offline.js healthcheck`
+
+See [`README-Intranet.en.md`](README-Intranet.en.md) (English) / [`README-Intranet.txt`](README-Intranet.txt) (中文) and [`PixelStreaming.ini`](PixelStreaming.ini) for full configuration details.
+
 ## Goals
 
 The goals of this repository are to:
