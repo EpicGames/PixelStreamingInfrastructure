@@ -11,3 +11,8 @@ coverage/
 common/types/*
 .nx/cache
 .nx/workspace-data
+/Offline/node/
+/Offline/coturn/
+/Offline/runtime-info.json
+/Offline/.state/
+/Logs/

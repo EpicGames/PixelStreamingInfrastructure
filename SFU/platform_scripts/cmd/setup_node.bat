@@ -15,8 +15,12 @@ if exist node\ (
 ) else (
   echo Node directory not found...beginning NodeJS download for Windows.
 
-  @Rem Download nodejs and follow redirects.
-  curl -L -o ./node.zip "https://nodejs.org/dist/%NodeVersion%/%NodeName%.zip"
+  @Rem Download nodejs and follow redirects (with China mirror support).
+  if /i "%PS_MIRROR%"=="cn" (
+    curl -L --connect-timeout 15 -o ./node.zip "https://npmmirror.com/mirrors/node/%NodeVersion%/%NodeName%.zip"
+  ) else (
+    curl -L --connect-timeout 15 -o ./node.zip "https://nodejs.org/dist/%NodeVersion%/%NodeName%.zip" || curl -L --connect-timeout 15 -o ./node.zip "https://npmmirror.com/mirrors/node/%NodeVersion%/%NodeName%.zip"
+  )
 
   @Rem Unarchive the .zip
   tar -xf node.zip
