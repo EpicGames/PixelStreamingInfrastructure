@@ -235,6 +235,24 @@ if(config.EnableWebserver) {
 	});
 }
 
+const cirrusStartTime = Date.now();
+const cirrusPkgVersion = (() => {
+	try {
+		return require('./package.json').version || '1.0.0';
+	} catch (_) {
+		return '1.0.0';
+	}
+})();
+
+app.get('/api/status', function (req, res) {
+	res.status(200).json({
+		uptime: Date.now() - cirrusStartTime,
+		streamer_count: typeof streamers !== 'undefined' && streamers ? streamers.size : 0,
+		player_count: typeof players !== 'undefined' && players ? players.size : 0,
+		version: cirrusPkgVersion
+	});
+});
+
 //Setup http and https servers
 http.listen(httpPort, function () {
 	console.logColor(logging.Green, 'Http listening on *: ' + httpPort);

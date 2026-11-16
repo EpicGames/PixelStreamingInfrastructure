@@ -50,11 +50,14 @@ function print_parameters {
 
 function set_start_default_values($SetTurnServerVar, $SetStunServerVar) {
  # publicip and cirruscmd are always needed
- $global:PublicIP = Invoke-WebRequest -Uri "https://api.ipify.org" -UseBasicParsing
- if ($global:PublicIP -eq $null -Or $global:PublicIP.length -eq 0) {
+ try {
+  $resp = Invoke-WebRequest -Uri "https://api.ipify.org" -UseBasicParsing -TimeoutSec 5 -ErrorAction Stop
+  $global:PublicIP = ($resp.Content).Trim()
+ } catch {
+  $global:PublicIP = $null
+ }
+ if ([string]::IsNullOrWhiteSpace($global:PublicIP)) {
   $global:PublicIP = "127.0.0.1"
- } else {
-    $global:PublicIP = ($global:PublicIP).Content
  }
  $global:cirruscmd = ""
 

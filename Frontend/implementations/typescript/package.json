@@ -26,7 +26,7 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
-    "@epicgames-ps/lib-pixelstreamingfrontend-ue5.5": "*",
-    "@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.5": "*"
+    "@epicgames-ps/lib-pixelstreamingfrontend-ue5.4": "*",
+    "@epicgames-ps/lib-pixelstreamingfrontend-ui-ue5.4": "*"
   }
 }

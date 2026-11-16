@@ -8,3 +8,8 @@ SignallingWebServer/Public/
 SignallingWebServer/certificates
 .vscode
 coverage/
+/Offline/node/
+/Offline/coturn/
+/Offline/runtime-info.json
+/Offline/.state/
+/Logs/
