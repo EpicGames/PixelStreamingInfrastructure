@@ -304,7 +304,7 @@ function setup() {
 # Sets PUBLIC_IP to the external ip
 function set_public_ip() {
     if [ -z "$PUBLIC_IP" ]; then
-        PUBLIC_IP=$(curl -s https://api.ipify.org)
+        PUBLIC_IP=$(curl -s --connect-timeout 3 --max-time 5 https://api.ipify.org || true)
         if [[ -z "$PUBLIC_IP" ]]; then
             PUBLIC_IP="127.0.0.1"
         fi
