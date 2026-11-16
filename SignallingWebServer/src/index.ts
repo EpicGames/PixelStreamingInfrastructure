@@ -43,6 +43,7 @@ const configArgsParser = new Command()
     )
     .helpOption(false)
     .allowUnknownOption() // ignore unknown options as we are doing a minimal parse here
+    .allowExcessArguments()
     .parse()
     .opts();
 // If we do not get passed `--no_config` then attempt open the config file
@@ -277,6 +278,7 @@ addStreamerTokenOptions(program, config_file)
     )
     .helpOption('-h, --help', 'Display this help text.')
     .allowUnknownOption() // ignore unknown options which will allow versions to be swapped out into existing scripts with maybe older/newer options
+    .allowExcessArguments()
     .parse();
 
 // parsed command line options
