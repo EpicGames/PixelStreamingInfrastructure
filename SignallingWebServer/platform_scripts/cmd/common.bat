@@ -18,8 +18,10 @@ echo    Usage:
 echo        %0 [--help] [--publicip ^<IP Address^>] [--turn ^<turn server^>] [--stun ^<stun server^>] [server options...]
 echo    Where:
 echo        --help              Print this message and stop this script.
-echo        --publicip          Define public ip address (using default port) for turn server, syntax: --publicip ; it is used for 
-echo                            Default value: Retrieved from 'curl https://api.ipify.org' or if unsuccessful then set to  127.0.0.1.  It is the IP address of the server and the default IP address of the TURN server
+echo        --publicip          Define the address used for the TURN server, syntax: --publicip 192.168.1.10. Skips the online lookup.
+echo                            Default: HTTPS lookup with a 5 second timeout, falling back to this PC's LAN address.
+echo                            For intranet / offline deployment use Start-PixelStreaming.bat instead.
+echo        --mirror            Download mirror: official (default) or cn (npmmirror.com, no VPN needed in China).
 echo        --turn              TURN server to be used, syntax: --turn 127.0.0.1:19303
 echo                            Default value: Retrieved from 'curl https://api.ipify.org' or if unsuccessful then set to  127.0.0.1.
 echo        --turn-user         Sets the turn username when using a turn server.
@@ -63,7 +65,12 @@ IF NOT "%1"=="" (
     )
     IF "%1"=="--publicip" (
         set HANDLED=1
-        set PUBLIC_IP=%2
+        set "PUBLIC_IP=%~2"
+        SHIFT
+    )
+    IF "%1"=="--mirror" (
+        set HANDLED=1
+        set "PS_MIRROR=%~2"
         SHIFT
     )
     IF "%1"=="--turn" (
@@ -126,13 +133,18 @@ exit /b
 :SetupNode
 pushd %SCRIPT_DIR%
 SET NODE_NAME=node-%NODE_VERSION%-win-x64
+SET "NODE_DIST_BASE=https://nodejs.org/dist"
+IF /I "%PS_MIRROR%"=="cn" (
+    SET "NODE_DIST_BASE=https://npmmirror.com/mirrors/node"
+    SET "npm_config_registry=https://registry.npmmirror.com/"
+)
 if exist node\ (
   echo Node directory found...skipping install.
 ) else (
   echo Node directory not found...beginning NodeJS download for Windows.
 
   rem Download nodejs and follow redirects.
-  curl -L -o ./node.zip "https://nodejs.org/dist/%NODE_VERSION%/%NODE_NAME%.zip"
+  curl -L -o ./node.zip "%NODE_DIST_BASE%/%NODE_VERSION%/%NODE_NAME%.zip"
 
   %TAR% -xf node.zip
   ren "%NODE_NAME%\" "node"
@@ -265,7 +277,18 @@ call :SetupCoturn
 exit /b
 
 :SetPublicIP
-FOR /f %%A IN ('curl --silent http://api.ipify.org') DO set PUBLIC_IP=%%A
+rem Never overwrite an explicit --publicip, and never hang without internet.
+rem An empty address used to produce the TURN URL "turn::19303", which browsers reject,
+rem so a failed lookup falls back to this PC's LAN address.
+IF DEFINED PUBLIC_IP (
+    echo Using configured IP: %PUBLIC_IP%
+    exit /b
+)
+FOR /f %%A IN ('curl.exe --fail --silent --connect-timeout 3 --max-time 5 https://api.ipify.org 2^>nul') DO set "PUBLIC_IP=%%A"
+IF NOT DEFINED PUBLIC_IP (
+    FOR /F "delims=[] tokens=2" %%A in ('ping -4 -n 1 %ComputerName% ^| findstr [') do set "PUBLIC_IP=%%A"
+)
+IF NOT DEFINED PUBLIC_IP set "PUBLIC_IP=127.0.0.1"
 Echo External IP is : %PUBLIC_IP%
 exit /b
 

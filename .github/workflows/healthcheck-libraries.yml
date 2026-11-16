@@ -11,10 +11,10 @@ on:
       - "Frontend/library/**"
       - "Frontend/ui-library/**"
       - "Frontend/implementations/typescript/**"
+      - "Frontend/implementations/react/**"
 
 jobs:
   build-using-local-deps:
-    if: github.repository == 'EpicGamesExt/PixelStreamingInfrastructure'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source code
@@ -31,7 +31,7 @@ jobs:
         cache: 'npm'
 
     - name: Install dependencies
-      run: npm install
+      run: npm install --ignore-scripts
 
     - name: Build and lint checks on common library
       working-directory: Common
@@ -60,3 +60,7 @@ jobs:
     - name: Build of frontend implementation as ES6
       working-directory: Frontend/implementations/typescript
       run: npm run build:esm
+
+    - name: Build of react frontend implementation
+      working-directory: Frontend/implementations/react
+      run: npm run build

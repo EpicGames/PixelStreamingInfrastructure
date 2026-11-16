@@ -13,7 +13,6 @@ on:
 
 jobs:
   streaming-test-linux:
-    if: github.repository == 'EpicGamesExt/PixelStreamingInfrastructure'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source code

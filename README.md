@@ -14,9 +14,25 @@ We have created a [migration guide](/Docs/pixel-streaming-2-migration-guide.md) 
 | [![Signalling Server Image](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-image-wilbur.yml/badge.svg?branch=master)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-image-wilbur.yml) | | | |
 | [![SFU Docker Image](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-image-sfu.yml/badge.svg?branch=master)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-image-sfu.yml) | | | |
 | [![Documentation Links](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-markdown-links.yml/badge.svg?branch=master)](https://github.com/EpicGamesExt/PixelStreamingInfrastructure/actions/workflows/healthcheck-markdown-links.yml) | | | |
+| [![Offline & Intranet Healthcheck](https://github.com/AdaSeraph/PixelStreamingInfrastructure/actions/workflows/healthcheck-offline.yml/badge.svg)](https://github.com/AdaSeraph/PixelStreamingInfrastructure/actions/workflows/healthcheck-offline.yml) | | | |
 
 # The official home for the Pixel Streaming servers and frontend!
 The frontend and web server elements for Unreal Pixel Streaming (previously located in `Samples/PixelStreaming/WebServers`) are now in this repository, for all to contribute to. They are referred to as the **Pixel Streaming Infrastructure**.
+
+## Offline / Intranet & China Network Quick Start (No VPN Required)
+This fork includes built-in support for **offline / intranet** deployment and **China network environments** (using `npmmirror.com` Mirrors, zero external Google Fonts dependencies, no external IP query blocks, and symlink-free offline `node_modules` bundling across UE 5.3 – UE 5.8).
+
+1. **Prepare Offline Runtime (on an internet-connected machine, once)**:
+   - **Windows**: `.\Offline\Prepare-OfflineRuntime.bat` (uses China mirror by default)
+   - **Linux / macOS**: `./Offline/Prepare-OfflineRuntime.sh --mirror cn`
+2. **Start Signalling Server & UE App (100% offline / LAN)**:
+   - **Windows**: `.\Start-PixelStreaming.bat` or `.\Start-SignallingServer.bat`
+   - **Linux / macOS**: `./Start-PixelStreaming.sh` or `./Start-SignallingServer.sh`
+3. **Run Environment & UE Standard Healthcheck**:
+   - **Windows**: `.\Check-PixelStreaming.bat` or `node .\Offline\ps2-offline.js healthcheck`
+   - **Linux / macOS**: `./Check-PixelStreaming.sh` or `node ./Offline/ps2-offline.js healthcheck`
+
+See [`README-Intranet.txt`](README-Intranet.txt) and [`PixelStreaming.ini`](PixelStreaming.ini) for full configuration details.
 
 ## Getting Started
 To **build** and **run** everything you need to connect to the Pixel Streaming plugin simply run the following in the root of your `PixelStreamingInfrastructure` directory:
