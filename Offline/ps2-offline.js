@@ -1187,8 +1187,8 @@ async function cmdCheck() {
                 [cfg.streamerPort, 'UE 连接(StreamerPort)'],
             ]) {
                 const code = await probePort(port);
-                if (code === 'EACCES' && !IS_WIN && port < 1024 && !isElevated()) {
-                    note(`${label} 端口 ${port} 在 Linux 非 root 用户下不可直接监听(如需非 root 运行可将 PlayerPort 改为 8080)`);
+                if (code === 'EACCES' && port < 1024) {
+                    note(`${label} 端口 ${port} 当前受系统权限或保留范围限制(如需直接运行可将 PlayerPort 改为 8080)`);
                 } else if (code) {
                     bad(describePortProblem(port, code, label));
                 } else {

@@ -54,6 +54,6 @@ jobs:
 
       - name: Prepare offline runtime on Windows and run UE healthcheck
         run: |
-          .\Offline\Prepare-OfflineRuntime.bat -NoTurn
-          .\Check-PixelStreaming.bat
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\Offline\Prepare-OfflineRuntime.ps1 -NoTurn
+          .\Offline\node\node.exe .\Offline\ps2-offline.js check
           .\Offline\node\node.exe .\Offline\ps2-offline.js healthcheck
