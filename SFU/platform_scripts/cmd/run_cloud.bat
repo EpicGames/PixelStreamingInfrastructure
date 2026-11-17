@@ -11,7 +11,7 @@ title SFU
 FOR /F "tokens=*" %%g IN ('curl -L -S -s https://api.ipify.org') do (SET PUBLICIP=%%g)
 
 @Rem Call out run.bat and pass in the Public IP we grabbed earlier.
-call run_local.bat --PublicIP=%PUBLICIP%
+call run_local.bat --PublicIP=%PUBLICIP% %*
 
 @Rem Pop script directory.
 popd

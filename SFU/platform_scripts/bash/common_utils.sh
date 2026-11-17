@@ -10,7 +10,7 @@ function log_msg() { #message
 function print_usage() {
  echo "
  Usage:
-  ${0} [--help] [--publicip <IP Address>] [sfu options...]
+  ${0} [--help] [--publicip <IP Address>] [--mirror <URL>] [sfu options...]
  Where:
   --help will print this message and stop this script.
   --debug will run all scripts with --inspect
@@ -19,6 +19,7 @@ function print_usage() {
   --package-manager <package manager name> specify an alternative package manager to apt-get
   --publicip is used to define public ip address (using default port) for turn server, syntax: --publicip ; it is used for 
     default value: Retrieved from 'curl https://api.ipify.org' or if unsuccessful then set to  127.0.0.1.  It is the IP address of the SFU
+  --mirror <URL> base URL for downloading Node.js binaries (default: https://nodejs.org/dist)
   Other options: stored and passed to the SFU.  All parameters printed once the script values are set.
  "
  exit 1
@@ -50,6 +51,7 @@ function use_args() {
    --nosudo ) NO_SUDO=1; shift;;
    --verbose ) VERBOSE=1; shift;;
    --publicip ) publicip="$2"; shift 2;;
+   --mirror ) MIRROR="${2%/}"; shift 2;;
    --help ) print_usage;;
    * ) echo "Unknown command, adding to SFU command line: $1"; sfucmd+=" $1"; shift;;
   esac
@@ -57,7 +59,11 @@ function use_args() {
 }
 
 function call_setup_sh() {
- bash "setup.sh"
+ if [[ -n "$MIRROR" ]]; then
+  bash "setup.sh" --mirror "$MIRROR"
+ else
+  bash "setup.sh"
+ fi
 }
 
 function start_process() {
