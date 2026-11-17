@@ -290,7 +290,7 @@ rem fetched over https and kept only if it consists solely of digits and dots,
 rem as an IPv4 address does. Anything else falls back to 127.0.0.1, matching
 rem the usage text and the bash script.
 set "FETCHED_IP="
-FOR /f %%A IN ('curl --silent https://api.ipify.org') DO set "FETCHED_IP=%%A"
+FOR /f %%A IN ('curl --silent --connect-timeout 3 --max-time 5 https://api.ipify.org') DO set "FETCHED_IP=%%A"
 set "IP_CHARS=!FETCHED_IP!"
 FOR %%C IN (0 1 2 3 4 5 6 7 8 9 .) DO IF DEFINED IP_CHARS set "IP_CHARS=!IP_CHARS:%%C=!"
 IF DEFINED FETCHED_IP IF NOT DEFINED IP_CHARS set "PUBLIC_IP=!FETCHED_IP!"
