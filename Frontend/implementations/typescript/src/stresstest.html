@@ -5,7 +5,14 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
-	<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+	<link rel="preload" href="./assets/fonts/michroma-v21-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="./assets/fonts/michroma-v21-latin.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="./assets/fonts/montserrat-v31-cyrillic-ext.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="./assets/fonts/montserrat-v31-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="./assets/fonts/montserrat-v31-vietnamese.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="./assets/fonts/montserrat-v31-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="./assets/fonts/montserrat-v31-latin.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="stylesheet" type="text/css" href="./assets/css/fonts.css">
 
 	<!-- Required - the stress tester style sheet -->
 	<link rel="stylesheet" type="text/css" href="./assets/css/stresstest.css">
@@ -17,7 +24,7 @@
 	<title>Pixel Streaming Stress Tester</title>
 </head>
 
-<body style="width: 100vw; height: 100vh; min-height: -webkit-fill-available; font-family: 'Montserrat'; margin: 0px">
+<body style="width: 100vw; height: 100vh; min-height: -webkit-fill-available; font-family: 'Montserrat', sans-serif; margin: 0px">
 	<div id="control">
 		<button id="playPause">Pause</button>
 		<div>Total streams: <span id="nStreamsLabel">0</span></div>

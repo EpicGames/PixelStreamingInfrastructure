@@ -25,7 +25,7 @@ body {
     padding: 0.5rem;
     text-align: center;
 	line-height: 1.75rem;
-	font-family: 'Montserrat';
+	font-family: 'Montserrat', sans-serif;
 	margin-left: 1%;
 }
 
