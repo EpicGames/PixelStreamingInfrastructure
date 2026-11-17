@@ -1,3 +1,4 @@
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.8';
 import { Config, OptionParameters } from '../Config/Config';
 import { PeerConnectionController } from './PeerConnectionController';
 import { getCodecOption } from '../Util/CodecUtils';
@@ -228,5 +229,56 @@ describe('PeerConnectionController', () => {
         await receiveOffer(peerConnectionController, config, ueOfferedCodecs);
 
         expect(setCodecPreferencesSpy).not.toHaveBeenCalled();
+    });
+
+    describe('when the browser refuses media access', () => {
+        const originalMediaDevices = Object.getOwnPropertyDescriptor(global.navigator, 'mediaDevices');
+        let getUserMediaSpy: jest.Mock;
+        let warnSpy: jest.SpyInstance;
+
+        beforeEach(() => {
+            warnSpy = jest.spyOn(Logger, 'Warning').mockImplementation(() => {});
+            // getUserMedia rejects, rather than resolving null, when permission is denied or there is no device
+            getUserMediaSpy = jest
+                .fn()
+                .mockRejectedValue(new DOMException('Permission denied', 'NotAllowedError'));
+            Object.defineProperty(global.navigator, 'mediaDevices', {
+                value: { getUserMedia: getUserMediaSpy },
+                configurable: true
+            });
+        });
+
+        afterEach(() => {
+            warnSpy.mockRestore();
+            if (originalMediaDevices) {
+                Object.defineProperty(global.navigator, 'mediaDevices', originalMediaDevices);
+            } else {
+                delete (global.navigator as { mediaDevices?: MediaDevices }).mediaDevices;
+            }
+        });
+
+        it('should still set codec preferences and set up the mic when the camera is denied', async () => {
+            const config = new Config();
+            const peerConnectionController = createPeerConnectionController(config, `H264 ${h264Baseline}`);
+
+            await expect(peerConnectionController.setupTransceiversAsync(true, true)).resolves.toBeUndefined();
+
+            expect(setCodecPreferencesSpy).toHaveBeenCalledTimes(1);
+            // Both the camera and the mic were asked for
+            expect(getUserMediaSpy).toHaveBeenCalledTimes(2);
+            expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Unable to access the webcam'));
+            expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Unable to access the microphone'));
+        });
+
+        it('should receive video and audio when the camera and mic are denied and there are no receivers', async () => {
+            const config = new Config();
+            const peerConnectionController = new PeerConnectionController({}, config, '');
+            const addTransceiverSpy = jest.spyOn(peerConnectionController.peerConnection, 'addTransceiver');
+
+            await expect(peerConnectionController.setupTransceiversAsync(true, true)).resolves.toBeUndefined();
+
+            expect(addTransceiverSpy).toHaveBeenCalledWith('video', { direction: 'recvonly' });
+            expect(addTransceiverSpy).toHaveBeenCalledWith('audio', { direction: 'recvonly' });
+        });
     });
 });

@@ -503,6 +503,25 @@ export class PeerConnectionController {
         }
     }
 
+    /**
+     * Ask the browser for a media stream, returning null when it can't give one, so that the stream is only
+     * received instead of failing the WebRTC handshake
+     * @param constraints - The media to ask for
+     * @param device - The device being asked for, for logging
+     * @returns The media stream, or null when access was denied or there is no such device
+     */
+    private async getUserMedia(
+        constraints: MediaStreamConstraints,
+        device: string
+    ): Promise<MediaStream | null> {
+        try {
+            return await navigator.mediaDevices.getUserMedia(constraints);
+        } catch (error) {
+            Logger.Warning(`Unable to access the ${device}, so it won't be sent to the streamer: ${error}`);
+            return null;
+        }
+    }
+
     async setupVideoSender(hasVideoReceiver: boolean) {
         // set the media send options
         const mediaSendOptions: MediaStreamConstraints = {
@@ -510,7 +529,7 @@ export class PeerConnectionController {
         };
 
         // Note using webcam on android chrome requires SSL or chrome://flags/ "unsafely-treat-insecure-origin-as-secure"
-        const stream = await navigator.mediaDevices.getUserMedia(mediaSendOptions);
+        const stream = await this.getUserMedia(mediaSendOptions, 'webcam');
 
         if (stream) {
             if (hasVideoReceiver) {
@@ -560,7 +579,7 @@ export class PeerConnectionController {
         };
 
         // Note using mic on android chrome requires SSL or chrome://flags/ "unsafely-treat-insecure-origin-as-secure"
-        const stream = await navigator.mediaDevices.getUserMedia(mediaSendOptions);
+        const stream = await this.getUserMedia(mediaSendOptions, 'microphone');
         if (stream) {
             if (hasAudioReceiver) {
                 for (const transceiver of this.peerConnection?.getTransceivers() ?? []) {
