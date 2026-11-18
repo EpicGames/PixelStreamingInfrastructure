@@ -273,6 +273,8 @@ export class ConfigUI {
             ) {
                 preferredCodecOption.disable();
             }
+            if (isSettingEnabled(settingsConfig, Flags.PreferHardwareAV1))
+                this.addSettingFlag(encoderSettingsSection, this.flagsUi.get(Flags.PreferHardwareAV1));
 
             if (isSettingEnabled(settingsConfig, OptionParameters.PreferredQuality))
                 this.addSettingOption(
