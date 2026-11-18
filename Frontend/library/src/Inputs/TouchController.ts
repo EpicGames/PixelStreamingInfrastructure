@@ -42,12 +42,15 @@ export class TouchController implements IInputController {
     register() {
         this.videoElementParent.addEventListener('touchstart', this.onTouchStartListener);
         this.videoElementParent.addEventListener('touchend', this.onTouchEndListener);
+        // A cancelled touch (browser gesture, system interruption) never fires touchend; release it the same way.
+        this.videoElementParent.addEventListener('touchcancel', this.onTouchEndListener);
         this.videoElementParent.addEventListener('touchmove', this.onTouchMoveListener);
     }
 
     unregister() {
         this.videoElementParent.removeEventListener('touchstart', this.onTouchStartListener);
         this.videoElementParent.removeEventListener('touchend', this.onTouchEndListener);
+        this.videoElementParent.removeEventListener('touchcancel', this.onTouchEndListener);
         this.videoElementParent.removeEventListener('touchmove', this.onTouchMoveListener);
     }
 

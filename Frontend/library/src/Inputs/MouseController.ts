@@ -134,8 +134,8 @@ export class MouseController implements IInputController {
         this.streamMessageController.toStreamerHandlers.get('MouseDown')?.([button, X, Y]);
     }
 
-    private sendMouseUp(button: number, X: number, Y: number) {
-        const coord = this.coordinateConverter.translateUnsigned(X, Y);
-        this.streamMessageController.toStreamerHandlers.get('MouseUp')?.([button, coord.x, coord.y]);
+    // x and y are already translated by the caller; translating them again sends an off-screen point.
+    private sendMouseUp(button: number, x: number, y: number) {
+        this.streamMessageController.toStreamerHandlers.get('MouseUp')?.([button, x, y]);
     }
 }

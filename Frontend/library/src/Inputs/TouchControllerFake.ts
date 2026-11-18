@@ -46,12 +46,15 @@ export class TouchControllerFake implements IInputController {
     register() {
         document.addEventListener('touchstart', this.onTouchStartListener);
         document.addEventListener('touchend', this.onTouchEndListener);
+        // A cancelled touch never fires touchend; without this the tracked finger would block every later tap.
+        document.addEventListener('touchcancel', this.onTouchEndListener);
         document.addEventListener('touchmove', this.onTouchMoveListener);
     }
 
     unregister() {
         document.removeEventListener('touchstart', this.onTouchStartListener);
         document.removeEventListener('touchend', this.onTouchEndListener);
+        document.removeEventListener('touchcancel', this.onTouchEndListener);
         document.removeEventListener('touchmove', this.onTouchMoveListener);
     }
 
