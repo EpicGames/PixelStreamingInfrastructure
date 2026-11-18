@@ -10,6 +10,11 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+// Messages travel as JSON objects, using the field names below as keys.
+// 
+// Player ids are strings. The original Pixel Streaming plugin sends a numeric id as a JSON
+// number, so receivers should accept a number wherever a playerId is expected.
+
 /**
  * *
  * This is just a helper message type that allows us to use a "base interface"
@@ -485,9 +490,10 @@ export interface ping {
      */
     type: string;
     /**
-     * The current time
+     * The current time since the Unix epoch. Browsers send milliseconds, which do not fit in
+     * 32 bits; Unreal Engine sends seconds. The receiver echoes it back unchanged in `pong`.
      *
-     * @generated from protobuf field: int32 time = 2
+     * @generated from protobuf field: double time = 2
      */
     time: number;
 }
@@ -508,7 +514,7 @@ export interface pong {
     /**
      * The echoed time from the ping message
      *
-     * @generated from protobuf field: int32 time = 2
+     * @generated from protobuf field: double time = 2
      */
     time: number;
 }
@@ -576,6 +582,13 @@ export interface dataChannelRequest {
      * @generated from protobuf field: string type = 1
      */
     type: string;
+    /**
+     * The player making the request. Set by the signalling server when it forwards the message
+     * to the SFU; a player does not need to send it.
+     *
+     * @generated from protobuf field: optional string playerId = 2
+     */
+    playerId?: string;
 }
 /**
  * *
@@ -624,6 +637,13 @@ export interface peerDataChannelsReady {
      * @generated from protobuf field: string type = 1
      */
     type: string;
+    /**
+     * The player whose data channels are ready. Set by the signalling server when it forwards
+     * the message to the SFU; a player does not need to send it.
+     *
+     * @generated from protobuf field: optional string playerId = 2
+     */
+    playerId?: string;
 }
 /**
  * *
@@ -657,6 +677,13 @@ export interface streamerDataChannels {
      * @generated from protobuf field: int32 recvStreamId = 4
      */
     recvStreamId: number;
+    /**
+     * The player behind the SFU these channels are for. Set by the SFU. The original Pixel
+     * Streaming plugin ignores the message without it.
+     *
+     * @generated from protobuf field: optional string playerId = 5
+     */
+    playerId?: string;
 }
 /**
  * *
@@ -1837,7 +1864,7 @@ class ping$Type extends MessageType<ping> {
     constructor() {
         super("ping", [
             { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "time", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+            { no: 2, name: "time", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value?: PartialMessage<ping>): ping {
@@ -1856,8 +1883,8 @@ class ping$Type extends MessageType<ping> {
                 case /* string type */ 1:
                     message.type = reader.string();
                     break;
-                case /* int32 time */ 2:
-                    message.time = reader.int32();
+                case /* double time */ 2:
+                    message.time = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1874,9 +1901,9 @@ class ping$Type extends MessageType<ping> {
         /* string type = 1; */
         if (message.type !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.type);
-        /* int32 time = 2; */
+        /* double time = 2; */
         if (message.time !== 0)
-            writer.tag(2, WireType.Varint).int32(message.time);
+            writer.tag(2, WireType.Bit64).double(message.time);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1892,7 +1919,7 @@ class pong$Type extends MessageType<pong> {
     constructor() {
         super("pong", [
             { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "time", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+            { no: 2, name: "time", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value?: PartialMessage<pong>): pong {
@@ -1911,8 +1938,8 @@ class pong$Type extends MessageType<pong> {
                 case /* string type */ 1:
                     message.type = reader.string();
                     break;
-                case /* int32 time */ 2:
-                    message.time = reader.int32();
+                case /* double time */ 2:
+                    message.time = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1929,9 +1956,9 @@ class pong$Type extends MessageType<pong> {
         /* string type = 1; */
         if (message.type !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.type);
-        /* int32 time = 2; */
+        /* double time = 2; */
         if (message.time !== 0)
-            writer.tag(2, WireType.Varint).int32(message.time);
+            writer.tag(2, WireType.Bit64).double(message.time);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -2064,7 +2091,8 @@ export const layerPreference = new layerPreference$Type();
 class dataChannelRequest$Type extends MessageType<dataChannelRequest> {
     constructor() {
         super("dataChannelRequest", [
-            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "playerId", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<dataChannelRequest>): dataChannelRequest {
@@ -2082,6 +2110,9 @@ class dataChannelRequest$Type extends MessageType<dataChannelRequest> {
                 case /* string type */ 1:
                     message.type = reader.string();
                     break;
+                case /* optional string playerId */ 2:
+                    message.playerId = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -2097,6 +2128,9 @@ class dataChannelRequest$Type extends MessageType<dataChannelRequest> {
         /* string type = 1; */
         if (message.type !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.type);
+        /* optional string playerId = 2; */
+        if (message.playerId !== undefined)
+            writer.tag(2, WireType.LengthDelimited).string(message.playerId);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -2182,7 +2216,8 @@ export const peerDataChannels = new peerDataChannels$Type();
 class peerDataChannelsReady$Type extends MessageType<peerDataChannelsReady> {
     constructor() {
         super("peerDataChannelsReady", [
-            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "playerId", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<peerDataChannelsReady>): peerDataChannelsReady {
@@ -2200,6 +2235,9 @@ class peerDataChannelsReady$Type extends MessageType<peerDataChannelsReady> {
                 case /* string type */ 1:
                     message.type = reader.string();
                     break;
+                case /* optional string playerId */ 2:
+                    message.playerId = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -2215,6 +2253,9 @@ class peerDataChannelsReady$Type extends MessageType<peerDataChannelsReady> {
         /* string type = 1; */
         if (message.type !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.type);
+        /* optional string playerId = 2; */
+        if (message.playerId !== undefined)
+            writer.tag(2, WireType.LengthDelimited).string(message.playerId);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -2232,7 +2273,8 @@ class streamerDataChannels$Type extends MessageType<streamerDataChannels> {
             { no: 1, name: "type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "sfuId", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "sendStreamId", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 4, name: "recvStreamId", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+            { no: 4, name: "recvStreamId", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 5, name: "playerId", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<streamerDataChannels>): streamerDataChannels {
@@ -2262,6 +2304,9 @@ class streamerDataChannels$Type extends MessageType<streamerDataChannels> {
                 case /* int32 recvStreamId */ 4:
                     message.recvStreamId = reader.int32();
                     break;
+                case /* optional string playerId */ 5:
+                    message.playerId = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -2286,6 +2331,9 @@ class streamerDataChannels$Type extends MessageType<streamerDataChannels> {
         /* int32 recvStreamId = 4; */
         if (message.recvStreamId !== 0)
             writer.tag(4, WireType.Varint).int32(message.recvStreamId);
+        /* optional string playerId = 5; */
+        if (message.playerId !== undefined)
+            writer.tag(5, WireType.LengthDelimited).string(message.playerId);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

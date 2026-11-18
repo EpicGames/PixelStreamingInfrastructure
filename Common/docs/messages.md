@@ -114,6 +114,7 @@ requests data channels to the streamer.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | type | [string](#string) |  | Should always be &#39;dataChannelRequest&#39; |
+| playerId | [string](#string) | optional | The player making the request. Set by the signalling server when it forwards the message to the SFU; a player does not need to send it. |
 
 
 
@@ -333,6 +334,7 @@ ready for data channels to be negotiated.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | type | [string](#string) |  | Should always be &#39;peerDataChannelsReady&#39; |
+| playerId | [string](#string) | optional | The player whose data channels are ready. Set by the signalling server when it forwards the message to the SFU; a player does not need to send it. |
 
 
 
@@ -348,7 +350,7 @@ A keepalive ping message used to test that the connection is still open.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | type | [string](#string) |  | Should always be &#39;ping&#39; |
-| time | [int32](#int32) |  | The current time |
+| time | [double](#double) |  | The current time since the Unix epoch. Browsers send milliseconds, which do not fit in 32 bits; Unreal Engine sends seconds. The receiver echoes it back unchanged in `pong`. |
 
 
 
@@ -420,7 +422,7 @@ ping message.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | type | [string](#string) |  | Should always be &#39;pong&#39; |
-| time | [int32](#int32) |  | The echoed time from the ping message |
+| time | [double](#double) |  | The echoed time from the ping message |
 
 
 
@@ -487,6 +489,7 @@ open up data channels for a given player.
 | sfuId | [string](#string) |  | The SFU the player is connected to |
 | sendStreamId | [int32](#int32) |  | The channel ID to use for sending data. |
 | recvStreamId | [int32](#int32) |  | The channel ID to use for receiving data. |
+| playerId | [string](#string) | optional | The player behind the SFU these channels are for. Set by the SFU. The original Pixel Streaming plugin ignores the message without it. |
 
 
 
