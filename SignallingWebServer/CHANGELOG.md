@@ -1,5 +1,19 @@
 # @epicgames-ps/wilbur
 
+## 3.2.0
+
+### Minor Changes
+
+- 563fd61: Add `--player_token` (or `--player_token_file`), an optional shared token that a player must present to connect. It is checked with the `playerWsOptions.verifyClient` seam the security guidelines already recommend, so a player that cannot present it is refused during the HTTP upgrade with `401` and never becomes a connection — which is what keeps the config message, and any TURN credential in its peer options, away from it. The token is accepted as a `?token=` query parameter or an `Authorization: Bearer` header, compared over SHA-256 digests so neither its length nor the position of the first difference is observable, removed from the request before the connection is logged, and kept out of `--save`, the `--log_config` dump, the `--stdin` config dump and — when `--player_token_file` is used — the process command line. Each refusal is logged with its source address, since the player port is not covered by the HTTP rate limiter. Streamer and SFU connections are unaffected, and no player connection is refused when no token is supplied. See `Docs/Security-Guidelines.md`.
+- 563fd61: Add optional `--rest_api_token` and `--rest_api_token_file`. When set, every request under `/api`, including `/api/api-definition`, must send the token in an `Authorization: Bearer` header or is refused with 401. Without a token the REST API stays open as before, and the server now warns at startup when `--rest_api` is enabled without one. `GET /api/config` no longer returns the configuration objects whole: ICE server usernames and credentials are replaced with `<redacted>`, and it returns only the ports, subscriber limit, keepalive timeout, peer options and protocol version, no longer the HTTP server and WebSocket options. The player and streamer tokens never covered the REST API, so `/api/config` handed out static TURN credentials that `--player_token` exists to protect.
+- 563fd61: Add optional `--sfu_token` and `--sfu_token_file` to Wilbur, matching `--streamer_token`: an SFU that does not present the token is refused at the HTTP upgrade with 401. The SFU gains `signallingToken` and `signallingTokenFile` (in `config.js` or as `--signallingToken=` / `--signallingTokenFile=`), sent as an `Authorization: Bearer` header and redacted from the config it prints at startup. Authentication remains disabled by default.
+- 563fd61: Add optional `--streamer_token` and `--streamer_token_file` shared-token authentication for the streamer WebSocket listener, mirroring existing player-token behavior. Authentication remains disabled by default, so existing deployments are unaffected.
+- 563fd61: Add `--streamer_host` and `--sfu_host`, which set the address the streamer and SFU ports listen on, such as 127.0.0.1 when streamers connect from the same machine or through a tunnel. Without them both ports listen on every address, as before.
+
+### Patch Changes
+
+- 563fd61: Redact `turn_secret` and `player_token` in the interactive config dump. Pressing `c` with `--stdin` wrote the whole options object to stdout, and a service supervisor routinely redirects stdout to a file — so the dump put a secret on disk just as surely as the `--log_config` dump it was already redacted in.
+
 ## 3.1.1
 
 ### Patch Changes
