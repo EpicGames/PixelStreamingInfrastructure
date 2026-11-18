@@ -51,6 +51,8 @@ Options:
   --streamer_port <port>        Sets the listening port for streamer connections. (default: "8888")
   --player_port <port>          Sets the listening port for player connections. (default: "80")
   --sfu_port <port>             Sets the listening port for SFU connections. (default: "8889")
+  --streamer_host <address>     Sets the address the streamer port listens on, such as 127.0.0.1 when streamers connect from the same machine or through a tunnel. When empty, it listens on every address. (default: "")
+  --sfu_host <address>          Sets the address the SFU port listens on. When empty, it listens on every address. (default: "")
   --max_players <number>        Sets the maximum number of subscribers per streamer. 0 = unlimited (default: "0")
   --player_keepalive_timeout <milliseconds>
                                 Disconnect a player after this many milliseconds without a keepalive response. 0 = disabled (default: "30000")
@@ -68,6 +70,17 @@ Options:
   --turn_secret_file <filename>
                                 Reads the value of --turn_secret from a file, so the secret does not appear in the command line of this process. (default: "")
   --turn_ttl <seconds>          How long a credential issued to a player stays valid. Streamers and SFUs are configured once and cannot be reissued, so they are given a credential that does not practically expire. (default: "86400")
+  --player_token <token>        Requires every player to present this token when it connects, as a ?token= query parameter or an Authorization: Bearer header. A player that does not is refused at the HTTP upgrade with 401, before it is sent the config message. Streamer and SFU connections are not affected. (default: "")
+  --player_token_file <filename>
+                                Reads the value of --player_token from a file, so the token does not appear in the command line of this process. (default: "")
+  --streamer_token <token>      Requires every streamer to present this token when it connects, as a ?token= query parameter or an Authorization: Bearer header. A streamer that does not is refused at the HTTP upgrade with 401, before it is sent the config message. Player and SFU connections are not affected. (default: "")
+  --streamer_token_file <filename>
+                                Reads the value of --streamer_token from a file, so the token does not appear in the command line of this process. (default: "")
+  --sfu_token <token>           Requires every SFU to present this token when it connects, as a ?token= query parameter or an Authorization: Bearer header. An SFU that does not is refused at the HTTP upgrade with 401, before it is sent the config message. Player and streamer connections are not affected. (default: "")
+  --sfu_token_file <filename>   Reads the value of --sfu_token from a file, so the token does not appear in the command line of this process. (default: "")
+  --rest_api_token <token>      Requires every request to the REST API to present this token in an Authorization: Bearer header. A request that does not is refused with 401. Player, streamer and SFU connections are not affected. (default: "")
+  --rest_api_token_file <filename>
+                                Reads the value of --rest_api_token from a file, so the token does not appear in the command line of this process. (default: "")
   --log_config                  Will print the program configuration on startup. (default: true)
   --stdin                       Allows stdin input while running. (default: false)
   --save                        After arguments are parsed the config.json is saved with whatever arguments were specified at launch. (default: false)
@@ -124,4 +137,3 @@ During development it may be useful to work with self-signed SSL certificates (e
 The previous reference signalling server was called Cirrus (UE 5.4 and earlier). Wilbur is a direct replacement for Cirrus.
 
 Differences of behaviour from the old Cirrus server are described [here](from_cirrus.md).
-
