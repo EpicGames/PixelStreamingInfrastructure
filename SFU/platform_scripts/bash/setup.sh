@@ -101,21 +101,22 @@ if [[ -f "${BASH_LOCATION}/node/bin/node" ]]; then
 	node_version=$("${BASH_LOCATION}/node/bin/node" --version)
 fi
 
+node_dist_base="${MIRROR:-https://nodejs.org/dist}"
 node_url=""
 if [ "$(uname)" == "Darwin" ]; then
 	arch=$(uname -m)
     if [[ $arch == x86_64* ]]; then
-        node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-x64.tar.gz"
+        node_url="$node_dist_base/$NODE_VERSION/node-$NODE_VERSION-darwin-x64.tar.gz"
     elif  [[ $arch == arm* ]]; then
-        node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-arm64.tar.gz"
+        node_url="$node_dist_base/$NODE_VERSION/node-$NODE_VERSION-darwin-arm64.tar.gz"
     else
         echo 'Incompatible architecture. Only x86_64 and ARM64 are supported'
         exit -1
     fi
 else
-    node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
+    node_url="$node_dist_base/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
 fi
-check_and_install "node" "$node_version" "$NODE_VERSION" "curl $node_url --output node.tar.xz 
+check_and_install "node" "$node_version" "$NODE_VERSION" "curl -L \"$node_url\" --output node.tar.xz 
 													&& tar -xf node.tar.xz 
 													&& rm node.tar.xz 
 													&& mv node-v*-*-* \"${BASH_LOCATION}/node\""

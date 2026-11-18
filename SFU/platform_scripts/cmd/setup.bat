@@ -6,7 +6,7 @@
 pushd "%~dp0"
 
 @Rem Ensure we have NodeJs available for calling.
-call setup_node.bat
+call setup_node.bat %*
 
 @Rem Move to sfu_server.js directory and install its package.json
 pushd %~dp0\..\..\

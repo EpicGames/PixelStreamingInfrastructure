@@ -32,6 +32,7 @@ echo        --rebuild           Force a rebuild of everything
 echo        --build-libraries   Force a rebuild of shared libraries
 echo        --build-wilbur      Force build of wilbur
 echo        --deps              Force reinstall of dependencies
+echo        --mirror            Base URL for downloading Node.js binaries (default: https://nodejs.org/dist)
 echo    Everything after -- is passed directly to the signalling server executable.
 IF exist "%SCRIPT_DIR%..\..\dist" (
     pushd "%SCRIPT_DIR%..\.."
@@ -52,6 +53,7 @@ set TURN_USER=
 set TURN_PASS=
 set STUN_SERVER=
 set PUBLIC_IP=
+set MIRROR=
 :arg_loop
 IF "%~1"=="" GOTO LoopExit
 IF "%~1"=="--" GOTO PostArgs
@@ -121,6 +123,11 @@ IF "%~1"=="--deps" (
     set HANDLED=1
     set INSTALL_DEPS=1
 )
+IF "%~1"=="--mirror" (
+    set HANDLED=1
+    set "MIRROR=%~2"
+    SHIFT
+)
 IF NOT "!HANDLED!"=="1" (
     echo Unknown arg %1
     exit /b 1
@@ -140,13 +147,16 @@ exit /b
 :SetupNode
 pushd "%SCRIPT_DIR%"
 SET NODE_NAME=node-%NODE_VERSION%-win-x64
+SET "NODE_DIST_BASE=https://nodejs.org/dist"
+IF NOT "!MIRROR!"=="" SET "NODE_DIST_BASE=!MIRROR!"
+IF "!NODE_DIST_BASE:~-1!"=="/" SET "NODE_DIST_BASE=!NODE_DIST_BASE:~0,-1!"
 if exist node\ (
   echo Node directory found...skipping install.
 ) else (
   echo Node directory not found...beginning NodeJS download for Windows.
 
   rem Download nodejs and follow redirects.
-  curl -L -o ./node.zip "https://nodejs.org/dist/%NODE_VERSION%/%NODE_NAME%.zip"
+  curl -L -o ./node.zip "!NODE_DIST_BASE!/%NODE_VERSION%/%NODE_NAME%.zip"
 
   %TAR% -xf node.zip
   ren "%NODE_NAME%\" "node"

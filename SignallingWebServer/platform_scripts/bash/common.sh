@@ -27,6 +27,7 @@ function print_usage() {
         --build-libraries   Force a rebuild of shared libraries
         --build-wilbur      Force build of wilbur
         --deps              Force reinstall of dependencies
+        --mirror            Base URL for downloading Node.js binaries (default: https://nodejs.org/dist)
 
     Anything after -- is passed directly to the signalling server.
     Command line options might be omitted to run with defaults and it is a good practice to omit specific ones when just starting the TURN or the STUN server alone, not the whole set of scripts.
@@ -65,6 +66,7 @@ function parse_args() {
         --build-wilbur ) BUILD_WILBUR=1; shift;;
         --build-libraries ) BUILD_LIBRARIES=1; shift;;
         --deps ) INSTALL_DEPS=1; shift;;
+        --mirror ) MIRROR="${2%/}"; shift 2;;
         --help ) print_usage;;
         -- ) shift; break;;
         * )
@@ -158,22 +160,23 @@ function setup_node() {
 
     local node_version=$("node" --version)
 
+    local node_dist_base="${MIRROR:-https://nodejs.org/dist}"
     local node_url=""
     if [ "$(uname)" == "Darwin" ]; then
         arch=$(uname -m)
         if [[ $arch == x86_64* ]]; then
-            node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-x64.tar.gz"
+            node_url="$node_dist_base/$NODE_VERSION/node-$NODE_VERSION-darwin-x64.tar.gz"
         elif  [[ $arch == arm* ]]; then
-            node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-darwin-arm64.tar.gz"
+            node_url="$node_dist_base/$NODE_VERSION/node-$NODE_VERSION-darwin-arm64.tar.gz"
         else
             echo 'Incompatible architecture. Only x86_64 and ARM64 are supported'
             exit -1
         fi
     else
-        node_url="https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
+        node_url="$node_dist_base/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.gz"
     fi
 
-    check_and_install "node" "$node_version" "$NODE_VERSION" "curl $node_url --output node.tar.xz
+    check_and_install "node" "$node_version" "$NODE_VERSION" "curl -L \"$node_url\" --output node.tar.xz
                                                                 && tar -xf node.tar.xz
                                                                 && rm node.tar.xz
                                                                 && mv node-v*-*-* \"${SCRIPT_DIR}/node\""
