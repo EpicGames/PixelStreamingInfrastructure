@@ -203,7 +203,7 @@ export class PixelStreamingApplicationStyle {
         '.btn-flat': {
             backgroundColor: 'transparent',
             color: 'var(--color2)',
-            fontFamily: "'Montserrat'",
+            fontFamily: "'Montserrat', sans-serif",
             fontWeight: 'bold',
             border: '3px solid var(--color3)',
             borderRadius: '1rem',
