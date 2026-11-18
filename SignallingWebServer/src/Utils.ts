@@ -6,7 +6,7 @@ import { Logger } from '@epicgames-ps/lib-pixelstreamingsignalling-ue5.8';
 // A simple interface to describe the options from commander.js
 export type IProgramOptions = Record<string, any>;
 
-const SECRET_OPTIONS = ['turn_secret', 'player_token', 'streamer_token'];
+const SECRET_OPTIONS = ['turn_secret', 'player_token', 'streamer_token', 'sfu_token', 'rest_api_token'];
 
 /** Returns a copy safe to write to logs or stdout. */
 export function redactConfig(options: IProgramOptions): IProgramOptions {

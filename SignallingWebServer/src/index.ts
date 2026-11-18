@@ -13,6 +13,13 @@ import {
 import { beautify, IProgramOptions, readSecretFile, redactConfig } from './Utils';
 import { createTokenVerifier } from './playerAuth';
 import { addStreamerTokenOptions, configureStreamerToken, loadStreamerTokenFile } from './streamerAuth';
+import { addSfuTokenOptions, configureSfuToken, loadSfuTokenFile } from './sfuAuth';
+import {
+    addRestApiTokenOptions,
+    createRestApiAuthMiddleware,
+    loadRestApiTokenFile,
+    resolveRestApiToken
+} from './restApiAuth';
 import { configureListenHosts } from './listenHosts';
 import { createTurnCredentialsProvider, hasCredentiallessTurnServer } from './turnCredentials';
 import { initInputHandler } from './InputHandler';
@@ -250,7 +257,10 @@ program
         ).default(config_file.player_token_file || '')
     );
 
-addStreamerTokenOptions(program, config_file)
+addRestApiTokenOptions(
+    addSfuTokenOptions(addStreamerTokenOptions(program, config_file), config_file),
+    config_file
+)
     .option(
         '--reverse-proxy',
         'Enables reverse proxy mode. This will trust the X-Forwarded-For header.',
@@ -294,6 +304,8 @@ if (options.save) {
     delete save_options.turn_secret;
     delete save_options.player_token;
     delete save_options.streamer_token;
+    delete save_options.sfu_token;
+    delete save_options.rest_api_token;
 
     // save out the config file with the current settings. Logged rather than thrown: the callback runs
     // asynchronously, outside any request, so a throw here would end a server that is otherwise healthy.
@@ -338,6 +350,8 @@ if (options.player_token_file) {
 }
 
 loadStreamerTokenFile(options);
+loadSfuTokenFile(options);
+loadRestApiTokenFile(options);
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 Logger.info(`${pjson.name} v${pjson.version} starting...`);
@@ -444,7 +458,61 @@ if (streamerToken) {
     Logger.info('Streamers must present --streamer_token to connect.');
 }
 
+let sfuToken = '';
+try {
+    sfuToken = configureSfuToken(options, serverOpts, (request) => {
+        Logger.warn(`Refused an SFU from %s: no valid token.`, request.socket.remoteAddress);
+    });
+} catch (error: unknown) {
+    Logger.error(
+        `An SFU token was configured but is invalid (${String(error)}); ` +
+            'refusing to start with an open SFU port.'
+    );
+    throw Error('Invalid sfu_token.');
+}
+if (sfuToken) {
+    if (sfuToken.length < MINIMUM_TOKEN_LENGTH) {
+        Logger.warn(
+            `sfu_token is only ${sfuToken.length} characters and can be guessed quickly. ` +
+                'A GUID is a good default.'
+        );
+    }
+    Logger.info('SFUs must present --sfu_token to connect.');
+}
+
 configureListenHosts(options, serverOpts);
+
+let restApiToken = '';
+try {
+    restApiToken = resolveRestApiToken(options);
+} catch (error: unknown) {
+    Logger.error(
+        `A REST API token was configured but is invalid (${String(error)}); ` +
+            'refusing to start with an open REST API.'
+    );
+    throw Error('Invalid rest_api_token.');
+}
+if (options.rest_api) {
+    if (restApiToken) {
+        if (restApiToken.length < MINIMUM_TOKEN_LENGTH) {
+            Logger.warn(
+                `rest_api_token is only ${restApiToken.length} characters and can be guessed quickly. ` +
+                    'A GUID is a good default.'
+            );
+        }
+        Logger.info('REST API requests must present --rest_api_token.');
+    } else {
+        // Warned rather than refused, as with the player and streamer tokens: the REST API is off
+        // by default, and an operator who turned it on may be relying on a network boundary.
+        Logger.warn(
+            'The REST API is enabled without --rest_api_token. Anyone who can reach the player port ' +
+                'can list connected players and their IP addresses. Set --rest_api_token, or keep ' +
+                'the player port off untrusted networks.'
+        );
+    }
+} else if (restApiToken) {
+    Logger.warn('--rest_api_token was given but --rest_api is not enabled, so it has no effect.');
+}
 
 // Time limited TURN credentials, when a shared secret was supplied. Without one the static username
 // and credential in the peer options are sent to every peer exactly as before.
@@ -543,6 +611,16 @@ if (options.stdin) {
 }
 
 if (options.rest_api) {
+    // Mounted before initialize() registers the routes, so it runs ahead of every one of them,
+    // including the API definition at /api/api-definition.
+    if (restApiToken) {
+        app.use(
+            '/api',
+            createRestApiAuthMiddleware(restApiToken, (request) => {
+                Logger.warn(`Refused a REST API request from %s: no valid token.`, request.ip);
+            })
+        );
+    }
     initialize({
         app,
         docsPath: '/api-definition',

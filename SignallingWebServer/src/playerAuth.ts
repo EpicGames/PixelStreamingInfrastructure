@@ -155,15 +155,13 @@ function stripToken(request: http.IncomingMessage): void {
  * @returns A verifyClient suitable for an IServerConfig WebSocket listener.
  */
 export function createTokenVerifier(token: string, onRefused?: OnRefused): VerifyClient {
-    // Hashed once rather than per request. The digest is not the token and is never compared to
-    // anything an attacker supplies directly, so holding it costs nothing.
-    const expected = crypto.createHash('sha256').update(token).digest();
+    const matches = createTokenMatcher(token);
 
     return (info, callback) => {
         // `some` short circuits, so a request presenting two tokens is measurably cheaper when the
         // first matches. That distinguishes states the client already knows it is in and says
         // nothing about the expected token, which is the only secret here.
-        if (tokensFromRequest(info.req).some((presented) => secretsMatch(presented, expected))) {
+        if (tokensFromRequest(info.req).some(matches)) {
             stripToken(info.req);
             callback(true);
             return;
@@ -175,6 +173,17 @@ export function createTokenVerifier(token: string, onRefused?: OnRefused): Verif
         // token" from "the server is down". Nothing about the expected token is disclosed by it.
         callback(false, 401, 'Unauthorized');
     };
+}
+
+/**
+ * Builds a check of presented secrets against one expected token, using the comparison below.
+ * Shared with the REST API's check, so every token in the server is compared the same way.
+ */
+export function createTokenMatcher(token: string): (presented: string) => boolean {
+    // Hashed once rather than per request. The digest is not the token and is never compared to
+    // anything an attacker supplies directly, so holding it costs nothing.
+    const expected = crypto.createHash('sha256').update(token).digest();
+    return (presented) => secretsMatch(presented, expected);
 }
 
 /**

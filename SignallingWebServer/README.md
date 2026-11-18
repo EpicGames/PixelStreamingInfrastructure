@@ -76,6 +76,11 @@ Options:
   --streamer_token <token>      Requires every streamer to present this token when it connects, as a ?token= query parameter or an Authorization: Bearer header. A streamer that does not is refused at the HTTP upgrade with 401, before it is sent the config message. Player and SFU connections are not affected. (default: "")
   --streamer_token_file <filename>
                                 Reads the value of --streamer_token from a file, so the token does not appear in the command line of this process. (default: "")
+  --sfu_token <token>           Requires every SFU to present this token when it connects, as a ?token= query parameter or an Authorization: Bearer header. An SFU that does not is refused at the HTTP upgrade with 401, before it is sent the config message. Player and streamer connections are not affected. (default: "")
+  --sfu_token_file <filename>   Reads the value of --sfu_token from a file, so the token does not appear in the command line of this process. (default: "")
+  --rest_api_token <token>      Requires every request to the REST API to present this token in an Authorization: Bearer header. A request that does not is refused with 401. Player, streamer and SFU connections are not affected. (default: "")
+  --rest_api_token_file <filename>
+                                Reads the value of --rest_api_token from a file, so the token does not appear in the command line of this process. (default: "")
   --log_config                  Will print the program configuration on startup. (default: true)
   --stdin                       Allows stdin input while running. (default: false)
   --save                        After arguments are parsed the config.json is saved with whatever arguments were specified at launch. (default: false)

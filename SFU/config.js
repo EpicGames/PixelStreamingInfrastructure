@@ -14,6 +14,14 @@ const config = {
   // The URL of the signalling server to connect to
   signallingURL: "ws://localhost:8889",
 
+  // The token to present to the signalling server, when it was started with --sfu_token. Sent as an
+  // Authorization: Bearer header rather than in signallingURL, which is printed at startup.
+  // Leave empty when the signalling server does not require one.
+  signallingToken: "",
+
+  // Reads signallingToken from this file instead, so it does not appear on the command line.
+  signallingTokenFile: "",
+
   // The ID for this SFU to use. This will show up as a streamer ID on the signalling server
   SFUId: "SFU",
 
