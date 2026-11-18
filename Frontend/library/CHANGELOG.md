@@ -1,5 +1,12 @@
 # @epicgames-ps/lib-pixelstreamingfrontend-ue5.6
 
+## 0.3.4
+
+### Patch Changes
+
+- a6c76ca: fix(frontend): keep the WebRTC handshake going when the browser refuses webcam or microphone access. With `UseCamera` or `UseMic` enabled, a denied permission or missing device made `getUserMedia` reject out of the transceiver setup, so a denied webcam skipped the preferred codec and the microphone, and the rejection went unhandled. The frontend now logs a warning and only receives that media.
+- 278d941: fix(frontend): track hovering mouse drags with pointer events and `setPointerCapture`, so moves and releases keep arriving when the cursor leaves the browser window. Held button chords are now sent as paired MouseDown/MouseUp messages, and cancelled or uncaptured pointers release their buttons. Closes #899.
+
 ## 0.3.3
 
 ### Patch Changes
