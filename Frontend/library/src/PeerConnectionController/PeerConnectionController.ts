@@ -111,7 +111,7 @@ export class PeerConnectionController {
             );
         }
 
-        void this.peerConnection?.setRemoteDescription(offer).then(() => {
+        const remoteDescriptionSet = this.peerConnection?.setRemoteDescription(offer).then(() => {
             // Fire event for when remote offer description is set
             this.onSetRemoteDescription(offer);
 
@@ -152,6 +152,9 @@ export class PeerConnectionController {
                     });
             });
         });
+        void remoteDescriptionSet?.catch((err) => {
+            Logger.Error(`setRemoteDescription() failed - ${err}`);
+        });
     }
 
     /**
@@ -159,7 +162,9 @@ export class PeerConnectionController {
      * @param answer - RTC Session Descriptor from the Signaling Server
      */
     receiveAnswer(answer: RTCSessionDescriptionInit) {
-        void this.peerConnection?.setRemoteDescription(answer);
+        void this.peerConnection?.setRemoteDescription(answer).catch((err) => {
+            Logger.Error(`setRemoteDescription() failed - ${err}`);
+        });
 
         // Add our list of preferred codecs, in order of preference
         this.config.setOptionSettingOptions(
@@ -172,7 +177,7 @@ export class PeerConnectionController {
      * Generate Aggregated Stats and then fire a onVideo Stats event
      */
     generateStats() {
-        void this.peerConnection?.getStats().then((statsData: RTCStatsReport) => {
+        const statsReport = this.peerConnection?.getStats().then((statsData: RTCStatsReport) => {
             this.aggregatedStats.processStats(statsData);
             this.onVideoStats(this.aggregatedStats);
 
@@ -224,13 +229,20 @@ export class PeerConnectionController {
                 }
             }
         });
+        void statsReport?.catch((err) => {
+            Logger.Warning(`getStats() failed - ${err}`);
+        });
     }
 
     /**
-     * Close The Peer Connection
+     * Close The Peer Connection and stop our local capture tracks. close() does not stop the tracks
+     * from getUserMedia, so without this the camera and microphone stay in use after every teardown.
      */
     close() {
         if (this.peerConnection) {
+            for (const sender of this.peerConnection.getSenders()) {
+                sender.track?.stop();
+            }
             this.peerConnection.close();
             this.peerConnection = null;
         }
@@ -510,9 +522,21 @@ export class PeerConnectionController {
         };
 
         // Note using webcam on android chrome requires SSL or chrome://flags/ "unsafely-treat-insecure-origin-as-secure"
-        const stream = await navigator.mediaDevices.getUserMedia(mediaSendOptions);
+        // A denied or missing camera rejects; treat it as "no stream" so the recvonly fallback runs
+        // and the microphone setup below is still reached.
+        const stream: MediaStream | null = await navigator.mediaDevices
+            .getUserMedia(mediaSendOptions)
+            .catch((err): null => {
+                Logger.Warning(`Webcam unavailable, continuing without it - ${err}`);
+                return null;
+            });
 
         if (stream) {
+            if (!this.peerConnection) {
+                // The connection was closed while the permission prompt was open, so nothing will send this.
+                stream.getTracks().forEach((track) => track.stop());
+                return;
+            }
             if (hasVideoReceiver) {
                 for (const transceiver of this.peerConnection?.getTransceivers() ?? []) {
                     if (RTCUtils.canTransceiverReceiveVideo(transceiver)) {
@@ -560,8 +584,19 @@ export class PeerConnectionController {
         };
 
         // Note using mic on android chrome requires SSL or chrome://flags/ "unsafely-treat-insecure-origin-as-secure"
-        const stream = await navigator.mediaDevices.getUserMedia(mediaSendOptions);
+        // A denied or missing microphone rejects; treat it as "no stream" so the recvonly fallback runs.
+        const stream: MediaStream | null = await navigator.mediaDevices
+            .getUserMedia(mediaSendOptions)
+            .catch((err): null => {
+                Logger.Warning(`Microphone unavailable, continuing without it - ${err}`);
+                return null;
+            });
         if (stream) {
+            if (!this.peerConnection) {
+                // The connection was closed while the permission prompt was open, so nothing will send this.
+                stream.getTracks().forEach((track) => track.stop());
+                return;
+            }
             if (hasAudioReceiver) {
                 for (const transceiver of this.peerConnection?.getTransceivers() ?? []) {
                     if (RTCUtils.canTransceiverReceiveAudio(transceiver)) {
