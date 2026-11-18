@@ -1,5 +1,0 @@
----
-'@epicgames-ps/wilbur': minor
----
-
-Add `--player_token` (or `--player_token_file`), an optional shared token that a player must present to connect. It is checked with the `playerWsOptions.verifyClient` seam the security guidelines already recommend, so a player that cannot present it is refused during the HTTP upgrade with `401` and never becomes a connection — which is what keeps the config message, and any TURN credential in its peer options, away from it. The token is accepted as a `?token=` query parameter or an `Authorization: Bearer` header, compared over SHA-256 digests so neither its length nor the position of the first difference is observable, removed from the request before the connection is logged, and kept out of `--save`, the `--log_config` dump, the `--stdin` config dump and — when `--player_token_file` is used — the process command line. Each refusal is logged with its source address, since the player port is not covered by the HTTP rate limiter. Streamer and SFU connections are unaffected, and no player connection is refused when no token is supplied. See `Docs/Security-Guidelines.md`.
