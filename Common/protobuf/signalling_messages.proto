@@ -1,5 +1,10 @@
 syntax = "proto3";
 
+// Messages travel as JSON objects, using the field names below as keys.
+//
+// Player ids are strings. The original Pixel Streaming plugin sends a numeric id as a JSON
+// number, so receivers should accept a number wherever a playerId is expected.
+
 /**
  * This is just a helper message type that allows us to use a "base interface"
  * in code to describe that all messages should at least have a 'type field'.
@@ -245,8 +250,9 @@ message disconnectPlayer {
 message ping {
   // Should always be 'ping'
   string type = 1;
-  // The current time
-  int32 time = 2;
+  // The current time since the Unix epoch. Browsers send milliseconds, which do not fit in
+  // 32 bits; Unreal Engine sends seconds. The receiver echoes it back unchanged in `pong`.
+  double time = 2;
 }
 
 /**
@@ -257,7 +263,7 @@ message pong {
   // Should always be 'pong'
   string type = 1;
   // The echoed time from the ping message
-  int32 time = 2;
+  double time = 2;
 }
 
 /**
@@ -293,6 +299,9 @@ message layerPreference {
 message dataChannelRequest {
   // Should always be 'dataChannelRequest'
   string type = 1;
+  // The player making the request. Set by the signalling server when it forwards the message
+  // to the SFU; a player does not need to send it.
+  optional string playerId = 2;
 }
 
 /**
@@ -317,6 +326,9 @@ message peerDataChannels {
 message peerDataChannelsReady {
   // Should always be 'peerDataChannelsReady'
   string type = 1;
+  // The player whose data channels are ready. Set by the signalling server when it forwards
+  // the message to the SFU; a player does not need to send it.
+  optional string playerId = 2;
 }
 
 /**
@@ -332,6 +344,9 @@ message streamerDataChannels {
   int32 sendStreamId = 3;
   // The channel ID to use for receiving data.
   int32 recvStreamId = 4;
+  // The player behind the SFU these channels are for. Set by the SFU. The original Pixel
+  // Streaming plugin ignores the message without it.
+  optional string playerId = 5;
 }
 
 /**
