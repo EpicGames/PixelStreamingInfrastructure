@@ -1,4 +1,4 @@
-import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.8';
+import { Logger } from '@epicgames-ps/lib-pixelstreamingcommon-ue5.7';
 import { Config, OptionParameters } from '../Config/Config';
 import { PeerConnectionController } from './PeerConnectionController';
 import { getCodecOption } from '../Util/CodecUtils';
