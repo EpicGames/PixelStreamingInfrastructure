@@ -3,6 +3,7 @@ const WebSocket = require('ws');
 const mediasoup = require('mediasoup');
 const mediasoupSdp = require('@epicgames-ps/mediasoup-sdp-bridge');
 const minimist = require('minimist');
+const fs = require('fs');
 
 if (!config.retrySubscribeDelaySecs) {
     config.retrySubscribeDelaySecs = 10;
@@ -152,7 +153,9 @@ function cancelStreamerSearch() {
 
 function connectSignalling(server) {
     console.log("Connecting to Signalling Server at %s", server);
-    signalServer = new WebSocket(server);
+    // The token goes in a header rather than the URL, which is logged above on every reconnect.
+    const options = config.signallingToken ? { headers: { Authorization: `Bearer ${config.signallingToken}` } } : undefined;
+    signalServer = new WebSocket(server, options);
     signalServer.addEventListener("open", _ => { console.log(`Connected to signalling server`); });
     signalServer.addEventListener("error", result => { console.log(`Error: ${result.message}`); });
     signalServer.addEventListener("message", result => onSignallingMessage(result.data));
@@ -560,10 +563,24 @@ async function main() {
     if ('signallingURL' in argv) {
         config.signallingURL = argv['signallingURL'];
     }
+    if ('signallingToken' in argv) {
+        config.signallingToken = String(argv['signallingToken']);
+    }
+    if ('signallingTokenFile' in argv) {
+        config.signallingTokenFile = String(argv['signallingTokenFile']);
+    }
+    if (config.signallingTokenFile) {
+        // Trimmed for the trailing newline `echo $TOKEN > file` leaves. An empty file is refused
+        // rather than read as "no token", which would connect without one and be refused anyway.
+        config.signallingToken = fs.readFileSync(config.signallingTokenFile, 'utf-8').trim();
+        if (!config.signallingToken) {
+            throw new Error(`signallingTokenFile ${config.signallingTokenFile} is empty.`);
+        }
+    }
 
     console.log('Starting Mediasoup...');
     console.log("Config = ");
-    console.log(config);
+    console.log({ ...config, signallingToken: config.signallingToken ? '<redacted>' : '' });
 
     mediasoupRouter = await startMediasoup();
     dataRouter = await createDataRouter();

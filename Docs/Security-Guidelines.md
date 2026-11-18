@@ -23,7 +23,9 @@ By following these tips, you can enhance the security of your Pixel Streaming se
 
 ## Authenticating and authorizing connections
 
-The signalling server **intentionally ships no authentication**. The streamer, player and SFU ports accept any connection, and any deployment is expected to bring its own authentication and authorization appropriate to its environment. In particular, the streamer port is designed to sit on a trusted/private network and should never be exposed directly to the internet without a front door of your own.
+The signalling server **only ships optional shared tokens for the player, streamer and SFU ports and the REST API** ([below](#shared-tokens)) — no identity, no sessions, no login flow. Each is off by default, and any deployment is expected to bring its own authentication and authorization appropriate to its environment. Keep these ports on a trusted/private network unless they are protected by the built-in token or a front door of your own.
+
+When the streamer runs on the same machine as the signalling server, or reaches it through a tunnel or proxy that ends there, `--streamer_host 127.0.0.1` keeps the streamer port off the network altogether: it listens on that address only. `--sfu_host` does the same for the SFU port. Both default to every address, as before.
 
 To make it practical to add your own auth without forking, the `Signalling` library exposes a few seams. None of these provide credentials or a login flow — they are hooks where *your* policy plugs in.
 
@@ -48,6 +50,68 @@ const server = new SignallingServer({
     }
 });
 ```
+
+#### Shared tokens
+
+The signalling server application implements the simplest useful case on top of that hook, for a deployment that needs a door rather than an identity — a kiosk, an internal demo, a staging environment that should not be open to whoever finds the address.
+
+Give it `--player_token <token>` (or `--player_token_file`) and every player must present that token to connect. `--streamer_token` and `--streamer_token_file` provide the same protection for streamers, and `--sfu_token` and `--sfu_token_file` for SFUs. A peer can send its token as a `?token=` query parameter or an `Authorization: Bearer` header. A peer that does not is refused at the HTTP upgrade with `401`, so it never becomes a connection and is never sent the config message.
+
+```
+wilbur --player_token 8f14e45f-ea8d-4b3f-b6de-1cd97b4e2d21
+wilbur --streamer_token_file /run/secrets/pixel-streamer-token
+```
+
+The token has to reach the **signalling WebSocket**, which is not the same thing as the page URL. The bundled frontend builds its signalling URL from the page's protocol, hostname and port and nothing else, so putting `?token=` on the page address does not do it — the page loads normally and then the stream silently never starts. Give it the whole signalling URL instead, with the frontend's `ss` setting:
+
+```
+https://your-server/?ss=wss%3A%2F%2Fyour-server%2F%3Ftoken%3D8f14e45f-ea8d-4b3f-b6de-1cd97b4e2d21
+```
+
+A deployment serving its own page can do better than that by constructing the URL itself, which is what most will want:
+
+```ts
+const stream = new PixelStreaming(config); // config with SignallingServerUrl already set to
+                                           // `wss://your-server/?token=${yourToken}`
+```
+
+A **streamer** has no page and no `ss` setting — it is the UE instance, and the token goes on the signalling URL it is launched with, because that URL *is* its signalling WebSocket:
+
+```
+UEGame.exe -PixelStreamingSignallingURL="ws://your-server:8888?token=8f14e45f-ea8d-4b3f-b6de-1cd97b4e2d21"
+```
+
+That is `--streamer_port` (8888 by default), not the player port. An engine predating Pixel Streaming 2 takes the same URL through `-PixelStreamingURL`. The older `-PixelStreamingIP`/`-PixelStreamingPort` pair builds a bare `ws://address:port/` URL with no query string, so it cannot carry a token: a streamer that has to pass `--streamer_token` must be given the URL form.
+
+The reference **SFU** sends its token in an `Authorization: Bearer` header, given as `signallingToken` (or `signallingTokenFile`) in its `config.js` or on its command line. Use that rather than adding `?token=` to its `signallingURL`, which the SFU prints at startup and on every reconnect:
+
+```
+node sfu_server.js --signallingURL=ws://your-server:8889 --signallingTokenFile=/run/secrets/pixel-sfu-token
+```
+
+Each option configures **one shared token, the same for every peer on that listener** — it does not identify a user, it does not expire, and revoking it means restarting the server with a new one. It answers "may this connection exist at all", which is the question a `--turn_secret` deliberately does not answer. If you need sessions, per-user revocation, or an identity attached to a connection, supply your own `verifyClient` instead; the flags exist so that a deployment which genuinely only needs a door does not have to fork the reference server to get one.
+
+Four things to know before relying on it:
+
+- **Each flag gates one door.** Configure a token for every listener that is exposed; one left without a token is open, whatever the others are set to.
+- **Nothing rate limits guessing.** The `express-rate-limit` middleware only sees HTTP requests, and a WebSocket upgrade is a separate event it never sees, so a wrong token costs an attacker one round trip. Each refusal is logged with its source address, and the server warns at startup about a token short enough to matter. Use a long random one — a GUID is a good default.
+- **A token in a query string is visible to anything that logs URLs** — a reverse proxy's access log, browser history, and the frontend's own console line naming the URL it is connecting to — and it is the only option a browser has, since a WebSocket opened from a page cannot set headers. The server removes it from its own connection log, but it cannot reach anything in front of it. Serve over `https`/`wss`, and prefer the `Authorization` header wherever the client is not a browser.
+- **It is compared byte for byte.** A `+` in a query string means a space, and two Unicode spellings of the same text are different tokens. A GUID avoids both.
+
+#### The REST API
+
+`--rest_api` serves `/api` on the player port. It lists every connected player with their IP address, every streamer, and the server configuration, so treat it as an operator interface rather than part of the player page. The player and streamer tokens do not cover it: they are checked at the WebSocket upgrade, which an ordinary HTTP request never reaches.
+
+Give it `--rest_api_token <token>` (or `--rest_api_token_file`) and every request under `/api`, including the API definition at `/api/api-definition`, must send that token in an `Authorization: Bearer` header. A request that does not is refused with `401`, and the refusal is logged with its source address. Unlike the WebSocket listeners, the REST API does not accept a `?token=` query parameter: any HTTP client can set the header, and a token in a URL ends up in proxy logs and browser history.
+
+```
+wilbur --rest_api --rest_api_token_file /run/secrets/pixel-rest-api-token
+curl -H "Authorization: Bearer $(cat /run/secrets/pixel-rest-api-token)" https://your-server/api/players
+```
+
+Without a token the REST API stays open to anyone who can reach the player port, as before, and the server warns at startup. Use a different token from `--player_token`: anything given the player token can connect as a player, and should not be able to list other players.
+
+`GET /api/config` replaces the `username` and `credential` of every ICE server in the peer options with `<redacted>`, with or without a token, and returns only the ports, the subscriber limit, the keepalive timeout, the peer options and the protocol version.
 
 ### Recovering the authenticated identity
 
@@ -92,6 +156,6 @@ Three things are worth understanding before choosing a TTL:
 
 - **Only players are given a limited credential.** A streamer or SFU receives its configuration once, when it connects, and there is no message that replaces it — so an expiry there would set a deadline on the stream rather than on an attacker. Those peers are issued a credential that outlives any plausible uptime. The exposure this feature exists to close is a credential shared by every browser that loads a page; a streamer is deployed by the operator on a host they control. If you want it rotated too, use `peerOptionsProvider` directly.
 - **A TTL may gate only the allocation, not the session.** Some TURN servers check the credential when a relay is allocated and not again, so a session already running continues past the expiry; others may re-check. Check your server before assuming a short TTL cannot interrupt a long call — with coturn, allocations have been reported to survive it.
-- **It does not decide who may obtain a credential.** Anything that can open a player WebSocket is sent one, so a short TTL limits how long a leaked credential stays useful, not who is issued one. Use the WebSocket upgrade hook above for that.
+- **It does not decide who may obtain a credential.** Anything that can open a player WebSocket is sent one, so a short TTL limits how long a leaked credential stays useful, not who is issued one. Use the WebSocket upgrade hook above for that — [`--player_token`](#shared-tokens) is the built-in way, and the server warns at startup when it is issuing TURN credentials without one.
 
 These hooks are deliberately policy-free: the library gives you the connection, its request, and the id it is asking for — what counts as a valid token, a permitted id or a valid credential is entirely up to your deployment.

@@ -9,6 +9,8 @@ Configuration is handled through the single config.js file.
 | Name | Type | Default | Description |
 |-|-|-|-|
 | signallingURL | String | 'http://localhost:8889' | The URL pointing to the signalling server we want to connect to. |
+| signallingToken | String | '' | The token to present when the signalling server was started with `--sfu_token`. Sent as an `Authorization: Bearer` header. Also `--signallingToken=`. |
+| signallingTokenFile | String | '' | Reads `signallingToken` from this file, so it does not appear on the command line. Also `--signallingTokenFile=`. |
 | SFUId | String | 'SFU' | The name this peer will be given that will then be displayed in the streamer list. Peers wishing to receive from this SFU should subscribe to this ID. |
 | subscribeStreamerId | String | 'DefaultStreamer' | This is the name of the streamer that this SFU should subscribe to and re-stream. |
 | retrySubscribeDelaySecs | Number | 10 | If subscribing to the given streamer fails, wait this many seconds before trying again. |
