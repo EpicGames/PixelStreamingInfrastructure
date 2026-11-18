@@ -1,4 +1,4 @@
-import { Config, OptionParameters } from '../Config/Config';
+import { Config, Flags, OptionParameters } from '../Config/Config';
 import { PeerConnectionController } from './PeerConnectionController';
 import { getCodecOption } from '../Util/CodecUtils';
 import { mockRTCPeerConnection, unmockRTCPeerConnection } from '../__test__/mockRTCPeerConnection';
@@ -228,5 +228,155 @@ describe('PeerConnectionController', () => {
         await receiveOffer(peerConnectionController, config, ueOfferedCodecs);
 
         expect(setCodecPreferencesSpy).not.toHaveBeenCalled();
+    });
+
+    describe('Microphone and SDP munging', () => {
+        const originalMediaDevices = Object.getOwnPropertyDescriptor(global.navigator, 'mediaDevices');
+        let getUserMediaSpy: jest.Mock;
+
+        const stubGetUserMedia = (result: MediaStream | null) => {
+            getUserMediaSpy = jest.fn().mockResolvedValue(result);
+            Object.defineProperty(global.navigator, 'mediaDevices', {
+                value: { getUserMedia: getUserMediaSpy },
+                configurable: true
+            });
+        };
+
+        afterEach(() => {
+            if (originalMediaDevices) {
+                Object.defineProperty(global.navigator, 'mediaDevices', originalMediaDevices);
+            } else {
+                delete (global.navigator as { mediaDevices?: MediaDevices }).mediaDevices;
+            }
+        });
+
+        const sampleSDP = [
+            'v=0',
+            'o=- 123456 2 IN IP4 127.0.0.1',
+            's=-',
+            't=0 0',
+            'm=audio 9 UDP/TLS/RTP/SAVPF 111',
+            'c=IN IP4 0.0.0.0',
+            'a=rtpmap:111 opus/48000/2',
+            'a=fmtp:111 minptime=10;useinbandfec=1',
+            'm=video 9 UDP/TLS/RTP/SAVPF 96',
+            'c=IN IP4 0.0.0.0',
+            'a=fmtp:96 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f'
+        ].join('\r\n') + '\r\n';
+
+        it('should append sprop-maxcapturerate when useMic is enabled', () => {
+            const config = new Config();
+            const peerConnectionController = new PeerConnectionController({}, config, '');
+            const munged = peerConnectionController.mungeSDP(sampleSDP, true);
+
+            expect(munged).toContain(
+                'a=fmtp:111 minptime=10;maxaveragebitrate=510000;sprop-maxcapturerate=48000;stereo=1;useinbandfec=1'
+            );
+            expect(munged).toContain('x-google-start-bitrate=10000;x-google-max-bitrate=100000');
+        });
+
+        it('should not append sprop-maxcapturerate when useMic is disabled', () => {
+            const config = new Config();
+            const peerConnectionController = new PeerConnectionController({}, config, '');
+            const munged = peerConnectionController.mungeSDP(sampleSDP, false);
+
+            expect(munged).toContain(
+                'a=fmtp:111 minptime=10;maxaveragebitrate=510000;stereo=1;useinbandfec=1'
+            );
+            expect(munged).not.toContain('sprop-maxcapturerate');
+        });
+
+        it('should force mono audio in SDP when ForceMonoAudio flag is enabled', () => {
+            const config = new Config();
+            config.setFlagEnabled(Flags.ForceMonoAudio, true);
+            const peerConnectionController = new PeerConnectionController({}, config, '');
+            const munged = peerConnectionController.mungeSDP(sampleSDP, false);
+
+            expect(munged).toContain(
+                'a=fmtp:111 minptime=10;maxaveragebitrate=510000;stereo=0;useinbandfec=1'
+            );
+        });
+
+        it('should configure audio transceiver as recvonly when useMic is disabled', async () => {
+            const config = new Config();
+            const peerConnectionController = new PeerConnectionController({}, config, '');
+            const addTransceiverSpy = jest.spyOn(peerConnectionController.peerConnection, 'addTransceiver');
+
+            await peerConnectionController.setupTransceiversAsync(false, false);
+
+            expect(addTransceiverSpy).toHaveBeenCalledWith('audio', { direction: 'recvonly' });
+        });
+
+        it('should set audio transceiver direction to sendrecv when useMic is enabled and audio receiver exists', async () => {
+            const config = new Config();
+            const peerConnectionController = new PeerConnectionController({}, config, '');
+
+            const mockTrack = {
+                kind: 'audio',
+                stop: jest.fn()
+            } as unknown as MediaStreamTrack;
+
+            const mockStream = {
+                getTracks: () => [mockTrack]
+            } as unknown as MediaStream;
+
+            const mockTransceiver = {
+                receiver: { track: { kind: 'audio' } },
+                sender: { replaceTrack: jest.fn().mockResolvedValue(undefined) },
+                direction: 'recvonly'
+            } as unknown as RTCRtpTransceiver;
+
+            jest.spyOn(peerConnectionController.peerConnection, 'getTransceivers').mockReturnValue([mockTransceiver]);
+            stubGetUserMedia(mockStream);
+
+            await peerConnectionController.setupTransceiversAsync(true, false);
+
+            expect(getUserMediaSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    video: false,
+                    audio: expect.objectContaining({
+                        sampleRate: 48000,
+                        channelCount: 1
+                    })
+                })
+            );
+            expect(mockTransceiver.direction).toBe('sendrecv');
+            expect(mockTransceiver.sender.replaceTrack).toHaveBeenCalledWith(mockTrack);
+        });
+
+        it('should add sendrecv audio transceiver when useMic is enabled and no audio receiver exists', async () => {
+            const config = new Config();
+            const peerConnectionController = new PeerConnectionController({}, config, '');
+
+            const mockTrack = {
+                kind: 'audio',
+                stop: jest.fn()
+            } as unknown as MediaStreamTrack;
+
+            const mockStream = {
+                getTracks: () => [mockTrack]
+            } as unknown as MediaStream;
+
+            jest.spyOn(peerConnectionController.peerConnection, 'getTransceivers').mockReturnValue([]);
+            const addTransceiverSpy = jest.spyOn(peerConnectionController.peerConnection, 'addTransceiver');
+            stubGetUserMedia(mockStream);
+
+            await peerConnectionController.setupTransceiversAsync(true, false);
+
+            expect(addTransceiverSpy).toHaveBeenCalledWith(mockTrack, { direction: 'sendrecv' });
+        });
+
+        it('should fall back to recvonly audio when microphone getUserMedia returns null', async () => {
+            const config = new Config();
+            const peerConnectionController = new PeerConnectionController({}, config, '');
+
+            jest.spyOn(peerConnectionController.peerConnection, 'getTransceivers').mockReturnValue([]);
+            const addTransceiverSpy = jest.spyOn(peerConnectionController.peerConnection, 'addTransceiver');
+            stubGetUserMedia(null);
+
+            await peerConnectionController.setupTransceiversAsync(true, false);
+
+            expect(addTransceiverSpy).toHaveBeenCalledWith('audio', { direction: 'recvonly' });
+        });
     });
 });
