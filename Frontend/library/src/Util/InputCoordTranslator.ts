@@ -51,7 +51,13 @@ export class InputCoordTranslator {
         if (normalizedX < 0.0 || normalizedX > 1.0 || normalizedY < 0.0 || normalizedY > 1.0) {
             return { inRange: false, x: 65535, y: 65535 };
         } else {
-            return { inRange: true, x: normalizedX * 65536, y: normalizedY * 65536 };
+            // The range check above is inclusive, so the right and bottom edges normalize to exactly
+            // 1.0. 1.0 * 65536 does not fit in the uint16 these are sent as and would wrap to 0.
+            return {
+                inRange: true,
+                x: Math.min(normalizedX * 65536, 65535),
+                y: Math.min(normalizedY * 65536, 65535)
+            };
         }
     }
 
